@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manlung Tech City · Cyber Recovery</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        #typing-text {
+            font-family: 'Poppins', 'Inter', -apple-system, sans-serif;
+            font-size: clamp(1.6rem, 5vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff; /* fallback for browsers without background-clip:text support */
+            background: linear-gradient(90deg, #38bdf8, #2dd4bf, #4ade80);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            text-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
+            margin-bottom: 0.6rem;
+            min-height: 1.3em; /* prevents layout jump while the typewriter animates in */
+        }
+        #typing-text::after {
+            content: "|";
+            margin-left: 4px;
+            -webkit-text-fill-color: #38bdf8;
+            color: #38bdf8;
+            animation: typingCursorBlink 0.45s infinite;
+        }
+        @keyframes typingCursorBlink {
+            50% { opacity: 0; }
+        }
+        .service-icon-image {
+            width: 2.3rem;
+            height: 2.3rem;
+            object-fit: contain;
+            display: block;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 480px) {
+            #typing-text { font-size: 1.5rem; letter-spacing: -0.3px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                <h1><i class="fas fa-shield-halved"></i> Manlung Tech City</h1>
+                <span>Cyber Recovery & Digital Investigation Portal</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i> Dark
+                </button>
+                <a href="/client/dashboard.html" class="btn btn-outline">
+                    <i class="fas fa-user"></i> My Cases
+                </a>
+                <a href="/donate.html" class="btn btn-outline">
+                    <i class="fas fa-heart"></i> Donate
+                </a>
+                <a href="/client/request.html" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> New Request
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Hero -->
+        <section class="hero">
+            <h1 id="typing-text"></h1>
+            <h2>Professional Cyber Recovery Services</h2>
+            <p>Submit your digital recovery request securely. Our team of experts will investigate and assist with your case.</p>
+            <a href="/client/request.html" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Submit a Request
+            </a>
+            <a href="/donate.html" class="btn btn-outline">
+                <i class="fas fa-heart"></i> Support Our Work
+            </a>
+        </section>
+
+        <!-- Features -->
+        <div class="features">
+            <div class="feature-card" onclick="openServiceModal('device')" style="cursor:pointer;">
+                <img class="service-icon-image" src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/812733019efc52dad38dd2cb8dd984ad_icon-Photoroom.png" alt="Device Recovery">
+                <h3>Device Recovery</h3>
+                <p>Lost phone, laptop, tablet or smartwatch? We'll help track and recover your device.</p>
+                <span style="display:inline-block; margin-top:0.6rem; color:var(--accent); font-size:0.85rem; font-weight:600;">Learn more <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="feature-card" onclick="openServiceModal('identity')" style="cursor:pointer;">
+                <img class="service-icon-image" src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/images-Photoroom.png" alt="Identity Theft">
+                <h3>Identity Theft</h3>
+                <p>Protect your identity and recover compromised accounts with our expert assistance.</p>
+                <span style="display:inline-block; margin-top:0.6rem; color:var(--accent); font-size:0.85rem; font-weight:600;">Learn more <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="feature-card" onclick="openServiceModal('scam')" style="cursor:pointer;">
+                <img class="service-icon-image" src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/images%20(1)-Photoroom.png" alt="Scam Investigation">
+                <h3>Scam Investigation</h3>
+                <p>Online scams, fraud, and phishing — we investigate and help you recover lost assets.</p>
+                <span style="display:inline-block; margin-top:0.6rem; color:var(--accent); font-size:0.85rem; font-weight:600;">Learn more <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="feature-card" onclick="openServiceModal('security')" style="cursor:pointer;">
+                <img class="service-icon-image" src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/3231340.png" alt="Security Assessment">
+                <h3>Security Assessment</h3>
+                <p>Network security audits and vulnerability assessments for organizations.</p>
+                <span style="display:inline-block; margin-top:0.6rem; color:var(--accent); font-size:0.85rem; font-weight:600;">Learn more <i class="fas fa-arrow-right"></i></span>
+            </div>
+        </div>
+
+        <!-- Service detail modal -->
+        <div id="serviceModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(10,18,40,0.55); align-items:flex-start; justify-content:center; padding:3rem 1rem; overflow-y:auto; z-index:50;" onclick="if(event.target===this) closeServiceModal()">
+            <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; max-width:640px; width:100%; padding:2rem;">
+                <div id="serviceModalBody"></div>
+            </div>
+        </div>
+
+        <!-- Track Case -->
+        <div class="card">
+            <div class="card-title"><i class="fas fa-search"></i> Track Your Case</div>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <input type="text" id="trackInput" placeholder="Enter Case ID (e.g., MTC-2026-001)" style="flex:1; min-width:200px;">
+                <button class="btn btn-primary" onclick="trackCase()">
+                    <i class="fas fa-arrow-right"></i> Track
+                </button>
+            </div>
+            <div id="trackResult" style="margin-top: 1rem; padding: 1rem; border-radius: 12px; background: var(--page-bg); border: 1px solid var(--card-border); display: none;"></div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="site-footer-brand">
+                <strong><i class="fas fa-shield-halved"></i> Manlung Tech City</strong>
+                <span>Cyber Recovery &amp; Digital Investigation Portal</span>
+            </div>
+            <div class="site-footer-links">
+                <a href="/about.html">About</a>
+                <a href="/terms.html">Terms</a>
+                <a href="/login.html">Client Portal</a>
+                <a href="/client/request.html">New Recovery Request</a>
+            </div>
+            <div class="site-footer-security">
+                <span><i class="fas fa-lock"></i> Secure portal</span>
+                <span><i class="fas fa-mobile-screen-button"></i> Mobile friendly</span>
+            </div>
+        </div>
+        <div class="site-footer-bottom">&copy; 2026 Manlung Tech City. All rights reserved.</div>
+    </footer>
+
+    <script>
+        // Typing/deleting header animation. Respects prefers-reduced-motion
+        // (some users get motion sickness from this kind of effect) and
+        // fails silently if the element isn't on the page for any reason.
+        (function typingHeader() {
+            const element = document.getElementById('typing-text');
+            if (!element) return;
+
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const text = 'Welcome to Manlung Recovery Portal';
+
+            if (prefersReducedMotion) {
+                element.textContent = text;
+                return;
+            }
+
+            let index = 0;
+            let deleting = false;
+
+            function typeWriter() {
+                if (!deleting) {
+                    element.textContent = text.substring(0, index + 1);
+                    index++;
+                    if (index === text.length) {
+                        deleting = true;
+                        setTimeout(typeWriter, 1400);
+                        return;
+                    }
+                    setTimeout(typeWriter, 45);
+                } else {
+                    element.textContent = text.substring(0, index - 1);
+                    index--;
+                    if (index === 0) {
+                        deleting = false;
+                        setTimeout(typeWriter, 400);
+                        return;
+                    }
+                    setTimeout(typeWriter, 25);
+                }
+            }
+            typeWriter();
+        })();
+
+        const SERVICE_DETAILS = {
+            device: {
+                icon: 'fa-mobile-alt',
+                title: 'Device Recovery',
+                defaultCaseType: 'Lost Phone Recovery',
+                intro: 'Lost or stolen phones, laptops, tablets, and smartwatches — traced and recovered wherever possible, working within the law.',
+                points: [
+                    'GPS and last-known-location tracing using your device\'s Find My/Google account history, carrier records, and IMEI lookups.',
+                    'Coordination with your mobile carrier to flag or block a stolen device\'s IMEI, and with local police where a report is warranted.',
+                    'Guidance on remotely locking or wiping a device before it\'s recovered, so your data stays protected either way.',
+                    'If the device turns up with a third party (sold on, pawned, etc.), we help document the chain of custody for law enforcement.',
+                ],
+                needed: 'Have ready: device make/model, IMEI (dial *#06# on most phones to find it), approximate last known location, and the Google/Apple account linked to it.',
+            },
+            identity: {
+                icon: 'fa-user-secret',
+                title: 'Identity Theft',
+                defaultCaseType: 'Identity Theft Assistance',
+                intro: 'Support recovering accounts and locking down your identity after a compromise — email, social media, banking, or government ID misuse.',
+                points: [
+                    'Step-by-step account recovery for compromised email, social media, and financial accounts, including working with each platform\'s own recovery/appeals process.',
+                    'Guidance on what to freeze or flag immediately (bank cards, credit lines, SIM swap protection) to stop further damage while the case is investigated.',
+                    'Help compiling the documentation platforms and banks typically require to prove identity theft occurred.',
+                    'Referral support for filing an official police report where required for insurance, bank disputes, or credit bureau action.',
+                ],
+                needed: 'Have ready: which accounts/services were affected, roughly when you noticed, and any suspicious emails, messages, or transactions you can show us.',
+            },
+            scam: {
+                icon: 'fa-bug',
+                title: 'Scam Investigation',
+                defaultCaseType: 'Online Scam Investigation',
+                intro: 'Investigation support for online scams, phishing, and fraud — from a fake seller to a full romance/investment scam.',
+                points: [
+                    'Evidence collection and preservation: chat logs, transaction records, screenshots, and scammer contact details, organized for a formal report.',
+                    'Tracing payment trails across bank transfers, mobile money (M-Pesa etc.), and crypto wallets where possible, to identify recovery options.',
+                    'Direct engagement with banks, mobile money providers, and platforms (social media, marketplaces) to report and request holds/reversals where applicable.',
+                    'Preparing a case file suitable for handing to police or a financial ombudsman if the case needs to escalate beyond what we can resolve directly.',
+                ],
+                needed: 'Have ready: any scammer contact info (phone, email, social handles, website), transaction references, and amounts lost.',
+            },
+            security: {
+                icon: 'fa-shield-alt',
+                title: 'Security Assessment',
+                defaultCaseType: 'Network Security Assessment',
+                intro: 'Network and systems security review for organizations — finding weaknesses before someone else does.',
+                points: [
+                    'Vulnerability scanning across your network, endpoints, and public-facing services to identify known exposures.',
+                    'Configuration review of firewalls, access controls, and Wi-Fi/network segmentation.',
+                    'A written report ranking findings by severity, with concrete remediation steps your team (or ours) can act on.',
+                    'Optional follow-up re-test after fixes are applied, to confirm the issues are actually closed.',
+                ],
+                needed: 'Have ready: a rough description of your network/systems and what prompted the request (routine audit, suspected incident, compliance requirement, etc.). Requires written authorization from someone with authority over the network — see the form\'s Network Investigation section.',
+            },
+        };
+
+        function openServiceModal(key) {
+            const s = SERVICE_DETAILS[key];
+            if (!s) return;
+            document.getElementById('serviceModalBody').innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2 style="display:flex; align-items:center; gap:10px;"><i class="fas ${s.icon}" style="color:var(--accent);"></i> ${s.title}</h2>
+                    <button class="btn btn-outline-dark" onclick="closeServiceModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <p style="color:var(--text-muted); margin-bottom:1rem;">${s.intro}</p>
+                <ul style="margin:0 0 1rem 1.2rem; padding:0; line-height:1.7;">
+                    ${s.points.map(p => `<li>${p}</li>`).join('')}
+                </ul>
+                <div class="notice" style="display:block;"><i class="fas fa-clipboard-list"></i> ${s.needed}</div>
+                <div style="margin-top:1.5rem;">
+                    <a href="/client/request.html?type=${encodeURIComponent(s.defaultCaseType)}" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Start a ${s.title} Request</a>
+                </div>
+            `;
+            document.getElementById('serviceModalOverlay').style.display = 'flex';
+        }
+        function closeServiceModal() {
+            document.getElementById('serviceModalOverlay').style.display = 'none';
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+            const btn = document.querySelector('.header-actions .btn-outline');
+            btn.innerHTML = document.body.classList.contains('dark')
+                ? '<i class="fas fa-sun"></i> Light'
+                : '<i class="fas fa-moon"></i> Dark';
+        }
+        (function applySavedTheme() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+                const btn = document.querySelector('.header-actions .btn-outline');
+                if (btn) btn.innerHTML = '<i class="fas fa-sun"></i> Light';
+            }
+        })();
+
+        async function trackCase() {
+            const caseId = document.getElementById('trackInput').value.trim();
+            const result = document.getElementById('trackResult');
+
+            if (!caseId) {
+                result.style.display = 'block';
+                result.innerHTML = '<span class="error-text">Please enter a Case ID.</span>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`);
+                const data = await response.json();
+
+                result.style.display = 'block';
+
+                if (data.success) {
+                    const c = data.case;
+                    result.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; margin-bottom:0.5rem;">
+                            <strong style="font-size:1.1rem;">${c.caseId}</strong>
+                            <span class="status-badge status-progress">${c.status}</span>
+                        </div>
+                        <div style="font-size:0.95rem; color:var(--text-muted);">
+                            <div><strong>Investigator:</strong> ${c.investigator || 'Not assigned'}</div>
+                            <div><strong>Last Updated:</strong> ${c.lastUpdated || 'N/A'}</div>
+                            ${c.publicNotes ? `<div style="margin-top:0.5rem;"><strong>Notes:</strong> ${c.publicNotes}</div>` : ''}
+                            ${c.recoveryLoc ? `<div><strong>Recovery Location:</strong> ${c.recoveryLoc}</div>` : ''}
+                            <div style="margin-top:0.5rem; background:var(--card-bg); padding:0.8rem; border-radius:12px;">
+                                <strong>Timeline</strong>
+                                <div style="margin-top:0.3rem; white-space:pre-line;">${c.timeline || 'Request Submitted ✅'}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `<span class="error-text">${data.error || 'Case not found'}</span>`;
+                }
+            } catch (error) {
+                result.style.display = 'block';
+                result.innerHTML = '<span class="error-text">Error tracking case. Please try again.</span>';
+                console.error('Track error:', error);
+            }
+        }
+
+        document.getElementById('trackInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') trackCase();
+        });
+    </script>
+    <script src="/js/call-webrtc.js"></script>
+    <script src="/js/call-widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login · Manlung Tech City</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { background: var(--navy-900); }
+        .center-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-container { background: #101f42; border: 1px solid #223257; }
+        .login-container .logo h1 { color: #fff; }
+        .login-container .logo span { color: #a9c0ec; }
+        .login-container label { color: #a9c0ec; }
+        .login-container input { background: #0b1730; border-color: #223257; color: #e6ecf5; }
+        .footer-text { text-align: center; margin-top: 1.5rem; color: #6b7a99; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <div class="center-wrap">
+        <div class="login-container">
+            <div class="logo">
+                <i class="fas fa-shield-halved"></i>
+                <h1>Admin Portal</h1>
+                <span>Manlung Tech City · Secure Access</span>
+                <div><span class="admin-badge"><i class="fas fa-lock"></i> Restricted</span></div>
+            </div>
+
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="adminUsername" placeholder="Enter username" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Login
+                </button>
+                <div id="loginError" class="error-text"></div>
+            </form>
+
+            <p style="text-align:center; margin-top:1rem;"><a href="/admin/register.html" style="color:#6ea8ff; font-size:0.85rem;">Have an Admin invitation? Create your account</a></p>
+            <div class="footer-text"><i class="fas fa-shield"></i> Protected by 256-bit encryption</div>
+        </div>
+    </div>
+
+    <script>
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorEl = document.getElementById('loginError');
+            errorEl.textContent = '';
+
+            try {
+                const response = await fetch('/api/auth/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('adminUser', JSON.stringify(data.user));
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    errorEl.textContent = data.error || 'Invalid credentials';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Connection error. Please try again.';
+                console.error('Login error:', error);
+            }
+        }
+
+        // If already logged in, skip straight to the dashboard
+        if (localStorage.getItem('adminToken')) {
+            window.location.href = '/admin/dashboard.html';
+        }
+    </script>
+</body>
+</html>

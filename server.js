@@ -1,0 +1,290 @@
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
+require('dotenv').config();
+
+const authRoutes = require('./routes/auth');
+const caseRoutes = require('./routes/cases');
+const configRoutes = require('./routes/config');
+const subscriptionRoutes = require('./routes/subscription');
+const callRoutes = require('./routes/calls');
+const donationRoutes = require('./routes/donations');
+const ownerRoutes = require('./routes/owner');
+const { supabase } = require('./config/supabase');
+
+const app = express();
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
+// CORS
+const allowedOrigins = String(process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || !allowedOrigins.length || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Origin not allowed'));
+  },
+}));
+
+// ============================================================
+// GENERAL API RATE LIMITER
+// ============================================================
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  // Call Admin polling routes have their own limiter below.
+  skip: (req) => {
+    return (
+      req.path.startsWith('/calls/admin/online') ||
+      req.path.startsWith('/calls/admin/offline') ||
+      req.path.startsWith('/calls/pending') ||
+      req.path.startsWith('/calls/availability')
+    );
+  },
+
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many API requests. Please wait a moment and try again.'
+    });
+  },
+});
+
+app.use('/api/', limiter);
+
+// ============================================================
+// CALL ADMIN POLLING RATE LIMITER
+// ============================================================
+
+const callPollingLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many call polling requests. Please wait a moment and try again.'
+    });
+  },
+});
+
+app.use('/api/calls/admin/online', callPollingLimiter);
+app.use('/api/calls/admin/offline', callPollingLimiter);
+app.use('/api/calls/pending', callPollingLimiter);
+app.use('/api/calls/availability', callPollingLimiter);
+
+// ============================================================
+// LOGIN RATE LIMITER
+// ============================================================
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many login attempts. Please wait 15 minutes and try again.'
+    });
+  },
+});
+
+app.use('/api/auth/admin/login', loginLimiter);
+app.use('/api/auth/client/login', loginLimiter);
+
+// ============================================================
+// PAYMENT RATE LIMITER
+// ============================================================
+
+const paymentLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many payment requests. Please wait a few minutes and try again.'
+    });
+  },
+});
+
+app.use('/api/subscription/initialize', paymentLimiter);
+app.use('/api/subscription/verify', paymentLimiter);
+app.use('/api/donations/initialize', paymentLimiter);
+app.use('/api/donations/verify', paymentLimiter);
+
+// ============================================================
+// CALL START RATE LIMITER
+// ============================================================
+
+const callStartLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many call attempts. Please wait before trying again.'
+    });
+  },
+});
+
+app.use('/api/calls/start', callStartLimiter);
+
+// ============================================================
+// BODY PARSERS
+// ============================================================
+
+app.use(express.json({
+  limit: '50mb',
+  verify: (req, _res, buf) => {
+    req.rawBody = buf;
+  },
+}));
+
+app.use(express.urlencoded({
+  extended: true,
+  limit: '50mb',
+}));
+
+// ============================================================
+// STATIC FRONTEND FILES
+// ============================================================
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ============================================================
+// HEALTH CHECK
+// ============================================================
+
+app.get('/api/health', async (req, res) => {
+  const health = {
+    status: 'ok',
+    server: 'up',
+    database: 'unknown',
+    timestamp: new Date().toISOString(),
+  };
+
+  try {
+    const { error } = await supabase
+      .from('recovery_cases')
+      .select('id', {
+        count: 'exact',
+        head: true,
+      })
+      .limit(1);
+
+    health.database = error ? 'error' : 'ok';
+
+    if (error) {
+      health.databaseError = error.message;
+    }
+  } catch (e) {
+    health.database = 'error';
+    health.databaseError = e.message;
+  }
+
+  res
+    .status(health.database === 'ok' ? 200 : 503)
+    .json(health);
+});
+
+// ============================================================
+// API ROUTES
+// ============================================================
+
+app.use('/api/auth', authRoutes);
+app.use('/api/cases', caseRoutes);
+app.use('/api/config', configRoutes);
+app.use('/api/subscription', subscriptionRoutes);
+
+// Alias for call-admin payment routes
+app.use('/api/payments/call-admin', subscriptionRoutes);
+
+app.use('/api/calls', callRoutes);
+app.use('/api/donations', donationRoutes);
+app.use('/api/owner', ownerRoutes);
+
+// ============================================================
+// ADMIN PAGES
+// ============================================================
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/login.html'));
+});
+
+app.get('/admin/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/login.html'));
+});
+
+// ============================================================
+// CLIENT LANDING PAGE
+// ============================================================
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
+
+// ============================================================
+// 404 FOR UNKNOWN API ROUTES
+// ============================================================
+
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'Not found',
+  });
+});
+
+// ============================================================
+// ERROR HANDLER
+// ============================================================
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  res.status(500).json({
+    success: false,
+    error: err.message || 'Something went wrong!',
+  });
+});
+
+// ============================================================
+// SERVER
+// ============================================================
+
+const PORT = process.env.PORT || 5000;
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`http://localhost:${PORT}`);
+    console.log(`Admin: http://localhost:${PORT}/admin`);
+  });
+}
+
+module.exports = app;

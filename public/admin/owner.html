@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Management · Manlung Tech City</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .role-badge { padding: 0.15rem 0.7rem; border-radius: 40px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+        .role-owner { background: #f7e7b0; color: #7d5d0a; }
+        .role-admin-active { background: var(--success-bg); color: var(--success); }
+        .role-admin-suspended { background: var(--danger-bg); color: var(--danger); }
+        .search-result-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; border: 1px solid var(--card-border); border-radius: 10px; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="admin-page-bg">
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                <h1><i class="fas fa-user-shield"></i> Admin Management</h1>
+                <span>Owner-only — assign, suspend, and remove admin access</span>
+            </div>
+            <div class="header-actions">
+                <a href="/admin/dashboard.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <button class="btn btn-danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" id="pageContent" style="display:none;">
+        <div class="card" style="border:2px solid var(--accent);">
+            <div class="card-title"><i class="fas fa-user-shield"></i> Owner Approval Queue</div>
+            <p style="color:var(--text-muted);font-size:.88rem;">Only the Owner can grant Admin access. Send an invitation below; after the invited person registers, their account appears here as <strong>Pending approval</strong>. Approving the request activates the Admin portal and case/call permissions.</p>
+            <div id="pendingAdminNotice" style="margin-top:.8rem;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-envelope"></i> Invite Admin</div>
+            <p style="color:var(--text-muted);font-size:.85rem;">The Owner sends an invitation. The invited person creates their own Admin username and password.</p>
+            <div style="display:flex;gap:.6rem;"><input id="inviteEmail" type="email" placeholder="admin@example.com" style="flex:1"><button class="btn btn-primary" onclick="inviteAdmin()">Send Invitation</button></div>
+            <div id="inviteResult" style="margin-top:.7rem;color:var(--text-muted);font-size:.85rem;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-users-gear"></i> Current Admins &amp; Owner</div>
+            <div id="adminsList"><p style="color:var(--text-muted);">Loading…</p></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-phone-volume"></i> Call Monitoring</div>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Owner-only call metadata. Admins and the Owner can go online from the main Admin dashboard and answer client calls; this page keeps the Owner in control of the audit trail.</p>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;">
+                <button class="btn btn-danger" onclick="clearCallLogs()"><i class="fas fa-trash"></i> Clear Call Logs</button>
+            </div>
+            <div id="ownerCalls"><p style="color:var(--text-muted);">Loading calls…</p></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Audit Log</div>
+            <div id="auditLog" style="max-height:320px; overflow-y:auto;"><p style="color:var(--text-muted);">Loading…</p></div>
+        </div>
+    </div>
+
+    <div id="deniedContent" style="display:none;" class="container">
+        <div class="card" style="text-align:center; padding:3rem;">
+            <i class="fas fa-lock" style="font-size:2.5rem; color:var(--danger); margin-bottom:1rem;"></i>
+            <p>This section is restricted to the site Owner.</p>
+            <a href="/admin/dashboard.html" class="btn btn-primary" style="margin-top:1rem;">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Manlung Tech City. All rights reserved.</p>
+        <p><i class="fas fa-lock"></i> 256-bit Encrypted &amp; Secure</p>
+    </footer>
+
+    <script>
+        const token = localStorage.getItem('adminToken');
+        if (!token) window.location.href = '/admin/login.html';
+
+        function authHeaders() { return { 'Authorization': `Bearer ${token}` }; }
+
+        async function handleUnauthorized(res) {
+            if (res.status === 401) {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                window.location.href = '/admin/login.html';
+                return true;
+            }
+            return false;
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            window.location.href = '/admin/login.html';
+        }
+
+        function roleBadge(admin) {
+            if (admin.role === 'owner') return '<span class="role-badge role-owner">Owner</span>';
+            if (admin.role === 'admin' && admin.admin_status === 'pending') return '<span class="role-badge" style="background:#f7e7b0;color:#7d5d0a">Pending approval</span>';
+            const cls = admin.admin_status === 'suspended' ? 'role-admin-suspended' : 'role-admin-active';
+            const label = admin.admin_status === 'suspended' ? 'Suspended' : 'Active';
+            return `<span class="role-badge ${cls}">${label}</span>`;
+        }
+
+        async function inviteAdmin() {
+            const email=document.getElementById('inviteEmail').value.trim(); const out=document.getElementById('inviteResult');
+            if(!email){out.textContent='Enter an email.';return;} out.textContent='Sending…';
+            const res=await fetch('/api/owner/invitations',{method:'POST',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify({email})});
+            const d=await res.json(); if(d.success){out.innerHTML=d.emailSent?'Invitation email sent.':`Email provider is not configured. Secure invitation link: <a href="${d.invitation.link}" target="_blank">Open invitation</a>`;document.getElementById('inviteEmail').value='';}else out.textContent=d.error||'Could not send invitation';
+        }
+
+        async function loadAdmins() {
+            const container = document.getElementById('adminsList');
+            try {
+                const res = await fetch('/api/owner/admins', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                if (res.status === 403) { showDenied(); return; }
+                const data = await res.json();
+                if (!data.success) { container.innerHTML = `<p style="color:var(--danger);">${data.error}</p>`; return; }
+
+                const pending = data.admins.filter(a => a.role === 'admin' && a.admin_status === 'pending');
+                const notice = document.getElementById('pendingAdminNotice');
+                if (notice) notice.innerHTML = pending.length ? `<div style="padding:.8rem 1rem;border-radius:12px;background:var(--warning-bg);color:var(--warning-text);font-weight:700;"><i class="fas fa-bell"></i> ${pending.length} Admin approval request${pending.length === 1 ? '' : 's'} waiting</div>` : '<div style="padding:.7rem 1rem;border-radius:12px;background:var(--success-bg);color:var(--success);">No pending Admin approvals.</div>';
+                if (!data.admins.length) { container.innerHTML = '<p style="color:var(--text-muted);">No admins yet.</p>'; return; }
+
+                container.innerHTML = data.admins.map(a => `
+                    <div class="case-item">
+                        <div class="case-info">
+                            <strong>${a.username}</strong>
+                            <span style="color:var(--text-muted); font-size:0.85rem;">${a.email || 'no email'}</span>
+                            ${roleBadge(a)}
+                            ${a.appointed_at ? `<span style="color:var(--text-muted); font-size:0.78rem;">appointed ${new Date(a.appointed_at).toLocaleDateString()}</span>` : ''}
+                        </div>
+                        ${a.role === 'admin' ? `
+                        <div style="display:flex; gap:6px;">
+                            ${a.admin_status === 'pending'
+                                ? `<button class="btn btn-success" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="approveAdmin('${a.id}')"><i class="fas fa-check"></i> Approve</button>`
+                                : a.admin_status === 'suspended'
+                                ? `<button class="btn btn-success" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="setStatus('${a.id}','active')"><i class="fas fa-check"></i> Reactivate</button>`
+                                : `<button class="btn btn-outline-dark" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="setStatus('${a.id}','suspended')"><i class="fas fa-pause"></i> Suspend</button>`
+                            }
+                            <button class="btn btn-danger" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="removeAdmin('${a.id}','${a.username}')"><i class="fas fa-user-minus"></i> Remove</button>
+                        </div>` : '<span style="color:var(--text-muted); font-size:0.8rem;">Protected</span>'}
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p style="color:var(--danger);">Network error loading admins.</p>';
+            }
+        }
+
+        async function setStatus(userId, status) {
+            const verb = status === 'suspended' ? 'suspend' : 'reactivate';
+            if (!confirm(`Are you sure you want to ${verb} this admin?`)) return;
+            try {
+                const res = await fetch(`/api/owner/admins/${userId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ status }),
+                });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (data.success) { loadAdmins(); loadAuditLog(); }
+                else alert(data.error || 'Could not update status.');
+            } catch (e) {
+                console.error(e);
+                alert('Network error.');
+            }
+        }
+        window.setStatus = setStatus;
+
+        async function removeAdmin(userId, username) {
+            if (!confirm(`Remove admin privileges from ${username}? Their account, case history, and call history will be preserved — they'll just become a regular client account. You can reassign them as admin again later.`)) return;
+            try {
+                const res = await fetch(`/api/owner/admins/${userId}`, { method: 'DELETE', headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (data.success) { loadAdmins(); loadAuditLog(); }
+                else alert(data.error || 'Could not remove admin privileges.');
+            } catch (e) {
+                console.error(e);
+                alert('Network error.');
+            }
+        }
+        window.removeAdmin = removeAdmin;
+
+        async function approveAdmin(userId) { const res=await fetch(`/api/owner/admins/${userId}/approve`,{method:'PUT',headers:authHeaders()}); const d=await res.json(); if(!res.ok){alert(d.error||'Approval failed');return;} loadAdmins(); loadAuditLog(); }
+        async function clearCallLogs() {
+            if (!confirm('Clear all call logs? This cannot be undone.')) return;
+            try {
+                const res = await fetch('/api/calls/owner/logs', { method: 'DELETE', headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    alert(data.error || 'Could not clear call logs.');
+                    return;
+                }
+                loadOwnerCalls();
+            } catch (e) {
+                console.error(e);
+                alert('Network error clearing call logs.');
+            }
+        }
+        window.clearCallLogs = clearCallLogs;
+
+        async function loadOwnerCalls() {
+            const container = document.getElementById('ownerCalls');
+            try {
+                const res = await fetch('/api/calls/owner/monitor', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                if (res.status === 403) { container.innerHTML = '<p style="color:var(--danger);">Owner access required.</p>'; return; }
+                const data = await res.json();
+                if (!data.success || !data.calls.length) { container.innerHTML = '<p style="color:var(--text-muted);">No calls recorded yet.</p>'; return; }
+                container.innerHTML = data.calls.map(c => `
+                    <div class="case-item">
+                        <div class="case-info">
+                            <strong><i class="fas fa-phone"></i> ${c.client_name || 'Client'}</strong>
+                            <span style="color:var(--text-muted);">${c.client_email || ''}</span>
+                            <span class="status-badge">${c.status}</span>
+                            ${c.case_id ? `<span style="color:var(--text-muted);">Case: ${c.case_id}</span>` : ''}
+                        </div>
+                        <div style="font-size:0.78rem; color:var(--text-muted);">${new Date(c.created_at).toLocaleString()}</div>
+                    </div>`).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p style="color:var(--danger);">Network error loading calls.</p>';
+            }
+        }
+
+        async function loadAuditLog() {
+            const container = document.getElementById('auditLog');
+            try {
+                const res = await fetch('/api/owner/audit-log', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!data.success) { container.innerHTML = `<p style="color:var(--danger);">${data.error}</p>`; return; }
+                if (!data.log.length) { container.innerHTML = '<p style="color:var(--text-muted);">No actions recorded yet.</p>'; return; }
+
+                const actionLabels = {
+                    assigned_admin: 'assigned Admin role to',
+                    invited_admin: 'sent an Admin invitation to',
+                    approved_admin: 'approved Admin access for',
+                    removed_admin: 'removed Admin privileges from',
+                    suspended_admin: 'suspended',
+                    reactivated_admin: 'reactivated',
+                };
+                container.innerHTML = data.log.map(entry => `
+                    <div style="padding:0.5rem 0; border-bottom:1px solid var(--card-border); font-size:0.85rem;">
+                        <strong>${entry.actor_username}</strong> ${actionLabels[entry.action] || entry.action} <strong>${entry.target_username}</strong>
+                        <div style="color:var(--text-muted); font-size:0.78rem;">${new Date(entry.created_at).toLocaleString()}</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p style="color:var(--danger);">Network error loading audit log.</p>';
+            }
+        }
+
+        function showDenied() {
+            document.getElementById('pageContent').style.display = 'none';
+            document.getElementById('deniedContent').style.display = 'block';
+        }
+
+        async function init() {
+            try {
+                const res = await fetch('/api/auth/verify', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!data.success || data.user.role !== 'owner') {
+                    showDenied();
+                    return;
+                }
+                document.getElementById('pageContent').style.display = 'block';
+                loadAdmins();
+                loadAuditLog();
+                loadOwnerCalls();
+                setInterval(loadOwnerCalls, 5000);
+            } catch (e) {
+                console.error(e);
+                showDenied();
+            }
+        }
+        init();
+    </script>
+</body>
+</html>

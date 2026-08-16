@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support Manlung Tech City</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.donation-shell{max-width:720px;margin:2rem auto;padding:1rem}
+.donation-card{background:var(--card-bg,#fff);border:1px solid var(--card-border,#e5e7eb);border-radius:28px;padding:2rem;box-shadow:0 16px 50px rgba(10,26,58,.08)}
+.donation-head{text-align:center}.donation-heart{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;margin:0 auto 1rem;background:#eef5ff;color:#2451d6;font-size:1.8rem}
+.donation-head h1{margin:0;font-size:2rem}.donation-head p{color:var(--text-muted);line-height:1.6}
+.total-card{margin:1.4rem 0;padding:1.2rem;border-radius:20px;background:linear-gradient(135deg,#0a1a3a,#2451d6);color:#fff;text-align:center}
+.total-card small{opacity:.8}.total-card strong{display:block;font-size:2.2rem;margin:.2rem 0}.total-card span{opacity:.85;font-size:.82rem}
+.amount-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin:1rem 0}
+.amount-btn{padding:.8rem;border:1px solid var(--card-border,#dbe2ef);border-radius:14px;background:var(--page-bg,#fff);font-weight:800;cursor:pointer}
+.amount-btn.active{background:#0a1a3a;color:#fff;border-color:#0a1a3a}
+.field{margin:.8rem 0}.field label{display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem}.field input{width:100%;padding:.85rem 1rem;border-radius:13px;border:1px solid #dbe2ef;font:inherit}
+.donate-action{width:100%;padding:1rem;border:0;border-radius:15px;background:#2451d6;color:#fff;font-weight:800;font-size:1rem;cursor:pointer}.donate-action:disabled{opacity:.6;cursor:wait}
+.notice{font-size:.76rem;color:var(--text-muted);text-align:center;margin-top:1rem;line-height:1.5}
+@media(max-width:600px){.donation-card{padding:1.25rem}.amount-grid{grid-template-columns:repeat(2,1fr)}.donation-head h1{font-size:1.55rem}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container"><div class="brand"><h1><i class="fas fa-heart"></i> Manlung Tech City</h1><span>Support our recovery work</span></div><div class="header-actions"><a class="btn btn-outline" href="/"><i class="fas fa-home"></i> Home</a></div></div></header>
+<main class="donation-shell">
+<section class="donation-card">
+  <div class="donation-head">
+    <div class="donation-heart"><img src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/hands-cradling-a-money-bag-with-hearts-above-symbolizing-charity-and-donation-vector-Photoroom.png" alt="Donation" style="width:48px;height:48px;object-fit:contain;" loading="lazy"></div>
+    <h1>Support Our Work</h1>
+    <p>Every confirmed donation helps us maintain the platform and provide recovery support.</p>
+  </div>
+  <div class="total-card">
+    <small>Total confirmed donations</small>
+    <strong id="totalRaised">KES 0</strong>
+    <span id="donationCount">0 donations</span>
+  </div>
+  <div class="amount-grid">
+    <button class="amount-btn" data-amount="50">KES 50</button>
+    <button class="amount-btn" data-amount="100">KES 100</button>
+    <button class="amount-btn" data-amount="300">KES 300</button>
+    <button class="amount-btn" data-amount="500">KES 500</button>
+    <button class="amount-btn" data-amount="1000">KES 1,000</button>
+    <button class="amount-btn" data-amount="2500">KES 2,500</button>
+    <button class="amount-btn" data-amount="5000">KES 5,000</button>
+    <button class="amount-btn" data-amount="10000">KES 10,000</button>
+  </div>
+  <div class="field"><label for="amount">Custom amount (KES)</label><input id="amount" type="number" min="50" max="1000000" step="1" placeholder="Enter amount"></div>
+  <div class="field"><label for="email">Email for payment receipt</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+  <button class="donate-action" id="donateBtn"><i class="fas fa-heart"></i> Donate Securely</button>
+  <p id="status" class="notice"></p>
+</section>
+</main>
+<script src="https://js.paystack.co/v2/inline.js"></script>
+<script>
+const amountEl=document.getElementById('amount'), emailEl=document.getElementById('email'), statusEl=document.getElementById('status'), btn=document.getElementById('donateBtn');
+document.querySelectorAll('.amount-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');amountEl.value=b.dataset.amount;});
+function money(n){return 'KES '+Number(n||0).toLocaleString('en-KE');}
+async function loadTotal(){try{const r=await fetch('/api/donations/total',{cache:'no-store'}),d=await r.json();if(d.success){document.getElementById('totalRaised').textContent=money(d.totalKes);document.getElementById('donationCount').textContent=`${d.donationCount} confirmed donation${d.donationCount===1?'':'s'}`;}}catch(e){console.error('Donation total error',e);}}
+async function verifyReference(reference){
+ if(!reference) return;
+ statusEl.textContent='Payment returned. Confirming your donation…';
+ try{
+  const vr=await fetch('/api/donations/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reference})});
+  const vd=await vr.json();
+  if(!vr.ok||!vd.success) throw new Error(vd.error||'Verification failed.');
+  statusEl.textContent=`Thank you! Your KES ${Number(vd.amountKes||0).toLocaleString()} donation has been confirmed.`;
+  const clean=new URL(window.location.href); clean.searchParams.delete('reference'); clean.searchParams.delete('trxref'); history.replaceState({},'',clean.pathname);
+  await loadTotal();
+ }catch(e){console.error(e);statusEl.textContent=e.message||'We could not confirm the payment yet. If you were charged, please wait a moment and refresh.';}
+}
+async function donate(){
+ const amount=Number(amountEl.value), email=emailEl.value.trim();
+ if(!Number.isInteger(amount)||amount<50||amount>1000000){statusEl.textContent='Enter a donation between KES 50 and KES 1,000,000.';return;}
+ if(!emailEl.checkValidity()){statusEl.textContent='Enter a valid email address.';emailEl.focus();return;}
+ btn.disabled=true; statusEl.textContent='Preparing secure payment…';
+ try{
+  const r=await fetch('/api/donations/initialize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amountKes:amount,email})});
+  const init=await r.json(); if(!r.ok||!init.success) throw new Error(init.error||'Could not start payment.');
+  if(typeof PaystackPop==='undefined'){
+    if(init.authorizationUrl){ window.location.href=init.authorizationUrl; return; }
+    throw new Error('Payment service failed to load. Refresh and try again.');
+  }
+  const popup=new PaystackPop();
+  const verifyPaid=async(reference)=>{
+    statusEl.textContent='Payment received. Verifying…';
+    const vr=await fetch('/api/donations/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reference})});
+    const vd=await vr.json();
+    if(!vr.ok||!vd.success) throw new Error(vd.error||'Verification failed.');
+    statusEl.textContent=`Thank you! Your KES ${amount.toLocaleString()} donation has been confirmed.`;
+    amountEl.value='';document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));await loadTotal();
+    return true;
+  };
+  if(init.accessCode && typeof popup.resumeTransaction==='function'){
+    try{
+      popup.resumeTransaction(init.accessCode);
+    }catch(error){
+      console.error('Paystack resumeTransaction error:',error);
+      if(init.authorizationUrl){
+        statusEl.innerHTML='Checkout could not open here. <a href="'+init.authorizationUrl+'" style="color:#2451d6;font-weight:800;">Open secure payment page</a>.';
+        btn.disabled=false;
+        return;
+      }
+      throw error;
+    }
+    let attempts=0;
+    const poll=async()=>{
+      attempts++;
+      try{
+        if(await verifyPaid(init.reference)) return;
+      }catch(e){console.warn('Donation verification poll:',e);}
+      if(attempts<45)setTimeout(poll,2000);
+      else statusEl.textContent='Payment is still being confirmed. If you were charged, refresh this page shortly.';
+    };
+    setTimeout(poll,2500);
+  }else{
+    popup.newTransaction({
+      key:init.publicKey,email:init.email,amount:init.amountKobo,currency:'KES',reference:init.reference,
+      onSuccess:(transaction)=>verifyPaid(transaction?.reference||init.reference).catch(e=>{console.error(e);statusEl.textContent=e.message||'Verification failed.';}),
+      onCancel:()=>{statusEl.textContent='Payment cancelled.';},
+      onError:(error)=>{statusEl.textContent=error?.message||'Payment checkout failed.';}
+    });
+  }
+ }catch(e){console.error(e);statusEl.textContent=e.message||'Payment failed.';}finally{btn.disabled=false;}
+}
+btn.onclick=donate; amountEl.onkeydown=e=>{if(e.key==='Enter')donate()};
+loadTotal();
+const params=new URLSearchParams(window.location.search);
+const returnedReference=params.get('reference')||params.get('trxref');
+if(returnedReference) verifyReference(returnedReference);
+setInterval(loadTotal,10000);
+</script>
+</body>
+</html>

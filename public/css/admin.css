@@ -1,0 +1,83 @@
+@import url('./style.css');
+
+/* Admin-only tweaks */
+.login-container {
+  background: var(--card-bg);
+  border-radius: 28px;
+  padding: 3rem;
+  max-width: 420px;
+  width: 90%;
+  border: 1px solid var(--card-border);
+}
+.login-container .logo { text-align: center; margin-bottom: 2rem; }
+.login-container .logo i { font-size: 3rem; color: var(--accent); }
+.login-container .logo h1 { color: var(--text); font-size: 1.8rem; margin-top: 0.5rem; }
+.login-container .logo span { color: var(--text-muted); font-size: 0.9rem; }
+.admin-badge {
+  display: inline-block; background: rgba(36,81,214,0.12); color: var(--accent);
+  padding: 0.2rem 1rem; border-radius: 40px; font-size: 0.7rem; font-weight: 600;
+  border: 1px solid var(--accent); margin-top: 0.5rem;
+}
+
+.admin-shell { display: flex; min-height: 100vh; }
+.admin-page-bg { background: var(--page-bg); min-height: 100vh; }
+
+.filters-bar {
+  display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1.2rem;
+}
+.filters-bar input, .filters-bar select { max-width: 260px; }
+
+.table-wrap { overflow-x: auto; }
+table.admin-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+table.admin-table th {
+  text-align: left; padding: 0.7rem; color: var(--text-muted);
+  border-bottom: 2px solid var(--card-border); white-space: nowrap;
+}
+table.admin-table td {
+  padding: 0.7rem; border-bottom: 1px solid var(--card-border); vertical-align: top;
+}
+table.admin-table tr:hover td { background: rgba(36,81,214,0.04); }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(10,18,40,0.55);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 3rem 1rem; overflow-y: auto; z-index: 50;
+}
+.modal-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg); max-width: 760px; width: 100%; padding: 2rem;
+}
+
+@media (max-width: 700px) {
+  .login-container { padding: 1.5rem; }
+  .filters-bar input, .filters-bar select { max-width:none; flex:1 1 100%; }
+  .modal-card { padding:1.1rem; border-radius:16px; }
+  table.admin-table { min-width:760px; }
+}
+
+
+/* Responsive footer for Admin portal */
+.site-footer {
+  margin-top: 2rem;
+  padding: 1rem 1.2rem;
+  border-top: 1px solid var(--card-border, rgba(0,0,0,.1));
+  text-align: center;
+  color: var(--text-muted, #667085);
+  font-size: .8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .75rem 1.25rem;
+  flex-wrap: wrap;
+}
+.site-footer p { margin: 0; }
+@media (max-width: 600px) {
+  .site-footer {
+    padding: .9rem .8rem;
+    gap: .35rem .7rem;
+    line-height: 1.45;
+  }
+  .site-footer p {
+    width: 100%;
+  }
+}
