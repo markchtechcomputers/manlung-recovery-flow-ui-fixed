@@ -58,7 +58,14 @@
         </div>
 
         <div class="card">
+            <div class="card-title"><i class="fas fa-briefcase"></i> Careers / Job Applications</div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;"><button class="btn btn-danger" onclick="clearCareerApplications()"><i class="fas fa-trash"></i> Delete All Applications</button></div>
+            <div id="careerApplications"><p style="color:var(--text-muted);">Loading applications…</p></div>
+        </div>
+
+        <div class="card">
             <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Audit Log</div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;"><button class="btn btn-danger" onclick="clearAuditLog()"><i class="fas fa-eraser"></i> Clear Audit Log</button></div>
             <div id="auditLog" style="max-height:320px; overflow-y:auto;"><p style="color:var(--text-muted);">Loading…</p></div>
         </div>
     </div>
@@ -260,6 +267,40 @@
             }
         }
 
+        async function loadCareerApplications() {
+            const box = document.getElementById('careerApplications');
+            try {
+                const res = await fetch('/api/careers/admin', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!res.ok || !data.success) { box.innerHTML = `<p style="color:var(--danger);">${data.error || 'Could not load applications.'}</p>`; return; }
+                if (!data.applications.length) { box.innerHTML = '<p style="color:var(--text-muted);">No applications yet.</p>'; return; }
+                box.innerHTML = data.applications.map(a => `
+                  <div class="case-item" style="margin-bottom:.7rem;">
+                    <div class="case-info" style="flex:1;">
+                      <strong>${a.full_name}</strong>
+                      <span>${a.role_interested} · ${a.email} · ${a.phone}</span>
+                      <span>${a.location}</span>
+                      <span class="status-badge">${a.status}</span>
+                      <details style="margin-top:.5rem;"><summary>View application</summary><div style="white-space:pre-wrap;margin-top:.5rem;color:var(--text-muted);"><strong>Education:</strong> ${a.education}\n\n<strong>Experience:</strong> ${a.experience}\n\n<strong>Skills:</strong> ${a.skills}\n\n<strong>Application:</strong> ${a.cover_note}</div></details>
+                    </div>
+                    <div style="display:flex;gap:.4rem;flex-wrap:wrap;justify-content:flex-end;">
+                      <button class="btn btn-outline" onclick="setCareerStatus('${a.id}','reviewing')">Reviewing</button>
+                      <button class="btn btn-outline" onclick="setCareerStatus('${a.id}','shortlisted')">Shortlist</button>
+                      <button class="btn btn-success" onclick="setCareerStatus('${a.id}','hired')">Hire</button>
+                      <button class="btn btn-danger" onclick="deleteCareerApplication('${a.id}')">Delete</button>
+                    </div>
+                  </div>`).join('');
+            } catch (e) { box.innerHTML = '<p style="color:var(--danger);">Network error loading applications.</p>'; }
+        }
+        async function setCareerStatus(id,status){
+            try { const res=await fetch(`/api/careers/admin/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify({status})}); const d=await res.json(); if(!res.ok||!d.success){alert(d.error||'Could not update application.');return;} loadCareerApplications(); } catch(e){alert('Network error.');}
+        }
+        async function deleteCareerApplication(id){ if(!confirm('Delete this application?')) return; try{const res=await fetch(`/api/careers/admin/${id}`,{method:'DELETE',headers:authHeaders()});const d=await res.json();if(!res.ok||!d.success){alert(d.error||'Could not delete application.');return;}loadCareerApplications();}catch(e){alert('Network error.');}}
+        async function clearCareerApplications(){ if(!confirm('Delete ALL career applications? This cannot be undone.')) return; try{const res=await fetch('/api/careers/admin',{method:'DELETE',headers:authHeaders()});const d=await res.json();if(!res.ok||!d.success){alert(d.error||'Could not clear applications.');return;}loadCareerApplications();}catch(e){alert('Network error.');}}
+        async function clearAuditLog(){ if(!confirm('Clear the entire Audit Log? This cannot be undone.')) return; try{const res=await fetch('/api/owner/audit-log',{method:'DELETE',headers:authHeaders()});const d=await res.json();if(!res.ok||!d.success){alert(d.error||'Could not clear audit log.');return;}loadAuditLog();}catch(e){alert('Network error.');}}
+        window.setCareerStatus=setCareerStatus; window.deleteCareerApplication=deleteCareerApplication; window.clearCareerApplications=clearCareerApplications; window.clearAuditLog=clearAuditLog;
+
         function showDenied() {
             document.getElementById('pageContent').style.display = 'none';
             document.getElementById('deniedContent').style.display = 'block';
@@ -277,6 +318,7 @@
                 document.getElementById('pageContent').style.display = 'block';
                 loadAdmins();
                 loadAuditLog();
+                loadCareerApplications();
                 loadOwnerCalls();
                 setInterval(loadOwnerCalls, 5000);
             } catch (e) {

@@ -107,6 +107,14 @@ router.get('/owner/monitor', ownerAuth, async (req, res) => {
       .order('created_at', { ascending: false })
       .limit(50);
     if (error) throw error;
+    if (data?.length) {
+      const ids = [...new Set(data.map(c => c.admin_user_id).filter(Boolean))];
+      if (ids.length) {
+        const { data: admins } = await supabase.from('recovery_users').select('id, username, email').in('id', ids);
+        const map = new Map((admins || []).map(a => [a.id, a.username || a.email || 'Admin']));
+        data.forEach(c => { c.admin_name = map.get(c.admin_user_id) || 'Admin'; });
+      }
+    }
     res.json({ success: true, calls: data || [] });
   } catch (error) {
     console.error('Owner call monitor error:', error);
@@ -127,13 +135,6 @@ router.post('/start', auth, async (req, res) => {
     const entitlement = CallEntitlement.evaluate(await CallEntitlement.get(req.user.id));
     if (!entitlement.access) {
       return res.status(403).json({ error: 'Call Admin subscription required', entitlement });
-    }
-
-    const available = await AdminPresence.anyAdminAvailable();
-    if (!available) {
-      return res.status(409).json({
-        error: 'Admin is currently unavailable. Please submit a recovery request and we will respond as soon as possible.',
-      });
     }
 
     const session = await CallSession.create({
@@ -161,10 +162,10 @@ router.get('/pending', adminAuth, async (req, res) => {
     const { data, error } = await supabase
       .from('recovery_call_sessions')
       .select('id, client_name, client_email, case_id, created_at')
-      .eq('status', 'ringing')
+      .in('status', ['ringing', 'queued'])
       .is('admin_user_id', null)
       .order('created_at', { ascending: true })
-      .limit(5);
+      .limit(20);
     if (error) throw error;
     res.json({ success: true, calls: data });
   } catch (error) {
@@ -175,6 +176,142 @@ router.get('/pending', adminAuth, async (req, res) => {
 
 // Either participant polls this to learn about status changes made by the
 // other side (accepted/rejected/ended) without needing a push channel.
+// Admin starts a callback to a client. The existing WebRTC/signaling stack is reused.
+router.post('/admin/callback', adminAuth, async (req, res) => {
+  try {
+    const clientUserId = String(req.body?.clientUserId || '').trim();
+    const caseId = req.body?.caseId ? String(req.body.caseId).trim() : null;
+    if (!clientUserId) return res.status(400).json({ error: 'Client user ID is required.' });
+
+    let clientQuery = supabase
+      .from('recovery_users')
+      .select('id, username, email, role')
+      .eq('id', clientUserId)
+      .maybeSingle();
+    const { data: client, error: clientError } = await clientQuery;
+    if (clientError) throw clientError;
+    if (!client || client.role !== 'client') return res.status(404).json({ error: 'Client not found.' });
+
+    const busy = await CallSession.adminHasActiveCall(req.user.id);
+    if (busy) return res.status(409).json({ error: 'You already have an active call. End it before calling a client.' });
+
+    const pendingCallback = await supabase
+      .from('recovery_call_sessions')
+      .select('id')
+      .eq('admin_user_id', req.user.id)
+      .eq('status', 'ringing')
+      .is('ended_at', null)
+      .limit(1)
+      .maybeSingle();
+    if (pendingCallback.error) throw pendingCallback.error;
+    if (pendingCallback.data) return res.status(409).json({ error: 'You already have a callback waiting for an answer.' });
+
+    if (caseId) {
+      const { data: caseRow, error: caseError } = await supabase
+        .from('recovery_cases')
+        .select('case_id, client_user_id')
+        .eq('case_id', caseId)
+        .maybeSingle();
+      if (caseError) throw caseError;
+      if (!caseRow || caseRow.client_user_id !== clientUserId) {
+        return res.status(404).json({ error: 'Client/case not found.' });
+      }
+    }
+
+    const existing = await supabase
+      .from('recovery_call_sessions')
+      .select('id')
+      .eq('client_user_id', clientUserId)
+      .eq('admin_user_id', req.user.id)
+      .in('status', ['ringing', 'accepted'])
+      .is('ended_at', null)
+      .limit(1)
+      .maybeSingle();
+    if (existing.error) throw existing.error;
+    if (existing.data) return res.status(409).json({ error: 'There is already an active callback with this client.' });
+
+    const now = new Date().toISOString();
+    const { data: session, error } = await supabase
+      .from('recovery_call_sessions')
+      .insert({
+        client_user_id: clientUserId,
+        client_name: client.username || client.email,
+        client_email: client.email,
+        case_id: caseId,
+        admin_user_id: req.user.id,
+        status: 'ringing',
+        ringing_started_at: now,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+
+    session.admin_name = req.user.username || req.user.email || 'Admin';
+    res.status(201).json({ success: true, sessionId: session.id, channel: session.id, status: session.status, adminName: session.admin_name, session });
+  } catch (error) {
+    console.error('Admin callback start error:', error);
+    res.status(500).json({ error: error.message || 'Could not start callback.' });
+  }
+});
+
+// Client polls for an admin callback assigned specifically to that client.
+router.get('/client/callbacks', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required' });
+    const { data, error } = await supabase
+      .from('recovery_call_sessions')
+      .select('id, client_name, client_email, case_id, status, admin_user_id, created_at, ringing_started_at')
+      .eq('client_user_id', req.user.id)
+      .eq('status', 'ringing')
+      .not('admin_user_id', 'is', null)
+      .order('created_at', { ascending: true })
+      .limit(1);
+    if (error) throw error;
+    res.json({ success: true, calls: data || [] });
+  } catch (error) {
+    console.error('Client callback poll error:', error);
+    res.status(500).json({ error: error.message || 'Server error' });
+  }
+});
+
+// Client accepts an admin callback. This does not put the client into the admin queue.
+router.put('/:id/reject-client', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required' });
+    const session = await CallSession.findById(req.params.id);
+    if (!session || session.client_user_id !== req.user.id || !session.admin_user_id || session.status !== 'ringing') {
+      return res.status(404).json({ error: 'Callback not found.' });
+    }
+    const updated = await CallSession.setStatus(req.params.id, 'rejected', 'client_declined_callback');
+    res.json({ success: true, session: updated });
+  } catch (error) {
+    console.error('Client reject callback error:', error);
+    res.status(500).json({ error: error.message || 'Could not reject callback.' });
+  }
+});
+
+router.put('/:id/accept-client', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required' });
+    const { data, error } = await supabase
+      .from('recovery_call_sessions')
+      .update({ status: 'accepted', accepted_at: new Date().toISOString() })
+      .eq('id', req.params.id)
+      .eq('client_user_id', req.user.id)
+      .eq('status', 'ringing')
+      .not('admin_user_id', 'is', null)
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return res.status(409).json({ error: 'This callback is no longer available.' });
+    await AdminPresence.setBusy(data.admin_user_id, true);
+    res.json({ success: true, session: data });
+  } catch (error) {
+    console.error('Client accept callback error:', error);
+    res.status(500).json({ error: error.message || 'Could not accept callback.' });
+  }
+});
+
 router.get('/:id', auth, async (req, res) => {
   try {
     let session = await CallSession.findById(req.params.id);
@@ -184,6 +321,10 @@ router.get('/:id', auth, async (req, res) => {
     if (!isParticipant) return res.status(403).json({ error: 'Not part of this call' });
 
     session = await CallSession.expireIfRingingTooLong(session);
+    if (session.admin_user_id) {
+      const { data: admin } = await supabase.from('recovery_users').select('username, email').eq('id', session.admin_user_id).maybeSingle();
+      session.admin_name = admin?.username || admin?.email || 'Admin';
+    }
     res.json({ success: true, session });
   } catch (error) {
     console.error('Get call session error:', error);
@@ -241,6 +382,19 @@ router.put('/:id/accept', adminAuth, async (req, res) => {
     const alreadyBusy = await CallSession.adminHasActiveCall(req.user.id);
     if (alreadyBusy) {
       return res.status(409).json({ error: 'You already have an active call. End it before accepting another.' });
+    }
+
+    const pendingCallback = await supabase
+      .from('recovery_call_sessions')
+      .select('id')
+      .eq('admin_user_id', req.user.id)
+      .eq('status', 'ringing')
+      .is('ended_at', null)
+      .limit(1)
+      .maybeSingle();
+    if (pendingCallback.error) throw pendingCallback.error;
+    if (pendingCallback.data) {
+      return res.status(409).json({ error: 'Finish or cancel your pending client callback before accepting another call.' });
     }
 
     const accepted = await CallSession.accept(req.params.id, req.user.id);

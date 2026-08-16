@@ -12,6 +12,7 @@ const subscriptionRoutes = require('./routes/subscription');
 const callRoutes = require('./routes/calls');
 const donationRoutes = require('./routes/donations');
 const ownerRoutes = require('./routes/owner');
+const careerRoutes = require('./routes/careers');
 const { supabase } = require('./config/supabase');
 
 const app = express();
@@ -228,6 +229,7 @@ app.use('/api/payments/call-admin', subscriptionRoutes);
 app.use('/api/calls', callRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/owner', ownerRoutes);
+app.use('/api/careers', careerRoutes);
 
 // ============================================================
 // ADMIN PAGES

@@ -28,7 +28,7 @@
 <main class="donation-shell">
 <section class="donation-card">
   <div class="donation-head">
-    <div class="donation-heart"><img src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/hands-cradling-a-money-bag-with-hearts-above-symbolizing-charity-and-donation-vector-Photoroom.png" alt="Donation" style="width:48px;height:48px;object-fit:contain;" loading="lazy"></div>
+    <div class="donation-heart"><img src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/hands-cradling-a-money-bag-with-hearts-above-symbolizing-charity-and-donation-vector-Photoroom.png" alt="Donation" style="width:48px;height:48px;object-fit:contain;display:block;" loading="lazy"></div>
     <h1>Support Our Work</h1>
     <p>Every confirmed donation helps us maintain the platform and provide recovery support.</p>
   </div>
@@ -48,14 +48,15 @@
     <button class="amount-btn" data-amount="10000">KES 10,000</button>
   </div>
   <div class="field"><label for="amount">Custom amount (KES)</label><input id="amount" type="number" min="50" max="1000000" step="1" placeholder="Enter amount"></div>
-  <div class="field"><label for="email">Email for payment receipt</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+  <div class="field"><label for="donorName">Your name</label><input id="donorName" type="text" maxlength="120" placeholder="Your full name"></div>
+  <div class="field"><label for="email">Email for payment receipt</label><input id="email" type="email" required autocomplete="email" placeholder="you@example.com"></div>
   <button class="donate-action" id="donateBtn"><i class="fas fa-heart"></i> Donate Securely</button>
   <p id="status" class="notice"></p>
 </section>
 </main>
 <script src="https://js.paystack.co/v2/inline.js"></script>
 <script>
-const amountEl=document.getElementById('amount'), emailEl=document.getElementById('email'), statusEl=document.getElementById('status'), btn=document.getElementById('donateBtn');
+const amountEl=document.getElementById('amount'), donorNameEl=document.getElementById('donorName'), emailEl=document.getElementById('email'), statusEl=document.getElementById('status'), btn=document.getElementById('donateBtn');
 document.querySelectorAll('.amount-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');amountEl.value=b.dataset.amount;});
 function money(n){return 'KES '+Number(n||0).toLocaleString('en-KE');}
 async function loadTotal(){try{const r=await fetch('/api/donations/total',{cache:'no-store'}),d=await r.json();if(d.success){document.getElementById('totalRaised').textContent=money(d.totalKes);document.getElementById('donationCount').textContent=`${d.donationCount} confirmed donation${d.donationCount===1?'':'s'}`;}}catch(e){console.error('Donation total error',e);}}
@@ -66,18 +67,26 @@ async function verifyReference(reference){
   const vr=await fetch('/api/donations/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reference})});
   const vd=await vr.json();
   if(!vr.ok||!vd.success) throw new Error(vd.error||'Verification failed.');
-  statusEl.textContent=`Thank you! Your KES ${Number(vd.amountKes||0).toLocaleString()} donation has been confirmed.`;
+  statusEl.innerHTML=`<strong>Thank you${vd.donorName ? ', '+escapeHtml(vd.donorName) : ''}!</strong> Your KES ${Number(vd.amountKes||0).toLocaleString()} donation has been confirmed. ❤️`; showDonationThankYou(vd.donorName || donorName || 'Donor');
   const clean=new URL(window.location.href); clean.searchParams.delete('reference'); clean.searchParams.delete('trxref'); history.replaceState({},'',clean.pathname);
   await loadTotal();
  }catch(e){console.error(e);statusEl.textContent=e.message||'We could not confirm the payment yet. If you were charged, please wait a moment and refresh.';}
 }
+function escapeHtml(v){return String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));}
+function showDonationThankYou(name){
+  const old=document.getElementById('donationThankYou'); if(old) old.remove();
+  const box=document.createElement('div'); box.id='donationThankYou'; box.style='margin-top:1rem;padding:1rem;border-radius:14px;background:#ecfdf5;color:#166534;border:1px solid #86efac;text-align:center;font-weight:700;';
+  box.innerHTML=`Thank you, ${escapeHtml(name)}! Your support helps us keep the recovery service running. ❤️`;
+  statusEl.parentNode.insertBefore(box,statusEl.nextSibling);
+}
 async function donate(){
- const amount=Number(amountEl.value), email=emailEl.value.trim();
+ const amount=Number(amountEl.value), donorName=(donorNameEl?.value||'').trim(), email=emailEl.value.trim();
  if(!Number.isInteger(amount)||amount<50||amount>1000000){statusEl.textContent='Enter a donation between KES 50 and KES 1,000,000.';return;}
+ if(donorName && donorName.length > 120){statusEl.textContent='Name is too long.';return;}
  if(!emailEl.checkValidity()){statusEl.textContent='Enter a valid email address.';emailEl.focus();return;}
  btn.disabled=true; statusEl.textContent='Preparing secure payment…';
  try{
-  const r=await fetch('/api/donations/initialize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amountKes:amount,email})});
+  const r=await fetch('/api/donations/initialize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amountKes:amount,email,donorName})});
   const init=await r.json(); if(!r.ok||!init.success) throw new Error(init.error||'Could not start payment.');
   if(typeof PaystackPop==='undefined'){
     if(init.authorizationUrl){ window.location.href=init.authorizationUrl; return; }
@@ -89,7 +98,7 @@ async function donate(){
     const vr=await fetch('/api/donations/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reference})});
     const vd=await vr.json();
     if(!vr.ok||!vd.success) throw new Error(vd.error||'Verification failed.');
-    statusEl.textContent=`Thank you! Your KES ${amount.toLocaleString()} donation has been confirmed.`;
+    statusEl.innerHTML=`<strong>Thank you${vd.donorName ? ', '+escapeHtml(vd.donorName) : (donorName ? ', '+escapeHtml(donorName) : '')}!</strong> Your KES ${amount.toLocaleString()} donation has been confirmed. ❤️`; showDonationThankYou(vd.donorName || donorName || 'Donor');
     amountEl.value='';document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));await loadTotal();
     return true;
   };
@@ -132,5 +141,5 @@ const returnedReference=params.get('reference')||params.get('trxref');
 if(returnedReference) verifyReference(returnedReference);
 setInterval(loadTotal,10000);
 </script>
-</body>
+<footer class="site-footer"><p>&copy; 2026 Manlung Tech City. All rights reserved.</p><p><a href="/careers.html" style="color:#a9c0ec;">Careers</a></p></footer></body>
 </html>

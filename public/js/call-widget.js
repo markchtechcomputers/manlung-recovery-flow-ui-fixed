@@ -11,6 +11,8 @@
   let pollTimer = null;
   let autoSubscriptionTriggered = false;
   let expiryTimer = null;
+  let callbackPollTimer = null;
+  let currentCallbackId = null;
 
   function el(html) {
     const div = document.createElement('div');
@@ -254,22 +256,11 @@
   async function beginCall(headers) {
     if (currentPeer || currentSessionId) return;
     const panel = panelContent();
-    panel.innerHTML = panelHtml('<p><i class="fas fa-spinner fa-spin"></i> Checking admin availability…</p>');
+    panel.innerHTML = panelHtml('<p><i class="fas fa-spinner fa-spin"></i> Joining the Call Admin queue…</p>');
 
     try {
-      const availRes = await fetch('/api/calls/availability', { headers });
-      const availData = await availRes.json();
-      if (!availRes.ok || !availData.available) {
-        panel.innerHTML = panelHtml(`
-          <p style="color:#f87171; margin-bottom:0.6rem;">Admin is currently unavailable.</p>
-          <p style="color:#96abc4;">Please submit a recovery request and we will respond as soon as possible.</p>
-          <button id="retryAvailabilityBtn" style="display:block; width:100%; background:#29385a; color:#fff; border:none; padding:0.5rem; border-radius:10px; margin-top:0.6rem; cursor:pointer;">Check Again</button>
-          <a href="/client/request.html" style="display:block; text-align:center; background:#2451d6; color:#fff; padding:0.5rem; border-radius:10px; text-decoration:none; margin-top:0.6rem;">Submit a Request</a>
-        `);
-        document.getElementById('retryAvailabilityBtn')?.addEventListener('click', () => beginCall(headers));
-        return;
-      }
-
+      // Do not reject callers just because all admins are busy. The server
+      // queues the request and an available admin can accept it later.
       const startRes = await fetch('/api/calls/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...headers },
@@ -365,6 +356,7 @@
       'connecting': `<p><i class="fas fa-spinner fa-spin"></i> Connecting…</p>`,
       'connected': `
         <p style="font-weight:600; color:#4ade80;">🟢 Connected</p>
+        <p id="connectedAdminName" style="color:#96abc4;margin:.2rem 0 .5rem;"></p>
         <p id="callDuration" style="font-size:1.4rem; margin:0.4rem 0;">00:00</p>
         <div style="display:flex; gap:8px; margin-bottom:8px;">
           <button id="speakerBtn" style="flex:1; background:#29385a; color:#fff; border:none; padding:0.5rem; border-radius:10px; cursor:pointer;"><i class="fas fa-volume-high"></i> Enable Audio</button>
@@ -387,6 +379,9 @@
     if (state === 'calling') startClientAlert();
     else if (['requesting-mic','connecting','connected','rejected','no-admin-answered','ended-by-remote','connection-failed','permission-denied'].includes(state)) stopClientAlert();
     if (label) label.textContent = state === 'connected' ? 'On Call' : 'Call Admin';
+    if (state === 'connected') {
+      fetch(`/api/calls/${encodeURIComponent(currentSessionId)}`, { headers: authHeaders(), cache:'no-store' }).then(r=>r.json()).then(d=>{ const n=document.getElementById('connectedAdminName'); if(n) n.textContent = d?.session?.admin_name ? `Admin: ${d.session.admin_name}` : ''; }).catch(()=>{});
+    }
 
     const cancelBtn = document.getElementById('cancelCallBtn');
     if (cancelBtn) cancelBtn.addEventListener('click', () => endCall());
@@ -429,6 +424,86 @@
     stopClientAlert();
     currentPeer = null;
     currentSessionId = null;
+  }
+
+  async function pollForAdminCallback() {
+    const headers = authHeaders();
+    if (!headers || currentPeer || currentSessionId || currentCallbackId) return;
+    try {
+      const res = await fetch('/api/calls/client/callbacks', { headers, cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.success && data.calls && data.calls.length) showAdminCallback(data.calls[0], headers);
+    } catch (_) {}
+  }
+
+  function showAdminCallback(call, headers) {
+    if (currentCallbackId || currentPeer || currentSessionId) return;
+    currentCallbackId = call.id;
+    startClientAlert();
+    const panel = panelContent();
+    panel.innerHTML = panelHtml(`
+      <div style="text-align:center;">
+        <div style="width:64px;height:64px;margin:0 auto .7rem;border-radius:50%;background:#1f6e4a;display:flex;align-items:center;justify-content:center;animation:callPulse 1.1s infinite;">
+          <i class="fas fa-phone-volume" style="font-size:28px;color:#fff;"></i>
+        </div>
+        <p style="font-weight:700;margin-bottom:.35rem;">Incoming Call From Manlung Admin</p>
+        <p style="color:#fff;margin-bottom:.35rem;font-weight:700;">${call.admin_name ? `Admin: ${call.admin_name}` : }</p>
+        <p style="color:#96abc4;margin-bottom:.8rem;">${call.case_id ? `Case ${call.case_id}` : 'Support callback'}</p>
+        <div style="display:flex;gap:8px;">
+          <button id="rejectCallbackBtn" style="flex:1;background:#c0392b;color:#fff;border:0;padding:.55rem;border-radius:10px;cursor:pointer;"><i class="fas fa-phone-slash"></i> Decline</button>
+          <button id="acceptCallbackBtn" style="flex:1;background:#1f6e4a;color:#fff;border:0;padding:.55rem;border-radius:10px;cursor:pointer;"><i class="fas fa-phone"></i> Accept</button>
+        </div>
+      </div>
+    `);
+    const accept = document.getElementById('acceptCallbackBtn');
+    const reject = document.getElementById('rejectCallbackBtn');
+    if (accept) accept.onclick = () => acceptAdminCallback(call.id, headers);
+    if (reject) reject.onclick = () => rejectAdminCallback(call.id, headers);
+  }
+
+  async function rejectAdminCallback(id, headers) {
+    stopClientAlert();
+    try { await fetch(`/api/calls/${id}/reject-client`, { method: 'PUT', headers }); } catch (_) {}
+    currentCallbackId = null;
+    refreshEntitlementPanel();
+  }
+
+  async function acceptAdminCallback(id, headers) {
+    const panel = panelContent();
+    panel.innerHTML = panelHtml('<p><i class="fas fa-spinner fa-spin"></i> Connecting to your admin…</p>');
+    try {
+      const res = await fetch(`/api/calls/${id}/accept-client`, { method: 'PUT', headers });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        currentCallbackId = null;
+        stopClientAlert();
+        panel.innerHTML = panelHtml(`<p style="color:#f87171;">${data.error || 'Callback is no longer available.'}</p>`);
+        return;
+      }
+      currentCallbackId = null;
+      currentSessionId = id;
+      stopClientAlert();
+      currentPeer = new window.ManlungCallWebRTC.CallPeer({
+        sessionId: id,
+        isInitiator: false,
+        headers,
+        onStateChange: (state, detail) => renderCallUI(state, detail),
+        onDuration: (d) => updateDuration(d),
+      });
+      await currentPeer.start();
+    } catch (e) {
+      currentCallbackId = null;
+      stopClientAlert();
+      renderCallUI('connection-failed', e.message);
+    }
+  }
+
+  function startCallbackPolling() {
+    clearInterval(callbackPollTimer);
+    const tick = () => pollForAdminCallback();
+    tick();
+    callbackPollTimer = setInterval(tick, 2000);
   }
 
   function loadScript(src) {
@@ -485,4 +560,6 @@
   } else {
     init();
   }
+  startCallbackPolling();
+
 })();

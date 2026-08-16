@@ -27,6 +27,7 @@ function validAmount(value) {
 router.post('/initialize', [
   body('amountKes').isInt({ min: MIN_KES, max: MAX_KES }).withMessage(`Donation must be between ${MIN_KES} and ${MAX_KES} KES`),
   body('email').isEmail().normalizeEmail().withMessage('A valid email is required'),
+  body('donorName').optional({ checkFalsy: true }).trim().isLength({ min: 2, max: 120 }).withMessage('Donor name is too long.'),
 ], async (req, res) => {
   if (!validationError(req, res)) return;
   try {
@@ -36,6 +37,7 @@ router.post('/initialize', [
 
     const amountKes = Number(req.body.amountKes);
     const email = String(req.body.email).trim().toLowerCase();
+    const donorName = String(req.body.donorName || '').trim();
     if (!validAmount(amountKes)) return res.status(400).json({ error: 'Invalid donation amount.' });
 
     const reference = `MTC-DONATE-${Date.now()}-${crypto.randomBytes(5).toString('hex')}`;
@@ -43,6 +45,7 @@ router.post('/initialize', [
     const { error: insertError } = await supabase.from(TABLE).insert({
       reference,
       donor_email: email,
+      donor_name: donorName || null,
       amount_kes: amountKes,
       status: 'pending',
     });
@@ -55,7 +58,7 @@ router.post('/initialize', [
         amount: amountKes * 100,
         currency: 'KES',
         reference,
-        metadata: { donation: true, amount_kes: amountKes },
+        metadata: { donation: true, amount_kes: amountKes, donor_name: donorName || null },
         callback_url: process.env.PAYSTACK_CALLBACK_URL || `${process.env.PUBLIC_APP_URL || `${req.protocol}://${req.get('host')}`}/donate.html`,
       },
       { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` } }
@@ -67,6 +70,7 @@ router.post('/initialize', [
       accessCode: init.data?.data?.access_code,
       authorizationUrl: init.data?.data?.authorization_url,
       amountKes,
+      donorName,
       amountKobo: amountKes * 100,
       email,
       publicKey: process.env.PAYSTACK_PUBLIC_KEY,
@@ -93,7 +97,7 @@ router.post('/verify', [
     if (!record) return res.status(404).json({ error: 'Donation record not found.' });
 
     if (record.status === 'confirmed') {
-      return res.json({ success: true, alreadyConfirmed: true, amountKes: record.amount_kes });
+      return res.json({ success: true, alreadyConfirmed: true, amountKes: record.amount_kes, donorName: record.donor_name || '' });
     }
 
     const verify = await axios.get(
@@ -130,7 +134,7 @@ router.post('/verify', [
       const { data: latest } = await supabase.from(TABLE).select('status, amount_kes').eq('reference', reference).maybeSingle();
       if (latest?.status === 'confirmed') return res.json({ success: true, alreadyConfirmed: true, amountKes: Number(latest.amount_kes) });
     }
-    res.json({ success: true, amountKes: Number(updated?.amount_kes || record.amount_kes) });
+    res.json({ success: true, amountKes: Number(updated?.amount_kes || record.amount_kes), donorName: updated?.donor_name || record.donor_name || '' });
   } catch (error) {
     console.error('Donation verify error:', error.response?.data || error.message);
     res.status(500).json({ error: 'Could not verify the donation right now.' });
@@ -214,7 +218,7 @@ router.get('/admin', adminAuth, async (_req, res) => {
   try {
     const { data: confirmedRows, error: confirmedError } = await supabase
       .from(TABLE)
-      .select('reference, donor_email, amount_kes, status, paid_at, created_at')
+      .select('reference, donor_name, donor_email, amount_kes, status, paid_at, created_at')
       .eq('status', 'confirmed')
       .order('paid_at', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false })

@@ -211,6 +211,17 @@ router.delete('/cases/:caseId/public-notes', async (req, res) => {
 });
 
 // Audit trail — who did what, to whom, when
+router.delete('/audit-log', async (req, res) => {
+  try {
+    const { error } = await require('../config/supabase').supabase.from('recovery_admin_audit_log').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Clear audit log error:', error);
+    res.status(500).json({ error: error.message || 'Could not clear audit log.' });
+  }
+});
+
 router.get('/audit-log', async (req, res) => {
   try {
     const log = await AdminAuditLog.list();

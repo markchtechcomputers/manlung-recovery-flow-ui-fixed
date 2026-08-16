@@ -13,11 +13,7 @@
             font-size: clamp(1.6rem, 5vw, 3.2rem);
             font-weight: 800;
             letter-spacing: -0.5px;
-            color: #ffffff; /* fallback for browsers without background-clip:text support */
-            background: linear-gradient(90deg, #38bdf8, #2dd4bf, #4ade80);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #ffffff;
             text-align: center;
             text-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
             margin-bottom: 0.6rem;
@@ -38,7 +34,7 @@
             height: 2.3rem;
             object-fit: contain;
             display: block;
-            margin-bottom: 1rem;
+            margin: 0 auto 1rem;
         }
         @media (max-width: 480px) {
             #typing-text { font-size: 1.5rem; letter-spacing: -0.3px; }
@@ -79,7 +75,7 @@
                 <i class="fas fa-paper-plane"></i> Submit a Request
             </a>
             <a href="/donate.html" class="btn btn-outline">
-                <i class="fas fa-heart"></i> Support Our Work
+                <img src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/hands-cradling-a-money-bag-with-hearts-above-symbolizing-charity-and-donation-vector-Photoroom.png" alt="Donation" style="width:1.3rem;height:1.3rem;object-fit:contain;vertical-align:middle;margin-right:.35rem;"> Support Our Work
             </a>
         </section>
 
@@ -139,6 +135,7 @@
             </div>
             <div class="site-footer-links">
                 <a href="/about.html">About</a>
+                <a href="/careers.html">Careers</a>
                 <a href="/terms.html">Terms</a>
                 <a href="/login.html">Client Portal</a>
                 <a href="/client/request.html">New Recovery Request</a>
@@ -169,6 +166,10 @@
 
             let index = 0;
             let deleting = false;
+            let colorIndex = 0;
+            const colors = ['#ffffff','#facc15','#22c55e','#f59e0b','#c0c0c0','#a855f7','#4f46e5','#ef4444','#3b82f6'];
+            function applyColor(){ element.style.color = colors[colorIndex % colors.length]; colorIndex++; }
+            applyColor();
 
             function typeWriter() {
                 if (!deleting) {
@@ -185,6 +186,7 @@
                     index--;
                     if (index === 0) {
                         deleting = false;
+                        applyColor();
                         setTimeout(typeWriter, 400);
                         return;
                     }
@@ -196,7 +198,7 @@
 
         const SERVICE_DETAILS = {
             device: {
-                icon: 'fa-mobile-alt',
+                image: 'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/812733019efc52dad38dd2cb8dd984ad_icon-Photoroom.png',
                 title: 'Device Recovery',
                 defaultCaseType: 'Lost Phone Recovery',
                 intro: 'Lost or stolen phones, laptops, tablets, and smartwatches — traced and recovered wherever possible, working within the law.',
@@ -209,7 +211,7 @@
                 needed: 'Have ready: device make/model, IMEI (dial *#06# on most phones to find it), approximate last known location, and the Google/Apple account linked to it.',
             },
             identity: {
-                icon: 'fa-user-secret',
+                image: 'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/images-Photoroom.png',
                 title: 'Identity Theft',
                 defaultCaseType: 'Identity Theft Assistance',
                 intro: 'Support recovering accounts and locking down your identity after a compromise — email, social media, banking, or government ID misuse.',
@@ -222,7 +224,7 @@
                 needed: 'Have ready: which accounts/services were affected, roughly when you noticed, and any suspicious emails, messages, or transactions you can show us.',
             },
             scam: {
-                icon: 'fa-bug',
+                image: 'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/images%20(1)-Photoroom.png',
                 title: 'Scam Investigation',
                 defaultCaseType: 'Online Scam Investigation',
                 intro: 'Investigation support for online scams, phishing, and fraud — from a fake seller to a full romance/investment scam.',
@@ -235,7 +237,7 @@
                 needed: 'Have ready: any scammer contact info (phone, email, social handles, website), transaction references, and amounts lost.',
             },
             security: {
-                icon: 'fa-shield-alt',
+                image: 'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/3231340.png',
                 title: 'Security Assessment',
                 defaultCaseType: 'Network Security Assessment',
                 intro: 'Network and systems security review for organizations — finding weaknesses before someone else does.',
@@ -253,9 +255,9 @@
             const s = SERVICE_DETAILS[key];
             if (!s) return;
             document.getElementById('serviceModalBody').innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                    <h2 style="display:flex; align-items:center; gap:10px;"><i class="fas ${s.icon}" style="color:var(--accent);"></i> ${s.title}</h2>
-                    <button class="btn btn-outline-dark" onclick="closeServiceModal()"><i class="fas fa-times"></i></button>
+                <div style="position:relative; margin-bottom:1rem; text-align:center;">
+                    <div><img src="${s.image}" alt="${s.title}" style="width:2.3rem;height:2.3rem;object-fit:contain;display:block;margin:0 auto .65rem;"><h2 style="margin:0;">${s.title}</h2></div>
+                    <button class="btn btn-outline-dark" style="position:absolute;right:0;top:0;" onclick="closeServiceModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <p style="color:var(--text-muted); margin-bottom:1rem;">${s.intro}</p>
                 <ul style="margin:0 0 1rem 1.2rem; padding:0; line-height:1.7;">
@@ -290,7 +292,14 @@
 
         async function trackCase() {
             const caseId = document.getElementById('trackInput').value.trim();
+            const token = localStorage.getItem('clientToken');
             const result = document.getElementById('trackResult');
+
+            if (!token) {
+                result.style.display = 'block';
+                result.innerHTML = '<span class="error-text">Please sign in to track your case. Case IDs are private to their owner.</span>';
+                return;
+            }
 
             if (!caseId) {
                 result.style.display = 'block';
@@ -299,7 +308,7 @@
             }
 
             try {
-                const response = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`);
+                const response = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`, { headers: { Authorization: `Bearer ${token}` } });
                 const data = await response.json();
 
                 result.style.display = 'block';

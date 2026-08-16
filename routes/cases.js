@@ -379,10 +379,10 @@ router.post(
       .isLength({ max: 5000 }),
   ],
 
-  optionalAuth,
+  auth,
 
   async (req, res) => {
-    if (req.user && req.user.role !== 'client') {
+    if (req.user.role !== 'client') {
       return res.status(403).json({
         error: 'Client access required',
       });
@@ -407,15 +407,13 @@ router.post(
       const caseFields =
         mapBodyToCaseFields(req.body);
 
-      // Authenticated clients keep their account association. Guests can
-      // submit using the validated contact details from the form.
-      if (req.user) {
-        caseFields.client_user_id = req.user.id;
-        caseFields.email = req.user.email;
-        caseFields.client_name =
-          req.user.username ||
-          caseFields.client_name;
-      }
+      // Every submitted case is permanently tied to the authenticated
+      // client account. The case ID is only an identifier, never a password.
+      caseFields.client_user_id = req.user.id;
+      caseFields.email = req.user.email;
+      caseFields.client_name =
+        req.user.username ||
+        caseFields.client_name;
 
       const uploadedFiles = [];
 
@@ -637,7 +635,7 @@ router.get(
 
 router.get(
   '/track/:caseId',
-  optionalAuth,
+  auth,
   async (req, res) => {
     try {
       const caseData =
@@ -651,9 +649,10 @@ router.get(
         });
       }
 
-      // Authenticated clients may only view their own cases. Guests can
-      // track a case by its case ID, which acts as the public lookup key.
-      if (req.user?.role === 'client') {
+      // Case IDs are never authorization credentials. Clients may only
+      // access cases owned by their authenticated account; admins/owners
+      // retain authorized administrative access.
+      if (req.user.role === 'client') {
         const owned =
           caseData.client_user_id ===
             req.user.id ||
@@ -691,7 +690,6 @@ router.get(
             withUrls.recovery_loc,
           lastUpdated:
             withUrls.last_updated,
-          files: withUrls.files,
         },
       });
     } catch (error) {

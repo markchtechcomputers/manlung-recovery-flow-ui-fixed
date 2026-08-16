@@ -1,7 +1,9 @@
 const { supabase } = require('../config/supabase');
+const AdminPresence = require('./AdminPresence');
 
 const TABLE = 'recovery_call_sessions';
 const RING_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_RING_TIMEOUT_SECONDS, 10) || 30;
+const QUEUE_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_QUEUE_TIMEOUT_SECONDS, 10) || 600;
 const ACTIVE_CALL_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_ACTIVE_TIMEOUT_SECONDS, 10) || 21600; // 6h safety valve
 
 async function create({ clientUserId, clientName, clientEmail, caseId }) {
@@ -105,18 +107,30 @@ async function setStatus(id, status, endReason) {
 async function expireIfRingingTooLong(session) {
   if (!session || session.status !== 'ringing') return session;
   const ringingSince = new Date(session.ringing_started_at || session.created_at).getTime();
-  if (Date.now() - ringingSince < RING_TIMEOUT_SECONDS * 1000) return session;
+  const timeoutSeconds = session.admin_user_id ? RING_TIMEOUT_SECONDS : QUEUE_TIMEOUT_SECONDS;
+  if (Date.now() - ringingSince < timeoutSeconds * 1000) return session;
   return setStatus(session.id, 'missed', 'ring_timeout');
 }
 
 async function cleanupAbandoned() {
-  const cutoff = new Date(Date.now() - RING_TIMEOUT_SECONDS * 1000).toISOString();
-  const { error } = await supabase.from(TABLE).update({
+  const now = Date.now();
+  const queueCutoff = new Date(now - QUEUE_TIMEOUT_SECONDS * 1000).toISOString();
+  const ringCutoff = new Date(now - RING_TIMEOUT_SECONDS * 1000).toISOString();
+  const { error: queueError } = await supabase.from(TABLE).update({
+    status: 'missed',
+    ended_at: new Date().toISOString(),
+    end_reason: 'queue_timeout',
+  }).eq('status', 'ringing').is('admin_user_id', null).lt('ringing_started_at', queueCutoff);
+  if (queueError) throw queueError;
+  const { data: timedOutCallbacks, error: ringError } = await supabase.from(TABLE).update({
     status: 'missed',
     ended_at: new Date().toISOString(),
     end_reason: 'ring_timeout',
-  }).eq('status', 'ringing').lt('ringing_started_at', cutoff);
-  if (error) throw error;
+  }).eq('status', 'ringing').not('admin_user_id', 'is', null).lt('ringing_started_at', ringCutoff).select('admin_user_id');
+  if (ringError) throw ringError;
+  for (const row of timedOutCallbacks || []) {
+    if (row.admin_user_id) await AdminPresence.setBusy(row.admin_user_id, false);
+  }
 }
 
 module.exports = {
@@ -130,4 +144,5 @@ module.exports = {
   expireIfRingingTooLong,
   RING_TIMEOUT_SECONDS,
   ACTIVE_CALL_TIMEOUT_SECONDS,
+  QUEUE_TIMEOUT_SECONDS,
 };

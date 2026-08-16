@@ -28,7 +28,7 @@
         <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
             <div>
                 <div class="card-title" style="margin-bottom:0.2rem;"><i class="fas fa-phone-volume"></i> Call Admin — Availability</div>
-                <p style="color:var(--text-muted); font-size:0.85rem; margin:0;" id="voiceLineStatus">Go online to receive Call Admin requests. All online, available admins are rung; the first to accept gets the call. Each Admin can actively manage up to 10 cases at a time.</p>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin:0;" id="voiceLineStatus">Go online to receive Call Admin requests. Calls are queued when all admins are busy; the first available admin can accept the next caller. Each Admin can actively manage up to 10 cases at a time.</p>
             </div>
             <button class="btn btn-success" id="voiceLineBtn" onclick="toggleAdminOnline()"><i class="fas fa-power-off"></i> Go Online</button>
         </div>
@@ -42,8 +42,8 @@
             </div>
             <div class="table-wrap" style="margin-top:1rem;">
                 <table class="admin-table">
-                    <thead><tr><th>Time</th><th>Email</th><th>Amount</th><th>Status</th></tr></thead>
-                    <tbody id="donationsBody"><tr><td colspan="4" style="text-align:center;">Loading…</td></tr></tbody>
+                    <thead><tr><th>Time</th><th>Donor</th><th>Email</th><th>Amount</th><th>Status</th></tr></thead>
+                    <tbody id="donationsBody"><tr><td colspan="5" style="text-align:center;">Loading…</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -485,6 +485,7 @@
                 <div class="form-group"><label>Internal Notes <span style="font-weight:400; color:var(--text-muted);">(admin only — never shown to the client)</span></label><textarea id="editInternalNotes" style="border-color:var(--warning-bg);">${c.internalNotes || ''}</textarea></div>
 
                 <button class="btn btn-primary" onclick="saveCase('${c.caseId}')"><i class="fas fa-save"></i> Save Changes</button>
+                ${c.clientUserId ? `<button class="btn btn-success" style="margin-left:.5rem;" onclick="callClientFromCase('${c.clientUserId}','${c.caseId}')"><i class="fas fa-phone"></i> Call Client</button>` : ''}
                 ${currentAdmin.role === 'owner' && c.publicNotes ? `<button class="btn btn-danger" style="margin-left:.5rem;" onclick="deleteClientMessage('${c.caseId}')"><i class="fas fa-trash"></i> Delete Client Message</button>` : ''}
                 <span id="saveStatus" style="margin-left:0.8rem; color:var(--text-muted); font-size:0.85rem;"></span>
 
@@ -516,6 +517,48 @@
                 </div>
             `;
         }
+
+        async function callClientFromCase(clientUserId, caseId) {
+            if (currentActiveCallId || currentIncomingCallId) {
+                alert('Finish the current call before starting another call.');
+                return;
+            }
+            const body = document.getElementById('callModalBody');
+            document.getElementById('callModalOverlay').style.display = 'flex';
+            body.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Calling client…</p>';
+            try {
+                const res = await fetch('/api/calls/admin/callback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ clientUserId, caseId }),
+                });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    body.innerHTML = `<p style="color:var(--danger);">${data.error || 'Could not start callback.'}</p><button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
+                    return;
+                }
+                currentActiveCallId = data.sessionId;
+                currentCallPeer = new window.ManlungCallWebRTC.CallPeer({
+                    sessionId: data.sessionId,
+                    isInitiator: true,
+                    headers: authHeaders(),
+                    onStateChange: (state, detail) => renderActiveCallUI(state, data.session, detail),
+                    onDuration: (d) => {
+                        const el = document.getElementById('adminCallDuration');
+                        if (el) el.textContent = d;
+                    },
+                });
+                body.innerHTML = '<p><i class="fas fa-phone-volume"></i> Calling client… waiting for them to answer.</p><button class="btn btn-danger" style="margin-top:.8rem;" onclick="endActiveCall()">Cancel</button>';
+                await currentCallPeer.start();
+            } catch (e) {
+                console.error(e);
+                currentActiveCallId = null;
+                currentCallPeer = null;
+                body.innerHTML = `<p style="color:var(--danger);">Could not start callback: ${e.message}</p><button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
+            }
+        }
+        window.callClientFromCase = callClientFromCase;
 
         async function saveCase(caseId) {
             const status = document.getElementById('editStatus').value;
@@ -938,10 +981,11 @@
                 body.innerHTML = rows.length ? rows.map(d => `
                     <tr>
                         <td>${d.paid_at ? new Date(d.paid_at).toLocaleString() : new Date(d.created_at).toLocaleString()}</td>
+                        <td>${String(d.donor_name || 'Donor').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}</td>
                         <td>${String(d.donor_email || '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}</td>
                         <td>KES ${Number(d.amount_kes || 0).toLocaleString('en-KE')}</td>
                         <td><span class="status-badge ${d.status === 'confirmed' ? 'status-completed' : d.status === 'failed' ? 'status-rejected' : 'status-pending'}">${d.status}</span></td>
-                    </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:1.2rem;">No donations yet.</td></tr>';
+                    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.2rem;">No donations yet.</td></tr>';
             } catch (e) {
                 console.error('Donation dashboard error:', e);
             }

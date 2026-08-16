@@ -230,7 +230,7 @@
     </div>
 
     <footer class="site-footer">
-        <p>&copy; 2026 Manlung Tech City. All rights reserved.</p>
+        <p>&copy; 2026 Manlung Tech City. All rights reserved.</p><p><a href="/careers.html" style="color:#a9c0ec;">Careers</a></p>
         <p><i class="fas fa-lock"></i> 256-bit Encrypted & Secure</p>
     </footer>
 
@@ -350,6 +350,13 @@
 
             const submitBtn = document.getElementById('submitBtn');
             const statusEl = document.getElementById('submitStatus');
+            const token = localStorage.getItem('clientToken');
+            if (!token) {
+                alert('Please sign in to submit a recovery case. Your case must be linked to your account so only you can track it.');
+                window.location.href = '/login.html';
+                return;
+            }
+
             submitBtn.disabled = true;
             statusEl.textContent = 'Submitting request…';
 
@@ -383,6 +390,7 @@
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/api/cases/submit');
+            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
             xhr.upload.onprogress = (e) => {
                 if (e.lengthComputable) {
@@ -418,7 +426,11 @@
 
         async function checkAuth() {
             const token = localStorage.getItem('clientToken');
-            if (!token) return false;
+            if (!token) {
+                const notice = document.getElementById('submitStatus');
+                if (notice) notice.textContent = 'Please sign in before submitting a case.';
+                return false;
+            }
             try {
                 const response = await fetch('/api/auth/verify', { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await response.json();
