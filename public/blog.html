@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog · Manlung Recovery</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .blog-hero {
+            text-align: center;
+            padding: 3rem 1rem;
+            margin-bottom: 2rem;
+            border-radius: 28px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--navy-900), var(--navy-700));
+        }
+        .blog-hero h1 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: .8rem; }
+        .blog-hero p { max-width: 760px; margin: 0 auto; opacity: .9; line-height: 1.7; }
+        .blog-categories {
+            display: flex; flex-wrap: wrap; gap: .55rem; justify-content: center;
+            margin: 0 0 2rem;
+        }
+        .blog-category {
+            display: inline-flex; align-items: center; gap: .35rem;
+            padding: .5rem .8rem; border-radius: 999px;
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            color: var(--text-muted); font-size: .85rem; font-weight: 600;
+        }
+        .blog-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem; margin-bottom: 2rem;
+        }
+        .blog-card { height: 100%; display: flex; flex-direction: column; }
+        .blog-card .blog-meta {
+            color: var(--accent); font-size: .78rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .04em; margin-bottom: .55rem;
+        }
+        .blog-card h2 { font-size: 1.2rem; margin-bottom: .65rem; }
+        .blog-card p { color: var(--text-muted); line-height: 1.65; }
+        .blog-card .btn { align-self: flex-start; margin-top: auto; padding-top: .8rem; }
+        .featured {
+            display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(240px, .6fr);
+            gap: 1.5rem; align-items: stretch; margin-bottom: 2rem;
+        }
+        .featured-panel {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg); padding: 2rem;
+        }
+        .featured-panel h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); margin-bottom: .8rem; }
+        .featured-panel p { color: var(--text-muted); line-height: 1.75; }
+        .featured-aside {
+            background: linear-gradient(160deg, var(--navy-900), var(--navy-800));
+            color: #fff; border-radius: var(--radius-lg); padding: 1.6rem;
+        }
+        .featured-aside h3 { margin-bottom: .7rem; }
+        .featured-aside p { opacity: .88; line-height: 1.65; }
+        .article-section { scroll-margin-top: 1rem; }
+        @media (max-width: 720px) {
+            .featured { grid-template-columns: 1fr; }
+            .featured-panel, .featured-aside { padding: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                <h1><i class="fas fa-shield-halved"></i> Manlung Recovery</h1>
+                <span>Recovery, support & digital guidance</span>
+            </div>
+            <div class="header-actions">
+                <a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a>
+                <a href="/login.html" class="btn btn-outline"><i class="fas fa-user"></i> Client Portal</a>
+                <a href="/client/request.html" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit a Request</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="blog-hero">
+            <h1>Manlung Recovery Blog</h1>
+            <p>A practical information and education center focused on recovery, support, awareness, resilience, responsible guidance, and taking the next positive step.</p>
+        </section>
+
+        <nav class="blog-categories" aria-label="Blog categories">
+            <span class="blog-category"><i class="fas fa-heart"></i> Recovery</span>
+            <span class="blog-category"><i class="fas fa-hands-helping"></i> Support</span>
+            <span class="blog-category"><i class="fas fa-book-open"></i> Education</span>
+            <span class="blog-category"><i class="fas fa-users"></i> Community</span>
+            <span class="blog-category"><i class="fas fa-shield-halved"></i> Awareness</span>
+            <span class="blog-category"><i class="fas fa-seedling"></i> Resilience</span>
+        </nav>
+
+        <section class="featured article-section" id="what-is-manlung-recovery">
+            <article class="featured-panel">
+                <div class="blog-meta">Featured · Our Story</div>
+                <h2>What is Manlung Recovery?</h2>
+                <p>Manlung Recovery is a platform designed to make it easier for people to seek assistance, submit cases, communicate with support personnel, receive guidance, follow cases, and access useful educational information.</p>
+                <p style="margin-top:.8rem;">The platform brings those activities into a structured client experience so that a person looking for help can understand the next step and keep relevant case information organized.</p>
+                <a href="#articles" class="btn btn-primary" style="margin-top:1.2rem;"><i class="fas fa-book-open"></i> Explore the articles</a>
+            </article>
+            <aside class="featured-aside">
+                <h3><i class="fas fa-compass"></i> A place to start</h3>
+                <p>If you are unsure what to do next, start by gathering the facts you have, preserving useful records, and using an appropriate support channel.</p>
+            </aside>
+        </section>
+
+        <section class="card article-section" id="our-mission" style="margin-bottom:2rem;">
+            <div class="blog-meta">Our Mission</div>
+            <h2 style="font-size:1.7rem; margin-bottom:.7rem;">Hope, dignity and responsible support</h2>
+            <p style="color:var(--text-muted); line-height:1.75;">Our mission is centered on hope, dignity, recovery, support, education, community, and responsible guidance. The goal is to help people take the next positive step without overstating what any service can guarantee.</p>
+        </section>
+
+        <section id="articles" class="article-section">
+            <div class="card-title"><i class="fas fa-newspaper"></i> Recent articles</div>
+            <div class="blog-grid">
+                <article class="card blog-card" id="recovery-journey">
+                    <div class="blog-meta">Recovery</div>
+                    <h2>Understanding the Recovery Journey</h2>
+                    <p>Recovery is often a process rather than a single event. Breaking a difficult situation into clear, manageable next steps can make progress easier to see.</p>
+                    <a class="btn btn-outline-dark" href="#recovery-journey">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="taking-first-step">
+                    <div class="blog-meta">Guidance</div>
+                    <h2>Taking the First Step</h2>
+                    <p>Start with what you know: what happened, when it happened, what evidence you have, and what outcome you need. Clear information helps support teams understand a case.</p>
+                    <a class="btn btn-outline-dark" href="#taking-first-step">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="asking-for-help">
+                    <div class="blog-meta">Support</div>
+                    <h2>Why Asking for Help Matters</h2>
+                    <p>Asking for help can create a clearer path forward. Reaching out early can also make it easier to preserve information and identify appropriate next steps.</p>
+                    <a class="btn btn-outline-dark" href="#asking-for-help">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="supporting-someone">
+                    <div class="blog-meta">Community</div>
+                    <h2>Supporting Someone You Care About</h2>
+                    <p>Good support starts with listening, respecting the person's dignity, and helping them connect with the right source of assistance rather than making promises on their behalf.</p>
+                    <a class="btn btn-outline-dark" href="#supporting-someone">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="resilience-hope">
+                    <div class="blog-meta">Resilience</div>
+                    <h2>Recovery, Resilience and Hope</h2>
+                    <p>Resilience can mean continuing to take constructive steps after a setback. Keeping useful records, reviewing what changed, and seeking appropriate support can help.</p>
+                    <a class="btn btn-outline-dark" href="#resilience-hope">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="community-support">
+                    <div class="blog-meta">Community</div>
+                    <h2>Why Community Support Matters</h2>
+                    <p>People often navigate difficult situations with more confidence when they know where to find trustworthy information and how to reach appropriate support.</p>
+                    <a class="btn btn-outline-dark" href="#community-support">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="healthy-routines">
+                    <div class="blog-meta">Routines</div>
+                    <h2>Building Healthy Routines</h2>
+                    <p>Simple routines can create structure during periods of change. Keep plans realistic, review progress regularly, and seek professional guidance when the situation calls for it.</p>
+                    <a class="btn btn-outline-dark" href="#healthy-routines">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="setbacks-progress">
+                    <div class="blog-meta">Progress</div>
+                    <h2>Understanding Setbacks and Progress</h2>
+                    <p>A setback does not erase every step already taken. Review what happened, adjust the plan where appropriate, and focus on the next useful action.</p>
+                    <a class="btn btn-outline-dark" href="#setbacks-progress">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="breaking-stigma">
+                    <div class="blog-meta">Awareness</div>
+                    <h2>Breaking the Stigma Around Asking for Help</h2>
+                    <p>Seeking assistance is a practical decision, not a failure. Compassionate conversations can make it easier for people to speak up and find appropriate resources.</p>
+                    <a class="btn btn-outline-dark" href="#breaking-stigma">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="professional-help">
+                    <div class="blog-meta">Safety</div>
+                    <h2>When to Seek Professional Help</h2>
+                    <p>When a situation involves significant safety, financial, legal, technical, or other specialized risk, consider contacting a qualified professional or the relevant official service.</p>
+                    <a class="btn btn-outline-dark" href="#professional-help">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+            </div>
+        </section>
+
+        <section class="featured article-section" id="what-we-are-building">
+            <article class="featured-panel">
+                <div class="blog-meta">Platform</div>
+                <h2>What We Are Building at Manlung Recovery</h2>
+                <p>The platform brings together case support, client communication, recovery information, support requests, awareness, education, community support, careers, and structured assistance.</p>
+                <p style="margin-top:.8rem;">These features are intended to make the process clearer and more organized while keeping existing client and administrative workflows connected.</p>
+            </article>
+            <aside class="featured-aside" id="careers">
+                <h3><i class="fas fa-briefcase"></i> Careers</h3>
+                <p>Manlung Recovery also has a Careers area for people interested in joining or contributing.</p>
+                <a href="/careers.html" class="btn btn-outline" style="margin-top:1rem;">Visit Careers</a>
+            </aside>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="site-footer-brand">
+                <strong><i class="fas fa-shield-halved"></i> Manlung Tech City</strong>
+                <span>Cyber Recovery &amp; Digital Investigation Portal</span>
+            </div>
+            <div class="site-footer-links">
+                <a href="/">Home</a>
+                <a href="/about.html">About</a>
+                <a href="/careers.html">Careers</a>
+                <a href="/terms.html">Terms</a>
+                <a href="/login.html">Client Portal</a>
+            </div>
+            <div class="site-footer-security">
+                <span><i class="fas fa-lock"></i> Secure portal</span>
+                <span><i class="fas fa-mobile-screen-button"></i> Mobile friendly</span>
+            </div>
+        </div>
+        <div class="site-footer-bottom">&copy; 2026 Manlung Tech City. All rights reserved.</div>
+    </footer>
+</body>
+</html>
