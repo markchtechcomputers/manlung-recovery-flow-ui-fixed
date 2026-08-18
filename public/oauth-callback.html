@@ -162,7 +162,7 @@
                 ]);
             } catch (error) {
                 console.error('OAuth callback error:', error?.message || 'Authentication callback failed.');
-                showError('Please return to sign in and try again.');
+                showError(error?.message || 'Authentication failed. Check the browser console for details.');
             }
         })();
     </script>
