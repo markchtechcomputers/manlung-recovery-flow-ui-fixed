@@ -98,7 +98,7 @@
             // Capture OAuth data before removing it from the address bar.
             if (hashError) {
                 clearOAuthUrl();
-                throw new Error('The social provider returned an authentication error.');
+                throw new Error(hashError);
             }
 
             if (code) {
