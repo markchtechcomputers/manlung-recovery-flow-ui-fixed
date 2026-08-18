@@ -38,14 +38,21 @@ router.post('/', [
       experience: req.body.experience,
       role_interested: req.body.roleInterested,
       skills: req.body.skills,
-      cover_note: req.body.coverNote,
+      application_statement: req.body.coverNote,
       status: 'submitted',
     }).select('id, status, created_at').single();
     if (error) throw error;
     res.status(201).json({ success: true, application: data, message: 'Application submitted successfully.' });
   } catch (error) {
-    console.error('Career application error:', error);
-    res.status(500).json({ error: 'Could not submit your application right now.' });
+    console.error('Career application error:', {
+      message: error?.message,
+      code: error?.code,
+      details: error?.details,
+      hint: error?.hint
+    });
+    res.status(500).json({
+      error: 'Could not submit your application right now.'
+    });
   }
 });
 
@@ -64,7 +71,7 @@ router.get('/admin', ownerAuth, async (_req, res) => {
 router.put('/admin/:id/status', ownerAuth, [body('status').isIn(['submitted','reviewing','shortlisted','hired','rejected']).withMessage('Invalid application status.')], async (req, res) => {
   if (!valid(req, res)) return;
   try {
-    const { data, error } = await supabase.from(TABLE).update({ status: req.body.status, reviewed_at: new Date().toISOString() }).eq('id', req.params.id).select().maybeSingle();
+    const { data, error } = await supabase.from(TABLE).update({ status: req.body.status }).eq('id', req.params.id).select().maybeSingle();
     if (error) throw error;
     if (!data) return res.status(404).json({ error: 'Application not found.' });
     res.json({ success: true, application: data });
