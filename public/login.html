@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Login · Manlung Tech City</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .auth-wrap { min-height: calc(100vh - 90px); display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+        .auth-card { max-width: 420px; width: 100%; }
+        .toggle-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .toggle-row button {
+            flex: 1; padding: 0.6rem; border-radius: var(--radius-md); border: 1px solid var(--card-border);
+            background: var(--page-bg); color: var(--text-muted); font-weight: 600; cursor: pointer;
+        }
+        .toggle-row button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .social-row { display:grid; gap:.55rem; margin:.9rem 0 1rem; }
+        .social-btn { width:100%; justify-content:center; }
+        .auth-divider { display:flex; align-items:center; gap:.7rem; color:var(--text-muted); font-size:.8rem; margin:.8rem 0; }
+        .auth-divider::before,.auth-divider::after { content:""; flex:1; height:1px; background:var(--card-border); }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                <h1><i class="fas fa-shield-halved"></i> Manlung Tech City</h1>
+                <span>Client Access</span>
+            </div>
+            <div class="header-actions">
+                <a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="auth-wrap">
+        <div class="card auth-card">
+            <div class="toggle-row">
+                <button id="tabLogin" class="active" onclick="showTab('login')">Sign In</button>
+                <button id="tabRegister" onclick="showTab('register')">Create Account</button>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required></div>
+                <div class="form-group"><label>Password</label><input type="password" id="loginPassword" required></div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Sign In
+                </button>
+                <div class="auth-divider">or continue with</div>
+                <div class="social-row">
+                    <button type="button" class="btn btn-outline social-btn" onclick="startSocialSignup('google')"><i class="fab fa-google"></i> Continue with Google</button>
+                    <button type="button" class="btn btn-outline social-btn" onclick="startSocialSignup('github')"><i class="fab fa-github"></i> Continue with GitHub</button>
+                </div>
+                <div id="loginError" class="error-text"></div>
+                <p style="text-align:center; margin-top:0.8rem;">
+                    <a href="#" onclick="showForgot(event)" style="color:var(--accent); font-size:0.85rem; text-decoration:none;">Forgot password?</a>
+                </p>
+            </form>
+
+            <form id="forgotForm" onsubmit="handleForgot(event)" style="display:none;">
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Enter your account email and we'll generate a reset link.</p>
+                <div class="form-group"><label>Email</label><input type="email" id="forgotEmail" required></div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-paper-plane"></i> Send Reset Link
+                </button>
+                <div id="forgotError" class="error-text"></div>
+                <div id="forgotResult" style="display:none; font-size:0.85rem; margin-top:0.8rem;"></div>
+                <p style="text-align:center; margin-top:0.8rem;">
+                    <a href="#" onclick="showTab('login')" style="color:var(--accent); font-size:0.85rem; text-decoration:none;">Back to sign in</a>
+                </p>
+            </form>
+
+            <form id="registerForm" onsubmit="handleRegister(event)" style="display:none;">
+                <div class="form-group"><label>Full Name</label><input id="regName" required></div>
+                <div class="form-group"><label>Email</label><input type="email" id="regEmail" required></div>
+                <div class="form-group"><label>Phone Number</label><input id="regPhone" required></div>
+                <div class="form-group"><label>Password</label><input type="password" id="regPassword" required minlength="6"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                <div class="auth-divider">or continue with</div>
+                <div class="social-row">
+                    <button type="button" class="btn btn-outline social-btn" onclick="startSocialSignup('google')"><i class="fab fa-google"></i> Continue with Google</button>
+                    <button type="button" class="btn btn-outline social-btn" onclick="startSocialSignup('github')"><i class="fab fa-github"></i> Continue with GitHub</button>
+                </div>
+                <div id="registerError" class="error-text"></div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Manlung Tech City. All rights reserved.</p>
+        <p><i class="fas fa-lock"></i> 256-bit Encrypted & Secure</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        function showTab(tab) {
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('forgotForm').style.display = 'none';
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+        }
+
+        function showForgot(event) {
+            event.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotForm').style.display = 'block';
+        }
+
+        async function handleForgot(event) {
+            event.preventDefault();
+            const email = document.getElementById('forgotEmail').value;
+            const errorEl = document.getElementById('forgotError');
+            const resultEl = document.getElementById('forgotResult');
+            errorEl.textContent = '';
+            resultEl.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/auth/client/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    resultEl.style.display = 'block';
+                    resultEl.style.color = 'var(--success)';
+                    resultEl.innerHTML = data.message;
+                    if (data.devResetLink) {
+                        resultEl.innerHTML += `<br><span style="color:var(--text-muted);">Dev mode (no email provider configured yet): <a href="${data.devResetLink}">${data.devResetLink}</a></span>`;
+                    }
+                } else {
+                    errorEl.textContent = data.error || 'Could not process request';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Could not reach the server (' + err.message + ').';
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            errorEl.textContent = '';
+
+            try {
+                const res = await fetch('/api/auth/client/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('clientToken', data.token);
+                    localStorage.setItem('clientUser', JSON.stringify(data.user));
+                    window.location.href = '/client/dashboard.html';
+                } else {
+                    errorEl.textContent = data.error || 'Invalid credentials';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Could not reach the server (' + err.message + '). Is it running?';
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const fullName = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const phone = document.getElementById('regPhone').value;
+            const password = document.getElementById('regPassword').value;
+            const errorEl = document.getElementById('registerError');
+            errorEl.textContent = '';
+
+            try {
+                const res = await fetch('/api/auth/client/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, email, phone, password }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('clientToken', data.token);
+                    localStorage.setItem('clientUser', JSON.stringify(data.user));
+                    window.location.href = '/client/dashboard.html';
+                } else {
+                    errorEl.textContent = data.error || 'Could not create account';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Could not reach the server (' + err.message + '). Is it running?';
+            }
+        }
+
+        async function startSocialSignup(provider) {
+            const errorEl = document.getElementById('loginError');
+            const registerErrorEl = document.getElementById('registerError');
+            errorEl.textContent = '';
+            registerErrorEl.textContent = '';
+
+            try {
+                const configRes = await fetch('/api/config/public', { cache: 'no-store' });
+                if (!configRes.ok) throw new Error('Could not load authentication settings.');
+                const config = await configRes.json();
+
+                if (!config.supabaseUrl || !config.supabaseAnonKey) {
+                    throw new Error('Social sign-in is not configured yet. Please try again later.');
+                }
+                if (!window.supabase) throw new Error('Authentication library could not be loaded.');
+
+                const client = window.supabase.createClient(
+                    config.supabaseUrl,
+                    config.supabaseAnonKey,
+                    {
+                        auth: {
+                            persistSession: true,
+                            autoRefreshToken: true,
+                            detectSessionInUrl: true,
+                            flowType: 'pkce'
+                        }
+                    }
+                );
+
+                const { error } = await client.auth.signInWithOAuth({
+                    provider,
+                    options: {
+                        redirectTo: 'https://manlungrecovery.manlungshop.co.ke/oauth-callback.html'
+                    }
+                });
+
+                if (error) throw error;
+            } catch (err) {
+                const message = err?.message || 'Could not start social sign-in.';
+                errorEl.textContent = message;
+                registerErrorEl.textContent = message;
+            }
+        }
+
+        // Remember logins: if a valid session already exists, skip straight to the dashboard
+        (async function autoLogin() {
+            const token = localStorage.getItem('clientToken');
+            if (!token) return;
+            try {
+                const res = await fetch('/api/auth/verify', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                if (data.success && data.user.role === 'client') {
+                    window.location.href = '/client/dashboard.html';
+                }
+            } catch (e) { /* server unreachable — just stay on the login page */ }
+        })();
+    </script>
+</body>
+</html>

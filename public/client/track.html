@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Details · Manlung Tech City</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                <h1><i class="fas fa-folder-open"></i> Case Details</h1>
+                <span id="caseIdHeading">Loading…</span>
+            </div>
+            <div class="header-actions">
+                <a href="/client/dashboard.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="content"></div>
+    </div>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Manlung Tech City. All rights reserved.</p><p><a href="/careers.html" style="color:#a9c0ec;">Careers</a></p>
+        <p><i class="fas fa-lock"></i> 256-bit Encrypted & Secure</p>
+    </footer>
+
+    <script>
+        function getStatusClass(status) {
+            const map = {
+                'Pending Review': 'status-pending',
+                'Accepted': 'status-progress',
+                'Under Investigation': 'status-progress',
+                'Awaiting Customer Response': 'status-progress',
+                'Evidence Collected': 'status-progress',
+                'Recovery Successful': 'status-completed',
+                'Recovered by Police': 'status-completed',
+                'Recovered by Owner': 'status-completed',
+                'Closed': 'status-closed',
+                'Rejected': 'status-rejected',
+            };
+            return map[status] || 'status-pending';
+        }
+
+        async function loadCase() {
+            const params = new URLSearchParams(window.location.search);
+            const caseId = params.get('case');
+            const content = document.getElementById('content');
+            const token = localStorage.getItem('clientToken');
+            if (!token) { window.location.href = '/login.html'; return; }
+
+            if (!caseId) {
+                content.innerHTML = '<div class="card"><p class="error-text">No case ID provided.</p></div>';
+                return;
+            }
+
+            document.getElementById('caseIdHeading').textContent = caseId;
+
+            try {
+                const res = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+
+                if (!data.success) {
+                    content.innerHTML = `<div class="card"><p class="error-text">${data.error || 'Case not found'}</p></div>`;
+                    return;
+                }
+
+                const c = data.case;
+                const filesHtml = (c.files && c.files.length)
+                    ? c.files.map(f => `
+                        <div class="file-item">
+                            <a href="${f.url}" target="_blank" rel="noopener"><i class="fas fa-file"></i> ${f.originalName || f.filename}</a>
+                            <span class="status">${f.uploadedBy || ''}</span>
+                        </div>`).join('')
+                    : '<p style="color:var(--text-muted); font-size:0.9rem;">No files attached yet.</p>';
+
+                content.innerHTML = `
+                    <div class="card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+                            <strong style="font-size:1.3rem;">${c.caseId}</strong>
+                            <span class="status-badge ${getStatusClass(c.status)}">${c.status}</span>
+                        </div>
+                        <p style="color:var(--text-muted); margin-bottom:1rem;">${c.caseType || ''}</p>
+                        <div><strong>Investigator:</strong> ${c.investigator || 'Not assigned'}</div>
+                        <div><strong>Last Updated:</strong> ${c.lastUpdated || 'N/A'}</div>
+                        ${c.recoveryLoc ? `<div><strong>Recovery Location:</strong> ${c.recoveryLoc}</div>` : ''}
+                        ${c.publicNotes ? `<div style="margin-top:.8rem;padding:.8rem;border-radius:10px;background:var(--info-bg);"><strong>Admin feedback:</strong><div style="margin-top:.35rem;white-space:pre-wrap;">${c.publicNotes}</div></div>` : ''}
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-timeline"></i> Timeline</div>
+                        <div style="white-space:pre-line;">${c.timeline || 'Request Submitted ✅'}</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-paperclip"></i> Files</div>
+                        <div class="file-list">${filesHtml}</div>
+                    </div>
+                `;
+            } catch (err) {
+                console.error(err);
+                content.innerHTML = '<div class="card"><p class="error-text">Error loading case.</p></div>';
+            }
+        }
+
+        loadCase();
+    </script>
+</body>
+</html>

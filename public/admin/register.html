@@ -1,0 +1,397 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Registration · Manlung Recovery</title>
+
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="icon" href="/favicon.svg">
+
+  <style>
+    body {
+      background: #07132d;
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      max-width: 480px;
+      width: 100%;
+      background: #101f42;
+      padding: 28px;
+      border: 1px solid #223257;
+      border-radius: 18px;
+      color: #fff;
+    }
+
+    label {
+      display: block;
+      margin: .8rem 0 .3rem;
+      color: #a9c0ec;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: .7rem;
+      border-radius: 9px;
+      border: 1px solid #223257;
+      background: #0b1730;
+      color: #fff;
+    }
+
+    .btn {
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .msg {
+      margin-top: 1rem;
+      padding: 10px;
+      border-radius: 8px;
+      color: #f87171;
+      white-space: pre-wrap;
+    }
+
+    .success {
+      color: #4ade80;
+      background: #102f22;
+    }
+
+    .warning {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 9px;
+      background: #3b1d1d;
+      border: 1px solid #7f1d1d;
+      color: #fca5a5;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <div class="card">
+
+    <h1>Admin Registration</h1>
+
+    <p style="color:#a9c0ec">
+      Use the invitation sent by the Owner.
+      You cannot create an Admin account without an invitation.
+    </p>
+
+    <div id="inviteWarning" class="warning hidden">
+      This registration link is invalid or missing an Owner invitation.
+      Please ask the Owner to send you a new invitation.
+    </div>
+
+    <form id="registrationForm">
+
+      <label for="fullName">Full name</label>
+      <input
+        id="fullName"
+        type="text"
+        autocomplete="name"
+        required
+      >
+
+      <label for="username">Username</label>
+      <input
+        id="username"
+        type="text"
+        minlength="3"
+        maxlength="80"
+        autocomplete="username"
+        required
+      >
+
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+        required
+      >
+
+      <label for="phone">Phone</label>
+      <input
+        id="phone"
+        type="tel"
+        autocomplete="tel"
+      >
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        minlength="8"
+        autocomplete="new-password"
+        required
+      >
+
+      <button
+        id="submitButton"
+        class="btn btn-primary"
+        type="submit"
+      >
+        Create Admin Account
+      </button>
+
+    </form>
+
+    <div id="msg" class="msg"></div>
+
+    <p>
+      <a href="/admin/login.html" style="color:#6ea8ff">
+        Back to Admin login
+      </a>
+    </p>
+
+  </div>
+</div>
+
+<script>
+
+  // ==========================================================
+  // GET INVITATION TOKEN
+  // ==========================================================
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const invitationToken = urlParams.get("token");
+
+  const form = document.getElementById("registrationForm");
+  const fullNameInput = document.getElementById("fullName");
+  const usernameInput = document.getElementById("username");
+  const emailInput = document.getElementById("email");
+  const phoneInput = document.getElementById("phone");
+  const passwordInput = document.getElementById("password");
+
+  const submitButton = document.getElementById("submitButton");
+  const message = document.getElementById("msg");
+  const inviteWarning = document.getElementById("inviteWarning");
+
+
+  // ==========================================================
+  // INVITATION IS REQUIRED
+  // ==========================================================
+
+  if (!invitationToken) {
+
+    inviteWarning.classList.remove("hidden");
+
+    submitButton.disabled = true;
+
+    message.textContent =
+      "An Owner invitation is required to create an Admin account.";
+
+  }
+
+
+  // ==========================================================
+  // REGISTER ADMIN
+  // ==========================================================
+
+  form.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    message.className = "msg";
+    message.textContent = "";
+
+    // Never allow registration without Owner invitation
+    if (!invitationToken) {
+
+      message.textContent =
+        "Registration denied. You must use an invitation sent by the Owner.";
+
+      return;
+    }
+
+
+    const fullName = fullNameInput.value.trim();
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase();
+    const phone = phoneInput.value.trim();
+    const password = passwordInput.value;
+
+
+    // ========================================================
+    // BASIC VALIDATION
+    // ========================================================
+
+    if (!fullName) {
+      message.textContent = "Please enter your full name.";
+      return;
+    }
+
+    if (username.length < 3) {
+      message.textContent =
+        "Username must be at least 3 characters.";
+      return;
+    }
+
+    if (!email) {
+      message.textContent =
+        "Please enter the email address used by the Owner for the invitation.";
+      return;
+    }
+
+    if (password.length < 8) {
+      message.textContent =
+        "Password must be at least 8 characters.";
+      return;
+    }
+
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Creating account...";
+    message.textContent = "Checking your invitation...";
+
+
+    try {
+
+      // ======================================================
+      // SEND REGISTRATION REQUEST
+      // ======================================================
+
+      const response = await fetch(
+        "/api/auth/admin/register",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+
+          body: JSON.stringify({
+            token: invitationToken,
+            fullName: fullName,
+            username: username,
+            email: email,
+            phone: phone,
+            password: password
+          })
+        }
+      );
+
+
+      // ======================================================
+      // READ SERVER RESPONSE
+      // ======================================================
+
+      const responseText = await response.text();
+
+      let data = {};
+
+      if (responseText) {
+
+        try {
+
+          data = JSON.parse(responseText);
+
+        } catch (parseError) {
+
+          console.error(
+            "Server returned non-JSON:",
+            responseText
+          );
+
+          throw new Error(
+            "Server error (" +
+            response.status +
+            "). Please make sure the backend is running correctly."
+          );
+        }
+      }
+
+
+      // ======================================================
+      // SERVER REJECTED REQUEST
+      // ======================================================
+
+      if (!response.ok) {
+
+        message.textContent =
+          data.error ||
+          data.message ||
+          "Registration was rejected by the server.";
+
+        submitButton.disabled = false;
+        submitButton.textContent = "Create Admin Account";
+
+        return;
+      }
+
+
+      // ======================================================
+      // SUCCESS
+      // ======================================================
+
+      if (data.success) {
+
+        message.className = "msg success";
+
+        message.textContent =
+          "Admin account created successfully.\n\n" +
+          "Your account is now waiting for Owner approval. " +
+          "You will be able to log in after the Owner approves your account.";
+
+
+        // Do NOT automatically log in.
+        // Admin accounts must be approved by Owner first.
+
+        form.reset();
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Registration Complete";
+
+        return;
+      }
+
+
+      // Unexpected response
+      message.textContent =
+        data.error ||
+        "Registration could not be completed.";
+
+      submitButton.disabled = false;
+      submitButton.textContent = "Create Admin Account";
+
+
+    } catch (error) {
+
+      console.error(
+        "Admin registration error:",
+        error
+      );
+
+      message.textContent =
+        error.message ||
+        "Unable to connect to the server.";
+
+      submitButton.disabled = false;
+      submitButton.textContent =
+        "Create Admin Account";
+    }
+
+  });
+
+</script>
+
+</body>
+</html>
+```

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a1a3a">
+  <title>My Cases · Manlung Tech City</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    .dashboard-hero { background:linear-gradient(135deg,#0a1a3a,#17336b); color:#fff; border-radius:24px; padding:1.5rem; margin:1.5rem 0; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
+    .dashboard-hero h2 { margin:0 0 .35rem; font-size:1.55rem; }
+    .dashboard-hero p { margin:0; color:#c8d7f2; }
+    .case-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:1rem; }
+    .case-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:1.2rem; box-shadow:0 4px 16px rgba(10,26,58,.05); }
+    .case-top { display:flex; justify-content:space-between; gap:.7rem; align-items:flex-start; margin-bottom:.8rem; }
+    .case-id { font-weight:800; color:var(--text); }
+    .case-type { color:var(--text-muted); font-size:.88rem; margin-top:.2rem; }
+    .case-meta { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin:1rem 0; }
+    .case-meta div { padding:.7rem; border-radius:10px; background:rgba(36,81,214,.05); }
+    .case-meta small { display:block; color:var(--text-muted); font-size:.72rem; margin-bottom:.2rem; }
+    .case-meta strong { font-size:.88rem; }
+    .feedback { margin:.8rem 0; padding:.8rem; border-radius:12px; background:var(--info-bg); color:var(--info-text); }
+    .empty { text-align:center; padding:3rem 1rem; color:var(--text-muted); }
+    .loading { text-align:center; padding:2rem; color:var(--text-muted); }
+    .error-box { padding:1rem; border-radius:12px; background:var(--danger-bg); color:var(--danger); }
+    .status-badge { display:inline-flex; align-items:center; border-radius:30px; padding:.25rem .65rem; font-size:.72rem; font-weight:700; white-space:nowrap; }
+    .status-pending { background:#fff4cc; color:#795b00; }
+    .status-progress { background:var(--info-bg); color:var(--info-text); }
+    .status-completed { background:var(--success-bg); color:var(--success); }
+    .status-closed { background:var(--closed-bg); color:var(--closed-text); }
+    .status-rejected { background:var(--danger-bg); color:var(--danger); }
+    .dashboard-actions { display:flex; gap:.65rem; flex-wrap:wrap; }
+    @media(max-width:600px){
+      .site-header .container { align-items:flex-start; }
+      .site-header .brand h1 { font-size:1.25rem; }
+      .header-actions { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+      .header-actions .btn { justify-content:center; padding:.55rem .7rem; }
+      .container { padding:1rem; }
+      .dashboard-hero { margin:1rem 0; padding:1.15rem; }
+      .dashboard-hero h2 { font-size:1.25rem; }
+      .case-grid { grid-template-columns:1fr; }
+      .case-meta { grid-template-columns:1fr; }
+      #callWidget { right:10px !important; bottom:10px !important; }
+      #callWidgetPanel { width:min(300px,calc(100vw - 20px)) !important; right:0 !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <div class="brand">
+        <h1><i class="fas fa-shield-halved"></i> My Recovery Dashboard</h1>
+        <span id="welcomeLine">Your cases, progress and Admin updates</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline" type="button" onclick="toggleDarkMode()"><i class="fas fa-moon"></i><span>Theme</span></button>
+        <a class="btn btn-outline" href="/client/request.html"><i class="fas fa-plus"></i><span>New Request</span></a>
+        <a class="btn btn-outline" href="/"><i class="fas fa-home"></i><span>Home</span></a>
+        <button class="btn btn-outline" type="button" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="dashboard-hero">
+      <div>
+        <h2>Welcome back</h2>
+        <p>Every case stays tied to your account. Follow updates and speak directly with an available Admin.</p>
+      </div>
+      <div class="dashboard-actions">
+        <a class="btn btn-primary" href="/client/request.html"><i class="fas fa-file-circle-plus"></i> Submit Case</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:1rem;">
+      <div class="card-title"><img src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/hands-cradling-a-money-bag-with-hearts-above-symbolizing-charity-and-donation-vector-Photoroom.png" alt="Donation" style="width:2.3rem;height:2.3rem;object-fit:contain;display:inline-block;vertical-align:middle;margin-right:.45rem;"> Community Support</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <div>
+          <strong id="publicDonationTotal">KES 0</strong>
+          <div style="font-size:.82rem;color:var(--text-muted);margin-top:.2rem;"><span id="publicDonationCount">0</span> confirmed donations</div>
+        </div>
+        <a class="btn btn-primary" href="/donate.html"><i class="fas fa-heart"></i> Donate</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:1rem;">
+      <div class="card-title"><i class="fas fa-list-check"></i> My Cases <span id="caseCount" style="font-size:.78rem;color:var(--text-muted);font-weight:500;"></span></div>
+      <div id="casesState" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading your cases…</div>
+      <div id="casesGrid" class="case-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="site-footer-brand"><strong><i class="fas fa-shield-halved"></i> Manlung Tech City</strong><span>Secure recovery assistance and case management.</span></div>
+      <div class="site-footer-links"><a href="/">Home</a><a href="/about.html">About</a><a href="/careers.html">Careers</a><a href="/terms.html">Terms</a></div>
+      <div class="site-footer-security"><span><i class="fas fa-lock"></i> Secure portal</span><span><i class="fas fa-headset"></i> Admin support</span></div>
+    </div>
+    <div class="site-footer-bottom">© 2026 Manlung Tech City. All rights reserved.</div>
+  </footer>
+
+  <script src="/js/call-webrtc.js"></script>
+  <script src="/js/call-widget.js"></script>
+  <script>
+    const token = localStorage.getItem('clientToken');
+    if (!token) window.location.href = '/login.html';
+
+    function authHeaders(){ return { Authorization: `Bearer ${token}` }; }
+    function escapeHtml(value){
+      return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+    function statusClass(status){
+      if (['Recovery Successful','Recovered by Police','Recovered by Owner'].includes(status)) return 'status-completed';
+      if (status === 'Closed') return 'status-closed';
+      if (status === 'Rejected') return 'status-rejected';
+      if (status === 'Pending Review') return 'status-pending';
+      return 'status-progress';
+    }
+    function formatDate(value){
+      if (!value) return '—';
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? escapeHtml(value) : d.toLocaleString('en-KE', { timeZone:'Africa/Nairobi' });
+    }
+    function toggleDarkMode(){
+      document.body.classList.toggle('dark');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark') ? '1' : '0');
+    }
+    function logout(){
+      localStorage.removeItem('clientToken');
+      localStorage.removeItem('clientUser');
+      window.location.href='/login.html';
+    }
+    function renderCases(cases){
+      const state=document.getElementById('casesState');
+      const grid=document.getElementById('casesGrid');
+      document.getElementById('caseCount').textContent = `· ${cases.length} case${cases.length===1?'':'s'}`;
+      if(!cases.length){ state.innerHTML='<div class="empty"><i class="fas fa-folder-open" style="font-size:2rem;margin-bottom:.7rem;"></i><p>You have not submitted a recovery case yet.</p><a class="btn btn-primary" style="margin-top:1rem;" href="/client/request.html">Create your first case</a></div>'; return; }
+      state.style.display='none';
+      grid.innerHTML=cases.map(c=>{
+        const id=escapeHtml(c.caseId);
+        const status=escapeHtml(c.status || 'Pending Review');
+        return `<article class="case-card">
+          <div class="case-top"><div><div class="case-id">${id}</div><div class="case-type">${escapeHtml(c.caseType || 'Recovery Request')}</div></div><span class="status-badge ${statusClass(c.status)}">${status}</span></div>
+          <div class="case-meta"><div><small>Last updated</small><strong>${formatDate(c.lastUpdated || c.createdAt)}</strong></div><div><small>Admin</small><strong>${escapeHtml(c.investigator || 'Not assigned yet')}</strong></div></div>
+          ${c.publicNotes ? `<div class="feedback"><strong><i class="fas fa-message"></i> Admin update</strong><div style="margin-top:.35rem;white-space:pre-wrap;">${escapeHtml(c.publicNotes)}</div></div>` : ''}
+          <div style="display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.8rem;"><a class="btn btn-primary" href="/client/track.html?case=${encodeURIComponent(c.caseId)}"><i class="fas fa-eye"></i> View Progress</a></div>
+        </article>`;
+      }).join('');
+    }
+    async function loadCases(){
+      const state=document.getElementById('casesState');
+      try{
+        const res=await fetch('/api/cases/client/me',{headers:authHeaders()});
+        const data=await res.json().catch(()=>({}));
+        if(res.status===401){ logout(); return; }
+        if(!res.ok || !data.success){ throw new Error(data.error || `Server returned ${res.status}`); }
+        renderCases(Array.isArray(data.cases) ? data.cases : []);
+      }catch(error){
+        console.error('Client dashboard cases error:', error);
+        state.className='error-box';
+        state.innerHTML=`<strong>We could not load your cases.</strong><div style="margin-top:.35rem;font-size:.86rem;">${escapeHtml(error.message || 'Network error')}</div><button class="btn btn-primary" style="margin-top:.8rem;" onclick="loadCases()"><i class="fas fa-rotate"></i> Try Again</button>`;
+      }
+    }
+    (function(){
+      if(localStorage.getItem('darkMode')==='1') document.body.classList.add('dark');
+      try{
+        const user=JSON.parse(localStorage.getItem('clientUser')||'null');
+        if(user?.username) document.getElementById('welcomeLine').textContent=`Welcome, ${user.username} · Your cases, progress and Admin updates`;
+      }catch(_){ }
+    })();
+    async function loadDonationSummary(){
+      try{
+        const res=await fetch('/api/donations/total',{cache:'no-store'});
+        const data=await res.json();
+        if(data.success){
+          document.getElementById('publicDonationTotal').textContent=`KES ${Number(data.totalKes||0).toLocaleString('en-KE')}`;
+          document.getElementById('publicDonationCount').textContent=Number(data.donationCount||0).toLocaleString('en-KE');
+        }
+      }catch(error){ console.error('Donation summary error',error); }
+    }
+    loadCases();
+    loadDonationSummary();
+    setInterval(loadCases, 15000);
+    setInterval(loadDonationSummary, 10000);
+  </script>
+</body>
+</html>
