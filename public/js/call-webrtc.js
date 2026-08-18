@@ -4,26 +4,14 @@
    TURN is supplied by the server for networks where direct P2P is blocked. */
 (function () {
   let publicConfigCache = null;
-  const RINGTONE_URL = '/favicon.svg';
-  let ringtoneAudio = null;
+  const RINGTONE_OPTIONS = [{id:'soft-bell',name:'Soft Bell',notes:[659.25,783.99]},{id:'gentle-chime',name:'Gentle Chime',notes:[523.25,659.25,783.99]},{id:'sweet-pulse',name:'Sweet Pulse',notes:[587.33,698.46]},{id:'calm-tone',name:'Calm Tone',notes:[440,554.37,659.25]},{id:'bright-call',name:'Bright Call',notes:[659.25,880]}];
+  let ringtoneContext=null, ringtoneTimer=null;
+  function selectedRingtone(){return localStorage.getItem('manlungRingtone')||'soft-bell';}
+  function playRingtone(){try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;if(!ringtoneContext)ringtoneContext=new A();const o=RINGTONE_OPTIONS.find(x=>x.id===selectedRingtone())||RINGTONE_OPTIONS[0];o.notes.forEach((f,i)=>{const x=ringtoneContext.createOscillator(),g=ringtoneContext.createGain(),t=ringtoneContext.currentTime+i*.12;x.type='sine';x.frequency.value=f;g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(.06,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.4);x.connect(g);g.connect(ringtoneContext.destination);x.start(t);x.stop(t+.45);});}catch(_){} }
+  function startRingtone(){stopRingtone();playRingtone();ringtoneTimer=setInterval(playRingtone,2600);}
+  function stopRingtone(){if(ringtoneTimer)clearInterval(ringtoneTimer);ringtoneTimer=null;}
+  window.ManlungCallRingtone={start:startRingtone,stop:stopRingtone,options:RINGTONE_OPTIONS,set:id=>{if(RINGTONE_OPTIONS.some(x=>x.id===id))localStorage.setItem('manlungRingtone',id);},get:selectedRingtone};
 
-  function startRingtone() {
-    stopRingtone();
-    try {
-      // Use a tiny silent-safe browser sound source; visual/vibration alerts
-      // remain the primary notification on mobile.
-      ringtoneAudio = new Audio();
-      ringtoneAudio.loop = true;
-      ringtoneAudio.volume = 0;
-      ringtoneAudio.play().catch(() => {});
-    } catch (_) {}
-  }
-  function stopRingtone() {
-    if (!ringtoneAudio) return;
-    try { ringtoneAudio.pause(); ringtoneAudio.src = ''; } catch (_) {}
-    ringtoneAudio = null;
-  }
-  window.ManlungCallRingtone = { start: startRingtone, stop: stopRingtone };
 
   async function getPublicConfig() {
     if (!publicConfigCache) {
