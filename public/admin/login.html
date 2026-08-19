@@ -59,6 +59,47 @@
                 </button>
                 <div id="loginError" class="error-text"></div>
             </form>
+<p style="margin-top:.8rem;text-align:center;">
+  <a
+    href="#"
+    id="adminForgotPassword"
+    style="font-size:.82rem;"
+  >
+    Forgot your password?
+  </a>
+</p>
+
+<div
+  id="adminForgotBox"
+  style="display:none;margin-top:1rem;"
+>
+  <div class="form-group">
+    <label for="adminResetEmail">
+      Admin Email
+    </label>
+
+    <input
+      id="adminResetEmail"
+      type="email"
+      autocomplete="email"
+      placeholder="you@example.com"
+    >
+  </div>
+
+  <button
+    type="button"
+    class="btn btn-primary"
+    onclick="requestAdminReset()"
+  >
+    Send Reset Link
+  </button>
+
+  <p
+    id="adminResetStatus"
+    style="margin-top:.6rem;font-size:.78rem;"
+  ></p>
+</div>
+
 
             <p style="text-align:center; margin-top:1rem;"><a href="/admin/register.html" style="color:#6ea8ff; font-size:0.85rem;">Have an Admin invitation? Create your account</a></p>
             <div class="footer-text"><i class="fas fa-shield"></i> Protected by 256-bit encryption</div>
@@ -117,5 +158,100 @@
 <div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</div>
 </div>
 </footer>
+
+<script id="admin-forgot-password-script">
+(function(){
+  const link =
+    document.getElementById('adminForgotPassword');
+
+  const box =
+    document.getElementById('adminForgotBox');
+
+  if(link && box){
+    link.addEventListener('click', function(event){
+      event.preventDefault();
+
+      box.style.display =
+        box.style.display === 'none'
+          ? 'block'
+          : 'none';
+    });
+  }
+})();
+
+async function requestAdminReset(){
+  const email =
+    document.getElementById('adminResetEmail')
+      ?.value
+      ?.trim();
+
+  const status =
+    document.getElementById('adminResetStatus');
+
+  if(!email){
+    if(status){
+      status.textContent =
+        'Enter your admin email address.';
+    }
+    return;
+  }
+
+  if(status){
+    status.textContent =
+      'Sending reset link…';
+  }
+
+  try{
+    const res =
+      await fetch(
+        '/api/auth/admin/forgot-password',
+        {
+          method:'POST',
+          headers:{
+            'Content-Type':
+              'application/json'
+          },
+          body:
+            JSON.stringify({ email })
+        }
+      );
+
+    const data =
+      await res.json().catch(
+        () => ({})
+      );
+
+    if(!res.ok || !data.success){
+      throw new Error(
+        data.error ||
+        'Could not request password reset.'
+      );
+    }
+
+    if(status){
+      status.textContent =
+        data.message ||
+        'If the account exists, a reset link has been sent.';
+    }
+
+    if(
+      data.devResetLink &&
+      window.location.hostname === 'localhost'
+    ){
+      console.log(
+        'Admin reset link:',
+        data.devResetLink
+      );
+    }
+  }catch(error){
+    if(status){
+      status.textContent =
+        error.message ||
+        'Could not request password reset.';
+    }
+  }
+}
+</script>
+
 </body>
 </html>

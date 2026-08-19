@@ -851,6 +851,186 @@ router.delete(
 
 
 // ============================================================
+// ADMIN / OWNER FORGOT PASSWORD
+// ============================================================
+
+router.post(
+  '/admin/forgot-password',
+  [
+    body('email')
+      .trim()
+      .isEmail()
+      .withMessage('A valid email is required')
+      .normalizeEmail(),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const { email } = req.body;
+
+      const user =
+        await User.findByEmail(email);
+
+      if (
+        !user ||
+        !['admin', 'owner'].includes(user.role)
+      ) {
+        return res.json({
+          success: true,
+          message:
+            'If that admin account exists, a reset link has been sent.',
+        });
+      }
+
+      const rawToken =
+        crypto.randomBytes(32).toString('hex');
+
+      const tokenHash =
+        hashToken(rawToken);
+
+      const expires =
+        new Date(
+          Date.now() + 60 * 60 * 1000
+        ).toISOString();
+
+      await User.setResetToken(
+        email,
+        tokenHash,
+        expires
+      );
+
+      const base =
+        process.env.PUBLIC_APP_URL ||
+        `${req.protocol}://${req.get('host')}`;
+
+      const resetLink =
+        `${base}/admin/reset-password.html?token=${rawToken}&email=${encodeURIComponent(email)}`;
+
+      const emailResult =
+        await sendEmail({
+          to: email,
+          subject:
+            'Manlung Recovery admin password reset',
+          html: `
+            <p>
+              We received a password reset request
+              for your Manlung Recovery Admin account.
+            </p>
+
+            <p>
+              <a href="${resetLink}">
+                Reset your Admin password
+              </a>
+            </p>
+
+            <p>
+              This link expires in one hour.
+            </p>
+          `,
+        });
+
+      const response = {
+        success: true,
+        message:
+          'If that admin account exists, a reset link has been sent.',
+      };
+
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        !emailResult.sent
+      ) {
+        response.devResetLink = resetLink;
+      }
+
+      res.json(response);
+    } catch (error) {
+      console.error(
+        'Admin forgot password error:',
+        error
+      );
+
+      res.status(500).json({
+        error:
+          error.message ||
+          'Server error',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// ADMIN / OWNER RESET PASSWORD
+// ============================================================
+
+router.post(
+  '/admin/reset-password',
+  [
+    body('token')
+      .notEmpty()
+      .withMessage('Reset token is required'),
+
+    body('password')
+      .isLength({ min: 8 })
+      .withMessage(
+        'Password must be at least 8 characters'
+      ),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const {
+        token,
+        password,
+      } = req.body;
+
+      const tokenHash =
+        hashToken(token);
+
+      const user =
+        await User.findByValidResetToken(
+          tokenHash
+        );
+
+      if (
+        !user ||
+        !['admin', 'owner'].includes(user.role)
+      ) {
+        return res.status(400).json({
+          error:
+            'This reset link is invalid or has expired. Please request a new one.',
+        });
+      }
+
+      await User.resetPassword(
+        user.id,
+        password
+      );
+
+      res.json({
+        success: true,
+        message:
+          'Admin password updated. You can now sign in.',
+      });
+    } catch (error) {
+      console.error(
+        'Admin reset password error:',
+        error
+      );
+
+      res.status(500).json({
+        error:
+          error.message ||
+          'Server error',
+      });
+    }
+  }
+);
+
+
+// ============================================================
 // CLIENT FORGOT PASSWORD
 // ============================================================
 
