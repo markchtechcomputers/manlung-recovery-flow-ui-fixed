@@ -442,14 +442,58 @@
 
   async function pollForAdminCallback() {
     const headers = authHeaders();
-    if (!headers || currentPeer || currentSessionId || currentCallbackId) return;
+
+    if (!headers || currentPeer || currentSessionId) {
+      return;
+    }
+
     try {
-      const res = await fetch('/api/calls/client/callbacks', { headers, cache: 'no-store' });
+      const res = await fetch(
+        '/api/calls/client/callbacks',
+        {
+          headers,
+          cache: 'no-store'
+        }
+      );
+
       if (!res.ok) return;
-      const data = await res.json();
-      if (data.success && Array.isArray(data.calls) && data.calls.length) {
-        showAdminCallback(data.calls[0], headers);
+
+      const data =
+        await res.json().catch(() => ({}));
+
+      const calls =
+        data.success && Array.isArray(data.calls)
+          ? data.calls
+          : [];
+
+      // If a callback popup is already open, keep watching it.
+      // When the Admin cancels, ends, or otherwise clears it,
+      // automatically close the stale client popup.
+      if (currentCallbackId) {
+        const stillPending =
+          calls.some(
+            call =>
+              String(call.id) ===
+              String(currentCallbackId)
+          );
+
+        if (!stillPending) {
+          currentCallbackId = null;
+          stopClientAlert();
+          refreshEntitlementPanel();
+          return;
+        }
+
+        return;
       }
+
+      if (calls.length) {
+        showAdminCallback(
+          calls[0],
+          headers
+        );
+      }
+
     } catch (_) {}
   }
 

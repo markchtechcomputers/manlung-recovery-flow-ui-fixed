@@ -287,7 +287,55 @@ router.get('/client/callbacks', auth, async (req, res) => {
       .order('created_at', { ascending: true })
       .limit(1);
     if (error) throw error;
-    res.json({ success: true, calls: data || [] });
+
+    const calls = (data || []).map(call => ({
+      ...call,
+      admin_name:
+        call.admin_user_id === req.user.id
+          ? 'Admin'
+          : call.admin_user_id
+            ? String(call.admin_user_id)
+            : 'Manlung Admin',
+    }));
+
+    // Resolve the actual admin usernames for the callback results.
+    if (calls.length) {
+      const adminIds = [
+        ...new Set(
+          calls
+            .map(call => call.admin_user_id)
+            .filter(Boolean)
+        ),
+      ];
+
+      if (adminIds.length) {
+        const { data: admins, error: adminError } =
+          await supabase
+            .from('recovery_users')
+            .select('id, username, email')
+            .in('id', adminIds);
+
+        if (adminError) throw adminError;
+
+        const adminMap = new Map(
+          (admins || []).map(admin => [
+            String(admin.id),
+            admin.username || admin.email || 'Manlung Admin',
+          ])
+        );
+
+        for (const call of calls) {
+          call.admin_name =
+            adminMap.get(String(call.admin_user_id)) ||
+            'Manlung Admin';
+        }
+      }
+    }
+
+    res.json({
+      success: true,
+      calls,
+    });
   } catch (error) {
     console.error('Client callback poll error:', error);
     res.status(500).json({ error: error.message || 'Server error' });
