@@ -135,13 +135,17 @@
         required
       >
 
-      <label for="email">Email</label>
+      <label for="email">Invited Email</label>
       <input
         id="email"
         type="email"
         autocomplete="email"
+        readonly
         required
       >
+      <small style="display:block;color:#9fb0c8;margin-top:.35rem;">
+        This email was selected by the Owner for this invitation.
+      </small>
 
       <label for="phone">Phone</label>
       <input
@@ -188,12 +192,19 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const invitationToken = urlParams.get("token");
+  const invitedEmail = (urlParams.get("email") || "").trim().toLowerCase();
 
   const form = document.getElementById("registrationForm");
   const fullNameInput = document.getElementById("fullName");
   const usernameInput = document.getElementById("username");
   const emailInput = document.getElementById("email");
   const phoneInput = document.getElementById("phone");
+
+  // The Owner invitation determines the registration email.
+  if (invitedEmail && emailInput) {
+    emailInput.value = invitedEmail;
+    emailInput.readOnly = true;
+  }
   const passwordInput = document.getElementById("password");
 
   const submitButton = document.getElementById("submitButton");
