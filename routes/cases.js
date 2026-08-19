@@ -543,6 +543,96 @@ router.get(
 );
 
 
+
+// ============================================================
+// Client: Delete Own Case
+// ============================================================
+
+router.delete(
+  '/client/case/:caseId',
+  auth,
+  async (req, res) => {
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          error: 'Client access required',
+        });
+      }
+
+      const { caseId } = req.params;
+
+      const existing = await Case.findByCaseId(caseId);
+
+      if (!existing) {
+        return res.status(404).json({
+          error: 'Case not found',
+        });
+      }
+
+      if (existing.client_user_id !== req.user.id) {
+        return res.status(403).json({
+          error: 'You can only delete cases submitted from your own account.',
+        });
+      }
+
+      const paths = [
+        ...(Array.isArray(existing.files)
+          ? existing.files
+              .map(f => f?.path)
+              .filter(Boolean)
+          : [])
+      ];
+
+      if (paths.length) {
+        const { error: storageError } =
+          await supabase.storage
+            .from(EVIDENCE_BUCKET)
+            .remove(paths);
+
+        if (storageError) {
+          console.error(
+            'Case evidence deletion failed:',
+            storageError
+          );
+
+          return res.status(500).json({
+            error:
+              'The case could not be deleted because its files could not be removed.',
+          });
+        }
+      }
+
+      const deleted = await Case.removeForClient(
+        caseId,
+        req.user.id
+      );
+
+      if (!deleted) {
+        return res.status(403).json({
+          error: 'You can only delete your own cases.',
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Case deleted successfully.',
+      });
+    } catch (error) {
+      console.error(
+        'Client case deletion error:',
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          error.message ||
+          'Could not delete the case.',
+      });
+    }
+  }
+);
+
+
 // ============================================================
 // Client: Get Cases By Email
 //

@@ -4,10 +4,12 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const Case = require('../models/Case');
 const { auth } = require('../middleware/auth');
 const AdminInvitation = require('../models/AdminInvitation');
 const AdminPermission = require('../models/AdminPermission');
 const { sendEmail } = require('../services/email');
+const { supabase, EVIDENCE_BUCKET } = require('../config/supabase');
 
 const signToken = (user) =>
   jwt.sign(
@@ -573,6 +575,86 @@ router.post(
         error:
           error.message ||
           'Could not complete social sign-in.',
+      });
+    }
+  }
+);
+
+
+
+// ============================================================
+// CLIENT: Delete Own Account
+// ============================================================
+
+router.delete(
+  '/client/account',
+  auth,
+  async (req, res) => {
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          error: 'Only client accounts can be deleted here.',
+        });
+      }
+
+      const cases = await Case.findByClientUserId(req.user.id);
+
+      const paths = [...new Set(
+        cases.flatMap(c =>
+          Array.isArray(c.files)
+            ? c.files.map(f => f?.path).filter(Boolean)
+            : []
+        )
+      )];
+
+      if (paths.length) {
+        const { error: storageError } =
+          await supabase.storage
+            .from(EVIDENCE_BUCKET)
+            .remove(paths);
+
+        if (storageError) {
+          console.error(
+            'Account deletion evidence cleanup failed:',
+            storageError
+          );
+
+          return res.status(500).json({
+            error:
+              'Your account could not be deleted because some case files could not be removed.',
+          });
+        }
+      }
+
+      for (const caseRow of cases) {
+        await Case.removeForClient(
+          caseRow.case_id,
+          req.user.id
+        );
+      }
+
+      const deleted = await User.deleteById(req.user.id);
+
+      if (!deleted) {
+        return res.status(500).json({
+          error: 'Account could not be deleted.',
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Your account and your linked cases have been deleted.',
+      });
+    } catch (error) {
+      console.error(
+        'Client account deletion error:',
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          error.message ||
+          'Could not delete your account.',
       });
     }
   }
