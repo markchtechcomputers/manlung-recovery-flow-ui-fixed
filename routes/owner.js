@@ -58,7 +58,7 @@ router.post('/invitations', [body('email').trim().isEmail().normalizeEmail()], a
     if (active >= MAX_ADMINS) return res.status(409).json({ error: `Maximum of ${MAX_ADMINS} active administrators reached.` });
     const invitation = await AdminInvitation.create({ email: req.body.email, invitedBy: req.user.id });
     const link =
-      `https://manlungrecovery.manlungshop.co.ke/admin/register.html?token=${encodeURIComponent(invitation.token)}`;
+      `https://manlungrecovery.manlungshop.co.ke/admin/register.html?token=${encodeURIComponent(invitation.token)}&email=${encodeURIComponent(req.body.email)}`;
     const mail = await sendEmail({ to:req.body.email, subject:'Manlung Recovery admin invitation', html:`<p>You have been invited to join the Manlung Recovery Admin portal.</p><p><a href="${link}">Complete your Admin registration</a></p><p>This invitation expires in 48 hours.</p>` });
     await AdminAuditLog.record({ actor:req.user, target:{ id:req.user.id, username:req.user.username }, action:'invited_admin' });
     res.status(201).json({
