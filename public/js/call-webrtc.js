@@ -102,6 +102,7 @@
       this.remoteAudio = null;
       this.signalCursor = 0;
       this.signalTimer = null;
+      this.sessionStatusTimer = null;
       this.offerSent = false;
       this.answerSent = false;
       this.endSent = false;
@@ -196,6 +197,8 @@
           this.setState('reconnecting');
         }
       };
+
+      this.startSessionStatusWatch();
 
       this.signalTimer = setInterval(() => this.pollSignals().catch(error => { console.error('[Manlung WebRTC] signal poll error:', error); }), 500);
       await this.pollSignals();
@@ -325,6 +328,39 @@
       return !track.enabled;
     }
 
+    startSessionStatusWatch() {
+      if (this.sessionStatusTimer) {
+        clearInterval(this.sessionStatusTimer);
+      }
+
+      this.sessionStatusTimer = setInterval(async () => {
+        if (this.ended) return;
+
+        try {
+          const res = await fetch(
+            `/api/calls/${encodeURIComponent(this.sessionId)}`,
+            {
+              headers: this.headers,
+              cache: 'no-store'
+            }
+          );
+
+          if (!res.ok) return;
+
+          const data = await res.json().catch(() => ({}));
+          const status = data?.session?.status;
+
+          if (
+            status === 'ended' ||
+            status === 'rejected' ||
+            status === 'missed'
+          ) {
+            this.handleRemoteEnd();
+          }
+        } catch (_) {}
+      }, 1500);
+    }
+
     handleRemoteEnd() {
       if (this.ended) return;
       this.setState('ended-by-remote');
@@ -348,9 +384,11 @@
       if (this.durationTimer) clearInterval(this.durationTimer);
       if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
       if (this.signalTimer) clearInterval(this.signalTimer);
+      if (this.sessionStatusTimer) clearInterval(this.sessionStatusTimer);
       this.durationTimer = null;
       this.connectionTimeout = null;
       this.signalTimer = null;
+      this.sessionStatusTimer = null;
       this.localStream?.getTracks().forEach(track => { try { track.stop(); } catch (_) {} });
       this.localStream = null;
       try { this.pc?.close(); } catch (_) {}
