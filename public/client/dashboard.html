@@ -242,6 +242,30 @@
   }
 }
 </style>
+
+<style id="manlung-notifications-style">
+.manlung-notifications-card{margin:1rem 0}
+.manlung-notification-head{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:.8rem}
+.manlung-notification-title{display:flex;align-items:center;gap:.55rem}
+.manlung-notification-title i{color:#60a5fa}
+.manlung-notification-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 .35rem;border-radius:999px;background:#2563eb;color:#fff;font-size:.7rem;font-weight:800}
+.manlung-notification-list{display:grid;gap:.55rem}
+.manlung-notification-item{padding:.75rem;border:1px solid rgba(148,163,184,.16);border-radius:9px;background:rgba(255,255,255,.025)}
+.manlung-notification-item.unread{border-color:rgba(96,165,250,.3);background:rgba(37,99,235,.06)}
+.manlung-notification-item h4{margin:0 0 .25rem;color:var(--text);font-size:.88rem}
+.manlung-notification-item p{margin:0;color:var(--text-muted);font-size:.8rem;line-height:1.5}
+.manlung-notification-meta{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.45rem;color:var(--text-muted);font-size:.68rem}
+.manlung-timeline-card{margin-top:1rem}
+.manlung-timeline{position:relative;display:grid;gap:.85rem}
+.manlung-timeline-item{position:relative;padding:.8rem .8rem .8rem 1.1rem;border-left:2px solid rgba(96,165,250,.35)}
+.manlung-timeline-item::before{content:"";position:absolute;left:-6px;top:1rem;width:10px;height:10px;border-radius:50%;background:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,.12)}
+.manlung-timeline-item h4{margin:0 0 .2rem;font-size:.85rem;color:var(--text)}
+.manlung-timeline-item p{margin:0;color:var(--text-muted);font-size:.78rem;line-height:1.5}
+.manlung-timeline-item small{display:block;margin-top:.25rem;color:var(--text-muted);font-size:.67rem}
+.manlung-empty{padding:1rem;text-align:center;color:var(--text-muted);font-size:.82rem}
+.manlung-mark-read{border:0;background:transparent;color:#60a5fa;cursor:pointer;font-size:.7rem;padding:0}
+</style>
+
 </head>
 <body>
   <header class="site-header">
@@ -304,7 +328,22 @@
       </button>
     </section>
 
-  </main>
+
+<section class="card manlung-notifications-card" id="manlungNotifications">
+  <div class="manlung-notification-head">
+    <div class="manlung-notification-title">
+      <i class="fas fa-bell"></i>
+      <strong>Notifications</strong>
+      <span class="manlung-notification-badge" id="manlungNotificationCount">0</span>
+    </div>
+    <button type="button" class="btn" onclick="markAllManlungNotificationsRead()">Mark all read</button>
+  </div>
+  <div class="manlung-notification-list" id="manlungNotificationList">
+    <div class="manlung-empty">Loading notifications…</div>
+  </div>
+</section>
+
+</main>
 
   <footer class="manlung-footer">
 <div class="manlung-footer-inner">
@@ -478,5 +517,136 @@
     setInterval(loadCases, 15000);
     setInterval(loadDonationSummary, 10000);
   </script>
+
+<script id="manlung-notifications-script">
+(function(){
+  function manlungToken(){
+    return localStorage.getItem('clientToken') || '';
+  }
+
+  function manlungHeaders(){
+    const token = manlungToken();
+    return token
+      ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+      : { 'Content-Type': 'application/json' };
+  }
+
+  function formatManlungDate(value){
+    if(!value) return '';
+    try{
+      return new Date(value).toLocaleString();
+    }catch(_){
+      return value;
+    }
+  }
+
+  async function loadManlungNotifications(){
+    const list = document.getElementById('manlungNotificationList');
+    const badge = document.getElementById('manlungNotificationCount');
+    if(!list || !badge) return;
+
+    try{
+      const res = await fetch('/api/notifications', {
+        headers: manlungHeaders(),
+        cache:'no-store'
+      });
+
+      const data = await res.json().catch(()=>({}));
+
+      if(res.status === 401){
+        if(typeof logout === 'function') logout();
+        return;
+      }
+
+      if(!res.ok || !data.success){
+        throw new Error(data.error || 'Could not load notifications.');
+      }
+
+      const notifications = Array.isArray(data.notifications)
+        ? data.notifications
+        : [];
+
+      const unread = notifications.filter(n => !n.read_at).length;
+      badge.textContent = String(unread);
+
+      if(!notifications.length){
+        list.innerHTML = '<div class="manlung-empty">No notifications yet.</div>';
+        return;
+      }
+
+      list.innerHTML = notifications.slice(0, 8).map(n => `
+        <article class="manlung-notification-item ${n.read_at ? '' : 'unread'}">
+          <h4>${escapeHtml(n.title || 'Notification')}</h4>
+          <p>${escapeHtml(n.message || '')}</p>
+          <div class="manlung-notification-meta">
+            <span>${escapeHtml(formatManlungDate(n.created_at))}</span>
+            ${n.read_at ? '<span>Read</span>' : `
+              <button type="button" class="manlung-mark-read"
+                onclick="markManlungNotificationRead('${escapeHtml(n.id)}')">
+                Mark read
+              </button>
+            `}
+          </div>
+        </article>
+      `).join('');
+    }catch(error){
+      console.error('Notification load error:', error);
+      list.innerHTML = '<div class="manlung-empty">Notifications could not be loaded.</div>';
+    }
+  }
+
+  async function markManlungNotificationRead(id){
+    try{
+      const res = await fetch(`/api/notifications/${encodeURIComponent(id)}/read`, {
+        method:'POST',
+        headers: manlungHeaders()
+      });
+
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok || !data.success){
+        throw new Error(data.error || 'Could not mark notification as read.');
+      }
+
+      await loadManlungNotifications();
+    }catch(error){
+      console.error('Mark notification read error:', error);
+    }
+  }
+
+  async function markAllManlungNotificationsRead(){
+    try{
+      const res = await fetch('/api/notifications/read-all', {
+        method:'POST',
+        headers: manlungHeaders()
+      });
+
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok || !data.success){
+        throw new Error(data.error || 'Could not mark notifications as read.');
+      }
+
+      await loadManlungNotifications();
+    }catch(error){
+      console.error('Mark all notifications error:', error);
+    }
+  }
+
+  function escapeHtml(value){
+    return String(value ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  window.loadManlungNotifications = loadManlungNotifications;
+  window.markManlungNotificationRead = markManlungNotificationRead;
+  window.markAllManlungNotificationsRead = markAllManlungNotificationsRead;
+
+  document.addEventListener('DOMContentLoaded', loadManlungNotifications);
+})();
+</script>
+
 </body>
 </html>
