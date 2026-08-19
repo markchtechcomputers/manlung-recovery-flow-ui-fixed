@@ -1047,15 +1047,50 @@
     window.toggleAdminOnline = toggleAdminOnline;
 
     async function pollForIncomingCalls() {
-        if (currentIncomingCallId || currentActiveCallId) return;
+        if (currentActiveCallId) return;
+
         try {
-            const res = await fetch('/api/calls/pending', { headers: authHeaders() });
+            const res = await fetch('/api/calls/pending', {
+                headers: authHeaders(),
+                cache: 'no-store'
+            });
+
             if (res.status === 401 || res.status === 403) return;
-            const data = await res.json();
-            if (data.success && data.calls && data.calls.length > 0) {
-                showIncomingCall(data.calls[0]);
+
+            const data = await res.json().catch(() => ({}));
+            const pendingCalls =
+                data.success && Array.isArray(data.calls)
+                    ? data.calls
+                    : [];
+
+            // If this browser is showing a call that is no longer pending,
+            // another admin answered/rejected it. Close the stale popup.
+            if (currentIncomingCallId) {
+                const stillPending = pendingCalls.some(
+                    call => String(call.id) === String(currentIncomingCallId)
+                );
+
+                if (!stillPending) {
+                    stopIncomingAlert();
+                    currentIncomingCallId = null;
+
+                    const overlay =
+                        document.getElementById('callModalOverlay');
+
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                    }
+
+                    return;
+                }
             }
-        } catch (_) {}
+
+            if (!currentIncomingCallId && pendingCalls.length > 0) {
+                showIncomingCall(pendingCalls[0]);
+            }
+        } catch (error) {
+            console.error('Incoming call poll error:', error);
+        }
     }
 
     function showIncomingCall(call) {
@@ -1099,7 +1134,27 @@
             const res = await fetch(`/api/calls/${callId}/accept`, { method: 'PUT', headers: authHeaders() });
             const data = await res.json();
             if (!res.ok || !data.success) {
-                document.getElementById('callModalBody').innerHTML = `<p style="color:var(--danger);">${data.error || 'Could not accept call.'}</p><button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
+                // A 409 here normally means another admin already answered
+                // or the client ended/rejected the call. Treat it as a stale
+                // incoming call and quietly close the popup.
+                if (res.status === 409) {
+                    currentIncomingCallId = null;
+                    stopIncomingAlert();
+
+                    const overlay =
+                        document.getElementById('callModalOverlay');
+
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                    }
+
+                    return;
+                }
+
+                document.getElementById('callModalBody').innerHTML =
+                    `<p style="color:var(--danger);">${data.error || 'Could not accept call.'}</p>
+                     <button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
+
                 currentIncomingCallId = null;
                 return;
             }
