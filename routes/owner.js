@@ -61,7 +61,15 @@ router.post('/invitations', [body('email').trim().isEmail().normalizeEmail()], a
       `https://manlungrecovery.manlungshop.co.ke/admin/register.html?token=${encodeURIComponent(invitation.token)}`;
     const mail = await sendEmail({ to:req.body.email, subject:'Manlung Recovery admin invitation', html:`<p>You have been invited to join the Manlung Recovery Admin portal.</p><p><a href="${link}">Complete your Admin registration</a></p><p>This invitation expires in 48 hours.</p>` });
     await AdminAuditLog.record({ actor:req.user, target:{ id:req.user.id, username:req.user.username }, action:'invited_admin' });
-    res.status(201).json({ success:true, invitation:{ email:req.body.email, expiresAt:invitation.expires_at, link: mail.sent ? undefined : link, emailSent:mail.sent } });
+    res.status(201).json({
+      success: true,
+      invitation: {
+        email: req.body.email,
+        expiresAt: invitation.expires_at,
+        link,
+        emailSent: mail.sent
+      }
+    });
   } catch (error) { console.error('Invite admin error:', error); res.status(500).json({ error:error.message || 'Could not create invitation' }); }
 });
 
