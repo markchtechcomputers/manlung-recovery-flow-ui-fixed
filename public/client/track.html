@@ -222,6 +222,24 @@
 .manlung-mark-read{border:0;background:transparent;color:#60a5fa;cursor:pointer;font-size:.7rem;padding:0}
 </style>
 
+
+<style id="manlung-message-style">
+.manlung-message-card{margin-top:1rem}
+.manlung-message-list{display:grid;gap:.6rem;max-height:420px;overflow:auto;padding:.2rem}
+.manlung-message{max-width:82%;padding:.7rem .8rem;border-radius:12px;border:1px solid var(--card-border);background:var(--page-bg)}
+.manlung-message.mine{margin-left:auto;background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.2)}
+.manlung-message-meta{display:flex;justify-content:space-between;gap:.6rem;margin-bottom:.25rem;font-size:.68rem;color:var(--text-muted)}
+.manlung-message-text{white-space:pre-wrap;line-height:1.5;font-size:.82rem;color:var(--text)}
+.manlung-message-compose{display:flex;gap:.55rem;margin-top:.7rem}
+.manlung-message-compose textarea{flex:1;min-height:78px;resize:vertical}
+.manlung-message-empty{padding:1rem;text-align:center;color:var(--text-muted);font-size:.82rem}
+@media(max-width:600px){
+  .manlung-message{max-width:94%}
+  .manlung-message-compose{flex-direction:column}
+  .manlung-message-compose .btn{width:100%}
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
@@ -326,11 +344,27 @@
                         <div style="white-space:pre-line;">${c.timeline || 'Request Submitted ✅'}</div>
                     </div>
 
+
+                    <div class="card manlung-message-card" id="caseMessagesCard">
+                        <div class="card-title"><i class="fas fa-comments"></i> Case Messages</div>
+                        <div id="caseMessagesList" class="manlung-message-list">
+                            <div class="manlung-message-empty">Loading messages…</div>
+                        </div>
+                        <div class="manlung-message-compose">
+                            <textarea id="caseMessageInput" maxlength="5000" placeholder="Write a message to your case team…"></textarea>
+                            <button type="button" class="btn btn-primary" onclick="sendClientCaseMessage()">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                        <div id="caseMessageStatus" style="margin-top:.4rem;color:var(--text-muted);font-size:.72rem;"></div>
+                    </div>
+
                     <div class="card">
                         <div class="card-title"><i class="fas fa-paperclip"></i> Files</div>
                         <div class="file-list">${filesHtml}</div>
                     </div>
                 `;
+                await loadClientCaseMessages(caseId);
             } catch (err) {
                 console.error(err);
                 content.innerHTML = '<div class="card"><p class="error-text">Error loading case.</p></div>';
@@ -434,6 +468,142 @@
 
   document.addEventListener('DOMContentLoaded', loadManlungTimeline);
 })();
+</script>
+
+
+<script id="manlung-client-messages">
+let currentCaseIdForMessages = null;
+
+function escapeClientMessageHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+}
+
+function clientMessageDate(value) {
+    try {
+        return value ? new Date(value).toLocaleString() : '';
+    } catch (_) {
+        return value || '';
+    }
+}
+
+async function loadClientCaseMessages(caseId) {
+    currentCaseIdForMessages = caseId;
+    const list = document.getElementById('caseMessagesList');
+    const token = localStorage.getItem('clientToken');
+
+    if (!list || !token) return;
+
+    try {
+        const res = await fetch(
+            `/api/messages/case/${encodeURIComponent(caseId)}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                cache: 'no-store'
+            }
+        );
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 401) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Could not load messages.');
+        }
+
+        const user = JSON.parse(
+            localStorage.getItem('clientUser') || '{}'
+        );
+
+        const messages =
+            Array.isArray(data.messages)
+                ? data.messages
+                : [];
+
+        if (!messages.length) {
+            list.innerHTML =
+                '<div class="manlung-message-empty">No messages yet. Send a message to your case team.</div>';
+            return;
+        }
+
+        list.innerHTML = messages.map((m) => {
+            const mine =
+                String(m.sender_user_id) === String(user.id);
+
+            return `
+                <article class="manlung-message ${mine ? 'mine' : ''}">
+                    <div class="manlung-message-meta">
+                        <span>${mine ? 'You' : 'Case team'}</span>
+                        <span>${escapeClientMessageHtml(clientMessageDate(m.created_at))}</span>
+                    </div>
+                    <div class="manlung-message-text">
+                        ${escapeClientMessageHtml(m.message)}
+                    </div>
+                </article>
+            `;
+        }).join('');
+
+        list.scrollTop = list.scrollHeight;
+    } catch (error) {
+        console.error('Client messages load error:', error);
+        list.innerHTML =
+            `<div class="manlung-message-empty">${escapeClientMessageHtml(error.message)}</div>`;
+    }
+}
+
+async function sendClientCaseMessage() {
+    const input = document.getElementById('caseMessageInput');
+    const status = document.getElementById('caseMessageStatus');
+    const token = localStorage.getItem('clientToken');
+
+    if (!input || !currentCaseIdForMessages || !token) return;
+
+    const message = input.value.trim();
+
+    if (!message) {
+        status.textContent = 'Write a message first.';
+        return;
+    }
+
+    status.textContent = 'Sending…';
+
+    try {
+        const res = await fetch(
+            `/api/messages/case/${encodeURIComponent(currentCaseIdForMessages)}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            }
+        );
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Could not send message.');
+        }
+
+        input.value = '';
+        status.textContent = 'Message sent.';
+        await loadClientCaseMessages(currentCaseIdForMessages);
+    } catch (error) {
+        console.error('Client message send error:', error);
+        status.textContent =
+            error.message || 'Could not send message.';
+    }
+}
 </script>
 
 </body>

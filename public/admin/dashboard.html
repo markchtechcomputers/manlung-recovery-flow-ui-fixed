@@ -198,6 +198,24 @@
   }
 }
 </style>
+
+<style id="manlung-message-style">
+.manlung-message-card{margin-top:1rem}
+.manlung-message-list{display:grid;gap:.6rem;max-height:420px;overflow:auto;padding:.2rem}
+.manlung-message{max-width:82%;padding:.7rem .8rem;border-radius:12px;border:1px solid var(--card-border);background:var(--page-bg)}
+.manlung-message.mine{margin-left:auto;background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.2)}
+.manlung-message-meta{display:flex;justify-content:space-between;gap:.6rem;margin-bottom:.25rem;font-size:.68rem;color:var(--text-muted)}
+.manlung-message-text{white-space:pre-wrap;line-height:1.5;font-size:.82rem;color:var(--text)}
+.manlung-message-compose{display:flex;gap:.55rem;margin-top:.7rem}
+.manlung-message-compose textarea{flex:1;min-height:78px;resize:vertical}
+.manlung-message-empty{padding:1rem;text-align:center;color:var(--text-muted);font-size:.82rem}
+@media(max-width:600px){
+  .manlung-message{max-width:94%}
+  .manlung-message-compose{flex-direction:column}
+  .manlung-message-compose .btn{width:100%}
+}
+</style>
+
 </head>
 <body class="admin-page-bg">
     <header class="site-header">
@@ -707,7 +725,41 @@
                     `).join('')}
                 </div>` : ''}
 
-                <div class="card-title"><i class="fas fa-paperclip"></i> Files</div>
+
+                <div class="card" style="margin-top:1rem;">
+                    <div class="card-title">
+                        <i class="fas fa-comments"></i> Client Messages
+                    </div>
+
+                    <div id="adminCaseMessagesList" class="manlung-message-list">
+                        <div class="manlung-message-empty">
+                            Loading messages…
+                        </div>
+                    </div>
+
+                    <div class="manlung-message-compose">
+                        <textarea
+                            id="adminCaseMessageInput"
+                            maxlength="5000"
+                            placeholder="Reply to the client…"
+                        ></textarea>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            onclick="sendAdminCaseMessage('${c.caseId}')"
+                        >
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+
+                    <div
+                        id="adminCaseMessageStatus"
+                        style="margin-top:.4rem;color:var(--text-muted);font-size:.72rem;"
+                    ></div>
+                </div>
+
+                                <div class="card-title"><i class="fas fa-paperclip"></i> Files</div>
                 <div class="file-list" style="margin-bottom:0.8rem;">${filesHtml}</div>
                 <div class="upload-zone" onclick="document.getElementById('adminFileInput').click()">
                     <i class="fas fa-cloud-upload-alt"></i>
@@ -1219,5 +1271,142 @@
         loadStats();
         loadCases(1);
     </script>
+
+<script id="manlung-admin-messages">
+function escapeAdminMessageHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+}
+
+function adminMessageDate(value) {
+    try {
+        return value ? new Date(value).toLocaleString() : '';
+    } catch (_) {
+        return value || '';
+    }
+}
+
+async function loadAdminCaseMessages(caseId) {
+    const list =
+        document.getElementById('adminCaseMessagesList');
+
+    if (!list) return;
+
+    try {
+        const res = await fetch(
+            `/api/messages/case/${encodeURIComponent(caseId)}`,
+            {
+                headers: authHeaders(),
+                cache: 'no-store'
+            }
+        );
+
+        if (await handleUnauthorized(res)) return;
+
+        const data =
+            await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+            throw new Error(
+                data.error || 'Could not load messages.'
+            );
+        }
+
+        const user = currentAdmin || {};
+        const messages =
+            Array.isArray(data.messages)
+                ? data.messages
+                : [];
+
+        if (!messages.length) {
+            list.innerHTML =
+                '<div class="manlung-message-empty">No messages yet.</div>';
+            return;
+        }
+
+        list.innerHTML = messages.map((m) => {
+            const mine =
+                String(m.sender_user_id) === String(user.id);
+
+            return `
+                <article class="manlung-message ${mine ? 'mine' : ''}">
+                    <div class="manlung-message-meta">
+                        <span>${mine ? 'You' : 'Client'}</span>
+                        <span>${escapeAdminMessageHtml(adminMessageDate(m.created_at))}</span>
+                    </div>
+
+                    <div class="manlung-message-text">
+                        ${escapeAdminMessageHtml(m.message)}
+                    </div>
+                </article>
+            `;
+        }).join('');
+
+        list.scrollTop = list.scrollHeight;
+    } catch (error) {
+        console.error('Admin messages load error:', error);
+        list.innerHTML =
+            `<div class="manlung-message-empty">${escapeAdminMessageHtml(error.message)}</div>`;
+    }
+}
+
+async function sendAdminCaseMessage(caseId) {
+    const input =
+        document.getElementById('adminCaseMessageInput');
+
+    const status =
+        document.getElementById('adminCaseMessageStatus');
+
+    if (!input) return;
+
+    const message = input.value.trim();
+
+    if (!message) {
+        status.textContent = 'Write a message first.';
+        return;
+    }
+
+    status.textContent = 'Sending…';
+
+    try {
+        const res = await fetch(
+            `/api/messages/case/${encodeURIComponent(caseId)}`,
+            {
+                method: 'POST',
+                headers: {
+                    ...authHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            }
+        );
+
+        if (await handleUnauthorized(res)) return;
+
+        const data =
+            await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+            throw new Error(
+                data.error || 'Could not send message.'
+            );
+        }
+
+        input.value = '';
+        status.textContent = 'Message sent.';
+
+        await loadAdminCaseMessages(caseId);
+    } catch (error) {
+        console.error('Admin message send error:', error);
+        status.textContent =
+            error.message || 'Could not send message.';
+    }
+}
+</script>
+
 </body>
 </html>
