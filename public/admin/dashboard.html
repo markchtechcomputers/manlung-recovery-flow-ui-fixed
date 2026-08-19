@@ -200,19 +200,122 @@
 </style>
 
 <style id="manlung-message-style">
-.manlung-message-card{margin-top:1rem}
-.manlung-message-list{display:grid;gap:.6rem;max-height:420px;overflow:auto;padding:.2rem}
-.manlung-message{max-width:82%;padding:.7rem .8rem;border-radius:12px;border:1px solid var(--card-border);background:var(--page-bg)}
-.manlung-message.mine{margin-left:auto;background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.2)}
-.manlung-message-meta{display:flex;justify-content:space-between;gap:.6rem;margin-bottom:.25rem;font-size:.68rem;color:var(--text-muted)}
-.manlung-message-text{white-space:pre-wrap;line-height:1.5;font-size:.82rem;color:var(--text)}
-.manlung-message-compose{display:flex;gap:.55rem;margin-top:.7rem}
-.manlung-message-compose textarea{flex:1;min-height:78px;resize:vertical}
-.manlung-message-empty{padding:1rem;text-align:center;color:var(--text-muted);font-size:.82rem}
+.manlung-message-card{
+  margin-top:1rem;
+}
+
+.manlung-message-list{
+  display:flex;
+  flex-direction:column;
+  gap:.45rem;
+  max-height:420px;
+  overflow:auto;
+  padding:.55rem .35rem;
+  background:var(--page-bg);
+  border-radius:14px;
+}
+
+.manlung-message{
+  max-width:min(76%,520px);
+  padding:.48rem .65rem .38rem;
+  border-radius:14px;
+  border:1px solid #e2e8f0;
+  background:#ffffff;
+  color:#0f172a;
+  box-shadow:0 1px 2px rgba(15,23,42,.06);
+}
+
+.manlung-message.mine{
+  margin-left:auto;
+  background:#123a78;
+  border-color:#123a78;
+  color:#ffffff;
+  border-bottom-right-radius:5px;
+}
+
+.manlung-message:not(.mine){
+  margin-right:auto;
+  background:#f8fafc;
+  border-color:#e2e8f0;
+  color:#0f172a;
+  border-bottom-left-radius:5px;
+}
+
+.manlung-message-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+  margin-bottom:.16rem;
+  font-size:.6rem;
+  color:#64748b;
+}
+
+.manlung-message.mine .manlung-message-meta{
+  color:#dbeafe;
+}
+
+.manlung-message-text{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  line-height:1.35;
+  font-size:.78rem;
+  color:#0f172a;
+}
+
+.manlung-message.mine .manlung-message-text{
+  color:#ffffff;
+}
+
+.manlung-message-status{
+  display:inline-block;
+  margin-left:.28rem;
+  font-size:.68rem;
+  letter-spacing:-.06em;
+}
+
+.manlung-message-status.sent{
+  color:#dbeafe;
+}
+
+.manlung-message-status.read{
+  color:#7dd3fc;
+}
+
+.manlung-message-compose{
+  display:flex;
+  gap:.5rem;
+  margin-top:.65rem;
+}
+
+.manlung-message-compose textarea{
+  flex:1;
+  min-height:52px;
+  max-height:120px;
+  resize:vertical;
+  padding:.6rem .7rem;
+  font-size:.8rem;
+}
+
+.manlung-message-empty{
+  padding:.9rem;
+  text-align:center;
+  color:var(--text-muted);
+  font-size:.78rem;
+}
+
 @media(max-width:600px){
-  .manlung-message{max-width:94%}
-  .manlung-message-compose{flex-direction:column}
-  .manlung-message-compose .btn{width:100%}
+  .manlung-message{
+    max-width:88%;
+  }
+
+  .manlung-message-compose{
+    flex-direction:column;
+  }
+
+  .manlung-message-compose .btn{
+    width:100%;
+  }
 }
 </style>
 
@@ -1410,8 +1513,19 @@ async function loadAdminCaseMessages(caseId) {
             return `
                 <article class="manlung-message ${mine ? 'mine' : ''}">
                     <div class="manlung-message-meta">
-                        <span>${mine ? 'You' : 'Client'}</span>
-                        <span>${escapeAdminMessageHtml(adminMessageDate(m.created_at))}</span>
+                        <span>${mine ? 'Admin' : 'Client'}</span>
+
+                        <span>
+                            ${escapeAdminMessageHtml(adminMessageDate(m.created_at))}
+                            ${
+                                mine
+                                    ? `<span
+                                         class="manlung-message-status ${m.read_at ? 'read' : 'sent'}"
+                                         title="${m.read_at ? 'Read' : 'Sent'}"
+                                       >${m.read_at ? '✓✓' : '✓'}</span>`
+                                    : ''
+                            }
+                        </span>
                     </div>
 
                     <div class="manlung-message-text">
