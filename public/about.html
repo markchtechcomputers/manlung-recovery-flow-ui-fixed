@@ -157,15 +157,37 @@
 @media(max-width:480px){
   .site-header .header-actions{
     grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
   }
   .site-header .header-actions a,
   .site-header .header-actions button{
-    font-size:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
   }
   .site-header .header-actions a i,
   .site-header .header-actions button i{
-    font-size:.95rem;
+    display:block;
+    font-size:1rem;
+    line-height:1;
     margin:0;
+  }
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
   }
 }
 @media(max-width:360px){
