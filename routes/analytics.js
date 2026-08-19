@@ -1,0 +1,405 @@
+const express = require('express');
+const router = express.Router();
+
+const { adminAuth } = require('../middleware/auth');
+const { supabase } = require('../config/supabase');
+
+const FINISHED_STATUSES = new Set([
+  'Recovery Successful',
+  'Recovered by Police',
+  'Recovered by Owner',
+  'Closed',
+  'Rejected',
+]);
+
+const SUCCESS_STATUSES = new Set([
+  'Recovery Successful',
+  'Recovered by Police',
+  'Recovered by Owner',
+]);
+
+function dayKey(value) {
+  return new Date(value).toISOString().slice(0, 10);
+}
+
+function monthKey(value) {
+  return new Date(value).toISOString().slice(0, 7);
+}
+
+function hoursBetween(start, end) {
+  if (!start || !end) return null;
+
+  const a = new Date(start).getTime();
+  const b = new Date(end).getTime();
+
+  if (!Number.isFinite(a) || !Number.isFinite(b) || b < a) {
+    return null;
+  }
+
+  return (b - a) / 3600000;
+}
+
+router.get('/operations', adminAuth, async (req, res) => {
+  try {
+    const now = new Date();
+
+    const todayKey = dayKey(now);
+    const currentMonth = monthKey(now);
+
+    const start14 = new Date(now);
+    start14.setHours(0, 0, 0, 0);
+    start14.setDate(start14.getDate() - 13);
+
+    const startMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1
+    );
+
+    const [
+      adminsResult,
+      casesResult,
+      callsResult,
+    ] = await Promise.all([
+      supabase
+        .from('recovery_users')
+        .select('id, username, email, role, admin_status, created_at')
+        .in('role', ['admin', 'owner'])
+        .order('created_at', { ascending: true }),
+
+      supabase
+        .from('recovery_cases')
+        .select(
+          'case_id, assigned_admin_id, completed_by, status, created_at, started_at, completed_at'
+        )
+        .order('created_at', { ascending: true }),
+
+      supabase
+        .from('recovery_call_sessions')
+        .select(
+          'id, admin_user_id, status, created_at, accepted_at, ended_at'
+        )
+        .order('created_at', { ascending: true }),
+    ]);
+
+    if (adminsResult.error) throw adminsResult.error;
+    if (casesResult.error) throw casesResult.error;
+    if (callsResult.error) throw callsResult.error;
+
+    const admins = adminsResult.data || [];
+    const cases = casesResult.data || [];
+    const calls = callsResult.data || [];
+
+    const adminMap = new Map(
+      admins.map(admin => [
+        String(admin.id),
+        {
+          ...admin,
+          name: admin.username || admin.email || 'Admin',
+        },
+      ])
+    );
+
+    const teamMembers = admins.map(admin => ({
+      id: String(admin.id),
+      name: admin.username || admin.email || 'Admin',
+      email: admin.email || '',
+      role: admin.role,
+      adminStatus: admin.admin_status || 'active',
+      active:
+        admin.role === 'owner' ||
+        admin.admin_status === 'active',
+      callsAnswered: 0,
+      casesAssigned: 0,
+      casesCompleted: 0,
+      successfulCases: 0,
+      averageResolutionHours: null,
+      callSharePercent: 0,
+      caseSharePercent: 0,
+      completionPercent: 0,
+      successPercent: 0,
+      activityPercent: 0,
+      resolutionSamples: [],
+    }));
+
+    const memberMap = new Map(
+      teamMembers.map(member => [String(member.id), member])
+    );
+
+    const todayCases = cases.filter(
+      item => item.created_at && dayKey(item.created_at) === todayKey
+    );
+
+    const monthCases = cases.filter(
+      item =>
+        item.created_at &&
+        monthKey(item.created_at) === currentMonth
+    );
+
+    const openCases = cases.filter(
+      item => !FINISHED_STATUSES.has(item.status)
+    );
+
+    const completedCases = cases.filter(
+      item => FINISHED_STATUSES.has(item.status)
+    );
+
+    const successfulCases = cases.filter(
+      item => SUCCESS_STATUSES.has(item.status)
+    );
+
+    const monthAnsweredCalls = calls.filter(
+      item =>
+        item.accepted_at &&
+        monthKey(item.accepted_at) === currentMonth
+    );
+
+    const todayAnsweredCalls = calls.filter(
+      item =>
+        item.accepted_at &&
+        dayKey(item.accepted_at) === todayKey
+    );
+
+    const resolutionSamples = completedCases
+      .map(item =>
+        hoursBetween(item.created_at, item.completed_at)
+      )
+      .filter(value => value !== null);
+
+    const averageResolutionHours =
+      resolutionSamples.length
+        ? resolutionSamples.reduce((a, b) => a + b, 0) /
+          resolutionSamples.length
+        : null;
+
+    let totalAssigned = 0;
+
+    for (const item of cases) {
+      if (!item.assigned_admin_id) continue;
+
+      const member =
+        memberMap.get(String(item.assigned_admin_id));
+
+      if (!member) continue;
+
+      member.casesAssigned += 1;
+      totalAssigned += 1;
+
+      if (FINISHED_STATUSES.has(item.status)) {
+        member.casesCompleted += 1;
+      }
+
+      if (SUCCESS_STATUSES.has(item.status)) {
+        member.successfulCases += 1;
+      }
+
+      const resolution =
+        hoursBetween(
+          item.created_at,
+          item.completed_at
+        );
+
+      if (resolution !== null) {
+        member.resolutionSamples.push(resolution);
+      }
+    }
+
+    let totalAnsweredCalls = 0;
+
+    for (const call of calls) {
+      if (!call.accepted_at || !call.admin_user_id) {
+        continue;
+      }
+
+      const member =
+        memberMap.get(String(call.admin_user_id));
+
+      if (!member) continue;
+
+      member.callsAnswered += 1;
+      totalAnsweredCalls += 1;
+    }
+
+    for (const member of teamMembers) {
+      const samples = member.resolutionSamples;
+
+      member.averageResolutionHours =
+        samples.length
+          ? samples.reduce((a, b) => a + b, 0) /
+            samples.length
+          : null;
+
+      member.callSharePercent =
+        totalAnsweredCalls
+          ? (member.callsAnswered / totalAnsweredCalls) * 100
+          : 0;
+
+      member.caseSharePercent =
+        totalAssigned
+          ? (member.casesAssigned / totalAssigned) * 100
+          : 0;
+
+      member.completionPercent =
+        member.casesAssigned
+          ? (member.casesCompleted / member.casesAssigned) * 100
+          : 0;
+
+      member.successPercent =
+        member.casesCompleted
+          ? (member.successfulCases / member.casesCompleted) * 100
+          : 0;
+
+      /*
+       * Activity percentage is descriptive, not a subjective
+       * employee score. It combines share of team calls and cases.
+       */
+      member.activityPercent =
+        Math.min(
+          100,
+          (member.callSharePercent * 0.4) +
+          (member.caseSharePercent * 0.6)
+        );
+
+      delete member.resolutionSamples;
+    }
+
+    const dailyMap = new Map();
+
+    for (let i = 0; i < 14; i++) {
+      const date = new Date(start14);
+      date.setDate(start14.getDate() + i);
+
+      dailyMap.set(
+        dayKey(date),
+        {
+          date: dayKey(date),
+          submitted: 0,
+          completed: 0,
+        }
+      );
+    }
+
+    for (const item of cases) {
+      if (!item.created_at) continue;
+
+      const key = dayKey(item.created_at);
+
+      if (dailyMap.has(key)) {
+        dailyMap.get(key).submitted += 1;
+      }
+
+      if (
+        item.completed_at &&
+        dailyMap.has(dayKey(item.completed_at))
+      ) {
+        dailyMap.get(dayKey(item.completed_at)).completed += 1;
+      }
+    }
+
+    const statusCounts = {};
+
+    for (const item of monthCases) {
+      const status =
+        item.status || 'Unknown';
+
+      statusCounts[status] =
+        (statusCounts[status] || 0) + 1;
+    }
+
+    const monthlyCallDistribution =
+      teamMembers
+        .map(member => ({
+          adminId: member.id,
+          name: member.name,
+          callsAnswered: member.callsAnswered,
+          percentage: Number(
+            member.callSharePercent.toFixed(1)
+          ),
+        }))
+        .filter(item => item.callsAnswered > 0)
+        .sort(
+          (a, b) =>
+            b.callsAnswered - a.callsAnswered
+        );
+
+    const topCallAdmin =
+      monthlyCallDistribution[0] || null;
+
+    res.json({
+      success: true,
+
+      generatedAt: now.toISOString(),
+
+      company: {
+        casesToday: todayCases.length,
+        casesThisMonth: monthCases.length,
+        openCases: openCases.length,
+        completedCases: completedCases.length,
+        successfulCases: successfulCases.length,
+        successRate:
+          completedCases.length
+            ? Number(
+                (
+                  (successfulCases.length /
+                    completedCases.length) *
+                  100
+                ).toFixed(1)
+              )
+            : 0,
+        callsAnsweredToday:
+          todayAnsweredCalls.length,
+        callsAnsweredThisMonth:
+          monthAnsweredCalls.length,
+        averageResolutionHours:
+          averageResolutionHours === null
+            ? null
+            : Number(
+                averageResolutionHours.toFixed(1)
+              ),
+        activeAdmins:
+          teamMembers.filter(
+            member =>
+              member.role === 'owner' ||
+              member.adminStatus === 'active'
+          ).length,
+        totalAdmins:
+          teamMembers.filter(
+            member => member.role === 'admin'
+          ).length,
+      },
+
+      dailyFlow: [...dailyMap.values()],
+
+      monthlyStatusCounts: statusCounts,
+
+      monthlyCallDistribution,
+
+      topCallAdmin,
+
+      admins: teamMembers.sort((a, b) => {
+        if (b.callsAnswered !== a.callsAnswered) {
+          return b.callsAnswered - a.callsAnswered;
+        }
+
+        return (
+          b.casesAssigned -
+          a.casesAssigned
+        );
+      }),
+    });
+  } catch (error) {
+    console.error(
+      'Operations analytics error:',
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      error:
+        error.message ||
+        'Could not load operations analytics.',
+    });
+  }
+});
+
+module.exports = router;
