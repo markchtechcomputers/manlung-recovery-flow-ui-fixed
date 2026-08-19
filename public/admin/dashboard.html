@@ -394,9 +394,23 @@
         const token = localStorage.getItem('adminToken');
         if (!token) window.location.href = '/admin/login.html';
         const currentAdmin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+        const ownerManagementNav =
+            document.getElementById('ownerManagementNav');
+
+        if (ownerManagementNav) {
+            ownerManagementNav.style.display =
+                currentAdmin.role === 'owner'
+                    ? 'inline-flex'
+                    : 'none';
+        }
+
         if (currentAdmin.role === 'owner') {
-            const ownerLink = document.getElementById('ownerLink');
-            if (ownerLink) ownerLink.style.display = 'inline-flex';
+            const ownerLink =
+                document.getElementById('ownerLink');
+
+            if (ownerLink) {
+                ownerLink.style.display = 'inline-flex';
+            }
         }
 
         let currentPage = 1;
