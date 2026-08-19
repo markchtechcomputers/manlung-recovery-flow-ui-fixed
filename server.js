@@ -8,6 +8,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const caseRoutes = require('./routes/cases');
 const configRoutes = require('./routes/config');
+const notificationRoutes = require('./routes/notifications');
 const subscriptionRoutes = require('./routes/subscription');
 const callRoutes = require('./routes/calls');
 const donationRoutes = require('./routes/donations');
@@ -221,6 +222,7 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/cases', caseRoutes);
 app.use('/api/config', configRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 
 // Alias for call-admin payment routes
