@@ -306,6 +306,215 @@ router.get('/operations', adminAuth, async (req, res) => {
         (statusCounts[status] || 0) + 1;
     }
 
+
+    // --------------------------------------------------------
+    // DAILY / WEEKLY / ALL-TIME ADMIN REPORTS
+    // --------------------------------------------------------
+    const startToday = new Date(now);
+    startToday.setHours(0, 0, 0, 0);
+
+    const startWeek = new Date(startToday);
+    startWeek.setDate(
+      startToday.getDate() - 6
+    );
+
+    function buildAdminPeriodReport(
+      startDate,
+      endDate = now
+    ) {
+      const report = new Map(
+        teamMembers.map(member => [
+          String(member.id),
+          {
+            id: String(member.id),
+            name: member.name,
+            role: member.role,
+            active: member.active,
+            casesHandled: 0,
+            casesCompleted: 0,
+            callsAnswered: 0,
+          }
+        ])
+      );
+
+      for (const item of cases) {
+        if (!item.assigned_admin_id) continue;
+        if (!item.created_at) continue;
+
+        const created = new Date(
+          item.created_at
+        );
+
+        if (
+          created < startDate ||
+          created > endDate
+        ) {
+          continue;
+        }
+
+        const member =
+          report.get(
+            String(item.assigned_admin_id)
+          );
+
+        if (!member) continue;
+
+        member.casesHandled += 1;
+
+        if (
+          FINISHED_STATUSES.has(
+            item.status
+          )
+        ) {
+          member.casesCompleted += 1;
+        }
+      }
+
+      for (const call of calls) {
+        if (!call.accepted_at) continue;
+        if (!call.admin_user_id) continue;
+
+        const accepted =
+          new Date(call.accepted_at);
+
+        if (
+          accepted < startDate ||
+          accepted > endDate
+        ) {
+          continue;
+        }
+
+        const member =
+          report.get(
+            String(call.admin_user_id)
+          );
+
+        if (!member) continue;
+
+        member.callsAnswered += 1;
+      }
+
+      const rows =
+        [...report.values()];
+
+      const totalCases =
+        rows.reduce(
+          (sum, row) =>
+            sum + row.casesHandled,
+          0
+        );
+
+      const totalCompleted =
+        rows.reduce(
+          (sum, row) =>
+            sum + row.casesCompleted,
+          0
+        );
+
+      const totalCalls =
+        rows.reduce(
+          (sum, row) =>
+            sum + row.callsAnswered,
+          0
+        );
+
+      rows.sort((a, b) => {
+        if (
+          b.casesHandled !==
+          a.casesHandled
+        ) {
+          return (
+            b.casesHandled -
+            a.casesHandled
+          );
+        }
+
+        if (
+          b.casesCompleted !==
+          a.casesCompleted
+        ) {
+          return (
+            b.casesCompleted -
+            a.casesCompleted
+          );
+        }
+
+        return (
+          b.callsAnswered -
+          a.callsAnswered
+        );
+      });
+
+      rows.forEach((row, index) => {
+        row.rank = index + 1;
+
+        row.caseSharePercent =
+          totalCases
+            ? Number(
+                (
+                  row.casesHandled /
+                  totalCases *
+                  100
+                ).toFixed(1)
+              )
+            : 0;
+
+        row.completionPercent =
+          row.casesHandled
+            ? Number(
+                (
+                  row.casesCompleted /
+                  row.casesHandled *
+                  100
+                ).toFixed(1)
+              )
+            : 0;
+
+        row.callSharePercent =
+          totalCalls
+            ? Number(
+                (
+                  row.callsAnswered /
+                  totalCalls *
+                  100
+                ).toFixed(1)
+              )
+            : 0;
+      });
+
+      return {
+        totals: {
+          casesHandled: totalCases,
+          casesCompleted: totalCompleted,
+          callsAnswered: totalCalls,
+        },
+        admins: rows,
+      };
+    }
+
+    const endToday = new Date(now);
+
+    const dailyAdminReport =
+      buildAdminPeriodReport(
+        startToday,
+        endToday
+      );
+
+    const weeklyAdminReport =
+      buildAdminPeriodReport(
+        startWeek,
+        endToday
+      );
+
+    const allTimeStart =
+      new Date(1970, 0, 1);
+
+    const allTimeAdminReport =
+      buildAdminPeriodReport(
+        allTimeStart,
+        endToday
+      );
+
     const monthlyCallDistribution =
       teamMembers
         .map(member => ({
@@ -375,6 +584,10 @@ router.get('/operations', adminAuth, async (req, res) => {
       monthlyCallDistribution,
 
       topCallAdmin,
+
+      dailyAdminReport,
+      weeklyAdminReport,
+      allTimeAdminReport,
 
       admins: teamMembers.sort((a, b) => {
         if (b.callsAnswered !== a.callsAnswered) {
