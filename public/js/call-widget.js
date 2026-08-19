@@ -26,7 +26,7 @@
 
   function buildWidget() {
     const wrap = el(`
-      <div id="callWidget" style="position:fixed; bottom:calc(12px + env(safe-area-inset-bottom)); right:12px; z-index:200; font-family:'Inter',-apple-system,sans-serif;">
+      <div id="callWidget" style="position:fixed; bottom:calc(20px + env(safe-area-inset-bottom)); right:20px; z-index:2147482000; font-family:'Inter',-apple-system,sans-serif; display:block !important; visibility:visible !important; opacity:1 !important;">
         <button id="callWidgetBtn" style="
           background:#1f6e4a; color:#fff; border:none; border-radius:50px;
           padding:0.7rem 1.1rem; font-weight:600; font-size:0.85rem; cursor:pointer;
