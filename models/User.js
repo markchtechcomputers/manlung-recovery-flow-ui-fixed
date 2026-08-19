@@ -71,6 +71,41 @@ async function resetPassword(id, newPassword) {
 }
 
 
+
+async function updateProfile(userId, { username, phone }) {
+  const fields = {
+    username: String(username || '').trim(),
+    phone: String(phone || '').trim() || null,
+  };
+
+  const { data, error } = await supabase
+    .from(TABLE)
+    .update(fields)
+    .eq('id', userId)
+    .eq('role', 'client')
+    .select('id, username, email, phone, role, created_at')
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+async function updatePassword(userId, newPassword) {
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  const { error } = await supabase
+    .from(TABLE)
+    .update({
+      password: hashed,
+      reset_token_hash: null,
+      reset_token_expires: null,
+    })
+    .eq('id', userId)
+    .eq('role', 'client');
+
+  if (error) throw error;
+}
+
 async function deleteById(userId) {
   const { data, error } = await supabase
     .from(TABLE)
@@ -159,6 +194,6 @@ async function createAdminFromInvitation({ username, password, email, phone, inv
 
 module.exports = {
   findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword,
-  setResetToken, findByValidResetToken, resetPassword, deleteById, createAdminFromInvitation,
+  setResetToken, findByValidResetToken, resetPassword, updateProfile, updatePassword, deleteById, createAdminFromInvitation,
   listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, setAdminStatus, removeAdminPrivileges,
 };
