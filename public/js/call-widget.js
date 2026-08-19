@@ -480,6 +480,7 @@
         if (!stillPending) {
           currentCallbackId = null;
           stopClientAlert();
+          removeIncomingCallbackOverlay();
           refreshEntitlementPanel();
           return;
         }
@@ -497,30 +498,210 @@
     } catch (_) {}
   }
 
+
+  function removeIncomingCallbackOverlay() {
+    const overlay =
+      document.getElementById('manlungIncomingCallbackOverlay');
+
+    if (overlay) {
+      overlay.remove();
+    }
+  }
+
+  function showIncomingCallbackOverlay(call, headers) {
+    removeIncomingCallbackOverlay();
+
+    const overlay =
+      document.createElement('div');
+
+    overlay.id =
+      'manlungIncomingCallbackOverlay';
+
+    overlay.style.cssText = `
+      position:fixed;
+      inset:0;
+      z-index:2147483000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:rgba(2,6,23,.72);
+      backdrop-filter:blur(6px);
+    `;
+
+    const adminName =
+      call.admin_name ||
+      'Manlung Recovery Admin';
+
+    const caseText =
+      call.case_id
+        ? `Case ${call.case_id}`
+        : 'Support callback';
+
+    overlay.innerHTML = `
+      <div
+        style="
+          width:min(430px,94vw);
+          background:#ffffff;
+          color:#0f172a;
+          border-radius:24px;
+          padding:28px 24px;
+          box-shadow:0 30px 80px rgba(0,0,0,.35);
+          text-align:center;
+        "
+      >
+        <div
+          style="
+            width:82px;
+            height:82px;
+            margin:0 auto 16px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#dcfce7;
+            animation:manlungCallPulse 1.15s infinite;
+          "
+        >
+          <i
+            class="fas fa-phone-volume"
+            style="font-size:34px;color:#15803d;"
+          ></i>
+        </div>
+
+        <h2
+          style="
+            margin:0 0 8px;
+            font-size:1.45rem;
+          "
+        >
+          Incoming Call
+        </h2>
+
+        <p
+          style="
+            margin:0 0 6px;
+            font-size:1rem;
+            font-weight:700;
+          "
+        >
+          ${escapeHtml(adminName)}
+        </p>
+
+        <p
+          style="
+            margin:0 0 22px;
+            color:#64748b;
+            font-size:.9rem;
+          "
+        >
+          ${escapeHtml(caseText)}
+        </p>
+
+        <div
+          style="
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+          "
+        >
+          <button
+            id="manlungIncomingDecline"
+            type="button"
+            style="
+              min-height:52px;
+              border:0;
+              border-radius:12px;
+              background:#dc2626;
+              color:#fff;
+              font-weight:800;
+              cursor:pointer;
+              font-size:.95rem;
+            "
+          >
+            <i class="fas fa-phone-slash"></i>
+            Decline
+          </button>
+
+          <button
+            id="manlungIncomingAccept"
+            type="button"
+            style="
+              min-height:52px;
+              border:0;
+              border-radius:12px;
+              background:#16a34a;
+              color:#fff;
+              font-weight:800;
+              cursor:pointer;
+              font-size:.95rem;
+            "
+          >
+            <i class="fas fa-phone"></i>
+            Accept
+          </button>
+        </div>
+      </div>
+
+      <style>
+        @keyframes manlungCallPulse {
+          0%,100% {
+            transform:scale(1);
+            box-shadow:0 0 0 0 rgba(22,163,74,.25);
+          }
+          50% {
+            transform:scale(1.06);
+            box-shadow:0 0 0 14px rgba(22,163,74,0);
+          }
+        }
+      </style>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document
+      .getElementById(
+        'manlungIncomingDecline'
+      )
+      ?.addEventListener(
+        'click',
+        () => {
+          removeIncomingCallbackOverlay();
+          rejectAdminCallback(
+            call.id,
+            headers
+          );
+        }
+      );
+
+    document
+      .getElementById(
+        'manlungIncomingAccept'
+      )
+      ?.addEventListener(
+        'click',
+        () => {
+          removeIncomingCallbackOverlay();
+          acceptAdminCallback(
+            call.id,
+            headers
+          );
+        }
+      );
+  }
+
   function showAdminCallback(call, headers) {
     if (currentCallbackId || currentPeer || currentSessionId) return;
     currentCallbackId = call.id;
     startClientAlert();
-    const panel = panelContent();
-    const adminName = call.admin_name || 'Manlung Admin';
-    panel.innerHTML = panelHtml(`
-      <div style="text-align:center;">
-        <div style="width:64px;height:64px;margin:0 auto .7rem;border-radius:50%;background:#1f6e4a;display:flex;align-items:center;justify-content:center;">
-          <i class="fas fa-phone-volume" style="font-size:28px;color:#fff;"></i>
-        </div>
-        <p style="font-weight:700;margin-bottom:.35rem;">Incoming Call From ${adminName}</p>
-        <p style="color:#96abc4;margin-bottom:.8rem;">${call.case_id ? `Case ${call.case_id}` : 'Support callback'}</p>
-        <div style="display:flex;gap:8px;">
-          <button id="rejectCallbackBtn" style="flex:1;background:#c0392b;color:#fff;border:0;padding:.55rem;border-radius:10px;cursor:pointer;"><i class="fas fa-phone-slash"></i> Decline</button>
-          <button id="acceptCallbackBtn" style="flex:1;background:#1f6e4a;color:#fff;border:0;padding:.55rem;border-radius:10px;cursor:pointer;"><i class="fas fa-phone"></i> Accept</button>
-        </div>
-      </div>
-    `);
-    document.getElementById('acceptCallbackBtn')?.addEventListener('click', () => acceptAdminCallback(call.id, headers));
-    document.getElementById('rejectCallbackBtn')?.addEventListener('click', () => rejectAdminCallback(call.id, headers));
-  }
+
+    showIncomingCallbackOverlay(
+      call,
+      headers
+    );
 
   async function rejectAdminCallback(id, headers) {
+    removeIncomingCallbackOverlay();
     stopClientAlert();
     try {
       await fetch(`/api/calls/${encodeURIComponent(id)}/reject-client`, { method: 'PUT', headers });
@@ -530,6 +711,8 @@
   }
 
   async function acceptAdminCallback(id, headers) {
+    removeIncomingCallbackOverlay();
+
     const panel = panelContent();
     panel.innerHTML = panelHtml('<p><i class="fas fa-spinner fa-spin"></i> Connecting to your admin…</p>');
     try {
