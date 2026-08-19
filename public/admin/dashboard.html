@@ -658,6 +658,7 @@
                     return;
                 }
                 renderCaseModal(data.case);
+                await loadAdminCaseMessages(caseId);
             } catch (e) {
                 console.error(e);
                 document.getElementById('modalBody').innerHTML = '<p class="error-text">Error loading case.</p>';
