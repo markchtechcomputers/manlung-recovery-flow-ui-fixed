@@ -148,6 +148,85 @@
                 <div id="operationsUpdated" class="operations-refresh">Updating…</div>
             </div>
 
+
+            <section class="card operations-card operations-date-panel">
+                <div class="operations-report-header">
+                    <div>
+                        <div class="operations-card-title" style="margin-bottom:.2rem;">
+                            <span><i class="fas fa-calendar-days"></i> Reports Calendar</span>
+                        </div>
+                        <div class="operations-refresh">
+                            Choose a date to inspect historical cases and calls.
+                        </div>
+                    </div>
+
+                    <div class="operations-date-controls">
+                        <button type="button" class="operations-report-tab" id="reportTodayBtn">
+                            Today
+                        </button>
+
+                        <button type="button" class="operations-report-tab" id="reportWeekBtn">
+                            This Week
+                        </button>
+
+                        <button type="button" class="operations-report-tab" id="reportMonthBtn">
+                            This Month
+                        </button>
+
+                        <input
+                            id="reportsDatePicker"
+                            type="date"
+                            style="
+                              padding:.42rem .55rem;
+                              border:1px solid var(--card-border);
+                              border-radius:9px;
+                              background:var(--card-bg);
+                              color:var(--text);
+                            "
+                        >
+                    </div>
+                </div>
+
+                <div class="operations-report-kpis">
+                    <div class="operations-report-kpi">
+                        <small>Selected Date Cases</small>
+                        <strong id="selectedDateCases">0</strong>
+                    </div>
+
+                    <div class="operations-report-kpi">
+                        <small>Selected Date Calls</small>
+                        <strong id="selectedDateCalls">0</strong>
+                    </div>
+
+                    <div class="operations-report-kpi">
+                        <small>Selected Date Completed</small>
+                        <strong id="selectedDateCompleted">0</strong>
+                    </div>
+                </div>
+
+                <div class="operations-card-title" style="margin-top:.65rem;">
+                    <span><i class="fas fa-chart-column"></i> Rolling 7-Day Activity</span>
+                    <span id="selectedDateLabel" class="operations-refresh"></span>
+                </div>
+
+                <div id="weeklyActivityChart" class="operations-flow"></div>
+
+                <div class="operations-legend">
+                    <span>
+                        <i class="operations-dot op-submitted"></i>
+                        Cases
+                    </span>
+                    <span>
+                        <i class="operations-dot op-completed"></i>
+                        Completed
+                    </span>
+                    <span>
+                        <i class="operations-dot op-calls"></i>
+                        Calls
+                    </span>
+                </div>
+            </section>
+
             <div class="operations-kpis">
                 <div class="operations-kpi"><small>Cases Today</small><strong id="opCasesToday">0</strong></div>
                 <div class="operations-kpi"><small>Cases This Month</small><strong id="opCasesMonth">0</strong></div>
@@ -763,6 +842,322 @@ function logout() {
       });
   }
 
+
+
+  let selectedReportsDate =
+    new Date().toISOString().slice(0,10);
+
+  let selectedReportPeriod = 'today';
+
+  function setReportMode(mode, dateValue = null){
+    selectedReportPeriod = mode;
+
+    const today =
+      new Date().toISOString().slice(0,10);
+
+    if(mode === 'today'){
+      selectedReportsDate = today;
+    } else if(mode === 'week'){
+      selectedReportsDate = today;
+    } else if(mode === 'month'){
+      selectedReportsDate = today;
+    } else if(mode === 'date' && dateValue){
+      selectedReportsDate = dateValue;
+    }
+
+    const picker =
+      document.getElementById(
+        'reportsDatePicker'
+      );
+
+    if(picker){
+      picker.value =
+        selectedReportsDate;
+    }
+
+    document
+      .querySelectorAll(
+        '#reportTodayBtn,#reportWeekBtn,#reportMonthBtn'
+      )
+      .forEach(button =>
+        button.classList.remove('active')
+      );
+
+    if(mode === 'today'){
+      document
+        .getElementById('reportTodayBtn')
+        ?.classList.add('active');
+    }
+
+    if(mode === 'week'){
+      document
+        .getElementById('reportWeekBtn')
+        ?.classList.add('active');
+    }
+
+    if(mode === 'month'){
+      document
+        .getElementById('reportMonthBtn')
+        ?.classList.add('active');
+    }
+
+    loadOperationsForDate(
+      selectedReportsDate,
+      mode
+    );
+  }
+
+  function renderWeeklyActivity(days){
+    const root =
+      document.getElementById(
+        'weeklyActivityChart'
+      );
+
+    if(!root) return;
+
+    if(!days.length){
+      root.innerHTML =
+        '<span class="operations-refresh">No activity available.</span>';
+      return;
+    }
+
+    const max =
+      Math.max(
+        1,
+        ...days.flatMap(day => [
+          Number(day.cases || 0),
+          Number(day.completed || 0),
+          Number(day.calls || 0)
+        ])
+      );
+
+    root.innerHTML =
+      days.map(day => {
+        const label =
+          new Date(
+            `${day.date}T00:00:00`
+          ).toLocaleDateString(
+            undefined,
+            {
+              month:'numeric',
+              day:'numeric'
+            }
+          );
+
+        const caseHeight =
+          Number(day.cases || 0)
+            ? Math.max(
+                5,
+                Number(day.cases || 0) /
+                  max * 105
+              )
+            : 0;
+
+        const completedHeight =
+          Number(day.completed || 0)
+            ? Math.max(
+                5,
+                Number(day.completed || 0) /
+                  max * 105
+              )
+            : 0;
+
+        const callHeight =
+          Number(day.calls || 0)
+            ? Math.max(
+                5,
+                Number(day.calls || 0) /
+                  max * 105
+              )
+            : 0;
+
+        return `
+          <div
+            class="operations-day"
+            title="${esc(day.date)}"
+          >
+            <div class="operations-bars">
+              <i
+                class="op-submitted"
+                style="height:${caseHeight}px"
+              ></i>
+
+              <i
+                class="op-completed"
+                style="height:${completedHeight}px"
+              ></i>
+
+              <i
+                class="op-calls"
+                style="height:${callHeight}px"
+              ></i>
+            </div>
+
+            <small>${esc(label)}</small>
+          </div>
+        `;
+      }).join('');
+  }
+
+  async function loadOperationsForDate(
+    date,
+    mode = 'date'
+  ){
+    try{
+      const query =
+        new URLSearchParams({
+          date,
+          mode
+        });
+
+      const res =
+        await fetch(
+          `/api/analytics/operations?${query.toString()}`,
+          {
+            headers: authHeaders(),
+            cache:'no-store'
+          }
+        );
+
+      if(await handleUnauthorized(res)){
+        return;
+      }
+
+      const data =
+        await res.json().catch(
+          () => ({})
+        );
+
+      if(!res.ok || !data.success){
+        throw new Error(
+          data.error ||
+          'Could not load selected report.'
+        );
+      }
+
+      const selected =
+        data.selectedDateReport || {};
+
+      setText(
+        'selectedDateCases',
+        selected.cases || 0
+      );
+
+      setText(
+        'selectedDateCalls',
+        selected.calls || 0
+      );
+
+      setText(
+        'selectedDateCompleted',
+        selected.completed || 0
+      );
+
+      const pretty =
+        new Date(
+          `${date}T00:00:00`
+        ).toLocaleDateString(
+          undefined,
+          {
+            weekday:'long',
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+          }
+        );
+
+      let label = pretty;
+
+      if(mode === 'week'){
+        label = `7-day report ending ${pretty}`;
+      }
+
+      if(mode === 'month'){
+        label =
+          new Date(
+            `${date.slice(0,7)}-01T00:00:00`
+          ).toLocaleDateString(
+            undefined,
+            {
+              month:'long',
+              year:'numeric'
+            }
+          );
+      }
+
+      setText(
+        'selectedDateLabel',
+        label
+      );
+
+      renderWeeklyActivity(
+        data.weeklyFlow || []
+      );
+
+    }catch(error){
+      console.error(
+        'Selected report error:',
+        error
+      );
+
+      setText(
+        'selectedDateLabel',
+        'Data unavailable'
+      );
+    }
+  }
+
+  function setupReportDateControls(){
+    const picker =
+      document.getElementById(
+        'reportsDatePicker'
+      );
+
+    if(picker){
+      picker.value =
+        selectedReportsDate;
+
+      picker.addEventListener(
+        'change',
+        event => {
+          setReportMode(
+            'date',
+            event.target.value
+          );
+        }
+      );
+    }
+
+    document
+      .getElementById(
+        'reportTodayBtn'
+      )
+      ?.addEventListener(
+        'click',
+        () => setReportMode('today')
+      );
+
+    document
+      .getElementById(
+        'reportWeekBtn'
+      )
+      ?.addEventListener(
+        'click',
+        () => setReportMode('week')
+      );
+
+    document
+      .getElementById(
+        'reportMonthBtn'
+      )
+      ?.addEventListener(
+        'click',
+        () => setReportMode('month')
+      );
+
+    setReportMode('today');
+  }
+
   async function loadOperations(){
     try{
       const res = await fetch(
@@ -924,6 +1319,7 @@ function logout() {
     'DOMContentLoaded',
     () => {
       setupOperationsReportTabs();
+      setupReportDateControls();
 
       loadOperations();
 

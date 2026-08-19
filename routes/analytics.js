@@ -43,6 +43,30 @@ router.get('/operations', adminAuth, async (req, res) => {
   try {
     const now = new Date();
 
+    const requestedDate =
+      String(req.query?.date || '').trim();
+
+    const requestedMode =
+      ['today', 'week', 'month', 'date'].includes(
+        String(req.query?.mode || '')
+      )
+        ? String(req.query.mode)
+        : 'today';
+
+    const selectedDate =
+      /^\d{4}-\d{2}-\d{2}$/.test(requestedDate)
+        ? requestedDate
+        : dayKey(now);
+
+    const selectedDateStart =
+      new Date(`${selectedDate}T00:00:00`);
+
+    const selectedDateEnd =
+      new Date(
+        selectedDateStart.getTime() +
+        24 * 60 * 60 * 1000 - 1
+      );
+
     const todayKey = dayKey(now);
     const currentMonth = monthKey(now);
 
@@ -295,6 +319,129 @@ router.get('/operations', adminAuth, async (req, res) => {
         dailyMap.get(dayKey(item.completed_at)).completed += 1;
       }
     }
+
+
+    // --------------------------------------------------------
+    // SELECTED DATE + ROLLING 7-DAY REPORT
+    // --------------------------------------------------------
+    let periodStart =
+      new Date(selectedDateStart);
+
+    let periodEnd =
+      new Date(selectedDateEnd);
+
+    if (requestedMode === 'week') {
+      periodStart = new Date(
+        selectedDateStart
+      );
+
+      periodStart.setDate(
+        periodStart.getDate() - 6
+      );
+    }
+
+    if (requestedMode === 'month') {
+      periodStart = new Date(
+        selectedDateStart.getFullYear(),
+        selectedDateStart.getMonth(),
+        1
+      );
+
+      periodEnd = new Date(
+        selectedDateStart.getFullYear(),
+        selectedDateStart.getMonth() + 1,
+        1
+      );
+
+      periodEnd.setMilliseconds(
+        periodEnd.getMilliseconds() - 1
+      );
+    }
+
+    const periodCases =
+      cases.filter(item => {
+        if (!item.created_at) return false;
+
+        const created =
+          new Date(item.created_at);
+
+        return (
+          created >= periodStart &&
+          created <= periodEnd
+        );
+      });
+
+    const periodCompleted =
+      cases.filter(item => {
+        if (!item.completed_at) return false;
+
+        const completed =
+          new Date(item.completed_at);
+
+        return (
+          completed >= periodStart &&
+          completed <= periodEnd &&
+          FINISHED_STATUSES.has(item.status)
+        );
+      });
+
+    const periodCalls =
+      calls.filter(item => {
+        if (!item.accepted_at) return false;
+
+        const accepted =
+          new Date(item.accepted_at);
+
+        return (
+          accepted >= periodStart &&
+          accepted <= periodEnd
+        );
+      });
+
+    const rollingWeekStart =
+      new Date(selectedDateStart);
+
+    rollingWeekStart.setDate(
+      rollingWeekStart.getDate() - 6
+    );
+
+    const weeklyCallFlow = [];
+
+    for (let i = 0; i < 7; i++) {
+      const date =
+        new Date(rollingWeekStart);
+
+      date.setDate(
+        rollingWeekStart.getDate() + i
+      );
+
+      const key =
+        dayKey(date);
+
+      weeklyCallFlow.push({
+        date: key,
+        calls: calls.filter(item =>
+          item.accepted_at &&
+          dayKey(item.accepted_at) === key
+        ).length,
+        cases: cases.filter(item =>
+          item.created_at &&
+          dayKey(item.created_at) === key
+        ).length,
+        completed: cases.filter(item =>
+          item.completed_at &&
+          dayKey(item.completed_at) === key &&
+          FINISHED_STATUSES.has(item.status)
+        ).length,
+      });
+    }
+
+    const selectedDateAdminReport =
+      buildAdminPeriodReport(
+        selectedDateStart,
+        selectedDateEnd
+      );
+
 
     const statusCounts = {};
 
@@ -578,6 +725,20 @@ router.get('/operations', adminAuth, async (req, res) => {
       },
 
       dailyFlow: [...dailyMap.values()],
+
+      selectedDate: selectedDate,
+
+      selectedDateReport: {
+        mode: requestedMode,
+        startDate: dayKey(periodStart),
+        endDate: dayKey(periodEnd),
+        cases: periodCases.length,
+        completed: periodCompleted.length,
+        calls: periodCalls.length,
+        adminReport: selectedDateAdminReport,
+      },
+
+      weeklyFlow: weeklyCallFlow,
 
       monthlyStatusCounts: statusCounts,
 
