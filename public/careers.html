@@ -2,22 +2,20 @@
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Careers · Manlung Tech City</title><link rel="stylesheet" href="/css/style.css"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"><style>
 .career-form{display:grid;gap:1rem}.career-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}@media(max-width:700px){.career-grid{grid-template-columns:1fr}}.career-form textarea{min-height:130px;resize:vertical}.career-note{padding:.9rem 1rem;border-radius:12px;background:var(--info-bg);color:var(--info-text)}
 </style><style id="manlung-footer-style">
-.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:linear-gradient(135deg,#06101d,#0b2038 55%,#06101d);border-top:1px solid rgba(56,189,248,.25);color:#dbeafe;box-shadow:0 -10px 30px rgba(0,0,0,.18)}
+.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:#06101d;border-top:1px solid rgba(255,255,255,.08);color:#dbeafe}
 .manlung-footer-inner{max-width:1000px;margin:auto}
 .manlung-footer-brand{text-align:center;margin-bottom:1rem}
 .manlung-footer-brand h2{margin:0 0 .3rem;font-size:clamp(1rem,1.7vw,1.25rem);color:#fff}
 .manlung-footer-brand p{margin:0;color:#94a3b8;font-size:.8rem}
 .manlung-footer-links{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1rem 0}
-.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(56,189,248,.18);border-radius:10px;background:rgba(255,255,255,.035);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease,color .2s ease}
-.manlung-footer-link:hover{transform:translateY(-3px);border-color:#38bdf8;background:rgba(14,165,233,.12);color:#fff;box-shadow:0 0 18px rgba(56,189,248,.28)}
-.manlung-footer-link:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
-.manlung-footer-link:active{transform:scale(.95);box-shadow:0 0 25px rgba(56,189,248,.5)}
-.manlung-footer-badges{display:flex;justify-content:center;gap:.45rem;flex-wrap:wrap;margin:.9rem 0}
-.manlung-footer-badge{padding:.35rem .65rem;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#a5f3fc;font-size:.7rem}
+.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.manlung-footer-link:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#fff}
+.manlung-footer-link:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
+.manlung-footer-link:active{background:rgba(255,255,255,.1)}
 .manlung-footer-bottom{padding-top:.7rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;color:#64748b;font-size:.7rem}
 .manlung-footer-bottom strong{color:#94a3b8}
 @media(max-width:900px){.manlung-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}.manlung-footer-brand{margin-bottom:.8rem}.manlung-footer-badges{margin:.7rem 0}}
+@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}}
 @media(max-width:380px){.manlung-footer-links{grid-template-columns:1fr}}
 </style>
 </head><body><header class="site-header"><div class="container"><div class="brand"><h1><i class="fas fa-briefcase"></i> Careers</h1><span>Join Manlung Tech City</span></div><div class="header-actions"><a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a><a href="/about.html" class="btn btn-outline">About</a></div></div></header><main class="container"><section class="hero" style="text-align:left"><h2>Work With Manlung Tech City</h2><p>We are building a practical cyber recovery and digital investigation service. Tell us about your education, experience, skills and the role you are interested in.</p></section><section class="card"><div class="card-title"><i class="fas fa-file-signature"></i> Career Application</div><div class="career-note">Submit accurate information. The Owner reviews applications through the private recruitment portal.</div><form id="careerForm" class="career-form" style="margin-top:1rem"><div class="career-grid"><div><label>Full name</label><input id="fullName" required maxlength="120"></div><div><label>Email</label><input id="email" type="email" required maxlength="160"></div><div><label>Phone</label><input id="phone" required maxlength="40"></div><div><label>Location</label><input id="location" required maxlength="160" placeholder="City / County / Country"></div><div><label>Role interested in</label><select id="roleInterested" required><option value="">Select a role</option><option>Cyber Recovery Investigator</option><option>Digital Forensics / Evidence Analyst</option><option>Scam Investigation Analyst</option><option>Identity Recovery Specialist</option><option>Security Assessment Analyst</option><option>Call Support / Client Success</option><option>Admin / Case Management</option><option>Software / Web Engineer</option><option>Other</option></select></div><div><label>Years of experience</label><input id="experienceYears" type="number" min="0" max="60" placeholder="e.g. 3"></div></div><div><label>Education</label><textarea id="education" required maxlength="2000" placeholder="Qualifications, certifications, institutions and relevant training"></textarea></div><div><label>Career experience</label><textarea id="experience" required maxlength="4000" placeholder="Previous roles, responsibilities and relevant projects"></textarea></div><div><label>Skills</label><textarea id="skills" required maxlength="3000" placeholder="Technical, investigative, communication and other relevant skills"></textarea></div><div><label>Why should we consider you?</label><textarea id="coverNote" required minlength="20" maxlength="5000" placeholder="Tell us briefly about your interest in Manlung Tech City and the value you can bring."></textarea></div><button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Submit Application</button><div id="careerStatus"></div></form></section></main><footer class="manlung-footer">
@@ -34,11 +32,6 @@
 <a class="manlung-footer-link" href="/login.html">Client Portal</a>
 <a class="manlung-footer-link" href="/client/request.html">New Recovery Request</a>
 </nav>
-<div class="manlung-footer-badges">
-<span class="manlung-footer-badge">Secure portal</span>
-<span class="manlung-footer-badge">Mobile friendly</span>
-<span class="manlung-footer-badge">Fast access</span>
-</div>
 <div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Tech City</strong>. All rights reserved.</div>
 </div>
 </footer><script>
