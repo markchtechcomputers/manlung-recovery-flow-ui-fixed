@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const caseRoutes = require('./routes/cases');
 const configRoutes = require('./routes/config');
 const notificationRoutes = require('./routes/notifications');
+const messageRoutes = require('./routes/messages');
 const subscriptionRoutes = require('./routes/subscription');
 const callRoutes = require('./routes/calls');
 const donationRoutes = require('./routes/donations');
@@ -223,6 +224,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cases', caseRoutes);
 app.use('/api/config', configRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/messages', messageRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 
 // Alias for call-admin payment routes
