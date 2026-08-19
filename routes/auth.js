@@ -453,6 +453,132 @@ router.post(
 );
 
 
+
+// ============================================================
+// CLIENT OAUTH
+// Google / GitHub / other Supabase OAuth providers
+// ============================================================
+
+router.post(
+  '/client/oauth',
+  [
+    body('accessToken')
+      .trim()
+      .notEmpty()
+      .withMessage('OAuth access token is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const { supabase } = require('../config/supabase');
+
+      const {
+        data,
+        error,
+      } = await supabase.auth.getUser(
+        req.body.accessToken
+      );
+
+      if (error || !data?.user) {
+        return res.status(401).json({
+          error: 'Social sign-in could not be verified.',
+        });
+      }
+
+      const oauthUser = data.user;
+
+      const email = String(
+        oauthUser.email || ''
+      ).trim().toLowerCase();
+
+      if (!email) {
+        return res.status(400).json({
+          error:
+            'Your social account did not provide an email address.',
+        });
+      }
+
+      let client = await User.findByEmail(email);
+
+      // Existing admin/owner accounts must never be converted
+      // into client accounts through social sign-in.
+      if (client && client.role !== 'client') {
+        return res.status(403).json({
+          error:
+            'This social account is reserved for an admin or owner account.',
+        });
+      }
+
+      const metadata = oauthUser.user_metadata || {};
+
+      const fullName = String(
+        metadata.full_name ||
+        metadata.name ||
+        metadata.user_name ||
+        metadata.preferred_username ||
+        email.split('@')[0]
+      ).trim().slice(0, 200);
+
+      const phone = String(
+        metadata.phone || ''
+      ).trim().slice(0, 40) || null;
+
+      if (!client) {
+        let username =
+          fullName ||
+          email.split('@')[0];
+
+        const existingUsername =
+          await User.findByUsername(username);
+
+        if (existingUsername) {
+          username =
+            `${username}-${String(oauthUser.id).slice(0, 8)}`
+              .slice(0, 80);
+        }
+
+        const randomPassword =
+          crypto.randomBytes(32).toString('hex');
+
+        client = await User.create({
+          username,
+          email,
+          phone,
+          password: randomPassword,
+          role: 'client',
+        });
+      }
+
+      const token = signToken(client);
+
+      return res.json({
+        success: true,
+        token,
+        user: {
+          id: client.id,
+          email: client.email,
+          username: client.username,
+          role: client.role,
+        },
+      });
+
+    } catch (error) {
+      console.error(
+        'Client OAuth error:',
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          error.message ||
+          'Could not complete social sign-in.',
+      });
+    }
+  }
+);
+
+
 // ============================================================
 // CLIENT FORGOT PASSWORD
 // ============================================================
