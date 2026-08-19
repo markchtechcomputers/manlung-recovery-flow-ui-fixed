@@ -4,6 +4,8 @@ const multer = require('multer');
 const { body, validationResult } = require('express-validator');
 
 const Case = require('../models/Case');
+const Notification = require('../models/Notification');
+const CaseTimeline = require('../models/CaseTimeline');
 const {
   auth,
   optionalAuth,
@@ -18,6 +20,90 @@ const {
   EVIDENCE_BUCKET,
 } = require('../config/supabase');
 
+
+
+async function recordCaseUpdateEvents({
+  existing,
+  updated,
+  actorId,
+  actorName,
+  source = 'admin',
+}) {
+  const events = [];
+
+  if (
+    existing.status !== undefined &&
+    updated.status !== existing.status
+  ) {
+    events.push({
+      eventType: 'status_changed',
+      description:
+        `Case status changed from "${existing.status}" to "${updated.status}".`,
+      notificationTitle: 'Case status updated',
+      notificationMessage:
+        `Your case ${updated.case_id} is now "${updated.status}".`,
+    });
+  }
+
+  if (
+    existing.investigator !== updated.investigator
+  ) {
+    const before = existing.investigator || 'Unassigned';
+    const after = updated.investigator || 'Unassigned';
+
+    events.push({
+      eventType: 'investigator_changed',
+      description:
+        `Investigator changed from "${before}" to "${after}".`,
+      notificationTitle: 'Case assignment updated',
+      notificationMessage:
+        `The investigator assignment for case ${updated.case_id} has been updated.`,
+    });
+  }
+
+  if (
+    existing.assigned_admin_id !== updated.assigned_admin_id
+  ) {
+    const before =
+      existing.assigned_admin_id || 'Unassigned';
+    const after =
+      updated.assigned_admin_id || 'Unassigned';
+
+    events.push({
+      eventType: 'assignment_changed',
+      description:
+        `Case assignment changed from "${before}" to "${after}".`,
+      notificationTitle: 'Case assignment updated',
+      notificationMessage:
+        `The assignment for case ${updated.case_id} has changed.`,
+    });
+  }
+
+  for (const event of events) {
+    await CaseTimeline.create({
+      caseId: updated.case_id,
+      actorUserId: actorId || null,
+      eventType: event.eventType,
+      description: event.description,
+      metadata: {
+        actorName: actorName || null,
+        source,
+      },
+    });
+
+    if (updated.client_user_id) {
+      await Notification.create({
+        userId: updated.client_user_id,
+        caseId: updated.case_id,
+        type: event.eventType,
+        title: event.notificationTitle,
+        message: event.notificationMessage,
+      });
+    }
+  }
+
+  return events.length;
+}
 
 // ============================================================
 // File Upload Configuration
@@ -1411,6 +1497,14 @@ router.put(
               req.body.status
             );
 
+          await recordCaseUpdateEvents({
+            existing,
+            updated: completed,
+            actorId: req.user.id,
+            actorName: req.user.username,
+            source: 'admin_complete',
+          });
+
           return res.json({
             success: true,
 
@@ -1460,6 +1554,14 @@ router.put(
           caseId,
           fields
         );
+
+      await recordCaseUpdateEvents({
+        existing,
+        updated,
+        actorId: req.user.id,
+        actorName: req.user.username,
+        source: 'admin_update',
+      });
 
       console.log(
         `📢 Case ${caseId} updated to: ${updated.status} by ${req.user.username}`
@@ -1551,12 +1653,21 @@ router.put(
             req.user.username
           );
 
-        results.push(
+        const updated =
           await Case.update(
             caseId,
             fields
-          )
-        );
+          );
+
+        await recordCaseUpdateEvents({
+          existing,
+          updated,
+          actorId: req.user.id,
+          actorName: req.user.username,
+          source: 'admin_bulk_update',
+        });
+
+        results.push(updated);
       }
 
       res.json({
