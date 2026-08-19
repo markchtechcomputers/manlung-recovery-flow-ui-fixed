@@ -323,9 +323,9 @@ router.post(
       .escape(),
 
     body('phone')
+      .optional()
       .trim()
-      .isLength({ min: 7, max: 40 })
-      .withMessage('A valid phone number is required')
+      .isLength({ max: 40 })
       .escape(),
   ],
   async (req, res) => {
@@ -448,81 +448,6 @@ router.post(
       res.status(500).json({
         error: error.message || 'Server error',
       });
-    }
-  }
-);
-
-
-
-
-// ============================================================
-// CLIENT SOCIAL AUTH (Supabase OAuth -> existing application JWT)
-// ============================================================
-// This does not replace the application's existing JWT/session system.
-// Supabase is used only to authenticate the social identity; the server then
-// maps that identity to recovery_users and issues the same JWT used elsewhere.
-router.post(
-  '/client/oauth',
-  [
-    body('accessToken').trim().notEmpty().withMessage('OAuth access token is required'),
-  ],
-  async (req, res) => {
-    if (!checkValidation(req, res)) return;
-
-    try {
-      const { data, error } = await require('../config/supabase').supabase.auth.getUser(req.body.accessToken);
-      if (error || !data?.user) {
-        return res.status(401).json({ error: 'Social sign-in could not be verified.' });
-      }
-
-      const oauthUser = data.user;
-      const email = String(oauthUser.email || '').trim().toLowerCase();
-      if (!email) {
-        return res.status(400).json({ error: 'Your social account did not provide an email address.' });
-      }
-
-      let client = await User.findByEmail(email);
-      if (client && client.role !== 'client') {
-        return res.status(403).json({ error: 'This social account is reserved for an admin or owner account.' });
-      }
-
-      const metadata = oauthUser.user_metadata || {};
-      const fullName = String(
-        metadata.full_name || metadata.name || metadata.user_name || metadata.preferred_username || email.split('@')[0]
-      ).trim().slice(0, 200);
-      const phone = String(metadata.phone || '').trim().slice(0, 40) || null;
-
-      if (!client) {
-        let username = fullName || email.split('@')[0];
-        const existingUsername = await User.findByUsername(username);
-        if (existingUsername) {
-          username = `${username}-${String(oauthUser.id).slice(0, 8)}`.slice(0, 120);
-        }
-
-        const randomPassword = require('crypto').randomBytes(32).toString('hex');
-        client = await User.create({
-          username,
-          email,
-          phone,
-          password: randomPassword,
-          role: 'client',
-        });
-      }
-
-      const token = signToken(client);
-      res.json({
-        success: true,
-        token,
-        user: {
-          id: client.id,
-          email: client.email,
-          username: client.username,
-          role: client.role,
-        },
-      });
-    } catch (error) {
-      console.error('Client OAuth error:', error);
-      res.status(500).json({ error: 'Could not complete social sign-in.' });
     }
   }
 );
