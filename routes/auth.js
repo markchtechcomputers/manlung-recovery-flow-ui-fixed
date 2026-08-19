@@ -98,28 +98,90 @@ router.post(
         });
       }
 
-      if (await User.findByUsername(req.body.username)) {
+      const requestedUsername =
+        String(req.body.username || '').trim();
+
+      const requestedEmail =
+        String(req.body.email || '').trim().toLowerCase();
+
+      const existingUser =
+        await User.findByEmail(
+          requestedEmail
+        );
+
+      const existingByUsername =
+        await User.findByUsername(
+          requestedUsername
+        );
+
+      if (
+        existingByUsername &&
+        (!existingUser ||
+          String(existingByUsername.id) !==
+            String(existingUser.id))
+      ) {
         return res.status(409).json({
           error: 'Username already exists.',
         });
       }
 
-      if (await User.findByEmail(req.body.email)) {
-        return res.status(409).json({
-          error: 'An account with this email already exists.',
-        });
+      let admin;
+
+      if (existingUser) {
+        // Existing CLIENT account:
+        // keep the same user ID so all cases/history remain attached.
+        if (existingUser.role === 'client') {
+          if (
+            existingByUsername &&
+            String(existingByUsername.id) !==
+              String(existingUser.id)
+          ) {
+            return res.status(409).json({
+              error: 'Username already exists.',
+            });
+          }
+
+          admin =
+            await User.convertClientToPendingAdmin(
+              existingUser.id,
+              {
+                username:
+                  requestedUsername,
+                password:
+                  req.body.password,
+                phone:
+                  req.body.phone,
+                appointedBy:
+                  invitation.invited_by,
+              }
+            );
+        } else {
+          return res.status(409).json({
+            error:
+              'This email already belongs to an Admin or Owner account.',
+          });
+        }
+      } else {
+        admin =
+          await User.createAdminFromInvitation({
+            username:
+              requestedUsername,
+            password:
+              req.body.password,
+            email:
+              requestedEmail,
+            phone:
+              req.body.phone,
+            invitationId:
+              invitation.id,
+            appointedBy:
+              invitation.invited_by,
+          });
       }
 
-      const admin = await User.createAdminFromInvitation({
-        username: req.body.username,
-        password: req.body.password,
-        email: req.body.email,
-        phone: req.body.phone,
-        invitationId: invitation.id,
-        appointedBy: invitation.invited_by,
-      });
-
-      await AdminInvitation.accept(invitation.id);
+      await AdminInvitation.accept(
+        invitation.id
+      );
 
       await AdminPermission.replace(
         admin.id,
@@ -130,8 +192,10 @@ router.post(
       res.status(201).json({
         success: true,
         pendingApproval: true,
+        existingAccount:
+          Boolean(existingUser),
         message:
-          'Admin account created. Wait for the Owner to approve your account.',
+          'Admin registration submitted. Your account is now pending Owner approval.',
       });
     } catch (error) {
       console.error('Admin registration error:', error);
