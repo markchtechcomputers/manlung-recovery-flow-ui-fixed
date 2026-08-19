@@ -15,22 +15,20 @@
         .search-result-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; border: 1px solid var(--card-border); border-radius: 10px; margin-bottom: 0.5rem; }
     </style>
 <style id="manlung-footer-style">
-.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:linear-gradient(135deg,#06101d,#0b2038 55%,#06101d);border-top:1px solid rgba(56,189,248,.25);color:#dbeafe;box-shadow:0 -10px 30px rgba(0,0,0,.18)}
+.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:#06101d;border-top:1px solid rgba(255,255,255,.08);color:#dbeafe}
 .manlung-footer-inner{max-width:1000px;margin:auto}
 .manlung-footer-brand{text-align:center;margin-bottom:1rem}
 .manlung-footer-brand h2{margin:0 0 .3rem;font-size:clamp(1rem,1.7vw,1.25rem);color:#fff}
 .manlung-footer-brand p{margin:0;color:#94a3b8;font-size:.8rem}
 .manlung-footer-links{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1rem 0}
-.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(56,189,248,.18);border-radius:10px;background:rgba(255,255,255,.035);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease,color .2s ease}
-.manlung-footer-link:hover{transform:translateY(-3px);border-color:#38bdf8;background:rgba(14,165,233,.12);color:#fff;box-shadow:0 0 18px rgba(56,189,248,.28)}
-.manlung-footer-link:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
-.manlung-footer-link:active{transform:scale(.95);box-shadow:0 0 25px rgba(56,189,248,.5)}
-.manlung-footer-badges{display:flex;justify-content:center;gap:.45rem;flex-wrap:wrap;margin:.9rem 0}
-.manlung-footer-badge{padding:.35rem .65rem;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#a5f3fc;font-size:.7rem}
+.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.manlung-footer-link:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#fff}
+.manlung-footer-link:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
+.manlung-footer-link:active{background:rgba(255,255,255,.1)}
 .manlung-footer-bottom{padding-top:.7rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;color:#64748b;font-size:.7rem}
 .manlung-footer-bottom strong{color:#94a3b8}
 @media(max-width:900px){.manlung-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}.manlung-footer-brand{margin-bottom:.8rem}.manlung-footer-badges{margin:.7rem 0}}
+@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}}
 @media(max-width:380px){.manlung-footer-links{grid-template-columns:1fr}}
 </style>
 </head>
@@ -111,11 +109,6 @@
 <a class="manlung-footer-link" href="/login.html">Client Portal</a>
 <a class="manlung-footer-link" href="/client/request.html">New Recovery Request</a>
 </nav>
-<div class="manlung-footer-badges">
-<span class="manlung-footer-badge">Secure portal</span>
-<span class="manlung-footer-badge">Mobile friendly</span>
-<span class="manlung-footer-badge">Fast access</span>
-</div>
 <div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Tech City</strong>. All rights reserved.</div>
 </div>
 </footer>
