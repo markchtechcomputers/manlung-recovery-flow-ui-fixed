@@ -70,6 +70,20 @@ async function resetPassword(id, newPassword) {
   if (error) throw error;
 }
 
+
+async function deleteById(userId) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .delete()
+    .eq('id', userId)
+    .eq('role', 'client')
+    .select('id')
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 // ---- Owner / Admin management ----
 
 // Every admin + the owner, for the Admin Management list view.
@@ -145,6 +159,6 @@ async function createAdminFromInvitation({ username, password, email, phone, inv
 
 module.exports = {
   findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword,
-  setResetToken, findByValidResetToken, resetPassword, createAdminFromInvitation,
+  setResetToken, findByValidResetToken, resetPassword, deleteById, createAdminFromInvitation,
   listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, setAdminStatus, removeAdminPrivileges,
 };

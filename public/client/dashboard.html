@@ -31,6 +31,11 @@
     .status-completed { background:var(--success-bg); color:var(--success); }
     .status-closed { background:var(--closed-bg); color:var(--closed-text); }
     .status-rejected { background:var(--danger-bg); color:var(--danger); }
+    .danger-zone { border:1px solid rgba(220,38,38,.18); background:rgba(220,38,38,.025); }
+    .danger-zone .card-title { color:#991b1b; }
+    .danger-copy { color:var(--text-muted); max-width:760px; font-size:.88rem; line-height:1.6; margin-bottom:1rem; }
+    .case-delete-btn { border:1px solid rgba(220,38,38,.22) !important; color:#b91c1c !important; background:transparent !important; }
+    .case-delete-btn:hover { background:rgba(220,38,38,.06) !important; border-color:rgba(220,38,38,.35) !important; }
     .dashboard-actions { display:flex; gap:.65rem; flex-wrap:wrap; }
     @media(max-width:600px){
       .site-header .container { align-items:flex-start; }
@@ -281,6 +286,24 @@
       <div id="casesState" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading your cases…</div>
       <div id="casesGrid" class="case-grid"></div>
     </section>
+
+    <section id="accountDangerZone" class="card danger-zone" style="margin-top:1rem;">
+      <div class="card-title">
+        <i class="fas fa-user-shield"></i> Account &amp; Privacy
+      </div>
+      <p class="danger-copy">
+        You control your account. Deleting it permanently removes your account,
+        your linked recovery cases, and the evidence files attached to those cases.
+      </p>
+      <button
+        type="button"
+        class="btn btn-danger"
+        onclick="deleteMyAccount()"
+      >
+        <i class="fas fa-user-xmark"></i> Delete My Account
+      </button>
+    </section>
+
   </main>
 
   <footer class="manlung-footer">
@@ -345,7 +368,10 @@
           <div class="case-top"><div><div class="case-id">${id}</div><div class="case-type">${escapeHtml(c.caseType || 'Recovery Request')}</div></div><span class="status-badge ${statusClass(c.status)}">${status}</span></div>
           <div class="case-meta"><div><small>Last updated</small><strong>${formatDate(c.lastUpdated || c.createdAt)}</strong></div><div><small>Admin</small><strong>${escapeHtml(c.investigator || 'Not assigned yet')}</strong></div></div>
           ${c.publicNotes ? `<div class="feedback"><strong><i class="fas fa-message"></i> Admin update</strong><div style="margin-top:.35rem;white-space:pre-wrap;">${escapeHtml(c.publicNotes)}</div></div>` : ''}
-          <div style="display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.8rem;"><a class="btn btn-primary" href="/client/track.html?case=${encodeURIComponent(c.caseId)}"><i class="fas fa-eye"></i> View Progress</a></div>
+          <div style="display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.8rem;">
+            <a class="btn btn-primary" href="/client/track.html?case=${encodeURIComponent(c.caseId)}"><i class="fas fa-eye"></i> View Progress</a>
+            <button class="btn case-delete-btn" type="button" onclick="deleteCase('${id}')"><i class="fas fa-trash"></i> Delete</button>
+          </div>
         </article>`;
       }).join('');
     }
@@ -370,6 +396,73 @@
         if(user?.username) document.getElementById('welcomeLine').textContent=`Welcome, ${user.username} · Your cases, progress and Admin updates`;
       }catch(_){ }
     })();
+
+    async function deleteCase(caseId){
+      if(!confirm(`Delete case ${caseId}? This permanently removes the case and its uploaded evidence.`)) return;
+
+      try{
+        const res = await fetch(`/api/cases/client/case/${encodeURIComponent(caseId)}`, {
+          method:'DELETE',
+          headers:authHeaders()
+        });
+
+        const data = await res.json().catch(()=>({}));
+
+        if(res.status === 401){
+          logout();
+          return;
+        }
+
+        if(!res.ok || !data.success){
+          throw new Error(data.error || `Could not delete case (${res.status})`);
+        }
+
+        await loadCases();
+      }catch(error){
+        console.error('Delete case error:', error);
+        alert(error.message || 'Could not delete the case.');
+      }
+    }
+
+    async function deleteMyAccount(){
+      const first = confirm(
+        'Delete your Manlung Recovery account permanently? Your account, linked recovery cases, and uploaded evidence will be removed.'
+      );
+
+      if(!first) return;
+
+      const second = prompt(
+        'Type DELETE to confirm permanent account deletion.'
+      );
+
+      if(second !== 'DELETE'){
+        alert('Account deletion cancelled.');
+        return;
+      }
+
+      try{
+        const res = await fetch('/api/auth/client/account', {
+          method:'DELETE',
+          headers:authHeaders()
+        });
+
+        const data = await res.json().catch(()=>({}));
+
+        if(!res.ok || !data.success){
+          throw new Error(data.error || `Could not delete account (${res.status})`);
+        }
+
+        localStorage.removeItem('clientToken');
+        localStorage.removeItem('clientUser');
+
+        alert('Your account has been deleted.');
+        window.location.href='/login.html';
+      }catch(error){
+        console.error('Delete account error:', error);
+        alert(error.message || 'Could not delete your account.');
+      }
+    }
+
     async function loadDonationSummary(){
       try{
         const res=await fetch('/api/donations/total',{cache:'no-store'});

@@ -75,6 +75,20 @@ async function remove(caseId) {
   if (error) throw error;
 }
 
+
+async function removeForClient(caseId, userId) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .delete()
+    .eq('case_id', caseId)
+    .eq('client_user_id', userId)
+    .select('case_id')
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 async function search({
   search,
   category,
@@ -348,6 +362,7 @@ module.exports = {
   findByEmail,
   update,
   remove,
+  removeForClient,
   search,
   searchAll,
   bulkUpdate,
