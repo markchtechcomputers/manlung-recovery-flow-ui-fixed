@@ -456,6 +456,195 @@ router.post(
 
 
 
+
+// ============================================================
+// CLIENT PROFILE
+// ============================================================
+
+router.get(
+  '/client/me',
+  auth,
+  async (req, res) => {
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          success: false,
+          error: 'Client access required.',
+        });
+      }
+
+      return res.json({
+        success: true,
+        user: {
+          id: req.user.id,
+          username: req.user.username,
+          email: req.user.email,
+          phone: req.user.phone || '',
+          role: req.user.role,
+          createdAt: req.user.created_at,
+        },
+      });
+    } catch (error) {
+      console.error('Client profile load error:', error);
+
+      return res.status(500).json({
+        success: false,
+        error: 'Could not load your profile.',
+      });
+    }
+  }
+);
+
+router.patch(
+  '/client/profile',
+  auth,
+  [
+    body('username')
+      .trim()
+      .isLength({ min: 3, max: 80 })
+      .withMessage('Name must be between 3 and 80 characters.'),
+    body('phone')
+      .optional()
+      .trim()
+      .isLength({ max: 40 })
+      .withMessage('Phone number is too long.'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          success: false,
+          error: 'Client access required.',
+        });
+      }
+
+      const username =
+        String(req.body.username || '').trim();
+
+      const existing =
+        await User.findByUsername(username);
+
+      if (
+        existing &&
+        String(existing.id) !== String(req.user.id)
+      ) {
+        return res.status(409).json({
+          success: false,
+          error: 'That name is already in use.',
+        });
+      }
+
+      const updated =
+        await User.updateProfile(
+          req.user.id,
+          {
+            username,
+            phone: req.body.phone,
+          }
+        );
+
+      if (!updated) {
+        return res.status(404).json({
+          success: false,
+          error: 'Client account not found.',
+        });
+      }
+
+      return res.json({
+        success: true,
+        user: {
+          id: updated.id,
+          username: updated.username,
+          email: updated.email,
+          phone: updated.phone || '',
+          role: updated.role,
+          createdAt: updated.created_at,
+        },
+      });
+    } catch (error) {
+      console.error('Client profile update error:', error);
+
+      return res.status(500).json({
+        success: false,
+        error:
+          error.message ||
+          'Could not update your profile.',
+      });
+    }
+  }
+);
+
+router.post(
+  '/client/change-password',
+  auth,
+  [
+    body('currentPassword')
+      .isLength({ min: 1 })
+      .withMessage('Current password is required.'),
+    body('newPassword')
+      .isLength({ min: 8 })
+      .withMessage('New password must be at least 8 characters.'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          success: false,
+          error: 'Client access required.',
+        });
+      }
+
+      const isMatch =
+        await User.comparePassword(
+          req.user,
+          req.body.currentPassword
+        );
+
+      if (!isMatch) {
+        return res.status(401).json({
+          success: false,
+          error: 'Current password is incorrect.',
+        });
+      }
+
+      if (
+        req.body.currentPassword ===
+        req.body.newPassword
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: 'New password must be different from the current password.',
+        });
+      }
+
+      await User.updatePassword(
+        req.user.id,
+        req.body.newPassword
+      );
+
+      return res.json({
+        success: true,
+        message:
+          'Password changed successfully. Please sign in again.',
+      });
+    } catch (error) {
+      console.error('Client password change error:', error);
+
+      return res.status(500).json({
+        success: false,
+        error:
+          error.message ||
+          'Could not change your password.',
+      });
+    }
+  }
+);
+
+
 // ============================================================
 // CLIENT OAUTH
 // Google / GitHub / other Supabase OAuth providers
