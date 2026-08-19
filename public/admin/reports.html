@@ -55,6 +55,34 @@
 @media(max-width:800px){.operations-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.operations-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.operations-flow{overflow-x:auto;grid-template-columns:repeat(14,22px)}}
 </style>
+
+<style id="operations-report-section">
+.operations-report-section{margin-top:.9rem}
+.operations-report-header{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;margin-bottom:.8rem}
+.operations-report-tabs{display:flex;gap:.35rem;flex-wrap:wrap}
+.operations-report-tab{border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);padding:.4rem .65rem;border-radius:9px;cursor:pointer;font-size:.7rem;font-weight:700}
+.operations-report-tab.active{background:#123a78;border-color:#123a78;color:#fff}
+.operations-report-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-bottom:.75rem}
+.operations-report-kpi{padding:.7rem;border:1px solid var(--card-border);border-radius:11px;background:var(--card-bg)}
+.operations-report-kpi small{display:block;color:var(--text-muted);font-size:.62rem}
+.operations-report-kpi strong{display:block;margin-top:.12rem;font-size:1.15rem}
+.operations-rank-list{display:grid;gap:.45rem}
+.operations-rank-row{display:grid;grid-template-columns:42px minmax(90px,.8fr) 1.8fr 55px 70px;gap:.5rem;align-items:center;padding:.55rem;border:1px solid var(--card-border);border-radius:10px;background:var(--card-bg)}
+.operations-rank-number{font-weight:900;text-align:center}
+.operations-rank-number.top{color:#d49a00}
+.operations-rank-name{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800}
+.operations-rank-track{height:10px;background:rgba(148,163,184,.15);border-radius:999px;overflow:hidden}
+.operations-rank-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#123a78,#2563eb);transition:width .8s ease}
+.operations-rank-count{text-align:right;font-weight:800}
+.operations-rank-percent{text-align:right;color:var(--text-muted);font-size:.68rem}
+.operations-rank-details{grid-column:2 / -1;display:flex;gap:1rem;flex-wrap:wrap;color:var(--text-muted);font-size:.63rem}
+@media(max-width:700px){
+  .operations-report-kpis{grid-template-columns:1fr}
+  .operations-rank-row{grid-template-columns:36px minmax(90px,1fr) 1fr 48px}
+  .operations-rank-percent{display:none}
+}
+</style>
+
 </head>
 
 <body class="admin-page-bg">
@@ -207,6 +235,48 @@
                     </div>
                     <div id="opStatusBars" class="operations-row-bars"></div>
                 </section>
+            </div>
+        </section>
+
+        <section class="card operations-card operations-report-section" id="operationsAdminReport">
+            <div class="operations-report-header">
+                <div>
+                    <div class="operations-card-title" style="margin-bottom:.2rem;">
+                        <span><i class="fas fa-ranking-star"></i> Admin Performance Report</span>
+                    </div>
+                    <div class="operations-refresh">
+                        Rankings update automatically from live case and call activity.
+                    </div>
+                </div>
+
+                <div class="operations-report-tabs">
+                    <button type="button" class="operations-report-tab active" data-period="daily">Daily</button>
+                    <button type="button" class="operations-report-tab" data-period="weekly">Weekly</button>
+                    <button type="button" class="operations-report-tab" data-period="allTime">All-Time</button>
+                </div>
+            </div>
+
+            <div class="operations-report-kpis">
+                <div class="operations-report-kpi">
+                    <small>Cases Handled</small>
+                    <strong id="reportCasesHandled">0</strong>
+                </div>
+
+                <div class="operations-report-kpi">
+                    <small>Cases Completed</small>
+                    <strong id="reportCasesCompleted">0</strong>
+                </div>
+
+                <div class="operations-report-kpi">
+                    <small>Calls Answered</small>
+                    <strong id="reportCallsAnswered">0</strong>
+                </div>
+            </div>
+
+            <div id="operationsRankList" class="operations-rank-list">
+                <div class="operations-refresh">
+                    Loading rankings…
+                </div>
             </div>
         </section>
 
@@ -488,6 +558,211 @@ function logout() {
     }).join('');
   }
 
+
+  let operationsReportCache = {
+    daily: null,
+    weekly: null,
+    allTime: null
+  };
+
+  let operationsReportPeriod = 'daily';
+
+  function animateReportNumber(element, target) {
+    if (!element) return;
+
+    const finalValue = Number(target || 0);
+    const startValue = Number(
+      element.dataset.currentValue || 0
+    );
+
+    if (startValue === finalValue) {
+      element.textContent = String(finalValue);
+      return;
+    }
+
+    const duration = 650;
+    const startTime = performance.now();
+
+    function frame(now) {
+      const progress = Math.min(
+        1,
+        (now - startTime) / duration
+      );
+
+      const eased =
+        1 - Math.pow(1 - progress, 3);
+
+      const value = Math.round(
+        startValue +
+        (finalValue - startValue) * eased
+      );
+
+      element.textContent = String(value);
+
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        element.textContent = String(finalValue);
+        element.dataset.currentValue =
+          String(finalValue);
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  function renderOperationsAdminReport() {
+    const report =
+      operationsReportCache[
+        operationsReportPeriod
+      ];
+
+    if (!report) return;
+
+    const rows = report.admins || [];
+    const totals = report.totals || {};
+
+    animateReportNumber(
+      document.getElementById(
+        'reportCasesHandled'
+      ),
+      totals.casesHandled || 0
+    );
+
+    animateReportNumber(
+      document.getElementById(
+        'reportCasesCompleted'
+      ),
+      totals.casesCompleted || 0
+    );
+
+    animateReportNumber(
+      document.getElementById(
+        'reportCallsAnswered'
+      ),
+      totals.callsAnswered || 0
+    );
+
+    const root =
+      document.getElementById(
+        'operationsRankList'
+      );
+
+    if (!root) return;
+
+    const maxCases = Math.max(
+      1,
+      ...rows.map(
+        row =>
+          Number(row.casesHandled || 0)
+      )
+    );
+
+    root.innerHTML =
+      rows.map((row, index) => {
+        const rank =
+          Number(row.rank || index + 1);
+
+        const cases =
+          Number(row.casesHandled || 0);
+
+        const completed =
+          Number(row.casesCompleted || 0);
+
+        const calls =
+          Number(row.callsAnswered || 0);
+
+        const width =
+          Math.min(
+            100,
+            (cases / maxCases) * 100
+          );
+
+        return `
+          <div class="operations-rank-row">
+
+            <div class="operations-rank-number ${rank === 1 ? 'top' : ''}">
+              #${rank}
+            </div>
+
+            <div class="operations-rank-name">
+              ${esc(row.name)}
+            </div>
+
+            <div class="operations-rank-track">
+              <div
+                class="operations-rank-fill"
+                style="width:${width}%"
+              ></div>
+            </div>
+
+            <div class="operations-rank-count">
+              ${cases}
+            </div>
+
+            <div class="operations-rank-percent">
+              ${pct(row.caseSharePercent)}
+            </div>
+
+            <div class="operations-rank-details">
+              <span>
+                Completed:
+                <strong>${completed}</strong>
+              </span>
+
+              <span>
+                Calls:
+                <strong>${calls}</strong>
+              </span>
+
+              <span>
+                Completion:
+                <strong>${pct(row.completionPercent)}</strong>
+              </span>
+
+              <span>
+                ${row.active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+  }
+
+  function setupOperationsReportTabs() {
+    document
+      .querySelectorAll(
+        '.operations-report-tab'
+      )
+      .forEach(button => {
+        button.addEventListener(
+          'click',
+          () => {
+            document
+              .querySelectorAll(
+                '.operations-report-tab'
+              )
+              .forEach(item =>
+                item.classList.remove(
+                  'active'
+                )
+              );
+
+            button.classList.add(
+              'active'
+            );
+
+            operationsReportPeriod =
+              button.dataset.period ||
+              'daily';
+
+            renderOperationsAdminReport();
+          }
+        );
+      });
+  }
+
   async function loadOperations(){
     try{
       const res = await fetch(
@@ -589,6 +864,19 @@ function logout() {
 
       renderAdminTable(admins);
 
+      operationsReportCache = {
+        daily:
+          data.dailyAdminReport || null,
+
+        weekly:
+          data.weeklyAdminReport || null,
+
+        allTime:
+          data.allTimeAdminReport || null
+      };
+
+      renderOperationsAdminReport();
+
       renderBars(
         'opActivityBars',
         admins.map(admin => ({
@@ -635,6 +923,8 @@ function logout() {
   document.addEventListener(
     'DOMContentLoaded',
     () => {
+      setupOperationsReportTabs();
+
       loadOperations();
 
       setInterval(
