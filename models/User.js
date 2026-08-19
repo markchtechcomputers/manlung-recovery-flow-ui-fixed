@@ -146,6 +146,44 @@ async function searchPromotableUsers(search) {
   return data;
 }
 
+
+async function convertClientToPendingAdmin(
+  userId,
+  {
+    username,
+    password,
+    phone,
+    appointedBy,
+  }
+) {
+  const hashed = await bcrypt.hash(
+    password,
+    10
+  );
+
+  const fields = {
+    username: String(username || '').trim(),
+    password: hashed,
+    phone: String(phone || '').trim() || null,
+    role: 'admin',
+    admin_status: 'pending',
+    appointed_at: new Date().toISOString(),
+    appointed_by: appointedBy || null,
+  };
+
+  const { data, error } = await supabase
+    .from(TABLE)
+    .update(fields)
+    .eq('id', userId)
+    .eq('role', 'client')
+    .select()
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data;
+}
+
 async function promoteToAdmin(userId, appointedByUserId) {
   const { data, error } = await supabase
     .from(TABLE)
@@ -195,5 +233,5 @@ async function createAdminFromInvitation({ username, password, email, phone, inv
 module.exports = {
   findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword,
   setResetToken, findByValidResetToken, resetPassword, updateProfile, updatePassword, deleteById, createAdminFromInvitation,
-  listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, setAdminStatus, removeAdminPrivileges,
+  listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, convertClientToPendingAdmin, setAdminStatus, removeAdminPrivileges,
 };
