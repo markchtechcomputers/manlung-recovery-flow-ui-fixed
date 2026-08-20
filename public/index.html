@@ -308,6 +308,124 @@
 }
 </style>
 
+
+<style id="manlung-home-mobile-nav">
+@media(max-width:650px){
+
+  .site-header .container{
+    min-height:auto !important;
+    padding:.65rem .7rem .72rem !important;
+    gap:.65rem !important;
+  }
+
+  .site-header .brand{
+    width:100% !important;
+    justify-content:flex-start !important;
+  }
+
+  .site-header .brand h1{
+    font-size:.9rem !important;
+  }
+
+  .site-header .brand span{
+    font-size:.58rem !important;
+    white-space:normal !important;
+  }
+
+  .site-header .manlung-site-logo{
+    width:38px !important;
+    height:38px !important;
+    flex:0 0 38px !important;
+  }
+
+  .site-header .header-actions{
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:.4rem !important;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100% !important;
+    min-height:52px !important;
+    padding:.45rem .25rem !important;
+    border-radius:11px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:.22rem !important;
+    font-size:.64rem !important;
+    line-height:1.05 !important;
+    white-space:normal !important;
+  }
+
+  .site-header .header-actions i{
+    display:block !important;
+    font-size:1rem !important;
+    line-height:1 !important;
+    margin:0 !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"]{
+    grid-column:1 / -1 !important;
+    min-height:50px !important;
+    flex-direction:row !important;
+    gap:.45rem !important;
+    font-size:.76rem !important;
+    background:#2563eb !important;
+    border-color:#2563eb !important;
+    color:#fff !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"] i{
+    font-size:.9rem !important;
+  }
+
+  .site-header .header-actions
+    button[onclick="toggleDarkMode()"]{
+    position:absolute !important;
+    top:.7rem !important;
+    right:.7rem !important;
+    width:42px !important;
+    min-height:42px !important;
+    height:42px !important;
+    border-radius:50% !important;
+    padding:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    font-size:0 !important;
+    z-index:5 !important;
+  }
+
+  .site-header .header-actions
+    button[onclick="toggleDarkMode()"] i{
+    font-size:1rem !important;
+  }
+
+}
+
+@media(max-width:390px){
+  .site-header .header-actions{
+    gap:.3rem !important;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:50px !important;
+    font-size:.6rem !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"]{
+    font-size:.72rem !important;
+  }
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
