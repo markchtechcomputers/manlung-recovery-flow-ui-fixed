@@ -26,6 +26,18 @@ function monthKey(value) {
   return new Date(value).toISOString().slice(0, 7);
 }
 
+function mondayKey(value) {
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+
+  const day = date.getDay();
+  const offset = day === 0 ? -6 : 1 - day;
+
+  date.setDate(date.getDate() + offset);
+
+  return dayKey(date);
+}
+
 function hoursBetween(start, end) {
   if (!start || !end) return null;
 
@@ -420,21 +432,135 @@ router.get('/operations', adminAuth, async (req, res) => {
 
       weeklyCallFlow.push({
         date: key,
-        calls: calls.filter(item =>
-          item.accepted_at &&
-          dayKey(item.accepted_at) === key
-        ).length,
-        cases: cases.filter(item =>
-          item.created_at &&
-          dayKey(item.created_at) === key
-        ).length,
-        completed: cases.filter(item =>
-          item.completed_at &&
-          dayKey(item.completed_at) === key &&
-          FINISHED_STATUSES.has(item.status)
-        ).length,
+
+        calls:
+          calls.filter(item =>
+            item.accepted_at &&
+            dayKey(item.accepted_at) === key
+          ).length,
+
+        cases:
+          cases.filter(item =>
+            item.created_at &&
+            dayKey(item.created_at) === key
+          ).length,
+
+        completed:
+          cases.filter(item =>
+            item.completed_at &&
+            dayKey(item.completed_at) === key &&
+            FINISHED_STATUSES.has(item.status)
+          ).length,
       });
     }
+
+    // --------------------------------------------------------
+    // WEEKLY CALL REPORTS
+    // Each Monday starts a new reporting week.
+    // Historical weeks remain available.
+    // --------------------------------------------------------
+    const weeklyCallMap = new Map();
+
+    for (const call of calls) {
+      if (!call.accepted_at) continue;
+
+      const weekStart =
+        mondayKey(call.accepted_at);
+
+      if (!weeklyCallMap.has(weekStart)) {
+        weeklyCallMap.set(
+          weekStart,
+          {
+            weekStart,
+            calls: 0,
+          }
+        );
+      }
+
+      weeklyCallMap.get(weekStart).calls += 1;
+    }
+
+    const weeklyCallReports =
+      [...weeklyCallMap.values()]
+        .sort(
+          (a, b) =>
+            a.weekStart.localeCompare(
+              b.weekStart
+            )
+        );
+
+    // Always create the current week even when
+    // there are no calls yet.
+    const currentWeekStart =
+      mondayKey(now);
+
+    if (
+      !weeklyCallReports.some(
+        item =>
+          item.weekStart ===
+          currentWeekStart
+      )
+    ) {
+      weeklyCallReports.push({
+        weekStart: currentWeekStart,
+        calls: 0,
+      });
+    }
+
+    weeklyCallReports.sort(
+      (a, b) =>
+        a.weekStart.localeCompare(
+          b.weekStart
+        )
+    );
+
+    // Keep the weekly chart readable.
+    const recentWeeklyCallReports =
+      weeklyCallReports.slice(-12);
+
+    // --------------------------------------------------------
+    // MONTHLY TOTALS BUILT FROM WEEKLY CALL ACTIVITY
+    // Each call is attributed to the month in
+    // which it was accepted.
+    // --------------------------------------------------------
+    const monthlyCallMap = new Map();
+
+    for (const call of calls) {
+      if (!call.accepted_at) continue;
+
+      const month =
+        monthKey(call.accepted_at);
+
+      if (!monthlyCallMap.has(month)) {
+        monthlyCallMap.set(
+          month,
+          {
+            month,
+            calls: 0,
+          }
+        );
+      }
+
+      monthlyCallMap.get(month).calls += 1;
+    }
+
+    const monthlyCallReports =
+      [...monthlyCallMap.values()]
+        .sort(
+          (a, b) =>
+            a.month.localeCompare(
+              b.month
+            )
+        );
+
+    const currentMonthCalls =
+      monthlyCallReports.find(
+        item =>
+          item.month === currentMonth
+      ) || {
+        month: currentMonth,
+        calls: 0,
+      };
 
     const selectedDateAdminReport =
       buildAdminPeriodReport(
@@ -843,6 +969,23 @@ router.get('/operations', adminAuth, async (req, res) => {
       },
 
       weeklyFlow: weeklyCallFlow,
+
+      currentWeek: {
+        weekStart: currentWeekStart,
+        calls:
+          recentWeeklyCallReports.find(
+            item =>
+              item.weekStart ===
+              currentWeekStart
+          )?.calls || 0,
+      },
+
+      weeklyCallReports:
+        recentWeeklyCallReports,
+
+      monthlyCallReports,
+
+      currentMonthCalls,
 
       monthlyStatusCounts: statusCounts,
 

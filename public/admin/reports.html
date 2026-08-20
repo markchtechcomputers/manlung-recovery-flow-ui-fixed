@@ -142,6 +142,80 @@
 @media(max-width:560px){.coverage-row{grid-template-columns:32px minmax(90px,1fr) auto}.coverage-track{grid-column:2 / -1;grid-row:2}.coverage-value{grid-column:3}.coverage-meta{grid-column:2 / -1}}
 </style>
 
+
+<style id="weekly-call-report-style">
+.weekly-call-report-card{margin-top:.8rem}
+.weekly-call-bars{
+  display:flex;
+  align-items:flex-end;
+  gap:.5rem;
+  min-height:180px;
+  padding:.8rem .35rem .35rem;
+  overflow-x:auto;
+}
+.weekly-call-column{
+  min-width:58px;
+  flex:1;
+  height:160px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.3rem;
+}
+.weekly-call-column strong{
+  font-size:.68rem;
+}
+.weekly-call-bar{
+  width:34px;
+  min-height:4px;
+  border-radius:8px 8px 3px 3px;
+  background:linear-gradient(180deg,#2563eb,#123a78);
+  transition:height .8s ease;
+}
+.weekly-call-label{
+  font-size:.58rem;
+  color:var(--text-muted);
+  white-space:nowrap;
+}
+.monthly-call-rollup{
+  display:grid;
+  gap:.45rem;
+}
+.monthly-call-row{
+  display:grid;
+  grid-template-columns:90px 1fr 45px;
+  gap:.5rem;
+  align-items:center;
+  padding:.5rem;
+  border:1px solid var(--card-border);
+  border-radius:9px;
+  background:var(--card-bg);
+}
+.monthly-call-track{
+  height:8px;
+  border-radius:999px;
+  background:rgba(148,163,184,.15);
+  overflow:hidden;
+}
+.monthly-call-fill{
+  height:100%;
+  border-radius:999px;
+  background:#2563eb;
+}
+.monthly-call-row strong{
+  text-align:right;
+  font-size:.72rem;
+}
+@media(max-width:650px){
+  .weekly-call-column{min-width:50px}
+  .weekly-call-bar{width:26px}
+  .monthly-call-row{
+    grid-template-columns:72px 1fr 38px;
+  }
+}
+</style>
+
 </head>
 
 <body class="admin-page-bg">
@@ -334,7 +408,60 @@
                 </section>
             </div>
 
-            <section class="card operations-card" style="margin-top:.8rem;">
+
+<section class="card operations-card weekly-call-report-card">
+  <div class="data-center-heading">
+    <div>
+      <div class="data-center-title">
+        <i class="fas fa-phone-volume"></i>
+        Weekly Call Reports
+      </div>
+      <div id="currentWeekCallLabel" class="data-center-subtitle">
+        Current week
+      </div>
+    </div>
+
+    <div id="currentWeekCallTotal" class="data-center-month">
+      0 calls
+    </div>
+  </div>
+
+  <div id="weeklyCallReport" class="weekly-call-bars">
+    <div class="operations-refresh">
+      Loading weekly calls…
+    </div>
+  </div>
+
+  <div class="operations-legend">
+    <span>Each bar represents one Monday–Sunday reporting week.</span>
+  </div>
+</section>
+
+<section class="card operations-card weekly-call-report-card">
+  <div class="data-center-heading">
+    <div>
+      <div class="data-center-title">
+        <i class="fas fa-calendar-check"></i>
+        Monthly Call Rollup
+      </div>
+      <div class="data-center-subtitle">
+        Weekly call activity consolidated into monthly totals.
+      </div>
+    </div>
+
+    <div id="currentMonthCallRollup" class="data-center-month">
+      0 calls
+    </div>
+  </div>
+
+  <div id="monthlyCallRollup" class="monthly-call-rollup">
+    <div class="operations-refresh">
+      Loading monthly rollup…
+    </div>
+  </div>
+</section>
+
+<section class="card operations-card" style="margin-top:.8rem;">
                 <div class="operations-card-title">
                     <span><i class="fas fa-users"></i> Admin Performance</span>
                     <span class="operations-refresh">All admins remain visible, including zero activity.</span>
@@ -1362,6 +1489,143 @@ function logout() {
     setText('coverageWorkUnits', String(totalUnits));
   }
 
+
+  function renderWeeklyCallReports(reports){
+    const root =
+      document.getElementById('weeklyCallReport');
+
+    if(!root) return;
+
+    const rows =
+      Array.isArray(reports)
+        ? reports
+        : [];
+
+    if(!rows.length){
+      root.innerHTML =
+        '<div class="operations-refresh">No weekly call data.</div>';
+      return;
+    }
+
+    const max =
+      Math.max(
+        1,
+        ...rows.map(
+          item => Number(item.calls || 0)
+        )
+      );
+
+    root.innerHTML =
+      rows.map(item => {
+        const value =
+          Number(item.calls || 0);
+
+        const height =
+          Math.max(
+            4,
+            (value / max) * 125
+          );
+
+        const start =
+          new Date(
+            `${item.weekStart}T00:00:00`
+          );
+
+        const label =
+          start.toLocaleDateString(
+            undefined,
+            {
+              month:'numeric',
+              day:'numeric'
+            }
+          );
+
+        return `
+          <div
+            class="weekly-call-column"
+            title="Week starting ${esc(item.weekStart)}: ${value} calls"
+          >
+            <strong>${value}</strong>
+            <div
+              class="weekly-call-bar"
+              style="height:${height}px"
+            ></div>
+            <span class="weekly-call-label">
+              ${esc(label)}
+            </span>
+          </div>
+        `;
+      }).join('');
+  }
+
+  function renderMonthlyCallRollup(reports){
+    const root =
+      document.getElementById('monthlyCallRollup');
+
+    if(!root) return;
+
+    const rows =
+      Array.isArray(reports)
+        ? reports
+        : [];
+
+    if(!rows.length){
+      root.innerHTML =
+        '<div class="operations-refresh">No monthly calls yet.</div>';
+      return;
+    }
+
+    const max =
+      Math.max(
+        1,
+        ...rows.map(
+          item => Number(item.calls || 0)
+        )
+      );
+
+    root.innerHTML =
+      rows
+        .slice(-12)
+        .reverse()
+        .map(item => {
+          const value =
+            Number(item.calls || 0);
+
+          const label =
+            new Date(
+              `${item.month}-01T00:00:00`
+            ).toLocaleDateString(
+              undefined,
+              {
+                month:'short',
+                year:'numeric'
+              }
+            );
+
+          const width =
+            Math.max(
+              0,
+              (value / max) * 100
+            );
+
+          return `
+            <div class="monthly-call-row">
+              <span>${esc(label)}</span>
+
+              <div class="monthly-call-track">
+                <div
+                  class="monthly-call-fill"
+                  style="width:${width}%"
+                ></div>
+              </div>
+
+              <strong>${value}</strong>
+            </div>
+          `;
+        })
+        .join('');
+  }
+
   async function loadOperations(){
     try{
       const res = await fetch(
@@ -1461,6 +1725,56 @@ function logout() {
       renderMonthlyWorkCoverage(
         data.monthlyWorkCoverage || []
       );
+
+      renderWeeklyCallReports(
+        data.weeklyCallReports || []
+      );
+
+      renderMonthlyCallRollup(
+        data.monthlyCallReports || []
+      );
+
+      const currentWeekCalls =
+        Number(
+          data.currentWeek?.calls || 0
+        );
+
+      const currentMonthCalls =
+        Number(
+          data.currentMonthCalls?.calls || 0
+        );
+
+      setText(
+        'currentWeekCallTotal',
+        `${currentWeekCalls} calls`
+      );
+
+      setText(
+        'currentMonthCallRollup',
+        `${currentMonthCalls} calls`
+      );
+
+      const weekStart =
+        data.currentWeek?.weekStart;
+
+      if(weekStart){
+        const label =
+          new Date(
+            `${weekStart}T00:00:00`
+          ).toLocaleDateString(
+            undefined,
+            {
+              month:'long',
+              day:'numeric',
+              year:'numeric'
+            }
+          );
+
+        setText(
+          'currentWeekCallLabel',
+          `Current week started ${label}`
+        );
+      }
 
       const top =
         data.topCallAdmin;
