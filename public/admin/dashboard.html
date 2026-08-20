@@ -1159,18 +1159,46 @@
             window.location.href = '/admin/login.html';
         }
 
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark');
-            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-            const btn = document.querySelector('.header-actions .btn-outline');
-            btn.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        }
-        (function applySavedTheme() {
-            if (localStorage.getItem('theme') === 'dark') {
-                document.body.classList.add('dark');
-                const btn = document.querySelector('.header-actions .btn-outline');
-                if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
+        function applyTheme() {
+            const savedTheme =
+                localStorage.getItem('theme') === 'dark'
+                    ? 'dark'
+                    : 'light';
+
+            document.body.classList.toggle(
+                'dark',
+                savedTheme === 'dark'
+            );
+
+            const btn =
+                document.querySelector(
+                    '.header-actions button[onclick="toggleDarkMode()"]'
+                );
+
+            if (btn) {
+                btn.innerHTML =
+                    savedTheme === 'dark'
+                        ? '<i class="fas fa-sun"></i>'
+                        : '<i class="fas fa-moon"></i>';
             }
+        }
+
+        function toggleDarkMode() {
+            const nextTheme =
+                document.body.classList.contains('dark')
+                    ? 'light'
+                    : 'dark';
+
+            localStorage.setItem(
+                'theme',
+                nextTheme
+            );
+
+            applyTheme();
+        }
+
+        (function applySavedTheme() {
+            applyTheme();
         })();
 
         document.getElementById('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') loadCases(1); });
