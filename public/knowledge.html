@@ -217,12 +217,52 @@
   }
 }
 </style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
 </head>
 <body>
 
 <header class="site-header">
 <div class="container">
 <div class="brand">
+
+<img
+  class="manlung-site-logo"
+  src="https://i.postimg.cc/9X95sh5L/favicon-Photoroom.png"
+  alt="Manlung Recovery"
+>
 <h1>🛡️ Manlung Recovery</h1>
 <span>Knowledge & Support Center</span>
 </div>

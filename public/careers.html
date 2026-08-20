@@ -192,7 +192,47 @@
   }
 }
 </style>
-</head><body><header class="site-header"><div class="container"><div class="brand"><h1><i class="fas fa-briefcase"></i> Careers</h1><span>Join Manlung Recovery</span></div><div class="header-actions"><a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a><a href="/about.html" class="btn btn-outline">About</a></div></div></header><main class="container"><section class="hero" style="text-align:left"><h2>Work With Manlung Recovery</h2><p>We are building a practical cyber recovery and digital investigation service. Tell us about your education, experience, skills and the role you are interested in.</p></section><section class="card"><div class="card-title"><i class="fas fa-file-signature"></i> Career Application</div><div class="career-note">Submit accurate information. The Owner reviews applications through the private recruitment portal.</div><form id="careerForm" class="career-form" style="margin-top:1rem"><div class="career-grid"><div><label>Full name</label><input id="fullName" required maxlength="120"></div><div><label>Email</label><input id="email" type="email" required maxlength="160"></div><div><label>Phone</label><input id="phone" required maxlength="40"></div><div><label>Location</label><input id="location" required maxlength="160" placeholder="City / County / Country"></div><div><label>Role interested in</label><select id="roleInterested" required><option value="">Select a role</option><option>Cyber Recovery Investigator</option><option>Digital Forensics / Evidence Analyst</option><option>Scam Investigation Analyst</option><option>Identity Recovery Specialist</option><option>Security Assessment Analyst</option><option>Call Support / Client Success</option><option>Admin / Case Management</option><option>Software / Web Engineer</option><option>Other</option></select></div><div><label>Years of experience</label><input id="experienceYears" type="number" min="0" max="60" placeholder="e.g. 3"></div></div><div><label>Education</label><textarea id="education" required maxlength="2000" placeholder="Qualifications, certifications, institutions and relevant training"></textarea></div><div><label>Career experience</label><textarea id="experience" required maxlength="4000" placeholder="Previous roles, responsibilities and relevant projects"></textarea></div><div><label>Skills</label><textarea id="skills" required maxlength="3000" placeholder="Technical, investigative, communication and other relevant skills"></textarea></div><div><label>Why should we consider you?</label><textarea id="coverNote" required minlength="20" maxlength="5000" placeholder="Tell us briefly about your interest in Manlung Recovery and the value you can bring."></textarea></div><button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Submit Application</button><div id="careerStatus"></div></form></section></main><footer class="manlung-footer">
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+</head><body><header class="site-header"><div class="container"><div class="brand">
+<img
+  class="manlung-site-logo"
+  src="https://i.postimg.cc/9X95sh5L/favicon-Photoroom.png"
+  alt="Manlung Recovery"
+>
+<h1><i class="fas fa-briefcase"></i> Careers</h1><span>Join Manlung Recovery</span></div><div class="header-actions"><a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a><a href="/about.html" class="btn btn-outline">About</a></div></div></header><main class="container"><section class="hero" style="text-align:left"><h2>Work With Manlung Recovery</h2><p>We are building a practical cyber recovery and digital investigation service. Tell us about your education, experience, skills and the role you are interested in.</p></section><section class="card"><div class="card-title"><i class="fas fa-file-signature"></i> Career Application</div><div class="career-note">Submit accurate information. The Owner reviews applications through the private recruitment portal.</div><form id="careerForm" class="career-form" style="margin-top:1rem"><div class="career-grid"><div><label>Full name</label><input id="fullName" required maxlength="120"></div><div><label>Email</label><input id="email" type="email" required maxlength="160"></div><div><label>Phone</label><input id="phone" required maxlength="40"></div><div><label>Location</label><input id="location" required maxlength="160" placeholder="City / County / Country"></div><div><label>Role interested in</label><select id="roleInterested" required><option value="">Select a role</option><option>Cyber Recovery Investigator</option><option>Digital Forensics / Evidence Analyst</option><option>Scam Investigation Analyst</option><option>Identity Recovery Specialist</option><option>Security Assessment Analyst</option><option>Call Support / Client Success</option><option>Admin / Case Management</option><option>Software / Web Engineer</option><option>Other</option></select></div><div><label>Years of experience</label><input id="experienceYears" type="number" min="0" max="60" placeholder="e.g. 3"></div></div><div><label>Education</label><textarea id="education" required maxlength="2000" placeholder="Qualifications, certifications, institutions and relevant training"></textarea></div><div><label>Career experience</label><textarea id="experience" required maxlength="4000" placeholder="Previous roles, responsibilities and relevant projects"></textarea></div><div><label>Skills</label><textarea id="skills" required maxlength="3000" placeholder="Technical, investigative, communication and other relevant skills"></textarea></div><div><label>Why should we consider you?</label><textarea id="coverNote" required minlength="20" maxlength="5000" placeholder="Tell us briefly about your interest in Manlung Recovery and the value you can bring."></textarea></div><button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Submit Application</button><div id="careerStatus"></div></form></section></main><footer class="manlung-footer">
 <div class="manlung-footer-inner">
 <div class="manlung-footer-brand">
 <h2>Cyber Recovery &amp; Digital Investigation Portal</h2>
