@@ -422,6 +422,64 @@ router.post(
         role: 'client',
       });
 
+      // Account-created notification.
+      // Email failure must never prevent a successful registration.
+      sendEmail({
+        to: client.email,
+        subject: 'Welcome to Manlung Recovery — Account Created Successfully',
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033;line-height:1.6;">
+            <div style="padding:24px;border-radius:16px;background:#0f2747;color:#fff;">
+              <h1 style="margin:0;font-size:24px;">Welcome to Manlung Recovery</h1>
+              <p style="margin:8px 0 0;color:#dbeafe;">
+                Your client account has been created successfully.
+              </p>
+            </div>
+
+            <div style="padding:24px 8px;">
+              <p>Hello ${String(client.username || 'Client')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')},</p>
+
+              <p>
+                Your Manlung Recovery client account was successfully created.
+                You can now sign in to your Client Portal and manage your recovery cases.
+              </p>
+
+              <div style="padding:16px;border:1px solid #dbe3ef;border-radius:12px;background:#f8fafc;">
+                <strong>Account email:</strong>
+                ${String(client.email)
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')}
+              </div>
+
+              <p style="margin-top:20px;">
+                From your portal you can submit recovery requests, track your cases,
+                receive Admin updates, and use Call Admin when you have an active subscription.
+              </p>
+
+              <p style="margin-top:24px;">
+                <a href="${process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'}"
+                   style="display:inline-block;padding:12px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700;">
+                  Open Manlung Recovery
+                </a>
+              </p>
+
+              <p style="margin-top:28px;color:#64748b;font-size:13px;">
+                If you did not create this account, please contact Manlung Recovery support.
+              </p>
+            </div>
+          </div>
+        `,
+      }).catch(error => {
+        console.error(
+          'Client account confirmation email failed:',
+          error?.message || error
+        );
+      });
+
       const token = signToken(client);
 
       res.status(201).json({
@@ -809,6 +867,59 @@ router.post(
           phone,
           password: randomPassword,
           role: 'client',
+        });
+
+        // Social account-created notification.
+        // Only sent when OAuth actually creates a new client account.
+        sendEmail({
+          to: client.email,
+          subject: 'Welcome to Manlung Recovery — Account Created Successfully',
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033;line-height:1.6;">
+              <div style="padding:24px;border-radius:16px;background:#0f2747;color:#fff;">
+                <h1 style="margin:0;font-size:24px;">Welcome to Manlung Recovery</h1>
+                <p style="margin:8px 0 0;color:#dbeafe;">
+                  Your client account has been created successfully.
+                </p>
+              </div>
+
+              <div style="padding:24px 8px;">
+                <p>Hello ${String(client.username || 'Client')
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')},</p>
+
+                <p>
+                  Your Manlung Recovery account was created successfully using social sign-in.
+                </p>
+
+                <div style="padding:16px;border:1px solid #dbe3ef;border-radius:12px;background:#f8fafc;">
+                  <strong>Account email:</strong>
+                  ${String(client.email)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')}
+                </div>
+
+                <p style="margin-top:20px;">
+                  You can now use the Client Portal to submit recovery requests,
+                  track cases, receive Admin updates, and use Call Admin when subscribed.
+                </p>
+
+                <p style="margin-top:24px;">
+                  <a href="${process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'}"
+                     style="display:inline-block;padding:12px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700;">
+                    Open Manlung Recovery
+                  </a>
+                </p>
+              </div>
+            </div>
+          `,
+        }).catch(error => {
+          console.error(
+            'Social client account confirmation email failed:',
+            error?.message || error
+          );
         });
       }
 
