@@ -114,11 +114,22 @@ const upload = multer({
   limits: {
     fileSize:
       parseInt(process.env.MAX_FILE_SIZE) ||
-      100 * 1024 * 1024,
+      25 * 1024 * 1024,
+    files: 20,
   },
 });
 
-const SIGNED_URL_TTL = 60 * 60;
+const ALLOWED_EVIDENCE_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/pdf',
+  'text/plain',
+  'application/zip',
+  'application/x-zip-compressed',
+]);
+
+const SIGNED_URL_TTL = 15 * 60;
 
 
 // ============================================================
@@ -144,16 +155,62 @@ function checkValidation(req, res) {
 // Upload File To Supabase Storage
 // ============================================================
 
-async function uploadToStorage(file, folder, uploadedBy) {
-  const path = `${folder}/${Date.now()}-${Math.round(
-    Math.random() * 1e9
-  )}-${file.originalname}`;
+async function uploadToStorage(
+  file,
+  folder,
+  uploadedBy
+) {
+  if (!file || !Buffer.isBuffer(file.buffer)) {
+    throw new Error('Invalid upload.');
+  }
 
-  const { error } = await supabase.storage
-    .from(EVIDENCE_BUCKET)
-    .upload(path, file.buffer, {
-      contentType: file.mimetype,
-    });
+  const mimetype =
+    String(file.mimetype || '')
+      .trim()
+      .toLowerCase();
+
+  if (!ALLOWED_EVIDENCE_TYPES.has(mimetype)) {
+    throw new Error(
+      'This file type is not allowed for evidence upload.'
+    );
+  }
+
+  const originalName =
+    String(file.originalname || 'file')
+      .replace(/[\\/]+/g, '_')
+      .replace(/[^a-zA-Z0-9._() -]/g, '_')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 180) || 'file';
+
+  const extension =
+    originalName.includes('.')
+      ? originalName
+          .split('.')
+          .pop()
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '')
+      : '';
+
+  const crypto = require('crypto');
+
+  const storageName =
+    `${crypto.randomUUID()}${extension ? `.${extension}` : ''}`;
+
+  const path =
+    `${folder}/${storageName}`;
+
+  const { error } =
+    await supabase.storage
+      .from(EVIDENCE_BUCKET)
+      .upload(
+        path,
+        file.buffer,
+        {
+          contentType: mimetype,
+          upsert: false,
+        }
+      );
 
   if (error) {
     throw error;
@@ -161,14 +218,16 @@ async function uploadToStorage(file, folder, uploadedBy) {
 
   return {
     path,
-    filename: file.originalname,
-    originalName: file.originalname,
+    filename: originalName,
+    originalName,
     size: file.size,
-    mimetype: file.mimetype,
+    mimetype,
     uploadedBy,
-    uploadedAt: new Date().toISOString(),
+    uploadedAt:
+      new Date().toISOString(),
   };
 }
+
 
 
 // ============================================================
@@ -766,13 +825,20 @@ router.get(
               req.user.email
             );
         }
-      } else {
-        // Admin/owner can search
-        // by the requested email.
+      } else if (
+        req.user.role === 'admin' ||
+        req.user.role === 'owner'
+      ) {
+        // Only Admin/Owner may search
+        // cases by another email address.
         cases =
           await Case.findByEmail(
             email
           );
+      } else {
+        return res.status(403).json({
+          error: 'Access denied',
+        });
       }
 
       const serializedCases =
