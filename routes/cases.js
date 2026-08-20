@@ -133,6 +133,136 @@ const SIGNED_URL_TTL = 15 * 60;
 
 
 // ============================================================
+// File Signature Validation
+// ============================================================
+
+function validateEvidenceSignature(file) {
+  const buffer = file?.buffer;
+
+  if (!Buffer.isBuffer(buffer) || buffer.length < 4) {
+    throw new Error('The uploaded file is invalid or empty.');
+  }
+
+  const mimetype =
+    String(file.mimetype || '')
+      .trim()
+      .toLowerCase();
+
+  // JPEG
+  if (mimetype === 'image/jpeg') {
+    const valid =
+      buffer[0] === 0xff &&
+      buffer[1] === 0xd8 &&
+      buffer[2] === 0xff;
+
+    if (!valid) {
+      throw new Error(
+        'The uploaded file is not a valid JPEG image.'
+      );
+    }
+
+    return;
+  }
+
+  // PNG
+  if (mimetype === 'image/png') {
+    const pngSignature =
+      Buffer.from([
+        0x89, 0x50, 0x4e, 0x47,
+        0x0d, 0x0a, 0x1a, 0x0a
+      ]);
+
+    if (
+      buffer.length < pngSignature.length ||
+      !buffer.subarray(
+        0,
+        pngSignature.length
+      ).equals(pngSignature)
+    ) {
+      throw new Error(
+        'The uploaded file is not a valid PNG image.'
+      );
+    }
+
+    return;
+  }
+
+  // WEBP
+  if (mimetype === 'image/webp') {
+    const riff =
+      buffer.toString(
+        'ascii',
+        0,
+        4
+      );
+
+    const webp =
+      buffer.toString(
+        'ascii',
+        8,
+        12
+      );
+
+    if (
+      riff !== 'RIFF' ||
+      webp !== 'WEBP'
+    ) {
+      throw new Error(
+        'The uploaded file is not a valid WEBP image.'
+      );
+    }
+
+    return;
+  }
+
+  // PDF
+  if (mimetype === 'application/pdf') {
+    if (
+      buffer.toString(
+        'ascii',
+        0,
+        5
+      ) !== '%PDF-'
+    ) {
+      throw new Error(
+        'The uploaded file is not a valid PDF.'
+      );
+    }
+
+    return;
+  }
+
+  // ZIP
+  if (
+    mimetype === 'application/zip' ||
+    mimetype === 'application/x-zip-compressed'
+  ) {
+    const zipHeader =
+      buffer[0] === 0x50 &&
+      buffer[1] === 0x4b;
+
+    if (!zipHeader) {
+      throw new Error(
+        'The uploaded file is not a valid ZIP archive.'
+      );
+    }
+
+    return;
+  }
+
+  // TXT is intentionally not signature-checked because
+  // plain-text files do not have a reliable magic signature.
+  if (mimetype === 'text/plain') {
+    return;
+  }
+
+  throw new Error(
+    'The uploaded file type is not supported.'
+  );
+}
+
+
+// ============================================================
 // Validation Helper
 // ============================================================
 
@@ -174,6 +304,8 @@ async function uploadToStorage(
       'This file type is not allowed for evidence upload.'
     );
   }
+
+  validateEvidenceSignature(file);
 
   const originalName =
     String(file.originalname || 'file')
