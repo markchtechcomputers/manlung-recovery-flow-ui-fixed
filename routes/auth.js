@@ -758,10 +758,17 @@ router.post(
 
       // Existing admin/owner accounts must never be converted
       // into client accounts through social sign-in.
+      // Send them to the correct portal instead of leaving them
+      // on a generic social-login failure screen.
       if (client && client.role !== 'client') {
         return res.status(403).json({
           error:
-            'This social account is reserved for an admin or owner account.',
+            'This email belongs to an Admin/Owner account. Continue from the Admin Sign In page.',
+          accountRole: client.role,
+          redirect:
+            client.role === 'owner' || client.role === 'admin'
+              ? '/admin/login.html'
+              : '/login.html',
         });
       }
 
