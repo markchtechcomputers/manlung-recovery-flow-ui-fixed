@@ -426,6 +426,113 @@
 }
 </style>
 
+
+<style id="manlung-colour-nav">
+/* Homepage navigation colours */
+.site-header .header-actions button[onclick="toggleDarkMode()"]{
+  background:#1f2937 !important;
+  border-color:#374151 !important;
+  color:#f9fafb !important;
+}
+
+.site-header .header-actions button[onclick="toggleDarkMode()"] i{
+  color:#facc15 !important;
+}
+
+.site-header .header-actions a[href="/client/dashboard.html"]{
+  background:#1d4ed8 !important;
+  border-color:#1d4ed8 !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/client/dashboard.html"] i{
+  color:#dbeafe !important;
+}
+
+.site-header .header-actions a[href="/blog.html"]{
+  background:#6d28d9 !important;
+  border-color:#6d28d9 !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/blog.html"] i{
+  color:#ede9fe !important;
+}
+
+.site-header .header-actions a[href="/donate.html"]{
+  background:#15803d !important;
+  border-color:#15803d !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/donate.html"] i{
+  color:#dcfce7 !important;
+}
+
+.site-header .header-actions a[href="/client/request.html"]{
+  background:#2563eb !important;
+  border-color:#2563eb !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/client/request.html"] i{
+  color:#fff !important;
+}
+
+/* Footer navigation colours */
+.manlung-footer-link[href="/"]{
+  border-color:rgba(245,158,11,.35) !important;
+  background:rgba(245,158,11,.10) !important;
+  color:#fbbf24 !important;
+}
+
+.manlung-footer-link[href="/login.html"]{
+  border-color:rgba(37,99,235,.35) !important;
+  background:rgba(37,99,235,.10) !important;
+  color:#93c5fd !important;
+}
+
+.manlung-footer-link[href="/client/dashboard.html"]{
+  border-color:rgba(37,99,235,.35) !important;
+  background:rgba(37,99,235,.10) !important;
+  color:#93c5fd !important;
+}
+
+.manlung-footer-link[href="/blog.html"]{
+  border-color:rgba(139,92,246,.35) !important;
+  background:rgba(139,92,246,.10) !important;
+  color:#c4b5fd !important;
+}
+
+.manlung-footer-link[href="/donate.html"]{
+  border-color:rgba(34,197,94,.35) !important;
+  background:rgba(34,197,94,.10) !important;
+  color:#86efac !important;
+}
+
+.manlung-footer-link:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+
+/* Keep the phone navigation colours strong */
+@media(max-width:650px){
+  .site-header .header-actions
+    a[href="/client/dashboard.html"],
+  .site-header .header-actions
+    a[href="/blog.html"],
+  .site-header .header-actions
+    a[href="/donate.html"]{
+    color:#fff !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"]{
+    box-shadow:0 8px 20px rgba(37,99,235,.25) !important;
+  }
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
