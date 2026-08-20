@@ -17,6 +17,7 @@ const donationRoutes = require('./routes/donations');
 const ownerRoutes = require('./routes/owner');
 const careerRoutes = require('./routes/careers');
 const { supabase } = require('./config/supabase');
+const { inputSecurity } = require('./middleware/inputSecurity');
 
 const app = express();
 
@@ -246,6 +247,9 @@ app.use(express.urlencoded({
   extended: true,
   limit: '50mb',
 }));
+
+// Validate API input before it reaches route handlers.
+app.use('/api/', inputSecurity);
 
 // ============================================================
 // STATIC FRONTEND FILES
