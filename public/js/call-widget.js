@@ -93,67 +93,179 @@
     }
   }
 
-  function formatTrialWindowDate(iso) {
-    // Display in the business's own timezone (Africa/Nairobi) regardless of
-    // the visitor's browser timezone, so the dates shown always match what
-    // was promised — not shifted by whoever happens to be looking at it.
-    return new Date(iso).toLocaleDateString('en-KE', { timeZone: 'Africa/Nairobi', day: 'numeric', month: 'long', year: 'numeric' });
-  }
-
   function renderEntitlementState(data, headers) {
     const panel = panelContent();
 
-    if (data.status === 'trial') {
-      const startLabel = formatTrialWindowDate(data.trialWindow.start);
-      const endLabel = formatTrialWindowDate(data.trialWindow.end);
+    if (data.status === 'active') {
+      const expires =
+        new Date(data.subscriptionExpiresAt);
+
       panel.innerHTML = panelHtml(`
-        <p style="font-weight:600; margin-bottom:0.2rem;"><i class="fas fa-gift" style="color:#4ade80;"></i> Free Launch Trial</p>
-        <p style="color:#96abc4; margin-bottom:0.8rem;">Free for everyone: ${startLabel} – ${endLabel}</p>
-        <button id="callActionBtn" style="width:100%; background:#1f6e4a; color:#fff; border:none; padding:0.6rem; border-radius:10px; font-weight:600; cursor:pointer;">
-          <i class="fas fa-phone"></i> Call Admin
+        <p style="font-weight:700;margin-bottom:.25rem;">
+          <i class="fas fa-circle-check" style="color:#4ade80;"></i>
+          Subscription Active
+        </p>
+
+        <p style="color:#96abc4;margin-bottom:.8rem;">
+          Call Admin access until
+          <strong>${expires.toLocaleDateString()}</strong>
+        </p>
+
+        <button
+          id="callActionBtn"
+          style="width:100%;background:#1f6e4a;color:#fff;border:none;padding:.65rem;border-radius:10px;font-weight:700;cursor:pointer;"
+        >
+          <i class="fas fa-phone"></i>
+          Call Admin
         </button>
-        <p id="callWidgetStatus" style="color:#96abc4; margin-top:0.5rem;"></p>
+
+        <p
+          id="callWidgetStatus"
+          style="color:#96abc4;margin-top:.5rem;"
+        ></p>
       `);
-      document.getElementById('callActionBtn').addEventListener('click', () => beginCall(headers));
-    } else if (data.status === 'active') {
-      const expires = new Date(data.subscriptionExpiresAt);
-      panel.innerHTML = panelHtml(`
-        <p style="font-weight:600; margin-bottom:0.2rem;"><i class="fas fa-circle-check" style="color:#4ade80;"></i> Subscription Active</p>
-        <p style="color:#96abc4; margin-bottom:0.8rem;">KES ${data.amountKes} / month — expires ${expires.toLocaleDateString()}</p>
-        <button id="callActionBtn" style="width:100%; background:#1f6e4a; color:#fff; border:none; padding:0.6rem; border-radius:10px; font-weight:600; cursor:pointer;">
-          <i class="fas fa-phone"></i> Call Admin
-        </button>
-        <p id="callWidgetStatus" style="color:#96abc4; margin-top:0.5rem;"></p>
-      `);
-      document.getElementById('callActionBtn').addEventListener('click', () => beginCall(headers));
-    } else {
-      const endLabel = formatTrialWindowDate(data.trialWindow.end);
-      const headline = data.status === 'expired' ? 'Your subscription has expired.' : `The free launch trial ended ${endLabel}.`;
-      panel.innerHTML = panelHtml(`
-        <p style="font-weight:600; margin-bottom:0.4rem;"><i class="fas fa-clock" style="color:#f87171;"></i> ${headline}</p>
-        <p style="color:#96abc4; margin-bottom:0.8rem;">Subscribe for <strong>KES ${data.amountKes} / month</strong> to use Call Admin.</p>
-        <button id="subscribeBtn" style="width:100%; background:#2451d6; color:#fff; border:none; padding:0.6rem; border-radius:10px; font-weight:600; cursor:pointer;">
-          <i class="fas fa-credit-card"></i> Subscribe for KES ${data.amountKes}
-        </button>
-        <p id="callWidgetStatus" style="color:#96abc4; margin-top:0.5rem;"></p>
-      `);
-      document.getElementById('subscribeBtn').addEventListener('click', () => startSubscription(headers));
-      if (!autoSubscriptionTriggered) {
-        autoSubscriptionTriggered = true;
-        setTimeout(() => document.getElementById('subscribeBtn')?.click(), 700);
-      }
+
+      document
+        .getElementById('callActionBtn')
+        ?.addEventListener(
+          'click',
+          () => beginCall(headers)
+        );
+
+      return;
     }
+
+    const plans =
+      Array.isArray(data.plans)
+        ? data.plans
+        : [];
+
+    const planStyles = {
+      monthly: {
+        color: '#2563eb',
+        label: '1 Month',
+        note: '30 days',
+      },
+      three_months: {
+        color: '#7c3aed',
+        label: '3 Months',
+        note: 'Save 10%',
+      },
+      six_months: {
+        color: '#059669',
+        label: '6 Months',
+        note: 'Save 20%',
+      },
+      yearly: {
+        color: '#d97706',
+        label: '1 Year',
+        note: 'Save 30% · Best Value',
+      },
+    };
+
+    const headline =
+      data.status === 'expired'
+        ? 'Your Call Admin subscription has expired.'
+        : 'Call Admin requires a subscription.';
+
+    panel.innerHTML = panelHtml(`
+      <div style="margin-bottom:.8rem;">
+        <p style="font-weight:800;margin:0 0 .25rem;">
+          <i class="fas fa-credit-card"></i>
+          ${headline}
+        </p>
+
+        <p style="color:#96abc4;margin:0;">
+          Choose a plan to continue calling Admin.
+        </p>
+      </div>
+
+      <div style="display:grid;gap:.5rem;">
+        ${
+          plans.map(plan => {
+            const style =
+              planStyles[plan.code] ||
+              {
+                color:'#2563eb',
+                label:plan.label || 'Subscription',
+                note:`${plan.days} days`,
+              };
+
+            return `
+              <button
+                type="button"
+                class="call-plan-btn"
+                data-plan="${String(plan.code).replace(/"/g,'&quot;')}"
+                style="
+                  width:100%;
+                  display:flex;
+                  align-items:center;
+                  justify-content:space-between;
+                  gap:.7rem;
+                  padding:.7rem .75rem;
+                  border:1px solid ${style.color};
+                  border-radius:11px;
+                  background:rgba(255,255,255,.04);
+                  color:#fff;
+                  cursor:pointer;
+                  text-align:left;
+                "
+              >
+                <span>
+                  <strong style="display:block;">
+                    ${style.label}
+                  </strong>
+                  <small style="color:#a8b8ce;">
+                    ${style.note}
+                  </small>
+                </span>
+
+                <strong style="font-size:.95rem;">
+                  KES ${Number(plan.amountKes).toLocaleString()}
+                </strong>
+              </button>
+            `;
+          }).join('')
+        }
+      </div>
+
+      <p
+        id="callWidgetStatus"
+        style="color:#96abc4;margin:.65rem 0 0;"
+      ></p>
+    `);
+
+    document
+      .querySelectorAll('.call-plan-btn')
+      .forEach(button => {
+        button.addEventListener(
+          'click',
+          () => startSubscription(
+            headers,
+            button.dataset.plan
+          )
+        );
+      });
   }
 
-  async function startSubscription(headers) {
+  async function startSubscription(headers, planCode) {
     const statusEl = document.getElementById('callWidgetStatus');
-    statusEl.textContent = 'Preparing checkout…';
+    statusEl.textContent = 'Preparing selected subscription…';
     try {
       const config = await window.ManlungCallWebRTC.getPublicConfig();
       if (!config.paystackPublicKey) { statusEl.textContent = 'Payment service is not configured. Please try again later.'; return; }
       if (typeof PaystackPop === 'undefined') { statusEl.textContent = 'Payment checkout could not load. Please refresh and try again.'; return; }
 
-      const initRes = await fetch('/api/subscription/initialize', { method: 'POST', headers });
+      const initRes = await fetch('/api/subscription/initialize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: JSON.stringify({
+          plan: planCode || 'monthly',
+        }),
+      });
       const initData = await initRes.json().catch(() => ({}));
       if (!initRes.ok || !initData.success) {
         statusEl.textContent = initData.error || `Could not start checkout (${initRes.status}).`;

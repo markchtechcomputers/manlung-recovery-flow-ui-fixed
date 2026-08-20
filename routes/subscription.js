@@ -7,7 +7,43 @@ const { auth } = require('../middleware/auth');
 const CallSubscription = require('../models/CallSubscription');
 const CallEntitlement = require('../models/CallEntitlement');
 
-const SUBSCRIPTION_AMOUNT_KES = 100;
+const SUBSCRIPTION_PLANS = {
+  monthly: {
+    code: 'monthly',
+    label: '1 Month',
+    amountKes: 100,
+    days: 30,
+  },
+  three_months: {
+    code: 'three_months',
+    label: '3 Months',
+    amountKes: 270,
+    days: 90,
+  },
+  six_months: {
+    code: 'six_months',
+    label: '6 Months',
+    amountKes: 480,
+    days: 180,
+  },
+  yearly: {
+    code: 'yearly',
+    label: '1 Year',
+    amountKes: 840,
+    days: 365,
+  },
+};
+
+function getPlan(code) {
+  return SUBSCRIPTION_PLANS[String(code || 'monthly')]
+    || SUBSCRIPTION_PLANS.monthly;
+}
+
+function planFromAmount(amountKes) {
+  return Object.values(SUBSCRIPTION_PLANS).find(
+    plan => Number(plan.amountKes) === Number(amountKes)
+  ) || null;
+}
 
 function checkValidation(req, res) {
   const errors = validationResult(req);
@@ -26,7 +62,10 @@ router.post('/initialize', auth, async (req, res) => {
     if (!process.env.PAYSTACK_SECRET_KEY || !process.env.PAYSTACK_PUBLIC_KEY) {
       return res.status(503).json({ error: 'Payment service is not configured on the server.' });
     }
-    const reference = `MTC-CALL-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    const plan = getPlan(req.body?.plan);
+
+    const reference =
+      `MTC-CALL-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
 
     // Initialize on the server first. This gives Popup V2 an access_code
     // that is tied to the exact server-created reference/amount instead of
@@ -35,10 +74,16 @@ router.post('/initialize', auth, async (req, res) => {
       'https://api.paystack.co/transaction/initialize',
       {
         email: req.user.email,
-        amount: SUBSCRIPTION_AMOUNT_KES * 100,
+        amount: plan.amountKes * 100,
         currency: 'KES',
         reference,
-        metadata: { call_admin_subscription: true, amount_kes: SUBSCRIPTION_AMOUNT_KES, user_id: req.user.id },
+        metadata: {
+          call_admin_subscription: true,
+          plan_code: plan.code,
+          amount_kes: plan.amountKes,
+          duration_days: plan.days,
+          user_id: req.user.id,
+        },
         callback_url: process.env.PAYSTACK_CALL_ADMIN_CALLBACK_URL ||
           `${process.env.PUBLIC_APP_URL || `${req.protocol}://${req.get('host')}`}/`,
       },
@@ -54,7 +99,7 @@ router.post('/initialize', auth, async (req, res) => {
       userId: req.user.id,
       email: req.user.email,
       reference,
-      amountKes: SUBSCRIPTION_AMOUNT_KES,
+      amountKes: plan.amountKes,
     });
 
     res.json({
@@ -63,8 +108,10 @@ router.post('/initialize', auth, async (req, res) => {
       accessCode: paystackData.access_code,
       authorizationUrl: paystackData.authorization_url || null,
       email: req.user.email,
-      amountKes: SUBSCRIPTION_AMOUNT_KES,
-      amountKobo: SUBSCRIPTION_AMOUNT_KES * 100,
+      amountKes: plan.amountKes,
+      amountKobo: plan.amountKes * 100,
+      plan,
+
       publicKey: process.env.PAYSTACK_PUBLIC_KEY,
     });
   } catch (error) {
@@ -80,9 +127,7 @@ router.post('/initialize', auth, async (req, res) => {
 // reference. We NEVER trust the browser's word alone — we re-verify directly
 // with Paystack's API using our secret key before activating anything.
 //
-// Renewal model: the client-side Call Admin widget automatically opens the
-// KES 100 checkout when the free trial has expired. Paystack still controls
-// the payment confirmation; this does not silently charge a saved card.
+// Paid subscription model. No free Call Admin trial is granted.
 router.post(
   '/verify',
   auth,
@@ -119,7 +164,19 @@ router.post(
       }
 
       await CallSubscription.activate(reference);
-      const entitlement = await CallEntitlement.activateSubscription(req.user.id);
+
+      const plan = planFromAmount(record.amount_kes);
+      if (!plan) {
+        return res.status(400).json({
+          error: 'Subscription plan could not be resolved.',
+        });
+      }
+
+      const entitlement =
+        await CallEntitlement.activateSubscription(
+          req.user.id,
+          plan.days
+        );
 
       res.json({
         success: true,
@@ -162,8 +219,17 @@ router.post('/webhook', async (req, res) => {
     const currencyOk = String(tx.currency || '').toUpperCase() === 'KES';
     if (tx.status !== 'success' || !amountOk || !currencyOk) return res.status(400).send('Payment mismatch');
 
+    const plan = planFromAmount(record.amount_kes);
+    if (!plan) {
+      return res.status(400).send('Unknown subscription plan');
+    }
+
     await CallSubscription.activate(reference);
-    await CallEntitlement.activateSubscription(record.user_id);
+
+    await CallEntitlement.activateSubscription(
+      record.user_id,
+      plan.days
+    );
     return res.status(200).send('OK');
   } catch (error) {
     console.error('Subscription webhook error:', error.response?.data || error.message);
@@ -171,13 +237,17 @@ router.post('/webhook', async (req, res) => {
   }
 });
 
-// Response shape: { access, status, trial, trialWindow: {start, end},
-// subscription, subscriptionExpiresAt }. Also mounted at
+// Response shape: { access, status, subscription, subscriptionExpiresAt, plans }.
+// Also mounted at
 // /api/payments/call-admin/status (see server.js) for spec compatibility.
 router.get('/status', auth, async (req, res) => {
   try {
     const entitlement = await CallEntitlement.get(req.user.id);
-    res.json({ success: true, amountKes: SUBSCRIPTION_AMOUNT_KES, ...CallEntitlement.evaluate(entitlement) });
+    res.json({
+      success: true,
+      plans: Object.values(SUBSCRIPTION_PLANS),
+      ...CallEntitlement.evaluate(entitlement),
+    });
   } catch (error) {
     console.error('Subscription status error:', error);
     res.status(500).json({ error: error.message || 'Server error' });

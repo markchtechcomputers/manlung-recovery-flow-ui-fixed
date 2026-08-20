@@ -15,14 +15,6 @@ const SUBSCRIPTION_DAYS = 30;
 // hardcoded as UTC instants rather than computed with a timezone library:
 //   2026-08-12 00:00:00 Africa/Nairobi  ==  2026-08-11T21:00:00.000Z
 //   2026-08-25 23:59:59.999 Africa/Nairobi  ==  2026-08-25T20:59:59.999Z
-const LAUNCH_TRIAL_START_UTC = '2026-08-11T21:00:00.000Z';
-const LAUNCH_TRIAL_END_UTC = '2026-08-25T20:59:59.999Z';
-
-function isLaunchTrialActive(nowMs = Date.now()) {
-  const start = new Date(LAUNCH_TRIAL_START_UTC).getTime();
-  const end = new Date(LAUNCH_TRIAL_END_UTC).getTime();
-  return nowMs >= start && nowMs <= end;
-}
 
 async function get(userId) {
   const { data, error } = await supabase.from(TABLE).select('*').eq('user_id', userId).maybeSingle();
@@ -32,9 +24,14 @@ async function get(userId) {
 
 // Flat 30 days from the moment of verified payment — not additive on top of
 // remaining time, matching the spec's worked example exactly.
-async function activateSubscription(userId) {
+async function activateSubscription(userId, subscriptionDays = SUBSCRIPTION_DAYS) {
+  const days = Number(subscriptionDays);
+  if (![30, 90, 180, 365].includes(days)) {
+    throw new Error('Invalid subscription duration.');
+  }
+
   const now = new Date();
-  const expires = new Date(now.getTime() + SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
+  const expires = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
   const { data, error } = await supabase
     .from(TABLE)
     .upsert({ user_id: userId, subscription_expires_at: expires.toISOString(), updated_at: now.toISOString() }, { onConflict: 'user_id' })
@@ -53,30 +50,39 @@ async function activateSubscription(userId) {
 //   2. Active paid subscription   -> access granted
 //   3. Neither                    -> access denied
 function evaluate(entitlement, nowMs = Date.now()) {
-  const launchTrialActive = isLaunchTrialActive(nowMs);
-  const subscriptionExpiresAt = entitlement?.subscription_expires_at ? new Date(entitlement.subscription_expires_at).getTime() : 0;
-  const subscriptionActive = subscriptionExpiresAt > nowMs;
-  const hadSubscriptionBefore = !!entitlement?.subscription_expires_at;
+  const subscriptionExpiresAt =
+    entitlement?.subscription_expires_at
+      ? new Date(entitlement.subscription_expires_at).getTime()
+      : 0;
 
-  const access = launchTrialActive || subscriptionActive;
+  const subscriptionActive =
+    subscriptionExpiresAt > nowMs;
+
+  const hadSubscriptionBefore =
+    !!entitlement?.subscription_expires_at;
 
   let status;
-  if (launchTrialActive) status = 'trial';
-  else if (subscriptionActive) status = 'active';
-  else if (hadSubscriptionBefore) status = 'expired';
-  else status = 'subscription_required';
+
+  if (subscriptionActive) {
+    status = 'active';
+  } else if (hadSubscriptionBefore) {
+    status = 'expired';
+  } else {
+    status = 'subscription_required';
+  }
 
   return {
-    access,
+    access: subscriptionActive,
     status,
-    trial: launchTrialActive,
-    trialWindow: { start: LAUNCH_TRIAL_START_UTC, end: LAUNCH_TRIAL_END_UTC },
+    trial: false,
+    trialWindow: null,
     subscription: subscriptionActive,
-    subscriptionExpiresAt: entitlement?.subscription_expires_at || null,
+    subscriptionExpiresAt:
+      entitlement?.subscription_expires_at || null,
   };
 }
 
 module.exports = {
-  get, activateSubscription, evaluate, isLaunchTrialActive,
-  LAUNCH_TRIAL_START_UTC, LAUNCH_TRIAL_END_UTC, SUBSCRIPTION_DAYS,
+  get, activateSubscription, evaluate,
+  SUBSCRIPTION_DAYS,
 };
