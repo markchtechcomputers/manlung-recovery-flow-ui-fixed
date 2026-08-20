@@ -21,10 +21,36 @@ const { supabase } = require('./config/supabase');
 const app = express();
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-}));
+app.use(
+  helmet({
+    // CSP stays disabled for now because the site currently uses
+    // inline scripts and third-party resources.
+    contentSecurityPolicy: false,
+
+    crossOriginResourcePolicy: {
+      policy: 'cross-origin',
+    },
+
+    crossOriginOpenerPolicy: {
+      policy: 'same-origin-allow-popups',
+    },
+
+    frameguard: {
+      action: 'deny',
+    },
+
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+    },
+
+    referrerPolicy: {
+      policy: 'strict-origin-when-cross-origin',
+    },
+  })
+);
+
+app.disable('x-powered-by');
 
 // CORS
 const allowedOrigins = String(process.env.ALLOWED_ORIGINS || '')
@@ -96,6 +122,27 @@ app.use('/api/calls/pending', callPollingLimiter);
 app.use('/api/calls/availability', callPollingLimiter);
 
 // ============================================================
+// NOTIFICATION RATE LIMITER
+// ============================================================
+
+const notificationLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error:
+        'Too many notification requests. Please wait a moment and try again.',
+    });
+  },
+});
+
+app.use('/api/notifications', notificationLimiter);
+
+// ============================================================
 // LOGIN RATE LIMITER
 // ============================================================
 
@@ -115,6 +162,31 @@ const loginLimiter = rateLimit({
 
 app.use('/api/auth/admin/login', loginLimiter);
 app.use('/api/auth/client/login', loginLimiter);
+
+// ============================================================
+// AUTH ACTION RATE LIMITER
+// ============================================================
+
+const authActionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error:
+        'Too many authentication requests. Please wait and try again later.',
+    });
+  },
+});
+
+app.use('/api/auth/client/register', authActionLimiter);
+app.use('/api/auth/client/oauth', authActionLimiter);
+app.use('/api/auth/admin/register', authActionLimiter);
+app.use('/api/auth/admin/forgot-password', authActionLimiter);
+app.use('/api/auth/client/forgot-password', authActionLimiter);
 
 // ============================================================
 // PAYMENT RATE LIMITER
@@ -236,6 +308,17 @@ app.use('/api/calls', callRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/owner', ownerRoutes);
 app.use('/api/careers', careerRoutes);
+
+// Authenticated/API data must never be stored in browser or proxy caches.
+app.use('/api/', (req, res, next) => {
+  res.setHeader(
+    'Cache-Control',
+    'no-store, no-cache, must-revalidate, proxy-revalidate'
+  );
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
 
 // ============================================================
 // ADMIN PAGES
