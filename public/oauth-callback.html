@@ -54,17 +54,60 @@
     <script>
         const CALLBACK_TIMEOUT_MS = 15000;
 
-        function showError(message) {
-            const title = document.getElementById('title');
-            const status = document.getElementById('status');
-            const spinner = document.getElementById('spinner');
-            const backLink = document.getElementById('backLink');
+        function showError(message, redirect) {
+            const title =
+                document.getElementById('title');
+
+            const status =
+                document.getElementById('status');
+
+            const spinner =
+                document.getElementById('spinner');
+
+            const backLink =
+                document.getElementById('backLink');
 
             spinner.style.display = 'none';
-            title.textContent = 'Social sign-in failed';
-            status.textContent = message || 'Please return to sign in and try again.';
-            status.classList.add('oauth-error');
-            backLink.style.display = 'inline-flex';
+
+            if (redirect) {
+                title.textContent =
+                    'Admin account detected';
+
+                status.textContent =
+                    message ||
+                    'This email belongs to an Admin or Owner account.';
+
+                backLink.href =
+                    redirect;
+
+                backLink.textContent =
+                    'Continue to Admin Sign In';
+
+                backLink.style.display =
+                    'inline-flex';
+
+                return;
+            }
+
+            title.textContent =
+                'Social sign-in failed';
+
+            status.textContent =
+                message ||
+                'Please return to sign in and try again.';
+
+            status.classList.add(
+                'oauth-error'
+            );
+
+            backLink.href =
+                '/login.html';
+
+            backLink.textContent =
+                'Back to Sign In';
+
+            backLink.style.display =
+                'inline-flex';
         }
 
         function clearOAuthUrl() {
@@ -80,8 +123,20 @@
             let data = {};
             try { data = await response.json(); } catch (_) {}
             if (!response.ok) {
-                throw new Error(data.error || 'The authentication request could not be completed.');
+                const error = new Error(
+                    data.error ||
+                    'The authentication request could not be completed.'
+                );
+
+                error.redirect =
+                    data.redirect || '';
+
+                error.accountRole =
+                    data.accountRole || '';
+
+                throw error;
             }
+
             return data;
         }
 
