@@ -117,6 +117,31 @@
 }
 </style>
 
+
+<style id="manlung-data-center-style">
+.data-center-section{margin-top:.9rem}
+.data-center-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:.8rem}
+.data-center-title{font-size:1rem;font-weight:800;color:var(--text)}
+.data-center-subtitle{margin-top:.18rem;font-size:.7rem;color:var(--text-muted)}
+.data-center-month{padding:.4rem .65rem;border-radius:999px;background:rgba(37,99,235,.08);color:#2563eb;font-size:.68rem;font-weight:800}
+.coverage-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.8rem}
+.coverage-list{display:grid;gap:.45rem}
+.coverage-row{display:grid;grid-template-columns:38px minmax(100px,1fr) 1.5fr auto;gap:.55rem;align-items:center;padding:.58rem;border:1px solid var(--card-border);border-radius:11px;background:var(--card-bg)}
+.coverage-rank{font-weight:900;text-align:center}
+.coverage-rank.top{color:#d49a00}
+.coverage-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+.coverage-track{height:9px;border-radius:999px;background:rgba(148,163,184,.15);overflow:hidden}
+.coverage-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#123a78,#2563eb);transition:width .75s ease}
+.coverage-value{min-width:55px;text-align:right;font-weight:900;font-size:.72rem}
+.coverage-meta{grid-column:2 / -1;display:flex;gap:.9rem;flex-wrap:wrap;color:var(--text-muted);font-size:.62rem}
+.coverage-insights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-top:.75rem}
+.coverage-insight{padding:.75rem;border-radius:11px;border:1px solid var(--card-border);background:var(--card-bg)}
+.coverage-insight small{display:block;font-size:.61rem;color:var(--text-muted)}
+.coverage-insight strong{display:block;margin-top:.15rem;font-size:.86rem}
+@media(max-width:800px){.coverage-grid{grid-template-columns:1fr}.coverage-insights{grid-template-columns:1fr}}
+@media(max-width:560px){.coverage-row{grid-template-columns:32px minmax(90px,1fr) auto}.coverage-track{grid-column:2 / -1;grid-row:2}.coverage-value{grid-column:3}.coverage-meta{grid-column:2 / -1}}
+</style>
+
 </head>
 
 <body class="admin-page-bg">
@@ -398,6 +423,77 @@
                 </div>
             </div>
         </section>
+
+
+<section class="card operations-card data-center-section" id="monthlyWorkCoverage">
+  <div class="data-center-heading">
+    <div>
+      <div class="data-center-title">
+        <i class="fas fa-chart-network"></i>
+        Operations Data Center
+      </div>
+      <div class="data-center-subtitle">
+        Monthly workload coverage, call distribution and administrator activity.
+      </div>
+    </div>
+
+    <div id="operationsCurrentMonth" class="data-center-month">
+      Current month
+    </div>
+  </div>
+
+  <div class="coverage-grid">
+    <section class="card operations-card">
+      <div class="operations-card-title">
+        <span><i class="fas fa-phone-volume"></i> Monthly Call Coverage</span>
+        <span id="monthlyCallsTotalLabel" class="operations-refresh">
+          0 answered
+        </span>
+      </div>
+
+      <div class="operations-pie-wrap">
+        <div class="operations-pie" id="opCallsPie">
+          <div class="operations-pie-center">
+            <strong id="opCallsPieTotal">0</strong>
+            <small>answered</small>
+          </div>
+        </div>
+        <div id="opCallsLegend" class="operations-call-legend"></div>
+      </div>
+    </section>
+
+    <section class="card operations-card">
+      <div class="operations-card-title">
+        <span><i class="fas fa-ranking-star"></i> Admin Work Coverage</span>
+        <span class="operations-refresh">Highest → lowest</span>
+      </div>
+
+      <div id="monthlyWorkCoverageList" class="coverage-list">
+        <div class="operations-refresh">
+          Loading coverage…
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="coverage-insights">
+    <div class="coverage-insight">
+      <small>Top workload share</small>
+      <strong id="coverageTopShare">0%</strong>
+    </div>
+
+    <div class="coverage-insight">
+      <small>Admins with activity</small>
+      <strong id="coverageActiveCount">0</strong>
+    </div>
+
+    <div class="coverage-insight">
+      <small>Monthly work units</small>
+      <strong id="coverageWorkUnits">0</strong>
+    </div>
+  </div>
+</section>
+
 
 </main>
 
@@ -1198,6 +1294,74 @@ function logout() {
     setReportMode('today');
   }
 
+
+  function renderMonthlyWorkCoverage(members){
+    const root =
+      document.getElementById('monthlyWorkCoverageList');
+
+    if(!root) return;
+
+    const rows = Array.isArray(members) ? members : [];
+
+    if(!rows.length){
+      root.innerHTML =
+        '<div class="operations-refresh">No admin data available.</div>';
+      return;
+    }
+
+    root.innerHTML = rows.map(member => `
+      <div class="coverage-row">
+        <div class="coverage-rank ${Number(member.rank) === 1 ? 'top' : ''}">
+          #${Number(member.rank || 0)}
+        </div>
+
+        <div class="coverage-name">
+          ${esc(member.name)}
+        </div>
+
+        <div class="coverage-track">
+          <div
+            class="coverage-fill"
+            style="width:${Number(member.workSharePercent || 0)}%"
+          ></div>
+        </div>
+
+        <div class="coverage-value">
+          ${Number(member.workSharePercent || 0).toFixed(1)}%
+        </div>
+
+        <div class="coverage-meta">
+          <span>Cases: <strong>${Number(member.casesHandled || 0)}</strong></span>
+          <span>Completed: <strong>${Number(member.casesCompleted || 0)}</strong></span>
+          <span>Calls: <strong>${Number(member.callsAnswered || 0)}</strong></span>
+          <span>Case share: <strong>${Number(member.caseSharePercent || 0).toFixed(1)}%</strong></span>
+          <span>Call share: <strong>${Number(member.callSharePercent || 0).toFixed(1)}%</strong></span>
+        </div>
+      </div>
+    `).join('');
+
+    const active =
+      rows.filter(
+        member => Number(member.workUnits || 0) > 0
+      ).length;
+
+    const totalUnits =
+      rows.reduce(
+        (sum, member) =>
+          sum + Number(member.workUnits || 0),
+        0
+      );
+
+    const topShare =
+      rows.length
+        ? Number(rows[0].workSharePercent || 0)
+        : 0;
+
+    setText('coverageTopShare', `${topShare.toFixed(1)}%`);
+    setText('coverageActiveCount', String(active));
+    setText('coverageWorkUnits', String(totalUnits));
+  }
+
   async function loadOperations(){
     try{
       const res = await fetch(
@@ -1282,6 +1446,20 @@ function logout() {
       renderCallsPie(
         calls,
         totalCalls
+      );
+
+      setText(
+        'monthlyCallsTotalLabel',
+        `${totalCalls} answered`
+      );
+
+      setText(
+        'operationsCurrentMonth',
+        data.currentMonthLabel || 'Current month'
+      );
+
+      renderMonthlyWorkCoverage(
+        data.monthlyWorkCoverage || []
       );
 
       const top =

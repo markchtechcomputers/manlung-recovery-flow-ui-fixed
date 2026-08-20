@@ -681,6 +681,110 @@ router.get('/operations', adminAuth, async (req, res) => {
     const topCallAdmin =
       monthlyCallDistribution[0] || null;
 
+    // --------------------------------------------------------
+    // MONTHLY ADMIN WORK COVERAGE
+    // Transparent workload distribution for the current month.
+    // Work units = assigned cases + answered calls.
+    // --------------------------------------------------------
+    const monthlyMembers =
+      teamMembers.map(member => {
+        const monthlyCases =
+          monthCases.filter(
+            item =>
+              String(item.assigned_admin_id) ===
+              String(member.id)
+          ).length;
+
+        const monthlyCompleted =
+          monthCases.filter(
+            item =>
+              String(item.assigned_admin_id) ===
+                String(member.id) &&
+              FINISHED_STATUSES.has(item.status)
+          ).length;
+
+        const monthlyCalls =
+          monthAnsweredCalls.filter(
+            call =>
+              String(call.admin_user_id) ===
+              String(member.id)
+          ).length;
+
+        return {
+          id: String(member.id),
+          name: member.name,
+          role: member.role,
+          active: member.active,
+          casesHandled: monthlyCases,
+          casesCompleted: monthlyCompleted,
+          callsAnswered: monthlyCalls,
+          workUnits:
+            monthlyCases + monthlyCalls,
+          caseSharePercent:
+            monthCases.length
+              ? Number(
+                  (
+                    monthlyCases /
+                    monthCases.length *
+                    100
+                  ).toFixed(1)
+                )
+              : 0,
+          callSharePercent:
+            monthAnsweredCalls.length
+              ? Number(
+                  (
+                    monthlyCalls /
+                    monthAnsweredCalls.length *
+                    100
+                  ).toFixed(1)
+                )
+              : 0,
+        };
+      });
+
+    const monthlyWorkUnits =
+      monthlyMembers.reduce(
+        (sum, member) =>
+          sum + member.workUnits,
+        0
+      );
+
+    monthlyMembers.forEach(member => {
+      member.workSharePercent =
+        monthlyWorkUnits
+          ? Number(
+              (
+                member.workUnits /
+                monthlyWorkUnits *
+                100
+              ).toFixed(1)
+            )
+          : 0;
+    });
+
+    monthlyMembers.sort(
+      (a, b) =>
+        b.workUnits - a.workUnits ||
+        b.casesCompleted - a.casesCompleted ||
+        b.callsAnswered - a.callsAnswered
+    );
+
+    monthlyMembers.forEach(
+      (member, index) => {
+        member.rank = index + 1;
+      }
+    );
+
+    const currentMonthLabel =
+      now.toLocaleDateString(
+        undefined,
+        {
+          month: 'long',
+          year: 'numeric'
+        }
+      );
+
     res.json({
       success: true,
 
@@ -745,6 +849,11 @@ router.get('/operations', adminAuth, async (req, res) => {
       monthlyCallDistribution,
 
       topCallAdmin,
+
+      currentMonthLabel,
+
+      monthlyWorkCoverage:
+        monthlyMembers,
 
       dailyAdminReport,
       weeklyAdminReport,
