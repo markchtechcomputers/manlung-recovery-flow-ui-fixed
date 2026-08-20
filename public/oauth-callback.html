@@ -234,7 +234,11 @@
                 ]);
             } catch (error) {
                 console.error('OAuth callback error:', error?.message || 'Authentication callback failed.');
-                showError(error?.message || 'Authentication failed. Check the browser console for details.');
+                showError(
+                    error?.message ||
+                    'Authentication failed. Check the browser console for details.',
+                    error?.redirect || ''
+                );
             }
         })();
     </script>
