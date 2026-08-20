@@ -266,13 +266,104 @@
 .manlung-mark-read{border:0;background:transparent;color:#60a5fa;cursor:pointer;font-size:.7rem;padding:0}
 </style>
 
+
+<style id="manlung-client-header-upgrade">
+.manlung-client-brand{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+}
+.manlung-client-logo{
+  width:44px;
+  height:44px;
+  object-fit:cover;
+  border-radius:12px;
+  flex:none;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 6px 18px rgba(0,0,0,.2);
+}
+.manlung-client-copy{
+  min-width:0;
+}
+.manlung-client-copy h1{
+  margin:0;
+  font-size:1rem;
+  color:#f8fafc;
+  font-weight:800;
+}
+.manlung-client-copy span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.68rem;
+}
+.site-header .header-actions a[href="/client/request.html"]{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.site-header .header-actions a[href="/client/request.html"] i{
+  color:#fff;
+}
+@media(max-width:650px){
+  .site-header .container{
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    flex-wrap:nowrap !important;
+  }
+  .manlung-client-logo{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+  }
+  .manlung-client-copy h1{
+    font-size:.86rem;
+  }
+  .manlung-client-copy span{
+    font-size:.58rem;
+    max-width:180px;
+  }
+  .site-header .header-actions{
+    width:auto !important;
+    display:flex !important;
+    flex:none !important;
+    align-items:center !important;
+  }
+  .site-header .header-actions a[href="/client/request.html"]{
+    width:auto !important;
+    min-height:42px !important;
+    padding:.55rem .72rem !important;
+    display:inline-flex !important;
+    flex-direction:row !important;
+    font-size:.7rem !important;
+    border-radius:11px;
+  }
+  .site-header .header-actions a[href="/client/request.html"] span{
+    display:inline !important;
+  }
+  .site-header .header-actions button:not(.theme-toggle),
+  .site-header .header-actions a:not([href="/client/request.html"]){
+    display:none !important;
+  }
+}
+</style>
+
 </head>
 <body>
   <header class="site-header">
     <div class="container">
-      <div class="brand">
-        <h1><i class="fas fa-shield-halved"></i> My Recovery Dashboard</h1>
-        <span id="welcomeLine">Your cases, progress and Admin updates</span>
+      <div class="brand manlung-client-brand">
+        <img
+          class="manlung-client-logo"
+          src="https://i.postimg.cc/9X95sh5L/favicon-Photoroom.png"
+          alt="Manlung Recovery logo"
+        >
+        <div class="manlung-client-copy">
+          <h1>Manlung Recovery</h1>
+          <span id="welcomeLine">Your cases, progress and Admin updates</span>
+        </div>
       </div>
       <div class="header-actions">
         <button class="btn btn-outline" type="button" onclick="toggleDarkMode()"><i class="fas fa-moon"></i><span>Theme</span></button>
