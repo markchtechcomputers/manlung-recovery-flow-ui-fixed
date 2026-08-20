@@ -499,9 +499,76 @@
   <script src="/js/call-widget.js"></script>
   <script>
     const token = localStorage.getItem('clientToken');
-    if (!token) window.location.href = '/login.html';
 
-    function authHeaders(){ return { Authorization: `Bearer ${token}` }; }
+    async function guardClientPortal() {
+      // No client session: return to client sign-in.
+      if (!token) {
+        window.location.href = '/login.html';
+        return false;
+      }
+
+      try {
+        const res = await fetch('/api/auth/verify', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          cache: 'no-store'
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+          localStorage.removeItem('clientToken');
+          localStorage.removeItem('clientUser');
+          window.location.href = '/login.html';
+          return false;
+        }
+
+        // An Admin/Owner must never use the Client Portal.
+        if (
+          data.user &&
+          (data.user.role === 'admin' ||
+           data.user.role === 'owner')
+        ) {
+          window.location.href = '/admin/dashboard.html';
+          return false;
+        }
+
+        if (!data.user || data.user.role !== 'client') {
+          localStorage.removeItem('clientToken');
+          localStorage.removeItem('clientUser');
+          window.location.href = '/login.html';
+          return false;
+        }
+
+        // Keep the local client user record synchronized with the
+        // server-authoritative account role.
+        localStorage.setItem(
+          'clientUser',
+          JSON.stringify(data.user)
+        );
+
+        return true;
+      } catch (error) {
+        console.error(
+          'Client portal role check failed:',
+          error
+        );
+
+        // Do not expose a client-only page when the session cannot
+        // be verified.
+        localStorage.removeItem('clientToken');
+        localStorage.removeItem('clientUser');
+        window.location.href = '/login.html';
+        return false;
+      }
+    }
+
+    function authHeaders(){
+      return {
+        Authorization: `Bearer ${token}`
+      };
+    }
     function escapeHtml(value){
       return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     }
