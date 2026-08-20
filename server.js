@@ -53,21 +53,79 @@ app.use(
 
 app.disable('x-powered-by');
 
+// CSP audit mode: report violations without breaking the existing site.
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy-Report-Only',
+    [
+      "default-src 'self' https:",
+      "base-uri 'self'",
+      "object-src 'none'",
+      "frame-ancestors 'none'",
+      "form-action 'self' https:",
+      "img-src 'self' data: blob: https:",
+      "media-src 'self' data: blob: https:",
+      "font-src 'self' data: https:",
+      "style-src 'self' 'unsafe-inline' https:",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
+      "connect-src 'self' https: wss:",
+      "frame-src 'self' https:"
+    ].join('; ')
+  );
+
+  next();
+});
+
 // CORS
-const allowedOrigins = String(process.env.ALLOWED_ORIGINS || '')
+const allowedOrigins = String(
+  process.env.ALLOWED_ORIGINS || ''
+)
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || !allowedOrigins.length || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+const isProduction =
+  process.env.NODE_ENV === 'production';
 
-    return callback(new Error('Origin not allowed'));
-  },
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Non-browser requests have no Origin header.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Never silently allow every website in production.
+      if (isProduction) {
+        return callback(
+          new Error('Origin not allowed')
+        );
+      }
+
+      // Development convenience only.
+      const developmentOrigins = new Set([
+        'http://localhost:3000',
+        'http://localhost:5000',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:5000',
+      ]);
+
+      if (
+        developmentOrigins.has(origin)
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(
+        new Error('Origin not allowed')
+      );
+    },
+  })
+);
 
 // ============================================================
 // GENERAL API RATE LIMITER
