@@ -24,30 +24,12 @@ const app = express();
 // Security middleware
 app.use(
   helmet({
-    // CSP stays disabled for now because the site currently uses
-    // inline scripts and third-party resources.
     contentSecurityPolicy: false,
-
-    crossOriginResourcePolicy: {
-      policy: 'cross-origin',
-    },
-
-    crossOriginOpenerPolicy: {
-      policy: 'same-origin-allow-popups',
-    },
-
-    frameguard: {
-      action: 'deny',
-    },
-
-    hsts: {
-      maxAge: 31536000,
-      includeSubDomains: true,
-    },
-
-    referrerPolicy: {
-      policy: 'strict-origin-when-cross-origin',
-    },
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+    frameguard: { action: 'deny' },
+    hsts: { maxAge: 31536000, includeSubDomains: true },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   })
 );
 
@@ -72,20 +54,23 @@ app.use((req, res, next) => {
       "frame-src 'self' https:"
     ].join('; ')
   );
-
   next();
 });
 
 // CORS
-const allowedOrigins = String(
-  process.env.ALLOWED_ORIGINS || ''
-)
+const allowedOrigins = String(process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-const isProduction =
-  process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === 'production';
+
+// The production frontend's own origin is always trusted. Additional origins
+// must still be explicitly supplied through ALLOWED_ORIGINS.
+const applicationOrigins = new Set([
+  'https://manlungrecovery.manlungshop.co.ke',
+  ...allowedOrigins,
+]);
 
 app.use(
   cors({
@@ -95,48 +80,25 @@ app.use(
         return callback(null, true);
       }
 
-      if (allowedOrigins.includes(origin)) {
+      if (applicationOrigins.has(origin)) {
         return callback(null, true);
-      }
-
-      // Allow the current application origin itself.
-      // This keeps same-origin browser requests working even if
-      // ALLOWED_ORIGINS is missing/misconfigured in Vercel.
-      const forwardedProto =
-        req.get('x-forwarded-proto') ||
-        req.protocol;
-
-      const currentOrigin =
-        `${forwardedProto}://${req.get('host')}`;
-
-      if (origin === currentOrigin) {
-        return callback(null, true);
-      }
-
-      // Never silently allow every website in production.
-      if (isProduction) {
-        return callback(
-          new Error('Origin not allowed')
-        );
       }
 
       // Development convenience only.
-      const developmentOrigins = new Set([
-        'http://localhost:3000',
-        'http://localhost:5000',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:5000',
-      ]);
+      if (!isProduction) {
+        const developmentOrigins = new Set([
+          'http://localhost:3000',
+          'http://localhost:5000',
+          'http://127.0.0.1:3000',
+          'http://127.0.0.1:5000',
+        ]);
 
-      if (
-        developmentOrigins.has(origin)
-      ) {
-        return callback(null, true);
+        if (developmentOrigins.has(origin)) {
+          return callback(null, true);
+        }
       }
 
-      return callback(
-        new Error('Origin not allowed')
-      );
+      return callback(new Error('Origin not allowed'));
     },
   })
 );
@@ -150,8 +112,6 @@ const limiter = rateLimit({
   max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
-
-  // Call Admin polling routes have their own limiter below.
   skip: (req) => {
     return (
       req.path.startsWith('/calls/admin/online') ||
@@ -160,11 +120,10 @@ const limiter = rateLimit({
       req.path.startsWith('/calls/availability')
     );
   },
-
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      error: 'Too many API requests. Please wait a moment and try again.'
+      error: 'Too many API requests. Please wait a moment and try again.',
     });
   },
 });
@@ -180,11 +139,10 @@ const callPollingLimiter = rateLimit({
   max: 120,
   standardHeaders: true,
   legacyHeaders: false,
-
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      error: 'Too many call polling requests. Please wait a moment and try again.'
+      error: 'Too many call polling requests. Please wait a moment and try again.',
     });
   },
 });
@@ -203,12 +161,10 @@ const notificationLimiter = rateLimit({
   max: 60,
   standardHeaders: true,
   legacyHeaders: false,
-
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      error:
-        'Too many notification requests. Please wait a moment and try again.',
+      error: 'Too many notification requests. Please wait a moment and try again.',
     });
   },
 });
@@ -224,11 +180,10 @@ const loginLimiter = rateLimit({
   max: 15,
   standardHeaders: true,
   legacyHeaders: false,
-
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      error: 'Too many login attempts. Please wait 15 minutes and try again.'
+      error: 'Too many login attempts. Please wait 15 minutes and try again.',
     });
   },
 });
@@ -245,12 +200,10 @@ const authActionLimiter = rateLimit({
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
-
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      error:
-        'Too many authentication requests. Please wait and try again later.',
+      error: 'Too many authentication requests. Please wait and try again later.',
     });
   },
 });
@@ -270,11 +223,10 @@ const paymentLimiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      error: 'Too many payment requests. Please wait a few minutes and try again.'
+      error: 'Too many payment requests. Please wait a few minutes and try again.',
     });
   },
 });
@@ -293,11 +245,10 @@ const callStartLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-
   handler: (req, res) => {
     res.status(429).json({
       success: false,
-      error: 'Too many call attempts. Please wait before trying again.'
+      error: 'Too many call attempts. Please wait before trying again.',
     });
   },
 });
@@ -315,12 +266,7 @@ app.use(express.json({
   },
 }));
 
-app.use(express.urlencoded({
-  extended: true,
-  limit: '50mb',
-}));
-
-// Validate API input before it reaches route handlers.
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/api/', inputSecurity);
 
 // ============================================================
@@ -344,25 +290,17 @@ app.get('/api/health', async (req, res) => {
   try {
     const { error } = await supabase
       .from('recovery_cases')
-      .select('id', {
-        count: 'exact',
-        head: true,
-      })
+      .select('id', { count: 'exact', head: true })
       .limit(1);
 
     health.database = error ? 'error' : 'ok';
-
-    if (error) {
-      health.databaseError = error.message;
-    }
+    if (error) health.databaseError = error.message;
   } catch (e) {
     health.database = 'error';
     health.databaseError = e.message;
   }
 
-  res
-    .status(health.database === 'ok' ? 200 : 503)
-    .json(health);
+  res.status(health.database === 'ok' ? 200 : 503).json(health);
 });
 
 // ============================================================
@@ -376,21 +314,14 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/subscription', subscriptionRoutes);
-
-// Alias for call-admin payment routes
 app.use('/api/payments/call-admin', subscriptionRoutes);
-
 app.use('/api/calls', callRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/owner', ownerRoutes);
 app.use('/api/careers', careerRoutes);
 
-// Authenticated/API data must never be stored in browser or proxy caches.
 app.use('/api/', (req, res, next) => {
-  res.setHeader(
-    'Cache-Control',
-    'no-store, no-cache, must-revalidate, proxy-revalidate'
-  );
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
   next();
@@ -421,10 +352,7 @@ app.get('/', (req, res) => {
 // ============================================================
 
 app.use('/api', (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Not found',
-  });
+  res.status(404).json({ success: false, error: 'Not found' });
 });
 
 // ============================================================
@@ -433,7 +361,6 @@ app.use('/api', (req, res) => {
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-
   res.status(500).json({
     success: false,
     error: err.message || 'Something went wrong!',
