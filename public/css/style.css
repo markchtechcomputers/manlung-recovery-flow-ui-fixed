@@ -4,6 +4,31 @@
    Page background: white (navy in dark mode)
    Cards: light gray on white / darker slate on dark
    =========================================================== */
+/* Mobile service detail scrolling fix */
+@media (max-width: 768px) {
+  .service-detail,
+  .service-details,
+  .service-modal-content,
+  .service-modal .modal-content,
+  .service-card .service-content {
+    max-height: 80vh !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain;
+  }
+
+  .service-detail *,
+  .service-details *,
+  .service-modal-content * {
+    max-width: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+}
 
 :root {
   --navy-900: #0a1a3a;
