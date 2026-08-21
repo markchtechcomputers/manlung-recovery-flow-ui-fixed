@@ -5,7 +5,9 @@ const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const Case = require('../models/Case');
-const { auth } = require('../middleware/auth');
+const { auth, adminAuth } = require('../middleware/auth');
+const TwoFactor = require('../models/TwoFactor');
+const QRCode = require('qrcode');
 const AdminInvitation = require('../models/AdminInvitation');
 const AdminPermission = require('../models/AdminPermission');
 const { sendEmail } = require('../services/email');
@@ -13,10 +15,28 @@ const { supabase, EVIDENCE_BUCKET } = require('../config/supabase');
 
 const signToken = (user) =>
   jwt.sign(
-    { id: user.id, role: user.role },
+    {
+      id: user.id,
+      role: user.role,
+      auth: 'full',
+    },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRE || '7d',
+    }
+  );
+
+const signTwoFactorChallenge = (user) =>
+  jwt.sign(
+    {
+      id: user.id,
+      role: user.role,
+      purpose: 'admin_2fa_challenge',
+      auth: '2fa_pending',
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '5m',
     }
   );
 
@@ -335,7 +355,31 @@ router.post(
       }
 
       // ------------------------------------------------------
-      // Create JWT
+      // 2FA gate
+      // ------------------------------------------------------
+
+      if (
+        ['admin', 'owner'].includes(admin.role) &&
+        admin.two_factor_enabled
+      ) {
+        const challengeToken =
+          signTwoFactorChallenge(admin);
+
+        return res.json({
+          success: true,
+          requires2FA: true,
+          challengeToken,
+          user: {
+            id: admin.id,
+            username: admin.username,
+            email: admin.email,
+            role: admin.role,
+          },
+        });
+      }
+
+      // ------------------------------------------------------
+      // No 2FA: issue full session
       // ------------------------------------------------------
 
       const token = signToken(admin);
@@ -346,6 +390,7 @@ router.post(
 
       return res.json({
         success: true,
+        requires2FA: false,
         token,
         user: {
           id: admin.id,
@@ -1396,6 +1441,255 @@ router.get(
         role: req.user.role,
       },
     });
+  }
+);
+
+
+
+// ============================================================
+// ADMIN / OWNER 2FA SETUP
+// ============================================================
+
+router.post(
+  '/admin/2fa/setup',
+  adminAuth,
+  async (req, res) => {
+    try {
+      const setup = await TwoFactor.beginSetup(req.user);
+      const qrCode = await QRCode.toDataURL(setup.uri);
+
+      return res.json({
+        success: true,
+        secret: setup.secret,
+        otpauthUri: setup.uri,
+        qrCode,
+      });
+    } catch (error) {
+      console.error('2FA setup error:', error);
+      return res.status(500).json({
+        error: 'Could not create 2FA setup.',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// ADMIN / OWNER 2FA ENABLE
+// ============================================================
+
+router.post(
+  '/admin/2fa/enable',
+  adminAuth,
+  [
+    body('secret')
+      .trim()
+      .notEmpty()
+      .withMessage('2FA secret is required'),
+
+    body('code')
+      .trim()
+      .matches(/^\d{6}$/)
+      .withMessage('A valid 6-digit authenticator code is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const { secret, code } = req.body;
+
+      const valid = await TwoFactor.verifySecret(
+        secret,
+        code
+      );
+
+      if (!valid) {
+        return res.status(400).json({
+          error:
+            'Invalid authenticator code. 2FA was not enabled.',
+        });
+      }
+
+      await TwoFactor.enable(
+        req.user.id,
+        secret
+      );
+
+      return res.json({
+        success: true,
+        enabled: true,
+        message:
+          'Two-factor authentication has been enabled.',
+      });
+    } catch (error) {
+      console.error('2FA enable error:', error);
+      return res.status(500).json({
+        error: 'Could not enable 2FA.',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// ADMIN / OWNER 2FA LOGIN VERIFICATION
+// ============================================================
+
+router.post(
+  '/admin/2fa/verify',
+  [
+    body('challengeToken')
+      .trim()
+      .notEmpty()
+      .withMessage('2FA challenge is required'),
+
+    body('code')
+      .trim()
+      .matches(/^\d{6}$/)
+      .withMessage('A valid 6-digit authenticator code is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const {
+        challengeToken,
+        code,
+      } = req.body;
+
+      let decoded;
+
+      try {
+        decoded = jwt.verify(
+          challengeToken,
+          process.env.JWT_SECRET
+        );
+      } catch {
+        return res.status(401).json({
+          error:
+            'Your 2FA challenge has expired. Please sign in again.',
+        });
+      }
+
+      if (
+        decoded.auth !== '2fa_pending' ||
+        decoded.purpose !== 'admin_2fa_challenge'
+      ) {
+        return res.status(401).json({
+          error: 'Invalid 2FA challenge.',
+        });
+      }
+
+      if (
+        !['admin', 'owner'].includes(decoded.role)
+      ) {
+        return res.status(403).json({
+          error: 'Admin or Owner access required.',
+        });
+      }
+
+      const admin = await User.findById(decoded.id);
+
+      if (
+        !admin ||
+        !['admin', 'owner'].includes(admin.role)
+      ) {
+        return res.status(401).json({
+          error: 'Account is no longer authorized.',
+        });
+      }
+
+      if (
+        admin.role === 'admin' &&
+        admin.admin_status !== 'active'
+      ) {
+        return res.status(403).json({
+          error: 'Your admin access is not active.',
+        });
+      }
+
+      const valid = await TwoFactor.checkCode(
+        admin,
+        code
+      );
+
+      if (!valid) {
+        return res.status(401).json({
+          error: 'Invalid authenticator code.',
+        });
+      }
+
+      const token = signToken(admin);
+
+      console.log(
+        `Admin/Owner 2FA login successful: ${admin.username} (${admin.role})`
+      );
+
+      return res.json({
+        success: true,
+        requires2FA: false,
+        token,
+        user: {
+          id: admin.id,
+          username: admin.username,
+          email: admin.email,
+          role: admin.role,
+        },
+      });
+    } catch (error) {
+      console.error('2FA verification error:', error);
+      return res.status(500).json({
+        error: 'Could not verify 2FA.',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// ADMIN / OWNER 2FA DISABLE
+// ============================================================
+
+router.post(
+  '/admin/2fa/disable',
+  adminAuth,
+  [
+    body('code')
+      .trim()
+      .matches(/^\d{6}$/)
+      .withMessage('A valid 6-digit authenticator code is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const valid = await TwoFactor.checkCode(
+        req.user,
+        req.body.code
+      );
+
+      if (!valid) {
+        return res.status(401).json({
+          error: 'Invalid authenticator code.',
+        });
+      }
+
+      await TwoFactor.disable(
+        req.user.id
+      );
+
+      return res.json({
+        success: true,
+        enabled: false,
+        message:
+          'Two-factor authentication has been disabled.',
+      });
+    } catch (error) {
+      console.error('2FA disable error:', error);
+      return res.status(500).json({
+        error: 'Could not disable 2FA.',
+      });
+    }
   }
 );
 
