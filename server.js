@@ -99,6 +99,20 @@ app.use(
         return callback(null, true);
       }
 
+      // Allow the current application origin itself.
+      // This keeps same-origin browser requests working even if
+      // ALLOWED_ORIGINS is missing/misconfigured in Vercel.
+      const forwardedProto =
+        req.get('x-forwarded-proto') ||
+        req.protocol;
+
+      const currentOrigin =
+        `${forwardedProto}://${req.get('host')}`;
+
+      if (origin === currentOrigin) {
+        return callback(null, true);
+      }
+
       // Never silently allow every website in production.
       if (isProduction) {
         return callback(
