@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Careers · Manlung Recovery</title><link rel="stylesheet" href="/css/style.css"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"><style>
+.career-form{display:grid;gap:1rem}.career-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}@media(max-width:700px){.career-grid{grid-template-columns:1fr}}.career-form textarea{min-height:130px;resize:vertical}.career-note{padding:.9rem 1rem;border-radius:12px;background:var(--info-bg);color:var(--info-text)}
+</style><style id="manlung-footer-style">
+.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:#06101d;border-top:1px solid rgba(255,255,255,.08);color:#dbeafe}
+.manlung-footer-inner{max-width:1000px;margin:auto}
+.manlung-footer-brand{text-align:center;margin-bottom:1rem}
+.manlung-footer-brand h2{margin:0 0 .3rem;font-size:clamp(1rem,1.7vw,1.25rem);color:#fff}
+.manlung-footer-brand p{margin:0;color:#94a3b8;font-size:.8rem}
+.manlung-footer-links{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1rem 0}
+.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.manlung-footer-link:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#fff}
+.manlung-footer-link:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
+.manlung-footer-link:active{background:rgba(255,255,255,.1)}
+.manlung-footer-bottom{padding-top:.7rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;color:#64748b;font-size:.7rem}
+.manlung-footer-bottom strong{color:#94a3b8}
+@media(max-width:900px){.manlung-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}}
+@media(max-width:380px){.manlung-footer-links{grid-template-columns:1fr}}
+</style>
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:
+    linear-gradient(135deg,rgba(15,23,42,.98),rgba(17,35,56,.98)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 64px);
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 4px 18px rgba(2,6,23,.22);
+}
+.site-header .container{
+  max-width:1180px;
+  margin:0 auto;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.55rem .8rem;
+}
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  min-width:0;
+}
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.05rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+.site-header .brand span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.72rem;
+  white-space:nowrap;
+}
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  min-height:38px;
+  padding:.45rem .68rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:700;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.35);
+  color:#fff;
+}
+.site-header .header-actions .btn-primary{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.site-header .header-actions .btn-primary:hover{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+}
+@media(max-width:900px){
+  .site-header .container{
+    min-height:58px;
+    padding:.45rem .7rem;
+  }
+  .site-header .brand h1{
+    font-size:.95rem;
+  }
+  .site-header .brand span{
+    font-size:.64rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:36px;
+    padding:.4rem .55rem;
+    font-size:.7rem;
+  }
+}
+@media(max-width:700px){
+  .site-header .container{
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+  .site-header .brand{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+  .site-header .brand span{
+    white-space:normal;
+  }
+  .site-header .header-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.35rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:38px;
+    padding:.35rem .2rem;
+    font-size:.68rem;
+  }
+}
+@media(max-width:480px){
+  .site-header .header-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
+  }
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    display:block;
+    font-size:1rem;
+    line-height:1;
+    margin:0;
+  }
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
+  }
+}
+@media(max-width:360px){
+  .site-header .brand h1{
+    font-size:.86rem;
+  }
+  .site-header .brand span{
+    font-size:.58rem;
+  }
+}
+</style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+</head><body><header class="site-header"><div class="container"><div class="brand">
+<img
+  class="manlung-site-logo"
+  src="https://i.postimg.cc/9X95sh5L/favicon-Photoroom.png"
+  alt="Manlung Recovery"
+>
+<h1><i class="fas fa-briefcase"></i> Careers</h1><span>Join Manlung Recovery</span></div><div class="header-actions"><a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a><a href="/about.html" class="btn btn-outline">About</a></div></div></header><main class="container"><section class="hero" style="text-align:left"><h2>Work With Manlung Recovery</h2><p>We are building a practical cyber recovery and digital investigation service. Tell us about your education, experience, skills and the role you are interested in.</p></section><section class="card"><div class="card-title"><i class="fas fa-file-signature"></i> Career Application</div><div class="career-note">Submit accurate information. The Owner reviews applications through the private recruitment portal.</div><form id="careerForm" class="career-form" style="margin-top:1rem"><div class="career-grid"><div><label>Full name</label><input id="fullName" required maxlength="120"></div><div><label>Email</label><input id="email" type="email" required maxlength="160"></div><div><label>Phone</label><input id="phone" required maxlength="40"></div><div><label>Location</label><input id="location" required maxlength="160" placeholder="City / County / Country"></div><div><label>Role interested in</label><select id="roleInterested" required><option value="">Select a role</option><option>Cyber Recovery Investigator</option><option>Digital Forensics / Evidence Analyst</option><option>Scam Investigation Analyst</option><option>Identity Recovery Specialist</option><option>Security Assessment Analyst</option><option>Call Support / Client Success</option><option>Admin / Case Management</option><option>Software / Web Engineer</option><option>Other</option></select></div><div><label>Years of experience</label><input id="experienceYears" type="number" min="0" max="60" placeholder="e.g. 3"></div></div><div><label>Education</label><textarea id="education" required maxlength="2000" placeholder="Qualifications, certifications, institutions and relevant training"></textarea></div><div><label>Career experience</label><textarea id="experience" required maxlength="4000" placeholder="Previous roles, responsibilities and relevant projects"></textarea></div><div><label>Skills</label><textarea id="skills" required maxlength="3000" placeholder="Technical, investigative, communication and other relevant skills"></textarea></div><div><label>Why should we consider you?</label><textarea id="coverNote" required minlength="20" maxlength="5000" placeholder="Tell us briefly about your interest in Manlung Recovery and the value you can bring."></textarea></div><button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Submit Application</button><div id="careerStatus"></div></form></section></main><footer class="manlung-footer">
+<div class="manlung-footer-inner">
+<div class="manlung-footer-brand">
+<h2>Cyber Recovery &amp; Digital Investigation Portal</h2>
+<p>Secure support, recovery guidance, digital awareness and responsible assistance.</p>
+</div>
+<nav class="manlung-footer-links" aria-label="Footer navigation">
+<a class="manlung-footer-link" href="/about.html">About</a>
+<a class="manlung-footer-link" href="/blog.html">Blog</a>
+<a class="manlung-footer-link" href="/careers.html">Careers</a>
+<a class="manlung-footer-link" href="/terms.html">Terms</a>
+<a class="manlung-footer-link" href="/login.html">Client Portal</a>
+<a class="manlung-footer-link" href="/client/request.html">New Recovery Request</a>
+</nav>
+<div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</div>
+</div>
+</footer><script>
+document.getElementById('careerForm').addEventListener('submit',async e=>{e.preventDefault();const status=document.getElementById('careerStatus');status.textContent='Submitting…';const payload={fullName:fullName.value,email:email.value,phone:phone.value,location:document.getElementById('location').value,education:education.value,experience:experience.value+(experienceYears.value?`\nYears of experience: ${experienceYears.value}`:''),roleInterested:roleInterested.value,skills:skills.value,coverNote:coverNote.value};try{const r=await fetch('/api/careers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Could not submit application.');status.innerHTML='<div class="career-note" style="margin-top:.7rem;background:#ecfdf5;color:#166534;">Application submitted successfully. Thank you — the Owner can now review your application.</div>';e.target.reset();}catch(err){status.innerHTML=`<div class="career-note" style="margin-top:.7rem;background:#fef2f2;color:#991b1b;">${err.message}</div>`;}});
+</script></body></html>

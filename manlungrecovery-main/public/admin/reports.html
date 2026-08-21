@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a1a3a">
+    <title>Reports · Manlung Recovery</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style id="manlung-operations-css">
+.operations-shell{margin:1rem 0 1.25rem}
+.operations-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:.8rem}
+.operations-head h2{margin:0;font-size:1.3rem}
+.operations-head p{margin:.25rem 0 0;color:var(--text-muted);font-size:.78rem}
+.operations-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.6rem}
+.operations-kpi{padding:.8rem;border:1px solid var(--card-border);border-radius:12px;background:var(--card-bg)}
+.operations-kpi small{display:block;color:var(--text-muted);font-size:.65rem;margin-bottom:.2rem}
+.operations-kpi strong{font-size:1.15rem}
+.operations-grid{display:grid;grid-template-columns:1.3fr .9fr;gap:.8rem;margin-top:.8rem}
+.operations-card{padding:.9rem}
+.operations-card-title{display:flex;justify-content:space-between;align-items:center;gap:.5rem;margin-bottom:.7rem;font-weight:800}
+.operations-refresh{font-size:.68rem;color:var(--text-muted)}
+.operations-flow{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:.25rem;min-height:155px;align-items:end}
+.operations-day{display:flex;flex-direction:column;align-items:center;gap:.2rem;min-width:0}
+.operations-bars{height:115px;width:100%;display:flex;align-items:end;justify-content:center;gap:2px}
+.operations-bars i{display:block;width:7px;border-radius:4px 4px 0 0}
+.op-submitted{background:#60a5fa}
+.op-completed{background:#22c55e}
+.operations-day small{font-size:.52rem;color:var(--text-muted);white-space:nowrap}
+.operations-legend{display:flex;gap:.8rem;margin-top:.6rem;color:var(--text-muted);font-size:.65rem}
+.operations-legend span{display:inline-flex;align-items:center;gap:.25rem}
+.operations-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.operations-pie-wrap{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.operations-pie{width:170px;height:170px;border-radius:50%;position:relative;background:conic-gradient(#cbd5e1 0 360deg);flex:none}
+.operations-pie:after{content:"";position:absolute;inset:36px;border-radius:50%;background:var(--card-bg)}
+.operations-pie-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2}
+.operations-pie-center strong{font-size:1.2rem}
+.operations-pie-center small{color:var(--text-muted);font-size:.62rem}
+.operations-call-legend{display:grid;gap:.4rem;flex:1;min-width:170px}
+.operations-call-row{display:grid;grid-template-columns:9px 1fr auto;gap:.35rem;align-items:center;font-size:.68rem}
+.operations-call-color{width:8px;height:8px;border-radius:50%}
+.operations-admin-wrap{overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(100,116,139,.55) transparent}
+.operations-admin-table{width:100%;min-width:760px;border-collapse:collapse;font-size:.68rem}
+.operations-admin-table th,.operations-admin-table td{padding:.5rem .35rem;border-bottom:1px solid var(--card-border);text-align:left}
+.operations-admin-table th{color:var(--text-muted)}
+.operations-admin-name{font-weight:800}
+.operations-status{display:inline-flex;align-items:center;gap:.2rem;border-radius:999px;padding:.16rem .4rem;background:rgba(34,197,94,.1);color:#15803d;font-size:.58rem;font-weight:800}
+.operations-status.off{background:rgba(148,163,184,.12);color:var(--text-muted)}
+.operations-row-bars{display:grid;gap:.45rem}
+.operations-row{display:grid;grid-template-columns:110px 1fr 52px;gap:.45rem;align-items:center;font-size:.68rem}
+.operations-track{height:9px;border-radius:999px;background:rgba(148,163,184,.15);overflow:hidden}
+.operations-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#2563eb,#60a5fa)}
+@media(max-width:1100px){.operations-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:800px){.operations-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.operations-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.operations-flow{overflow-x:auto;grid-template-columns:repeat(14,22px)}}
+</style>
+
+<style id="operations-report-section">
+.operations-report-section{margin-top:.9rem}
+.operations-report-header{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;margin-bottom:.8rem}
+.operations-report-tabs{display:flex;gap:.35rem;flex-wrap:wrap}
+.operations-report-tab{border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);padding:.4rem .65rem;border-radius:9px;cursor:pointer;font-size:.7rem;font-weight:700}
+.operations-report-tab.active{background:#123a78;border-color:#123a78;color:#fff}
+.operations-report-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-bottom:.75rem}
+.operations-report-kpi{padding:.7rem;border:1px solid var(--card-border);border-radius:11px;background:var(--card-bg)}
+.operations-report-kpi small{display:block;color:var(--text-muted);font-size:.62rem}
+.operations-report-kpi strong{display:block;margin-top:.12rem;font-size:1.15rem}
+.operations-rank-list{display:grid;gap:.45rem}
+.operations-rank-row{display:grid;grid-template-columns:42px minmax(90px,.8fr) 1.8fr 55px 70px;gap:.5rem;align-items:center;padding:.55rem;border:1px solid var(--card-border);border-radius:10px;background:var(--card-bg)}
+.operations-rank-number{font-weight:900;text-align:center}
+.operations-rank-number.top{color:#d49a00}
+.operations-rank-name{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800}
+.operations-rank-track{height:10px;background:rgba(148,163,184,.15);border-radius:999px;overflow:hidden}
+.operations-rank-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#123a78,#2563eb);transition:width .8s ease}
+.operations-rank-count{text-align:right;font-weight:800}
+.operations-rank-percent{text-align:right;color:var(--text-muted);font-size:.68rem}
+.operations-rank-details{grid-column:2 / -1;display:flex;gap:1rem;flex-wrap:wrap;color:var(--text-muted);font-size:.63rem}
+@media(max-width:700px){
+  .operations-report-kpis{grid-template-columns:1fr}
+  .operations-rank-row{grid-template-columns:36px minmax(90px,1fr) 1fr 48px}
+  .operations-rank-percent{display:none}
+}
+</style>
+
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+
+<style id="manlung-data-center-style">
+.data-center-section{margin-top:.9rem}
+.data-center-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:.8rem}
+.data-center-title{font-size:1rem;font-weight:800;color:var(--text)}
+.data-center-subtitle{margin-top:.18rem;font-size:.7rem;color:var(--text-muted)}
+.data-center-month{padding:.4rem .65rem;border-radius:999px;background:rgba(37,99,235,.08);color:#2563eb;font-size:.68rem;font-weight:800}
+.coverage-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.8rem}
+.coverage-list{display:grid;gap:.45rem}
+.coverage-row{display:grid;grid-template-columns:38px minmax(100px,1fr) 1.5fr auto;gap:.55rem;align-items:center;padding:.58rem;border:1px solid var(--card-border);border-radius:11px;background:var(--card-bg)}
+.coverage-rank{font-weight:900;text-align:center}
+.coverage-rank.top{color:#d49a00}
+.coverage-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+.coverage-track{height:9px;border-radius:999px;background:rgba(148,163,184,.15);overflow:hidden}
+.coverage-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#123a78,#2563eb);transition:width .75s ease}
+.coverage-value{min-width:55px;text-align:right;font-weight:900;font-size:.72rem}
+.coverage-meta{grid-column:2 / -1;display:flex;gap:.9rem;flex-wrap:wrap;color:var(--text-muted);font-size:.62rem}
+.coverage-insights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-top:.75rem}
+.coverage-insight{padding:.75rem;border-radius:11px;border:1px solid var(--card-border);background:var(--card-bg)}
+.coverage-insight small{display:block;font-size:.61rem;color:var(--text-muted)}
+.coverage-insight strong{display:block;margin-top:.15rem;font-size:.86rem}
+@media(max-width:800px){.coverage-grid{grid-template-columns:1fr}.coverage-insights{grid-template-columns:1fr}}
+@media(max-width:560px){.coverage-row{grid-template-columns:32px minmax(90px,1fr) auto}.coverage-track{grid-column:2 / -1;grid-row:2}.coverage-value{grid-column:3}.coverage-meta{grid-column:2 / -1}}
+</style>
+
+
+<style id="weekly-call-report-style">
+.weekly-call-report-card{margin-top:.8rem}
+.operations-admin-wrap::-webkit-scrollbar,.weekly-call-bars::-webkit-scrollbar{height:7px}.operations-admin-wrap::-webkit-scrollbar-track,.weekly-call-bars::-webkit-scrollbar-track{background:transparent}.operations-admin-wrap::-webkit-scrollbar-thumb,.weekly-call-bars::-webkit-scrollbar-thumb{background:rgba(100,116,139,.42);border-radius:999px}.operations-admin-wrap::-webkit-scrollbar-thumb:hover,.weekly-call-bars::-webkit-scrollbar-thumb:hover{background:rgba(36,81,214,.68)}
+.weekly-call-bars{
+  display:flex;
+  align-items:flex-end;
+  gap:.5rem;
+  min-height:180px;
+  padding:.8rem .35rem .35rem;
+  overflow-x:auto;
+}
+.weekly-call-column{
+  min-width:58px;
+  flex:1;
+  height:160px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.3rem;
+}
+.weekly-call-column strong{
+  font-size:.68rem;
+}
+.weekly-call-bar{
+  width:34px;
+  min-height:4px;
+  border-radius:8px 8px 3px 3px;
+  background:linear-gradient(180deg,#2563eb,#123a78);
+  transition:height .8s ease;
+}
+.weekly-call-label{
+  font-size:.58rem;
+  color:var(--text-muted);
+  white-space:nowrap;
+}
+.monthly-call-rollup{
+  display:grid;
+  gap:.45rem;
+}
+.monthly-call-row{
+  display:grid;
+  grid-template-columns:90px 1fr 45px;
+  gap:.5rem;
+  align-items:center;
+  padding:.5rem;
+  border:1px solid var(--card-border);
+  border-radius:9px;
+  background:var(--card-bg);
+}
+.monthly-call-track{
+  height:8px;
+  border-radius:999px;
+  background:rgba(148,163,184,.15);
+  overflow:hidden;
+}
+.monthly-call-fill{
+  height:100%;
+  border-radius:999px;
+  background:#2563eb;
+}
+.monthly-call-row strong{
+  text-align:right;
+  font-size:.72rem;
+}
+@media(max-width:650px){
+  .weekly-call-column{min-width:50px}
+  .weekly-call-bar{width:26px}
+  .monthly-call-row{
+    grid-template-columns:72px 1fr 38px;
+  }
+}
+</style>
+
+</head>
+
+<body class="admin-page-bg">
+
+<header class="site-header">
+    <div class="container">
+        <div class="brand">
+            
+<img
+  class="manlung-site-logo"
+  src="https://i.postimg.cc/9X95sh5L/favicon-Photoroom.png"
+  alt="Manlung Recovery"
+>
+<h1>
+                <i class="fas fa-chart-line"></i>
+                Manlung Recovery Reports
+            </h1>
+            <span>
+                Company performance, cases, calls and admin activity
+            </span>
+        </div>
+
+        <div class="header-actions">
+
+            <a class="btn btn-outline"
+               href="/admin/dashboard.html">
+                <i class="fas fa-folder-open"></i>
+                <span>Case Management</span>
+            </a>
+
+            <a class="btn btn-outline"
+               href="/admin/owner.html">
+                <i class="fas fa-user-shield"></i>
+                <span>Admin Management</span>
+            </a>
+
+            <a class="btn btn-outline"
+               href="/admin/reports.html">
+                <i class="fas fa-chart-line"></i>
+                <span>Reports</span>
+            </a>
+
+            <a class="btn btn-outline"
+               href="/">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+
+            <button
+                class="btn btn-outline"
+                type="button"
+                onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+
+        </div>
+    </div>
+</header>
+
+<main class="container">
+
+<section class="card operations-shell" id="manlungOperationsDashboard">
+            <div class="operations-head">
+                <div>
+                    <h2><i class="fas fa-chart-line"></i> Manlung Recovery Operations</h2>
+                    <p>Live company performance from recovery cases and answered calls.</p>
+                </div>
+                <div id="operationsUpdated" class="operations-refresh">Updating…</div>
+            </div>
+
+
+            <section class="card operations-card operations-date-panel">
+                <div class="operations-report-header">
+                    <div>
+                        <div class="operations-card-title" style="margin-bottom:.2rem;">
+                            <span><i class="fas fa-calendar-days"></i> Reports Calendar</span>
+                        </div>
+                        <div class="operations-refresh">
+                            Choose a date to inspect historical cases and calls.
+                        </div>
+                    </div>
+
+                    <div class="operations-date-controls">
+                        <button type="button" class="operations-report-tab" id="reportTodayBtn">
+                            Today
+                        </button>
+
+                        <button type="button" class="operations-report-tab" id="reportWeekBtn">
+                            This Week
+                        </button>
+
+                        <button type="button" class="operations-report-tab" id="reportMonthBtn">
+                            This Month
+                        </button>
+
+                        <input
+                            id="reportsDatePicker"
+                            type="date"
+                            style="
+                              padding:.42rem .55rem;
+                              border:1px solid var(--card-border);
+                              border-radius:9px;
+                              background:var(--card-bg);
+                              color:var(--text);
+                            "
+                        >
+                    </div>
+                </div>
+
+                <div class="operations-report-kpis">
+                    <div class="operations-report-kpi">
+                        <small>Selected Date Cases</small>
+                        <strong id="selectedDateCases">0</strong>
+                    </div>
+
+                    <div class="operations-report-kpi">
+                        <small>Selected Date Calls</small>
+                        <strong id="selectedDateCalls">0</strong>
+                    </div>
+
+                    <div class="operations-report-kpi">
+                        <small>Selected Date Completed</small>
+                        <strong id="selectedDateCompleted">0</strong>
+                    </div>
+                </div>
+
+                <div class="operations-card-title" style="margin-top:.65rem;">
+                    <span><i class="fas fa-chart-column"></i> Rolling 7-Day Activity</span>
+                    <span id="selectedDateLabel" class="operations-refresh"></span>
+                </div>
+
+                <div id="weeklyActivityChart" class="operations-flow"></div>
+
+                <div class="operations-legend">
+                    <span>
+                        <i class="operations-dot op-submitted"></i>
+                        Cases
+                    </span>
+                    <span>
+                        <i class="operations-dot op-completed"></i>
+                        Completed
+                    </span>
+                    <span>
+                        <i class="operations-dot op-calls"></i>
+                        Calls
+                    </span>
+                </div>
+            </section>
+
+            <div class="operations-kpis">
+                <div class="operations-kpi"><small>Cases Today</small><strong id="opCasesToday">0</strong></div>
+                <div class="operations-kpi"><small>Cases This Month</small><strong id="opCasesMonth">0</strong></div>
+                <div class="operations-kpi"><small>Open Cases</small><strong id="opOpenCases">0</strong></div>
+                <div class="operations-kpi"><small>Completed</small><strong id="opCompletedCases">0</strong></div>
+                <div class="operations-kpi"><small>Recovery Success</small><strong id="opSuccessRate">0%</strong></div>
+                <div class="operations-kpi"><small>Calls This Month</small><strong id="opCallsMonth">0</strong></div>
+            </div>
+
+            <div class="operations-grid">
+                <section class="card operations-card">
+                    <div class="operations-card-title">
+                        <span><i class="fas fa-chart-column"></i> 14-Day Case Flow</span>
+                        <span id="opAverageResolution" class="operations-refresh"></span>
+                    </div>
+                    <div id="opDailyFlow" class="operations-flow"></div>
+                    <div class="operations-legend">
+                        <span><i class="operations-dot op-submitted"></i> Submitted</span>
+                        <span><i class="operations-dot op-completed"></i> Completed</span>
+                    </div>
+                </section>
+
+                <section class="card operations-card">
+                    <div class="operations-card-title">
+                        <span><i class="fas fa-chart-pie"></i> Monthly Calls</span>
+                    </div>
+                    <div id="opTopCallAdmin" class="operations-refresh" style="margin-bottom:.7rem;">
+                        No calls answered this month yet.
+                    </div>
+
+                    <div class="operations-pie-wrap">
+                        <div class="operations-pie" id="opCallsPie">
+                            <div class="operations-pie-center">
+                                <strong id="opCallsPieTotal">0</strong>
+                                <small>answered</small>
+                            </div>
+                        </div>
+                        <div id="opCallsLegend" class="operations-call-legend"></div>
+                    </div>
+                </section>
+            </div>
+
+
+<section class="card operations-card weekly-call-report-card">
+  <div class="data-center-heading">
+    <div>
+      <div class="data-center-title">
+        <i class="fas fa-phone-volume"></i>
+        Weekly Call Reports
+      </div>
+      <div id="currentWeekCallLabel" class="data-center-subtitle">
+        Current week
+      </div>
+    </div>
+
+    <div id="currentWeekCallTotal" class="data-center-month">
+      0 calls
+    </div>
+  </div>
+
+  <div id="weeklyCallReport" class="weekly-call-bars">
+    <div class="operations-refresh">
+      Loading weekly calls…
+    </div>
+  </div>
+
+  <div class="operations-legend">
+    <span>Each bar represents one Monday–Sunday reporting week.</span>
+  </div>
+</section>
+
+<section class="card operations-card weekly-call-report-card">
+  <div class="data-center-heading">
+    <div>
+      <div class="data-center-title">
+        <i class="fas fa-calendar-check"></i>
+        Monthly Call Rollup
+      </div>
+      <div class="data-center-subtitle">
+        Weekly call activity consolidated into monthly totals.
+      </div>
+    </div>
+
+    <div id="currentMonthCallRollup" class="data-center-month">
+      0 calls
+    </div>
+  </div>
+
+  <div id="monthlyCallRollup" class="monthly-call-rollup">
+    <div class="operations-refresh">
+      Loading monthly rollup…
+    </div>
+  </div>
+</section>
+
+<section class="card operations-card" style="margin-top:.8rem;">
+                <div class="operations-card-title">
+                    <span><i class="fas fa-users"></i> Admin Performance</span>
+                    <span class="operations-refresh">All admins remain visible, including zero activity.</span>
+                </div>
+
+                <div class="operations-admin-wrap">
+                    <table class="operations-admin-table">
+                        <thead>
+                            <tr>
+                                <th>Admin</th>
+                                <th>Status</th>
+                                <th>Calls</th>
+                                <th>Call %</th>
+                                <th>Cases</th>
+                                <th>Case %</th>
+                                <th>Completed</th>
+                                <th>Completion %</th>
+                                <th>Success %</th>
+                                <th>Avg Resolution</th>
+                            </tr>
+                        </thead>
+                        <tbody id="opAdminTableBody">
+                            <tr>
+                                <td colspan="10" style="text-align:center;">Loading performance…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <div class="operations-grid">
+                <section class="card operations-card">
+                    <div class="operations-card-title">
+                        <span><i class="fas fa-chart-simple"></i> Team Activity</span>
+                    </div>
+                    <div id="opActivityBars" class="operations-row-bars"></div>
+                </section>
+
+                <section class="card operations-card">
+                    <div class="operations-card-title">
+                        <span><i class="fas fa-list-check"></i> Monthly Case Flow</span>
+                    </div>
+                    <div id="opStatusBars" class="operations-row-bars"></div>
+                </section>
+            </div>
+        </section>
+
+        <section class="card operations-card operations-report-section" id="operationsAdminReport">
+            <div class="operations-report-header">
+                <div>
+                    <div class="operations-card-title" style="margin-bottom:.2rem;">
+                        <span><i class="fas fa-ranking-star"></i> Admin Performance Report</span>
+                    </div>
+                    <div class="operations-refresh">
+                        Rankings update automatically from live case and call activity.
+                    </div>
+                </div>
+
+                <div class="operations-report-tabs">
+                    <button type="button" class="operations-report-tab active" data-period="daily">Daily</button>
+                    <button type="button" class="operations-report-tab" data-period="weekly">Weekly</button>
+                    <button type="button" class="operations-report-tab" data-period="allTime">All-Time</button>
+                </div>
+            </div>
+
+            <div class="operations-report-kpis">
+                <div class="operations-report-kpi">
+                    <small>Cases Handled</small>
+                    <strong id="reportCasesHandled">0</strong>
+                </div>
+
+                <div class="operations-report-kpi">
+                    <small>Cases Completed</small>
+                    <strong id="reportCasesCompleted">0</strong>
+                </div>
+
+                <div class="operations-report-kpi">
+                    <small>Calls Answered</small>
+                    <strong id="reportCallsAnswered">0</strong>
+                </div>
+            </div>
+
+            <div id="operationsRankList" class="operations-rank-list">
+                <div class="operations-refresh">
+                    Loading rankings…
+                </div>
+            </div>
+        </section>
+
+
+<section class="card operations-card data-center-section" id="monthlyWorkCoverage">
+  <div class="data-center-heading">
+    <div>
+      <div class="data-center-title">
+        <i class="fas fa-chart-network"></i>
+        Operations Data Center
+      </div>
+      <div class="data-center-subtitle">
+        Monthly workload coverage, call distribution and administrator activity.
+      </div>
+    </div>
+
+    <div id="operationsCurrentMonth" class="data-center-month">
+      Current month
+    </div>
+  </div>
+
+  <div class="coverage-grid">
+    <section class="card operations-card">
+      <div class="operations-card-title">
+        <span><i class="fas fa-phone-volume"></i> Monthly Call Coverage</span>
+        <span id="monthlyCallsTotalLabel" class="operations-refresh">
+          0 answered
+        </span>
+      </div>
+
+      <div class="operations-pie-wrap">
+        <div class="operations-pie" id="opCallsPie">
+          <div class="operations-pie-center">
+            <strong id="opCallsPieTotal">0</strong>
+            <small>answered</small>
+          </div>
+        </div>
+        <div id="opCallsLegend" class="operations-call-legend"></div>
+      </div>
+    </section>
+
+    <section class="card operations-card">
+      <div class="operations-card-title">
+        <span><i class="fas fa-ranking-star"></i> Admin Work Coverage</span>
+        <span class="operations-refresh">Highest → lowest</span>
+      </div>
+
+      <div id="monthlyWorkCoverageList" class="coverage-list">
+        <div class="operations-refresh">
+          Loading coverage…
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="coverage-insights">
+    <div class="coverage-insight">
+      <small>Top workload share</small>
+      <strong id="coverageTopShare">0%</strong>
+    </div>
+
+    <div class="coverage-insight">
+      <small>Admins with activity</small>
+      <strong id="coverageActiveCount">0</strong>
+    </div>
+
+    <div class="coverage-insight">
+      <small>Monthly work units</small>
+      <strong id="coverageWorkUnits">0</strong>
+    </div>
+  </div>
+</section>
+
+
+</main>
+
+<script>
+const token = localStorage.getItem('adminToken');
+
+if (!token) {
+    window.location.href = '/admin/login.html';
+}
+
+function authHeaders() {
+    return {
+        'Authorization': `Bearer ${token}`
+    };
+}
+
+async function handleUnauthorized(res) {
+    if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        window.location.href = '/admin/login.html';
+        return true;
+    }
+
+    return false;
+}
+
+function logout() {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    window.location.href = '/admin/login.html';
+}
+</script>
+
+<script id="manlung-operations-script">
+(function(){
+
+  const colors = [
+    '#2563eb',
+    '#22c55e',
+    '#f59e0b',
+    '#ef4444',
+    '#8b5cf6',
+    '#06b6d4',
+    '#f97316',
+    '#14b8a6'
+  ];
+
+  function esc(value){
+    return String(value ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  function pct(value){
+    return `${Number(value || 0).toFixed(1)}%`;
+  }
+
+  function duration(value){
+    if(value === null || value === undefined) return '—';
+
+    const n = Number(value);
+
+    if(!Number.isFinite(n)) return '—';
+
+    return n < 24
+      ? `${n.toFixed(1)}h`
+      : `${(n / 24).toFixed(1)}d`;
+  }
+
+  function setText(id,value){
+    const el = document.getElementById(id);
+    if(el) el.textContent = value;
+  }
+
+  function renderDailyFlow(days){
+    const root = document.getElementById('opDailyFlow');
+    if(!root) return;
+
+    if(!days.length){
+      root.innerHTML =
+        '<span class="operations-refresh">No daily data available.</span>';
+      return;
+    }
+
+    const max = Math.max(
+      1,
+      ...days.flatMap(day => [
+        Number(day.submitted || 0),
+        Number(day.completed || 0)
+      ])
+    );
+
+    root.innerHTML = days.map(day => {
+      const submitted =
+        Number(day.submitted || 0);
+
+      const completed =
+        Number(day.completed || 0);
+
+      const submittedHeight =
+        submitted
+          ? Math.max(5,(submitted / max) * 105)
+          : 0;
+
+      const completedHeight =
+        completed
+          ? Math.max(5,(completed / max) * 105)
+          : 0;
+
+      const label = new Date(
+        `${day.date}T00:00:00`
+      ).toLocaleDateString(
+        undefined,
+        {
+          month:'numeric',
+          day:'numeric'
+        }
+      );
+
+      return `
+        <div class="operations-day"
+             title="${esc(day.date)} — ${submitted} submitted, ${completed} completed">
+          <div class="operations-bars">
+            <i class="op-submitted"
+               style="height:${submittedHeight}px"></i>
+            <i class="op-completed"
+               style="height:${completedHeight}px"></i>
+          </div>
+          <small>${esc(label)}</small>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderCallsPie(items,total){
+    const pie =
+      document.getElementById('opCallsPie');
+
+    const legend =
+      document.getElementById('opCallsLegend');
+
+    const totalEl =
+      document.getElementById('opCallsPieTotal');
+
+    if(!pie || !legend || !totalEl) return;
+
+    totalEl.textContent = String(total);
+
+    if(!items.length || total <= 0){
+      pie.style.background =
+        'conic-gradient(#cbd5e1 0 360deg)';
+
+      legend.innerHTML =
+        '<span class="operations-refresh">No answered calls this month.</span>';
+
+      return;
+    }
+
+    let angle = 0;
+    const segments = [];
+
+    items.forEach((item,index) => {
+      const degrees =
+        (Number(item.callsAnswered || 0) / total) * 360;
+
+      segments.push(
+        `${colors[index % colors.length]} ${angle}deg ${angle + degrees}deg`
+      );
+
+      angle += degrees;
+    });
+
+    pie.style.background =
+      `conic-gradient(${segments.join(',')})`;
+
+    legend.innerHTML = items.map((item,index) => `
+      <div class="operations-call-row">
+        <span class="operations-call-color"
+              style="background:${colors[index % colors.length]}"></span>
+
+        <span>${esc(item.name)}</span>
+
+        <strong>
+          ${item.callsAnswered}
+          ·
+          ${pct(item.percentage)}
+        </strong>
+      </div>
+    `).join('');
+  }
+
+  function renderAdminTable(admins){
+    const body =
+      document.getElementById('opAdminTableBody');
+
+    if(!body) return;
+
+    if(!admins.length){
+      body.innerHTML = `
+        <tr>
+          <td colspan="10" style="text-align:center;">
+            No administrators found.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    body.innerHTML = admins.map(admin => `
+      <tr>
+        <td>
+          <div class="operations-admin-name">
+            ${esc(admin.name)}
+          </div>
+          <small>
+            ${esc(admin.role)}
+          </small>
+        </td>
+
+        <td>
+          <span class="operations-status ${admin.active ? '' : 'off'}">
+            ${admin.active ? 'Active' : 'Inactive'}
+          </span>
+        </td>
+
+        <td>${admin.callsAnswered}</td>
+        <td>${pct(admin.callSharePercent)}</td>
+        <td>${admin.casesAssigned}</td>
+        <td>${pct(admin.caseSharePercent)}</td>
+        <td>${admin.casesCompleted}</td>
+        <td>${pct(admin.completionPercent)}</td>
+        <td>${pct(admin.successPercent)}</td>
+        <td>${duration(admin.averageResolutionHours)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderBars(rootId,items){
+    const root =
+      document.getElementById(rootId);
+
+    if(!root) return;
+
+    if(!items.length){
+      root.innerHTML =
+        '<span class="operations-refresh">No data available.</span>';
+      return;
+    }
+
+    const max = Math.max(
+      1,
+      ...items.map(item => Number(item.value || 0))
+    );
+
+    root.innerHTML = items.map(item => {
+      const value = Number(item.value || 0);
+      const width = (value / max) * 100;
+
+      return `
+        <div class="operations-row">
+          <span>${esc(item.name)}</span>
+
+          <div class="operations-track">
+            <div
+              class="operations-fill"
+              style="width:${width}%"
+            ></div>
+          </div>
+
+          <strong>${value}</strong>
+        </div>
+      `;
+    }).join('');
+  }
+
+
+  let operationsReportCache = {
+    daily: null,
+    weekly: null,
+    allTime: null
+  };
+
+  let operationsReportPeriod = 'daily';
+
+  function animateReportNumber(element, target) {
+    if (!element) return;
+
+    const finalValue = Number(target || 0);
+    const startValue = Number(
+      element.dataset.currentValue || 0
+    );
+
+    if (startValue === finalValue) {
+      element.textContent = String(finalValue);
+      return;
+    }
+
+    const duration = 650;
+    const startTime = performance.now();
+
+    function frame(now) {
+      const progress = Math.min(
+        1,
+        (now - startTime) / duration
+      );
+
+      const eased =
+        1 - Math.pow(1 - progress, 3);
+
+      const value = Math.round(
+        startValue +
+        (finalValue - startValue) * eased
+      );
+
+      element.textContent = String(value);
+
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        element.textContent = String(finalValue);
+        element.dataset.currentValue =
+          String(finalValue);
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  function renderOperationsAdminReport() {
+    const report =
+      operationsReportCache[
+        operationsReportPeriod
+      ];
+
+    if (!report) return;
+
+    const rows = report.admins || [];
+    const totals = report.totals || {};
+
+    animateReportNumber(
+      document.getElementById(
+        'reportCasesHandled'
+      ),
+      totals.casesHandled || 0
+    );
+
+    animateReportNumber(
+      document.getElementById(
+        'reportCasesCompleted'
+      ),
+      totals.casesCompleted || 0
+    );
+
+    animateReportNumber(
+      document.getElementById(
+        'reportCallsAnswered'
+      ),
+      totals.callsAnswered || 0
+    );
+
+    const root =
+      document.getElementById(
+        'operationsRankList'
+      );
+
+    if (!root) return;
+
+    const maxCases = Math.max(
+      1,
+      ...rows.map(
+        row =>
+          Number(row.casesHandled || 0)
+      )
+    );
+
+    root.innerHTML =
+      rows.map((row, index) => {
+        const rank =
+          Number(row.rank || index + 1);
+
+        const cases =
+          Number(row.casesHandled || 0);
+
+        const completed =
+          Number(row.casesCompleted || 0);
+
+        const calls =
+          Number(row.callsAnswered || 0);
+
+        const width =
+          Math.min(
+            100,
+            (cases / maxCases) * 100
+          );
+
+        return `
+          <div class="operations-rank-row">
+
+            <div class="operations-rank-number ${rank === 1 ? 'top' : ''}">
+              #${rank}
+            </div>
+
+            <div class="operations-rank-name">
+              ${esc(row.name)}
+            </div>
+
+            <div class="operations-rank-track">
+              <div
+                class="operations-rank-fill"
+                style="width:${width}%"
+              ></div>
+            </div>
+
+            <div class="operations-rank-count">
+              ${cases}
+            </div>
+
+            <div class="operations-rank-percent">
+              ${pct(row.caseSharePercent)}
+            </div>
+
+            <div class="operations-rank-details">
+              <span>
+                Completed:
+                <strong>${completed}</strong>
+              </span>
+
+              <span>
+                Calls:
+                <strong>${calls}</strong>
+              </span>
+
+              <span>
+                Completion:
+                <strong>${pct(row.completionPercent)}</strong>
+              </span>
+
+              <span>
+                ${row.active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+  }
+
+  function setupOperationsReportTabs() {
+    document
+      .querySelectorAll(
+        '.operations-report-tab'
+      )
+      .forEach(button => {
+        button.addEventListener(
+          'click',
+          () => {
+            document
+              .querySelectorAll(
+                '.operations-report-tab'
+              )
+              .forEach(item =>
+                item.classList.remove(
+                  'active'
+                )
+              );
+
+            button.classList.add(
+              'active'
+            );
+
+            operationsReportPeriod =
+              button.dataset.period ||
+              'daily';
+
+            renderOperationsAdminReport();
+          }
+        );
+      });
+  }
+
+
+
+  let selectedReportsDate =
+    new Date().toISOString().slice(0,10);
+
+  let selectedReportPeriod = 'today';
+
+  function setReportMode(mode, dateValue = null){
+    selectedReportPeriod = mode;
+
+    const today =
+      new Date().toISOString().slice(0,10);
+
+    if(mode === 'today'){
+      selectedReportsDate = today;
+    } else if(mode === 'week'){
+      selectedReportsDate = today;
+    } else if(mode === 'month'){
+      selectedReportsDate = today;
+    } else if(mode === 'date' && dateValue){
+      selectedReportsDate = dateValue;
+    }
+
+    const picker =
+      document.getElementById(
+        'reportsDatePicker'
+      );
+
+    if(picker){
+      picker.value =
+        selectedReportsDate;
+    }
+
+    document
+      .querySelectorAll(
+        '#reportTodayBtn,#reportWeekBtn,#reportMonthBtn'
+      )
+      .forEach(button =>
+        button.classList.remove('active')
+      );
+
+    if(mode === 'today'){
+      document
+        .getElementById('reportTodayBtn')
+        ?.classList.add('active');
+    }
+
+    if(mode === 'week'){
+      document
+        .getElementById('reportWeekBtn')
+        ?.classList.add('active');
+    }
+
+    if(mode === 'month'){
+      document
+        .getElementById('reportMonthBtn')
+        ?.classList.add('active');
+    }
+
+    loadOperationsForDate(
+      selectedReportsDate,
+      mode
+    );
+  }
+
+  function renderWeeklyActivity(days){
+    const root =
+      document.getElementById(
+        'weeklyActivityChart'
+      );
+
+    if(!root) return;
+
+    if(!days.length){
+      root.innerHTML =
+        '<span class="operations-refresh">No activity available.</span>';
+      return;
+    }
+
+    const max =
+      Math.max(
+        1,
+        ...days.flatMap(day => [
+          Number(day.cases || 0),
+          Number(day.completed || 0),
+          Number(day.calls || 0)
+        ])
+      );
+
+    root.innerHTML =
+      days.map(day => {
+        const label =
+          new Date(
+            `${day.date}T00:00:00`
+          ).toLocaleDateString(
+            undefined,
+            {
+              month:'numeric',
+              day:'numeric'
+            }
+          );
+
+        const caseHeight =
+          Number(day.cases || 0)
+            ? Math.max(
+                5,
+                Number(day.cases || 0) /
+                  max * 105
+              )
+            : 0;
+
+        const completedHeight =
+          Number(day.completed || 0)
+            ? Math.max(
+                5,
+                Number(day.completed || 0) /
+                  max * 105
+              )
+            : 0;
+
+        const callHeight =
+          Number(day.calls || 0)
+            ? Math.max(
+                5,
+                Number(day.calls || 0) /
+                  max * 105
+              )
+            : 0;
+
+        return `
+          <div
+            class="operations-day"
+            title="${esc(day.date)}"
+          >
+            <div class="operations-bars">
+              <i
+                class="op-submitted"
+                style="height:${caseHeight}px"
+              ></i>
+
+              <i
+                class="op-completed"
+                style="height:${completedHeight}px"
+              ></i>
+
+              <i
+                class="op-calls"
+                style="height:${callHeight}px"
+              ></i>
+            </div>
+
+            <small>${esc(label)}</small>
+          </div>
+        `;
+      }).join('');
+  }
+
+  async function loadOperationsForDate(
+    date,
+    mode = 'date'
+  ){
+    try{
+      const query =
+        new URLSearchParams({
+          date,
+          mode
+        });
+
+      const res =
+        await fetch(
+          `/api/analytics/operations?${query.toString()}`,
+          {
+            headers: authHeaders(),
+            cache:'no-store'
+          }
+        );
+
+      if(await handleUnauthorized(res)){
+        return;
+      }
+
+      const data =
+        await res.json().catch(
+          () => ({})
+        );
+
+      if(!res.ok || !data.success){
+        throw new Error(
+          data.error ||
+          'Could not load selected report.'
+        );
+      }
+
+      const selected =
+        data.selectedDateReport || {};
+
+      setText(
+        'selectedDateCases',
+        selected.cases || 0
+      );
+
+      setText(
+        'selectedDateCalls',
+        selected.calls || 0
+      );
+
+      setText(
+        'selectedDateCompleted',
+        selected.completed || 0
+      );
+
+      const pretty =
+        new Date(
+          `${date}T00:00:00`
+        ).toLocaleDateString(
+          undefined,
+          {
+            weekday:'long',
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+          }
+        );
+
+      let label = pretty;
+
+      if(mode === 'week'){
+        label = `7-day report ending ${pretty}`;
+      }
+
+      if(mode === 'month'){
+        label =
+          new Date(
+            `${date.slice(0,7)}-01T00:00:00`
+          ).toLocaleDateString(
+            undefined,
+            {
+              month:'long',
+              year:'numeric'
+            }
+          );
+      }
+
+      setText(
+        'selectedDateLabel',
+        label
+      );
+
+      renderWeeklyActivity(
+        data.weeklyFlow || []
+      );
+
+    }catch(error){
+      console.error(
+        'Selected report error:',
+        error
+      );
+
+      setText(
+        'selectedDateLabel',
+        'Data unavailable'
+      );
+    }
+  }
+
+  function setupReportDateControls(){
+    const picker =
+      document.getElementById(
+        'reportsDatePicker'
+      );
+
+    if(picker){
+      picker.value =
+        selectedReportsDate;
+
+      picker.addEventListener(
+        'change',
+        event => {
+          setReportMode(
+            'date',
+            event.target.value
+          );
+        }
+      );
+    }
+
+    document
+      .getElementById(
+        'reportTodayBtn'
+      )
+      ?.addEventListener(
+        'click',
+        () => setReportMode('today')
+      );
+
+    document
+      .getElementById(
+        'reportWeekBtn'
+      )
+      ?.addEventListener(
+        'click',
+        () => setReportMode('week')
+      );
+
+    document
+      .getElementById(
+        'reportMonthBtn'
+      )
+      ?.addEventListener(
+        'click',
+        () => setReportMode('month')
+      );
+
+    setReportMode('today');
+  }
+
+
+  function renderMonthlyWorkCoverage(members){
+    const root =
+      document.getElementById('monthlyWorkCoverageList');
+
+    if(!root) return;
+
+    const rows = Array.isArray(members) ? members : [];
+
+    if(!rows.length){
+      root.innerHTML =
+        '<div class="operations-refresh">No admin data available.</div>';
+      return;
+    }
+
+    root.innerHTML = rows.map(member => `
+      <div class="coverage-row">
+        <div class="coverage-rank ${Number(member.rank) === 1 ? 'top' : ''}">
+          #${Number(member.rank || 0)}
+        </div>
+
+        <div class="coverage-name">
+          ${esc(member.name)}
+        </div>
+
+        <div class="coverage-track">
+          <div
+            class="coverage-fill"
+            style="width:${Number(member.workSharePercent || 0)}%"
+          ></div>
+        </div>
+
+        <div class="coverage-value">
+          ${Number(member.workSharePercent || 0).toFixed(1)}%
+        </div>
+
+        <div class="coverage-meta">
+          <span>Cases: <strong>${Number(member.casesHandled || 0)}</strong></span>
+          <span>Completed: <strong>${Number(member.casesCompleted || 0)}</strong></span>
+          <span>Calls: <strong>${Number(member.callsAnswered || 0)}</strong></span>
+          <span>Case share: <strong>${Number(member.caseSharePercent || 0).toFixed(1)}%</strong></span>
+          <span>Call share: <strong>${Number(member.callSharePercent || 0).toFixed(1)}%</strong></span>
+        </div>
+      </div>
+    `).join('');
+
+    const active =
+      rows.filter(
+        member => Number(member.workUnits || 0) > 0
+      ).length;
+
+    const totalUnits =
+      rows.reduce(
+        (sum, member) =>
+          sum + Number(member.workUnits || 0),
+        0
+      );
+
+    const topShare =
+      rows.length
+        ? Number(rows[0].workSharePercent || 0)
+        : 0;
+
+    setText('coverageTopShare', `${topShare.toFixed(1)}%`);
+    setText('coverageActiveCount', String(active));
+    setText('coverageWorkUnits', String(totalUnits));
+  }
+
+
+  function renderWeeklyCallReports(reports){
+    const root =
+      document.getElementById('weeklyCallReport');
+
+    if(!root) return;
+
+    const rows =
+      Array.isArray(reports)
+        ? reports
+        : [];
+
+    if(!rows.length){
+      root.innerHTML =
+        '<div class="operations-refresh">No weekly call data.</div>';
+      return;
+    }
+
+    const max =
+      Math.max(
+        1,
+        ...rows.map(
+          item => Number(item.calls || 0)
+        )
+      );
+
+    root.innerHTML =
+      rows.map(item => {
+        const value =
+          Number(item.calls || 0);
+
+        const height =
+          Math.max(
+            4,
+            (value / max) * 125
+          );
+
+        const start =
+          new Date(
+            `${item.weekStart}T00:00:00`
+          );
+
+        const label =
+          start.toLocaleDateString(
+            undefined,
+            {
+              month:'numeric',
+              day:'numeric'
+            }
+          );
+
+        return `
+          <div
+            class="weekly-call-column"
+            title="Week starting ${esc(item.weekStart)}: ${value} calls"
+          >
+            <strong>${value}</strong>
+            <div
+              class="weekly-call-bar"
+              style="height:${height}px"
+            ></div>
+            <span class="weekly-call-label">
+              ${esc(label)}
+            </span>
+          </div>
+        `;
+      }).join('');
+  }
+
+  function renderMonthlyCallRollup(reports){
+    const root =
+      document.getElementById('monthlyCallRollup');
+
+    if(!root) return;
+
+    const rows =
+      Array.isArray(reports)
+        ? reports
+        : [];
+
+    if(!rows.length){
+      root.innerHTML =
+        '<div class="operations-refresh">No monthly calls yet.</div>';
+      return;
+    }
+
+    const max =
+      Math.max(
+        1,
+        ...rows.map(
+          item => Number(item.calls || 0)
+        )
+      );
+
+    root.innerHTML =
+      rows
+        .slice(-12)
+        .reverse()
+        .map(item => {
+          const value =
+            Number(item.calls || 0);
+
+          const label =
+            new Date(
+              `${item.month}-01T00:00:00`
+            ).toLocaleDateString(
+              undefined,
+              {
+                month:'short',
+                year:'numeric'
+              }
+            );
+
+          const width =
+            Math.max(
+              0,
+              (value / max) * 100
+            );
+
+          return `
+            <div class="monthly-call-row">
+              <span>${esc(label)}</span>
+
+              <div class="monthly-call-track">
+                <div
+                  class="monthly-call-fill"
+                  style="width:${width}%"
+                ></div>
+              </div>
+
+              <strong>${value}</strong>
+            </div>
+          `;
+        })
+        .join('');
+  }
+
+  async function loadOperations(){
+    try{
+      const res = await fetch(
+        '/api/analytics/operations',
+        {
+          headers: authHeaders(),
+          cache:'no-store'
+        }
+      );
+
+      if(await handleUnauthorized(res)){
+        return;
+      }
+
+      const data =
+        await res.json().catch(() => ({}));
+
+      if(!res.ok || !data.success){
+        throw new Error(
+          data.error ||
+          'Could not load operations data.'
+        );
+      }
+
+      const company =
+        data.company || {};
+
+      setText(
+        'opCasesToday',
+        company.casesToday || 0
+      );
+
+      setText(
+        'opCasesMonth',
+        company.casesThisMonth || 0
+      );
+
+      setText(
+        'opOpenCases',
+        company.openCases || 0
+      );
+
+      setText(
+        'opCompletedCases',
+        company.completedCases || 0
+      );
+
+      setText(
+        'opSuccessRate',
+        pct(company.successRate)
+      );
+
+      setText(
+        'opCallsMonth',
+        company.callsAnsweredThisMonth || 0
+      );
+
+      setText(
+        'opAverageResolution',
+        company.averageResolutionHours === null
+          ? 'Average resolution: —'
+          : `Average resolution: ${duration(company.averageResolutionHours)}`
+      );
+
+      setText(
+        'operationsUpdated',
+        data.generatedAt
+          ? `Updated ${new Date(data.generatedAt).toLocaleTimeString()}`
+          : 'Updated'
+      );
+
+      renderDailyFlow(
+        data.dailyFlow || []
+      );
+
+      const calls =
+        data.monthlyCallDistribution || [];
+
+      const totalCalls =
+        Number(company.callsAnsweredThisMonth || 0);
+
+      renderCallsPie(
+        calls,
+        totalCalls
+      );
+
+      setText(
+        'monthlyCallsTotalLabel',
+        `${totalCalls} answered`
+      );
+
+      setText(
+        'operationsCurrentMonth',
+        data.currentMonthLabel || 'Current month'
+      );
+
+      renderMonthlyWorkCoverage(
+        data.monthlyWorkCoverage || []
+      );
+
+      renderWeeklyCallReports(
+        data.weeklyCallReports || []
+      );
+
+      renderMonthlyCallRollup(
+        data.monthlyCallReports || []
+      );
+
+      const currentWeekCalls =
+        Number(
+          data.currentWeek?.calls || 0
+        );
+
+      const currentMonthCalls =
+        Number(
+          data.currentMonthCalls?.calls || 0
+        );
+
+      setText(
+        'currentWeekCallTotal',
+        `${currentWeekCalls} calls`
+      );
+
+      setText(
+        'currentMonthCallRollup',
+        `${currentMonthCalls} calls`
+      );
+
+      const weekStart =
+        data.currentWeek?.weekStart;
+
+      if(weekStart){
+        const label =
+          new Date(
+            `${weekStart}T00:00:00`
+          ).toLocaleDateString(
+            undefined,
+            {
+              month:'long',
+              day:'numeric',
+              year:'numeric'
+            }
+          );
+
+        setText(
+          'currentWeekCallLabel',
+          `Current week started ${label}`
+        );
+      }
+
+      const top =
+        data.topCallAdmin;
+
+      setText(
+        'opTopCallAdmin',
+        top
+          ? `${top.name} is the top call responder with ${top.callsAnswered} calls (${pct(top.percentage)} of team calls).`
+          : 'No calls answered this month yet.'
+      );
+
+      const admins =
+        data.admins || [];
+
+      renderAdminTable(admins);
+
+      operationsReportCache = {
+        daily:
+          data.dailyAdminReport || null,
+
+        weekly:
+          data.weeklyAdminReport || null,
+
+        allTime:
+          data.allTimeAdminReport || null
+      };
+
+      renderOperationsAdminReport();
+
+      renderBars(
+        'opActivityBars',
+        admins.map(admin => ({
+          name: admin.name,
+          value: Number(
+            admin.activityPercent || 0
+          )
+        }))
+      );
+
+      const statusItems =
+        Object.entries(
+          data.monthlyStatusCounts || {}
+        )
+        .map(([name,value]) => ({
+          name,
+          value: Number(value || 0)
+        }))
+        .sort(
+          (a,b) => b.value - a.value
+        );
+
+      renderBars(
+        'opStatusBars',
+        statusItems
+      );
+
+    }catch(error){
+      console.error(
+        'Operations dashboard error:',
+        error
+      );
+
+      setText(
+        'operationsUpdated',
+        'Operations data unavailable'
+      );
+    }
+  }
+
+  window.loadOperations =
+    loadOperations;
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+      setupOperationsReportTabs();
+      setupReportDateControls();
+
+      loadOperations();
+
+      setInterval(
+        loadOperations,
+        60000
+      );
+    }
+  );
+
+})();
+</script>
+
+</body>
+</html>
