@@ -12,7 +12,17 @@ const auth = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    if (decoded.auth !== 'full') {
+      return res.status(401).json({
+        error: 'Full authentication required',
+      });
+    }
+
     const user = await User.findById(decoded.id);
 
     if (!user) {
@@ -44,7 +54,17 @@ const optionalAuth = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    if (decoded.auth !== 'full') {
+      return res.status(401).json({
+        error: 'Full authentication required',
+      });
+    }
+
     const user = await User.findById(decoded.id);
 
     if (!user) {

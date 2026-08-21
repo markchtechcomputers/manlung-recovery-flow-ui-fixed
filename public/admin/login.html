@@ -110,29 +110,224 @@
         async function handleAdminLogin(event) {
             event.preventDefault();
 
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-            const errorEl = document.getElementById('loginError');
+            const username =
+                document.getElementById('adminUsername').value.trim();
+
+            const password =
+                document.getElementById('adminPassword').value;
+
+            const errorEl =
+                document.getElementById('loginError');
+
             errorEl.textContent = '';
 
             try {
-                const response = await fetch('/api/auth/admin/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
-                const data = await response.json();
+                const response = await fetch(
+                    '/api/auth/admin/login',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username,
+                            password,
+                        }),
+                    }
+                );
 
-                if (data.success) {
-                    localStorage.setItem('adminToken', data.token);
-                    localStorage.setItem('adminUser', JSON.stringify(data.user));
-                    window.location.href = '/admin/dashboard.html';
-                } else {
-                    errorEl.textContent = data.error || 'Invalid credentials';
+                const data =
+                    await response.json();
+
+                if (!response.ok || !data.success) {
+                    errorEl.textContent =
+                        data.error ||
+                        'Invalid credentials';
+
+                    return;
                 }
+
+                if (data.requires2FA) {
+                    localStorage.setItem(
+                        'adminTwoFactorChallenge',
+                        data.challengeToken
+                    );
+
+                    localStorage.setItem(
+                        'adminTwoFactorUser',
+                        JSON.stringify(data.user)
+                    );
+
+                    showAdminTwoFactorStep();
+                    return;
+                }
+
+                if (!data.token) {
+                    errorEl.textContent =
+                        'Authentication response was incomplete.';
+                    return;
+                }
+
+                localStorage.setItem(
+                    'adminToken',
+                    data.token
+                );
+
+                localStorage.setItem(
+                    'adminUser',
+                    JSON.stringify(data.user)
+                );
+
+                window.location.href =
+                    '/admin/dashboard.html';
+
             } catch (error) {
-                errorEl.textContent = 'Connection error. Please try again.';
-                console.error('Login error:', error);
+                console.error(
+                    'Login error:',
+                    error
+                );
+
+                errorEl.textContent =
+                    'Connection error. Please try again.';
+            }
+        }
+
+        function showAdminTwoFactorStep() {
+            const form =
+                document.querySelector('form');
+
+            if (!form) return;
+
+            form.innerHTML = `
+                <div style="text-align:center;">
+                    <h3>Two-Factor Authentication</h3>
+
+                    <p>
+                        Enter the 6-digit code from
+                        your authenticator app.
+                    </p>
+
+                    <input
+                        id="adminTwoFactorCode"
+                        type="text"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        maxlength="6"
+                        pattern="\\d{6}"
+                        placeholder="000000"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        onclick="verifyAdminTwoFactor()"
+                    >
+                        Verify code
+                    </button>
+
+                    <p
+                        id="adminTwoFactorError"
+                        style="color:#ff6b6b;"
+                    ></p>
+                </div>
+            `;
+        }
+
+        async function verifyAdminTwoFactor() {
+            const code =
+                document.getElementById(
+                    'adminTwoFactorCode'
+                )?.value.trim();
+
+            const errorEl =
+                document.getElementById(
+                    'adminTwoFactorError'
+                );
+
+            if (!/^\d{6}$/.test(code)) {
+                if (errorEl) {
+                    errorEl.textContent =
+                        'Enter a valid 6-digit code.';
+                }
+                return;
+            }
+
+            const challengeToken =
+                localStorage.getItem(
+                    'adminTwoFactorChallenge'
+                );
+
+            if (!challengeToken) {
+                if (errorEl) {
+                    errorEl.textContent =
+                        'Your 2FA session has expired. Please sign in again.';
+                }
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    '/api/auth/admin/2fa/verify',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type':
+                                'application/json',
+                        },
+                        body: JSON.stringify({
+                            challengeToken,
+                            code,
+                        }),
+                    }
+                );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success ||
+                    !data.token
+                ) {
+                    if (errorEl) {
+                        errorEl.textContent =
+                            data.error ||
+                            'Invalid authenticator code.';
+                    }
+                    return;
+                }
+
+                localStorage.removeItem(
+                    'adminTwoFactorChallenge'
+                );
+
+                localStorage.removeItem(
+                    'adminTwoFactorUser'
+                );
+
+                localStorage.setItem(
+                    'adminToken',
+                    data.token
+                );
+
+                localStorage.setItem(
+                    'adminUser',
+                    JSON.stringify(data.user)
+                );
+
+                window.location.href =
+                    '/admin/dashboard.html';
+
+            } catch (error) {
+                console.error(
+                    '2FA verification error:',
+                    error
+                );
+
+                if (errorEl) {
+                    errorEl.textContent =
+                        'Could not verify your code.';
+                }
             }
         }
 
