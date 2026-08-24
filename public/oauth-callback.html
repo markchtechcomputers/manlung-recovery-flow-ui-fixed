@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Signing you in… · Manlung Recovery</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .oauth-callback-wrap { min-height: 70vh; display: grid; place-items: center; padding: 2rem 1rem; }
+        .oauth-callback-card { max-width: 460px; width: 100%; text-align: center; }
+        .oauth-spinner {
+            width: 34px; height: 34px; margin: 0 auto 1rem;
+            border: 3px solid var(--card-border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: oauthSpin .8s linear infinite;
+        }
+        .oauth-error { color: var(--danger); }
+        .oauth-back { display: inline-flex; margin-top: 1rem; }
+        @keyframes oauthSpin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            .oauth-spinner { animation: none; }
+        }
+    </style>
+<style id="manlung-footer-style">
+.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:#06101d;border-top:1px solid rgba(255,255,255,.08);color:#dbeafe}
+.manlung-footer-inner{max-width:1000px;margin:auto}
+.manlung-footer-brand{text-align:center;margin-bottom:1rem}
+.manlung-footer-brand h2{margin:0 0 .3rem;font-size:clamp(1rem,1.7vw,1.25rem);color:#fff}
+.manlung-footer-brand p{margin:0;color:#94a3b8;font-size:.8rem}
+.manlung-footer-links{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1rem 0}
+.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.manlung-footer-link:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#fff}
+.manlung-footer-link:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
+.manlung-footer-link:active{background:rgba(255,255,255,.1)}
+.manlung-footer-bottom{padding-top:.7rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;color:#64748b;font-size:.7rem}
+.manlung-footer-bottom strong{color:#94a3b8}
+@media(max-width:900px){.manlung-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}}
+@media(max-width:380px){.manlung-footer-links{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+    <main class="container oauth-callback-wrap">
+        <section class="card oauth-callback-card" aria-live="polite">
+            <div id="spinner" class="oauth-spinner" aria-hidden="true"></div>
+            <h2 id="title">Signing you in securely…</h2>
+            <p id="status" style="color:var(--text-muted);">Verifying your account securely.</p>
+            <a id="backLink" class="btn btn-primary oauth-back" href="/login.html" style="display:none;">Back to Sign In</a>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const CALLBACK_TIMEOUT_MS = 15000;
+
+        function showError(message, redirect) {
+            const title =
+                document.getElementById('title');
+
+            const status =
+                document.getElementById('status');
+
+            const spinner =
+                document.getElementById('spinner');
+
+            const backLink =
+                document.getElementById('backLink');
+
+            spinner.style.display = 'none';
+
+            if (redirect) {
+                title.textContent =
+                    'Admin account detected';
+
+                status.textContent =
+                    message ||
+                    'This email belongs to an Admin or Owner account.';
+
+                backLink.href =
+                    redirect;
+
+                backLink.textContent =
+                    'Continue to Admin Sign In';
+
+                backLink.style.display =
+                    'inline-flex';
+
+                return;
+            }
+
+            title.textContent =
+                'Social sign-in failed';
+
+            status.textContent =
+                message ||
+                'Please return to sign in and try again.';
+
+            status.classList.add(
+                'oauth-error'
+            );
+
+            backLink.href =
+                '/login.html';
+
+            backLink.textContent =
+                'Back to Sign In';
+
+            backLink.style.display =
+                'inline-flex';
+        }
+
+        function clearOAuthUrl() {
+            try {
+                window.history.replaceState({}, document.title, `${window.location.origin}/oauth-callback.html`);
+            } catch (_) {
+                // The callback can still complete if history manipulation is unavailable.
+            }
+        }
+
+        async function fetchJson(url, options) {
+            const response = await fetch(url, options);
+            let data = {};
+            try { data = await response.json(); } catch (_) {}
+            if (!response.ok) {
+                const error = new Error(
+                    data.error ||
+                    'The authentication request could not be completed.'
+                );
+
+                error.redirect =
+                    data.redirect || '';
+
+                error.accountRole =
+                    data.accountRole || '';
+
+                throw error;
+            }
+
+            return data;
+        }
+
+        async function processCallback() {
+            const config = await fetchJson('/api/config/public', { cache: 'no-store' });
+            if (!config.supabaseUrl || !config.supabaseAnonKey) {
+                throw new Error('Social sign-in is not configured.');
+            }
+            if (!window.supabase) {
+                throw new Error('Authentication library could not be loaded.');
+            }
+
+            const client = window.supabase.createClient(
+                config.supabaseUrl,
+                config.supabaseAnonKey,
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: true,
+                        flowType: 'implicit'
+                    }
+                }
+            );
+
+            const url = new URL(window.location.href);
+            const code = url.searchParams.get('code');
+            const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+            const hashError = hashParams.get('error_description') || hashParams.get('error');
+
+            // Capture OAuth data before removing it from the address bar.
+            if (hashError) {
+                clearOAuthUrl();
+                throw new Error(hashError);
+            }
+
+            if (code) {
+                // PKCE/code flow: exchange the one-time code explicitly.
+                const { error } = await client.auth.exchangeCodeForSession(code);
+                clearOAuthUrl();
+                if (error) throw error;
+            } else {
+                const accessToken = hashParams.get('access_token');
+                const refreshToken = hashParams.get('refresh_token');
+
+                if (accessToken) {
+                    // Legacy/implicit Supabase hash flow.
+                    const { error } = await client.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: refreshToken || ''
+                    });
+                    clearOAuthUrl();
+                    if (error) throw error;
+                } else {
+                    // Existing browser session flow, if Supabase already restored it.
+                    clearOAuthUrl();
+                }
+            }
+
+            const { data: sessionData, error: sessionError } = await client.auth.getSession();
+            if (sessionError) throw sessionError;
+
+            const session = sessionData?.session;
+            if (!session?.access_token) {
+                throw new Error('No social sign-in session was found. Please try again.');
+            }
+
+            // Send only the access token required by the existing backend OAuth endpoint.
+            // Never log or expose this token.
+            const appSession = await fetchJson('/api/auth/client/oauth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accessToken: session.access_token })
+            });
+
+            if (!appSession.success || !appSession.token || !appSession.user) {
+                throw new Error('Could not complete social sign-in.');
+            }
+
+            localStorage.setItem('clientToken', appSession.token);
+            localStorage.setItem('clientUser', JSON.stringify(appSession.user));
+
+            await client.auth.signOut();
+            clearOAuthUrl();
+            window.location.replace('/client/dashboard.html');
+        }
+
+        (async function runCallback() {
+            try {
+                await Promise.race([
+                    processCallback(),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('The sign-in process timed out. Please try again.')), CALLBACK_TIMEOUT_MS)
+                    )
+                ]);
+            } catch (error) {
+                console.error('OAuth callback error:', error?.message || 'Authentication callback failed.');
+                showError(
+                    error?.message ||
+                    'Authentication failed. Check the browser console for details.',
+                    error?.redirect || ''
+                );
+            }
+        })();
+    </script>
+<footer class="manlung-footer">
+<div class="manlung-footer-inner">
+<div class="manlung-footer-brand">
+<h2>Cyber Recovery &amp; Digital Investigation Portal</h2>
+<p>Secure support, recovery guidance, digital awareness and responsible assistance.</p>
+</div>
+<nav class="manlung-footer-links" aria-label="Footer navigation">
+<a class="manlung-footer-link" href="/about.html">About</a>
+<a class="manlung-footer-link" href="/blog.html">Blog</a>
+<a class="manlung-footer-link" href="/careers.html">Careers</a>
+<a class="manlung-footer-link" href="/terms.html">Terms</a>
+<a class="manlung-footer-link" href="/login.html">Client Portal</a>
+<a class="manlung-footer-link" href="/client/request.html">New Recovery Request</a>
+</nav>
+<div class="manlung-footer-social" aria-label="Social media">
+<a class="manlung-footer-link" href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="Manlung Recovery on YouTube"><i class="fab fa-youtube"></i> YouTube</a>
+</div>
+<div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</div>
+</div>
+</footer>
+</body>
+</html>
