@@ -244,7 +244,7 @@
     <header class="site-header">
         <div class="container">
             <div class="brand">
-                
+
 <img
   class="manlung-site-logo"
   src="https://i.postimg.cc/9X95sh5L/favicon-Photoroom.png"
@@ -328,15 +328,15 @@
 </footer>
 
     <script>
-        const token = localStorage.getItem('adminToken');
+
         if (!token) window.location.href = '/admin/login.html';
 
-        function authHeaders() { return { 'Authorization': `Bearer ${token}` }; }
+        function authHeaders() { return {}; }
 
         async function handleUnauthorized(res) {
             if (res.status === 401) {
-                localStorage.removeItem('adminToken');
-                localStorage.removeItem('adminUser');
+
+                sessionStorage.removeItem('adminUser');
                 window.location.href = '/admin/login.html';
                 return true;
             }
@@ -344,8 +344,8 @@
         }
 
         function handleLogout() {
-            localStorage.removeItem('adminToken');
-            localStorage.removeItem('adminUser');
+
+            sessionStorage.removeItem('adminUser');
             window.location.href = '/admin/login.html';
         }
 

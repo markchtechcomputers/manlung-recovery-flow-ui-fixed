@@ -2,9 +2,18 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const AdminPermission = require('../models/AdminPermission');
 
+const getToken = (req) => {
+  // Admin/Owner authentication uses the HttpOnly cookie.
+  // Bearer tokens remain supported for client authentication.
+  return (
+    req.cookies?.adminToken ||
+    req.header('Authorization')?.replace('Bearer ', '')
+  );
+};
+
 const auth = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = getToken(req);
 
     if (!token) {
       return res.status(401).json({
@@ -32,10 +41,8 @@ const auth = async (req, res, next) => {
   }
 };
 
-
 // Optional authentication for public-facing case submission/tracking.
-// A valid client token is used when present; visitors without a token
-// are allowed through as guests. Invalid supplied tokens are still rejected.
+// Client Bearer tokens remain supported.
 const optionalAuth = async (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -65,8 +72,6 @@ const optionalAuth = async (req, res, next) => {
 };
 
 // Accepts admin OR owner.
-// Owner has all admin permissions.
-// Suspended admins are blocked immediately.
 const adminAuth = async (req, res, next) => {
   await auth(req, res, () => {
     if (
@@ -104,16 +109,9 @@ const ownerAuth = async (req, res, next) => {
   });
 };
 
-// Permission middleware.
-//
-// IMPORTANT:
-// This function itself must NOT be async.
-// Express needs requirePermission(...) to return
-// a middleware function, not a Promise.
 function requirePermission(permission) {
   return async (req, res, next) => {
     await adminAuth(req, res, async () => {
-      // Owner can do everything.
       if (req.user.role === 'owner') {
         return next();
       }
@@ -143,7 +141,7 @@ function requirePermission(permission) {
       }
     });
   };
-};
+}
 
 module.exports = {
   auth,

@@ -410,7 +410,7 @@
     <header class="site-header">
         <div class="container">
             <div class="brand manlung-brand">
-                
+
 <img
   class="manlung-site-logo"
   src="https://i.postimg.cc/9X95sh5L/favicon-Photoroom.png"
@@ -590,9 +590,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/js/call-webrtc.js"></script>
     <script>
-        const token = localStorage.getItem('adminToken');
-        if (!token) window.location.href = '/admin/login.html';
-        const currentAdmin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+        const currentAdmin = JSON.parse(sessionStorage.getItem('adminUser') || '{}');
         const ownerManagementNav =
             document.getElementById('ownerManagementNav');
 
@@ -617,13 +615,13 @@
         let selectedIds = new Set();
 
         function authHeaders() {
-            return { 'Authorization': `Bearer ${token}` };
+            return {};
         }
 
         async function handleUnauthorized(res) {
             if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('adminToken');
-                localStorage.removeItem('adminUser');
+
+                sessionStorage.removeItem('adminUser');
                 window.location.href = '/admin/login.html';
                 return true;
             }
@@ -657,7 +655,11 @@
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), timeoutMs);
             try {
-                return await fetch(url, { ...options, signal: controller.signal });
+                return await fetch(url, {
+                    ...options,
+                    credentials: 'include',
+                    signal: controller.signal,
+                });
             } finally {
                 clearTimeout(timer);
             }
@@ -1102,7 +1104,6 @@
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', `/api/cases/admin/upload/${encodeURIComponent(caseId)}`);
-            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
             xhr.upload.onprogress = (e) => {
                 if (e.lengthComputable) statusEl.textContent = `Uploading… ${Math.round((e.loaded / e.total) * 100)}%`;
@@ -1110,8 +1111,8 @@
 
             xhr.onload = async () => {
                 if (xhr.status === 401 || xhr.status === 403) {
-                    localStorage.removeItem('adminToken');
-                    localStorage.removeItem('adminUser');
+
+                    sessionStorage.removeItem('adminUser');
                     window.location.href = '/admin/login.html';
                     return;
                 }
@@ -1154,8 +1155,8 @@
         function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
 
         function handleLogout() {
-            localStorage.removeItem('adminToken');
-            localStorage.removeItem('adminUser');
+
+            sessionStorage.removeItem('adminUser');
             window.location.href = '/admin/login.html';
         }
 

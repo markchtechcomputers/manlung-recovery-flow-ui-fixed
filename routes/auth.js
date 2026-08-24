@@ -344,9 +344,16 @@ router.post(
         `Admin/Owner login successful: ${admin.username} (${admin.role})`
       );
 
+      res.cookie('adminToken', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/',
+      });
+
       return res.json({
         success: true,
-        token,
         user: {
           id: admin.id,
           username: admin.username,
@@ -363,6 +370,22 @@ router.post(
     }
   }
 );
+
+
+// ============================================================
+// ADMIN / OWNER LOGOUT
+// ============================================================
+
+router.post('/admin/logout', (req, res) => {
+  res.clearCookie('adminToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+  });
+
+  return res.json({ success: true });
+});
 
 
 // ============================================================

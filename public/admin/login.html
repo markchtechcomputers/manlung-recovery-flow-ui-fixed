@@ -119,13 +119,13 @@
                 const response = await fetch('/api/auth/admin/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ username, password }),
                 });
                 const data = await response.json();
 
                 if (data.success) {
-                    localStorage.setItem('adminToken', data.token);
-                    localStorage.setItem('adminUser', JSON.stringify(data.user));
+                    sessionStorage.setItem('adminUser', JSON.stringify(data.user));
                     window.location.href = '/admin/dashboard.html';
                 } else {
                     errorEl.textContent = data.error || 'Invalid credentials';
@@ -137,9 +137,7 @@
         }
 
         // If already logged in, skip straight to the dashboard
-        if (localStorage.getItem('adminToken')) {
-            window.location.href = '/admin/dashboard.html';
-        }
+
     </script>
 <footer class="manlung-footer">
 <div class="manlung-footer-inner">

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const dns = require('dns').promises;
@@ -122,7 +123,9 @@ app.use(cors({
 
     return callback(new Error('Origin not allowed'));
   },
+  credentials: true,
 }));
+app.use(cookieParser());
 
 // ============================================================
 // GENERAL API RATE LIMITER
@@ -314,11 +317,13 @@ app.use(express.json({
     req.rawBody = buf;
   },
 }));
+app.use(cookieParser());
 
 app.use(express.urlencoded({
   extended: true,
   limit: '10mb',
 }));
+app.use(cookieParser());
 
 // Validate API input before it reaches route handlers.
 app.use('/api/', inputSecurity);
