@@ -385,3 +385,189 @@ body[data-theme="dark"] .site-header i {
     opacity: 1 !important;
 }
 
+
+/* =========================================================
+   MANLUNG RECOVERY — PREMIUM HEADER ICONS
+   ========================================================= */
+
+/* Header glow line */
+.site-header {
+    position: relative !important;
+    border-bottom: 1px solid rgba(37, 99, 235, 0.45) !important;
+    box-shadow:
+        0 1px 0 rgba(30, 64, 175, 0.35),
+        0 3px 14px rgba(37, 99, 235, 0.16) !important;
+}
+
+/* Bright blue glowing line */
+.site-header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        #0f2f68 15%,
+        #2563eb 35%,
+        #60a5fa 50%,
+        #2563eb 65%,
+        #0f2f68 85%,
+        transparent 100%
+    );
+    box-shadow:
+        0 0 5px rgba(37, 99, 235, 0.9),
+        0 0 12px rgba(37, 99, 235, 0.65),
+        0 0 24px rgba(30, 64, 175, 0.35);
+    z-index: 20;
+    pointer-events: none;
+}
+
+/* Header navigation icons */
+.site-header .header-actions a i,
+.site-header .header-actions button i,
+.site-header .header-actions > * i {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 1rem !important;
+    transition:
+        color .22s ease,
+        transform .22s ease,
+        filter .22s ease,
+        text-shadow .22s ease !important;
+}
+
+/* My Cases — blue */
+.site-header .header-actions a[href*="dashboard"] i,
+.site-header i.fa-user,
+.site-header i.fa-user-circle {
+    color: #60a5fa !important;
+    text-shadow: 0 0 8px rgba(96,165,250,.55) !important;
+}
+
+/* Blog — purple */
+.site-header i.fa-newspaper,
+.site-header i.fa-blog,
+.site-header i.fa-book-open {
+    color: #c084fc !important;
+    text-shadow: 0 0 8px rgba(192,132,252,.5) !important;
+}
+
+/* Donate — green */
+.site-header i.fa-heart,
+.site-header i.fa-hand-holding-heart,
+.site-header i.fa-donate {
+    color: #34d399 !important;
+    text-shadow: 0 0 8px rgba(52,211,153,.55) !important;
+}
+
+/* New Request — cyan */
+.site-header i.fa-plus,
+.site-header i.fa-plus-circle,
+.site-header i.fa-file-circle-plus {
+    color: #22d3ee !important;
+    text-shadow: 0 0 8px rgba(34,211,238,.55) !important;
+}
+
+/* Home — blue */
+.site-header i.fa-home {
+    color: #60a5fa !important;
+    text-shadow: 0 0 8px rgba(96,165,250,.55) !important;
+}
+
+/* Search — cyan */
+.site-header i.fa-search,
+.site-header i.fa-magnifying-glass {
+    color: #38bdf8 !important;
+    text-shadow: 0 0 8px rgba(56,189,248,.55) !important;
+}
+
+/* Security / shield — gold */
+.site-header i.fa-shield,
+.site-header i.fa-shield-halved,
+.site-header i.fa-lock {
+    color: #fbbf24 !important;
+    text-shadow: 0 0 8px rgba(251,191,36,.5) !important;
+}
+
+/* Dark/light theme icon */
+.site-header i.fa-moon {
+    color: #facc15 !important;
+    text-shadow: 0 0 9px rgba(250,204,21,.65) !important;
+}
+
+.site-header i.fa-sun {
+    color: #f59e0b !important;
+    text-shadow: 0 0 9px rgba(245,158,11,.65) !important;
+}
+
+/* Hover — icons become brighter */
+.site-header .header-actions a:hover i,
+.site-header .header-actions button:hover i {
+    transform: translateY(-2px) scale(1.12) !important;
+    filter: brightness(1.3) !important;
+}
+
+/* Individual hover glow */
+.site-header i.fa-user:hover,
+.site-header i.fa-user-circle:hover {
+    text-shadow: 0 0 6px #60a5fa, 0 0 16px #2563eb !important;
+}
+
+.site-header i.fa-newspaper:hover,
+.site-header i.fa-blog:hover,
+.site-header i.fa-book-open:hover {
+    text-shadow: 0 0 6px #c084fc, 0 0 16px #9333ea !important;
+}
+
+.site-header i.fa-heart:hover,
+.site-header i.fa-hand-holding-heart:hover {
+    text-shadow: 0 0 6px #34d399, 0 0 16px #059669 !important;
+}
+
+.site-header i.fa-plus-circle:hover,
+.site-header i.fa-file-circle-plus:hover {
+    text-shadow: 0 0 6px #22d3ee, 0 0 16px #0891b2 !important;
+}
+
+/* Make icon + text spacing cleaner */
+.site-header .header-actions a,
+.site-header .header-actions button {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: .42rem !important;
+}
+
+/* Premium hover background */
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover {
+    border-radius: 10px;
+    background: rgba(37, 99, 235, .08);
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .site-header::after {
+        height: 2px;
+        box-shadow:
+            0 0 5px rgba(37,99,235,.9),
+            0 0 12px rgba(37,99,235,.6);
+    }
+
+    .site-header .header-actions a i,
+    .site-header .header-actions button i {
+        font-size: .95rem !important;
+    }
+}
+
+/* Respect reduced-motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .site-header .header-actions a i,
+    .site-header .header-actions button i {
+        transition: none !important;
+    }
+}
+
