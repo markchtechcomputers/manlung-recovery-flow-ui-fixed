@@ -571,3 +571,135 @@ body[data-theme="dark"] .site-header i {
     }
 }
 
+
+/* =========================================================
+   MANLUNG RECOVERY — HEADER MENU RECTANGLE DESIGN
+   ========================================================= */
+
+/* Header menu links become premium rectangular buttons */
+.site-header .header-actions a {
+    color: #000000 !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+
+    border: 1px solid rgba(37, 99, 235, 0.45) !important;
+    border-radius: 8px !important;
+
+    padding: 8px 13px !important;
+    min-height: 38px;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+
+    box-shadow:
+        0 2px 7px rgba(15, 47, 104, 0.10),
+        inset 0 0 0 1px rgba(255,255,255,.65) !important;
+
+    transition:
+        transform .2s ease,
+        background .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease !important;
+}
+
+/* Keep menu text BLACK */
+.site-header .header-actions a span,
+.site-header .header-actions a {
+    color: #000000 !important;
+}
+
+/* Premium hover */
+.site-header .header-actions a:hover {
+    background: #ffffff !important;
+    border-color: #2563eb !important;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 4px 12px rgba(37, 99, 235, 0.20),
+        0 0 8px rgba(37, 99, 235, 0.18) !important;
+}
+
+/* Keep the icons coloured */
+.site-header .header-actions a i {
+    font-weight: 900 !important;
+}
+
+/* =========================================================
+   THEME/DARK CONTROL — NO RECTANGLE
+   ========================================================= */
+
+/* Remove box styling from the Dark/Light control */
+.site-header .header-actions .theme-toggle,
+.site-header .header-actions button.theme-toggle,
+.site-header .header-actions [data-theme-toggle="true"] {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+
+    padding: 5px 3px !important;
+    min-height: auto !important;
+
+    color: #000000 !important;
+}
+
+/* Dark text remains black */
+.site-header .header-actions .theme-toggle::after,
+.site-header .header-actions button.theme-toggle::after {
+    color: #000000 !important;
+}
+
+/* Theme icon stays coloured */
+.site-header .header-actions .theme-toggle i,
+.site-header .header-actions [data-theme-toggle="true"] i {
+    color: #f59e0b !important;
+    text-shadow:
+        0 0 7px rgba(245, 158, 11, .45) !important;
+}
+
+/* Theme control hover — no rectangle */
+.site-header .header-actions .theme-toggle:hover,
+.site-header .header-actions button.theme-toggle:hover,
+.site-header .header-actions [data-theme-toggle="true"]:hover {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Only the icon reacts */
+.site-header .header-actions .theme-toggle:hover i,
+.site-header .header-actions [data-theme-toggle="true"]:hover i {
+    transform: scale(1.15) rotate(8deg) !important;
+    filter: brightness(1.2) !important;
+}
+
+/* =========================================================
+   MOBILE HEADER
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .site-header .header-actions {
+        gap: 6px !important;
+    }
+
+    .site-header .header-actions a {
+        padding: 7px 9px !important;
+        min-height: 36px;
+        border-radius: 7px !important;
+        font-size: .82rem !important;
+    }
+
+    .site-header .header-actions a i {
+        font-size: .88rem !important;
+    }
+
+    /* Dark stays outside the boxes */
+    .site-header .header-actions .theme-toggle {
+        padding: 4px 2px !important;
+    }
+}
+
