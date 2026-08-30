@@ -395,6 +395,64 @@
     <meta name="twitter:description" content="Cyber Recovery & Digital Investigation Portal">
     <meta name="twitter:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
 
+
+<style id="client-header-visibility-fix">
+.header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.header-actions > * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.header-actions .btn,
+.header-actions a,
+.header-actions button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.header-actions .logout,
+.header-actions .btn-logout,
+.header-actions a[href*="logout"],
+.header-actions a[onclick*="logout"],
+.header-actions button[onclick*="logout"] {
+    color: #ffffff !important;
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+    text-decoration: none !important;
+}
+
+.header-actions .logout *,
+.header-actions .btn-logout *,
+.header-actions a[href*="logout"] *,
+.header-actions a[onclick*="logout"] *,
+.header-actions button[onclick*="logout"] * {
+    color: #ffffff !important;
+}
+
+@media (max-width: 700px) {
+    .header-actions {
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .header-actions .btn,
+    .header-actions a,
+    .header-actions button {
+        min-height: 40px !important;
+    }
+}
+</style>
+
 </head>
 <body>
   <header class="site-header">
