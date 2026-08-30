@@ -139,3 +139,187 @@ body.admin-page-bg .site-header .brand .manlung-site-logo {
     flex-basis: 38px !important;
   }
 }
+
+/* =========================================================
+   GLOBAL HEADER — LIGHT / DARK MODE
+   Light mode: white header + black text
+   Dark mode: dark header + white text
+   ========================================================= */
+
+/* LIGHT MODE */
+:root {
+  --header-bg: #ffffff;
+  --header-text: #000000;
+  --header-border: #e5e7eb;
+  --header-muted: #333333;
+  --header-button-bg: #ffffff;
+  --header-button-text: #000000;
+  --header-button-border: #000000;
+}
+
+/* Main header */
+.site-header {
+  background: var(--header-bg) !important;
+  color: var(--header-text) !important;
+  border-bottom: 1px solid var(--header-border) !important;
+}
+
+/* Header container and branding */
+.site-header,
+.site-header .container,
+.site-header .brand,
+.site-header .manlung-brand,
+.site-header .manlung-brand-copy {
+  color: var(--header-text) !important;
+}
+
+/* Header title */
+.site-header h1,
+.site-header h2,
+.site-header h3,
+.site-header p,
+.site-header span {
+  color: var(--header-text) !important;
+}
+
+/* Header navigation links */
+.site-header a {
+  color: var(--header-text) !important;
+}
+
+/* Header buttons */
+.site-header button,
+.site-header .btn {
+  color: var(--header-button-text) !important;
+  background: var(--header-button-bg) !important;
+  border-color: var(--header-button-border) !important;
+}
+
+/* Header icons */
+.site-header i,
+.site-header svg {
+  color: var(--header-text) !important;
+  fill: currentColor;
+}
+
+/* =========================================================
+   DARK MODE
+   Works with the existing theme system.
+   Supports both common dark-theme attributes/classes.
+   ========================================================= */
+
+html[data-theme="dark"],
+body.dark,
+body.dark-mode,
+html.dark,
+html.dark-mode {
+  --header-bg: #111111;
+  --header-text: #ffffff;
+  --header-border: #333333;
+  --header-muted: #dddddd;
+  --header-button-bg: #111111;
+  --header-button-text: #ffffff;
+  --header-button-border: #ffffff;
+}
+
+/* If the existing theme uses data-theme on body */
+body[data-theme="dark"] {
+  --header-bg: #111111;
+  --header-text: #ffffff;
+  --header-border: #333333;
+  --header-muted: #dddddd;
+  --header-button-bg: #111111;
+  --header-button-text: #ffffff;
+  --header-button-border: #ffffff;
+}
+
+/* Dark header */
+html[data-theme="dark"] .site-header,
+body.dark .site-header,
+body.dark-mode .site-header,
+html.dark .site-header,
+html.dark-mode .site-header,
+body[data-theme="dark"] .site-header {
+  background: var(--header-bg) !important;
+  color: var(--header-text) !important;
+  border-bottom-color: var(--header-border) !important;
+}
+
+/* Dark header text */
+html[data-theme="dark"] .site-header h1,
+html[data-theme="dark"] .site-header h2,
+html[data-theme="dark"] .site-header h3,
+html[data-theme="dark"] .site-header p,
+html[data-theme="dark"] .site-header span,
+html[data-theme="dark"] .site-header a,
+html[data-theme="dark"] .site-header i,
+body.dark .site-header h1,
+body.dark .site-header h2,
+body.dark .site-header h3,
+body.dark .site-header p,
+body.dark .site-header span,
+body.dark .site-header a,
+body.dark .site-header i,
+body.dark-mode .site-header h1,
+body.dark-mode .site-header h2,
+body.dark-mode .site-header h3,
+body.dark-mode .site-header p,
+body.dark-mode .site-header span,
+body.dark-mode .site-header a,
+body.dark-mode .site-header i,
+html.dark .site-header h1,
+html.dark .site-header h2,
+html.dark .site-header h3,
+html.dark .site-header p,
+html.dark .site-header span,
+html.dark .site-header a,
+html.dark .site-header i,
+html.dark-mode .site-header h1,
+html.dark-mode .site-header h2,
+html.dark-mode .site-header h3,
+html.dark-mode .site-header p,
+html.dark-mode .site-header span,
+html.dark-mode .site-header a,
+html.dark-mode .site-header i,
+body[data-theme="dark"] .site-header h1,
+body[data-theme="dark"] .site-header h2,
+body[data-theme="dark"] .site-header h3,
+body[data-theme="dark"] .site-header p,
+body[data-theme="dark"] .site-header span,
+body[data-theme="dark"] .site-header a,
+body[data-theme="dark"] .site-header i {
+  color: #ffffff !important;
+}
+
+/* Dark header buttons */
+html[data-theme="dark"] .site-header button,
+html[data-theme="dark"] .site-header .btn,
+body.dark .site-header button,
+body.dark .site-header .btn,
+body.dark-mode .site-header button,
+body.dark-mode .site-header .btn,
+html.dark .site-header button,
+html.dark .site-header .btn,
+html.dark-mode .site-header button,
+html.dark-mode .site-header .btn,
+body[data-theme="dark"] .site-header button,
+body[data-theme="dark"] .site-header .btn {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+/* Keep the compact Admin logo size */
+.site-header .admin-portal-logo,
+.site-header .manlung-site-logo {
+  object-fit: contain !important;
+}
+
+/* Mobile header keeps the same theme colours */
+@media (max-width: 700px) {
+  .site-header {
+    background: var(--header-bg) !important;
+    color: var(--header-text) !important;
+  }
+}
+
