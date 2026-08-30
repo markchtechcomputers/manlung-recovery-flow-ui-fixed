@@ -409,6 +409,48 @@
 </style>
 
   <link rel="stylesheet" href="/css/theme.css">
+
+<style id="admin-portal-logo-size-fix">
+/* ADMIN PORTAL ONLY: compact header logo */
+.admin-portal-logo {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    flex: 0 0 42px !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Prevent the logo wrapper from stretching it */
+.site-header .brand {
+    min-height: 42px !important;
+    height: auto !important;
+}
+
+.site-header .brand > img.admin-portal-logo {
+    width: 42px !important;
+    height: 42px !important;
+}
+
+@media (max-width: 700px) {
+    .admin-portal-logo,
+    .site-header .brand > img.admin-portal-logo {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        flex-basis: 36px !important;
+    }
+}
+</style>
+
 </head>
 <body class="admin-page-bg">
     <header class="site-header">
