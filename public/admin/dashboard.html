@@ -469,7 +469,7 @@
                 </div>
             </div>
             <div class="header-actions">
-                <a href="/admin/owner.html" id="ownerLink" class="btn btn-outline" style="display:none;"><i class="fas fa-user-shield"></i> Admin Management</a>
+                <a href="/admin/owner.html" id="ownerLink" class="btn btn-outline owner-only" style="display:none !important;"><i class="fas fa-user-shield"></i> Admin Management</a>
                 <a class="btn btn-outline" href="/admin/reports.html"><i class="fas fa-chart-line"></i> Reports</a>
                 <button class="btn btn-outline" data-theme-toggle="true"><i class="fas fa-moon"></i></button>
                 <a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a>
@@ -634,8 +634,18 @@
 <script src="/js/call-webrtc.js"></script>
     <script>
         
-        let currentAdmin =
-            JSON.parse(localStorage.getItem('adminUser') || '{}');
+        let currentAdmin = (() => {
+            try {
+                const raw =
+                    sessionStorage.getItem('adminUser') ||
+                    localStorage.getItem('adminUser') ||
+                    '{}';
+                return JSON.parse(raw);
+            } catch (e) {
+                console.warn('Could not read admin session:', e);
+                return {};
+            }
+        })();
 
         const ownerManagementNav =
             document.getElementById('ownerManagementNav');
@@ -655,17 +665,24 @@
         }
 
         function applyOwnerVisibility(user) {
-            const isOwner = getAdminRole(user) === 'owner';
+            const role = getAdminRole(user);
+            const isOwner = role === 'owner';
 
-            if (ownerManagementNav) {
-                ownerManagementNav.style.display =
-                    isOwner ? 'inline-flex' : 'none';
-            }
+            console.log('[Manlung] Admin role:', role, 'Owner:', isOwner);
 
-            if (ownerLink) {
-                ownerLink.style.display =
-                    isOwner ? 'inline-flex' : 'none';
-            }
+            const ownerElements = document.querySelectorAll(
+                '#ownerLink, #ownerManagementNav, .owner-only'
+            );
+
+            ownerElements.forEach(el => {
+                el.style.setProperty(
+                    'display',
+                    isOwner ? 'inline-flex' : 'none',
+                    'important'
+                );
+
+                el.setAttribute('aria-hidden', isOwner ? 'false' : 'true');
+            });
         }
 
         applyOwnerVisibility(currentAdmin);
@@ -710,10 +727,10 @@
                 ...verifiedUser
             };
 
-            localStorage.setItem(
-                'adminUser',
-                JSON.stringify(currentAdmin)
-            );
+            const adminJson = JSON.stringify(currentAdmin);
+
+            sessionStorage.setItem('adminUser', adminJson);
+            localStorage.setItem('adminUser', adminJson);
 
             applyOwnerVisibility(currentAdmin);
         })
