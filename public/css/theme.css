@@ -1550,3 +1550,67 @@ body.dark-mode .site-header {
         0 3px 12px rgba(15,47,104,.55) !important;
 }
 
+
+/* =========================================================
+   ADMIN LOGOUT — BLACK TEXT
+   ========================================================= */
+
+/* Logout links/buttons */
+.admin-header a[href*="logout"],
+.admin-header button[id*="logout"],
+.site-header a[href*="logout"],
+.site-header button[id*="logout"],
+a.logout,
+button.logout,
+#logout,
+#logoutBtn,
+#logoutButton {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Logout text inside the element */
+.admin-header a[href*="logout"] *,
+.admin-header button[id*="logout"] *,
+.site-header a[href*="logout"] *,
+.site-header button[id*="logout"] *,
+a.logout *,
+button.logout *,
+#logout *,
+#logoutBtn *,
+#logoutButton * {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Logout icon */
+.admin-header a[href*="logout"] i,
+.admin-header button[id*="logout"] i,
+.site-header a[href*="logout"] i,
+.site-header button[id*="logout"] i,
+a.logout i,
+button.logout i,
+#logout i,
+#logoutBtn i,
+#logoutButton i {
+    color: #000000 !important;
+}
+
+/* Hover */
+.admin-header a[href*="logout"]:hover,
+.admin-header button[id*="logout"]:hover,
+.site-header a[href*="logout"]:hover,
+.site-header button[id*="logout"]:hover,
+a.logout:hover,
+button.logout:hover,
+#logout:hover,
+#logoutBtn:hover,
+#logoutButton:hover {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
