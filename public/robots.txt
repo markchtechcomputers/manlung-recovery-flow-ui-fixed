@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /client/
+Disallow: /login.html
+Disallow: /reset-password.html
+Disallow: /oauth-callback.html
+
+Sitemap: https://manlungrecovery.manlungshop.co.ke/sitemap.xml

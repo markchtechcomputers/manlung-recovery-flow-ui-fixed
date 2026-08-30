@@ -1,0 +1,1083 @@
+/*
+============================================================
+MANLUNG RECOVERY
+FINAL RESPONSIVE HEADER
+============================================================
+
+DESKTOP / LAPTOP
+----------------
+The mobile hamburger and mobile navigation are COMPLETELY
+hidden.
+
+MOBILE
+------
+The header contains:
+    Logo / Manlung Recovery       ☰
+
+Clicking ☰ opens:
+    Navigation
+                         ×
+    Home
+    About
+    Services
+    Knowledge Centre
+    Careers
+    Contact
+
+    Client Portal
+    Recovery Request
+
+    Sign In
+
+The X button closes it.
+
+============================================================
+*/
+
+
+/* ==========================================================
+   ABSOLUTE DESKTOP DEFAULT
+   ========================================================== */
+
+/*
+   IMPORTANT:
+   These MUST be hidden outside the media query.
+
+   This is what prevents:
+
+       Navigation ×
+
+   from appearing on laptops/desktops.
+*/
+
+.mobile-menu-toggle,
+.mobile-nav {
+    display: none !important;
+}
+
+
+/* ==========================================================
+   MOBILE ONLY
+   ========================================================== */
+
+@media screen and (max-width: 767px) {
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+
+    /* ------------------------------------------------------
+       HEADER
+       ------------------------------------------------------ */
+
+    .site-header {
+        position: relative !important;
+        width: 100% !important;
+
+        background:
+            linear-gradient(
+                135deg,
+                #000000,
+                #000000
+            ) !important;
+
+        border-bottom:
+            1px solid rgba(125,177,255,.25) !important;
+
+        z-index: 99999 !important;
+
+        box-shadow:
+            0 4px 18px rgba(2,6,23,.25) !important;
+    }
+
+
+    /* ------------------------------------------------------
+       HEADER INNER
+       ------------------------------------------------------ */
+
+    .site-header .manlung-header-inner {
+        width: 100% !important;
+
+        min-height: 68px !important;
+
+        display: flex !important;
+
+        flex-direction: row !important;
+
+        align-items: center !important;
+
+        justify-content: space-between !important;
+
+        gap: 10px !important;
+
+        padding:
+            9px 13px !important;
+
+        margin: 0 !important;
+
+        box-sizing: border-box !important;
+
+        position: relative !important;
+    }
+
+
+    /* ------------------------------------------------------
+       BRAND
+       ------------------------------------------------------ */
+
+    .site-header .brand {
+        display: flex !important;
+
+        align-items: center !important;
+
+        flex: 1 1 auto !important;
+
+        width: auto !important;
+
+        min-width: 0 !important;
+
+        max-width:
+            calc(100% - 56px) !important;
+
+        margin: 0 !important;
+
+        padding: 0 !important;
+
+        justify-content: flex-start !important;
+
+        text-align: left !important;
+
+        gap: 9px !important;
+    }
+
+
+    /* ------------------------------------------------------
+       LOGO
+       ------------------------------------------------------ */
+
+    .site-header .manlung-home-logo {
+        display: flex !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        flex: 0 0 40px !important;
+
+        width: 40px !important;
+        height: 40px !important;
+
+        min-width: 40px !important;
+        min-height: 40px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        overflow: hidden !important;
+
+        text-decoration: none !important;
+    }
+
+    .site-header .manlung-home-logo img,
+    .site-header .manlung-site-logo {
+        display: block !important;
+
+        width: 40px !important;
+        height: 40px !important;
+
+        min-width: 40px !important;
+        min-height: 40px !important;
+
+        object-fit: cover !important;
+
+        border-radius: 10px !important;
+
+        background: #ffffff !important;
+    }
+
+
+    /* ------------------------------------------------------
+       BRAND TEXT
+       ------------------------------------------------------ */
+
+    .site-header .manlung-brand-copy {
+        display: block !important;
+
+        min-width: 0 !important;
+
+        flex: 1 1 auto !important;
+
+        overflow: hidden !important;
+    }
+
+
+    .site-header .brand h1 {
+        display: block !important;
+
+        width: 100% !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        color: #ffffff !important;
+
+        font-size:
+            .93rem !important;
+
+        line-height:
+            1.15 !important;
+
+        font-weight:
+            850 !important;
+
+        white-space:
+            nowrap !important;
+
+        overflow:
+            hidden !important;
+
+        text-overflow:
+            ellipsis !important;
+    }
+
+
+    .site-header .brand h1 i {
+        display: inline-block !important;
+
+        color: #7db1ff !important;
+
+        margin-right: 5px !important;
+    }
+
+
+    .site-header .brand span {
+        display: block !important;
+
+        width: 100% !important;
+
+        margin:
+            3px 0 0 !important;
+
+        padding: 0 !important;
+
+        color:
+            #aac1e8 !important;
+
+        font-size:
+            .58rem !important;
+
+        line-height:
+            1.2 !important;
+
+        white-space:
+            nowrap !important;
+
+        overflow:
+            hidden !important;
+
+        text-overflow:
+            ellipsis !important;
+    }
+
+
+    /* ------------------------------------------------------
+       HIDE DESKTOP BUTTONS ON PHONE
+       ------------------------------------------------------ */
+
+    .site-header .header-actions {
+        display: none !important;
+    }
+
+
+    /* ------------------------------------------------------
+       HAMBURGER
+       ------------------------------------------------------ */
+
+    .site-header .mobile-menu-toggle {
+        display: flex !important;
+
+        align-items: center !important;
+
+        justify-content: center !important;
+
+        flex:
+            0 0 44px !important;
+
+        width:
+            44px !important;
+
+        height:
+            44px !important;
+
+        min-width:
+            44px !important;
+
+        min-height:
+            44px !important;
+
+        margin:
+            0 0 0 auto !important;
+
+        padding:
+            0 !important;
+
+        position:
+            relative !important;
+
+        border:
+            1px solid rgba(255,255,255,.28) !important;
+
+        border-radius:
+            11px !important;
+
+        background:
+            rgba(255,255,255,.08) !important;
+
+        color:
+            #ffffff !important;
+
+        cursor:
+            pointer !important;
+
+        z-index:
+            100002 !important;
+
+        touch-action:
+            manipulation !important;
+
+        -webkit-tap-highlight-color:
+            transparent !important;
+
+        box-sizing:
+            border-box !important;
+    }
+
+
+    .site-header .mobile-menu-toggle:hover {
+        background:
+            rgba(255,255,255,.15) !important;
+    }
+
+
+    .site-header .mobile-menu-toggle:active {
+        transform:
+            scale(.95) !important;
+    }
+
+
+    .site-header .mobile-menu-toggle i {
+        display: block !important;
+
+        pointer-events: none !important;
+
+        font-size:
+            1.05rem !important;
+    }
+
+
+    /* ------------------------------------------------------
+       MOBILE NAVIGATION
+       ------------------------------------------------------ */
+
+    .site-header .mobile-nav {
+        display: none !important;
+
+        position: absolute !important;
+
+        top:
+            calc(100% + 8px) !important;
+
+        left:
+            10px !important;
+
+        right:
+            10px !important;
+
+        width:
+            auto !important;
+
+        max-width:
+            none !important;
+
+        max-height:
+            calc(100dvh - 85px) !important;
+
+        margin:
+            0 !important;
+
+        padding:
+            0 !important;
+
+        overflow-y:
+            auto !important;
+
+        overflow-x:
+            hidden !important;
+
+        background:
+            #ffffff !important;
+
+        color:
+            #172033 !important;
+
+        border:
+            1px solid #dce3ec !important;
+
+        border-radius:
+            16px !important;
+
+        box-shadow:
+            0 20px 50px rgba(2,6,23,.32) !important;
+
+        z-index:
+            100001 !important;
+
+        box-sizing:
+            border-box !important;
+
+        -webkit-overflow-scrolling:
+            touch !important;
+    }
+
+
+    /* OPEN STATE */
+
+    .site-header .mobile-nav.is-open {
+        display: block !important;
+    }
+
+
+    /* ------------------------------------------------------
+       NAV PANEL
+       ------------------------------------------------------ */
+
+    .site-header .mobile-nav-panel {
+        display: block !important;
+
+        width:
+            100% !important;
+
+        padding:
+            9px !important;
+
+        box-sizing:
+            border-box !important;
+    }
+
+
+    /* ------------------------------------------------------
+       NAVIGATION TITLE
+       ------------------------------------------------------ */
+
+    .site-header .mobile-nav-title {
+        display: flex !important;
+
+        align-items: center !important;
+
+        justify-content: space-between !important;
+
+        width:
+            100% !important;
+
+        min-height:
+            43px !important;
+
+        padding:
+            3px 5px 7px !important;
+
+        color:
+            #64748b !important;
+
+        font-size:
+            .69rem !important;
+
+        font-weight:
+            850 !important;
+
+        text-transform:
+            uppercase !important;
+
+        letter-spacing:
+            .08em !important;
+
+        box-sizing:
+            border-box !important;
+    }
+
+
+    /* ------------------------------------------------------
+       CLOSE X
+       ------------------------------------------------------ */
+
+    .site-header .mobile-menu-close {
+        display: flex !important;
+
+        align-items: center !important;
+
+        justify-content: center !important;
+
+        flex:
+            0 0 38px !important;
+
+        width:
+            38px !important;
+
+        height:
+            38px !important;
+
+        min-width:
+            38px !important;
+
+        min-height:
+            38px !important;
+
+        margin:
+            0 !important;
+
+        padding:
+            0 !important;
+
+        border:
+            0 !important;
+
+        border-radius:
+            9px !important;
+
+        background:
+            #eef2f7 !important;
+
+        color:
+            #1e293b !important;
+
+        font-size:
+            1.45rem !important;
+
+        font-weight:
+            500 !important;
+
+        line-height:
+            1 !important;
+
+        cursor:
+            pointer !important;
+
+        touch-action:
+            manipulation !important;
+
+        -webkit-tap-highlight-color:
+            transparent !important;
+
+        z-index:
+            100003 !important;
+    }
+
+
+    .site-header .mobile-menu-close:hover {
+        background:
+            #e2e8f0 !important;
+    }
+
+
+    .site-header .mobile-menu-close:active {
+        transform:
+            scale(.94) !important;
+    }
+
+
+    /* ------------------------------------------------------
+       NAV LINKS
+       ------------------------------------------------------ */
+
+    .site-header .mobile-nav a {
+        display: flex !important;
+
+        align-items: center !important;
+
+        width:
+            100% !important;
+
+        min-height:
+            46px !important;
+
+        margin:
+            2px 0 !important;
+
+        padding:
+            10px 11px !important;
+
+        box-sizing:
+            border-box !important;
+
+        border:
+            0 !important;
+
+        border-radius:
+            10px !important;
+
+        background:
+            transparent !important;
+
+        color:
+            #1e293b !important;
+
+        text-decoration:
+            none !important;
+
+        font-size:
+            .84rem !important;
+
+        font-weight:
+            700 !important;
+
+        line-height:
+            1.2 !important;
+
+        cursor:
+            pointer !important;
+
+        touch-action:
+            manipulation !important;
+    }
+
+
+    .site-header .mobile-nav a:hover {
+        background:
+            #f1f5f9 !important;
+    }
+
+
+    .site-header .mobile-nav a:active {
+        background:
+            #e2e8f0 !important;
+    }
+
+
+    .site-header .mobile-nav a i {
+        display:
+            inline-block !important;
+
+        width:
+            20px !important;
+
+        margin-right:
+            9px !important;
+
+        color:
+            #2451d6 !important;
+
+        text-align:
+            center !important;
+
+        pointer-events:
+            none !important;
+    }
+
+
+    /* ------------------------------------------------------
+       DIVIDERS
+       ------------------------------------------------------ */
+
+    .site-header .mobile-nav-divider {
+        display:
+            block !important;
+
+        width:
+            calc(100% - 8px) !important;
+
+        height:
+            1px !important;
+
+        margin:
+            7px 4px !important;
+
+        background:
+            #e2e8f0 !important;
+    }
+
+
+    /* ------------------------------------------------------
+       IMPORTANT ACTIONS
+       ------------------------------------------------------ */
+
+    .site-header .mobile-nav a.mobile-nav-action {
+        background:
+            #f8fafc !important;
+
+        color:
+            #0f172a !important;
+
+        font-weight:
+            800 !important;
+    }
+
+
+    .site-header .mobile-nav a.mobile-nav-action:hover {
+        background:
+            #eef2ff !important;
+    }
+
+
+    /* ------------------------------------------------------
+       BODY LOCK
+       ------------------------------------------------------ */
+
+    body.mobile-menu-open,
+    body.manlung-mobile-menu-open {
+        overflow:
+            hidden !important;
+    }
+}
+
+
+/* ==========================================================
+   SMALL PHONES
+   ========================================================== */
+
+@media screen and (max-width: 390px) {
+
+    .site-header .manlung-home-logo,
+    .site-header .manlung-home-logo img,
+    .site-header .manlung-site-logo {
+        width:
+            37px !important;
+
+        height:
+            37px !important;
+
+        min-width:
+            37px !important;
+
+        min-height:
+            37px !important;
+    }
+
+
+    .site-header .mobile-menu-toggle {
+        width:
+            42px !important;
+
+        height:
+            42px !important;
+
+        min-width:
+            42px !important;
+
+        min-height:
+            42px !important;
+
+        flex-basis:
+            42px !important;
+    }
+
+
+    .site-header .brand h1 {
+        font-size:
+            .87rem !important;
+    }
+
+
+    .site-header .brand span {
+        font-size:
+            .54rem !important;
+    }
+}
+
+
+/* ==========================================================
+   LAPTOP / DESKTOP SAFETY
+   ========================================================== */
+
+@media screen and (min-width: 768px) {
+
+    .site-header .mobile-menu-toggle,
+    .site-header .mobile-nav {
+        display:
+            none !important;
+
+        visibility:
+            hidden !important;
+
+        pointer-events:
+            none !important;
+    }
+}
+
+
+/* Mobile follows the same light-by-default theme as desktop. */
+@media screen and (max-width: 767px) {
+  body.dark .site-header {
+    background: linear-gradient(135deg, #000000, #000000) !important;
+    border-bottom-color: rgba(125,177,255,.25) !important;
+  }
+  body.dark .site-header .brand h1,
+  body.dark .site-header .mobile-menu-toggle {
+    color: #ffffff !important;
+  }
+  body.dark .site-header .brand span {
+    color: #a9c0ec !important;
+  }
+  body.dark .site-header .mobile-menu-toggle {
+    background: rgba(255,255,255,.04) !important;
+    border-color: rgba(255,255,255,.2) !important;
+  }
+}
+
+/* =========================================================
+   FINAL MOBILE HEADER — BLACK / LIGHT WHITE
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  /* Strong black header */
+  .site-header {
+    background: #000000 !important;
+    border-bottom: 2px solid #000000 !important;
+    box-shadow: 0 3px 12px rgba(0,0,0,.28) !important;
+  }
+
+  /* Header title */
+  .site-header .brand h1 {
+    color: #ffffff !important;
+  }
+
+  /* Brand icon */
+  .site-header .brand h1 i {
+    color: #ffffff !important;
+  }
+
+  /* Subtitle — softer white */
+  .site-header .brand span {
+    color: #d6d6d6 !important;
+  }
+
+  /* Hamburger */
+  .site-header .mobile-menu-toggle {
+    color: #ffffff !important;
+    background: #000000 !important;
+    border: 1px solid #ffffff !important;
+  }
+
+  .site-header .mobile-menu-toggle:hover {
+    background: #181818 !important;
+  }
+
+  .site-header .mobile-menu-toggle i {
+    color: #ffffff !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media screen and (max-width: 390px) {
+
+  .site-header {
+    background: #000000 !important;
+    border-bottom: 2px solid #000000 !important;
+  }
+
+  .site-header .brand h1 {
+    color: #ffffff !important;
+  }
+
+  .site-header .brand span {
+    color: #d6d6d6 !important;
+  }
+
+  .site-header .mobile-menu-toggle {
+    color: #ffffff !important;
+    background: #000000 !important;
+    border-color: #ffffff !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL OVERRIDE — MOBILE HEADER BLACK & WHITE
+   Must be LAST so it overrides style.css/theme.css
+   ========================================================= */
+
+@media screen and (max-width: 767px) {
+
+  html body .site-header,
+  body:not(.dark) .site-header,
+  body.dark .site-header {
+    background: #000000 !important;
+    background-image: none !important;
+    border-bottom: 2px solid #000000 !important;
+    box-shadow: 0 3px 12px rgba(0,0,0,.35) !important;
+  }
+
+  html body .site-header .brand h1,
+  html body .site-header .brand h1 i {
+    color: #ffffff !important;
+  }
+
+  html body .site-header .brand span {
+    color: #d6d6d6 !important;
+  }
+
+  html body .site-header .mobile-menu-toggle {
+    display: flex !important;
+    color: #ffffff !important;
+    background: #000000 !important;
+    background-image: none !important;
+    border: 1px solid #ffffff !important;
+  }
+
+  html body .site-header .mobile-menu-toggle i,
+  html body .site-header .mobile-menu-toggle svg {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
+  }
+
+  html body .site-header .mobile-menu-toggle:hover {
+    background: #181818 !important;
+  }
+}
+
+@media screen and (max-width: 390px) {
+
+  html body .site-header {
+    background: #000000 !important;
+    background-image: none !important;
+  }
+
+  html body .site-header .brand h1 {
+    color: #ffffff !important;
+  }
+
+  html body .site-header .brand span {
+    color: #d6d6d6 !important;
+  }
+
+  html body .site-header .mobile-menu-toggle {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL HEADER OVERRIDE — BLACK + WHITE
+   ALL DEVICES — DESKTOP + MOBILE
+   ========================================================= */
+
+.site-header,
+html .site-header,
+body .site-header,
+body:not(.dark) .site-header,
+body.dark .site-header {
+  background: #000000 !important;
+  background-image: none !important;
+  border-bottom: 2px solid #000000 !important;
+  box-shadow: 0 4px 18px rgba(0,0,0,.35) !important;
+}
+
+/* MANLUNG RECOVERY TITLE */
+.site-header .brand h1,
+.site-header .brand h1 i,
+.site-header .brand h1 strong {
+  color: #ffffff !important;
+}
+
+/* SUBTITLE */
+.site-header .brand span {
+  color: #d6d6d6 !important;
+}
+
+/* HEADER BUTTONS */
+.site-header .header-actions a,
+.site-header .header-actions button,
+.site-header .header-actions .btn,
+.site-header .manlung-account-section a,
+.site-header .manlung-account-section button {
+  color: #ffffff !important;
+  background: #000000 !important;
+  background-image: none !important;
+  border-color: #ffffff !important;
+}
+
+/* BUTTON ICONS */
+.site-header .header-actions i,
+.site-header .header-actions svg,
+.site-header .header-actions [data-lucide],
+.site-header .manlung-account-section i,
+.site-header .manlung-account-section svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* NEW REQUEST BUTTON */
+.site-header .header-actions a[href="/client/request.html"],
+.site-header .header-actions .btn-primary {
+  color: #ffffff !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+}
+
+/* HOVER */
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover,
+.site-header .header-actions .btn:hover {
+  color: #ffffff !important;
+  background: #181818 !important;
+  border-color: #ffffff !important;
+}
+
+/* THEME BUTTON */
+.site-header .manlung-theme-toggle,
+.site-header button[data-theme-toggle="true"] {
+  color: #ffffff !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+}
+
+/* HAMBURGER */
+.site-header .mobile-menu-toggle {
+  color: #ffffff !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+}
+
+.site-header .mobile-menu-toggle i,
+.site-header .mobile-menu-toggle svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+
+
+
+/* Coordinated header/mobile navigation final rules. */
+.site-header { position: relative; z-index: 20; }
+.site-header .manlung-header-inner { position: relative; }
+.site-header .mobile-menu-toggle { cursor: pointer; }
+.site-header .mobile-nav { z-index: 30; }
+@media (max-width: 740px) {
+  .site-header .manlung-header-inner {
+    display:flex; align-items:center; gap:.75rem;
+    width:100%; box-sizing:border-box;
+  }
+  .site-header .brand { min-width:0; flex:1 1 auto; }
+  .site-header .header-actions { display:none; }
+  .site-header .mobile-menu-toggle {
+    display:inline-flex; margin-left:auto; position:relative;
+    background:var(--surface, #fff); color:inherit;
+    border:1px solid rgba(37,99,235,.35); border-radius:10px;
+  }
+  .site-header .mobile-menu-toggle i,
+  .site-header .mobile-menu-toggle svg { display:block; visibility:visible; opacity:1; }
+  nav.mobile-nav { pointer-events:none; }
+  nav.mobile-nav.is-open, nav.mobile-nav.open { pointer-events:auto; }
+  nav.mobile-nav a, nav.mobile-nav button { pointer-events:auto; }
+}
