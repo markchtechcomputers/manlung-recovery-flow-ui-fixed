@@ -1174,3 +1174,172 @@ html.dark .site-header .brand-subtitle {
     }
 }
 
+
+/* =========================================================
+   MANLUNG RECOVERY — MOBILE HEADER COMPACT FIX
+   Mobile only: 3 clean compact sections
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    /* Floating white header */
+    .site-header {
+        width: calc(100% - 12px) !important;
+        margin: 6px auto 0 !important;
+        top: 6px !important;
+
+        background: #ffffff !important;
+        border-radius: 12px !important;
+
+        padding: 8px 9px !important;
+
+        overflow: visible !important;
+    }
+
+    /* Header main row */
+    .site-header .header-inner,
+    .site-header .header-container,
+    .site-header .container {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    /* Keep brand compact */
+    .site-header .site-brand,
+    .site-header .header-brand,
+    .site-header .brand,
+    .site-header .logo-area {
+        min-width: 0 !important;
+        flex-shrink: 1 !important;
+    }
+
+    /* Make the navigation a clean horizontal row */
+    .site-header .header-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+
+        gap: 5px !important;
+
+        flex-wrap: nowrap !important;
+        white-space: nowrap !important;
+
+        min-width: 0 !important;
+    }
+
+    /* Compact rectangular buttons */
+    .site-header .header-actions a {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        flex: 0 1 auto !important;
+
+        min-width: 0 !important;
+        width: auto !important;
+
+        padding: 6px 7px !important;
+
+        border-radius: 7px !important;
+
+        font-size: 0 !important;
+
+        line-height: 1 !important;
+
+        white-space: nowrap !important;
+    }
+
+    /* Keep icons visible */
+    .site-header .header-actions a i {
+        display: inline-block !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        font-size: 15px !important;
+
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Hide long menu text on phones */
+    .site-header .header-actions a span {
+        display: none !important;
+    }
+
+    /* Theme control stays outside rectangles */
+    .site-header .header-actions .theme-toggle,
+    .site-header .header-actions button.theme-toggle {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        flex: 0 0 auto !important;
+
+        padding: 5px !important;
+
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+
+        font-size: 0 !important;
+    }
+
+    .site-header .header-actions .theme-toggle i,
+    .site-header .header-actions button.theme-toggle i {
+        font-size: 16px !important;
+    }
+
+    /* Hide the "Dark" text on small phones */
+    .site-header .header-actions .theme-toggle::after {
+        display: none !important;
+    }
+
+    /* Brand title */
+    .site-header .brand-name,
+    .site-header .site-title,
+    .site-header strong {
+        font-size: .9rem !important;
+        line-height: 1.1 !important;
+    }
+
+    /* Brand subtitle */
+    .site-header .tagline,
+    .site-header .subtitle,
+    .site-header .site-description,
+    .site-header p {
+        font-size: .62rem !important;
+        line-height: 1.1 !important;
+    }
+
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 390px) {
+
+    .site-header {
+        padding: 7px 6px !important;
+    }
+
+    .site-header .header-actions {
+        gap: 3px !important;
+    }
+
+    .site-header .header-actions a {
+        padding: 5px 6px !important;
+    }
+
+    .site-header .header-actions a i {
+        font-size: 14px !important;
+    }
+
+    .site-header .header-actions .theme-toggle i {
+        font-size: 15px !important;
+    }
+
+}
+
