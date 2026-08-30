@@ -1,0 +1,619 @@
+/* =========================================================
+   MANLUNG RECOVERY — PROFESSIONAL SITE FOOTER
+   Black footer / white typography
+   Consistent in LIGHT and DARK themes
+   Responsive desktop / tablet / mobile
+   ========================================================= */
+
+.manlung-footer {
+  width: 100%;
+  margin: 3rem 0 0;
+  padding: 3.25rem 1.25rem 1.25rem;
+  box-sizing: border-box;
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-top: 1px solid #262626;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.manlung-footer *,
+.manlung-footer *::before,
+.manlung-footer *::after {
+  box-sizing: border-box;
+}
+
+.manlung-footer-inner {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+}
+
+.manlung-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.25fr;
+  gap: 2.75rem;
+  align-items: start;
+}
+
+/* Brand */
+
+.manlung-footer-brand {
+  min-width: 0;
+}
+
+.manlung-footer-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.manlung-footer-logo {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.manlung-footer-brand h2 {
+  margin: 0 0 0.3rem;
+  color: #ffffff !important;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.manlung-footer-brand-subtitle {
+  margin: 0;
+  color: #d4d4d4 !important;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.manlung-footer-description {
+  max-width: 440px;
+  margin: 1.1rem 0 0;
+  color: #e5e5e5 !important;
+  font-size: 0.84rem;
+  line-height: 1.75;
+}
+
+/* Columns */
+
+.manlung-footer-column {
+  min-width: 0;
+}
+
+.manlung-footer-column h3 {
+  margin: 0 0 1rem;
+  color: #ffffff !important;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.manlung-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.manlung-footer-links a {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.38rem 0;
+  color: #dddddd !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.manlung-footer-links a:hover {
+  color: #ffffff !important;
+  background: transparent !important;
+  transform: translateX(3px);
+}
+
+.manlung-footer-links a:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.manlung-footer-links .footer-important {
+  color: #ffffff !important;
+  font-weight: 650;
+}
+
+/* Trust / security information */
+
+.manlung-footer-trust {
+  margin: 0 0 0.8rem;
+  padding: 0;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.manlung-footer-trust p {
+  margin: 0;
+  color: #d5d5d5 !important;
+  font-size: 0.74rem;
+  line-height: 1.65;
+}
+
+.manlung-footer-security-links {
+  margin-top: 0.7rem;
+}
+
+/* Divider */
+
+.manlung-footer-divider {
+  width: 100%;
+  height: 1px;
+  margin: 2.4rem 0 1.35rem;
+  background: #2a2a2a !important;
+}
+
+/* Contact */
+
+.manlung-footer-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.manlung-footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  color: #dddddd !important;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.manlung-footer-contact a {
+  color: #ffffff !important;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.manlung-footer-contact a:hover {
+  color: #d4d4d4 !important;
+  text-decoration: underline;
+}
+
+.manlung-footer-contact i {
+  margin-right: 0.35rem;
+  color: #ffffff !important;
+}
+
+/* Social media
+   IMPORTANT: no circles, no black dots, no button backgrounds */
+
+.manlung-footer-social {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.15rem;
+  flex-wrap: wrap;
+}
+
+.manlung-footer-social-label {
+  margin-right: 0.15rem;
+  color: #bdbdbd !important;
+  font-size: 0.74rem;
+}
+
+.manlung-footer-social a,
+.manlung-footer-social button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.38rem;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: #ffffff !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.manlung-footer-social a:hover,
+.manlung-footer-social button:hover {
+  color: #d4d4d4 !important;
+  background: transparent !important;
+  border: 0 !important;
+  transform: translateY(-1px);
+}
+
+.manlung-footer-social a:focus-visible,
+.manlung-footer-social button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+.manlung-footer-social i,
+.manlung-footer-social svg {
+  width: 20px;
+  height: 20px;
+  color: #ffffff !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.manlung-footer-social span:not(.manlung-footer-social-label) {
+  color: #ffffff !important;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+/* Bottom */
+
+.manlung-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  color: #bdbdbd !important;
+  font-size: 0.7rem;
+  line-height: 1.6;
+}
+
+.manlung-footer-bottom span {
+  color: #bdbdbd !important;
+}
+
+.manlung-footer-bottom strong {
+  color: #ffffff !important;
+}
+
+.manlung-footer-legal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.manlung-footer-bottom a {
+  color: #d7d7d7 !important;
+  text-decoration: none;
+}
+
+.manlung-footer-bottom a:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
+}
+
+/* =========================================================
+   HARD THEME OVERRIDE
+   Footer remains BLACK in both light and dark mode.
+   ========================================================= */
+
+html[data-theme="light"] .manlung-footer,
+html[data-theme="dark"] .manlung-footer,
+html.light .manlung-footer,
+html.dark .manlung-footer,
+body.light .manlung-footer,
+body.light-mode .manlung-footer,
+body.dark .manlung-footer,
+body.dark-mode .manlung-footer {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-top-color: #262626 !important;
+}
+
+html[data-theme="light"] .manlung-footer *,
+html[data-theme="dark"] .manlung-footer *,
+html.light .manlung-footer *,
+html.dark .manlung-footer *,
+body.light .manlung-footer *,
+body.light-mode .manlung-footer *,
+body.dark .manlung-footer *,
+body.dark-mode .manlung-footer * {
+  color: inherit;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 950px) {
+  .manlung-footer {
+    padding: 2.75rem 1rem 1.1rem;
+  }
+
+  .manlung-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.25rem 1.75rem;
+  }
+
+  .manlung-footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .manlung-footer-description {
+    max-width: 720px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .manlung-footer {
+    margin-top: 2rem;
+    padding: 2.25rem 0.85rem 1rem;
+  }
+
+  .manlung-footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.8rem 1rem;
+  }
+
+  .manlung-footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .manlung-footer-brand-row {
+    align-items: flex-start;
+  }
+
+  .manlung-footer-logo {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+
+  .manlung-footer-brand h2 {
+    font-size: 1.05rem;
+  }
+
+  .manlung-footer-brand-subtitle {
+    font-size: 0.69rem;
+  }
+
+  .manlung-footer-description {
+    margin-top: 0.85rem;
+    font-size: 0.76rem;
+    line-height: 1.65;
+  }
+
+  .manlung-footer-column h3 {
+    margin-bottom: 0.7rem;
+    font-size: 0.76rem;
+  }
+
+  .manlung-footer-links a {
+    padding: 0.3rem 0;
+    font-size: 0.72rem;
+  }
+
+  .manlung-footer-trust p {
+    font-size: 0.68rem;
+    line-height: 1.6;
+  }
+
+  .manlung-footer-divider {
+    margin: 1.75rem 0 1.15rem;
+  }
+
+  .manlung-footer-contact-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .manlung-footer-social {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+
+  .manlung-footer-social-label {
+    width: 100%;
+    margin: 0;
+  }
+
+  .manlung-footer-social span:not(.manlung-footer-social-label) {
+    font-size: 0.7rem;
+  }
+
+  .manlung-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+    font-size: 0.66rem;
+  }
+
+  .manlung-footer-legal {
+    gap: 0.8rem;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .manlung-footer {
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+  }
+
+  .manlung-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.35rem;
+  }
+
+  .manlung-footer-brand {
+    grid-column: auto;
+  }
+
+  .manlung-footer-social {
+    gap: 0.8rem;
+  }
+}
+
+/* Prevent footer from causing horizontal scrolling */
+
+.manlung-footer img,
+.manlung-footer svg,
+.manlung-footer iframe {
+  max-width: 100%;
+}
+
+.manlung-footer a,
+.manlung-footer p,
+.manlung-footer h2,
+.manlung-footer h3,
+.manlung-footer span {
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   FINAL FOOTER CONTRAST FIX
+   Footer is ALWAYS black with white readable text.
+   Overrides site/theme/global color rules.
+   ========================================================= */
+
+.manlung-footer,
+.manlung-footer * {
+  color: #ffffff !important;
+}
+
+.manlung-footer {
+  background: #000000 !important;
+}
+
+/* Brand */
+.manlung-footer .manlung-footer-brand h2,
+.manlung-footer .manlung-footer-brand-subtitle,
+.manlung-footer .manlung-footer-description {
+  color: #ffffff !important;
+}
+
+/* Section headings */
+.manlung-footer .manlung-footer-column h3,
+.manlung-footer .manlung-footer-column h4 {
+  color: #ffffff !important;
+}
+
+/* All navigation links */
+.manlung-footer .manlung-footer-links a,
+.manlung-footer .manlung-footer-links a *,
+.manlung-footer .footer-important {
+  color: #ffffff !important;
+  background: transparent !important;
+}
+
+/* Trust/security text */
+.manlung-footer .manlung-footer-trust,
+.manlung-footer .manlung-footer-trust *,
+.manlung-footer .manlung-footer-trust p {
+  color: #ffffff !important;
+}
+
+/* Contact information */
+.manlung-footer .manlung-footer-contact,
+.manlung-footer .manlung-footer-contact *,
+.manlung-footer .manlung-footer-contact a,
+.manlung-footer .manlung-footer-contact i {
+  color: #ffffff !important;
+}
+
+/* Social media */
+.manlung-footer .manlung-footer-social,
+.manlung-footer .manlung-footer-social *,
+.manlung-footer .manlung-footer-social a,
+.manlung-footer .manlung-footer-social a *,
+.manlung-footer .manlung-footer-social i,
+.manlung-footer .manlung-footer-social svg,
+.manlung-footer .manlung-footer-social svg * {
+  color: #ffffff !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Bottom copyright/legal */
+.manlung-footer .manlung-footer-bottom,
+.manlung-footer .manlung-footer-bottom *,
+.manlung-footer .manlung-footer-bottom a,
+.manlung-footer .manlung-footer-bottom strong {
+  color: #ffffff !important;
+}
+
+/* Divider remains subtle */
+.manlung-footer .manlung-footer-divider {
+  background: #333333 !important;
+}
+
+/* Hover remains white */
+.manlung-footer a:hover,
+.manlung-footer a:hover *,
+.manlung-footer button:hover,
+.manlung-footer button:hover * {
+  color: #ffffff !important;
+}
+
+/* Keyboard accessibility */
+.manlung-footer a:focus-visible,
+.manlung-footer button:focus-visible {
+  outline-color: #ffffff !important;
+}
+
+/* Never allow theme classes to recolor the footer */
+html[data-theme="light"] .manlung-footer,
+html[data-theme="dark"] .manlung-footer,
+html.light .manlung-footer,
+html.dark .manlung-footer,
+body.light .manlung-footer,
+body.light-mode .manlung-footer,
+body.dark .manlung-footer,
+body.dark-mode .manlung-footer {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] .manlung-footer *,
+html[data-theme="dark"] .manlung-footer *,
+html.light .manlung-footer *,
+html.dark .manlung-footer *,
+body.light .manlung-footer *,
+body.light-mode .manlung-footer *,
+body.dark .manlung-footer *,
+body.dark-mode .manlung-footer * {
+  color: #ffffff !important;
+}
+

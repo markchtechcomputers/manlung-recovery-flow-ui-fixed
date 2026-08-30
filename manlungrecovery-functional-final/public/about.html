@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+    <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us · Manlung Recovery</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>.about-service-icon{width:2.3rem;height:2.3rem;object-fit:contain;display:block;margin:0 auto 1rem}</style>
+
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:
+    linear-gradient(135deg,rgba(15,23,42,.98),rgba(17,35,56,.98)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 64px);
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 4px 18px rgba(2,6,23,.22);
+}
+.site-header .container{
+  max-width:1180px;
+  margin:0 auto;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.55rem .8rem;
+}
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  min-width:0;
+}
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.05rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+.site-header .brand span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.72rem;
+  white-space:nowrap;
+}
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  min-height:38px;
+  padding:.45rem .68rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:700;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.35);
+  color:#fff;
+}
+.site-header .header-actions .btn-primary{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.site-header .header-actions .btn-primary:hover{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+}
+@media(max-width:900px){
+  .site-header .container{
+    min-height:58px;
+    padding:.45rem .7rem;
+  }
+  .site-header .brand h1{
+    font-size:.95rem;
+  }
+  .site-header .brand span{
+    font-size:.64rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:36px;
+    padding:.4rem .55rem;
+    font-size:.7rem;
+  }
+}
+@media(max-width:700px){
+  .site-header .container{
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+  .site-header .brand{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+  .site-header .brand span{
+    white-space:normal;
+  }
+  .site-header .header-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.35rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:38px;
+    padding:.35rem .2rem;
+    font-size:.68rem;
+  }
+}
+@media(max-width:480px){
+  .site-header .header-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
+  }
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    display:block;
+    font-size:1rem;
+    line-height:1;
+    margin:0;
+  }
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
+  }
+}
+@media(max-width:360px){
+  .site-header .brand h1{
+    font-size:.86rem;
+  }
+  .site-header .brand span{
+    font-size:.58rem;
+  }
+}
+</style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/footer.css?v=ultimate-white-footer-20260830">
+  
+
+
+<style id="manlung-footer-ultimate-contrast">
+/* FINAL OVERRIDE — MANLUNG RECOVERY FOOTER */
+html body footer.manlung-footer {
+  background:#000000 !important;
+  color:#ffffff !important;
+  opacity:1 !important;
+}
+
+html body footer.manlung-footer,
+html body footer.manlung-footer *,
+html body footer.manlung-footer p,
+html body footer.manlung-footer span,
+html body footer.manlung-footer strong,
+html body footer.manlung-footer h2,
+html body footer.manlung-footer h3,
+html body footer.manlung-footer h4,
+html body footer.manlung-footer a,
+html body footer.manlung-footer i,
+html body footer.manlung-footer svg,
+html body footer.manlung-footer svg *,
+html body footer.manlung-footer div,
+html body footer.manlung-footer section,
+html body footer.manlung-footer nav {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer a,
+html body footer.manlung-footer a:visited,
+html body footer.manlung-footer a:hover,
+html body footer.manlung-footer a:active {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  text-decoration:none;
+}
+
+html body footer.manlung-footer .manlung-footer-brand-subtitle,
+html body footer.manlung-footer .manlung-footer-description,
+html body footer.manlung-footer .manlung-footer-trust p,
+html body footer.manlung-footer .manlung-footer-social-label,
+html body footer.manlung-footer .manlung-footer-bottom,
+html body footer.manlung-footer .manlung-footer-bottom span {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer .manlung-footer-social a,
+html body footer.manlung-footer .manlung-footer-social a *,
+html body footer.manlung-footer .manlung-footer-social i,
+html body footer.manlung-footer .manlung-footer-social svg,
+html body footer.manlung-footer .manlung-footer-social svg * {
+  color:#ffffff !important;
+  fill:#ffffff !important;
+  stroke:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+html body footer.manlung-footer .manlung-footer-divider {
+  background:#333333 !important;
+}
+</style>
+
+</head>
+<body>
+    <header class="site-header">
+  <div class="container manlung-header-inner">
+    <div class="brand">
+      <a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home">
+        <img class="manlung-site-logo" src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png" alt="Manlung Recovery">
+      </a>
+      <div class="manlung-brand-copy">
+        <h1><i class="fas fa-shield-halved" aria-hidden="true"></i> Manlung Recovery</h1>
+        <span>Cyber Recovery &amp; Digital Investigation Portal</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-outline" data-theme-toggle="true">
+        <i class="fas fa-moon"></i> Dark
+      </button>
+      <a href="/client/dashboard.html" class="btn btn-outline">
+        <i class="fas fa-user"></i> My Cases
+      </a>
+      <a href="/blog.html" class="btn btn-outline">
+        <i class="fas fa-newspaper"></i> Blog
+      </a>
+      <a href="/donate.html" class="btn btn-outline">
+        <img src="/icons/donation.png" class="donation-nav-icon" alt="" aria-hidden="true"> Donate
+      </a>
+      <a href="/client/request.html" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> New Request
+      </a>
+    </div>
+  </div>
+</header>
+
+    <div class="container">
+        <section class="hero" style="text-align:left;">
+            <div style="text-align:center;margin-bottom:.7rem;"><img src="/images/identity-theft.png" alt="Manlung Recovery" style="width:2.3rem;height:2.3rem;object-fit:contain;display:block;margin:0 auto .5rem;"><h2 style="text-align:left;">Who We Are</h2></div>
+            <p style="text-align:left; max-width:100%;">Manlung Recovery is a cyber recovery and digital investigation service. We help individuals and organizations recover lost or stolen devices, regain control of compromised accounts, investigate online scams and fraud, and assess network security — combining technical tracing, platform coordination, and (where needed) law enforcement liaison.</p>
+        </section>
+
+        <div class="features">
+            <div class="feature-card">
+                <img class="about-service-icon" src="/images/device-recovery.png" alt="Device Recovery">
+                <h3>Device Recovery</h3>
+                <p>GPS/IMEI tracing, carrier coordination, and remote lock/wipe guidance for lost or stolen phones, laptops, tablets, and smartwatches.</p>
+            </div>
+            <div class="feature-card">
+                <img class="about-service-icon" src="/images/identity-theft.png" alt="Identity Theft">
+                <h3>Identity Theft</h3>
+                <p>Account recovery support, documentation help for banks and platforms, and guidance on locking down further exposure.</p>
+            </div>
+            <div class="feature-card">
+                <img class="about-service-icon" src="/images/scam-investigation.png" alt="Scam Investigation">
+                <h3>Scam Investigation</h3>
+                <p>Evidence collection, payment-trail tracing across banks/mobile money/crypto, and direct engagement with providers and platforms.</p>
+            </div>
+            <div class="feature-card">
+                <img class="about-service-icon" src="/images/security-assessment.png" alt="Security Assessment">
+                <h3>Security Assessment</h3>
+                <p>Vulnerability scanning, configuration review, and a prioritized remediation report for organizations.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-bullseye"></i> Our Approach</div>
+            <p style="color:var(--text-muted); line-height:1.8;">
+                Every case starts with a structured intake — the same form you'll find under "New Request" — so nothing critical
+                gets missed. From there, a case is reviewed, an investigator is assigned, and you can track progress in real time
+                using your case ID. We keep you updated at each meaningful stage, and every file you submit is stored securely
+                and only accessible to you and the assigned investigator.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-address-card"></i> Contact Us</div>
+            <div style="display:flex; flex-direction:column; gap:0.8rem; font-size:0.98rem;">
+                <div><i class="fas fa-envelope" style="color:var(--accent); width:22px;"></i> <a href="mailto:manlungrecovery@outlook.com" style="color:var(--text); text-decoration:none;">manlungrecovery@outlook.com</a></div>
+                <div><i class="fas fa-phone" style="color:var(--accent); width:22px;"></i> <a href="tel:+254724356178" style="color:var(--text); text-decoration:none;">+254 724356178</a></div>
+            </div>
+        </div>
+    </div>
+
+    
+<footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+
+    <div class="manlung-footer-grid">
+
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row">
+          <img src="/icons/icon-512.png"
+               alt="Manlung Recovery"
+               class="manlung-footer-logo"
+               width="58"
+               height="58">
+          <div>
+            <h2 id="footer-brand-title">Manlung Recovery</h2>
+            <p class="manlung-footer-brand-subtitle">
+              Cyber Recovery &amp; Digital Investigation Portal
+            </p>
+          </div>
+        </div>
+
+        <p class="manlung-footer-description">
+          Manlung Recovery provides structured digital recovery assistance,
+          investigation support, account and device recovery guidance,
+          cybersecurity awareness, and secure case-management services.
+          Our goal is to help individuals and organizations respond to
+          digital incidents responsibly, protect important information,
+          and take appropriate steps toward recovery.
+        </p>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Quick Links</h3>
+        <nav class="manlung-footer-links" aria-label="Quick links">
+          <a href="/">Home</a>
+          <a href="/about.html">About Manlung Recovery</a>
+          <a href="/knowledge.html">Knowledge Centre</a>
+          <a href="/blog.html">Security &amp; Recovery Blog</a>
+          <a href="/contact.html">Contact Us</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Recovery Services</h3>
+        <nav class="manlung-footer-links" aria-label="Recovery services">
+          <a href="/client/request.html" class="footer-important">Submit Recovery Request</a>
+          <a href="/client/dashboard.html" class="footer-important">Client Portal</a>
+          <a href="/client/track.html">Track a Case</a>
+          <a href="/client/settings.html">Account Settings</a>
+          <a href="/login.html">Sign In</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Security &amp; Trust</h3>
+
+        <div class="manlung-footer-trust">
+          <p>
+            We use access controls, authentication safeguards and responsible
+            information-handling practices to help protect client and case
+            information.
+          </p>
+        </div>
+
+        <div class="manlung-footer-trust">
+          <p>
+            Personal-data processing is described in our Privacy Notice,
+            including applicable rights and responsibilities under Kenya's
+            Data Protection Act, 2019 and relevant regulations.
+          </p>
+        </div>
+
+        <nav class="manlung-footer-links manlung-footer-security-links"
+             aria-label="Legal and security links">
+          <a href="/privacy.html" class="footer-important">Privacy Notice</a>
+          <a href="/terms.html" class="footer-important">Terms &amp; Conditions</a>
+        </nav>
+      </section>
+
+    </div>
+
+    <div class="manlung-footer-divider"></div>
+
+    <div class="manlung-footer-contact-row">
+
+      <div class="manlung-footer-contact">
+        <a href="mailto:manlungrecovery@outlook.com">
+          <i class="fas fa-envelope" aria-hidden="true"></i>
+          manlungrecovery@outlook.com
+        </a>
+
+        <a href="tel:+254724356178">
+          <i class="fas fa-phone" aria-hidden="true"></i>
+          +254 724 356 178
+        </a>
+      </div>
+
+      <div class="manlung-footer-social"
+           aria-label="Manlung Recovery social media">
+
+        <span class="manlung-footer-social-label">Follow Manlung Recovery</span>
+
+        <a href="https://www.youtube.com/@manlungrecory"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on YouTube">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
+          <span>YouTube</span>
+        </a>
+
+        <a href="https://www.linkedin.com/in/mark-ochiengke"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on LinkedIn">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+          <span>LinkedIn</span>
+        </a>
+
+        <a href="https://github.com/markchtechcomputers"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on GitHub">
+          <i class="fab fa-github" aria-hidden="true"></i>
+          <span>GitHub</span>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="manlung-footer-bottom">
+      <span>
+        &copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.
+      </span>
+
+      <div class="manlung-footer-legal">
+        <a href="/terms.html">Terms &amp; Conditions</a>
+        <a href="/privacy.html">Privacy Notice</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<script src="/js/pwa.js" defer></script>
+<script src="/js/site-auth.js" defer></script>
+
+
+</body>
+</html>

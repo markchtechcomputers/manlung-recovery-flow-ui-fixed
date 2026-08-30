@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+    <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Request · Manlung Recovery</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .container-narrow { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+        .progress-bar-wrap { position: sticky; top: 0; z-index: 20; background: var(--page-bg); border-bottom: 1px solid var(--card-border); padding: 0.5rem 1.5rem; }
+        .progress-bar-track { max-width: 900px; margin: 0 auto; height: 6px; background: var(--card-border); border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s ease; }
+        .progress-bar-label { max-width: 900px; margin: 0 auto; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+        /* Honeypot — hidden from real users, but visible to bots that ignore CSS/inline styles */
+        .hp-field { display: none !important; }
+        .draft-banner { background: var(--info-bg); color: var(--info-text); padding: 0.6rem 1rem; border-radius: 12px; margin-bottom: 1rem; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+        .file-thumb { width: 32px; height: 32px; object-fit: cover; border-radius: 6px; margin-right: 8px; vertical-align: middle; }
+    </style>
+
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:
+    linear-gradient(135deg,rgba(15,23,42,.98),rgba(17,35,56,.98)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 64px);
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 4px 18px rgba(2,6,23,.22);
+}
+.site-header .container{
+  max-width:1180px;
+  margin:0 auto;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.55rem .8rem;
+}
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  min-width:0;
+}
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.05rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+.site-header .brand span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.72rem;
+  white-space:nowrap;
+}
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  min-height:38px;
+  padding:.45rem .68rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:700;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.35);
+  color:#fff;
+}
+.site-header .header-actions .btn-primary{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.site-header .header-actions .btn-primary:hover{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+}
+@media(max-width:900px){
+  .site-header .container{
+    min-height:58px;
+    padding:.45rem .7rem;
+  }
+  .site-header .brand h1{
+    font-size:.95rem;
+  }
+  .site-header .brand span{
+    font-size:.64rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:36px;
+    padding:.4rem .55rem;
+    font-size:.7rem;
+  }
+}
+@media(max-width:700px){
+  .site-header .container{
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+  .site-header .brand{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+  .site-header .brand span{
+    white-space:normal;
+  }
+  .site-header .header-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.35rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:38px;
+    padding:.35rem .2rem;
+    font-size:.68rem;
+  }
+}
+@media(max-width:480px){
+  .site-header .header-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
+  }
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    display:block;
+    font-size:1rem;
+    line-height:1;
+    margin:0;
+  }
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
+  }
+}
+@media(max-width:360px){
+  .site-header .brand h1{
+    font-size:.86rem;
+  }
+  .site-header .brand span{
+    font-size:.58rem;
+  }
+}
+</style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/footer.css?v=ultimate-white-footer-20260830">
+  
+
+  <link rel="stylesheet" href="/css/mobile-header.css?v=20260830-white-blue-glow">
+
+<style id="manlung-footer-ultimate-contrast">
+/* FINAL OVERRIDE — MANLUNG RECOVERY FOOTER */
+html body footer.manlung-footer {
+  background:#000000 !important;
+  color:#ffffff !important;
+  opacity:1 !important;
+}
+
+html body footer.manlung-footer,
+html body footer.manlung-footer *,
+html body footer.manlung-footer p,
+html body footer.manlung-footer span,
+html body footer.manlung-footer strong,
+html body footer.manlung-footer h2,
+html body footer.manlung-footer h3,
+html body footer.manlung-footer h4,
+html body footer.manlung-footer a,
+html body footer.manlung-footer i,
+html body footer.manlung-footer svg,
+html body footer.manlung-footer svg *,
+html body footer.manlung-footer div,
+html body footer.manlung-footer section,
+html body footer.manlung-footer nav {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer a,
+html body footer.manlung-footer a:visited,
+html body footer.manlung-footer a:hover,
+html body footer.manlung-footer a:active {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  text-decoration:none;
+}
+
+html body footer.manlung-footer .manlung-footer-brand-subtitle,
+html body footer.manlung-footer .manlung-footer-description,
+html body footer.manlung-footer .manlung-footer-trust p,
+html body footer.manlung-footer .manlung-footer-social-label,
+html body footer.manlung-footer .manlung-footer-bottom,
+html body footer.manlung-footer .manlung-footer-bottom span {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer .manlung-footer-social a,
+html body footer.manlung-footer .manlung-footer-social a *,
+html body footer.manlung-footer .manlung-footer-social i,
+html body footer.manlung-footer .manlung-footer-social svg,
+html body footer.manlung-footer .manlung-footer-social svg * {
+  color:#ffffff !important;
+  fill:#ffffff !important;
+  stroke:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+html body footer.manlung-footer .manlung-footer-divider {
+  background:#333333 !important;
+}
+</style>
+
+</head>
+<body>
+    <header class="site-header"><div class="container manlung-header-inner"><div class="brand"><a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home"><img class="manlung-site-logo" src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png" alt="Manlung Recovery"></a><div class="manlung-brand-copy"><h1><i class="fas fa-shield-halved" aria-hidden="true"></i> Manlung Recovery</h1><span>Submit a secure recovery request</span></div></div><div class="header-actions"><button class="btn btn-outline" type="button" data-theme-toggle="true"><i class="fas fa-moon"></i> Theme</button><a class="btn btn-outline" href="/client/dashboard.html"><i class="fas fa-folder-open"></i> My Cases</a><a class="btn btn-outline" href="/client/request.html"><i class="fas fa-plus"></i> New Request</a><a class="btn btn-outline" href="/client/settings.html"><i class="fas fa-user-gear"></i> Settings</a><a class="btn btn-outline" href="/"><i class="fas fa-home"></i> Home</a><button class="btn btn-danger" type="button" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+    <button class="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i></button>
+    <nav class="mobile-nav" aria-label="Mobile navigation"><div class="mobile-nav-panel">
+      <div class="mobile-nav-title"><span>Navigation</span><button type="button" class="mobile-menu-close" aria-label="Close navigation menu">×</button></div>
+      <a href="/client/dashboard.html" class=""><i class="fas fa-house" aria-hidden="true"></i> Dashboard</a>
+      <a href="/client/request.html" class=""><i class="fas fa-plus-circle" aria-hidden="true"></i> New Request</a>
+      <a href="/client/track.html" class=""><i class="fas fa-folder-open" aria-hidden="true"></i> Track Case</a>
+      <a href="/client/settings.html" class=""><i class="fas fa-user-gear" aria-hidden="true"></i> Settings</a>
+      <button type="button" data-theme-toggle="true"><i class="fas fa-moon" aria-hidden="true"></i> Theme</button>
+      <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</a>
+    </div></nav></div></header>
+
+    <div class="progress-bar-wrap">
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+        <div class="progress-bar-label" id="progressLabel">0% of required fields complete</div>
+    </div>
+
+    <div class="container-narrow">
+        <div id="formContainer">
+            <div id="draftBanner" class="draft-banner" style="display:none;">
+                <span><i class="fas fa-clock-rotate-left"></i> We restored your unsaved draft from earlier.</span>
+                <button type="button" class="btn btn-outline-dark" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="clearDraft()">Discard draft</button>
+            </div>
+            <form id="incidentForm" onsubmit="handleSubmit(event)">
+                <!-- Honeypot: real users never see or fill this. Bots that auto-fill every field will. -->
+                <div class="hp-field" aria-hidden="true">
+                    <label for="hp_confirm">Leave this field empty</label>
+                    <input type="text" id="hp_confirm" name="hp_confirm" tabindex="-1" autocomplete="off">
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-tag"></i> Case Type</div>
+                    <div class="form-group">
+                        <select id="caseType" required>
+                            <option value="">— Select a case type —</option>
+                            <option>Lost Phone Recovery</option>
+                            <option>Lost Laptop Recovery</option>
+                            <option>Lost Tablet Recovery</option>
+                            <option>Lost Smartwatch Recovery</option>
+                            <option>Lost Vehicle GPS Investigation</option>
+                            <option>Online Scam Investigation</option>
+                            <option>Identity Theft Assistance</option>
+                            <option>Social Media Account Recovery</option>
+                            <option>Email Account Recovery</option>
+                            <option>Website Security Incident</option>
+                            <option>Malware or Virus Investigation</option>
+                            <option>Network Security Assessment</option>
+                            <option>Other Cyber Incident</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-user"></i> Personal Information</div>
+                    <div class="row-2">
+                        <div class="form-group"><label>Full Name *</label><input id="fullName" required></div>
+                        <div class="form-group"><label>Phone Number *</label><input id="phone" required></div>
+                    </div>
+                    <div class="row-2">
+                        <div class="form-group"><label>Email *</label><input type="email" id="email" required></div>
+                        <div class="form-group"><label>Country</label><input id="country" value="Kenya"></div>
+                    </div>
+                    <div class="row-3">
+                        <div class="form-group"><label>County/State</label><input id="county"></div>
+                        <div class="form-group"><label>Town/City</label><input id="city"></div>
+                        <div class="form-group"><label>Preferred Contact</label>
+                            <select id="contactMethod"><option>Phone</option><option>Email</option><option>Telegram</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-clock"></i> Incident Details</div>
+                    <div class="form-group"><label>Describe exactly what happened *</label><textarea id="incidentDesc" required></textarea></div>
+                    <div class="row-3">
+                        <div class="form-group"><label>Date of Incident</label><input type="date" id="incidentDate"></div>
+                        <div class="form-group"><label>Time</label><input type="time" id="incidentTime"></div>
+                        <div class="form-group"><label>Location</label><input id="incidentLocation"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-laptop"></i> Device Information <span style="font-weight:400;font-size:0.85rem;color:var(--text-muted);">(if applicable)</span></div>
+                    <div class="row-3">
+                        <div class="form-group"><label>Device Type</label><input id="deviceType" placeholder="Phone, Laptop..."></div>
+                        <div class="form-group"><label>Brand</label><input id="deviceBrand" placeholder="Apple, Samsung..."></div>
+                        <div class="form-group"><label>Model</label><input id="deviceModel" placeholder="iPhone 14, ThinkPad..."></div>
+                    </div>
+                    <div class="row-3">
+                        <div class="form-group"><label>Colour</label><input id="deviceColour"></div>
+                        <div class="form-group"><label>IMEI 1</label><input id="imei1"></div>
+                        <div class="form-group"><label>IMEI 2</label><input id="imei2"></div>
+                    </div>
+                    <div class="row-2">
+                        <div class="form-group"><label>Serial Number</label><input id="serial"></div>
+                        <div class="form-group"><label>Purchase Date</label><input type="date" id="purchaseDate"></div>
+                    </div>
+                    <div class="row-2">
+                        <div class="form-group"><label>Last Known Location</label><input id="lastLocation"></div>
+                        <div class="form-group"><label>Google Account (optional)</label><input id="googleAccount" placeholder="email@gmail.com"></div>
+                    </div>
+                    <div class="row-2">
+                        <div class="form-group"><label>Apple ID (optional)</label><input id="appleId" placeholder="apple@icloud.com"></div>
+                        <div class="form-group"><label>Recovery Phone (optional)</label><input id="recoveryPhone"></div>
+                    </div>
+                    <div class="notice"><i class="fas fa-shield"></i> We never ask for passwords.</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-triangle-exclamation"></i> Scam / Fraud Details</div>
+                    <div class="row-3">
+                        <div class="form-group"><label>Scammer Phone</label><input id="scamPhone"></div>
+                        <div class="form-group"><label>Scammer Email</label><input id="scamEmail"></div>
+                        <div class="form-group"><label>Website</label><input id="scamWebsite"></div>
+                    </div>
+                    <div class="row-3">
+                        <div class="form-group"><label>Telegram</label><input id="scamTelegram"></div>
+                        <div class="form-group"><label>WhatsApp</label><input id="scamWhatsapp"></div>
+                        <div class="form-group"><label>Facebook</label><input id="scamFacebook"></div>
+                    </div>
+                    <div class="row-3">
+                        <div class="form-group"><label>Instagram</label><input id="scamInstagram"></div>
+                        <div class="form-group"><label>TikTok</label><input id="scamTiktok"></div>
+                        <div class="form-group"><label>Bank Account</label><input id="scamBank"></div>
+                    </div>
+                    <div class="row-3">
+                        <div class="form-group"><label>M-Pesa</label><input id="scamMpesa"></div>
+                        <div class="form-group"><label>Crypto Wallet</label><input id="scamCrypto"></div>
+                        <div class="form-group"><label>Amount Lost</label><input id="scamAmount"></div>
+                    </div>
+                    <div class="form-group"><label>PDF • JPG/JPEG • PNG only</label><input type="file" id="scamEvidence" multiple accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-id-card"></i> Identity Theft</div>
+                    <div class="form-group"><label>What identity was compromised?</label><input id="idCompromised"></div>
+                    <div class="form-group"><label>Accounts affected</label><input id="idAccounts"></div>
+                    <div class="row-2">
+                        <div class="form-group"><label>Date discovered</label><input type="date" id="idDate"></div>
+                        <div class="form-group"><label>Description</label><input id="idDescription"></div>
+                    </div>
+                    <div class="form-group"><label>Evidence</label><input type="file" id="idEvidence" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-network-wired"></i> Network Investigation</div>
+                    <div class="row-2">
+                        <div class="form-group"><label>Company Name</label><input id="netCompany"></div>
+                        <div class="form-group"><label>Authorized Contact</label><input id="netContact"></div>
+                    </div>
+                    <div class="row-2">
+                        <div class="form-group"><label>Network Type</label><input id="netType"></div>
+                        <div class="form-group"><label>Issue Description</label><input id="netDesc"></div>
+                    </div>
+                    <div class="checkbox-group"><input type="checkbox" id="netAuth"><label>I am authorized to request this investigation</label></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-paperclip"></i> Additional Files <span style="font-weight:400;font-size:0.85rem;color:var(--text-muted);">(max 100MB each)</span></div>
+                    <div class="upload-zone" onclick="document.getElementById('fileUpload').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload PDF, Word, Images, Video, ZIP</p>
+                        <input type="file" id="fileUpload" multiple style="display:none" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div id="fileList" class="file-list"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-flag"></i> Priority</div>
+                    <div class="form-group">
+                        <select id="priority" style="max-width:260px;">
+                            <option>Normal</option>
+                            <option>Urgent</option>
+                            <option>Emergency</option>
+                        </select>
+                    </div>
+
+                    <div class="card-title"><i class="fas fa-scale-balanced"></i> Terms</div>
+                    <div class="checkbox-group"><input type="checkbox" id="term1" required><label>I confirm that I am the owner of the device, account, or information described above, or I am legally authorized to request this investigation.</label></div>
+                    <div class="checkbox-group"><input type="checkbox" id="term2" required><label>I understand that submitting false information may result in my request being rejected.</label></div>
+                </div>
+
+                <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+                    <button type="submit" id="submitBtn" class="btn btn-success" style="padding:0.8rem 2.5rem; font-size:1rem;">
+                        <i class="fas fa-paper-plane"></i> Submit Request
+                    </button>
+                    <button type="reset" class="btn btn-outline-dark">Clear Form</button>
+                    <span id="submitStatus" style="color:var(--text-muted); font-size:0.9rem;"></span>
+                </div>
+            </form>
+        </div>
+
+        <div id="successMessage" style="display:none;">
+            <div class="card success-message">
+                <i class="fas fa-circle-check"></i>
+                <h2>Request Submitted Successfully!</h2>
+                <p>Your case has been received and is being reviewed.</p>
+                <div class="case-id" id="submittedCaseId">MTC-2026-001</div>
+                <p style="margin-top:0.5rem; color:var(--text-muted);">You can track your case using this ID.</p>
+                <div style="display:flex; gap:1rem; justify-content:center; margin-top:1.5rem; flex-wrap:wrap;">
+                    <a href="/client/dashboard.html" class="btn btn-primary"><i class="fas fa-user"></i> My Cases</a>
+                    <a href="/" class="btn btn-outline-dark"><i class="fas fa-home"></i> Home</a>
+                    <button class="btn btn-outline-dark" onclick="location.reload()"><i class="fas fa-plus"></i> New Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+<footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+
+    <div class="manlung-footer-grid">
+
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row">
+          <img src="/icons/icon-512.png"
+               alt="Manlung Recovery"
+               class="manlung-footer-logo"
+               width="58"
+               height="58">
+          <div>
+            <h2 id="footer-brand-title">Manlung Recovery</h2>
+            <p class="manlung-footer-brand-subtitle">
+              Cyber Recovery &amp; Digital Investigation Portal
+            </p>
+          </div>
+        </div>
+
+        <p class="manlung-footer-description">
+          Manlung Recovery provides structured digital recovery assistance,
+          investigation support, account and device recovery guidance,
+          cybersecurity awareness, and secure case-management services.
+          Our goal is to help individuals and organizations respond to
+          digital incidents responsibly, protect important information,
+          and take appropriate steps toward recovery.
+        </p>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Quick Links</h3>
+        <nav class="manlung-footer-links" aria-label="Quick links">
+          <a href="/">Home</a>
+          <a href="/about.html">About Manlung Recovery</a>
+          <a href="/knowledge.html">Knowledge Centre</a>
+          <a href="/blog.html">Security &amp; Recovery Blog</a>
+          <a href="/contact.html">Contact Us</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Recovery Services</h3>
+        <nav class="manlung-footer-links" aria-label="Recovery services">
+          <a href="/client/request.html" class="footer-important">Submit Recovery Request</a>
+          <a href="/client/dashboard.html" class="footer-important">Client Portal</a>
+          <a href="/client/track.html">Track a Case</a>
+          <a href="/client/settings.html">Account Settings</a>
+          <a href="/login.html">Sign In</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Security &amp; Trust</h3>
+
+        <div class="manlung-footer-trust">
+          <p>
+            We use access controls, authentication safeguards and responsible
+            information-handling practices to help protect client and case
+            information.
+          </p>
+        </div>
+
+        <div class="manlung-footer-trust">
+          <p>
+            Personal-data processing is described in our Privacy Notice,
+            including applicable rights and responsibilities under Kenya's
+            Data Protection Act, 2019 and relevant regulations.
+          </p>
+        </div>
+
+        <nav class="manlung-footer-links manlung-footer-security-links"
+             aria-label="Legal and security links">
+          <a href="/privacy.html" class="footer-important">Privacy Notice</a>
+          <a href="/terms.html" class="footer-important">Terms &amp; Conditions</a>
+        </nav>
+      </section>
+
+    </div>
+
+    <div class="manlung-footer-divider"></div>
+
+    <div class="manlung-footer-contact-row">
+
+      <div class="manlung-footer-contact">
+        <a href="mailto:manlungrecovery@outlook.com">
+          <i class="fas fa-envelope" aria-hidden="true"></i>
+          manlungrecovery@outlook.com
+        </a>
+
+        <a href="tel:+254724356178">
+          <i class="fas fa-phone" aria-hidden="true"></i>
+          +254 724 356 178
+        </a>
+      </div>
+
+      <div class="manlung-footer-social"
+           aria-label="Manlung Recovery social media">
+
+        <span class="manlung-footer-social-label">Follow Manlung Recovery</span>
+
+        <a href="https://www.youtube.com/@manlungrecory"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on YouTube">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
+          <span>YouTube</span>
+        </a>
+
+        <a href="https://www.linkedin.com/in/mark-ochiengke"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on LinkedIn">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+          <span>LinkedIn</span>
+        </a>
+
+        <a href="https://github.com/markchtechcomputers"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on GitHub">
+          <i class="fab fa-github" aria-hidden="true"></i>
+          <span>GitHub</span>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="manlung-footer-bottom">
+      <span>
+        &copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.
+      </span>
+
+      <div class="manlung-footer-legal">
+        <a href="/terms.html">Terms &amp; Conditions</a>
+        <a href="/privacy.html">Privacy Notice</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+
+    <script>
+        let pendingFiles = []; // File objects staged for upload (from the general upload zone)
+
+        document.getElementById('fileUpload').addEventListener('change', function (e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                if (file.size > 100 * 1024 * 1024) {
+                    alert(`File ${file.name} exceeds 100MB limit.`);
+                    return;
+                }
+                pendingFiles.push(file);
+            });
+            renderFileList();
+        });
+
+        function renderFileList() {
+            const container = document.getElementById('fileList');
+            if (pendingFiles.length === 0) { container.innerHTML = ''; return; }
+            let html = '';
+            pendingFiles.forEach((file, index) => {
+                const isImage = file.type && file.type.startsWith('image/');
+                const thumb = isImage ? `<img class="file-thumb" src="${URL.createObjectURL(file)}" alt="">` : '<i class="fas fa-file" style="margin-right:8px;"></i>';
+                html += `
+                    <div class="file-item">
+                        <span style="display:flex; align-items:center;">${thumb} ${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>
+                        <span class="remove" onclick="removeFile(${index})"><i class="fas fa-times"></i></span>
+                    </div>`;
+            });
+            container.innerHTML = html;
+        }
+        function removeFile(index) { pendingFiles.splice(index, 1); renderFileList(); }
+
+        function applyTheme() {
+            const savedTheme =
+                localStorage.getItem('theme') === 'dark'
+                    ? 'dark'
+                    : 'light';
+
+            document.body.classList.toggle(
+                'dark',
+                savedTheme === 'dark'
+            );
+
+            const btn =
+                document.querySelector(
+                    '.header-actions button[data-theme-toggle="true"]'
+                );
+
+            if (btn) {
+                btn.innerHTML =
+                    savedTheme === 'dark'
+                        ? '<i class="fas fa-sun"></i>'
+                        : '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        function toggleDarkMode() {
+            const nextTheme =
+                document.body.classList.contains('dark')
+                    ? 'light'
+                    : 'dark';
+
+            localStorage.setItem(
+                'theme',
+                nextTheme
+            );
+
+            applyTheme();
+        }
+
+        (function applySavedTheme() {
+            applyTheme();
+        })();
+
+        // ---- Draft autosave (text fields only — files aren't persisted to localStorage) ----
+        const DRAFT_KEY = 'requestFormDraft';
+        const DRAFT_FIELD_IDS = [
+            'caseType', 'fullName', 'phone', 'email', 'country', 'county', 'city', 'contactMethod',
+            'incidentDesc', 'incidentDate', 'incidentTime', 'incidentLocation',
+            'deviceType', 'deviceBrand', 'deviceModel', 'deviceColour', 'imei1', 'imei2', 'serial',
+            'purchaseDate', 'lastLocation', 'googleAccount', 'appleId', 'recoveryPhone',
+            'scamPhone', 'scamEmail', 'scamWebsite', 'scamTelegram', 'scamWhatsapp', 'scamFacebook',
+            'scamInstagram', 'scamTiktok', 'scamBank', 'scamMpesa', 'scamCrypto', 'scamAmount',
+            'idCompromised', 'idAccounts', 'idDate', 'idDescription',
+            'netCompany', 'netContact', 'netType', 'netDesc', 'priority',
+        ];
+
+        function saveDraft() {
+            const draft = {};
+            DRAFT_FIELD_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) draft[id] = el.value;
+            });
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+            updateProgress();
+        }
+
+        function restoreDraft() {
+            const raw = localStorage.getItem(DRAFT_KEY);
+            if (!raw) return;
+            try {
+                const draft = JSON.parse(raw);
+                let hasContent = false;
+                DRAFT_FIELD_IDS.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && draft[id]) { el.value = draft[id]; hasContent = true; }
+                });
+                if (hasContent) document.getElementById('draftBanner').style.display = 'flex';
+            } catch (e) { /* corrupt draft, ignore */ }
+        }
+
+        function clearDraft() {
+            localStorage.removeItem(DRAFT_KEY);
+            document.getElementById('draftBanner').style.display = 'none';
+        }
+
+        const REQUIRED_FIELD_IDS = ['caseType', 'fullName', 'phone', 'email', 'incidentDesc'];
+        function updateProgress() {
+            const filled = REQUIRED_FIELD_IDS.filter(id => {
+                const el = document.getElementById(id);
+                return el && el.value.trim().length > 0;
+            }).length;
+            const pct = Math.round((filled / REQUIRED_FIELD_IDS.length) * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressLabel').textContent = `${pct}% of required fields complete`;
+        }
+
+        document.getElementById('incidentForm').addEventListener('input', () => { saveDraft(); });
+        restoreDraft();
+        updateProgress();
+
+        // Submits the whole form (fields + files) in one multipart request straight
+        // to our own backend — the backend uploads files to Supabase Storage itself,
+        // so no cloud SDK or API key is ever needed in the browser.
+        function handleSubmit(event) {
+            event.preventDefault();
+
+            if (!document.getElementById('term1').checked || !document.getElementById('term2').checked) {
+                alert('Please accept both terms to proceed.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const statusEl = document.getElementById('submitStatus');
+            const token = localStorage.getItem('clientToken');
+            if (!token) {
+                alert('Please sign in to submit a recovery case. Your case must be linked to your account so only you can track it.');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            statusEl.textContent = 'Submitting request…';
+
+            const scamFiles = Array.from(document.getElementById('scamEvidence').files || []);
+            const idFiles = Array.from(document.getElementById('idEvidence').files || []);
+            const allFiles = [...pendingFiles, ...scamFiles, ...idFiles];
+
+            const fd = new FormData();
+            const fields = {
+                clientName: 'fullName', phone: 'phone', email: 'email', caseType: 'caseType',
+                priority: 'priority', incidentDesc: 'incidentDesc', country: 'country', county: 'county',
+                city: 'city', contactMethod: 'contactMethod', incidentDate: 'incidentDate',
+                incidentTime: 'incidentTime', incidentLocation: 'incidentLocation', deviceType: 'deviceType',
+                deviceBrand: 'deviceBrand', deviceModel: 'deviceModel', deviceColour: 'deviceColour',
+                imei1: 'imei1', imei2: 'imei2', serial: 'serial', purchaseDate: 'purchaseDate',
+                lastLocation: 'lastLocation', googleAccount: 'googleAccount', appleId: 'appleId',
+                recoveryPhone: 'recoveryPhone', scamPhone: 'scamPhone', scamEmail: 'scamEmail',
+                scamWebsite: 'scamWebsite', scamTelegram: 'scamTelegram', scamWhatsapp: 'scamWhatsapp',
+                scamFacebook: 'scamFacebook', scamInstagram: 'scamInstagram', scamTiktok: 'scamTiktok',
+                scamBank: 'scamBank', scamMpesa: 'scamMpesa', scamCrypto: 'scamCrypto', scamAmount: 'scamAmount',
+                idCompromised: 'idCompromised', idAccounts: 'idAccounts', idDate: 'idDate',
+                idDescription: 'idDescription', netCompany: 'netCompany', netContact: 'netContact',
+                netType: 'netType', netDesc: 'netDesc',
+            };
+            for (const [formKey, elId] of Object.entries(fields)) {
+                fd.append(formKey, document.getElementById(elId).value || '');
+            }
+            fd.append('netAuth', document.getElementById('netAuth').checked ? 'true' : 'false');
+            fd.append('hp_confirm', document.getElementById('hp_confirm').value || ''); // honeypot
+            allFiles.forEach(file => fd.append('files', file));
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/cases/submit');
+            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    const pct = Math.round((e.loaded / e.total) * 100);
+                    statusEl.textContent = allFiles.length ? `Uploading (${pct}%)…` : 'Submitting request…';
+                }
+            };
+
+            xhr.onload = () => {
+                statusEl.textContent = '';
+                submitBtn.disabled = false;
+                let data;
+                try { data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
+
+                if (xhr.status >= 200 && xhr.status < 300 && data && data.success) {
+                    document.getElementById('formContainer').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('submittedCaseId').textContent = data.case.caseId;
+                    clearDraft();
+                } else {
+                    alert((data && data.error) || `Error submitting request (status ${xhr.status}). Please try again.`);
+                }
+            };
+
+            xhr.onerror = () => {
+                statusEl.textContent = '';
+                submitBtn.disabled = false;
+                alert('Could not reach the server. Is it running, and is the URL correct?');
+            };
+
+            xhr.send(fd);
+        }
+
+        async function checkAuth() {
+            const token = localStorage.getItem('clientToken');
+            if (!token) {
+                const notice = document.getElementById('submitStatus');
+                if (notice) notice.textContent = 'Please sign in before submitting a case.';
+                return false;
+            }
+            try {
+                const response = await fetch('/api/auth/verify', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (data.success && data.user.role === 'client' && data.user.email) {
+                    document.getElementById('email').value = data.user.email;
+                    return true;
+                }
+            } catch (e) { /* not authenticated — guest submission is allowed */ }
+            return false;
+        }
+
+        // Pre-select case type when arriving from a "Learn more" service card
+        (function prefillCaseType() {
+            const params = new URLSearchParams(window.location.search);
+            const type = params.get('type');
+            if (!type) return;
+            const select = document.getElementById('caseType');
+            const match = Array.from(select.options).find(o => o.value === type);
+            if (match) { select.value = type; updateProgress(); }
+        })();
+
+        checkAuth();
+    </script>
+  <script src="/js/call-widget.js"></script>
+<script src="/js/pwa.js" defer></script>
+<script src="/js/site-auth.js" defer></script>
+
+
+  <script src="/js/mobile-navigation.js"></script>
+</body>
+</html>

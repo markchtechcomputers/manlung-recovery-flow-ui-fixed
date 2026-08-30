@@ -1,0 +1,1368 @@
+
+/* ==========================================================
+   MANLUNG GLOBAL THEME + RESPONSIVE OVERRIDES
+   Light is the default. Dark is an explicit user choice.
+   ========================================================== */
+html, body { min-width: 0; }
+html { color-scheme: light; }
+html.dark { color-scheme: dark; }
+
+html:not(.dark) body,
+html:not(.dark) .admin-page-bg { background: var(--page-bg) !important; color: var(--text) !important; }
+html.dark body,
+html.dark .admin-page-bg { background: var(--page-bg) !important; color: var(--text) !important; }
+
+/* Floating toggle for pages without the standard header. */
+.manlung-floating-theme {
+  position: fixed !important;
+  top: max(14px, env(safe-area-inset-top)) !important;
+  right: max(14px, env(safe-area-inset-right)) !important;
+  z-index: 12000 !important;
+  min-height: 42px;
+  padding: .55rem .8rem;
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(15,23,42,.16);
+  cursor: pointer;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+.manlung-floating-theme:hover { transform: translateY(-1px); }
+.manlung-theme-toggle { white-space: nowrap; }
+
+/* Global responsive guardrails. */
+img, video, canvas, svg { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+pre, code { overflow-wrap: anywhere; }
+main, section, article, .container, .card { min-width: 0; }
+
+@media (max-width: 760px) {
+  .site-header .container { align-items: stretch !important; }
+  .site-header .brand { flex: 1 1 100%; }
+  .site-header .brand span { white-space: normal !important; }
+  .site-header .header-actions { width: 100%; justify-content: flex-start !important; overflow-x: auto; padding-bottom: .15rem; scrollbar-width: thin; }
+  .site-header .header-actions > * { flex: 0 0 auto; }
+  .site-header .header-actions .manlung-theme-toggle { order: -1; }
+  .container { padding-left: 1rem; padding-right: 1rem; }
+}
+@media (max-width: 480px) {
+  .site-header .brand h1 { font-size: 1rem !important; }
+  .site-header .header-actions a,
+  .site-header .header-actions button { min-height: 40px !important; padding: .45rem .65rem !important; font-size: .76rem !important; }
+  .manlung-floating-theme { top: 10px !important; right: 10px !important; }
+}
+
+/* Global production responsiveness and accessibility safeguards */
+html { overflow-x: hidden; }
+img, video, canvas, svg { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
+@media (max-width: 600px) {
+  .container, .main-container, .content-container { width: 100%; max-width: 100%; box-sizing: border-box; }
+  table { max-width: 100%; }
+}
+
+/* Manlung Recovery brand header: fixed dark-blue appearance in both themes. */
+.site-header {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.site-header .brand h1,
+.site-header .brand span,
+.site-header .header-actions a,
+.site-header .header-actions button {
+  color: #ffffff !important;
+}
+
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover {
+  color: #ffffff !important;
+}
+
+/* =========================================================
+   LIGHT/DARK MODE ICON VISIBILITY FIX
+   Keeps Font Awesome and navigation icons visible in both themes.
+   Does not alter logos, SVG illustrations, PWA icons, or calls.
+   ========================================================= */
+
+body:not(.dark) .site-header i.fas,
+body:not(.dark) .site-header i.far,
+body:not(.dark) .site-header i.fab,
+body:not(.dark) .site-header i.fa,
+body:not(.dark) .site-header .fa,
+body:not(.dark) .site-header svg,
+body:not(.dark) .site-header .icon,
+body:not(.dark) .site-header [data-lucide] {
+  color: var(--navy-900, #0a1a3a) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body:not(.dark) .site-header a i,
+body:not(.dark) .site-header button i,
+body:not(.dark) .site-header a svg,
+body:not(.dark) .site-header button svg {
+  color: var(--navy-900, #0a1a3a) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body.dark .site-header i,
+body.dark .site-header svg,
+body.dark .site-header .icon,
+body.dark .site-header [data-lucide] {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Theme-safe icons inside normal page content */
+body:not(.dark) main i.fas,
+body:not(.dark) main i.far,
+body:not(.dark) main i.fab,
+body:not(.dark) main i.fa {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Buttons/links: icon follows readable text color */
+body:not(.dark) .btn i,
+body:not(.dark) a.btn i,
+body:not(.dark) button i {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+
+/* =========================================================
+   LIGHT MODE — BOX/CARD TEXT VISIBILITY FIX
+   Makes headings, labels, metadata and normal text readable
+   inside cards/boxes without changing dark mode.
+   ========================================================= */
+
+body:not(.dark) .card,
+body:not(.dark) .blog-card,
+body:not(.dark) .feature-card,
+body:not(.dark) .service-card,
+body:not(.dark) .stat-card,
+body:not(.dark) .info-card,
+body:not(.dark) .box,
+body:not(.dark) .panel,
+body:not(.dark) .dashboard-card {
+  color: var(--text, #0a1a3a) !important;
+}
+
+body:not(.dark) .card h1,
+body:not(.dark) .card h2,
+body:not(.dark) .card h3,
+body:not(.dark) .card h4,
+body:not(.dark) .card h5,
+body:not(.dark) .card h6,
+body:not(.dark) .blog-card h1,
+body:not(.dark) .blog-card h2,
+body:not(.dark) .blog-card h3,
+body:not(.dark) .blog-card h4,
+body:not(.dark) .blog-card h5,
+body:not(.dark) .blog-card h6,
+body:not(.dark) .feature-card h1,
+body:not(.dark) .feature-card h2,
+body:not(.dark) .feature-card h3,
+body:not(.dark) .feature-card h4,
+body:not(.dark) .feature-card h5,
+body:not(.dark) .feature-card h6 {
+  color: #0a1a3a !important;
+}
+
+body:not(.dark) .card p,
+body:not(.dark) .card span,
+body:not(.dark) .card label,
+body:not(.dark) .card .blog-meta,
+body:not(.dark) .blog-card p,
+body:not(.dark) .blog-card span,
+body:not(.dark) .blog-card label,
+body:not(.dark) .blog-card .blog-meta {
+  color: #334155 !important;
+}
+
+body:not(.dark) .card a:not(.btn),
+body:not(.dark) .blog-card a:not(.btn) {
+  color: #0a1a3a !important;
+}
+
+body:not(.dark) .card .btn,
+body:not(.dark) .blog-card .btn {
+  color: inherit;
+}
+
+
+/* =========================================================
+   FINAL LIGHT MODE — HEADER NAMES, ICONS & BOX COLOUR FIX
+   ========================================================= */
+
+/* Header itself */
+html:not(.dark) .site-header,
+body:not(.dark) .site-header {
+  background: #000000 !important;
+  color: #0a1a3a !important;
+  border-bottom-color: #e3e6ec !important;
+}
+
+/* Logo / brand name */
+html:not(.dark) .site-header .brand h1,
+body:not(.dark) .site-header .brand h1 {
+  color: #0a1a3a !important;
+}
+
+html:not(.dark) .site-header .brand h1 i,
+body:not(.dark) .site-header .brand h1 i {
+  color: #2451d6 !important;
+}
+
+html:not(.dark) .site-header .brand span,
+body:not(.dark) .site-header .brand span {
+  color: #5b6472 !important;
+}
+
+/* Header button/link NAMES */
+html:not(.dark) .site-header .header-actions a,
+html:not(.dark) .site-header .header-actions button,
+body:not(.dark) .site-header .header-actions a,
+body:not(.dark) .site-header .header-actions button {
+  color: #0a1a3a !important;
+  background: #000000 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Header ICONS */
+html:not(.dark) .site-header .header-actions i,
+html:not(.dark) .site-header .header-actions svg,
+html:not(.dark) .site-header .header-actions [data-lucide],
+body:not(.dark) .site-header .header-actions i,
+body:not(.dark) .site-header .header-actions svg,
+body:not(.dark) .site-header .header-actions [data-lucide] {
+  color: #2451d6 !important;
+  fill: currentColor;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Header hover */
+html:not(.dark) .site-header .header-actions a:hover,
+html:not(.dark) .site-header .header-actions button:hover,
+body:not(.dark) .site-header .header-actions a:hover,
+body:not(.dark) .site-header .header-actions button:hover {
+  color: #0a1a3a !important;
+  background: #000000 !important;
+  border-color: #2451d6 !important;
+}
+
+/* Primary header button stays blue */
+html:not(.dark) .site-header .header-actions .btn-primary,
+body:not(.dark) .site-header .header-actions .btn-primary {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #2451d6 !important;
+}
+
+html:not(.dark) .site-header .header-actions .btn-primary i,
+body:not(.dark) .site-header .header-actions .btn-primary i {
+  color: #ffffff !important;
+}
+
+/* =========================================================
+   LIGHT MODE — ALL CARDS / BOXES
+   ========================================================= */
+
+html:not(.dark) .card,
+html:not(.dark) .blog-card,
+html:not(.dark) .feature-card,
+html:not(.dark) .service-card,
+html:not(.dark) .stat-card,
+html:not(.dark) .info-card,
+html:not(.dark) .box,
+html:not(.dark) .panel,
+html:not(.dark) .dashboard-card,
+body:not(.dark) .card,
+body:not(.dark) .blog-card,
+body:not(.dark) .feature-card,
+body:not(.dark) .service-card,
+body:not(.dark) .stat-card,
+body:not(.dark) .info-card,
+body:not(.dark) .box,
+body:not(.dark) .panel,
+body:not(.dark) .dashboard-card {
+  background: #f3f4f7 !important;
+  color: #10182a !important;
+  border-color: #e3e6ec !important;
+}
+
+/* Card headings / names */
+html:not(.dark) .card h1,
+html:not(.dark) .card h2,
+html:not(.dark) .card h3,
+html:not(.dark) .card h4,
+html:not(.dark) .card h5,
+html:not(.dark) .card h6,
+html:not(.dark) .blog-card h1,
+html:not(.dark) .blog-card h2,
+html:not(.dark) .blog-card h3,
+html:not(.dark) .blog-card h4,
+html:not(.dark) .blog-card h5,
+html:not(.dark) .blog-card h6,
+body:not(.dark) .card h1,
+body:not(.dark) .card h2,
+body:not(.dark) .card h3,
+body:not(.dark) .card h4,
+body:not(.dark) .card h5,
+body:not(.dark) .card h6,
+body:not(.dark) .blog-card h1,
+body:not(.dark) .blog-card h2,
+body:not(.dark) .blog-card h3,
+body:not(.dark) .blog-card h4,
+body:not(.dark) .blog-card h5,
+body:not(.dark) .blog-card h6 {
+  color: #0a1a3a !important;
+}
+
+/* Card normal text */
+html:not(.dark) .card p,
+html:not(.dark) .card span,
+html:not(.dark) .card label,
+html:not(.dark) .blog-card p,
+html:not(.dark) .blog-card span,
+html:not(.dark) .blog-card label,
+body:not(.dark) .card p,
+body:not(.dark) .card span,
+body:not(.dark) .card label,
+body:not(.dark) .blog-card p,
+body:not(.dark) .blog-card span,
+body:not(.dark) .blog-card label {
+  color: #334155 !important;
+}
+
+/* Blog category labels */
+html:not(.dark) .blog-meta,
+body:not(.dark) .blog-meta {
+  color: #2451d6 !important;
+}
+
+/* Card icons */
+html:not(.dark) .card i,
+html:not(.dark) .blog-card i,
+html:not(.dark) .feature-card i,
+body:not(.dark) .card i,
+body:not(.dark) .blog-card i,
+body:not(.dark) .feature-card i {
+  color: #2451d6 !important;
+  opacity: 1 !important;
+}
+
+/* Links inside cards */
+html:not(.dark) .card a:not(.btn),
+html:not(.dark) .blog-card a:not(.btn),
+body:not(.dark) .card a:not(.btn),
+body:not(.dark) .blog-card a:not(.btn) {
+  color: #0a1a3a !important;
+}
+
+/* Outline buttons inside cards */
+html:not(.dark) .card .btn-outline,
+html:not(.dark) .blog-card .btn-outline,
+html:not(.dark) .card .btn-outline-dark,
+html:not(.dark) .blog-card .btn-outline-dark,
+body:not(.dark) .card .btn-outline,
+body:not(.dark) .blog-card .btn-outline,
+body:not(.dark) .card .btn-outline-dark,
+body:not(.dark) .blog-card .btn-outline-dark {
+  color: #2451d6 !important;
+  background: transparent !important;
+  border-color: #2451d6 !important;
+}
+
+html:not(.dark) .card .btn-outline i,
+html:not(.dark) .blog-card .btn-outline i,
+html:not(.dark) .card .btn-outline-dark i,
+html:not(.dark) .blog-card .btn-outline-dark i,
+body:not(.dark) .card .btn-outline i,
+body:not(.dark) .blog-card .btn-outline i,
+body:not(.dark) .card .btn-outline-dark i,
+body:not(.dark) .blog-card .btn-outline-dark i {
+  color: #2451d6 !important;
+}
+
+
+/* =========================================================
+   LIGHT MODE — GREY-BLUE HEADER
+   ========================================================= */
+
+html:not(.dark) .site-header,
+body:not(.dark) .site-header {
+  background: #000000 !important;
+  color: #0a1a3a !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  box-shadow: 0 2px 12px rgba(10,26,58,.08) !important;
+}
+
+/* Brand */
+html:not(.dark) .site-header .brand h1,
+body:not(.dark) .site-header .brand h1 {
+  color: #0a1a3a !important;
+}
+
+html:not(.dark) .site-header .brand h1 i,
+body:not(.dark) .site-header .brand h1 i {
+  color: #2451d6 !important;
+}
+
+html:not(.dark) .site-header .brand span,
+body:not(.dark) .site-header .brand span {
+  color: #475569 !important;
+}
+
+/* Header navigation buttons */
+html:not(.dark) .site-header .header-actions a,
+html:not(.dark) .site-header .header-actions button,
+body:not(.dark) .site-header .header-actions a,
+body:not(.dark) .site-header .header-actions button {
+  background: #000000 !important;
+  color: #0a1a3a !important;
+  border-color: #b8c7da !important;
+}
+
+/* Header navigation icons */
+html:not(.dark) .site-header .header-actions a i,
+html:not(.dark) .site-header .header-actions button i,
+body:not(.dark) .site-header .header-actions a i,
+body:not(.dark) .site-header .header-actions button i {
+  color: #2451d6 !important;
+}
+
+/* Hover */
+html:not(.dark) .site-header .header-actions a:hover,
+html:not(.dark) .site-header .header-actions button:hover,
+body:not(.dark) .site-header .header-actions a:hover,
+body:not(.dark) .site-header .header-actions button:hover {
+  background: #000000 !important;
+  color: #0a1a3a !important;
+  border-color: #2451d6 !important;
+}
+
+/* Primary action */
+html:not(.dark) .site-header .header-actions .btn-primary,
+body:not(.dark) .site-header .header-actions .btn-primary {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #2451d6 !important;
+}
+
+html:not(.dark) .site-header .header-actions .btn-primary i,
+body:not(.dark) .site-header .header-actions .btn-primary i {
+  color: #ffffff !important;
+}
+
+
+/* =========================================================
+   LIGHT MODE — GREY-BLUE FOOTER
+   Slightly stronger/deeper than the page background
+   ========================================================= */
+
+html:not(.dark) .manlung-footer,
+body:not(.dark) .manlung-footer {
+  background: #d7e2f0 !important;
+  color: #0a1a3a !important;
+  border-top: 1px solid #b8c7da !important;
+}
+
+/* Footer inner content — narrower on desktop */
+html:not(.dark) .manlung-footer .container,
+body:not(.dark) .manlung-footer .container {
+  max-width: 1080px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Footer brand */
+html:not(.dark) .manlung-footer-brand h2,
+body:not(.dark) .manlung-footer-brand h2 {
+  color: #0a1a3a !important;
+}
+
+html:not(.dark) .manlung-footer-brand h2 i,
+body:not(.dark) .manlung-footer-brand h2 i {
+  color: #2451d6 !important;
+}
+
+html:not(.dark) .manlung-footer-brand p,
+body:not(.dark) .manlung-footer-brand p {
+  color: #475569 !important;
+}
+
+/* Footer links */
+html:not(.dark) .manlung-footer-link,
+body:not(.dark) .manlung-footer-link {
+  background: rgba(255,255,255,.42) !important;
+  border-color: #b8c7da !important;
+  color: #0a1a3a !important;
+}
+
+html:not(.dark) .manlung-footer-link i,
+body:not(.dark) .manlung-footer-link i {
+  color: #2451d6 !important;
+}
+
+html:not(.dark) .manlung-footer-link:hover,
+body:not(.dark) .manlung-footer-link:hover {
+  background: #c7d7e9 !important;
+  border-color: #2451d6 !important;
+  color: #0a1a3a !important;
+}
+
+/* Footer security section */
+html:not(.dark) .manlung-footer-security-links,
+body:not(.dark) .manlung-footer-security-links {
+  color: #334155 !important;
+}
+
+html:not(.dark) .manlung-footer-security-links i,
+body:not(.dark) .manlung-footer-security-links i {
+  color: #2451d6 !important;
+}
+
+/* Footer bottom */
+html:not(.dark) .manlung-footer-bottom,
+body:not(.dark) .manlung-footer-bottom {
+  border-top-color: #b8c7da !important;
+  color: #64748b !important;
+}
+
+html:not(.dark) .manlung-footer-bottom strong,
+body:not(.dark) .manlung-footer-bottom strong {
+  color: #334155 !important;
+}
+
+/* =========================================================
+   DESKTOP — REDUCE FOOTER CONTENT WIDTH
+   ========================================================= */
+
+@media (min-width: 1024px) {
+  html:not(.dark) .manlung-footer > *,
+  body:not(.dark) .manlung-footer > * {
+    max-width: 1080px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  html:not(.dark) .manlung-footer,
+  body:not(.dark) .manlung-footer {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+}
+
+/* =========================================================
+   MOBILE — KEEP FOOTER COMFORTABLE
+   ========================================================= */
+
+@media (max-width: 767px) {
+  html:not(.dark) .manlung-footer,
+  body:not(.dark) .manlung-footer {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL LIGHT MODE FOOTER — TEXT CONTRAST FIX
+   ========================================================= */
+
+html:not(.dark) .manlung-footer,
+body:not(.dark) .manlung-footer {
+  background: #cbd9e9 !important;
+  color: #0a1a3a !important;
+}
+
+/* ALL footer text */
+html:not(.dark) .manlung-footer,
+html:not(.dark) .manlung-footer *,
+body:not(.dark) .manlung-footer,
+body:not(.dark) .manlung-footer * {
+  text-shadow: none !important;
+}
+
+/* Footer headings */
+html:not(.dark) .manlung-footer h1,
+html:not(.dark) .manlung-footer h2,
+html:not(.dark) .manlung-footer h3,
+html:not(.dark) .manlung-footer h4,
+html:not(.dark) .manlung-footer h5,
+html:not(.dark) .manlung-footer h6,
+body:not(.dark) .manlung-footer h1,
+body:not(.dark) .manlung-footer h2,
+body:not(.dark) .manlung-footer h3,
+body:not(.dark) .manlung-footer h4,
+body:not(.dark) .manlung-footer h5,
+body:not(.dark) .manlung-footer h6 {
+  color: #07152f !important;
+}
+
+/* Footer paragraphs and normal text */
+html:not(.dark) .manlung-footer p,
+html:not(.dark) .manlung-footer span,
+html:not(.dark) .manlung-footer strong,
+html:not(.dark) .manlung-footer div,
+body:not(.dark) .manlung-footer p,
+body:not(.dark) .manlung-footer span,
+body:not(.dark) .manlung-footer strong,
+body:not(.dark) .manlung-footer div {
+  color: #24364f !important;
+}
+
+/* Footer links */
+html:not(.dark) .manlung-footer a,
+body:not(.dark) .manlung-footer a {
+  color: #0a1a3a !important;
+}
+
+/* Footer link icons */
+html:not(.dark) .manlung-footer a i,
+html:not(.dark) .manlung-footer i,
+body:not(.dark) .manlung-footer a i,
+body:not(.dark) .manlung-footer i {
+  color: #174ea6 !important;
+  opacity: 1 !important;
+}
+
+/* Footer link boxes */
+html:not(.dark) .manlung-footer .manlung-footer-link,
+body:not(.dark) .manlung-footer .manlung-footer-link {
+  background: rgba(255,255,255,.55) !important;
+  border: 1px solid #aebfd4 !important;
+  color: #0a1a3a !important;
+}
+
+/* Footer link hover */
+html:not(.dark) .manlung-footer .manlung-footer-link:hover,
+body:not(.dark) .manlung-footer .manlung-footer-link:hover {
+  background: #b9cbe0 !important;
+  border-color: #2451d6 !important;
+  color: #07152f !important;
+}
+
+/* Footer bottom */
+html:not(.dark) .manlung-footer .manlung-footer-bottom,
+body:not(.dark) .manlung-footer .manlung-footer-bottom {
+  color: #40536d !important;
+  border-top: 1px solid #aebfd4 !important;
+}
+
+html:not(.dark) .manlung-footer .manlung-footer-bottom strong,
+body:not(.dark) .manlung-footer .manlung-footer-bottom strong {
+  color: #24364f !important;
+}
+
+/* =========================================================
+   DO NOT CHANGE DARK MODE FOOTER
+   ========================================================= */
+
+html.dark .manlung-footer,
+body.dark .manlung-footer {
+  color: inherit;
+}
+
+
+/* FINAL FOOTER OVERRIDE */
+.manlung-footer {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.manlung-footer h2,
+.manlung-footer h3,
+.manlung-footer p,
+.manlung-footer span,
+.manlung-footer strong,
+.manlung-footer div,
+.manlung-footer li {
+  color: #ffffff !important;
+}
+
+.manlung-footer a {
+  color: #ffffff !important;
+}
+
+.manlung-footer .manlung-footer-link {
+  background: #111111 !important;
+  border: 1px solid #333333 !important;
+  color: #ffffff !important;
+}
+
+.manlung-footer .manlung-footer-link i {
+  color: #ffffff !important;
+}
+
+.manlung-footer .manlung-footer-link:hover {
+  background: #222222 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.manlung-footer-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 20px auto;
+}
+
+.manlung-footer-social a {
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #111111 !important;
+  border: 1px solid #444444 !important;
+  color: #ffffff !important;
+}
+
+.manlung-footer-social a i,
+.manlung-footer-social a .fab,
+.manlung-footer-social a .fa-brands {
+  color: #ffffff !important;
+  font-size: 20px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.manlung-footer-social a:hover {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 0 18px rgba(255,255,255,.25);
+}
+
+.manlung-footer-social a:hover i,
+.manlung-footer-social a:hover .fab,
+.manlung-footer-social a:hover .fa-brands {
+  color: #000000 !important;
+}
+
+.manlung-footer .manlung-footer-bottom {
+  color: #cccccc !important;
+  border-top: 1px solid #333333 !important;
+}
+
+.manlung-footer .manlung-footer-bottom strong {
+  color: #ffffff !important;
+}
+
+
+/* =========================================================
+   FINAL FOOTER COLOUR — BLACK BACKGROUND / WHITE CONTENT
+   ========================================================= */
+
+.manlung-footer {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Everything inside footer */
+.manlung-footer,
+.manlung-footer div,
+.manlung-footer section,
+.manlung-footer h1,
+.manlung-footer h2,
+.manlung-footer h3,
+.manlung-footer h4,
+.manlung-footer h5,
+.manlung-footer h6,
+.manlung-footer p,
+.manlung-footer span,
+.manlung-footer strong,
+.manlung-footer li,
+.manlung-footer label {
+  color: #ffffff !important;
+}
+
+/* All footer links */
+.manlung-footer a,
+.manlung-footer a:visited,
+.manlung-footer a:active {
+  color: #ffffff !important;
+  text-decoration: none;
+}
+
+/* Footer link hover */
+.manlung-footer a:hover {
+  color: #ffffff !important;
+}
+
+/* Footer icons */
+.manlung-footer i,
+.manlung-footer svg,
+.manlung-footer .fab,
+.manlung-footer .fas,
+.manlung-footer .far,
+.manlung-footer .fa-brands {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Footer social icons */
+.manlung-footer-social a,
+.manlung-footer-social a i,
+.manlung-footer-social a svg,
+.manlung-footer-social a .fab,
+.manlung-footer-social a .fa-brands {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Footer bottom line */
+.manlung-footer-bottom {
+  color: #ffffff !important;
+  border-top-color: rgba(255,255,255,.25) !important;
+}
+
+.manlung-footer-bottom strong {
+  color: #ffffff !important;
+}
+
+/* Footer link boxes stay dark/black */
+.manlung-footer .manlung-footer-link {
+  background: #111111 !important;
+  border-color: #333333 !important;
+  color: #ffffff !important;
+}
+
+.manlung-footer .manlung-footer-link:hover {
+  background: #222222 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Social circles */
+.manlung-footer-social a {
+  background: #111111 !important;
+  border-color: #444444 !important;
+}
+
+.manlung-footer-social a:hover {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+.manlung-footer-social a:hover i,
+.manlung-footer-social a:hover svg,
+.manlung-footer-social a:hover .fab,
+.manlung-footer-social a:hover .fa-brands {
+  color: #000000 !important;
+  fill: #000000 !important;
+}
+
+
+/* =========================================================
+   MANLUNG RECOVERY — FINAL FOOTER DESIGN
+   SOLID BLACK / WHITE CONTENT / WHITE SOCIAL ICONS
+   ========================================================= */
+
+.manlung-footer {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-top: 1px solid #222222 !important;
+}
+
+/* ALL FOOTER TEXT */
+.manlung-footer * {
+  color: #ffffff !important;
+}
+
+/* Footer headings */
+.manlung-footer h1,
+.manlung-footer h2,
+.manlung-footer h3,
+.manlung-footer h4,
+.manlung-footer h5,
+.manlung-footer h6 {
+  color: #ffffff !important;
+}
+
+/* Footer description and security text */
+.manlung-footer p,
+.manlung-footer span,
+.manlung-footer div,
+.manlung-footer strong,
+.manlung-footer li {
+  color: #ffffff !important;
+}
+
+/* ALL FOOTER LINKS */
+.manlung-footer a,
+.manlung-footer a:visited,
+.manlung-footer a:active {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+/* Footer links hover */
+.manlung-footer a:hover {
+  color: #ffffff !important;
+}
+
+/* FOOTER ICONS */
+.manlung-footer i,
+.manlung-footer svg,
+.manlung-footer .fab,
+.manlung-footer .fas,
+.manlung-footer .far,
+.manlung-footer .fa,
+.manlung-footer .fa-brands,
+.manlung-footer .fa-solid,
+.manlung-footer .fa-regular {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* FOOTER LINK BOXES */
+.manlung-footer .manlung-footer-link {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333 !important;
+}
+
+.manlung-footer .manlung-footer-link:hover {
+  background: #222222 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+/* SOCIAL MEDIA AREA */
+.manlung-footer-social {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin: 20px auto !important;
+}
+
+/* SOCIAL MEDIA CIRCLES */
+.manlung-footer-social a {
+  width: 46px !important;
+  height: 46px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: #111111 !important;
+  border: 1px solid #555555 !important;
+  color: #ffffff !important;
+  transition: all .25s ease !important;
+}
+
+/* SOCIAL MEDIA ICONS */
+.manlung-footer-social a i,
+.manlung-footer-social a svg,
+.manlung-footer-social a .fab,
+.manlung-footer-social a .fa-brands,
+.manlung-footer-social a .fa-solid {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  font-size: 20px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* SOCIAL HOVER */
+.manlung-footer-social a:hover {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  transform: translateY(-4px) scale(1.08) !important;
+  box-shadow: 0 0 18px rgba(255,255,255,.25) !important;
+}
+
+.manlung-footer-social a:hover i,
+.manlung-footer-social a:hover svg,
+.manlung-footer-social a:hover .fab,
+.manlung-footer-social a:hover .fa-brands,
+.manlung-footer-social a:hover .fa-solid {
+  color: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* EMAIL / PHONE */
+.manlung-footer a[href^="mailto:"],
+.manlung-footer a[href^="tel:"] {
+  color: #ffffff !important;
+}
+
+/* FOOTER BOTTOM */
+.manlung-footer .manlung-footer-bottom,
+.manlung-footer .manlung-footer-bottom * {
+  color: #ffffff !important;
+}
+
+.manlung-footer .manlung-footer-bottom {
+  border-top: 1px solid rgba(255,255,255,.25) !important;
+}
+
+/* TERMS + PRIVACY */
+.manlung-footer-bottom a,
+.manlung-footer-bottom a:visited {
+  color: #ffffff !important;
+}
+
+
+/* =========================================================
+   MANLUNG RECOVERY — FINAL FOOTER
+   SOLID BLACK / WHITE CONTENT
+   ========================================================= */
+
+.manlung-footer {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-top: 1px solid #222222 !important;
+}
+
+.manlung-footer * {
+  color: #ffffff !important;
+}
+
+.manlung-footer h1,
+.manlung-footer h2,
+.manlung-footer h3,
+.manlung-footer h4,
+.manlung-footer h5,
+.manlung-footer h6 {
+  color: #ffffff !important;
+}
+
+.manlung-footer p,
+.manlung-footer span,
+.manlung-footer div,
+.manlung-footer li,
+.manlung-footer strong,
+.manlung-footer label {
+  color: #ffffff !important;
+}
+
+.manlung-footer a,
+.manlung-footer a:visited,
+.manlung-footer a:active {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+.manlung-footer a:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+
+/* Footer links */
+.manlung-footer .manlung-footer-link {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333 !important;
+  border-radius: 10px !important;
+}
+
+.manlung-footer .manlung-footer-link:hover {
+  background: #222222 !important;
+  border-color: #ffffff !important;
+}
+
+/* Social media */
+.manlung-footer-social {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  margin: 22px auto !important;
+}
+
+.manlung-footer-social a {
+  width: 48px !important;
+  height: 48px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: #111111 !important;
+  border: 1px solid #555555 !important;
+  color: #ffffff !important;
+  transition: all .25s ease !important;
+}
+
+.manlung-footer-social a i,
+.manlung-footer-social a svg,
+.manlung-footer-social a .fab,
+.manlung-footer-social a .fa-brands,
+.manlung-footer-social a .fa-solid {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  font-size: 20px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.manlung-footer-social a:hover {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  transform: translateY(-4px) scale(1.08) !important;
+}
+
+.manlung-footer-social a:hover i,
+.manlung-footer-social a:hover svg,
+.manlung-footer-social a:hover .fab,
+.manlung-footer-social a:hover .fa-brands,
+.manlung-footer-social a:hover .fa-solid {
+  color: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Email and phone */
+.manlung-footer a[href^="mailto:"],
+.manlung-footer a[href^="tel:"] {
+  color: #ffffff !important;
+}
+
+/* Bottom footer */
+.manlung-footer-bottom,
+.manlung-footer-bottom * {
+  color: #ffffff !important;
+}
+
+.manlung-footer-bottom {
+  border-top: 1px solid #333333 !important;
+}
+
+/* Terms and Privacy */
+.manlung-footer-bottom a,
+.manlung-footer-bottom a:visited {
+  color: #ffffff !important;
+}
+
+
+/* =========================================================
+   FINAL LIGHT MODE FOOTER — TEXT CONTRAST FIX
+   ========================================================= */
+
+html:not(.dark) .manlung-footer,
+body:not(.dark) .manlung-footer {
+  background: #cbd9e9 !important;
+  color: #0a1a3a !important;
+}
+
+/* ALL footer text */
+html:not(.dark) .manlung-footer,
+html:not(.dark) .manlung-footer *,
+body:not(.dark) .manlung-footer,
+body:not(.dark) .manlung-footer * {
+  text-shadow: none !important;
+}
+
+/* Footer headings */
+html:not(.dark) .manlung-footer h1,
+html:not(.dark) .manlung-footer h2,
+html:not(.dark) .manlung-footer h3,
+html:not(.dark) .manlung-footer h4,
+html:not(.dark) .manlung-footer h5,
+html:not(.dark) .manlung-footer h6,
+body:not(.dark) .manlung-footer h1,
+body:not(.dark) .manlung-footer h2,
+body:not(.dark) .manlung-footer h3,
+body:not(.dark) .manlung-footer h4,
+body:not(.dark) .manlung-footer h5,
+body:not(.dark) .manlung-footer h6 {
+  color: #07152f !important;
+}
+
+/* Footer paragraphs and normal text */
+html:not(.dark) .manlung-footer p,
+html:not(.dark) .manlung-footer span,
+html:not(.dark) .manlung-footer strong,
+html:not(.dark) .manlung-footer div,
+body:not(.dark) .manlung-footer p,
+body:not(.dark) .manlung-footer span,
+body:not(.dark) .manlung-footer strong,
+body:not(.dark) .manlung-footer div {
+  color: #24364f !important;
+}
+
+/* Footer links */
+html:not(.dark) .manlung-footer a,
+body:not(.dark) .manlung-footer a {
+  color: #0a1a3a !important;
+}
+
+/* Footer link icons */
+html:not(.dark) .manlung-footer a i,
+html:not(.dark) .manlung-footer i,
+body:not(.dark) .manlung-footer a i,
+body:not(.dark) .manlung-footer i {
+  color: #174ea6 !important;
+  opacity: 1 !important;
+}
+
+/* Footer link boxes */
+html:not(.dark) .manlung-footer .manlung-footer-link,
+body:not(.dark) .manlung-footer .manlung-footer-link {
+  background: rgba(255,255,255,.55) !important;
+  border: 1px solid #aebfd4 !important;
+  color: #0a1a3a !important;
+}
+
+/* Footer link hover */
+html:not(.dark) .manlung-footer .manlung-footer-link:hover,
+body:not(.dark) .manlung-footer .manlung-footer-link:hover {
+  background: #b9cbe0 !important;
+  border-color: #2451d6 !important;
+  color: #07152f !important;
+}
+
+/* Footer bottom */
+html:not(.dark) .manlung-footer .manlung-footer-bottom,
+body:not(.dark) .manlung-footer .manlung-footer-bottom {
+  color: #40536d !important;
+  border-top: 1px solid #aebfd4 !important;
+}
+
+html:not(.dark) .manlung-footer .manlung-footer-bottom strong,
+body:not(.dark) .manlung-footer .manlung-footer-bottom strong {
+  color: #24364f !important;
+}
+
+/* =========================================================
+   DO NOT CHANGE DARK MODE FOOTER
+   ========================================================= */
+
+html.dark .manlung-footer,
+body.dark .manlung-footer {
+  color: inherit;
+}
+
+
+/* =========================================================
+   MANLUNG RECOVERY — FINAL FOOTER
+   SOLID BLACK + WHITE CONTENT
+   ========================================================= */
+
+.manlung-footer {
+  background: #000 !important;
+  color: #fff !important;
+  border-top: 1px solid #222 !important;
+}
+
+.manlung-footer *,
+.manlung-footer h1,
+.manlung-footer h2,
+.manlung-footer h3,
+.manlung-footer h4,
+.manlung-footer h5,
+.manlung-footer h6,
+.manlung-footer p,
+.manlung-footer span,
+.manlung-footer div,
+.manlung-footer li,
+.manlung-footer strong,
+.manlung-footer label,
+.manlung-footer a,
+.manlung-footer a:visited,
+.manlung-footer a:active {
+  color: #fff !important;
+}
+
+.manlung-footer a {
+  text-decoration: none !important;
+}
+
+.manlung-footer a:hover {
+  color: #fff !important;
+}
+
+.manlung-footer i,
+.manlung-footer svg,
+.manlung-footer .fa,
+.manlung-footer .fas,
+.manlung-footer .far,
+.manlung-footer .fab,
+.manlung-footer .fa-solid,
+.manlung-footer .fa-regular,
+.manlung-footer .fa-brands {
+  color: #fff !important;
+  fill: #fff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.manlung-footer .manlung-footer-link {
+  background: #111 !important;
+  color: #fff !important;
+  border: 1px solid #333 !important;
+}
+
+.manlung-footer .manlung-footer-link:hover {
+  background: #222 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+.manlung-footer .manlung-footer-social a {
+  background: #111 !important;
+  border: 1px solid #555 !important;
+  color: #fff !important;
+}
+
+.manlung-footer .manlung-footer-social a:hover {
+  background: #fff !important;
+  border-color: #fff !important;
+}
+
+.manlung-footer .manlung-footer-social a:hover i,
+.manlung-footer .manlung-footer-social a:hover svg,
+.manlung-footer .manlung-footer-social a:hover .fab,
+.manlung-footer .manlung-footer-social a:hover .fa-brands {
+  color: #000 !important;
+  fill: #000 !important;
+}
+
+.manlung-footer .manlung-footer-bottom {
+  color: #fff !important;
+  border-top: 1px solid #333 !important;
+}
+
+.manlung-footer .manlung-footer-bottom * {
+  color: #fff !important;
+}
+
+.manlung-footer a[href^="mailto:"],
+.manlung-footer a[href^="tel:"] {
+  color: #fff !important;
+}
+
+
+
+/* FINAL BRAND OVERRIDE — requested dark gray header */
+.site-header {
+  background: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-bottom-color: rgba(255,255,255,.18) !important;
+}
+.site-header .brand h1,
+.site-header .brand span,
+.site-header .header-actions a,
+.site-header .header-actions button,
+.site-header .header-actions i {
+  color: #ffffff !important;
+}

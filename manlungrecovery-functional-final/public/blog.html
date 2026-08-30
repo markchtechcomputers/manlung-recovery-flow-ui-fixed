@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+    <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog · Manlung Recovery</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .blog-hero {
+            text-align: center;
+            padding: 3rem 1rem;
+            margin-bottom: 2rem;
+            border-radius: 28px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--navy-900), var(--navy-700));
+        }
+        .blog-hero h1 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: .8rem; }
+        .blog-hero p { max-width: 760px; margin: 0 auto; opacity: .9; line-height: 1.7; }
+        .blog-categories {
+            display: flex; flex-wrap: wrap; gap: .55rem; justify-content: center;
+            margin: 0 0 2rem;
+        }
+        .blog-category {
+            display: inline-flex; align-items: center; gap: .35rem;
+            padding: .5rem .8rem; border-radius: 999px;
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            color: var(--text-muted); font-size: .85rem; font-weight: 600;
+        }
+        .blog-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem; margin-bottom: 2rem;
+        }
+        .blog-card { height: 100%; display: flex; flex-direction: column; }
+        .blog-card .blog-meta {
+            color: var(--accent); font-size: .78rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .04em; margin-bottom: .55rem;
+        }
+        .blog-card h2 { font-size: 1.2rem; margin-bottom: .65rem; }
+        .blog-card p { color: var(--text-muted); line-height: 1.65; }
+        .blog-card .btn { align-self: flex-start; margin-top: auto; padding-top: .8rem; }
+        .featured {
+            display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(240px, .6fr);
+            gap: 1.5rem; align-items: stretch; margin-bottom: 2rem;
+        }
+        .featured-panel {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg); padding: 2rem;
+        }
+        .featured-panel h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); margin-bottom: .8rem; }
+        .featured-panel p { color: var(--text-muted); line-height: 1.75; }
+        .featured-aside {
+            background: linear-gradient(160deg, var(--navy-900), var(--navy-800));
+            color: #fff; border-radius: var(--radius-lg); padding: 1.6rem;
+        }
+        .featured-aside h3 { margin-bottom: .7rem; }
+        .featured-aside p { opacity: .88; line-height: 1.65; }
+        .article-section { scroll-margin-top: 1rem; }
+        @media (max-width: 720px) {
+            .featured { grid-template-columns: 1fr; }
+            .featured-panel, .featured-aside { padding: 1.4rem; }
+        }
+    </style>
+
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:
+    linear-gradient(135deg,rgba(15,23,42,.98),rgba(17,35,56,.98)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 64px);
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 4px 18px rgba(2,6,23,.22);
+}
+.site-header .container{
+  max-width:1180px;
+  margin:0 auto;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.55rem .8rem;
+}
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  min-width:0;
+}
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.05rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+.site-header .brand span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.72rem;
+  white-space:nowrap;
+}
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  min-height:38px;
+  padding:.45rem .68rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:700;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.35);
+  color:#fff;
+}
+.site-header .header-actions .btn-primary{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.site-header .header-actions .btn-primary:hover{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+}
+@media(max-width:900px){
+  .site-header .container{
+    min-height:58px;
+    padding:.45rem .7rem;
+  }
+  .site-header .brand h1{
+    font-size:.95rem;
+  }
+  .site-header .brand span{
+    font-size:.64rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:36px;
+    padding:.4rem .55rem;
+    font-size:.7rem;
+  }
+}
+@media(max-width:700px){
+  .site-header .container{
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+  .site-header .brand{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+  .site-header .brand span{
+    white-space:normal;
+  }
+  .site-header .header-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.35rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:38px;
+    padding:.35rem .2rem;
+    font-size:.68rem;
+  }
+}
+@media(max-width:480px){
+  .site-header .header-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
+  }
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    display:block;
+    font-size:1rem;
+    line-height:1;
+    margin:0;
+  }
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
+  }
+}
+@media(max-width:360px){
+  .site-header .brand h1{
+    font-size:.86rem;
+  }
+  .site-header .brand span{
+    font-size:.58rem;
+  }
+}
+</style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/footer.css?v=ultimate-white-footer-20260830">
+  
+
+
+<style id="manlung-footer-ultimate-contrast">
+/* FINAL OVERRIDE — MANLUNG RECOVERY FOOTER */
+html body footer.manlung-footer {
+  background:#000000 !important;
+  color:#ffffff !important;
+  opacity:1 !important;
+}
+
+html body footer.manlung-footer,
+html body footer.manlung-footer *,
+html body footer.manlung-footer p,
+html body footer.manlung-footer span,
+html body footer.manlung-footer strong,
+html body footer.manlung-footer h2,
+html body footer.manlung-footer h3,
+html body footer.manlung-footer h4,
+html body footer.manlung-footer a,
+html body footer.manlung-footer i,
+html body footer.manlung-footer svg,
+html body footer.manlung-footer svg *,
+html body footer.manlung-footer div,
+html body footer.manlung-footer section,
+html body footer.manlung-footer nav {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer a,
+html body footer.manlung-footer a:visited,
+html body footer.manlung-footer a:hover,
+html body footer.manlung-footer a:active {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  text-decoration:none;
+}
+
+html body footer.manlung-footer .manlung-footer-brand-subtitle,
+html body footer.manlung-footer .manlung-footer-description,
+html body footer.manlung-footer .manlung-footer-trust p,
+html body footer.manlung-footer .manlung-footer-social-label,
+html body footer.manlung-footer .manlung-footer-bottom,
+html body footer.manlung-footer .manlung-footer-bottom span {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer .manlung-footer-social a,
+html body footer.manlung-footer .manlung-footer-social a *,
+html body footer.manlung-footer .manlung-footer-social i,
+html body footer.manlung-footer .manlung-footer-social svg,
+html body footer.manlung-footer .manlung-footer-social svg * {
+  color:#ffffff !important;
+  fill:#ffffff !important;
+  stroke:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+html body footer.manlung-footer .manlung-footer-divider {
+  background:#333333 !important;
+}
+</style>
+
+</head>
+<body>
+    <header class="site-header">
+  <div class="container manlung-header-inner">
+    <div class="brand">
+      <a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home">
+        <img class="manlung-site-logo" src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png" alt="Manlung Recovery">
+      </a>
+      <div class="manlung-brand-copy">
+        <h1><i class="fas fa-shield-halved" aria-hidden="true"></i> Manlung Recovery</h1>
+        <span>Cyber Recovery &amp; Digital Investigation Portal</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-outline" data-theme-toggle="true">
+        <i class="fas fa-moon"></i> Dark
+      </button>
+      <a href="/client/dashboard.html" class="btn btn-outline">
+        <i class="fas fa-user"></i> My Cases
+      </a>
+      <a href="/blog.html" class="btn btn-outline">
+        <i class="fas fa-newspaper"></i> Blog
+      </a>
+      <a href="/donate.html" class="btn btn-outline">
+        <img src="/icons/donation.png" class="donation-nav-icon" alt="" aria-hidden="true"> Donate
+      </a>
+      <a href="/client/request.html" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> New Request
+      </a>
+    </div>
+  </div>
+</header>
+
+    <main class="container">
+        <section class="blog-hero">
+            <h1>Manlung Recovery Blog</h1>
+            <p>A practical information and education center focused on recovery, support, awareness, resilience, responsible guidance, and taking the next positive step.</p>
+        </section>
+
+        <nav class="blog-categories" aria-label="Blog categories">
+            <span class="blog-category"><i class="fas fa-heart"></i> Recovery</span>
+            <span class="blog-category"><i class="fas fa-hands-helping"></i> Support</span>
+            <span class="blog-category"><i class="fas fa-book-open"></i> Education</span>
+            <span class="blog-category"><i class="fas fa-users"></i> Community</span>
+            <span class="blog-category"><i class="fas fa-shield-halved"></i> Awareness</span>
+            <span class="blog-category"><i class="fas fa-seedling"></i> Resilience</span>
+        </nav>
+
+        <section class="featured article-section" id="what-is-manlung-recovery">
+            <article class="featured-panel">
+                <div class="blog-meta">Featured · Our Story</div>
+                <h2>What is Manlung Recovery?</h2>
+                <p>Manlung Recovery is a structured support and education platform designed to help people understand difficult situations, organize information, seek appropriate assistance, communicate with support personnel, and follow their recovery journey.</p>
+                <p style="margin-top:.8rem;">Explore practical knowledge, safer digital habits, warning signs, recovery guidance, community support and resilience resources.</p>
+                <a href="/knowledge.html" class="btn btn-primary" style="margin-top:1.2rem;"><i class="fas fa-book-open"></i> Open Knowledge Center</a>
+            </article>
+            <aside class="featured-aside">
+                <h3><i class="fas fa-compass"></i> Explore a topic</h3>
+                <p>Choose an area to learn more and find practical next steps.</p>
+                <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem;margin-top:1rem;">
+                    <a href="/knowledge.html#recovery" class="btn btn-outline">Recovery</a>
+                    <a href="/knowledge.html#support" class="btn btn-outline">Support</a>
+                    <a href="/knowledge.html#education" class="btn btn-outline">Education</a>
+                    <a href="/knowledge.html#community" class="btn btn-outline">Community</a>
+                    <a href="/knowledge.html#awareness" class="btn btn-outline">Awareness</a>
+                    <a href="/knowledge.html#resilience" class="btn btn-outline">Resilience</a>
+                </div>
+            </aside>
+        </section>
+
+        <section class="card article-section" id="our-mission" style="margin-bottom:2rem;">
+            <div class="blog-meta">Our Mission</div>
+            <h2 style="font-size:1.7rem; margin-bottom:.7rem;">Hope, dignity and responsible support</h2>
+            <p style="color:var(--text-muted); line-height:1.75;">Our mission is centered on hope, dignity, recovery, support, education, community, and responsible guidance. The goal is to help people take the next positive step without overstating what any service can guarantee.</p>
+        </section>
+
+        <section id="articles" class="article-section">
+            <div class="card-title"><i class="fas fa-newspaper"></i> Recent articles</div>
+            <div class="blog-grid">
+                <article class="card blog-card" id="recovery-journey">
+                    <div class="blog-meta">Recovery</div>
+                    <h2>Understanding the Recovery Journey</h2>
+                    <p>Recovery is often a process rather than a single event. Breaking a difficult situation into clear, manageable next steps can make progress easier to see.</p>
+                    <a class="btn btn-outline-dark" href="#recovery-journey">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="taking-first-step">
+                    <div class="blog-meta">Guidance</div>
+                    <h2>Taking the First Step</h2>
+                    <p>Start with what you know: what happened, when it happened, what evidence you have, and what outcome you need. Clear information helps support teams understand a case.</p>
+                    <a class="btn btn-outline-dark" href="#taking-first-step">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="asking-for-help">
+                    <div class="blog-meta">Support</div>
+                    <h2>Why Asking for Help Matters</h2>
+                    <p>Asking for help can create a clearer path forward. Reaching out early can also make it easier to preserve information and identify appropriate next steps.</p>
+                    <a class="btn btn-outline-dark" href="#asking-for-help">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="supporting-someone">
+                    <div class="blog-meta">Community</div>
+                    <h2>Supporting Someone You Care About</h2>
+                    <p>Good support starts with listening, respecting the person's dignity, and helping them connect with the right source of assistance rather than making promises on their behalf.</p>
+                    <a class="btn btn-outline-dark" href="#supporting-someone">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="resilience-hope">
+                    <div class="blog-meta">Resilience</div>
+                    <h2>Recovery, Resilience and Hope</h2>
+                    <p>Resilience can mean continuing to take constructive steps after a setback. Keeping useful records, reviewing what changed, and seeking appropriate support can help.</p>
+                    <a class="btn btn-outline-dark" href="#resilience-hope">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="community-support">
+                    <div class="blog-meta">Community</div>
+                    <h2>Why Community Support Matters</h2>
+                    <p>People often navigate difficult situations with more confidence when they know where to find trustworthy information and how to reach appropriate support.</p>
+                    <a class="btn btn-outline-dark" href="#community-support">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="healthy-routines">
+                    <div class="blog-meta">Routines</div>
+                    <h2>Building Healthy Routines</h2>
+                    <p>Simple routines can create structure during periods of change. Keep plans realistic, review progress regularly, and seek professional guidance when the situation calls for it.</p>
+                    <a class="btn btn-outline-dark" href="#healthy-routines">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="setbacks-progress">
+                    <div class="blog-meta">Progress</div>
+                    <h2>Understanding Setbacks and Progress</h2>
+                    <p>A setback does not erase every step already taken. Review what happened, adjust the plan where appropriate, and focus on the next useful action.</p>
+                    <a class="btn btn-outline-dark" href="#setbacks-progress">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="breaking-stigma">
+                    <div class="blog-meta">Awareness</div>
+                    <h2>Breaking the Stigma Around Asking for Help</h2>
+                    <p>Seeking assistance is a practical decision, not a failure. Compassionate conversations can make it easier for people to speak up and find appropriate resources.</p>
+                    <a class="btn btn-outline-dark" href="#breaking-stigma">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="card blog-card" id="professional-help">
+                    <div class="blog-meta">Safety</div>
+                    <h2>When to Seek Professional Help</h2>
+                    <p>When a situation involves significant safety, financial, legal, technical, or other specialized risk, consider contacting a qualified professional or the relevant official service.</p>
+                    <a class="btn btn-outline-dark" href="#professional-help">Read More <i class="fas fa-arrow-right"></i></a>
+                </article>
+            </div>
+        </section>
+
+        <section class="featured article-section" id="what-we-are-building">
+            <article class="featured-panel">
+                <div class="blog-meta">Platform</div>
+                <h2>What We Are Building at Manlung Recovery</h2>
+                <p>The platform brings together case support, client communication, recovery information, support requests, awareness, education, community support, careers, and structured assistance.</p>
+                <p style="margin-top:.8rem;">These features are intended to make the process clearer and more organized while keeping existing client and administrative workflows connected.</p>
+            </article>
+            <aside class="featured-aside" id="careers">
+                <h3><i class="fas fa-briefcase"></i> Careers</h3>
+                <p>Manlung Recovery also has a Careers area for people interested in joining or contributing.</p>
+                <a href="/careers.html" class="btn btn-outline" style="margin-top:1rem;">Visit Careers</a>
+            </aside>
+        </section>
+    </main>
+
+    
+<footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+
+    <div class="manlung-footer-grid">
+
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row">
+          <img src="/icons/icon-512.png"
+               alt="Manlung Recovery"
+               class="manlung-footer-logo"
+               width="58"
+               height="58">
+          <div>
+            <h2 id="footer-brand-title">Manlung Recovery</h2>
+            <p class="manlung-footer-brand-subtitle">
+              Cyber Recovery &amp; Digital Investigation Portal
+            </p>
+          </div>
+        </div>
+
+        <p class="manlung-footer-description">
+          Manlung Recovery provides structured digital recovery assistance,
+          investigation support, account and device recovery guidance,
+          cybersecurity awareness, and secure case-management services.
+          Our goal is to help individuals and organizations respond to
+          digital incidents responsibly, protect important information,
+          and take appropriate steps toward recovery.
+        </p>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Quick Links</h3>
+        <nav class="manlung-footer-links" aria-label="Quick links">
+          <a href="/">Home</a>
+          <a href="/about.html">About Manlung Recovery</a>
+          <a href="/knowledge.html">Knowledge Centre</a>
+          <a href="/blog.html">Security &amp; Recovery Blog</a>
+          <a href="/contact.html">Contact Us</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Recovery Services</h3>
+        <nav class="manlung-footer-links" aria-label="Recovery services">
+          <a href="/client/request.html" class="footer-important">Submit Recovery Request</a>
+          <a href="/client/dashboard.html" class="footer-important">Client Portal</a>
+          <a href="/client/track.html">Track a Case</a>
+          <a href="/client/settings.html">Account Settings</a>
+          <a href="/login.html">Sign In</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Security &amp; Trust</h3>
+
+        <div class="manlung-footer-trust">
+          <p>
+            We use access controls, authentication safeguards and responsible
+            information-handling practices to help protect client and case
+            information.
+          </p>
+        </div>
+
+        <div class="manlung-footer-trust">
+          <p>
+            Personal-data processing is described in our Privacy Notice,
+            including applicable rights and responsibilities under Kenya's
+            Data Protection Act, 2019 and relevant regulations.
+          </p>
+        </div>
+
+        <nav class="manlung-footer-links manlung-footer-security-links"
+             aria-label="Legal and security links">
+          <a href="/privacy.html" class="footer-important">Privacy Notice</a>
+          <a href="/terms.html" class="footer-important">Terms &amp; Conditions</a>
+        </nav>
+      </section>
+
+    </div>
+
+    <div class="manlung-footer-divider"></div>
+
+    <div class="manlung-footer-contact-row">
+
+      <div class="manlung-footer-contact">
+        <a href="mailto:manlungrecovery@outlook.com">
+          <i class="fas fa-envelope" aria-hidden="true"></i>
+          manlungrecovery@outlook.com
+        </a>
+
+        <a href="tel:+254724356178">
+          <i class="fas fa-phone" aria-hidden="true"></i>
+          +254 724 356 178
+        </a>
+      </div>
+
+      <div class="manlung-footer-social"
+           aria-label="Manlung Recovery social media">
+
+        <span class="manlung-footer-social-label">Follow Manlung Recovery</span>
+
+        <a href="https://www.youtube.com/@manlungrecory"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on YouTube">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
+          <span>YouTube</span>
+        </a>
+
+        <a href="https://www.linkedin.com/in/mark-ochiengke"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on LinkedIn">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+          <span>LinkedIn</span>
+        </a>
+
+        <a href="https://github.com/markchtechcomputers"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on GitHub">
+          <i class="fab fa-github" aria-hidden="true"></i>
+          <span>GitHub</span>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="manlung-footer-bottom">
+      <span>
+        &copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.
+      </span>
+
+      <div class="manlung-footer-legal">
+        <a href="/terms.html">Terms &amp; Conditions</a>
+        <a href="/privacy.html">Privacy Notice</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<script src="/js/pwa.js" defer></script>
+<script src="/js/site-auth.js" defer></script>
+
+
+</body>
+</html>

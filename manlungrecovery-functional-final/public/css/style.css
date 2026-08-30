@@ -1,0 +1,3029 @@
+/* ===========================================================
+   Manlung Tech City — shared theme
+   Header & footer: dark navy (always)
+   Page background: white (navy in dark mode)
+   Cards: light gray on white / darker slate on dark
+   =========================================================== */
+/* Mobile service detail scrolling fix */
+@media (max-width: 768px) {
+  .service-detail,
+  .service-details,
+  .service-modal-content,
+  .service-modal .modal-content,
+  .service-card .service-content {
+    max-height: 80vh !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain;
+  }
+
+  .service-detail *,
+  .service-details *,
+  .service-modal-content * {
+    max-width: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+}
+
+:root {
+  --navy-900: #0a1a3a;
+  --navy-800: #10254e;
+  --navy-700: #17336b;
+  --accent: #2451d6;
+  --accent-hover: #1b3fae;
+  --page-bg: #ffffff;
+  --card-bg: #f3f4f7;
+  --card-border: #e3e6ec;
+  --text: #10182a;
+  --text-muted: #5b6472;
+  --success: #1f6e4a;
+  --success-bg: #e3f5ea;
+  --danger: #c0392b;
+  --danger-bg: #fdecea;
+  --warning-bg: #f7e7b0;
+  --warning-text: #7d5d0a;
+  --info-bg: #b8d4e8;
+  --info-text: #0f3b5a;
+  --closed-bg: #d1d5db;
+  --closed-text: #2d3748;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-pill: 40px;
+}
+
+body.dark {
+  --page-bg: #0b1424;
+  --card-bg: #17233d;
+  --card-border: #29385a;
+  --text: #e6ecf5;
+  --text-muted: #96abc4;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html, body {
+  background: var(--page-bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* ---------- Header (always dark navy) ---------- */
+.site-header {
+  background: #000000 !important;
+  color: #fff;
+  border-bottom: 3px solid var(--accent);
+}
+
+.site-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 1.2rem;
+  padding-bottom: 1.2rem;
+}
+
+.site-header .brand h1 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.site-header .brand h1 i {
+  color: #6ea8ff;
+  margin-right: 10px;
+}
+
+.site-header .brand span {
+  display: block;
+  font-size: 0.9rem;
+  color: #a9c0ec;
+  font-weight: 500;
+  margin-top: 0.2rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ---------- Footer (always dark navy) ---------- */
+.site-footer {
+  background: linear-gradient(135deg, #081630, #0d2450);
+  color: #a9c0ec;
+  padding: 2.3rem 1.2rem 1rem;
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(110,168,255,.18);
+}
+.site-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+.site-footer-brand strong { display:block; color:#fff; font-size:1rem; margin-bottom:.3rem; }
+.site-footer-brand strong i, .site-footer-security i { color:#6ea8ff; margin-right:.35rem; }
+.site-footer-brand span { color:#8fa8cf; font-size:.82rem; }
+.site-footer-links { display:flex; flex-direction:column; gap:.45rem; }
+.site-footer-links a { color:#c2d3ee; text-decoration:none; }
+.site-footer-links a:hover { color:#fff; text-decoration:underline; }
+.site-footer-security { display:flex; flex-direction:column; gap:.45rem; color:#a9c0ec; }
+.site-footer-bottom { max-width:1200px; margin:1.4rem auto 0; padding-top:1rem; border-top:1px solid rgba(169,192,236,.12); text-align:center; font-size:.78rem; color:#7e97bd; }
+@media (max-width: 760px) {
+  footer.site-footer { padding: 1.6rem 1rem .85rem; margin-top: 2rem; }
+  .site-footer-inner {
+    grid-template-columns: 1fr;
+    gap: .9rem;
+    text-align: center;
+  }
+  .site-footer-brand span { display:block; max-width:30rem; margin:.25rem auto 0; line-height:1.45; }
+  .site-footer-links, .site-footer-security {
+    flex-direction:row;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:.55rem .9rem;
+  }
+  .site-footer-links a, .site-footer-security span {
+    font-size:.82rem;
+    line-height:1.4;
+  }
+  .site-footer-bottom {
+    margin-top:1rem;
+    padding-top:.8rem;
+    line-height:1.45;
+  }
+}
+.site-footer i { color: #6ea8ff; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  padding: 0.6rem 1.4rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.5);
+  color: #fff;
+}
+.btn-outline:hover { background: rgba(255,255,255,0.12); }
+
+/* outline button used on light backgrounds (inside page body, not header/footer) */
+.btn-outline-dark {
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+}
+.btn-outline-dark:hover { background: var(--accent); color: #fff; }
+
+.btn-success {
+  background: var(--success);
+  color: #fff;
+}
+.btn-success:hover { background: #2a8a63; }
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-danger:hover { background: #d9483a; }
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  border: 1px solid var(--card-border);
+  margin-bottom: 2rem;
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-title i { color: var(--accent); }
+
+/* ---------- Hero ---------- */
+.hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%);
+  border-radius: 28px;
+  color: white;
+  margin-bottom: 2rem;
+}
+.hero h2 { font-size: 2.4rem; margin-bottom: 1rem; }
+.hero p { font-size: 1.05rem; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+.hero .btn { margin-top: 1.5rem; }
+
+/* ---------- Feature grid ---------- */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.feature-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid var(--card-border);
+  transition: 0.2s;
+}
+.feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(10,26,58,0.1); }
+.feature-card i { font-size: 2.3rem; color: var(--accent); margin-bottom: 1rem; }
+.feature-card h3 { color: var(--text); margin-bottom: 0.5rem; }
+.feature-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+/* ---------- Forms ---------- */
+.form-group { margin-bottom: 1.2rem; }
+label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+input, select, textarea {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--card-border);
+  background: #ffffff;
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+body.dark input, body.dark select, body.dark textarea {
+  background: #0f1a2b;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--accent);
+  border-color: transparent;
+}
+textarea { min-height: 100px; resize: vertical; }
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0.6rem 0;
+}
+.checkbox-group input[type="checkbox"] {
+  width: 20px; height: 20px; accent-color: var(--accent); flex-shrink: 0; margin-top: 2px;
+}
+
+.upload-zone {
+  border: 2px dashed var(--card-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--page-bg);
+  cursor: pointer;
+  transition: 0.2s;
+}
+.upload-zone:hover { border-color: var(--accent); }
+.upload-zone i { font-size: 2rem; color: var(--accent); }
+.upload-zone p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+.file-list { margin-top: 0.5rem; }
+.file-list .file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  background: var(--page-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+}
+.file-list .file-item .remove { color: var(--danger); cursor: pointer; }
+.file-list .file-item .status { color: var(--text-muted); font-size: 0.75rem; }
+
+/* ---------- Status badges ---------- */
+.status-badge { padding: 0.15rem 0.8rem; border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 600; }
+.status-pending { background: var(--warning-bg); color: var(--warning-text); }
+.status-progress { background: var(--info-bg); color: var(--info-text); }
+.status-completed { background: var(--success-bg); color: var(--success); }
+.status-closed { background: var(--closed-bg); color: var(--closed-text); }
+.status-rejected { background: var(--danger-bg); color: var(--danger); }
+
+/* ---------- Stats ---------- */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.stat-card { background: var(--card-bg); border-radius: 16px; padding: 1rem; text-align: center; border: 1px solid var(--card-border); }
+.stat-card .number { font-size: 2rem; font-weight: 700; color: var(--text); }
+.stat-card .label { color: var(--text-muted); font-size: 0.85rem; }
+
+/* ---------- Case list items ---------- */
+.case-item {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+  padding: 0.8rem 1rem; border-bottom: 1px solid var(--card-border); gap: 0.5rem;
+}
+.case-item:last-child { border-bottom: none; }
+.case-item .case-info { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.case-item .case-info strong { color: var(--text); font-size: 0.95rem; }
+
+.empty-state { text-align: center; padding: 2rem; color: var(--text-muted); }
+.empty-state i { font-size: 2.5rem; display: block; margin-bottom: 1rem; color: var(--accent); }
+
+.success-message { text-align: center; padding: 3rem 1rem; }
+.success-message i { font-size: 4rem; color: var(--success); }
+.success-message h2 { color: var(--text); margin: 1rem 0; }
+.success-message .case-id {
+  background: var(--page-bg); border: 1px solid var(--card-border);
+  padding: 0.5rem 1.5rem; border-radius: var(--radius-md);
+  font-size: 1.2rem; font-weight: 700; display: inline-block; margin: 0.5rem 0;
+}
+
+.notice {
+  background: var(--success-bg); color: var(--success);
+  padding: 0.5rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; margin-top: 0.5rem;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+
+.error-text { color: var(--danger); text-align: center; margin-top: 0.8rem; font-size: 0.9rem; min-height: 24px; }
+
+@media (max-width: 740px) {
+  .row-2, .row-3 { grid-template-columns: 1fr; }
+  .card { padding: 1.2rem; }
+  .site-header .container { flex-direction: column; align-items: flex-start; }
+  .hero h2 { font-size: 1.7rem; }
+  .features { grid-template-columns: 1fr; }
+  .case-item { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 640px) {
+  .container { padding: 1rem; }
+  .site-header .container { padding: .9rem 1rem; }
+  .site-header .brand h1 { font-size: 1.25rem; }
+  .site-header .brand span { font-size: .78rem; }
+  .header-actions { width:100%; gap:.45rem; }
+  .header-actions .btn { flex:1 1 auto; justify-content:center; padding:.55rem .75rem; font-size:.8rem; }
+  .hero { padding:2.2rem 1rem; border-radius:20px; }
+  .hero h2 { font-size:1.7rem; }
+  .card { padding:1.2rem; border-radius:16px; }
+}
+
+/* ============================================================
+   MANLUNG RECOVERY - FINAL HEADER SYSTEM
+   Desktop / Laptop / Tablet / Phone
+   ============================================================ */
+
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* ------------------------------------------------------------
+   HEADER
+   ------------------------------------------------------------ */
+
+.site-header {
+    width: 100% !important;
+    background: #000000 !important;
+    color: #fff;
+    border-bottom: 3px solid #2451d6;
+    overflow: visible !important;
+}
+
+.site-header .container {
+    width: 100% !important;
+    max-width: 1320px !important;
+    margin: 0 auto !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    gap: 18px !important;
+
+    padding: 12px 20px !important;
+
+    box-sizing: border-box !important;
+}
+
+/* ------------------------------------------------------------
+   BRAND
+   ------------------------------------------------------------ */
+
+.site-header .brand {
+    display: flex !important;
+    flex: 1 1 auto !important;
+
+    min-width: 0 !important;
+    max-width: none !important;
+
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 10px !important;
+
+    flex-wrap: nowrap !important;
+
+    text-align: left !important;
+}
+
+/* Clickable home logo */
+
+.site-header .brand .manlung-home-logo {
+    display: inline-flex !important;
+
+    width: 46px !important;
+    height: 46px !important;
+
+    min-width: 46px !important;
+    min-height: 46px !important;
+
+    max-width: 46px !important;
+    max-height: 46px !important;
+
+    flex: 0 0 46px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: #000000 !important;
+    border-radius: 11px !important;
+
+    overflow: hidden !important;
+
+    text-decoration: none !important;
+
+    box-shadow: 0 3px 12px rgba(0,0,0,.22);
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease;
+}
+
+.site-header .brand .manlung-home-logo:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0,0,0,.3);
+}
+
+.site-header .brand .manlung-site-logo {
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    max-width: 100% !important;
+    max-height: 100% !important;
+
+    flex: none !important;
+
+    object-fit: cover !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ------------------------------------------------------------
+   BRAND TEXT
+   ------------------------------------------------------------ */
+
+.site-header .brand h1 {
+    flex: 0 0 auto !important;
+
+    min-width: 0 !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+
+    color: #fff !important;
+
+    font-size: clamp(1.05rem, 1.55vw, 1.45rem) !important;
+
+    line-height: 1.15 !important;
+
+    font-weight: 800 !important;
+
+    white-space: nowrap !important;
+}
+
+.site-header .brand h1 i {
+    margin-right: 5px !important;
+    color: #60a5fa !important;
+}
+
+.site-header .brand span {
+    flex: 0 1 auto !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+
+    color: #dbeafe !important;
+
+    font-size: clamp(.68rem, .9vw, .85rem) !important;
+
+    line-height: 1.25 !important;
+
+    white-space: nowrap !important;
+}
+
+/* ------------------------------------------------------------
+   NAVIGATION / ACTIONS
+   ------------------------------------------------------------ */
+
+.site-header .header-actions {
+    display: flex !important;
+
+    flex: 0 0 auto !important;
+
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+    justify-content: flex-end !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 6px !important;
+
+    margin: 0 !important;
+}
+
+/* All top-level buttons */
+
+.site-header .header-actions > .btn {
+    display: inline-flex !important;
+
+    flex: 0 0 auto !important;
+
+    width: auto !important;
+    min-width: max-content !important;
+
+    min-height: 40px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 6px !important;
+
+    padding: 9px 12px !important;
+
+    border-radius: 10px !important;
+
+    font-size: .78rem !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+
+    box-sizing: border-box !important;
+}
+
+/* ------------------------------------------------------------
+   ACCOUNT SECTION
+   ------------------------------------------------------------ */
+
+.site-header .manlung-account-section {
+    display: flex !important;
+
+    flex: 0 0 auto !important;
+
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 5px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.site-header .manlung-account-section > * {
+    flex: 0 0 auto !important;
+
+    white-space: nowrap !important;
+}
+
+.site-header .manlung-account-section .account-label {
+    padding: 8px 10px !important;
+    font-size: .75rem !important;
+    white-space: nowrap !important;
+}
+
+.site-header .manlung-account-section a,
+.site-header .manlung-account-section button {
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 5px !important;
+
+    min-height: 40px !important;
+
+    padding: 8px 11px !important;
+
+    border-radius: 10px !important;
+
+    font-size: .76rem !important;
+
+    white-space: nowrap !important;
+
+    box-sizing: border-box !important;
+}
+
+/* ------------------------------------------------------------
+   LARGE LAPTOPS
+   1200px+
+   Everything stays on ONE clean row.
+   ------------------------------------------------------------ */
+
+@media (min-width: 1201px) {
+
+    .site-header .container {
+        max-width: 1400px !important;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+    }
+
+    .site-header .header-actions {
+        gap: 7px !important;
+    }
+
+    .site-header .header-actions > .btn {
+        padding-left: 13px !important;
+        padding-right: 13px !important;
+    }
+}
+
+/* ------------------------------------------------------------
+   NORMAL LAPTOPS
+   901px - 1200px
+   Slightly smaller but STILL readable.
+   ------------------------------------------------------------ */
+
+@media (min-width: 901px) and (max-width: 1200px) {
+
+    .site-header .container {
+        max-width: 1200px !important;
+
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+
+        gap: 12px !important;
+    }
+
+    .site-header .brand {
+        gap: 8px !important;
+    }
+
+    .site-header .brand .manlung-home-logo {
+        width: 42px !important;
+        height: 42px !important;
+
+        min-width: 42px !important;
+        min-height: 42px !important;
+
+        max-width: 42px !important;
+        max-height: 42px !important;
+
+        flex-basis: 42px !important;
+    }
+
+    .site-header .brand h1 {
+        font-size: 1.05rem !important;
+    }
+
+    .site-header .brand span {
+        font-size: .66rem !important;
+    }
+
+    .site-header .header-actions {
+        gap: 4px !important;
+    }
+
+    .site-header .header-actions > .btn {
+        min-height: 38px !important;
+
+        padding: 8px 8px !important;
+
+        font-size: .68rem !important;
+    }
+
+    .site-header .manlung-account-section {
+        gap: 3px !important;
+    }
+
+    .site-header .manlung-account-section .account-label {
+        display: none !important;
+    }
+
+    .site-header .manlung-account-section a,
+    .site-header .manlung-account-section button {
+        min-height: 38px !important;
+
+        padding: 8px 8px !important;
+
+        font-size: .66rem !important;
+    }
+}
+
+/* ------------------------------------------------------------
+   SMALL LAPTOP / TABLET
+   701px - 900px
+   Do NOT squeeze. Put navigation on its own row.
+   ------------------------------------------------------------ */
+
+@media (min-width: 701px) and (max-width: 900px) {
+
+    .site-header .container {
+        flex-direction: column !important;
+
+        align-items: stretch !important;
+        justify-content: center !important;
+
+        gap: 10px !important;
+
+        padding: 10px 14px 12px !important;
+    }
+
+    .site-header .brand {
+        width: 100% !important;
+
+        justify-content: center !important;
+
+        text-align: center !important;
+    }
+
+    .site-header .brand .manlung-home-logo {
+        width: 44px !important;
+        height: 44px !important;
+
+        min-width: 44px !important;
+        min-height: 44px !important;
+
+        max-width: 44px !important;
+        max-height: 44px !important;
+
+        flex-basis: 44px !important;
+    }
+
+    .site-header .brand h1 {
+        font-size: 1.1rem !important;
+    }
+
+    .site-header .brand span {
+        font-size: .7rem !important;
+    }
+
+    .site-header .header-actions {
+        width: 100% !important;
+
+        justify-content: center !important;
+
+        flex-wrap: wrap !important;
+
+        gap: 6px !important;
+    }
+
+    .site-header .header-actions > .btn {
+        min-height: 40px !important;
+
+        padding: 8px 12px !important;
+
+        font-size: .74rem !important;
+    }
+
+    .site-header .manlung-account-section {
+        flex-wrap: wrap !important;
+    }
+}
+
+/* ------------------------------------------------------------
+   PHONES
+   <= 700px
+   ------------------------------------------------------------ */
+
+@media (max-width: 700px) {
+
+    .site-header .container {
+        width: 100% !important;
+
+        flex-direction: column !important;
+
+        align-items: stretch !important;
+
+        gap: 9px !important;
+
+        padding: 9px 10px 11px !important;
+    }
+
+    .site-header .brand {
+        width: 100% !important;
+
+        justify-content: center !important;
+
+        text-align: center !important;
+
+        flex-wrap: nowrap !important;
+
+        gap: 8px !important;
+    }
+
+    .site-header .brand .manlung-home-logo {
+        width: 40px !important;
+        height: 40px !important;
+
+        min-width: 40px !important;
+        min-height: 40px !important;
+
+        max-width: 40px !important;
+        max-height: 40px !important;
+
+        flex-basis: 40px !important;
+
+        border-radius: 10px !important;
+    }
+
+    .site-header .brand h1 {
+        font-size: .95rem !important;
+
+        white-space: nowrap !important;
+    }
+
+    .site-header .brand span {
+        font-size: .62rem !important;
+
+        white-space: normal !important;
+
+        line-height: 1.2 !important;
+    }
+
+    .site-header .header-actions {
+        width: 100% !important;
+
+        display: grid !important;
+
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+
+        gap: 5px !important;
+    }
+
+    .site-header .header-actions > .btn {
+        width: 100% !important;
+
+        min-width: 0 !important;
+
+        min-height: 44px !important;
+
+        padding: 7px 4px !important;
+
+        font-size: .68rem !important;
+
+        line-height: 1.05 !important;
+
+        white-space: normal !important;
+
+        text-align: center !important;
+    }
+
+    /* New Request gets a full row */
+
+    .site-header .header-actions > a[href="/client/request.html"] {
+        grid-column: 1 / -1 !important;
+
+        min-height: 44px !important;
+
+        white-space: nowrap !important;
+
+        font-size: .74rem !important;
+    }
+
+    /* Account gets its own row */
+
+    .site-header .manlung-account-section {
+        width: 100% !important;
+
+        display: grid !important;
+
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+
+        gap: 5px !important;
+
+        grid-column: 1 / -1 !important;
+    }
+
+    .site-header .manlung-account-section .account-label {
+        display: none !important;
+    }
+
+    .site-header .manlung-account-section a,
+    .site-header .manlung-account-section button {
+        width: 100% !important;
+
+        min-width: 0 !important;
+
+        min-height: 42px !important;
+
+        padding: 8px 5px !important;
+
+        font-size: .67rem !important;
+
+        white-space: nowrap !important;
+    }
+
+    /* Dark mode becomes a compact circular control */
+
+    .site-header .header-actions > button[data-theme-toggle="true"] {
+        min-width: 0 !important;
+    }
+}
+
+/* ------------------------------------------------------------
+   SMALL PHONES
+   ------------------------------------------------------------ */
+
+@media (max-width: 430px) {
+
+    .site-header .container {
+        padding-left: 7px !important;
+        padding-right: 7px !important;
+    }
+
+    .site-header .brand {
+        gap: 7px !important;
+    }
+
+    .site-header .brand .manlung-home-logo {
+        width: 38px !important;
+        height: 38px !important;
+
+        min-width: 38px !important;
+        min-height: 38px !important;
+
+        max-width: 38px !important;
+        max-height: 38px !important;
+
+        flex-basis: 38px !important;
+    }
+
+    .site-header .brand h1 {
+        font-size: .86rem !important;
+    }
+
+    .site-header .brand span {
+        font-size: .57rem !important;
+    }
+
+    .site-header .header-actions {
+        gap: 4px !important;
+    }
+
+    .site-header .header-actions > .btn {
+        min-height: 42px !important;
+
+        padding: 6px 3px !important;
+
+        font-size: .63rem !important;
+    }
+
+    .site-header .header-actions > a[href="/client/request.html"] {
+        font-size: .7rem !important;
+    }
+}
+
+/* ------------------------------------------------------------
+   NEVER ALLOW THE LOGO TO ESCAPE ITS BOX
+   ------------------------------------------------------------ */
+
+.site-header .manlung-home-logo,
+.site-header .manlung-home-logo img,
+.site-header .manlung-site-logo {
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+
+    object-fit: cover !important;
+}
+
+/* Accessibility */
+
+.site-header .manlung-home-logo:focus-visible {
+    outline: 3px solid #60a5fa !important;
+    outline-offset: 2px !important;
+}
+
+
+/* ============================================================
+   MANLUNG RECOVERY - FINAL HEADER LAYOUT
+   Desktop:
+     Brand = left
+     Navigation = right
+     Dark = top-right
+   Mobile:
+     Separate compact layout
+   ============================================================ */
+
+/* ---------- GLOBAL HEADER BASE ---------- */
+
+.site-header {
+    width: 100% !important;
+    position: relative !important;
+    z-index: 1000 !important;
+    box-sizing: border-box !important;
+}
+
+.site-header .container {
+    width: min(100% - 32px, 1400px) !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    position: relative !important;
+    box-sizing: border-box !important;
+
+    gap: 24px !important;
+}
+
+/* ---------- LOGO / BRAND ---------- */
+
+.site-header .brand {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+
+    gap: 10px !important;
+}
+
+.site-header .manlung-site-logo,
+.site-header .manlung-home-logo img,
+.site-header .manlung-home-logo {
+    width: 42px !important;
+    height: 42px !important;
+
+    min-width: 42px !important;
+    min-height: 42px !important;
+
+    max-width: 42px !important;
+    max-height: 42px !important;
+
+    flex: 0 0 42px !important;
+
+    object-fit: cover !important;
+    box-sizing: border-box !important;
+
+    border-radius: 10px !important;
+}
+
+.site-header .manlung-home-logo {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-decoration: none !important;
+    overflow: hidden !important;
+}
+
+.site-header .brand h1 {
+    margin: 0 !important;
+    font-size: clamp(1rem, 1.35vw, 1.35rem) !important;
+    white-space: nowrap !important;
+    line-height: 1.1 !important;
+}
+
+.site-header .brand span {
+    font-size: clamp(.68rem, .9vw, .9rem) !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
+}
+
+/* ---------- DESKTOP NAVIGATION ---------- */
+
+@media (min-width: 901px) {
+
+    .site-header .container {
+        min-height: 88px !important;
+        padding: 14px 0 12px !important;
+
+        align-items: center !important;
+    }
+
+    /* Keep navigation on the RIGHT */
+    .site-header .header-actions {
+        flex: 0 1 auto !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+
+        flex-wrap: nowrap !important;
+
+        gap: 7px !important;
+
+        margin-left: auto !important;
+
+        padding-top: 20px !important;
+        max-width: 780px !important;
+    }
+
+    /* Compact laptop buttons */
+    .site-header .header-actions > .btn,
+    .site-header .header-actions > a,
+    .site-header .header-actions > button {
+        flex: 0 0 auto !important;
+
+        min-width: 0 !important;
+        min-height: 40px !important;
+
+        padding: 8px 13px !important;
+
+        border-radius: 11px !important;
+
+        font-size: .78rem !important;
+        line-height: 1 !important;
+
+        white-space: nowrap !important;
+
+        box-sizing: border-box !important;
+    }
+
+    /* Make the navigation use available space without stretching */
+    .site-header .header-actions > a[href="/client/dashboard.html"] {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .site-header .header-actions > a[href="/blog.html"] {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .site-header .header-actions > a[href="/donate.html"] {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .site-header .header-actions > a[href="/client/request.html"] {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+    /* DARK CONTROL - TOP RIGHT */
+    .site-header .header-actions > button[data-theme-toggle="true"] {
+        position: absolute !important;
+
+        top: 8px !important;
+        right: 0 !important;
+
+        min-height: 30px !important;
+        height: 30px !important;
+
+        padding: 4px 10px !important;
+
+        border-radius: 8px !important;
+
+        font-size: .68rem !important;
+
+        z-index: 20 !important;
+    }
+
+    /* Leave space so Dark never overlaps the navigation */
+    .site-header .header-actions {
+        padding-top: 24px !important;
+    }
+}
+
+/* ---------- MEDIUM LAPTOPS ---------- */
+
+@media (min-width: 901px) and (max-width: 1200px) {
+
+    .site-header .container {
+        width: calc(100% - 24px) !important;
+        gap: 12px !important;
+    }
+
+    .site-header .brand {
+        gap: 7px !important;
+    }
+
+    .site-header .manlung-site-logo,
+    .site-header .manlung-home-logo img,
+    .site-header .manlung-home-logo {
+        width: 38px !important;
+        height: 38px !important;
+
+        min-width: 38px !important;
+        min-height: 38px !important;
+
+        max-width: 38px !important;
+        max-height: 38px !important;
+
+        flex-basis: 38px !important;
+    }
+
+    .site-header .brand h1 {
+        font-size: 1rem !important;
+    }
+
+    .site-header .brand span {
+        font-size: .67rem !important;
+    }
+
+    .site-header .header-actions {
+        gap: 5px !important;
+        max-width: 690px !important;
+    }
+
+    .site-header .header-actions > .btn,
+    .site-header .header-actions > a,
+    .site-header .header-actions > button {
+        padding: 7px 9px !important;
+        font-size: .7rem !important;
+    }
+}
+
+/* ---------- SMALL LAPTOP / TABLET ---------- */
+
+@media (min-width: 701px) and (max-width: 900px) {
+
+    .site-header .container {
+        width: calc(100% - 20px) !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    .site-header .brand {
+        flex: 1 1 100% !important;
+    }
+
+    .site-header .header-actions {
+        width: 100% !important;
+
+        display: flex !important;
+        justify-content: flex-end !important;
+
+        flex-wrap: wrap !important;
+
+        gap: 5px !important;
+
+        padding-top: 0 !important;
+    }
+
+    .site-header .header-actions > .btn,
+    .site-header .header-actions > a,
+    .site-header .header-actions > button {
+        min-height: 38px !important;
+        padding: 7px 10px !important;
+        font-size: .7rem !important;
+    }
+
+    .site-header .header-actions > button[data-theme-toggle="true"] {
+        position: static !important;
+        min-height: 38px !important;
+        height: auto !important;
+    }
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 700px) {
+
+    .site-header .container {
+        width: 100% !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        align-items: stretch !important;
+
+        gap: 9px !important;
+
+        padding: 10px 10px 12px !important;
+    }
+
+    .site-header .brand {
+        width: 100% !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+
+        padding-right: 48px !important;
+
+        gap: 8px !important;
+    }
+
+    .site-header .manlung-site-logo,
+    .site-header .manlung-home-logo img,
+    .site-header .manlung-home-logo {
+        width: 38px !important;
+        height: 38px !important;
+
+        min-width: 38px !important;
+        min-height: 38px !important;
+
+        max-width: 38px !important;
+        max-height: 38px !important;
+
+        flex-basis: 38px !important;
+
+        border-radius: 9px !important;
+    }
+
+    .site-header .brand h1 {
+        font-size: .9rem !important;
+        white-space: nowrap !important;
+    }
+
+    .site-header .brand span {
+        font-size: .57rem !important;
+        white-space: normal !important;
+    }
+
+    /* Dark stays TOP RIGHT on phones */
+    .site-header .header-actions > button[data-theme-toggle="true"] {
+        position: absolute !important;
+
+        top: 9px !important;
+        right: 9px !important;
+
+        width: 38px !important;
+        height: 38px !important;
+
+        min-width: 38px !important;
+        min-height: 38px !important;
+
+        padding: 0 !important;
+
+        border-radius: 50% !important;
+
+        font-size: 0 !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        z-index: 50 !important;
+    }
+
+    .site-header .header-actions > button[data-theme-toggle="true"] i {
+        font-size: .95rem !important;
+        margin: 0 !important;
+    }
+
+    /* Mobile navigation */
+    .site-header .header-actions {
+        width: 100% !important;
+
+        display: grid !important;
+
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+
+        gap: 6px !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .site-header .header-actions > .btn,
+    .site-header .header-actions > a,
+    .site-header .header-actions > button {
+        width: 100% !important;
+
+        min-width: 0 !important;
+        min-height: 44px !important;
+
+        padding: 7px 5px !important;
+
+        font-size: .67rem !important;
+        line-height: 1.05 !important;
+
+        white-space: normal !important;
+
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    /* New Request gets full width */
+    .site-header .header-actions > a[href="/client/request.html"] {
+        grid-column: 1 / -1 !important;
+
+        min-height: 44px !important;
+
+        white-space: nowrap !important;
+    }
+
+    /* Don't let Account section break the layout */
+    .site-header .manlung-account-section {
+        width: 100% !important;
+        grid-column: 1 / -1 !important;
+    }
+}
+
+/* ---------- VERY SMALL PHONES ---------- */
+
+@media (max-width: 430px) {
+
+    .site-header .container {
+        padding-left: 7px !important;
+        padding-right: 7px !important;
+    }
+
+    .site-header .brand {
+        gap: 6px !important;
+        padding-right: 44px !important;
+    }
+
+    .site-header .manlung-site-logo,
+    .site-header .manlung-home-logo img,
+    .site-header .manlung-home-logo {
+        width: 34px !important;
+        height: 34px !important;
+
+        min-width: 34px !important;
+        min-height: 34px !important;
+
+        max-width: 34px !important;
+        max-height: 34px !important;
+
+        flex-basis: 34px !important;
+    }
+
+    .site-header .brand h1 {
+        font-size: .82rem !important;
+    }
+
+    .site-header .brand span {
+        font-size: .52rem !important;
+    }
+
+    .site-header .header-actions {
+        gap: 4px !important;
+    }
+
+    .site-header .header-actions > .btn,
+    .site-header .header-actions > a,
+    .site-header .header-actions > button {
+        min-height: 42px !important;
+        font-size: .61rem !important;
+    }
+}
+
+/* ---------- STOP ANY HEADER CHILD FROM OVERFLOWING ---------- */
+
+.site-header *,
+.site-header *::before,
+.site-header *::after {
+    box-sizing: border-box !important;
+}
+
+.site-header img {
+    max-width: 100% !important;
+}
+
+
+
+/* ============================================================
+   MANLUNG RECOVERY — MOBILE HEADER
+   ============================================================
+   Mobile only.
+   Desktop header is intentionally untouched.
+   Footer is intentionally untouched.
+   ============================================================ */
+
+@media (max-width: 767px) {
+
+  /* ----------------------------------------------------------
+     Main mobile header
+     ---------------------------------------------------------- */
+
+  header,
+  .site-header,
+  .main-header,
+  .navbar,
+  .nav-header {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 64px;
+
+    z-index: 1000;
+  }
+
+
+  /* ----------------------------------------------------------
+     Header inner layout
+     ---------------------------------------------------------- */
+
+  header .container,
+  .site-header .container,
+  .main-header .container,
+  .navbar .container,
+  .nav-header .container {
+
+    width: 100%;
+
+    max-width: none;
+
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+
+  /* ----------------------------------------------------------
+     Logo / brand
+     ---------------------------------------------------------- */
+
+  header .brand,
+  header .navbar-brand,
+  .site-header .brand,
+  .main-header .brand,
+  .navbar-brand {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    min-width: 0;
+
+    max-width: calc(100% - 70px);
+
+    text-decoration: none;
+  }
+
+
+  header .brand img,
+  header .navbar-brand img,
+  .site-header .brand img,
+  .main-header .brand img,
+  .navbar-brand img {
+
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    object-fit: contain;
+
+    margin-right: 9px;
+  }
+
+
+  /* ----------------------------------------------------------
+     Brand text
+     ---------------------------------------------------------- */
+
+  header .brand-text,
+  header .brand-copy,
+  header .logo-text,
+  .site-header .brand-text,
+  .main-header .brand-text {
+
+    min-width: 0;
+
+    overflow: hidden;
+  }
+
+
+  header .brand-text strong,
+  header .brand-copy strong,
+  header .logo-text strong,
+  .site-header .brand-text strong,
+  .main-header .brand-text strong {
+
+    display: block;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: .91rem;
+
+    line-height: 1.15;
+  }
+
+
+  header .brand-text small,
+  header .brand-copy small,
+  header .logo-text small,
+  .site-header .brand-text small,
+  .main-header .brand-text small {
+
+    display: block;
+
+    margin-top: 2px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: .61rem;
+
+    line-height: 1.25;
+
+    opacity: .75;
+  }
+
+
+  /* ----------------------------------------------------------
+     Mobile menu button
+     ---------------------------------------------------------- */
+
+  header .menu-toggle,
+  header .mobile-menu-toggle,
+  header .navbar-toggler,
+  header .hamburger,
+  .site-header .menu-toggle,
+  .site-header .mobile-menu-toggle,
+  .main-header .menu-toggle,
+  .main-header .mobile-menu-toggle,
+  .navbar-toggler {
+
+    width: 44px;
+    height: 44px;
+
+    min-width: 44px;
+    min-height: 44px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-left: auto;
+
+    border: 1px solid rgba(148, 163, 184, .28);
+
+    border-radius: 11px;
+
+    background: #000000 !important;
+
+    color: inherit;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+  }
+
+
+  header .menu-toggle:hover,
+  header .mobile-menu-toggle:hover,
+  header .navbar-toggler:hover,
+  header .hamburger:hover {
+
+    background: rgba(255, 255, 255, .1);
+  }
+
+
+  /* ----------------------------------------------------------
+     Hamburger icon
+     ---------------------------------------------------------- */
+
+  header .menu-toggle span,
+  header .mobile-menu-toggle span,
+  header .hamburger span {
+
+    display: block;
+
+    width: 20px;
+    height: 2px;
+
+    margin: 3px 0;
+
+    border-radius: 999px;
+
+    background: currentColor;
+  }
+
+
+  /* ----------------------------------------------------------
+     Mobile navigation panel
+     ---------------------------------------------------------- */
+
+  header nav,
+  .site-header nav,
+  .main-header nav,
+  .navbar-collapse {
+
+    width: 100%;
+  }
+
+
+  @supports (height: 100dvh) {
+
+    .mobile-nav,
+    .mobile-menu,
+    .navbar-collapse {
+
+      max-height: calc(100dvh - 64px);
+
+      overflow-y: auto;
+
+      overscroll-behavior: contain;
+    }
+  }
+
+
+  /* ----------------------------------------------------------
+     Navigation links
+     ---------------------------------------------------------- */
+
+  header nav a,
+  .site-header nav a,
+  .main-header nav a,
+  .mobile-nav a,
+  .mobile-menu a,
+  .navbar-collapse a {
+
+    min-height: 46px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 10px 14px;
+
+    border-radius: 10px;
+
+    font-size: .9rem;
+
+    font-weight: 700;
+
+    line-height: 1.3;
+
+    text-decoration: none;
+  }
+
+
+  header nav a:active,
+  .site-header nav a:active,
+  .main-header nav a:active,
+  .mobile-nav a:active,
+  .mobile-menu a:active {
+
+    transform: scale(.985);
+  }
+
+
+  /* ----------------------------------------------------------
+     Navigation groups
+     ---------------------------------------------------------- */
+
+  .mobile-nav .nav-section,
+  .mobile-menu .nav-section {
+
+    margin-top: 10px;
+
+    padding-top: 10px;
+
+    border-top: 1px solid rgba(148, 163, 184, .12);
+  }
+
+
+  /* ----------------------------------------------------------
+     Client actions
+     ---------------------------------------------------------- */
+
+  .mobile-nav .client-link,
+  .mobile-menu .client-link,
+  .mobile-nav .client-portal,
+  .mobile-menu .client-portal {
+
+    font-weight: 850;
+  }
+
+
+  /* ----------------------------------------------------------
+     Remove unnecessary mobile nav icon clutter
+     ONLY inside mobile header navigation.
+     ---------------------------------------------------------- */
+
+  header nav a > i,
+  header nav a > svg,
+  header nav a .icon,
+  header nav a .iconify,
+  header nav a [data-lucide],
+
+  .site-header nav a > i,
+  .site-header nav a > svg,
+  .site-header nav a .icon,
+  .site-header nav a .iconify,
+  .site-header nav a [data-lucide],
+
+  .main-header nav a > i,
+  .main-header nav a > svg,
+  .main-header nav a .icon,
+  .main-header nav a .iconify,
+  .main-header nav a [data-lucide] {
+
+    display: none !important;
+  }
+
+
+  /* ----------------------------------------------------------
+     Remove icon gaps left behind
+     ---------------------------------------------------------- */
+
+  header nav a,
+  .site-header nav a,
+  .main-header nav a {
+
+    gap: 0 !important;
+  }
+
+
+  /* ----------------------------------------------------------
+     Authenticated mobile account area
+     ---------------------------------------------------------- */
+
+  .account-section,
+  .manlung-account-section {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    max-width: 100%;
+  }
+
+
+  .account-section .account-status,
+  .manlung-account-section .account-status {
+
+    display: none !important;
+  }
+
+
+  .account-section .account,
+  .manlung-account-section .account {
+
+    max-width: 150px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: .78rem;
+
+    font-weight: 800;
+  }
+
+
+  /* ----------------------------------------------------------
+     Prevent horizontal overflow
+     ---------------------------------------------------------- */
+
+  header,
+  .site-header,
+  .main-header,
+  .navbar {
+
+    overflow-x: clip;
+  }
+}
+
+
+/* ============================================================
+   VERY SMALL PHONES
+   ============================================================ */
+
+@media (max-width: 380px) {
+
+  header .brand img,
+  header .navbar-brand img,
+  .site-header .brand img,
+  .main-header .brand img,
+  .navbar-brand img {
+
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+
+
+  header .brand-text strong,
+  header .brand-copy strong,
+  header .logo-text strong {
+
+    font-size: .83rem;
+  }
+
+
+  header .brand-text small,
+  header .brand-copy small,
+  header .logo-text small {
+
+    font-size: .55rem;
+  }
+
+
+  header .menu-toggle,
+  header .mobile-menu-toggle,
+  header .navbar-toggler,
+  header .hamburger {
+
+    width: 42px;
+    height: 42px;
+
+    min-width: 42px;
+    min-height: 42px;
+  }
+}
+
+
+
+/* ============================================================
+   MANLUNG RECOVERY — SHARED HEADER POLISH
+   Default: clean white. Dark mode: navy.
+   ============================================================ */
+.site-header {
+  background: #000000 !important;
+  color: var(--text);
+  border-bottom: 1px solid var(--card-border);
+  box-shadow: 0 6px 24px rgba(15,23,42,.06);
+  position: relative;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.site-header .brand h1 { color: var(--navy-900); }
+.site-header .brand h1 i { color: var(--accent); }
+.site-header .brand span { color: var(--text-muted); }
+.site-header .header-actions .btn-outline {
+  color: var(--navy-900);
+  border-color: #cbd5e1;
+  background: #000000 !important;
+}
+.site-header .header-actions .btn-outline:hover {
+  background: #000000 !important;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.site-header .header-actions .btn-primary {
+  box-shadow: 0 6px 18px rgba(36,81,214,.18);
+}
+.site-header .mobile-menu-toggle {
+  color: var(--navy-900);
+  background: #000000 !important;
+  border-color: #cbd5e1;
+}
+.site-header .mobile-menu-toggle:hover {
+  background: #000000 !important;
+  border-color: var(--accent);
+}
+body.dark .site-header {
+  background: #000000 !important;
+  color: #fff;
+  border-bottom-color: rgba(110,168,255,.32);
+  box-shadow: 0 8px 28px rgba(0,0,0,.22);
+}
+body.dark .site-header .brand h1 { color: #fff; }
+body.dark .site-header .brand h1 i { color: #6ea8ff; }
+body.dark .site-header .brand span { color: #a9c0ec; }
+body.dark .site-header .header-actions .btn-outline {
+  color: #fff;
+  border-color: rgba(255,255,255,.32);
+  background: #000000 !important;
+}
+body.dark .site-header .header-actions .btn-outline:hover {
+  background: #000000 !important;
+  border-color: #6ea8ff;
+  color: #fff;
+}
+body.dark .site-header .mobile-menu-toggle {
+  color: #fff;
+  background: #000000 !important;
+  border-color: rgba(255,255,255,.28);
+}
+body.dark .site-header .mobile-menu-toggle:hover {
+  background: #000000 !important;
+}
+
+/* Mobile navigation follows the active theme instead of forcing dark UI. */
+@media (max-width: 767px) {
+  .site-header .mobile-nav-panel,
+  .site-header .mobile-nav,
+  .site-header .mobile-menu,
+  .site-header .navbar-collapse {
+    background: #000000 !important;
+    color: var(--text);
+    border-color: var(--card-border);
+  }
+  .site-header .mobile-nav a,
+  .site-header .mobile-menu a,
+  .site-header .navbar-collapse a {
+    color: var(--text);
+  }
+  .site-header .mobile-nav a:hover,
+  .site-header .mobile-menu a:hover,
+  .site-header .navbar-collapse a:hover {
+    background: #000000 !important;
+  }
+  body.dark .site-header .mobile-nav-panel,
+  body.dark .site-header .mobile-nav,
+  body.dark .site-header .mobile-menu,
+  body.dark .site-header .navbar-collapse {
+    background: #000000 !important;
+    color: #e6ecf5;
+    border-color: #29385a;
+  }
+  body.dark .site-header .mobile-nav a,
+  body.dark .site-header .mobile-menu a,
+  body.dark .site-header .navbar-collapse a {
+    color: #e6ecf5;
+  }
+  body.dark .site-header .mobile-nav a:hover,
+  body.dark .site-header .mobile-menu a:hover,
+  body.dark .site-header .navbar-collapse a:hover {
+    background: #000000 !important;
+  }
+}
+
+
+/* ===========================================================
+   FINAL THEME RULE: LIGHT HEADER BY DEFAULT
+   Dark header is enabled only when the user selects dark mode.
+   =========================================================== */
+.site-header {
+  background: #000000 !important;
+  color: var(--text);
+  border-bottom: 1px solid var(--card-border);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+}
+
+.site-header .brand h1 {
+  color: var(--text);
+}
+
+.site-header .brand h1 i {
+  color: var(--accent);
+}
+
+.site-header .brand span {
+  color: var(--text-muted);
+}
+
+.site-header .header-actions .btn-outline {
+  color: var(--text);
+  border-color: var(--card-border);
+  background: #000000 !important;
+}
+
+.site-header .header-actions .btn-outline:hover {
+  background: #000000 !important;
+  border-color: var(--accent);
+}
+
+.site-header .mobile-menu-toggle {
+  color: var(--text);
+  border-color: var(--card-border);
+  background: #000000 !important;
+}
+
+body.dark .site-header {
+  background: #000000 !important;
+  color: #ffffff;
+  border-bottom-color: var(--accent);
+  box-shadow: 0 4px 18px rgba(2, 6, 23, 0.25);
+}
+
+body.dark .site-header .brand h1 {
+  color: #ffffff;
+}
+
+body.dark .site-header .brand h1 i {
+  color: #6ea8ff;
+}
+
+body.dark .site-header .brand span {
+  color: #a9c0ec;
+}
+
+body.dark .site-header .header-actions .btn-outline,
+body.dark .site-header .mobile-menu-toggle {
+  color: #ffffff;
+  border-color: rgba(255,255,255,.2);
+  background: #000000 !important;
+}
+
+/* Definitive requested header colour */
+html body .site-header,
+html body:not(.dark) .site-header,
+html:not(.dark) body .site-header {
+  background: #000000 !important;
+  background-color: #333333 !important;
+}
+
+
+/* ============================================================
+   MANLUNG RECOVERY - WHITE HEADER + BLUE GLOW OVERRIDE
+   Final override - applies to desktop, tablet and mobile
+   ============================================================ */
+
+.site-header,
+html body .site-header {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0b1f3a !important;
+    border-bottom: 2px solid #2563eb !important;
+    box-shadow:
+        0 4px 18px rgba(37, 99, 235, 0.28),
+        0 1px 0 rgba(37, 99, 235, 0.18) !important;
+}
+
+.site-header .container,
+html body .site-header .container {
+    background: transparent !important;
+}
+
+/* Brand title */
+.site-header .brand h1,
+html body .site-header .brand h1 {
+    color: #0b1f3a !important;
+}
+
+/* Brand icon */
+.site-header .brand h1 i,
+html body .site-header .brand h1 i {
+    color: #2563eb !important;
+}
+
+/* Brand subtitle */
+.site-header .brand span,
+html body .site-header .brand span {
+    color: #475569 !important;
+}
+
+/* Header buttons */
+.site-header .header-actions .btn,
+html body .site-header .header-actions .btn {
+    color: #0b1f3a !important;
+}
+
+/* White header logo box */
+.site-header .brand .manlung-home-logo,
+html body .site-header .brand .manlung-home-logo {
+    background: #ffffff !important;
+    box-shadow: 0 2px 12px rgba(37, 99, 235, 0.18) !important;
+}
+
+/* Mobile menu button */
+.site-header button,
+.site-header .menu-toggle,
+.site-header .mobile-menu-toggle,
+html body .site-header button,
+html body .site-header .menu-toggle,
+html body .site-header .mobile-menu-toggle {
+    color: #0b1f3a !important;
+}
+
+/* Mobile navigation */
+.mobile-nav-panel {
+    background: #ffffff !important;
+    color: #0b1f3a !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25) !important;
+}
+
+.mobile-nav-title,
+.mobile-nav-action {
+    color: #0b1f3a !important;
+}
+
+.mobile-nav-divider {
+    background: rgba(37, 99, 235, 0.18) !important;
+}
+
+
+/* ============================================================
+   FINAL HEADER COLOR FIX — PURE WHITE
+   ============================================================ */
+
+html body .site-header,
+html body header.site-header,
+html body .site-header::before,
+html body .site-header::after {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    opacity: 1 !important;
+}
+
+html body .site-header {
+    color: #0b1f3a !important;
+    border-bottom: 2px solid #2563eb !important;
+    box-shadow:
+        0 4px 18px rgba(37, 99, 235, 0.30),
+        0 1px 0 rgba(37, 99, 235, 0.20) !important;
+}
+
+html body .site-header .container,
+html body .site-header .manlung-header-inner {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+}
+
+html body .site-header .brand,
+html body .site-header .header-actions {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html body .site-header .brand h1 {
+    color: #0b1f3a !important;
+}
+
+html body .site-header .brand span {
+    color: #475569 !important;
+}
+
+
+/* ============================================================
+   LIGHT MODE — WHITE HEADER TEXT VISIBILITY FIX
+   ============================================================ */
+
+html:not(.dark) body .site-header,
+html:not(.dark) body .site-header a,
+html:not(.dark) body .site-header button,
+html:not(.dark) body .site-header .nav-link,
+html:not(.dark) body .site-header .header-actions {
+    color: #0b1f3a !important;
+}
+
+html:not(.dark) body .site-header a {
+    text-decoration: none !important;
+}
+
+html:not(.dark) body .site-header a:hover,
+html:not(.dark) body .site-header button:hover {
+    color: #2563eb !important;
+}
+
+/* Navigation links */
+html:not(.dark) body .site-header nav a,
+html:not(.dark) body .site-header .nav a,
+html:not(.dark) body .site-header .header-actions a {
+    color: #0b1f3a !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Dark mode toggle */
+html:not(.dark) body .site-header .theme-toggle,
+html:not(.dark) body .site-header [class*="theme"],
+html:not(.dark) body .site-header [id*="theme"] {
+    color: #0b1f3a !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* User name */
+html:not(.dark) body .site-header .user-name,
+html:not(.dark) body .site-header .username,
+html:not(.dark) body .site-header [class*="user"] {
+    color: #0b1f3a !important;
+}
+
+/* Log out */
+html:not(.dark) body .site-header .logout,
+html:not(.dark) body .site-header .logout-btn,
+html:not(.dark) body .site-header a[href*="logout"] {
+    color: #0b1f3a !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Icons */
+html:not(.dark) body .site-header i,
+html:not(.dark) body .site-header svg {
+    color: #2563eb !important;
+    fill: currentColor;
+}
+
+
+/* ============================================================
+   MANLUNG RECOVERY — FINAL LIGHT HEADER DESIGN
+   WHITE HEADER / BLACK TEXT / COLOURED CONTROLS
+   ============================================================ */
+
+html:not(.dark) body .site-header {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+
+    border-bottom: 3px solid #2563eb !important;
+
+    box-shadow:
+        0 4px 10px rgba(37, 99, 235, 0.18),
+        0 0 22px rgba(37, 99, 235, 0.22) !important;
+}
+
+/* Header container */
+html:not(.dark) body .site-header .container,
+html:not(.dark) body .site-header .manlung-header-inner {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+/* ============================================================
+   BRAND
+   ============================================================ */
+
+html:not(.dark) body .site-header .brand h1 {
+    color: #000000 !important;
+    font-weight: 900 !important;
+}
+
+html:not(.dark) body .site-header .brand h1 i {
+    color: #2563eb !important;
+}
+
+html:not(.dark) body .site-header .brand span {
+    color: #334155 !important;
+}
+
+/* Logo shape */
+html:not(.dark) body .site-header .manlung-home-logo {
+    background: #eff6ff !important;
+    border: 2px solid #2563eb !important;
+    box-shadow:
+        0 3px 12px rgba(37, 99, 235, 0.30) !important;
+}
+
+/* ============================================================
+   ALL HEADER LINKS — PURE BLACK
+   ============================================================ */
+
+html:not(.dark) body .site-header a,
+html:not(.dark) body .site-header nav a,
+html:not(.dark) body .site-header .nav a,
+html:not(.dark) body .site-header .header-actions a {
+    color: #000000 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+html:not(.dark) body .site-header a:hover {
+    color: #2563eb !important;
+}
+
+/* ============================================================
+   HEADER ACTION SHAPES — DIFFERENT COLOURS
+   ============================================================ */
+
+html:not(.dark) body .site-header .header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+/* Every action button gets a visible shape */
+html:not(.dark) body .site-header .header-actions .btn,
+html:not(.dark) body .site-header .header-actions button {
+    color: #000000 !important;
+    background: #f1f5f9 !important;
+
+    border: 2px solid #94a3b8 !important;
+    border-radius: 12px !important;
+
+    padding: 9px 15px !important;
+
+    font-weight: 900 !important;
+
+    box-shadow:
+        0 3px 8px rgba(15, 23, 42, 0.12) !important;
+
+    transition: all .2s ease !important;
+}
+
+/* Hover */
+html:not(.dark) body .site-header .header-actions .btn:hover,
+html:not(.dark) body .site-header .header-actions button:hover {
+    background: #dbeafe !important;
+    border-color: #2563eb !important;
+    color: #000000 !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ============================================================
+   COLOUR EACH COMMON ACTION DIFFERENTLY
+   ============================================================ */
+
+/* Dark mode toggle */
+html:not(.dark) body .site-header .theme-toggle,
+html:not(.dark) body .site-header [class*="theme"],
+html:not(.dark) body .site-header [id*="theme"] {
+    background: #fef3c7 !important;
+    border: 2px solid #f59e0b !important;
+    color: #000000 !important;
+}
+
+/* My Cases */
+html:not(.dark) body .site-header a[href*="/client/dashboard"] {
+    background: #dbeafe !important;
+    border: 2px solid #3b82f6 !important;
+    color: #000000 !important;
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+}
+
+/* Blog */
+html:not(.dark) body .site-header a[href*="blog"] {
+    background: #dcfce7 !important;
+    border: 2px solid #22c55e !important;
+    color: #000000 !important;
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+}
+
+/* Donate */
+html:not(.dark) body .site-header a[href*="donate"] {
+    background: #fce7f3 !important;
+    border: 2px solid #ec4899 !important;
+    color: #000000 !important;
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+}
+
+/* New Request */
+html:not(.dark) body .site-header a[href*="/client/request"] {
+    background: #ede9fe !important;
+    border: 2px solid #8b5cf6 !important;
+    color: #000000 !important;
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+}
+
+/* ============================================================
+   USER / LOGOUT
+   ============================================================ */
+
+html:not(.dark) body .site-header .user-name,
+html:not(.dark) body .site-header .username {
+    color: #000000 !important;
+    font-weight: 900 !important;
+}
+
+html:not(.dark) body .site-header a[href*="logout"],
+html:not(.dark) body .site-header .logout,
+html:not(.dark) body .site-header .logout-btn {
+    background: #fee2e2 !important;
+    border: 2px solid #ef4444 !important;
+    color: #000000 !important;
+
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+
+    font-weight: 900 !important;
+}
+
+/* ============================================================
+   HEADER ICONS
+   ============================================================ */
+
+html:not(.dark) body .site-header i {
+    color: #2563eb !important;
+}
+
+html:not(.dark) body .site-header a[href*="blog"] i {
+    color: #16a34a !important;
+}
+
+html:not(.dark) body .site-header a[href*="donate"] i {
+    color: #db2777 !important;
+}
+
+html:not(.dark) body .site-header a[href*="/client/request"] i {
+    color: #7c3aed !important;
+}
+
+html:not(.dark) body .site-header a[href*="logout"] i {
+    color: #dc2626 !important;
+}
+
+
+/* ============================================================
+   MANLUNG RECOVERY — DARK MODE HEADER VISIBILITY
+   DARK MODE = WHITE TEXT
+   ============================================================ */
+
+html.dark body .site-header,
+html.dark body header.site-header {
+    background: #081630 !important;
+    background-color: #081630 !important;
+    background-image: none !important;
+    color: #ffffff !important;
+
+    border-bottom: 3px solid #3b82f6 !important;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.45),
+        0 0 24px rgba(37, 99, 235, 0.35) !important;
+}
+
+/* Dark mode header container */
+html.dark body .site-header .container,
+html.dark body .site-header .manlung-header-inner {
+    background: transparent !important;
+    color: #ffffff !important;
+}
+
+/* ============================================================
+   DARK MODE BRAND
+   ============================================================ */
+
+html.dark body .site-header .brand h1 {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+html.dark body .site-header .brand h1 i {
+    color: #60a5fa !important;
+}
+
+html.dark body .site-header .brand span {
+    color: #dbeafe !important;
+}
+
+/* Logo */
+html.dark body .site-header .manlung-home-logo {
+    background: #0f2347 !important;
+    border: 2px solid #60a5fa !important;
+    box-shadow:
+        0 3px 14px rgba(37, 99, 235, 0.45) !important;
+}
+
+/* ============================================================
+   ALL DARK MODE NAVIGATION — WHITE
+   ============================================================ */
+
+html.dark body .site-header a,
+html.dark body .site-header nav a,
+html.dark body .site-header .nav a,
+html.dark body .site-header button,
+html.dark body .site-header .header-actions,
+html.dark body .site-header .header-actions a {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-weight: 800 !important;
+}
+
+/* Hover */
+html.dark body .site-header a:hover,
+html.dark body .site-header button:hover {
+    color: #93c5fd !important;
+}
+
+/* ============================================================
+   DARK MODE ACTION BUTTONS
+   ============================================================ */
+
+html.dark body .site-header .header-actions .btn,
+html.dark body .site-header .header-actions button {
+    color: #ffffff !important;
+
+    background: #172554 !important;
+    border: 2px solid #3b82f6 !important;
+
+    border-radius: 12px !important;
+    padding: 9px 15px !important;
+
+    font-weight: 900 !important;
+
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.30) !important;
+}
+
+/* ============================================================
+   DARK MODE — COLOURED ACTIONS
+   ============================================================ */
+
+/* Dark toggle */
+html.dark body .site-header .theme-toggle,
+html.dark body .site-header [class*="theme"],
+html.dark body .site-header [id*="theme"] {
+    background: #78350f !important;
+    border: 2px solid #f59e0b !important;
+    color: #ffffff !important;
+}
+
+/* My Cases */
+html.dark body .site-header a[href*="/client/dashboard"] {
+    background: #1e3a8a !important;
+    border: 2px solid #60a5fa !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+}
+
+/* Blog */
+html.dark body .site-header a[href*="blog"] {
+    background: #14532d !important;
+    border: 2px solid #4ade80 !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+}
+
+/* Donate */
+html.dark body .site-header a[href*="donate"] {
+    background: #831843 !important;
+    border: 2px solid #f472b6 !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+}
+
+/* New Request */
+html.dark body .site-header a[href*="/client/request"] {
+    background: #4c1d95 !important;
+    border: 2px solid #a78bfa !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+}
+
+/* ============================================================
+   DARK MODE USER + LOGOUT
+   ============================================================ */
+
+html.dark body .site-header .user-name,
+html.dark body .site-header .username {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+html.dark body .site-header a[href*="logout"],
+html.dark body .site-header .logout,
+html.dark body .site-header .logout-btn {
+    background: #7f1d1d !important;
+    border: 2px solid #f87171 !important;
+    color: #ffffff !important;
+
+    border-radius: 12px !important;
+    padding: 9px 14px !important;
+
+    font-weight: 900 !important;
+}
+
+/* ============================================================
+   DARK MODE ICONS
+   ============================================================ */
+
+html.dark body .site-header i,
+html.dark body .site-header svg {
+    color: #93c5fd !important;
+}
+
+html.dark body .site-header a[href*="blog"] i {
+    color: #4ade80 !important;
+}
+
+html.dark body .site-header a[href*="donate"] i {
+    color: #f472b6 !important;
+}
+
+html.dark body .site-header a[href*="/client/request"] i {
+    color: #c4b5fd !important;
+}
+
+html.dark body .site-header a[href*="logout"] i {
+    color: #f87171 !important;
+}
+
+/* ============================================================
+   DARK MOBILE NAV
+   ============================================================ */
+
+html.dark body .mobile-nav-panel {
+    background: #081630 !important;
+    background-color: #081630 !important;
+    color: #ffffff !important;
+    border-color: #3b82f6 !important;
+}
+
+html.dark body .mobile-nav-title,
+html.dark body .mobile-nav-action {
+    color: #ffffff !important;
+}
+
+html.dark body .mobile-nav-divider {
+    background: rgba(96, 165, 250, 0.25) !important;
+}
+
+
+/* ============================================================
+   MOBILE NAVIGATION — WHITE PANEL
+   Phone version only
+   ============================================================ */
+
+@media (max-width: 740px) {
+
+    .mobile-nav-panel,
+    html body .mobile-nav-panel {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+
+        color: #000000 !important;
+
+        border: 2px solid #2563eb !important;
+        border-radius: 16px !important;
+
+        box-shadow:
+            0 8px 28px rgba(37, 99, 235, 0.28) !important;
+    }
+
+    /* Mobile navigation title */
+    .mobile-nav-title,
+    html body .mobile-nav-title {
+        color: #000000 !important;
+        font-weight: 900 !important;
+    }
+
+    /* Mobile navigation links */
+    .mobile-nav-action,
+    html body .mobile-nav-action,
+    html body .mobile-nav-panel a {
+        color: #000000 !important;
+        background: #ffffff !important;
+
+        font-weight: 800 !important;
+
+        opacity: 1 !important;
+        visibility: visible !important;
+
+        border-radius: 10px !important;
+    }
+
+    /* Hover / touch state */
+    .mobile-nav-action:hover,
+    .mobile-nav-action:active,
+    html body .mobile-nav-panel a:hover {
+        background: #eff6ff !important;
+        color: #000000 !important;
+    }
+
+    /* Mobile nav icons */
+    .mobile-nav-action i,
+    html body .mobile-nav-panel i {
+        color: #2563eb !important;
+    }
+
+    /* Divider */
+    .mobile-nav-divider {
+        background: #bfdbfe !important;
+        height: 1px !important;
+    }
+
+    /* Mobile navigation heading/icon */
+    .mobile-nav-title i {
+        color: #2563eb !important;
+    }
+}
+
+/* ============================================================
+   MOBILE NAV — FORCE WHITE EVEN WHEN DARK MODE IS ACTIVE
+   ============================================================ */
+
+@media (max-width: 740px) {
+
+    html.dark body .mobile-nav-panel,
+    html.dark body .mobile-nav-panel a,
+    html.dark body .mobile-nav-action {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    html.dark body .mobile-nav-title {
+        color: #000000 !important;
+    }
+
+    html.dark body .mobile-nav-action i,
+    html.dark body .mobile-nav-panel i {
+        color: #2563eb !important;
+    }
+
+    html.dark body .mobile-nav-divider {
+        background: #bfdbfe !important;
+    }
+}
+
+
+/* ============================================================
+   FINAL MOBILE NAVIGATION — WHITE
+   This rule intentionally overrides all previous mobile rules.
+   ============================================================ */
+
+@media (max-width: 740px) {
+
+    /* The navigation overlay itself */
+    html body nav.mobile-nav,
+    html.dark body nav.mobile-nav {
+        background: rgba(255,255,255,0.98) !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+        color: #000000 !important;
+    }
+
+    /* The actual menu box */
+    html body nav.mobile-nav .mobile-nav-panel,
+    html.dark body nav.mobile-nav .mobile-nav-panel {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+
+        color: #000000 !important;
+
+        border: 2px solid #2563eb !important;
+        border-radius: 18px !important;
+
+        box-shadow:
+            0 10px 35px rgba(37,99,235,.30),
+            0 0 20px rgba(37,99,235,.18) !important;
+    }
+
+    /* Navigation heading */
+    html body nav.mobile-nav .mobile-nav-title,
+    html.dark body nav.mobile-nav .mobile-nav-title {
+        background: #eff6ff !important;
+        background-color: #eff6ff !important;
+        color: #000000 !important;
+        font-weight: 900 !important;
+    }
+
+    /* Close X */
+    html body nav.mobile-nav .mobile-menu-close,
+    html.dark body nav.mobile-nav .mobile-menu-close {
+        background: #fee2e2 !important;
+        background-color: #fee2e2 !important;
+        color: #000000 !important;
+
+        border: 2px solid #ef4444 !important;
+        border-radius: 10px !important;
+
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    /* Every navigation link */
+    html body nav.mobile-nav a,
+    html.dark body nav.mobile-nav a,
+    html body nav.mobile-nav .mobile-nav-action,
+    html.dark body nav.mobile-nav .mobile-nav-action {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+
+        color: #000000 !important;
+
+        font-weight: 900 !important;
+
+        opacity: 1 !important;
+        visibility: visible !important;
+
+        border-radius: 12px !important;
+    }
+
+    /* Hover / tap */
+    html body nav.mobile-nav a:hover,
+    html body nav.mobile-nav a:active,
+    html.dark body nav.mobile-nav a:hover,
+    html.dark body nav.mobile-nav a:active {
+        background: #dbeafe !important;
+        background-color: #dbeafe !important;
+        color: #000000 !important;
+    }
+
+    /* Icons */
+    html body nav.mobile-nav i,
+    html.dark body nav.mobile-nav i {
+        color: #2563eb !important;
+    }
+
+    /* Dividers */
+    html body nav.mobile-nav .mobile-nav-divider,
+    html.dark body nav.mobile-nav .mobile-nav-divider {
+        background: #bfdbfe !important;
+        background-color: #bfdbfe !important;
+        height: 2px !important;
+    }
+}
+
+
+
+
+/* Header icon sizing is intentionally scoped to navigation only. */
+.site-header .donation-nav-icon {
+  width: 18px;
+  height: 18px;
+  max-width: 18px;
+  max-height: 18px;
+  object-fit: contain;
+  flex: 0 0 18px;
+  vertical-align: middle;
+}
+.site-header .header-actions a,
+.site-header .header-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+}
+@media (max-width: 740px) {
+  .site-header .donation-nav-icon { width: 17px; height: 17px; max-width:17px; max-height:17px; }
+  .site-header .manlung-header-inner { min-height: 64px; }
+  .site-header .header-actions { display: none; }
+  .site-header .mobile-menu-toggle {
+    display: inline-flex;
+    margin-left: auto;
+    width: 42px; height: 42px;
+    min-width: 42px; min-height: 42px;
+    align-items: center; justify-content: center;
+    flex: 0 0 42px;
+  }
+  .site-header .mobile-menu-toggle i { font-size: 1.2rem; }
+}

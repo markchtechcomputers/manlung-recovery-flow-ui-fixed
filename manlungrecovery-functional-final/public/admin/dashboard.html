@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+    <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard · Manlung Recovery</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:linear-gradient(135deg,#081525,#10253f);
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 8px 28px rgba(2,6,23,.22);
+}
+
+.site-header .container{
+  max-width:1220px;
+  margin:0 auto;
+  min-height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.65rem 1rem;
+}
+
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  min-width:0;
+}
+
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.02rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+
+.site-header .brand span{
+  display:block;
+  margin-top:.18rem;
+  color:#94a3b8;
+  font-size:.7rem;
+  white-space:nowrap;
+}
+
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.45rem;
+  flex-wrap:wrap;
+}
+
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.45rem;
+  min-height:40px;
+  padding:.45rem .72rem;
+  border:1px solid rgba(148,163,184,.18);
+  border-radius:11px;
+  background:rgba(255,255,255,.045);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.76rem;
+  font-weight:700;
+  white-space:nowrap;
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.34);
+  color:#fff;
+  transform:translateY(-1px);
+  box-shadow:0 6px 16px rgba(2,6,23,.18);
+}
+
+.site-header .header-actions a i,
+.site-header .header-actions button i{
+  width:18px;
+  text-align:center;
+  font-size:.9rem;
+  color:#93c5fd;
+}
+
+.site-header .header-actions a[href="/admin/reports.html"] i{
+  color:#4ade80;
+}
+
+.site-header .header-actions a[href="/"] i{
+  color:#fbbf24;
+}
+
+.site-header .header-actions .btn-danger{
+  background:rgba(220,38,38,.09);
+  border-color:rgba(248,113,113,.2);
+}
+
+.site-header .header-actions .btn-danger i{
+  color:#fca5a5;
+}
+
+@media(max-width:960px){
+  .site-header .container{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .site-header .brand{
+    width:100%;
+  }
+
+  .site-header .header-actions{
+    width:100%;
+    justify-content:flex-start;
+  }
+}
+
+@media(max-width:650px){
+  .site-header .container{
+    padding:.6rem .7rem;
+  }
+
+  .site-header .brand h1{
+    font-size:.94rem;
+  }
+
+  .site-header .brand span{
+    font-size:.64rem;
+    white-space:normal;
+  }
+
+  .site-header .header-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:.4rem;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:46px;
+    padding:.45rem .55rem;
+    font-size:.68rem;
+  }
+
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    font-size:.9rem;
+  }
+}
+
+@media(max-width:390px){
+  .site-header .header-actions{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:44px;
+    font-size:.63rem;
+  }
+}
+
+.manlung-brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+}
+.manlung-brand-logo{
+  width:44px;
+  height:44px;
+  object-fit:cover;
+  border-radius:12px;
+  flex:none;
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+  border:1px solid rgba(255,255,255,.12);
+  background:#fff;
+}
+.manlung-brand-copy{
+  min-width:0;
+}
+.manlung-brand-copy h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.02rem;
+  font-weight:800;
+  line-height:1.1;
+}
+.manlung-brand-copy span{
+  display:block;
+  margin-top:.18rem;
+  color:#94a3b8;
+  font-size:.7rem;
+}
+@media(max-width:650px){
+  .manlung-brand-logo{
+    width:40px;
+    height:40px;
+  }
+  .manlung-brand-copy h1{
+    font-size:.92rem;
+  }
+  .manlung-brand-copy span{
+    font-size:.62rem;
+  }
+}
+
+</style>
+
+<style id="manlung-message-style">
+.manlung-message-card{
+  margin-top:1rem;
+}
+
+.manlung-message-list{
+  display:flex;
+  flex-direction:column;
+  gap:.45rem;
+  max-height:420px;
+  overflow:auto;
+  padding:.55rem .35rem;
+  background:var(--page-bg);
+  border-radius:14px;
+}
+
+.manlung-message{
+  max-width:min(76%,520px);
+  padding:.48rem .65rem .38rem;
+  border-radius:14px;
+  border:1px solid #e2e8f0;
+  background:#ffffff;
+  color:#0f172a;
+  box-shadow:0 1px 2px rgba(15,23,42,.06);
+}
+
+.manlung-message.mine{
+  margin-left:auto;
+  background:#123a78;
+  border-color:#123a78;
+  color:#ffffff;
+  border-bottom-right-radius:5px;
+}
+
+.manlung-message:not(.mine){
+  margin-right:auto;
+  background:#f8fafc;
+  border-color:#e2e8f0;
+  color:#0f172a;
+  border-bottom-left-radius:5px;
+}
+
+.manlung-message-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+  margin-bottom:.16rem;
+  font-size:.6rem;
+  color:#64748b;
+}
+
+.manlung-message.mine .manlung-message-meta{
+  color:#dbeafe;
+}
+
+.manlung-message-text{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  line-height:1.35;
+  font-size:.78rem;
+  color:#0f172a;
+}
+
+.manlung-message.mine .manlung-message-text{
+  color:#ffffff;
+}
+
+.manlung-message-status{
+  display:inline-block;
+  margin-left:.28rem;
+  font-size:.68rem;
+  letter-spacing:-.06em;
+}
+
+.manlung-message-status.sent{
+  color:#dbeafe;
+}
+
+.manlung-message-status.read{
+  color:#7dd3fc;
+}
+
+.manlung-message-compose{
+  display:flex;
+  gap:.5rem;
+  margin-top:.65rem;
+}
+
+.manlung-message-compose textarea{
+  flex:1;
+  min-height:52px;
+  max-height:120px;
+  resize:vertical;
+  padding:.6rem .7rem;
+  font-size:.8rem;
+}
+
+.manlung-message-empty{
+  padding:.9rem;
+  text-align:center;
+  color:var(--text-muted);
+  font-size:.78rem;
+}
+
+@media(max-width:600px){
+  .manlung-message{
+    max-width:88%;
+  }
+
+  .manlung-message-compose{
+    flex-direction:column;
+  }
+
+  .manlung-message-compose .btn{
+    width:100%;
+  }
+}
+</style>
+
+
+
+
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/footer.css?v=ultimate-white-footer-20260830">
+  
+
+  <link rel="stylesheet" href="/css/mobile-header.css?v=20260830-white-blue-glow">
+
+<style id="manlung-footer-ultimate-contrast">
+/* FINAL OVERRIDE — MANLUNG RECOVERY FOOTER */
+html body footer.manlung-footer {
+  background:#000000 !important;
+  color:#ffffff !important;
+  opacity:1 !important;
+}
+
+html body footer.manlung-footer,
+html body footer.manlung-footer *,
+html body footer.manlung-footer p,
+html body footer.manlung-footer span,
+html body footer.manlung-footer strong,
+html body footer.manlung-footer h2,
+html body footer.manlung-footer h3,
+html body footer.manlung-footer h4,
+html body footer.manlung-footer a,
+html body footer.manlung-footer i,
+html body footer.manlung-footer svg,
+html body footer.manlung-footer svg *,
+html body footer.manlung-footer div,
+html body footer.manlung-footer section,
+html body footer.manlung-footer nav {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer a,
+html body footer.manlung-footer a:visited,
+html body footer.manlung-footer a:hover,
+html body footer.manlung-footer a:active {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  text-decoration:none;
+}
+
+html body footer.manlung-footer .manlung-footer-brand-subtitle,
+html body footer.manlung-footer .manlung-footer-description,
+html body footer.manlung-footer .manlung-footer-trust p,
+html body footer.manlung-footer .manlung-footer-social-label,
+html body footer.manlung-footer .manlung-footer-bottom,
+html body footer.manlung-footer .manlung-footer-bottom span {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer .manlung-footer-social a,
+html body footer.manlung-footer .manlung-footer-social a *,
+html body footer.manlung-footer .manlung-footer-social i,
+html body footer.manlung-footer .manlung-footer-social svg,
+html body footer.manlung-footer .manlung-footer-social svg * {
+  color:#ffffff !important;
+  fill:#ffffff !important;
+  stroke:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+html body footer.manlung-footer .manlung-footer-divider {
+  background:#333333 !important;
+}
+</style>
+
+</head>
+<body class="admin-page-bg">
+    <header class="site-header"><div class="container manlung-header-inner"><div class="brand"><a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home"><img class="manlung-site-logo" src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png" alt="Manlung Recovery"></a><div class="manlung-brand-copy"><h1><i class="fas fa-shield-halved" aria-hidden="true"></i> Manlung Recovery</h1><span>Admin Dashboard · Case management</span></div></div><div class="header-actions"><a href="/admin/owner.html" id="ownerLink" class="btn btn-outline" style="display:none;"><i class="fas fa-user-shield"></i> Admin Management</a><a class="btn btn-outline" href="/admin/reports.html"><i class="fas fa-chart-line"></i> Reports</a><button class="btn btn-outline" data-theme-toggle="true"><i class="fas fa-moon"></i> Theme</button><a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a><button class="btn btn-danger" type="button" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+    <button class="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i></button>
+    <nav class="mobile-nav" aria-label="Mobile navigation"><div class="mobile-nav-panel">
+      <div class="mobile-nav-title"><span>Navigation</span><button type="button" class="mobile-menu-close" aria-label="Close navigation menu">×</button></div>
+      <a href="/admin/dashboard.html" class=""><i class="fas fa-folder-open" aria-hidden="true"></i> Dashboard</a>
+      <a href="/admin/reports.html" class=""><i class="fas fa-chart-line" aria-hidden="true"></i> Reports</a>
+      <a href="/admin/owner.html" id="ownerMobileLink" style="display:none;"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin Management</a>
+      <a href="/" class=""><i class="fas fa-home" aria-hidden="true"></i> Website</a>
+      <button type="button" data-theme-toggle="true"><i class="fas fa-moon" aria-hidden="true"></i> Theme</button>
+      <a href="#" onclick="handleLogout(); return false;"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout</a>
+    </div></nav></div></header>
+
+    <div class="container">
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div>
+                <div class="card-title" style="margin-bottom:0.2rem;"><i class="fas fa-phone-volume"></i> Call Admin — Availability</div>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin:0;" id="voiceLineStatus">Go online to receive Call Admin requests. Calls are queued when all admins are busy; the first available admin can accept the next caller. Each Admin can actively manage up to 10 cases at a time.</p>
+                <div id="voiceLineRingtoneSettings"></div>
+            </div>
+            <button class="btn btn-success" id="voiceLineBtn" onclick="toggleAdminOnline()"><i class="fas fa-power-off"></i> Go Online</button>
+        </div>
+
+
+
+                <div class="card" style="margin-bottom:1rem;">
+            <div class="card-title"><i class="fas fa-heart"></i> Donation Dashboard</div>
+            <div class="stats-grid" style="margin-top:0.8rem;">
+                <div class="stat-card"><div class="number" id="donationTotal">KES 0</div><div class="label">Confirmed donations</div></div>
+                <div class="stat-card"><div class="number" id="donationCountAdmin">0</div><div class="label">Donations</div></div>
+            </div>
+            <div class="table-wrap" style="margin-top:1rem;">
+                <table class="admin-table">
+                    <thead><tr><th>Time</th><th>Donor</th><th>Email</th><th>Amount</th><th>Status</th></tr></thead>
+                    <tbody id="donationsBody"><tr><td colspan="5" style="text-align:center;">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="number" id="statTotal">0</div><div class="label">Total</div></div>
+            <div class="stat-card" style="cursor:pointer;" onclick="quickFilter('unread')"><div class="number" id="statUnread" style="color:var(--accent);">0</div><div class="label">Unread</div></div>
+            <div class="stat-card"><div class="number" id="statPending">0</div><div class="label">Pending</div></div>
+            <div class="stat-card"><div class="number" id="statProgress">0</div><div class="label">In Progress</div></div>
+            <div class="stat-card"><div class="number" id="statClosed">0</div><div class="label">Closed / Recovered</div></div>
+            <div class="stat-card"><div class="number" id="statRejected">0</div><div class="label">Rejected</div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-folder-open"></i> All Cases</div>
+
+            <div class="filters-bar">
+                <input type="text" id="searchInput" placeholder="Search name, phone, email, case ID, IMEI…">
+                <select id="statusFilter">
+                    <option value="all">All Statuses</option>
+                    <option>Pending Review</option>
+                    <option>Accepted</option>
+                    <option>Under Investigation</option>
+                    <option>Awaiting Customer Response</option>
+                    <option>Evidence Collected</option>
+                    <option>Recovery Successful</option>
+                    <option>Recovered by Police</option>
+                    <option>Recovered by Owner</option>
+                    <option>Closed</option>
+                    <option>Rejected</option>
+                </select>
+                <select id="progressFilter">
+                    <option value="all">Unfinished + Finished</option>
+                    <option value="unfinished">Unfinished only</option>
+                    <option value="finished">Finished only</option>
+                </select>
+                <select id="unreadFilter">
+                    <option value="all">Read + Unread</option>
+                    <option value="true">Unread only</option>
+                </select>
+                <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
+                    <input type="checkbox" id="myCasesFilter" style="width:auto;" onchange="loadCases(1)"> My cases only
+                </label>
+                <button class="btn btn-primary" onclick="loadCases(1)"><i class="fas fa-search"></i> Search</button>
+                <button class="btn btn-outline-dark" onclick="exportCsv()"><i class="fas fa-file-csv"></i> Export CSV</button>
+            </div>
+
+            <div id="bulkBar" style="display:none; align-items:center; gap:0.8rem; flex-wrap:wrap; background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:0.6rem 1rem; margin-bottom:1rem;">
+                <span id="bulkCount" style="font-size:0.85rem; font-weight:600;"></span>
+                <select id="bulkStatus" style="max-width:220px;">
+                    <option value="">Set status to…</option>
+                    <option>Pending Review</option>
+                    <option>Accepted</option>
+                    <option>Under Investigation</option>
+                    <option>Awaiting Customer Response</option>
+                    <option>Evidence Collected</option>
+                    <option>Recovery Successful</option>
+                    <option>Recovered by Police</option>
+                    <option>Recovered by Owner</option>
+                    <option>Closed</option>
+                    <option>Rejected</option>
+                </select>
+                <button class="btn btn-primary" style="padding:0.4rem 1rem; font-size:0.82rem;" onclick="applyBulkUpdate()"><i class="fas fa-check"></i> Apply to selected</button>
+                <button class="btn btn-outline-dark" style="padding:0.4rem 1rem; font-size:0.82rem;" onclick="clearSelection()">Clear selection</button>
+                <span id="bulkStatusMsg" style="font-size:0.8rem; color:var(--text-muted);"></span>
+            </div>
+
+            <div class="table-wrap cases-scroll">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"><input type="checkbox" id="selectAllBox" onchange="toggleSelectAll(this)"></th>
+                            <th>Case ID</th>
+                            <th>Client</th>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="casesTableBody">
+                        <tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:2rem;">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem; flex-wrap:wrap; gap:0.5rem;">
+                <span id="pageInfo" style="color:var(--text-muted); font-size:0.85rem;"></span>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="btn btn-outline-dark" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i> Prev</button>
+                    <button class="btn btn-outline-dark" onclick="changePage(1)">Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+
+    <div class="manlung-footer-grid">
+
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row">
+          <img src="/icons/icon-512.png"
+               alt="Manlung Recovery"
+               class="manlung-footer-logo"
+               width="58"
+               height="58">
+          <div>
+            <h2 id="footer-brand-title">Manlung Recovery</h2>
+            <p class="manlung-footer-brand-subtitle">
+              Cyber Recovery &amp; Digital Investigation Portal
+            </p>
+          </div>
+        </div>
+
+        <p class="manlung-footer-description">
+          Manlung Recovery provides structured digital recovery assistance,
+          investigation support, account and device recovery guidance,
+          cybersecurity awareness, and secure case-management services.
+          Our goal is to help individuals and organizations respond to
+          digital incidents responsibly, protect important information,
+          and take appropriate steps toward recovery.
+        </p>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Quick Links</h3>
+        <nav class="manlung-footer-links" aria-label="Quick links">
+          <a href="/">Home</a>
+          <a href="/about.html">About Manlung Recovery</a>
+          <a href="/knowledge.html">Knowledge Centre</a>
+          <a href="/blog.html">Security &amp; Recovery Blog</a>
+          <a href="/contact.html">Contact Us</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Recovery Services</h3>
+        <nav class="manlung-footer-links" aria-label="Recovery services">
+          <a href="/client/request.html" class="footer-important">Submit Recovery Request</a>
+          <a href="/client/dashboard.html" class="footer-important">Client Portal</a>
+          <a href="/client/track.html">Track a Case</a>
+          <a href="/client/settings.html">Account Settings</a>
+          <a href="/login.html">Sign In</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Security &amp; Trust</h3>
+
+        <div class="manlung-footer-trust">
+          <p>
+            We use access controls, authentication safeguards and responsible
+            information-handling practices to help protect client and case
+            information.
+          </p>
+        </div>
+
+        <div class="manlung-footer-trust">
+          <p>
+            Personal-data processing is described in our Privacy Notice,
+            including applicable rights and responsibilities under Kenya's
+            Data Protection Act, 2019 and relevant regulations.
+          </p>
+        </div>
+
+        <nav class="manlung-footer-links manlung-footer-security-links"
+             aria-label="Legal and security links">
+          <a href="/privacy.html" class="footer-important">Privacy Notice</a>
+          <a href="/terms.html" class="footer-important">Terms &amp; Conditions</a>
+        </nav>
+      </section>
+
+    </div>
+
+    <div class="manlung-footer-divider"></div>
+
+    <div class="manlung-footer-contact-row">
+
+      <div class="manlung-footer-contact">
+        <a href="mailto:manlungrecovery@outlook.com">
+          <i class="fas fa-envelope" aria-hidden="true"></i>
+          manlungrecovery@outlook.com
+        </a>
+
+        <a href="tel:+254724356178">
+          <i class="fas fa-phone" aria-hidden="true"></i>
+          +254 724 356 178
+        </a>
+      </div>
+
+      <div class="manlung-footer-social"
+           aria-label="Manlung Recovery social media">
+
+        <span class="manlung-footer-social-label">Follow Manlung Recovery</span>
+
+        <a href="https://www.youtube.com/@manlungrecory"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on YouTube">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
+          <span>YouTube</span>
+        </a>
+
+        <a href="https://www.linkedin.com/in/mark-ochiengke"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on LinkedIn">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+          <span>LinkedIn</span>
+        </a>
+
+        <a href="https://github.com/markchtechcomputers"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on GitHub">
+          <i class="fab fa-github" aria-hidden="true"></i>
+          <span>GitHub</span>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="manlung-footer-bottom">
+      <span>
+        &copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.
+      </span>
+
+      <div class="manlung-footer-legal">
+        <a href="/terms.html">Terms &amp; Conditions</a>
+        <a href="/privacy.html">Privacy Notice</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+    <!-- Case detail modal -->
+    <div id="modalOverlay" class="modal-overlay" style="display:none;" onclick="if(event.target===this) closeModal()">
+        <div class="modal-card">
+            <div id="modalBody">Loading…</div>
+        </div>
+    </div>
+
+    <!-- Incoming / active call panel -->
+    <div id="callModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(10,18,40,0.6); align-items:center; justify-content:center; z-index:300;" onclick="if(event.target===this) closeCallModal()">
+        <div style="position:relative; background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; max-width:380px; width:90%; padding:2rem; text-align:center;">
+            <button type="button" aria-label="Close call window" title="Close" onclick="closeCallModal()" style="position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;border-radius:50%;background:var(--page-bg);color:var(--text);cursor:pointer;font-size:1rem;"><i class="fas fa-times"></i></button>
+            <div id="callModalBody"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/js/call-webrtc.js"></script>
+    <script>
+        
+        let currentAdmin =
+            JSON.parse(localStorage.getItem('adminUser') || '{}');
+
+        const ownerManagementNav =
+            document.getElementById('ownerManagementNav');
+
+        const ownerLink =
+            document.getElementById('ownerLink');
+
+        function getAdminRole(user) {
+            return String(
+                user?.role ||
+                user?.admin_role ||
+                user?.user_role ||
+                user?.adminRole ||
+                user?.userRole ||
+                ''
+            ).trim().toLowerCase();
+        }
+
+        function applyOwnerVisibility(user) {
+            const isOwner = getAdminRole(user) === 'owner';
+
+            if (ownerManagementNav) {
+                ownerManagementNav.style.display =
+                    isOwner ? 'inline-flex' : 'none';
+            }
+
+            if (ownerLink) {
+                ownerLink.style.display =
+                    isOwner ? 'inline-flex' : 'none';
+            }
+            const ownerMobileLink = document.getElementById('ownerMobileLink');
+            if (ownerMobileLink) ownerMobileLink.style.display = isOwner ? 'block' : 'none';
+        }
+
+        applyOwnerVisibility(currentAdmin);
+
+        /*
+         * Re-check the authenticated session after every login.
+         * This is important because adminUser may not contain the
+         * role immediately after a fresh login.
+         */
+        fetch('/api/auth/verify', {
+            method: 'GET',
+            credentials: 'include',
+            cache: 'no-store',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(async (res) => {
+            if (!res.ok) {
+                return null;
+            }
+
+            const data = await res.json();
+
+            const verifiedUser =
+                data?.user ||
+                data?.admin ||
+                data?.data?.user ||
+                data?.data?.admin ||
+                data?.data ||
+                data;
+
+            return verifiedUser;
+        })
+        .then((verifiedUser) => {
+            if (!verifiedUser || typeof verifiedUser !== 'object') {
+                return;
+            }
+
+            currentAdmin = {
+                ...currentAdmin,
+                ...verifiedUser
+            };
+
+            localStorage.setItem(
+                'adminUser',
+                JSON.stringify(currentAdmin)
+            );
+
+            applyOwnerVisibility(currentAdmin);
+        })
+        .catch((error) => {
+            console.warn(
+                'Admin session verification failed:',
+                error
+            );
+
+            /*
+             * Keep the locally stored owner state if the verification
+             * request temporarily fails.
+             */
+            applyOwnerVisibility(currentAdmin);
+        });
+
+        let currentPage = 1;
+        let totalPages = 1;
+        let selectedIds = new Set();
+
+        function authHeaders() {
+            return {};
+        }
+
+        async function handleUnauthorized(res) {
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('adminUser');
+                fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
+                window.location.href = '/admin/login.html';
+                return true;
+            }
+            return false;
+        }
+
+        function getStatusClass(status) {
+            const map = {
+                'Pending Review': 'status-pending',
+                'Accepted': 'status-progress',
+                'Under Investigation': 'status-progress',
+                'Awaiting Customer Response': 'status-progress',
+                'Evidence Collected': 'status-progress',
+                'Recovery Successful': 'status-completed',
+                'Recovered by Police': 'status-completed',
+                'Recovered by Owner': 'status-completed',
+                'Closed': 'status-closed',
+                'Rejected': 'status-rejected',
+            };
+            return map[status] || 'status-pending';
+        }
+
+        // Emergency-priority cases still sitting untouched a day later get flagged
+        function isEscalated(c) {
+            if (c.priority !== 'Emergency' || c.status !== 'Pending Review') return false;
+            const ageMs = Date.now() - new Date(c.createdAt).getTime();
+            return ageMs > 24 * 60 * 60 * 1000;
+        }
+
+        async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                return await fetch(url, { ...options, signal: controller.signal });
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetchWithTimeout('/api/cases/admin/stats', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('statTotal').textContent = data.stats.total ?? 0;
+                    document.getElementById('statUnread').textContent = data.stats.unread ?? 0;
+                    document.getElementById('statPending').textContent = data.stats.pending ?? 0;
+                    document.getElementById('statProgress').textContent = data.stats.progress ?? 0;
+                    document.getElementById('statClosed').textContent = data.stats.closed ?? 0;
+                    document.getElementById('statRejected').textContent = data.stats.rejected ?? 0;
+                } else {
+                    console.error('Admin stats error:', data.error);
+                }
+            } catch (e) {
+                console.error('Admin stats load error:', e);
+            }
+        }
+
+        function quickFilter(kind) {
+            if (kind === 'unread') document.getElementById('unreadFilter').value = 'true';
+            loadCases(1);
+        }
+
+        function buildFilterParams(extra) {
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            const progressVal = document.getElementById('progressFilter').value;
+            const unreadVal = document.getElementById('unreadFilter').value;
+            const myCases = document.getElementById('myCasesFilter').checked;
+            const params = new URLSearchParams(extra || {});
+            if (search) params.set('search', search);
+            if (status && status !== 'all') params.set('status', status);
+            if (progressVal && progressVal !== 'all') params.set('progress', progressVal);
+            if (unreadVal === 'true') params.set('unread', 'true');
+            if (myCases && currentAdmin.username) params.set('investigator', currentAdmin.username);
+            return params;
+        }
+
+        async function loadCases(page) {
+            currentPage = page || currentPage;
+            const params = buildFilterParams({ page: currentPage, limit: 20 });
+
+            const tbody = document.getElementById('casesTableBody');
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:2rem;">Loading…</td></tr>`;
+
+            try {
+                const res = await fetchWithTimeout(`/api/cases/admin/all?${params.toString()}`, { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+
+                if (!data.success) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger); padding:2rem;">${data.error || 'Failed to load cases'}</td></tr>`;
+                    return;
+                }
+
+                totalPages = data.totalPages || 1;
+                document.getElementById('pageInfo').textContent = `Page ${data.page} of ${totalPages} · ${data.total} case(s)`;
+
+                if (!data.cases.length) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:2rem;">No cases found.</td></tr>`;
+                    return;
+                }
+
+                // Newest submissions first (server already sorts by createdAt desc);
+                // unread ones get a NEW badge + bold row, escalated ones get a red
+                // left border so they stand out.
+                tbody.innerHTML = data.cases.map(c => {
+                    const unreadStyle = c.adminRead ? '' : 'background:rgba(36,81,214,0.05); font-weight:600;';
+                    const escalated = isEscalated(c);
+                    const borderStyle = escalated ? 'border-left:4px solid var(--danger);' : '';
+                    return `
+                    <tr style="${unreadStyle} ${borderStyle}">
+                        <td><input type="checkbox" class="rowCheck" value="${c.caseId}" ${selectedIds.has(c.caseId) ? 'checked' : ''} onchange="toggleRowSelect('${c.caseId}', this.checked)"></td>
+                        <td><strong>${c.caseId}</strong>
+                            ${c.adminRead ? '' : '<span class="status-badge" style="background:var(--accent); color:#fff; margin-left:6px;">NEW</span>'}
+                            ${escalated ? '<span class="status-badge" style="background:var(--danger); color:#fff; margin-left:6px;"><i class="fas fa-triangle-exclamation"></i> 24h+</span>' : ''}
+                        </td>
+                        <td>${c.clientName}<br><span style="color:var(--text-muted); font-size:0.8rem; font-weight:400;">${c.email}</span></td>
+                        <td>${c.caseType}</td>
+                        <td>${c.priority}</td>
+                        <td><span class="status-badge ${getStatusClass(c.status)}">${c.status}</span></td>
+                        <td>${new Date(c.createdAt).toLocaleDateString()}</td>
+                        <td style="white-space:nowrap;"><button class="btn btn-outline-dark" style="padding:0.3rem 0.7rem; font-size:0.8rem;" onclick="openCase('${c.caseId}')"><i class="fas fa-eye"></i> View</button> ${(!c.assignedAdminId && !['Recovery Successful','Recovered by Police','Recovered by Owner','Closed','Rejected'].includes(c.status)) ? `<button class="btn btn-success" style="padding:0.3rem 0.7rem; font-size:0.8rem;" onclick="claimCase('${c.caseId}')"><i class="fas fa-hand"></i> Take Case</button>` : ''}</td>
+                    </tr>`;
+                }).join('');
+                document.getElementById('selectAllBox').checked = false;
+                updateBulkBar();
+            } catch (e) {
+                console.error('Admin cases load error:', e);
+                const message = e.name === 'AbortError'
+                    ? 'The database request timed out. Check Supabase/Vercel and try again.'
+                    : 'Network error loading cases.';
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger); padding:2rem;">
+                    ${message}<br>
+                    <button class="btn btn-outline-dark" style="margin-top:.7rem;" onclick="loadCases(currentPage)">
+                        <i class="fas fa-rotate"></i> Try Again
+                    </button>
+                </td></tr>`;
+            }
+        }
+
+        function toggleRowSelect(caseId, checked) {
+            if (checked) selectedIds.add(caseId); else selectedIds.delete(caseId);
+            updateBulkBar();
+        }
+
+        function toggleSelectAll(box) {
+            document.querySelectorAll('.rowCheck').forEach(cb => {
+                cb.checked = box.checked;
+                if (box.checked) selectedIds.add(cb.value); else selectedIds.delete(cb.value);
+            });
+            updateBulkBar();
+        }
+
+        function updateBulkBar() {
+            const bar = document.getElementById('bulkBar');
+            if (selectedIds.size > 0) {
+                bar.style.display = 'flex';
+                document.getElementById('bulkCount').textContent = `${selectedIds.size} selected`;
+            } else {
+                bar.style.display = 'none';
+            }
+        }
+
+        function clearSelection() {
+            selectedIds.clear();
+            document.querySelectorAll('.rowCheck').forEach(cb => cb.checked = false);
+            document.getElementById('selectAllBox').checked = false;
+            updateBulkBar();
+        }
+
+        async function applyBulkUpdate() {
+            const status = document.getElementById('bulkStatus').value;
+            const msgEl = document.getElementById('bulkStatusMsg');
+            if (!status) { msgEl.textContent = 'Choose a status first.'; return; }
+            if (selectedIds.size === 0) return;
+
+            msgEl.textContent = 'Applying…';
+            try {
+                const res = await fetch('/api/cases/admin/bulk-update', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ caseIds: Array.from(selectedIds), status }),
+                });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (data.success) {
+                    msgEl.textContent = `Updated ${data.updated} case(s) ✓`;
+                    clearSelection();
+                    loadCases(currentPage);
+                    loadStats();
+                } else {
+                    msgEl.textContent = data.error || 'Bulk update failed';
+                }
+            } catch (e) {
+                console.error(e);
+                msgEl.textContent = 'Network error';
+            }
+        }
+
+        function exportCsv() {
+            const params = buildFilterParams();
+            const url = `/api/cases/admin/export?${params.toString()}`;
+            // GET with auth header needs a fetch, not a plain link click
+            fetch(url, { headers: authHeaders() })
+                .then(async (res) => {
+                    if (await handleUnauthorized(res)) return;
+                    const blob = await res.blob();
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `cases-export-${Date.now()}.csv`;
+                    a.click();
+                })
+                .catch((e) => { console.error(e); alert('Export failed — network error'); });
+        }
+
+        function changePage(delta) {
+            const next = currentPage + delta;
+            if (next < 1 || next > totalPages) return;
+            loadCases(next);
+        }
+
+        const STATUS_OPTIONS = [
+            'Pending Review', 'Accepted', 'Under Investigation', 'Awaiting Customer Response',
+            'Evidence Collected', 'Recovery Successful', 'Recovered by Police', 'Recovered by Owner',
+            'Closed', 'Rejected',
+        ];
+
+        async function claimCase(caseId) {
+            try {
+                const res = await fetch(`/api/cases/admin/case/${encodeURIComponent(caseId)}/claim`, { method:'POST', headers:authHeaders() });
+                const data = await res.json();
+                if (!res.ok) { alert(data.error || 'Could not claim case'); return; }
+                alert('Case claimed successfully. You can manage up to 10 active cases at a time.');
+                loadCases(currentPage); loadStats();
+            } catch(e) { alert('Network error while claiming case.'); }
+        }
+
+        async function openCase(caseId) {
+            document.getElementById('modalOverlay').style.display = 'flex';
+            document.getElementById('modalBody').innerHTML = 'Loading…';
+
+            try {
+                const res = await fetch(`/api/cases/admin/case/${encodeURIComponent(caseId)}`, { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!data.success) {
+                    document.getElementById('modalBody').innerHTML = `<p class="error-text">${data.error || 'Case not found'}</p>`;
+                    return;
+                }
+                renderCaseModal(data.case);
+                await loadAdminCaseMessages(caseId);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('modalBody').innerHTML = '<p class="error-text">Error loading case.</p>';
+            }
+        }
+
+        function renderCaseModal(c) {
+            const filesHtml = (c.files && c.files.length)
+                ? c.files.map(f => `
+                    <div class="file-item">
+                        <a href="${f.url}" target="_blank" rel="noopener"><i class="fas fa-file"></i> ${f.originalName || f.filename}</a>
+                        <span class="status">${f.uploadedBy || ''}</span>
+                    </div>`).join('')
+                : '<p style="color:var(--text-muted); font-size:0.9rem;">No files yet.</p>';
+
+            document.getElementById('modalBody').innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+                    <div>
+                        <h2 style="margin-bottom:0.2rem;">${c.caseId}</h2>
+                        <span style="color:var(--text-muted); font-size:0.9rem;">${c.caseType}</span>
+                    </div>
+                    <button class="btn btn-outline-dark" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div class="row-2" style="margin-bottom:1rem;">
+                    <div><strong>Client:</strong> ${c.clientName}</div>
+                    <div><strong>Priority:</strong> ${c.priority}</div>
+                    <div><strong>Phone:</strong> ${c.phone}</div>
+                    <div><strong>Email:</strong> ${c.email}</div>
+                </div>
+
+                <div class="form-group"><label>Description</label>
+                    <div style="background:var(--page-bg); border:1px solid var(--card-border); border-radius:12px; padding:0.8rem; font-size:0.9rem;">${c.incidentDesc || ''}</div>
+                </div>
+
+                <div class="row-2">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="editStatus">
+                            ${STATUS_OPTIONS.map(s => `<option ${s === c.status ? 'selected' : ''}>${s}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Investigator</label><input id="editInvestigator" value="${c.investigator || ''}"></div>
+                </div>
+                <div class="form-group"><label>Recovery Location</label><input id="editRecoveryLoc" value="${c.recoveryLoc || ''}"></div>
+                <div class="form-group"><label>Public Notes <span style="font-weight:400; color:var(--text-muted);">(visible to client)</span></label><textarea id="editNotes">${c.publicNotes || ''}</textarea></div>
+                <div class="form-group"><label>Internal Notes <span style="font-weight:400; color:var(--text-muted);">(admin only — never shown to the client)</span></label><textarea id="editInternalNotes" style="border-color:var(--warning-bg);">${c.internalNotes || ''}</textarea></div>
+
+                <button class="btn btn-primary" onclick="saveCase('${c.caseId}')"><i class="fas fa-save"></i> Save Changes</button>
+                ${c.clientUserId ? `<button class="btn btn-success" style="margin-left:.5rem;" onclick="callClientFromCase('${c.clientUserId}','${c.caseId}')"><i class="fas fa-phone"></i> Call Client</button>` : ''}
+                ${currentAdmin.role === 'owner' && c.publicNotes ? `<button class="btn btn-danger" style="margin-left:.5rem;" onclick="deleteClientMessage('${c.caseId}')"><i class="fas fa-trash"></i> Delete Client Message</button>` : ''}
+                <span id="saveStatus" style="margin-left:0.8rem; color:var(--text-muted); font-size:0.85rem;"></span>
+
+                <div class="card-title" style="margin-top:1.5rem;"><i class="fas fa-timeline"></i> Timeline</div>
+                <div style="white-space:pre-line; background:var(--page-bg); border:1px solid var(--card-border); border-radius:12px; padding:0.8rem; font-size:0.9rem; margin-bottom:1rem;">${c.timeline || ''}</div>
+
+                ${(c.adminHistory && c.adminHistory.length) ? `
+                <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Audit History</div>
+                <div style="background:var(--page-bg); border:1px solid var(--card-border); border-radius:12px; padding:0.8rem; font-size:0.82rem; margin-bottom:1rem; max-height:160px; overflow-y:auto;">
+                    ${c.adminHistory.slice().reverse().map(h => `
+                        <div style="padding:0.3rem 0; border-bottom:1px solid var(--card-border);">
+                            <strong>${h.by || 'admin'}</strong> — ${new Date(h.at).toLocaleString()}<br>
+                            <span style="color:var(--text-muted);">${Object.keys(h.changes || {}).join(', ')}</span>
+                        </div>
+                    `).join('')}
+                </div>` : ''}
+
+
+                <div class="card" style="margin-top:1rem;">
+                    <div class="card-title">
+                        <i class="fas fa-comments"></i> Client Messages
+                    </div>
+
+                    <div id="adminCaseMessagesList" class="manlung-message-list">
+                        <div class="manlung-message-empty">
+                            Loading messages…
+                        </div>
+                    </div>
+
+                    <div class="manlung-message-compose">
+                        <textarea
+                            id="adminCaseMessageInput"
+                            maxlength="5000"
+                            placeholder="Reply to the client…"
+                        ></textarea>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            onclick="sendAdminCaseMessage('${c.caseId}')"
+                        >
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+
+                    <div
+                        id="adminCaseMessageStatus"
+                        style="margin-top:.4rem;color:var(--text-muted);font-size:.72rem;"
+                    ></div>
+                </div>
+
+                                <div class="card-title"><i class="fas fa-paperclip"></i> Files</div>
+                <div class="file-list" style="margin-bottom:0.8rem;">${filesHtml}</div>
+                <div class="upload-zone" onclick="document.getElementById('adminFileInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click to attach a file to this case</p>
+                    <input type="file" id="adminFileInput" style="display:none" onchange="uploadAdminFile('${c.caseId}', this)" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png">
+                </div>
+                <span id="uploadStatus" style="color:var(--text-muted); font-size:0.85rem;"></span>
+
+                <div style="margin-top:1.5rem; border-top:1px solid var(--card-border); padding-top:1rem;">
+                    <button class="btn btn-danger" onclick="deleteCase('${c.caseId}')"><i class="fas fa-trash"></i> Delete Case</button>
+                </div>
+            `;
+        }
+
+        async function callClientFromCase(clientUserId, caseId) {
+            if (currentActiveCallId || currentIncomingCallId) {
+                alert('Finish the current call before starting another call.');
+                return;
+            }
+            const body = document.getElementById('callModalBody');
+            document.getElementById('callModalOverlay').style.display = 'flex';
+            body.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Calling client…</p>';
+            try {
+                const res = await fetch('/api/calls/admin/callback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ clientUserId, caseId }),
+                });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    body.innerHTML = `<p style="color:var(--danger);">${data.error || 'Could not start callback.'}</p><button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
+                    return;
+                }
+                currentActiveCallId = data.sessionId;
+                currentCallPeer = new window.ManlungCallWebRTC.CallPeer({
+                    sessionId: data.sessionId,
+                    isInitiator: true,
+                    headers: authHeaders(),
+                    onStateChange: (state, detail) => renderActiveCallUI(state, data.session, detail),
+                    onDuration: (d) => {
+                        const el = document.getElementById('adminCallDuration');
+                        if (el) el.textContent = d;
+                    },
+                });
+                body.innerHTML = '<p><i class="fas fa-phone-volume"></i> Calling client… waiting for them to answer.</p><button class="btn btn-danger" style="margin-top:.8rem;" onclick="endActiveCall()">Cancel</button>';
+                await currentCallPeer.start();
+            } catch (e) {
+                console.error(e);
+                currentActiveCallId = null;
+                currentCallPeer = null;
+                body.innerHTML = `<p style="color:var(--danger);">Could not start callback: ${e.message}</p><button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
+            }
+        }
+        window.callClientFromCase = callClientFromCase;
+
+        async function saveCase(caseId) {
+            const status = document.getElementById('editStatus').value;
+            const investigator = document.getElementById('editInvestigator').value;
+            const recoveryLoc = document.getElementById('editRecoveryLoc').value;
+            const publicNotes = document.getElementById('editNotes').value;
+            const internalNotes = document.getElementById('editInternalNotes').value;
+            const saveStatus = document.getElementById('saveStatus');
+            saveStatus.textContent = 'Saving…';
+
+            try {
+                const res = await fetch(`/api/cases/admin/case/${encodeURIComponent(caseId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ status, investigator, recoveryLoc, publicNotes, internalNotes }),
+                });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (data.success) {
+                    saveStatus.textContent = 'Saved ✓';
+                    renderCaseModal(data.case);
+                    loadCases(currentPage);
+                    loadStats();
+                } else {
+                    saveStatus.textContent = data.error || 'Failed to save';
+                }
+            } catch (e) {
+                console.error(e);
+                saveStatus.textContent = 'Network error';
+            }
+        }
+
+        async function deleteClientMessage(caseId) {
+            if (currentAdmin.role !== 'owner') {
+                alert('Only the Owner can delete client messages.');
+                return;
+            }
+            if (!confirm(`Delete the client-facing message for ${caseId}?`)) return;
+            try {
+                const res = await fetch(`/api/owner/cases/${encodeURIComponent(caseId)}/public-notes`, {
+                    method: 'DELETE',
+                    headers: authHeaders(),
+                });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    alert(data.error || 'Could not delete the client message.');
+                    return;
+                }
+                openCase(caseId);
+            } catch (e) {
+                console.error(e);
+                alert('Network error deleting client message.');
+            }
+        }
+        window.deleteClientMessage = deleteClientMessage;
+
+        function uploadAdminFile(caseId, input) {
+            const file = input.files[0];
+            if (!file) return;
+            const statusEl = document.getElementById('uploadStatus');
+            statusEl.textContent = 'Uploading…';
+
+            const fd = new FormData();
+            fd.append('file', file);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', `/api/cases/admin/upload/${encodeURIComponent(caseId)}`);
+            // HttpOnly admin session cookie is sent automatically for same-origin requests.
+
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) statusEl.textContent = `Uploading… ${Math.round((e.loaded / e.total) * 100)}%`;
+            };
+
+            xhr.onload = async () => {
+                if (xhr.status === 401 || xhr.status === 403) {
+                    localStorage.removeItem('adminUser');
+                    fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
+                    window.location.href = '/admin/login.html';
+                    return;
+                }
+                let data;
+                try { data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
+                if (xhr.status >= 200 && xhr.status < 300 && data && data.success) {
+                    statusEl.textContent = 'Uploaded ✓';
+                    openCase(caseId);
+                } else {
+                    statusEl.textContent = (data && data.error) || 'Failed to attach file';
+                }
+            };
+            xhr.onerror = () => { statusEl.textContent = 'Network error — could not reach the server'; };
+
+            xhr.send(fd);
+        }
+
+        async function deleteCase(caseId) {
+            if (!confirm(`Delete case ${caseId}? This cannot be undone.`)) return;
+            try {
+                const res = await fetch(`/api/cases/admin/case/${encodeURIComponent(caseId)}`, {
+                    method: 'DELETE',
+                    headers: authHeaders(),
+                });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (data.success) {
+                    closeModal();
+                    loadCases(currentPage);
+                    loadStats();
+                } else {
+                    alert(data.error || 'Failed to delete case');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Network error');
+            }
+        }
+
+        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+
+        function handleLogout() {
+            localStorage.removeItem('adminUser');
+            fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
+            window.location.href = '/admin/login.html';
+        }
+
+        function applyTheme() {
+            const savedTheme =
+                localStorage.getItem('theme') === 'dark'
+                    ? 'dark'
+                    : 'light';
+
+            document.body.classList.toggle(
+                'dark',
+                savedTheme === 'dark'
+            );
+
+            const btn =
+                document.querySelector(
+                    '.header-actions button[data-theme-toggle="true"]'
+                );
+
+            if (btn) {
+                btn.innerHTML =
+                    savedTheme === 'dark'
+                        ? '<i class="fas fa-sun"></i>'
+                        : '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        function toggleDarkMode() {
+            const nextTheme =
+                document.body.classList.contains('dark')
+                    ? 'light'
+                    : 'dark';
+
+            localStorage.setItem(
+                'theme',
+                nextTheme
+            );
+
+            applyTheme();
+        }
+
+        (function applySavedTheme() {
+            applyTheme();
+        })();
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') loadCases(1); });
+
+        // ---- Call Admin: presence, incoming-call ringing, and the call itself ----
+    if (window.ManlungCallRingtone) window.ManlungCallRingtone.useRole('admin');
+
+    function renderAdminRingtoneSettings() {
+        const options = window.ManlungCallRingtone?.options || [];
+        const current = window.ManlungCallRingtone?.get('admin') || options[0]?.id || '';
+        const host = document.getElementById('voiceLineRingtoneSettings');
+        if (!host) return;
+        host.innerHTML = `
+            <div style="margin-top:.8rem;padding-top:.7rem;border-top:1px solid var(--card-border);">
+                <label style="display:block;font-weight:700;margin-bottom:.35rem;">Incoming call ringtone</label>
+                <div style="display:flex;gap:7px;align-items:center;">
+                    <select id="adminRingtoneSelect" style="flex:1;background:var(--card-bg);color:var(--text);border:1px solid var(--card-border);border-radius:8px;padding:.45rem;">
+                        ${options.map(o => `<option value="${o.id}" ${o.id === current ? 'selected' : ''}>${o.name}</option>`).join('')}
+                    </select>
+                    <button type="button" class="btn btn-outline-dark" id="adminRingtoneTestBtn">Test</button>
+                </div>
+                <small style="display:block;color:var(--text-muted);margin-top:.3rem;">Choose the sound this Admin hears for client calls.</small>
+            </div>`;
+        document.getElementById('adminRingtoneSelect')?.addEventListener('change', e => window.ManlungCallRingtone.set(e.target.value, 'admin'));
+        document.getElementById('adminRingtoneTestBtn')?.addEventListener('click', async () => {
+            const value = document.getElementById('adminRingtoneSelect')?.value;
+            if (value) window.ManlungCallRingtone.set(value, 'admin');
+            await window.ManlungCallRingtone.preview('admin');
+        });
+    }
+
+    let isOnline = false;
+    let heartbeatTimer = null;
+    let pendingPollTimer = null;
+    let currentIncomingCallId = null;
+    let currentCallPeer = null;
+    let currentActiveCallId = null;
+
+    function startIncomingAlert() {
+        if (window.ManlungCallRingtone) window.ManlungCallRingtone.start();
+        try {
+            if (navigator.vibrate) {
+                navigator.vibrate([700, 250, 700, 250, 1000]);
+                clearInterval(window.__adminVibrateTimer);
+                window.__adminVibrateTimer = setInterval(() => {
+                    try { navigator.vibrate([700, 250, 700, 250, 1000]); } catch (_) {}
+                }, 2800);
+            }
+        } catch (_) {}
+    }
+
+    function stopIncomingAlert() {
+        if (window.ManlungCallRingtone) window.ManlungCallRingtone.stop();
+        try {
+            if (window.__adminVibrateTimer) clearInterval(window.__adminVibrateTimer);
+            window.__adminVibrateTimer = null;
+            if (navigator.vibrate) navigator.vibrate(0);
+        } catch (_) {}
+    }
+
+    async function toggleAdminOnline() {
+        const btn = document.getElementById('voiceLineBtn');
+        const statusEl = document.getElementById('voiceLineStatus');
+
+        if (isOnline) {
+            try { await fetch('/api/calls/admin/offline', { method: 'POST', headers: authHeaders() }); } catch (_) {}
+            isOnline = false;
+            clearInterval(heartbeatTimer);
+            clearInterval(pendingPollTimer);
+            stopIncomingAlert();
+            btn.innerHTML = '<i class="fas fa-power-off"></i> Go Online';
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-success');
+            statusEl.textContent = 'Offline — you will not receive Call Admin requests.';
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/calls/admin/online', { method: 'POST', headers: authHeaders() });
+            const data = await res.json();
+            if (!data.success) { statusEl.textContent = data.error || 'Could not go online.'; return; }
+
+            isOnline = true;
+            btn.innerHTML = '<i class="fas fa-phone-slash"></i> Go Offline';
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-danger');
+            statusEl.textContent = 'Online — listening for Call Admin requests.';
+
+            heartbeatTimer = setInterval(async () => {
+    try {
+        const res = await fetch('/api/calls/admin/online', {
+            method: 'POST',
+            headers: authHeaders()
+        });
+
+        if (!res.ok) {
+            console.error('Admin heartbeat failed:', res.status);
+            return;
+        }
+
+        const data = await res.json();
+
+        if (!data.success) {
+            console.error('Admin heartbeat rejected:', data.error || 'Unknown error');
+        }
+    } catch (error) {
+        console.error('Admin heartbeat error:', error);
+    }
+}, 20000);
+
+            pendingPollTimer = setInterval(pollForIncomingCalls, 1500);
+            pollForIncomingCalls();
+        } catch (e) {
+            console.error(e);
+            statusEl.textContent = 'Could not go online: ' + e.message;
+        }
+    }
+    window.toggleAdminOnline = toggleAdminOnline;
+
+    async function pollForIncomingCalls() {
+        if (currentActiveCallId) return;
+
+        try {
+            const res = await fetch('/api/calls/pending', {
+                headers: authHeaders(),
+                cache: 'no-store'
+            });
+
+            if (res.status === 401 || res.status === 403) return;
+
+            const data = await res.json().catch(() => ({}));
+            const pendingCalls =
+                data.success && Array.isArray(data.calls)
+                    ? data.calls
+                    : [];
+
+            // If this browser is showing a call that is no longer pending,
+            // another admin answered/rejected it. Close the stale popup.
+            if (currentIncomingCallId) {
+                const stillPending = pendingCalls.some(
+                    call => String(call.id) === String(currentIncomingCallId)
+                );
+
+                if (!stillPending) {
+                    stopIncomingAlert();
+                    currentIncomingCallId = null;
+
+                    const overlay =
+                        document.getElementById('callModalOverlay');
+
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                    }
+
+                    return;
+                }
+            }
+
+            if (!currentIncomingCallId && pendingCalls.length > 0) {
+                showIncomingCall(pendingCalls[0]);
+            }
+        } catch (error) {
+            console.error('Incoming call poll error:', error);
+        }
+    }
+
+    function showIncomingCall(call) {
+        currentIncomingCallId = call.id;
+        startIncomingAlert();
+        const overlay = document.getElementById('callModalOverlay');
+        document.getElementById('callModalBody').innerHTML = `
+            <div style="width:72px;height:72px;margin:0 auto 0.8rem;border-radius:50%;background:var(--success-bg);display:flex;align-items:center;justify-content:center;animation:callPulse 1.1s infinite;">
+                <i class="fas fa-phone-volume" style="font-size:30px;color:var(--success);"></i>
+            </div>
+            <p style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Incoming Help Call</p>
+            <p style="color:var(--text-muted);margin-bottom:0.2rem;">Client: <strong style="color:var(--text);">${call.client_name || 'Client'}</strong></p>
+            ${call.case_id ? `<p style="color:var(--text-muted);margin-bottom:1rem;">Case: <strong style="color:var(--text);">${call.case_id}</strong></p>` : '<p style="color:var(--text-muted);margin-bottom:1rem;">General support call</p>'}
+            <div style="display:flex;gap:10px;justify-content:center;">
+                <button class="btn btn-danger" onclick="rejectIncomingCall()"><i class="fas fa-phone-slash"></i> Decline</button>
+                <button class="btn btn-success" onclick="acceptIncomingCall()"><i class="fas fa-phone"></i> Accept</button>
+            </div>
+        `;
+        overlay.style.display = 'flex';
+    }
+
+    async function rejectIncomingCall() {
+        const callId = currentIncomingCallId;
+        if (!callId) return;
+        stopIncomingAlert();
+        try {
+            await fetch(`/api/calls/${callId}/reject`, { method: 'PUT', headers: authHeaders() });
+        } catch (_) {}
+        currentIncomingCallId = null;
+        document.getElementById('callModalOverlay').style.display = 'none';
+    }
+    window.rejectIncomingCall = rejectIncomingCall;
+
+    async function acceptIncomingCall() {
+        const callId = currentIncomingCallId;
+        if (!callId) return;
+        stopIncomingAlert();
+        document.getElementById('callModalBody').innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Connecting…</p>';
+
+        try {
+            const res = await fetch(`/api/calls/${callId}/accept`, { method: 'PUT', headers: authHeaders() });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                // A 409 here normally means another admin already answered
+                // or the client ended/rejected the call. Treat it as a stale
+                // incoming call and quietly close the popup.
+                if (res.status === 409) {
+                    currentIncomingCallId = null;
+                    stopIncomingAlert();
+
+                    const overlay =
+                        document.getElementById('callModalOverlay');
+
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                    }
+
+                    return;
+                }
+
+                document.getElementById('callModalBody').innerHTML =
+                    `<p style="color:var(--danger);">${data.error || 'Could not accept call.'}</p>
+                     <button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
+
+                currentIncomingCallId = null;
+                return;
+            }
+
+            currentActiveCallId = callId;
+            currentIncomingCallId = null;
+
+            currentCallPeer = new window.ManlungCallWebRTC.CallPeer({
+                sessionId: callId,
+                isInitiator: false,
+                headers: authHeaders(),
+                onStateChange: (state, detail) => renderActiveCallUI(state, data.session, detail),
+                onDuration: (d) => {
+                    const el = document.getElementById('adminCallDuration');
+                    if (el) el.textContent = d;
+                },
+            });
+
+            await currentCallPeer.start();
+        } catch (e) {
+            console.error(e);
+            document.getElementById('callModalBody').innerHTML = `<p style="color:var(--danger);">Could not connect: ${e.message}</p><button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
+        }
+    }
+    window.acceptIncomingCall = acceptIncomingCall;
+
+    function renderActiveCallUI(state, session, detail) {
+        const body = document.getElementById('callModalBody');
+        if (state === 'connected') {
+            body.innerHTML = `
+                <p style="font-weight:700;color:var(--success);">Connected to Client</p>
+                <p style="color:var(--text-muted);margin-bottom:0.3rem;">${session.client_name || 'Client'}${session.case_id ? ' — ' + session.case_id : ''}</p>
+                <p id="adminCallDuration" style="font-size:1.6rem;margin:0.6rem 0;">00:00</p>
+                <div style="display:flex;gap:10px;justify-content:center;margin-bottom:8px;">
+                    <button class="btn btn-outline-dark" id="adminSpeakerBtn" onclick="enableAdminAudio()"><i class="fas fa-volume-high"></i> Enable Audio</button>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:center;">
+                    <button class="btn btn-outline-dark" id="adminMuteBtn" onclick="toggleAdminMute()"><i class="fas fa-microphone"></i> Mute</button>
+                    <button class="btn btn-danger" onclick="endActiveCall()"><i class="fas fa-phone-slash"></i> End Call</button>
+                </div>
+            `;
+        } else if (state === 'connecting' || state === 'requesting-mic') {
+            body.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> ${state === 'requesting-mic' ? 'Requesting microphone access…' : 'Connecting securely…'}</p>`;
+        } else if (state === 'ended-by-remote' || state === 'ended') {
+            body.innerHTML = `<p>Client ended the call.</p><button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
+            cleanupActiveCall();
+        } else if (state === 'connection-failed') {
+            body.innerHTML = `<p style="color:var(--danger);">Connection failed${detail ? `: ${detail}` : '.'}</p><button class="btn btn-outline-dark" onclick="endActiveCall()">Close</button>`;
+            endActiveCall();
+        }
+    }
+
+    async function enableAdminAudio() {
+        const btn = document.getElementById('adminSpeakerBtn');
+        const ok = await currentCallPeer?.enableRemoteAudio();
+        if (btn) btn.innerHTML = ok
+            ? '<i class="fas fa-volume-high"></i> Audio Enabled'
+            : '<i class="fas fa-triangle-exclamation"></i> Tap Again';
+    }
+    window.enableAdminAudio = enableAdminAudio;
+
+    function toggleAdminMute() {
+        const isMuted = currentCallPeer?.toggleMute();
+        const btn = document.getElementById('adminMuteBtn');
+        if (btn) btn.innerHTML = isMuted ? '<i class="fas fa-microphone-slash"></i> Unmute' : '<i class="fas fa-microphone"></i> Mute';
+    }
+    window.toggleAdminMute = toggleAdminMute;
+
+    async function endActiveCall() {
+        const callId = currentActiveCallId;
+        stopIncomingAlert();
+        try { if (currentCallPeer) await currentCallPeer.end(); } catch (_) {}
+        if (callId) {
+            try {
+                await fetch(`/api/calls/${callId}/end`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ reason: 'admin_hangup' }),
+                });
+            } catch (_) {}
+        }
+        cleanupActiveCall();
+        closeCallModal();
+    }
+    window.endActiveCall = endActiveCall;
+
+    function cleanupActiveCall() {
+        stopIncomingAlert();
+        try { currentCallPeer?.cleanup(); } catch (_) {}
+        currentCallPeer = null;
+        currentActiveCallId = null;
+    }
+
+    async function closeCallModal() {
+        stopIncomingAlert();
+        if (currentIncomingCallId && !currentActiveCallId) {
+            const callId = currentIncomingCallId;
+            currentIncomingCallId = null;
+            try { await fetch(`/api/calls/${callId}/reject`, { method: 'PUT', headers: authHeaders() }); } catch (_) {}
+        } else if (currentActiveCallId) {
+            const callId = currentActiveCallId;
+            currentActiveCallId = null;
+            try { if (currentCallPeer) await currentCallPeer.end(); } catch (_) {}
+            currentCallPeer = null;
+            try {
+                await fetch(`/api/calls/${callId}/end`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ reason: 'admin_hangup' }),
+                });
+            } catch (_) {}
+        }
+        document.getElementById('callModalOverlay').style.display = 'none';
+    }
+    window.closeCallModal = closeCallModal;
+
+        // Best-effort: if the admin closes the tab, tell the server so
+        // presence doesn't stay "online" until the 45s staleness timeout.
+        window.addEventListener('beforeunload', () => {
+            if (isOnline) {
+                navigator.sendBeacon('/api/calls/admin/offline', new Blob([JSON.stringify({})], { type: 'application/json' }));
+            }
+        });
+
+
+        async function loadDonationDashboard() {
+            try {
+                const res = await fetch('/api/donations/admin', { headers: authHeaders(), cache: 'no-store' });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!data.success) return;
+                document.getElementById('donationTotal').textContent = `KES ${Number(data.totalKes || 0).toLocaleString('en-KE')}`;
+                document.getElementById('donationCountAdmin').textContent = data.confirmedCount || 0;
+                const body = document.getElementById('donationsBody');
+                const rows = data.donations || [];
+                body.innerHTML = rows.length ? rows.map(d => `
+                    <tr>
+                        <td>${d.paid_at ? new Date(d.paid_at).toLocaleString() : new Date(d.created_at).toLocaleString()}</td>
+                        <td>${String(d.donor_name || 'Donor').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}</td>
+                        <td>${String(d.donor_email || '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}</td>
+                        <td>KES ${Number(d.amount_kes || 0).toLocaleString('en-KE')}</td>
+                        <td><span class="status-badge ${d.status === 'confirmed' ? 'status-completed' : d.status === 'failed' ? 'status-rejected' : 'status-pending'}">${d.status}</span></td>
+                    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.2rem;">No donations yet.</td></tr>';
+            } catch (e) {
+                console.error('Donation dashboard error:', e);
+            }
+        }
+
+        // expose functions used by inline onclick handlers
+        window.loadCases = loadCases;
+        window.quickFilter = quickFilter;
+        window.changePage = changePage;
+        window.openCase = openCase;
+        window.closeModal = closeModal;
+        window.saveCase = saveCase;
+        window.uploadAdminFile = uploadAdminFile;
+        window.deleteCase = deleteCase;
+        window.toggleDarkMode = toggleDarkMode;
+        window.handleLogout = handleLogout;
+        window.toggleRowSelect = toggleRowSelect;
+        window.toggleSelectAll = toggleSelectAll;
+        window.clearSelection = clearSelection;
+        window.applyBulkUpdate = applyBulkUpdate;
+        window.exportCsv = exportCsv;
+        window.loadDonationDashboard = loadDonationDashboard;
+        loadDonationDashboard();
+        setInterval(loadDonationDashboard, 10000);
+
+        renderAdminRingtoneSettings();
+        setTimeout(() => { if (!isOnline) toggleAdminOnline(); }, 500);
+        loadStats();
+        loadCases(1);
+    </script>
+
+<script id="manlung-admin-messages">
+function escapeAdminMessageHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+}
+
+function adminMessageDate(value) {
+    try {
+        return value ? new Date(value).toLocaleString() : '';
+    } catch (_) {
+        return value || '';
+    }
+}
+
+async function loadAdminCaseMessages(caseId) {
+    const list =
+        document.getElementById('adminCaseMessagesList');
+
+    if (!list) return;
+
+    try {
+        const res = await fetch(
+            `/api/messages/case/${encodeURIComponent(caseId)}`,
+            {
+                headers: authHeaders(),
+                cache: 'no-store'
+            }
+        );
+
+        if (await handleUnauthorized(res)) return;
+
+        const data =
+            await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+            throw new Error(
+                data.error || 'Could not load messages.'
+            );
+        }
+
+        const user = currentAdmin || {};
+        const messages =
+            Array.isArray(data.messages)
+                ? data.messages
+                : [];
+
+        if (!messages.length) {
+            list.innerHTML =
+                '<div class="manlung-message-empty">No messages yet.</div>';
+            return;
+        }
+
+        list.innerHTML = messages.map((m) => {
+            const mine =
+                String(m.sender_user_id) === String(user.id);
+
+            return `
+                <article class="manlung-message ${mine ? 'mine' : ''}">
+                    <div class="manlung-message-meta">
+                        <span>${mine ? 'Admin' : 'Client'}</span>
+
+                        <span>
+                            ${escapeAdminMessageHtml(adminMessageDate(m.created_at))}
+                            ${
+                                mine
+                                    ? `<span
+                                         class="manlung-message-status ${m.read_at ? 'read' : 'sent'}"
+                                         title="${m.read_at ? 'Read' : 'Sent'}"
+                                       >${m.read_at ? '✓✓' : '✓'}</span>`
+                                    : ''
+                            }
+                        </span>
+                    </div>
+
+                    <div class="manlung-message-text">
+                        ${escapeAdminMessageHtml(m.message)}
+                    </div>
+                </article>
+            `;
+        }).join('');
+
+        list.scrollTop = list.scrollHeight;
+    } catch (error) {
+        console.error('Admin messages load error:', error);
+        list.innerHTML =
+            `<div class="manlung-message-empty">${escapeAdminMessageHtml(error.message)}</div>`;
+    }
+}
+
+async function sendAdminCaseMessage(caseId) {
+    const input =
+        document.getElementById('adminCaseMessageInput');
+
+    const status =
+        document.getElementById('adminCaseMessageStatus');
+
+    if (!input) return;
+
+    const message = input.value.trim();
+
+    if (!message) {
+        status.textContent = 'Write a message first.';
+        return;
+    }
+
+    status.textContent = 'Sending…';
+
+    try {
+        const res = await fetch(
+            `/api/messages/case/${encodeURIComponent(caseId)}`,
+            {
+                method: 'POST',
+                headers: {
+                    ...authHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            }
+        );
+
+        if (await handleUnauthorized(res)) return;
+
+        const data =
+            await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+            throw new Error(
+                data.error || 'Could not send message.'
+            );
+        }
+
+        input.value = '';
+        status.textContent = 'Message sent.';
+
+        await loadAdminCaseMessages(caseId);
+    } catch (error) {
+        console.error('Admin message send error:', error);
+        status.textContent =
+            error.message || 'Could not send message.';
+    }
+}
+</script>
+
+
+
+
+<script src="/js/pwa.js" defer></script>
+
+
+  <script src="/js/mobile-navigation.js"></script>
+</body>
+</html>

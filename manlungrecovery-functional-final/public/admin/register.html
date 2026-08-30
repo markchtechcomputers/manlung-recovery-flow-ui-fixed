@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Registration · Manlung Recovery</title>
+
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="icon" href="/favicon.svg">
+
+  <style>
+    body {
+      background: #07132d;
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      max-width: 480px;
+      width: 100%;
+      background: #101f42;
+      padding: 28px;
+      border: 1px solid #223257;
+      border-radius: 18px;
+      color: #fff;
+    }
+
+    label {
+      display: block;
+      margin: .8rem 0 .3rem;
+      color: #a9c0ec;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: .7rem;
+      border-radius: 9px;
+      border: 1px solid #223257;
+      background: #0b1730;
+      color: #fff;
+    }
+
+    .btn {
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .msg {
+      margin-top: 1rem;
+      padding: 10px;
+      border-radius: 8px;
+      color: #f87171;
+      white-space: pre-wrap;
+    }
+
+    .success {
+      color: #4ade80;
+      background: #102f22;
+    }
+
+    .warning {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 9px;
+      background: #3b1d1d;
+      border: 1px solid #7f1d1d;
+      color: #fca5a5;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/footer.css?v=ultimate-white-footer-20260830">
+  
+
+
+<style id="manlung-footer-ultimate-contrast">
+/* FINAL OVERRIDE — MANLUNG RECOVERY FOOTER */
+html body footer.manlung-footer {
+  background:#000000 !important;
+  color:#ffffff !important;
+  opacity:1 !important;
+}
+
+html body footer.manlung-footer,
+html body footer.manlung-footer *,
+html body footer.manlung-footer p,
+html body footer.manlung-footer span,
+html body footer.manlung-footer strong,
+html body footer.manlung-footer h2,
+html body footer.manlung-footer h3,
+html body footer.manlung-footer h4,
+html body footer.manlung-footer a,
+html body footer.manlung-footer i,
+html body footer.manlung-footer svg,
+html body footer.manlung-footer svg *,
+html body footer.manlung-footer div,
+html body footer.manlung-footer section,
+html body footer.manlung-footer nav {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer a,
+html body footer.manlung-footer a:visited,
+html body footer.manlung-footer a:hover,
+html body footer.manlung-footer a:active {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  text-decoration:none;
+}
+
+html body footer.manlung-footer .manlung-footer-brand-subtitle,
+html body footer.manlung-footer .manlung-footer-description,
+html body footer.manlung-footer .manlung-footer-trust p,
+html body footer.manlung-footer .manlung-footer-social-label,
+html body footer.manlung-footer .manlung-footer-bottom,
+html body footer.manlung-footer .manlung-footer-bottom span {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+html body footer.manlung-footer .manlung-footer-social a,
+html body footer.manlung-footer .manlung-footer-social a *,
+html body footer.manlung-footer .manlung-footer-social i,
+html body footer.manlung-footer .manlung-footer-social svg,
+html body footer.manlung-footer .manlung-footer-social svg * {
+  color:#ffffff !important;
+  fill:#ffffff !important;
+  stroke:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+html body footer.manlung-footer .manlung-footer-divider {
+  background:#333333 !important;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="wrap">
+  <div class="card">
+
+    <h1>Admin Registration</h1>
+
+    <p style="color:#a9c0ec">
+      Use the invitation sent by the Owner.
+      You cannot create an Admin account without an invitation.
+    </p>
+
+    <div id="inviteWarning" class="warning hidden">
+      This registration link is invalid or missing an Owner invitation.
+      Please ask the Owner to send you a new invitation.
+    </div>
+
+    <form id="registrationForm">
+
+      <label for="fullName">Full name</label>
+      <input
+        id="fullName"
+        type="text"
+        autocomplete="name"
+        required
+      >
+
+      <label for="username">Username</label>
+      <input
+        id="username"
+        type="text"
+        minlength="3"
+        maxlength="80"
+        autocomplete="username"
+        required
+      >
+
+      <label for="email">Invited Email</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+        readonly
+        required
+      >
+      <small style="display:block;color:#9fb0c8;margin-top:.35rem;">
+        This email was selected by the Owner for this invitation.
+      </small>
+
+      <label for="phone">Phone</label>
+      <input
+        id="phone"
+        type="tel"
+        autocomplete="tel"
+      >
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        minlength="8"
+        autocomplete="new-password"
+        required
+      >
+
+      <button
+        id="submitButton"
+        class="btn btn-primary"
+        type="submit"
+      >
+        Create Admin Account
+      </button>
+
+    </form>
+
+    <div id="msg" class="msg"></div>
+
+    <p>
+      <a href="/admin/login.html" style="color:#6ea8ff">
+        Back to Admin login
+      </a>
+    </p>
+
+  </div>
+</div>
+
+<script>
+
+  // ==========================================================
+  // GET INVITATION TOKEN
+  // ==========================================================
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const invitationToken = urlParams.get("token");
+  const invitedEmail = (urlParams.get("email") || "").trim().toLowerCase();
+
+  const form = document.getElementById("registrationForm");
+  const fullNameInput = document.getElementById("fullName");
+  const usernameInput = document.getElementById("username");
+  const emailInput = document.getElementById("email");
+  const phoneInput = document.getElementById("phone");
+
+  // The Owner invitation determines the registration email.
+  if (invitedEmail && emailInput) {
+    emailInput.value = invitedEmail;
+    emailInput.readOnly = true;
+  }
+  const passwordInput = document.getElementById("password");
+
+  const submitButton = document.getElementById("submitButton");
+  const message = document.getElementById("msg");
+  const inviteWarning = document.getElementById("inviteWarning");
+
+
+  // ==========================================================
+  // INVITATION IS REQUIRED
+  // ==========================================================
+
+  if (!invitationToken) {
+
+    inviteWarning.classList.remove("hidden");
+
+    submitButton.disabled = true;
+
+    message.textContent =
+      "An Owner invitation is required to create an Admin account.";
+
+  }
+
+
+  // ==========================================================
+  // REGISTER ADMIN
+  // ==========================================================
+
+  form.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    message.className = "msg";
+    message.textContent = "";
+
+    // Never allow registration without Owner invitation
+    if (!invitationToken) {
+
+      message.textContent =
+        "Registration denied. You must use an invitation sent by the Owner.";
+
+      return;
+    }
+
+
+    const fullName = fullNameInput.value.trim();
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase();
+    const phone = phoneInput.value.trim();
+    const password = passwordInput.value;
+
+
+    // ========================================================
+    // BASIC VALIDATION
+    // ========================================================
+
+    if (!fullName) {
+      message.textContent = "Please enter your full name.";
+      return;
+    }
+
+    if (username.length < 3) {
+      message.textContent =
+        "Username must be at least 3 characters.";
+      return;
+    }
+
+    if (!email) {
+      message.textContent =
+        "Please enter the email address used by the Owner for the invitation.";
+      return;
+    }
+
+    if (password.length < 8) {
+      message.textContent =
+        "Password must be at least 8 characters.";
+      return;
+    }
+
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Creating account...";
+    message.textContent = "Checking your invitation...";
+
+
+    try {
+
+      // ======================================================
+      // SEND REGISTRATION REQUEST
+      // ======================================================
+
+      const response = await fetch(
+        "/api/auth/admin/register",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+
+          body: JSON.stringify({
+            token: invitationToken,
+            fullName: fullName,
+            username: username,
+            email: email,
+            phone: phone,
+            password: password
+          })
+        }
+      );
+
+
+      // ======================================================
+      // READ SERVER RESPONSE
+      // ======================================================
+
+      const responseText = await response.text();
+
+      let data = {};
+
+      if (responseText) {
+
+        try {
+
+          data = JSON.parse(responseText);
+
+        } catch (parseError) {
+
+          console.error(
+            "Server returned non-JSON:",
+            responseText
+          );
+
+          throw new Error(
+            "Server error (" +
+            response.status +
+            "). Please make sure the backend is running correctly."
+          );
+        }
+      }
+
+
+      // ======================================================
+      // SERVER REJECTED REQUEST
+      // ======================================================
+
+      if (!response.ok) {
+
+        message.textContent =
+          data.error ||
+          data.message ||
+          "Registration was rejected by the server.";
+
+        submitButton.disabled = false;
+        submitButton.textContent = "Create Admin Account";
+
+        return;
+      }
+
+
+      // ======================================================
+      // SUCCESS
+      // ======================================================
+
+      if (data.success) {
+
+        message.className = "msg success";
+
+        message.textContent =
+          "Admin account created successfully.\n\n" +
+          "Your account is now waiting for Owner approval. " +
+          "You will be able to log in after the Owner approves your account.";
+
+
+        // Do NOT automatically log in.
+        // Admin accounts must be approved by Owner first.
+
+        form.reset();
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Registration Complete";
+
+        return;
+      }
+
+
+      // Unexpected response
+      message.textContent =
+        data.error ||
+        "Registration could not be completed.";
+
+      submitButton.disabled = false;
+      submitButton.textContent = "Create Admin Account";
+
+
+    } catch (error) {
+
+      console.error(
+        "Admin registration error:",
+        error
+      );
+
+      message.textContent =
+        error.message ||
+        "Unable to connect to the server.";
+
+      submitButton.disabled = false;
+      submitButton.textContent =
+        "Create Admin Account";
+    }
+
+  });
+
+</script>
+
+<footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+
+    <div class="manlung-footer-grid">
+
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row">
+          <img src="/icons/icon-512.png"
+               alt="Manlung Recovery"
+               class="manlung-footer-logo"
+               width="58"
+               height="58">
+          <div>
+            <h2 id="footer-brand-title">Manlung Recovery</h2>
+            <p class="manlung-footer-brand-subtitle">
+              Cyber Recovery &amp; Digital Investigation Portal
+            </p>
+          </div>
+        </div>
+
+        <p class="manlung-footer-description">
+          Manlung Recovery provides structured digital recovery assistance,
+          investigation support, account and device recovery guidance,
+          cybersecurity awareness, and secure case-management services.
+          Our goal is to help individuals and organizations respond to
+          digital incidents responsibly, protect important information,
+          and take appropriate steps toward recovery.
+        </p>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Quick Links</h3>
+        <nav class="manlung-footer-links" aria-label="Quick links">
+          <a href="/">Home</a>
+          <a href="/about.html">About Manlung Recovery</a>
+          <a href="/knowledge.html">Knowledge Centre</a>
+          <a href="/blog.html">Security &amp; Recovery Blog</a>
+          <a href="/contact.html">Contact Us</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Recovery Services</h3>
+        <nav class="manlung-footer-links" aria-label="Recovery services">
+          <a href="/client/request.html" class="footer-important">Submit Recovery Request</a>
+          <a href="/client/dashboard.html" class="footer-important">Client Portal</a>
+          <a href="/client/track.html">Track a Case</a>
+          <a href="/client/settings.html">Account Settings</a>
+          <a href="/login.html">Sign In</a>
+        </nav>
+      </section>
+
+      <section class="manlung-footer-column">
+        <h3>Security &amp; Trust</h3>
+
+        <div class="manlung-footer-trust">
+          <p>
+            We use access controls, authentication safeguards and responsible
+            information-handling practices to help protect client and case
+            information.
+          </p>
+        </div>
+
+        <div class="manlung-footer-trust">
+          <p>
+            Personal-data processing is described in our Privacy Notice,
+            including applicable rights and responsibilities under Kenya's
+            Data Protection Act, 2019 and relevant regulations.
+          </p>
+        </div>
+
+        <nav class="manlung-footer-links manlung-footer-security-links"
+             aria-label="Legal and security links">
+          <a href="/privacy.html" class="footer-important">Privacy Notice</a>
+          <a href="/terms.html" class="footer-important">Terms &amp; Conditions</a>
+        </nav>
+      </section>
+
+    </div>
+
+    <div class="manlung-footer-divider"></div>
+
+    <div class="manlung-footer-contact-row">
+
+      <div class="manlung-footer-contact">
+        <a href="mailto:manlungrecovery@outlook.com">
+          <i class="fas fa-envelope" aria-hidden="true"></i>
+          manlungrecovery@outlook.com
+        </a>
+
+        <a href="tel:+254724356178">
+          <i class="fas fa-phone" aria-hidden="true"></i>
+          +254 724 356 178
+        </a>
+      </div>
+
+      <div class="manlung-footer-social"
+           aria-label="Manlung Recovery social media">
+
+        <span class="manlung-footer-social-label">Follow Manlung Recovery</span>
+
+        <a href="https://www.youtube.com/@manlungrecory"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on YouTube">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
+          <span>YouTube</span>
+        </a>
+
+        <a href="https://www.linkedin.com/in/mark-ochiengke"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on LinkedIn">
+          <i class="fab fa-linkedin" aria-hidden="true"></i>
+          <span>LinkedIn</span>
+        </a>
+
+        <a href="https://github.com/markchtechcomputers"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Manlung Recovery on GitHub">
+          <i class="fab fa-github" aria-hidden="true"></i>
+          <span>GitHub</span>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="manlung-footer-bottom">
+      <span>
+        &copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.
+      </span>
+
+      <div class="manlung-footer-legal">
+        <a href="/terms.html">Terms &amp; Conditions</a>
+        <a href="/privacy.html">Privacy Notice</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+<script src="/js/pwa.js" defer></script>
+
+
+</body>
+</html>
+```
