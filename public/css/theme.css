@@ -703,3 +703,129 @@ body[data-theme="dark"] .site-header i {
     }
 }
 
+
+/* =========================================================
+   FINAL LIGHT MODE HEADER TEXT FIX
+   ========================================================= */
+
+/* LIGHT MODE — header navigation text MUST be black */
+html:not(.dark) .site-header .header-actions a,
+html:not(.dark) .site-header .header-actions a span,
+html:not(.dark) .site-header .header-actions a strong,
+html:not(.dark) .site-header .header-actions a b,
+body:not(.dark) .site-header .header-actions a,
+body:not(.dark) .site-header .header-actions a span,
+body:not(.dark) .site-header .header-actions a strong,
+body:not(.dark) .site-header .header-actions a b {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* Make the rectangular menu boxes clearly visible */
+html:not(.dark) .site-header .header-actions a {
+    background: #ffffff !important;
+    border: 1px solid #2563eb !important;
+    border-radius: 8px !important;
+
+    padding: 8px 13px !important;
+
+    box-shadow:
+        0 2px 8px rgba(15, 47, 104, 0.12),
+        0 0 5px rgba(37, 99, 235, 0.10) !important;
+}
+
+/* Hover */
+html:not(.dark) .site-header .header-actions a:hover {
+    color: #000000 !important;
+    background: #f8fbff !important;
+    border-color: #1d4ed8 !important;
+
+    box-shadow:
+        0 4px 14px rgba(37, 99, 235, 0.22),
+        0 0 10px rgba(37, 99, 235, 0.18) !important;
+}
+
+/* =========================================================
+   DO NOT PUT DARK/LIGHT CONTROL IN A RECTANGLE
+   ========================================================= */
+
+html:not(.dark) .site-header .header-actions .theme-toggle,
+html:not(.dark) .site-header .header-actions button.theme-toggle,
+html:not(.dark) .site-header .header-actions [data-theme-toggle="true"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 5px !important;
+}
+
+/* Dark text */
+html:not(.dark) .site-header .header-actions .theme-toggle,
+html:not(.dark) .site-header .header-actions .theme-toggle::after {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* =========================================================
+   FORCE COLOURED ICONS IN LIGHT MODE
+   ========================================================= */
+
+html:not(.dark) .site-header .header-actions a i.fa-user,
+html:not(.dark) .site-header .header-actions a i.fa-user-circle {
+    color: #2563eb !important;
+}
+
+html:not(.dark) .site-header .header-actions a i.fa-newspaper,
+html:not(.dark) .site-header .header-actions a i.fa-blog,
+html:not(.dark) .site-header .header-actions a i.fa-book-open {
+    color: #9333ea !important;
+}
+
+html:not(.dark) .site-header .header-actions a i.fa-heart,
+html:not(.dark) .site-header .header-actions a i.fa-hand-holding-heart,
+html:not(.dark) .site-header .header-actions a i.fa-donate {
+    color: #059669 !important;
+}
+
+html:not(.dark) .site-header .header-actions a i.fa-plus,
+html:not(.dark) .site-header .header-actions a i.fa-plus-circle,
+html:not(.dark) .site-header .header-actions a i.fa-file-circle-plus {
+    color: #0891b2 !important;
+}
+
+/* =========================================================
+   KEEP HEADER BLUE GLOW LINE
+   ========================================================= */
+
+.site-header {
+    border-bottom: 1px solid rgba(37, 99, 235, .45) !important;
+    position: relative !important;
+}
+
+.site-header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 2px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #0f2f68,
+        #2563eb,
+        #60a5fa,
+        #2563eb,
+        #0f2f68,
+        transparent
+    );
+
+    box-shadow:
+        0 0 5px #2563eb,
+        0 0 12px rgba(37, 99, 235, .7),
+        0 0 22px rgba(37, 99, 235, .35);
+
+    pointer-events: none;
+    z-index: 999;
+}
+
