@@ -359,3 +359,190 @@ body.dark-mode header .header-actions button.btn-danger i {
     }
 }
 
+
+/* =========================================================
+   MANLUNG ADMIN HEADER — FORCE NAVIGATION VISIBILITY
+   Reports / Dark / Home / Logout
+   ========================================================= */
+
+/* Header actions must remain visible */
+header .header-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Reports + Home */
+header .header-actions a.btn,
+header .header-actions a.btn-outline {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #183b6b !important;
+    border-radius: 8px !important;
+
+    padding: 7px 11px !important;
+
+    white-space: nowrap !important;
+}
+
+/* Reports + Home icons */
+header .header-actions a.btn i,
+header .header-actions a.btn-outline i {
+    color: #183b6b !important;
+    -webkit-text-fill-color: #183b6b !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Logout */
+header .header-actions button.btn-danger {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    background: #dc2626 !important;
+
+    border: 1px solid #b91c1c !important;
+    border-radius: 8px !important;
+
+    padding: 7px 11px !important;
+
+    white-space: nowrap !important;
+}
+
+/* Logout icon */
+header .header-actions button.btn-danger i {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Theme / Dark button */
+header .header-actions button[data-theme-toggle="true"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #183b6b !important;
+    border-radius: 8px !important;
+
+    padding: 7px 11px !important;
+
+    white-space: nowrap !important;
+}
+
+/* Theme icon */
+header .header-actions button[data-theme-toggle="true"] i {
+    color: #183b6b !important;
+    -webkit-text-fill-color: #183b6b !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+html.dark header .header-actions a.btn,
+html.dark header .header-actions a.btn-outline,
+body.dark header .header-actions a.btn,
+body.dark header .header-actions a.btn-outline,
+html.dark-mode header .header-actions a.btn,
+body.dark-mode header .header-actions a.btn {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    background: #ffffff !important;
+}
+
+/* Keep dark mode theme button visible */
+html.dark header .header-actions button[data-theme-toggle="true"],
+body.dark header .header-actions button[data-theme-toggle="true"],
+html.dark-mode header .header-actions button[data-theme-toggle="true"],
+body.dark-mode header .header-actions button[data-theme-toggle="true"] {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    background: #ffffff !important;
+}
+
+/* Logout stays white in dark mode */
+html.dark header .header-actions button.btn-danger,
+body.dark header .header-actions button.btn-danger,
+html.dark-mode header .header-actions button.btn-danger,
+body.dark-mode header .header-actions button.btn-danger {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: #dc2626 !important;
+}
+
+html.dark header .header-actions button.btn-danger i,
+body.dark header .header-actions button.btn-danger i,
+html.dark-mode header .header-actions button.btn-danger i,
+body.dark-mode header .header-actions button.btn-danger i {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* =========================================================
+   MOBILE — KEEP THEM VISIBLE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    header .header-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+
+        gap: 4px !important;
+
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+    }
+
+    header .header-actions::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    header .header-actions a.btn,
+    header .header-actions a.btn-outline,
+    header .header-actions button {
+        flex: 0 0 auto !important;
+
+        min-width: auto !important;
+
+        padding: 6px 8px !important;
+
+        font-size: .78rem !important;
+    }
+}
+
