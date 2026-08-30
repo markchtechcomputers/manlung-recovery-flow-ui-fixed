@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v3';
+const CACHE_NAME = 'manlung-recovery-static-v4';
 
 const STATIC_ASSETS = [
   '/',
