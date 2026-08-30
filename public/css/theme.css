@@ -906,3 +906,115 @@ html.dark .site-header .brand-subtitle {
     -webkit-text-fill-color: #bfdbfe !important;
 }
 
+
+/* =========================================================
+   MANLUNG RECOVERY — SOLID FLOATING HEADER
+   ========================================================= */
+
+.site-header {
+    position: sticky !important;
+    top: 12px !important;
+    z-index: 9999 !important;
+
+    width: calc(100% - 24px) !important;
+    margin: 12px auto 0 !important;
+
+    /* SOLID HEADER */
+    background: #0b1f3a !important;
+    background-color: #0b1f3a !important;
+
+    border: 1px solid #1e4f91 !important;
+    border-radius: 16px !important;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, .28),
+        0 0 14px rgba(37, 99, 235, .20) !important;
+
+    opacity: 1 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Solid inner header area */
+.site-header::before {
+    background: #0b1f3a !important;
+    opacity: 1 !important;
+}
+
+/* Glowing blue line */
+.site-header::after {
+    content: "";
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    bottom: -3px;
+    height: 2px;
+
+    background: #2563eb !important;
+
+    box-shadow:
+        0 0 5px #2563eb,
+        0 0 12px #2563eb,
+        0 0 24px rgba(37, 99, 235, .75);
+
+    border-radius: 10px;
+    pointer-events: none;
+}
+
+/* Brand title */
+.site-header h1,
+.site-header h2,
+.site-header h3,
+.site-header strong {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Brand subtitle */
+.site-header p {
+    color: #bfdbfe !important;
+    -webkit-text-fill-color: #bfdbfe !important;
+}
+
+/* Navigation text */
+.site-header .header-actions a {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Navigation boxes */
+.site-header .header-actions a {
+    background: #ffffff !important;
+    border: 1px solid #3b82f6 !important;
+    border-radius: 8px !important;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.20) !important;
+}
+
+/* Text inside navigation boxes stays BLACK */
+.site-header .header-actions a span,
+.site-header .header-actions a {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* Dark/Light control remains outside a rectangle */
+.site-header .header-actions .theme-toggle,
+.site-header .header-actions button.theme-toggle {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #ffffff !important;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .site-header {
+        top: 6px !important;
+        width: calc(100% - 12px) !important;
+        margin-top: 6px !important;
+        border-radius: 12px !important;
+    }
+}
+
