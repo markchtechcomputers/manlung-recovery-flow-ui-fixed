@@ -411,3 +411,53 @@ textarea { min-height: 100px; resize: vertical; }
   .hero h2 { font-size:1.7rem; }
   .card { padding:1.2rem; border-radius:16px; }
 }
+
+/* Admin Portal - keep branding/logo compact */
+.admin-header .manlung-brand-logo,
+.admin-header img.manlung-brand-logo,
+.admin-header .brand-logo,
+.admin-header .site-logo {
+  width: 42px !important;
+  height: 42px !important;
+  max-width: 42px !important;
+  max-height: 42px !important;
+  object-fit: contain !important;
+  display: block !important;
+  flex: 0 0 42px !important;
+}
+
+/* Prevent header branding from becoming oversized */
+.admin-header .brand,
+.admin-header .branding,
+.admin-header .site-brand {
+  max-height: 52px !important;
+  overflow: hidden !important;
+}
+
+.admin-header .brand img,
+.admin-header .branding img,
+.admin-header .site-brand img {
+  width: 42px !important;
+  height: 42px !important;
+  max-width: 42px !important;
+  max-height: 42px !important;
+  object-fit: contain !important;
+}
+
+/* Mobile Admin Portal */
+@media (max-width: 700px) {
+  .admin-header .manlung-brand-logo,
+  .admin-header img.manlung-brand-logo,
+  .admin-header .brand-logo,
+  .admin-header .site-logo,
+  .admin-header .brand img,
+  .admin-header .branding img,
+  .admin-header .site-brand img {
+    width: 34px !important;
+    height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    flex-basis: 34px !important;
+  }
+}
+
