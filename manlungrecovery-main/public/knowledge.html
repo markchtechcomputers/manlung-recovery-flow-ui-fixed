@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/js/theme.js"></script>
+<meta charset="UTF-8">
+<link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Safety Knowledge Center | Manlung Recovery</title>
+    <meta name="description" content="Explore practical cyber safety, scam awareness, digital recovery and online security guidance from Manlung Recovery.">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <link rel="canonical" href="https://manlungrecovery.manlungshop.co.ke/knowledge.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Cyber Safety Knowledge Center | Manlung Recovery">
+    <meta property="og:description" content="Explore practical cyber safety, scam awareness, digital recovery and online security guidance from Manlung Recovery.">
+    <meta property="og:url" content="https://manlungrecovery.manlungshop.co.ke/knowledge.html">
+    <meta property="og:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Cyber Safety Knowledge Center | Manlung Recovery">
+    <meta name="twitter:description" content="Explore practical cyber safety, scam awareness, digital recovery and online security guidance from Manlung Recovery.">
+    <meta name="twitter:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<style>
+.knowledge-hero{
+  padding:4rem 1rem;
+  text-align:center;
+  border-radius:24px;
+  background:linear-gradient(135deg,#071a38,#0b3158);
+  color:#fff;
+  margin:1.5rem 0 2rem;
+}
+
+.knowledge-hero h1{
+  font-size:clamp(2rem,5vw,3.5rem);
+  margin:0 0 1rem;
+}
+
+.knowledge-hero p{
+  max-width:760px;
+  margin:auto;
+  color:#cbd9ea;
+  line-height:1.7;
+}
+
+.knowledge-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1rem;
+  margin-bottom:2rem;
+}
+
+.knowledge-card{
+  padding:1.5rem;
+  border-radius:18px;
+  background:var(--card-bg,#fff);
+  border:1px solid var(--card-border,#dbe4ee);
+  cursor:pointer;
+  transition:.2s;
+}
+
+.knowledge-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 30px rgba(0,0,0,.1);
+}
+
+.knowledge-card h2{
+  margin:.5rem 0;
+}
+
+.knowledge-card p{
+  color:var(--text-muted,#64748b);
+  line-height:1.6;
+}
+
+.knowledge-icon{
+  font-size:2rem;
+}
+
+.knowledge-section{
+  display:none;
+  padding:2rem;
+  margin-bottom:1.5rem;
+  border-radius:20px;
+  background:var(--card-bg,#fff);
+  border:1px solid var(--card-border,#dbe4ee);
+}
+
+.knowledge-section.active{
+  display:block;
+}
+
+.knowledge-section h2{
+  font-size:2rem;
+  margin-top:0;
+}
+
+.guide{
+  padding:1rem;
+  margin:1rem 0;
+  border-radius:14px;
+  background:var(--page-bg,#f5f8fc);
+}
+
+.guide h3{
+  margin-top:0;
+}
+
+.guide li{
+  margin:.5rem 0;
+  line-height:1.6;
+}
+
+.faq{
+  margin:1rem 0;
+}
+
+.faq strong{
+  display:block;
+  margin-bottom:.35rem;
+}
+
+.back{
+  margin-bottom:1rem;
+}
+</style>
+
+<style id="manlung-footer-style">
+.manlung-footer{
+  margin-top:2.5rem;
+  padding:1.6rem 1rem .8rem;
+  background:#06101d;
+  border-top:1px solid rgba(255,255,255,.08);
+  color:#dbeafe;
+}
+
+.manlung-footer-inner{
+  max-width:1000px;
+  margin:auto;
+}
+
+.manlung-footer-brand{
+  text-align:center;
+  margin-bottom:1rem;
+}
+
+.manlung-footer-brand h2{
+  margin:0 0 .3rem;
+  font-size:clamp(1rem,1.7vw,1.25rem);
+  color:#fff;
+}
+
+.manlung-footer-brand p{
+  margin:0;
+  color:#94a3b8;
+  font-size:.8rem;
+}
+
+.manlung-footer-links{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:.5rem;
+  margin:1rem 0;
+}
+
+.manlung-footer-link{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:.45rem .35rem;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;
+  background:rgba(255,255,255,.025);
+  color:#dbeafe;
+  text-decoration:none;
+  font-weight:600;
+  font-size:.76rem;
+  text-align:center;
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease;
+}
+
+.manlung-footer-link:hover{
+  background:rgba(255,255,255,.07);
+  border-color:rgba(255,255,255,.16);
+  color:#fff;
+}
+
+.manlung-footer-link:focus-visible{
+  outline:2px solid #94a3b8;
+  outline-offset:2px;
+}
+
+.manlung-footer-link:active{
+  background:rgba(255,255,255,.1);
+}
+
+.manlung-footer-bottom{
+  padding-top:.7rem;
+  border-top:1px solid rgba(255,255,255,.07);
+  text-align:center;
+  color:#64748b;
+  font-size:.7rem;
+}
+
+.manlung-footer-bottom strong{
+  color:#94a3b8;
+}
+
+@media(max-width:900px){
+  .manlung-footer-links{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+
+@media(max-width:600px){
+  .manlung-footer{
+    margin-top:2rem;
+    padding:1.3rem .65rem .7rem;
+  }
+
+  .manlung-footer-links{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:.45rem;
+    margin:.8rem 0;
+  }
+
+  .manlung-footer-link{
+    min-height:40px;
+    font-size:.72rem;
+  }
+}
+
+@media(max-width:380px){
+  .manlung-footer-links{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(15,23,42,.98),
+      rgba(17,35,56,.98)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,.025) 0 1px,
+      transparent 1px 64px
+    );
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 4px 18px rgba(2,6,23,.22);
+}
+
+.site-header .container{
+  max-width:1180px;
+  margin:0 auto;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.55rem .8rem;
+}
+
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  min-width:0;
+}
+
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.05rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+
+.site-header .brand span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.72rem;
+  white-space:nowrap;
+}
+
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  min-height:38px;
+  padding:.45rem .68rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:700;
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease;
+}
+
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.35);
+  color:#fff;
+}
+
+.site-header .header-actions .btn-primary{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+
+.site-header .header-actions .btn-primary:hover{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+}
+
+@media(max-width:900px){
+  .site-header .container{
+    min-height:58px;
+    padding:.45rem .7rem;
+  }
+
+  .site-header .brand h1{
+    font-size:.95rem;
+  }
+
+  .site-header .brand span{
+    font-size:.64rem;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:36px;
+    padding:.4rem .55rem;
+    font-size:.7rem;
+  }
+}
+
+@media(max-width:700px){
+  .site-header .container{
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+
+  .site-header .brand{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+
+  .site-header .brand span{
+    white-space:normal;
+  }
+
+  .site-header .header-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.35rem;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:38px;
+    padding:.35rem .2rem;
+    font-size:.68rem;
+  }
+}
+
+@media(max-width:480px){
+  .site-header .header-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
+  }
+
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    display:block;
+    font-size:1rem;
+    line-height:1;
+    margin:0;
+  }
+
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
+  }
+}
+
+@media(max-width:360px){
+  .site-header .brand h1{
+    font-size:.86rem;
+  }
+
+  .site-header .brand span{
+    font-size:.58rem;
+  }
+}
+</style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+  <link rel="stylesheet" href="/css/theme.css">
+</head>
+
+<body>
+
+<header class="site-header">
+
+<div class="container">
+
+<div class="brand">
+
+<img
+  class="manlung-site-logo"
+  src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
+  alt="Manlung Recovery"
+>
+
+<h1>🛡️ Manlung Recovery</h1>
+
+<span>Knowledge &amp; Support Center</span>
+
+</div>
+
+<div class="header-actions">
+
+<a href="/" class="btn btn-outline">
+Home
+</a>
+
+<a href="/client/request.html" class="btn btn-primary">
+Get Support
+</a>
+
+</div>
+
+</div>
+
+</header>
+
+
+<main class="container">
+
+
+<section class="knowledge-hero">
+
+<h1>
+Manlung Recovery Knowledge Center
+</h1>
+
+<p>
+Clear information, practical guidance and useful resources to help you understand
+a difficult situation, organize what you know, protect yourself and choose the
+next appropriate step.
+</p>
+
+</section>
+
+
+<div class="knowledge-grid">
+
+
+<div class="knowledge-card" onclick="openSection('recovery')">
+
+<div class="knowledge-icon">
+🔄
+</div>
+
+<h2>
+Recovery
+</h2>
+
+<p>
+Understand the recovery journey, preserve information, organize your case and work through practical next steps.
+</p>
+
+</div>
+
+
+<div class="knowledge-card" onclick="openSection('support')">
+
+<div class="knowledge-icon">
+🤝
+</div>
+
+<h2>
+Support
+</h2>
+
+<p>
+Learn how to ask for help, prepare useful information and communicate clearly with support personnel.
+</p>
+
+</div>
+
+
+<div class="knowledge-card" onclick="openSection('education')">
+
+<div class="knowledge-icon">
+📚
+</div>
+
+<h2>
+Education
+</h2>
+
+<p>
+Build your knowledge around digital safety, accounts, privacy, evidence and responsible technology use.
+</p>
+
+</div>
+
+
+<div class="knowledge-card" onclick="openSection('community')">
+
+<div class="knowledge-icon">
+🌍
+</div>
+
+<h2>
+Community
+</h2>
+
+<p>
+Learn how communities can support people while respecting privacy, dignity and responsible information sharing.
+</p>
+
+</div>
+
+
+<div class="knowledge-card" onclick="openSection('awareness')">
+
+<div class="knowledge-icon">
+🔎
+</div>
+
+<h2>
+Awareness
+</h2>
+
+<p>
+Recognize common warning signs involving scams, phishing, fraud, identity misuse and suspicious activity.
+</p>
+
+</div>
+
+
+<div class="knowledge-card" onclick="openSection('resilience')">
+
+<div class="knowledge-icon">
+🌱
+</div>
+
+<h2>
+Resilience
+</h2>
+
+<p>
+Develop safer routines, learn from setbacks and build practical habits for moving forward.
+</p>
+
+</div>
+
+
+</div>
+
+
+<section id="recovery" class="knowledge-section">
+
+<button
+  class="btn btn-outline back"
+  onclick="closeSections()"
+>
+← All topics
+</button>
+
+<h2>
+🔄 Recovery
+</h2>
+
+<p>
+Recovery is often a process rather than a single event.
+Start by understanding what happened and organizing the information available to you.
+</p>
+
+
+<div class="guide">
+
+<h3>
+Start here
+</h3>
+
+<ol>
+
+<li>
+Write down what happened and when it happened.
+</li>
+
+<li>
+Preserve messages, emails, screenshots, receipts and other relevant records.
+</li>
+
+<li>
+Identify accounts, devices, transactions or information affected.
+</li>
+
+<li>
+Record what action has already been taken.
+</li>
+
+<li>
+Define the outcome you are trying to achieve.
+</li>
+
+</ol>
+
+</div>
+
+
+<div class="guide">
+
+<h3>
+Common recovery situations
+</h3>
+
+<ul>
+
+<li>
+Lost or stolen devices
+</li>
+
+<li>
+Compromised accounts
+</li>
+
+<li>
+Online scams and fraud
+</li>
+
+<li>
+Identity-related problems
+</li>
+
+<li>
+Loss of important digital information
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="guide">
+
+<h3>
+Important reminder
+</h3>
+
+<p>
+Recovery cannot always guarantee a particular outcome.
+The available options depend on the situation, evidence,
+service providers and applicable authorities.
+</p>
+
+</div>
+
+</section>
+
+
+<section id="support" class="knowledge-section">
+
+<button
+  class="btn btn-outline back"
+  onclick="closeSections()"
+>
+← All topics
+</button>
+
+<h2>
+🤝 Support
+</h2>
+
+<p>
+Good support begins with clear information and realistic expectations.
+</p>
+
+
+<div class="guide">
+
+<h3>
+Preparing to ask for help
+</h3>
+
+<ul>
+
+<li>
+Explain what happened in chronological order.
+</li>
+
+<li>
+Provide relevant dates and transaction references.
+</li>
+
+<li>
+Identify affected accounts, devices or services.
+</li>
+
+<li>
+Keep original evidence where possible.
+</li>
+
+<li>
+Clearly explain what assistance you are seeking.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="guide">
+
+<h3>
+What happens after a request?
+</h3>
+
+<p>
+Your information can be reviewed so that the appropriate next steps can be identified.
+Some matters may require a bank, platform, telecommunications provider,
+police service or other qualified professional.
+</p>
+
+</div>
+
+
+<div class="faq">
+
+<strong>
+Should I share everything publicly?
+</strong>
+
+<p>
+No. Sensitive personal, financial and account information should be shared
+only through appropriate trusted channels.
+</p>
+
+</div>
+
+</section>
+
+
+<section id="education" class="knowledge-section">
+
+<button
+  class="btn btn-outline back"
+  onclick="closeSections()"
+>
+← All topics
+</button>
+
+<h2>
+📚 Education
+</h2>
+
+<p>
+Understanding basic digital safety can reduce risk and help you respond
+more effectively when something goes wrong.
+</p>
+
+
+<div class="guide">
+
+<h3>
+Digital safety basics
+</h3>
+
+<ul>
+
+<li>
+Use strong, unique passwords.
+</li>
+
+<li>
+Enable multi-factor authentication where available.
+</li>
+
+<li>
+Keep devices and applications updated.
+</li>
+
+<li>
+Review account recovery methods regularly.
+</li>
+
+<li>
+Be cautious with unexpected links and attachments.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="guide">
+
+<h3>
+Understanding digital evidence
+</h3>
+
+<p>
+Messages, emails, transaction records, timestamps, screenshots and account
+notifications may help establish what happened.
+Avoid altering or deleting useful records unnecessarily.
+</p>
+
+</div>
+
+</section>
+
+
+<section id="community" class="knowledge-section">
+
+<button
+  class="btn btn-outline back"
+  onclick="closeSections()"
+>
+← All topics
+</button>
+
+<h2>
+🌍 Community
+</h2>
+
+<p>
+People often handle difficult situations better when they know where to find
+trustworthy information and appropriate support.
+</p>
+
+
+<div class="guide">
+
+<h3>
+How to support someone
+</h3>
+
+<ul>
+
+<li>
+Listen without blaming them.
+</li>
+
+<li>
+Respect their privacy.
+</li>
+
+<li>
+Help them organize information.
+</li>
+
+<li>
+Encourage appropriate professional assistance.
+</li>
+
+<li>
+Avoid making promises about outcomes.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="guide">
+
+<h3>
+Responsible information sharing
+</h3>
+
+<p>
+Do not publish passwords, private documents, financial information,
+phone numbers or other sensitive evidence simply to seek community assistance.
+</p>
+
+</div>
+
+</section>
+
+
+<section id="awareness" class="knowledge-section">
+
+<button
+  class="btn btn-outline back"
+  onclick="closeSections()"
+>
+← All topics
+</button>
+
+<h2>
+🔎 Awareness
+</h2>
+
+<p>
+Awareness can help you recognize suspicious situations earlier.
+</p>
+
+
+<div class="guide">
+
+<h3>
+Common warning signs
+</h3>
+
+<ul>
+
+<li>
+Unexpected requests for passwords or verification codes.
+</li>
+
+<li>
+Pressure to send money immediately.
+</li>
+
+<li>
+Promises of guaranteed profits or guaranteed recovery.
+</li>
+
+<li>
+Suspicious links or unfamiliar login pages.
+</li>
+
+<li>
+Requests to keep a transaction secret.
+</li>
+
+<li>
+Someone pretending to be a bank, company or official.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="guide">
+
+<h3>
+If you suspect a scam
+</h3>
+
+<p>
+Stop communicating or paying where appropriate, preserve evidence,
+contact the relevant financial institution or platform,
+and use official reporting channels.
+</p>
+
+</div>
+
+</section>
+
+
+<section id="resilience" class="knowledge-section">
+
+<button
+  class="btn btn-outline back"
+  onclick="closeSections()"
+>
+← All topics
+</button>
+
+<h2>
+🌱 Resilience
+</h2>
+
+<p>
+Resilience can mean continuing to take constructive steps after a setback.
+</p>
+
+
+<div class="guide">
+
+<h3>
+Build safer routines
+</h3>
+
+<ul>
+
+<li>
+Review important account security settings regularly.
+</li>
+
+<li>
+Keep backups of important information.
+</li>
+
+<li>
+Maintain records of important transactions.
+</li>
+
+<li>
+Learn from previous incidents without blaming yourself.
+</li>
+
+<li>
+Ask for qualified help when the situation requires it.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="guide">
+
+<h3>
+Progress after a setback
+</h3>
+
+<p>
+A setback does not erase every positive step already taken.
+Review what changed, adjust your approach and focus on the next useful action.
+</p>
+
+</div>
+
+</section>
+
+
+<div style="text-align:center;padding:2rem 0 4rem">
+
+<h2>
+Need assistance?
+</h2>
+
+<p>
+When you are ready, you can submit a structured recovery request.
+</p>
+
+<a
+  href="/client/request.html"
+  class="btn btn-primary"
+>
+Get Support
+</a>
+
+</div>
+
+
+</main>
+
+
+<script>
+
+function openSection(id){
+
+  document
+    .querySelectorAll('.knowledge-section')
+    .forEach(function(section){
+      section.classList.remove('active');
+    });
+
+  const section = document.getElementById(id);
+
+  if(section){
+
+    section.classList.add('active');
+
+    section.scrollIntoView({
+      behavior:'smooth',
+      block:'start'
+    });
+
+  }
+
+}
+
+
+function closeSections(){
+
+  document
+    .querySelectorAll('.knowledge-section')
+    .forEach(function(section){
+      section.classList.remove('active');
+    });
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+
+}
+
+</script>
+
+
+<footer class="manlung-footer">
+
+<div class="manlung-footer-inner">
+
+
+<div class="manlung-footer-brand">
+
+<h2>
+Cyber Recovery &amp; Digital Investigation Portal
+</h2>
+
+<p>
+Secure support, recovery guidance, digital awareness and responsible assistance.
+</p>
+
+</div>
+
+
+<nav
+  class="manlung-footer-links"
+  aria-label="Footer navigation"
+>
+
+<a
+  class="manlung-footer-link"
+  href="/about.html"
+>
+About
+</a>
+
+<a
+  class="manlung-footer-link"
+  href="/blog.html"
+>
+Blog
+</a>
+
+<a
+  class="manlung-footer-link"
+  href="/careers.html"
+>
+Careers
+</a>
+
+<a
+  class="manlung-footer-link"
+  href="/terms.html"
+>
+Terms
+</a>
+
+<a
+  class="manlung-footer-link"
+  href="/login.html"
+>
+Client Portal
+</a>
+
+<a
+  class="manlung-footer-link"
+  href="/client/request.html"
+>
+New Recovery Request
+</a>
+
+</nav>
+
+
+<div class="manlung-footer-social" aria-label="Social media">
+<a class="manlung-footer-link" href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="Manlung Recovery on YouTube"><i class="fab fa-youtube"></i> YouTube</a>
+</div>
+<div class="manlung-footer-bottom">
+
+&copy; 2026
+<strong>Manlung Recovery</strong>.
+All rights reserved.
+
+</div>
+
+
+</div>
+
+</footer>
+
+
+<script src="/js/pwa.js" defer></script>
+</body>
+</html>

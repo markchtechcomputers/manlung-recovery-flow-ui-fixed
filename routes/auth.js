@@ -1,0 +1,1549 @@
+const express = require('express');
+const router = express.Router();
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { body, validationResult } = require('express-validator');
+const User = require('../models/User');
+const Case = require('../models/Case');
+const { auth } = require('../middleware/auth');
+const AdminInvitation = require('../models/AdminInvitation');
+const AdminPermission = require('../models/AdminPermission');
+const { sendEmail } = require('../services/email');
+const { supabase, EVIDENCE_BUCKET } = require('../config/supabase');
+const {
+  generateSecret, verifyTotp, encryptSecret, decryptSecret, buildOtpUri,
+  generateRecoveryCodes, hashRecoveryCode, consumeRecoveryCode,
+} = require('../services/mfa');
+
+const signToken = (user) =>
+  jwt.sign(
+    { id: user.id, role: user.role, mfa: ['admin', 'owner'].includes(user.role) ? Boolean(user.mfa_enabled) : undefined },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRE || '7d',
+    }
+  );
+
+const hashToken = (token) =>
+  crypto.createHash('sha256').update(token).digest('hex');
+
+
+const ADMIN_COOKIE = 'manlung_admin_session';
+const MFA_TICKET_EXPIRE = '5m';
+
+// Owner identity is required for MFA management, but unlike ownerAuth it
+// intentionally does not require MFA yet: the Owner must be able to turn MFA on.
+const ownerIdentity = async (req, res, next) => {
+  await auth(req, res, () => {
+    if (req.user.role !== 'owner') {
+      return res.status(403).json({ error: 'Owner access required' });
+    }
+    next();
+  });
+};
+
+function setAdminCookie(res, token) {
+  res.cookie(ADMIN_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+}
+
+function clearAdminCookie(res) {
+  res.clearCookie(ADMIN_COOKIE, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+  });
+}
+
+function getCookie(req, name) {
+  const raw = req.headers.cookie || '';
+  const match = raw.split(';').map((v) => v.trim()).find((v) => v.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.slice(name.length + 1)) : null;
+}
+
+function issueAdminSession(res, user) {
+  const token = signToken(user);
+  setAdminCookie(res, token);
+}
+
+function checkValidation(req, res) {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    res.status(400).json({
+      error: errors.array()[0].msg,
+    });
+    return false;
+  }
+
+  return true;
+}
+
+
+// ============================================================
+// ADMIN REGISTRATION
+// Invitation required — clients cannot self-promote.
+// ============================================================
+
+router.post(
+  '/admin/register',
+  [
+    body('token')
+      .trim()
+      .notEmpty()
+      .withMessage('Invitation token is required'),
+
+    body('fullName')
+      .trim()
+      .notEmpty()
+      .withMessage('Full name is required')
+      .isLength({ max: 200 }),
+
+    body('username')
+      .trim()
+      .isLength({ min: 3, max: 80 })
+      .withMessage('Username must be between 3 and 80 characters'),
+
+    body('email')
+      .trim()
+      .isEmail()
+      .withMessage('A valid email is required')
+      .normalizeEmail(),
+
+    body('password')
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters'),
+
+    body('phone')
+      .optional()
+      .trim()
+      .isLength({ max: 40 }),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const invitation = await AdminInvitation.findValid(req.body.token);
+
+      if (!invitation) {
+        return res.status(400).json({
+          error: 'This admin invitation is invalid or expired.',
+        });
+      }
+
+      if (
+        invitation.email.toLowerCase() !==
+        req.body.email.toLowerCase()
+      ) {
+        return res.status(403).json({
+          error:
+            'This invitation was issued to a different email address.',
+        });
+      }
+
+      const requestedUsername =
+        String(req.body.username || '').trim();
+
+      const requestedEmail =
+        String(req.body.email || '').trim().toLowerCase();
+
+      const existingUser =
+        await User.findByEmail(
+          requestedEmail
+        );
+
+      const existingByUsername =
+        await User.findByUsername(
+          requestedUsername
+        );
+
+      if (
+        existingByUsername &&
+        (!existingUser ||
+          String(existingByUsername.id) !==
+            String(existingUser.id))
+      ) {
+        return res.status(409).json({
+          error: 'Username already exists.',
+        });
+      }
+
+      let admin;
+
+      if (existingUser) {
+        // Existing CLIENT account:
+        // keep the same user ID so all cases/history remain attached.
+        if (existingUser.role === 'client') {
+          if (
+            existingByUsername &&
+            String(existingByUsername.id) !==
+              String(existingUser.id)
+          ) {
+            return res.status(409).json({
+              error: 'Username already exists.',
+            });
+          }
+
+          admin =
+            await User.convertClientToPendingAdmin(
+              existingUser.id,
+              {
+                username:
+                  requestedUsername,
+                password:
+                  req.body.password,
+                phone:
+                  req.body.phone,
+                appointedBy:
+                  invitation.invited_by,
+              }
+            );
+        } else {
+          return res.status(409).json({
+            error:
+              'This email already belongs to an Admin or Owner account.',
+          });
+        }
+      } else {
+        admin =
+          await User.createAdminFromInvitation({
+            username:
+              requestedUsername,
+            password:
+              req.body.password,
+            email:
+              requestedEmail,
+            phone:
+              req.body.phone,
+            invitationId:
+              invitation.id,
+            appointedBy:
+              invitation.invited_by,
+          });
+      }
+
+      await AdminInvitation.accept(
+        invitation.id
+      );
+
+      await AdminPermission.replace(
+        admin.id,
+        AdminPermission.DEFAULT_PERMISSIONS,
+        invitation.invited_by
+      );
+
+      res.status(201).json({
+        success: true,
+        pendingApproval: true,
+        existingAccount:
+          Boolean(existingUser),
+        message:
+          'Admin registration submitted. Your account is now pending Owner approval.',
+      });
+    } catch (error) {
+      console.error('Admin registration error:', error);
+
+      res.status(500).json({
+        error:
+          error.message || 'Could not create admin account',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// ADMIN / OWNER LOGIN
+// Login accepts either USERNAME or EMAIL.
+// ============================================================
+
+router.post(
+  '/admin/login',
+  [
+    body('username')
+      .trim()
+      .notEmpty()
+      .withMessage('Username or email is required'),
+
+    body('password')
+      .notEmpty()
+      .withMessage('Password is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const login = req.body.username.trim();
+      const password = req.body.password;
+
+      let admin = null;
+
+      // ------------------------------------------------------
+      // First try username
+      // ------------------------------------------------------
+
+      admin = await User.findByUsername(login);
+
+      // ------------------------------------------------------
+      // If username was not found and login looks like email,
+      // try email.
+      // ------------------------------------------------------
+
+      if (!admin && login.includes('@')) {
+        admin = await User.findByEmail(login);
+      }
+
+      // ------------------------------------------------------
+      // Bootstrap Owner
+      //
+      // If the Owner account does not exist yet, create it
+      // ONLY when the submitted username matches
+      // ADMIN_USERNAME.
+      // ------------------------------------------------------
+
+      if (
+        !admin &&
+        process.env.ADMIN_USERNAME &&
+        login === process.env.ADMIN_USERNAME
+      ) {
+        if (!process.env.ADMIN_PASSWORD) {
+          console.error(
+            'ADMIN_PASSWORD environment variable is missing.'
+          );
+
+          return res.status(500).json({
+            error: 'Owner account is not configured correctly.',
+          });
+        }
+
+        admin = await User.create({
+          username: process.env.ADMIN_USERNAME,
+          password: process.env.ADMIN_PASSWORD,
+          role: 'owner',
+        });
+
+        console.log(
+          `Owner bootstrap account created: ${admin.username}`
+        );
+      }
+
+      // ------------------------------------------------------
+      // Account must be Admin or Owner
+      // ------------------------------------------------------
+
+      if (
+        !admin ||
+        (admin.role !== 'admin' && admin.role !== 'owner')
+      ) {
+        return res.status(401).json({
+          error: 'Invalid credentials',
+        });
+      }
+
+      // ------------------------------------------------------
+      // Suspended / pending Admin accounts cannot log in.
+      // Owner is not affected by admin_status.
+      // ------------------------------------------------------
+
+      if (
+        admin.role === 'admin' &&
+        admin.admin_status !== 'active'
+      ) {
+        if (admin.admin_status === 'pending') {
+          return res.status(403).json({
+            error:
+              'Your Admin account is awaiting Owner approval.',
+          });
+        }
+
+        return res.status(403).json({
+          error:
+            'Your admin access has been suspended. Contact the site owner.',
+        });
+      }
+
+      // ------------------------------------------------------
+      // Check password
+      // ------------------------------------------------------
+
+      const isMatch = await User.comparePassword(
+        admin,
+        password
+      );
+
+      if (!isMatch) {
+        return res.status(401).json({
+          error: 'Invalid credentials',
+        });
+      }
+
+      // MFA-enabled accounts receive a short-lived ticket first.
+      if (admin.mfa_enabled) {
+        const mfaTicket = jwt.sign(
+          { id: admin.id, role: admin.role, purpose: 'admin_mfa_login' },
+          process.env.JWT_SECRET,
+          { expiresIn: MFA_TICKET_EXPIRE }
+        );
+
+        return res.json({
+          success: true,
+          mfaRequired: true,
+          mfaTicket,
+          user: { id: admin.id, username: admin.username, email: admin.email, role: admin.role },
+        });
+      }
+
+      issueAdminSession(res, admin);
+
+      console.log(`Admin/Owner login successful: ${admin.username} (${admin.role})`);
+
+      return res.json({
+        success: true,
+        mfaRequired: false,
+        mfaConfigured: Boolean(admin.mfa_enabled),
+        user: { id: admin.id, username: admin.username, email: admin.email, role: admin.role, mfa: Boolean(admin.mfa_enabled) },
+      });
+    } catch (error) {
+      console.error('Admin login error:', error);
+
+      return res.status(500).json({
+        error: error.message || 'Server error',
+      });
+    }
+  }
+);
+
+
+
+// ============================================================
+// ADMIN / OWNER SESSION + MFA
+// ============================================================
+
+router.post('/admin/logout', (req, res) => {
+  clearAdminCookie(res);
+  res.json({ success: true });
+});
+
+router.post('/admin/mfa/login', [
+  body('mfaTicket').trim().notEmpty(),
+  body('code').trim().notEmpty(),
+], async (req, res) => {
+  try {
+    const ticket = jwt.verify(req.body.mfaTicket, process.env.JWT_SECRET);
+    if (ticket.purpose !== 'admin_mfa_login') return res.status(401).json({ error: 'Invalid MFA session.' });
+    const admin = await User.findById(ticket.id);
+    if (!admin || !['admin', 'owner'].includes(admin.role) || !admin.mfa_enabled || !admin.mfa_secret) {
+      return res.status(401).json({ error: 'MFA session is invalid.' });
+    }
+    const secret = decryptSecret(admin.mfa_secret);
+    let valid = verifyTotp(secret, req.body.code);
+    if (!valid) {
+      const index = consumeRecoveryCode(req.body.code, admin.mfa_recovery_code_hashes || []);
+      if (index !== null) {
+        const remaining = [...(admin.mfa_recovery_code_hashes || [])];
+        remaining.splice(index, 1);
+        await User.consumeRecoveryCode(admin.id, remaining);
+        valid = true;
+      }
+    }
+    if (!valid) return res.status(401).json({ error: 'Invalid authentication code.' });
+    issueAdminSession(res, admin);
+    return res.json({ success: true, user: { id: admin.id, username: admin.username, email: admin.email, role: admin.role } });
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid or expired MFA session.' });
+  }
+});
+
+router.post('/admin/mfa/setup', ownerIdentity, async (req, res) => {
+  try {
+    const current = await User.findById(req.user.id);
+    if (current?.mfa_enabled) {
+      return res.status(409).json({ error: 'Owner MFA is already enabled. Disable it with the current authenticator code before re-enrolling.' });
+    }
+    const secret = generateSecret();
+    await User.setMfaSetup(req.user.id, encryptSecret(secret));
+    return res.json({ success: true, secret, otpAuthUri: buildOtpUri(secret, req.user.username), message: 'Add this account to your authenticator app, then verify the code to enable MFA.' });
+  } catch (error) {
+    console.error('MFA setup error:', error);
+    return res.status(500).json({ error: 'Could not start MFA setup.' });
+  }
+});
+
+router.post('/admin/mfa/enable', [body('code').trim().notEmpty()], ownerIdentity, async (req, res) => {
+  try {
+    const fresh = await User.findById(req.user.id);
+    if (!fresh?.mfa_secret) return res.status(400).json({ error: 'Start MFA setup first.' });
+    const secret = decryptSecret(fresh.mfa_secret);
+    if (!verifyTotp(secret, req.body.code)) return res.status(400).json({ error: 'Invalid authenticator code.' });
+    const recoveryCodes = generateRecoveryCodes();
+    await User.enableMfa(req.user.id, recoveryCodes.map(hashRecoveryCode));
+    // Replace the pre-MFA session with a token explicitly marked as MFA-verified.
+    // This is required because auth middleware rejects tokens issued before MFA
+    // was enabled once the database flag becomes true.
+    issueAdminSession(res, { ...fresh, mfa_enabled: true });
+    return res.json({ success: true, recoveryCodes, warning: 'Save these recovery codes somewhere secure. Each code can be used once.' });
+  } catch (error) {
+    console.error('MFA enable error:', error);
+    return res.status(500).json({ error: 'Could not enable MFA.' });
+  }
+});
+
+router.post('/admin/mfa/disable', [body('code').trim().notEmpty()], ownerIdentity, async (req, res) => {
+  try {
+    const fresh = await User.findById(req.user.id);
+    if (!fresh?.mfa_enabled || !fresh.mfa_secret) return res.json({ success: true, message: 'MFA is already disabled.' });
+    if (!verifyTotp(decryptSecret(fresh.mfa_secret), req.body.code)) return res.status(400).json({ error: 'Invalid authenticator code.' });
+    await User.disableMfa(req.user.id);
+    return res.json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ error: 'Could not disable MFA.' });
+  }
+});
+
+router.get('/admin/mfa/status', ownerIdentity, async (req, res) => {
+  const user = await User.findById(req.user.id);
+  return res.json({ success: true, enabled: Boolean(user?.mfa_enabled) });
+});
+
+// ============================================================
+// CLIENT REGISTRATION
+// ============================================================
+
+router.post(
+  '/client/register',
+  [
+    body('email')
+      .trim()
+      .isEmail()
+      .withMessage('A valid email is required')
+      .normalizeEmail(),
+
+    body('password')
+      .isLength({ min: 6 })
+      .withMessage('Password must be at least 6 characters'),
+
+    body('fullName')
+      .optional()
+      .trim()
+      .isLength({ max: 200 })
+      .escape(),
+
+    body('phone')
+      .optional()
+      .trim()
+      .isLength({ max: 40 })
+      .escape(),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const {
+        fullName,
+        email,
+        phone,
+        password,
+      } = req.body;
+
+      const existing = await User.findByEmail(email);
+
+      if (existing) {
+        return res.status(409).json({
+          error:
+            'An account with this email already exists',
+        });
+      }
+
+      const client = await User.create({
+        username: fullName || email.split('@')[0],
+        email,
+        phone,
+        password,
+        role: 'client',
+      });
+
+      // Account-created notification.
+      // Email failure must never prevent a successful registration.
+      sendEmail({
+        to: client.email,
+        subject: 'Welcome to Manlung Recovery — Account Created Successfully',
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033;line-height:1.6;">
+            <div style="padding:24px;border-radius:16px;background:#0f2747;color:#fff;">
+              <h1 style="margin:0;font-size:24px;">Welcome to Manlung Recovery</h1>
+              <p style="margin:8px 0 0;color:#dbeafe;">
+                Your client account has been created successfully.
+              </p>
+            </div>
+
+            <div style="padding:24px 8px;">
+              <p>Hello ${String(client.username || 'Client')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')},</p>
+
+              <p>
+                Your Manlung Recovery client account was successfully created.
+                You can now sign in to your Client Portal and manage your recovery cases.
+              </p>
+
+              <div style="padding:16px;border:1px solid #dbe3ef;border-radius:12px;background:#f8fafc;">
+                <strong>Account email:</strong>
+                ${String(client.email)
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')}
+              </div>
+
+              <p style="margin-top:20px;">
+                From your portal you can submit recovery requests, track your cases,
+                receive Admin updates, and use the free Call Admin service.
+              </p>
+
+              <p style="margin-top:24px;">
+                <a href="${process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'}"
+                   style="display:inline-block;padding:12px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700;">
+                  Open Manlung Recovery
+                </a>
+              </p>
+
+              <p style="margin-top:28px;color:#64748b;font-size:13px;">
+                If you did not create this account, please contact Manlung Recovery support.
+              </p>
+            </div>
+          </div>
+        `,
+      }).catch(error => {
+        console.error(
+          'Client account confirmation email failed:',
+          error?.message || error
+        );
+      });
+
+      const token = signToken(client);
+
+      res.status(201).json({
+        success: true,
+        token,
+        user: {
+          id: client.id,
+          email: client.email,
+          username: client.username,
+          role: client.role,
+        },
+      });
+    } catch (error) {
+      console.error('Client register error:', error);
+
+      if (error.code === '23505') {
+        return res.status(409).json({
+          error:
+            'An account with this email already exists',
+        });
+      }
+
+      res.status(500).json({
+        error: error.message || 'Server error',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// CLIENT LOGIN
+// ============================================================
+
+router.post(
+  '/client/login',
+  [
+    body('email')
+      .trim()
+      .isEmail()
+      .withMessage('A valid email is required')
+      .normalizeEmail(),
+
+    body('password')
+      .notEmpty()
+      .withMessage('Password is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const {
+        email,
+        password,
+      } = req.body;
+
+      const client =
+        await User.findByEmailAndRole(email, 'client');
+
+      if (!client) {
+        return res.status(401).json({
+          error: 'Invalid credentials',
+        });
+      }
+
+      const isMatch =
+        await User.comparePassword(client, password);
+
+      if (!isMatch) {
+        return res.status(401).json({
+          error: 'Invalid credentials',
+        });
+      }
+
+      const token = signToken(client);
+
+      res.json({
+        success: true,
+        token,
+        user: {
+          id: client.id,
+          email: client.email,
+          username: client.username,
+          role: client.role,
+        },
+      });
+    } catch (error) {
+      console.error('Client login error:', error);
+
+      res.status(500).json({
+        error: error.message || 'Server error',
+      });
+    }
+  }
+);
+
+
+
+
+// ============================================================
+// CLIENT PROFILE
+// ============================================================
+
+router.get(
+  '/client/me',
+  auth,
+  async (req, res) => {
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          success: false,
+          error: 'Client access required.',
+        });
+      }
+
+      return res.json({
+        success: true,
+        user: {
+          id: req.user.id,
+          username: req.user.username,
+          email: req.user.email,
+          phone: req.user.phone || '',
+          role: req.user.role,
+          createdAt: req.user.created_at,
+        },
+      });
+    } catch (error) {
+      console.error('Client profile load error:', error);
+
+      return res.status(500).json({
+        success: false,
+        error: 'Could not load your profile.',
+      });
+    }
+  }
+);
+
+router.patch(
+  '/client/profile',
+  auth,
+  [
+    body('username')
+      .trim()
+      .isLength({ min: 3, max: 80 })
+      .withMessage('Name must be between 3 and 80 characters.'),
+    body('phone')
+      .optional()
+      .trim()
+      .isLength({ max: 40 })
+      .withMessage('Phone number is too long.'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          success: false,
+          error: 'Client access required.',
+        });
+      }
+
+      const username =
+        String(req.body.username || '').trim();
+
+      const existing =
+        await User.findByUsername(username);
+
+      if (
+        existing &&
+        String(existing.id) !== String(req.user.id)
+      ) {
+        return res.status(409).json({
+          success: false,
+          error: 'That name is already in use.',
+        });
+      }
+
+      const updated =
+        await User.updateProfile(
+          req.user.id,
+          {
+            username,
+            phone: req.body.phone,
+          }
+        );
+
+      if (!updated) {
+        return res.status(404).json({
+          success: false,
+          error: 'Client account not found.',
+        });
+      }
+
+      return res.json({
+        success: true,
+        user: {
+          id: updated.id,
+          username: updated.username,
+          email: updated.email,
+          phone: updated.phone || '',
+          role: updated.role,
+          createdAt: updated.created_at,
+        },
+      });
+    } catch (error) {
+      console.error('Client profile update error:', error);
+
+      return res.status(500).json({
+        success: false,
+        error:
+          error.message ||
+          'Could not update your profile.',
+      });
+    }
+  }
+);
+
+router.post(
+  '/client/change-password',
+  auth,
+  [
+    body('currentPassword')
+      .isLength({ min: 1 })
+      .withMessage('Current password is required.'),
+    body('newPassword')
+      .isLength({ min: 8 })
+      .withMessage('New password must be at least 8 characters.'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          success: false,
+          error: 'Client access required.',
+        });
+      }
+
+      const isMatch =
+        await User.comparePassword(
+          req.user,
+          req.body.currentPassword
+        );
+
+      if (!isMatch) {
+        return res.status(401).json({
+          success: false,
+          error: 'Current password is incorrect.',
+        });
+      }
+
+      if (
+        req.body.currentPassword ===
+        req.body.newPassword
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: 'New password must be different from the current password.',
+        });
+      }
+
+      await User.updatePassword(
+        req.user.id,
+        req.body.newPassword
+      );
+
+      return res.json({
+        success: true,
+        message:
+          'Password changed successfully. Please sign in again.',
+      });
+    } catch (error) {
+      console.error('Client password change error:', error);
+
+      return res.status(500).json({
+        success: false,
+        error:
+          error.message ||
+          'Could not change your password.',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// CLIENT OAUTH
+// Google / GitHub / other Supabase OAuth providers
+// ============================================================
+
+router.post(
+  '/client/oauth',
+  [
+    body('accessToken')
+      .trim()
+      .notEmpty()
+      .withMessage('OAuth access token is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const { supabase } = require('../config/supabase');
+
+      const {
+        data,
+        error,
+      } = await supabase.auth.getUser(
+        req.body.accessToken
+      );
+
+      if (error || !data?.user) {
+        return res.status(401).json({
+          error: 'Social sign-in could not be verified.',
+        });
+      }
+
+      const oauthUser = data.user;
+
+      const email = String(
+        oauthUser.email || ''
+      ).trim().toLowerCase();
+
+      if (!email) {
+        return res.status(400).json({
+          error:
+            'Your social account did not provide an email address.',
+        });
+      }
+
+      let client = await User.findByEmail(email);
+
+      // Existing admin/owner accounts must never be converted
+      // into client accounts through social sign-in.
+      // Send them to the correct portal instead of leaving them
+      // on a generic social-login failure screen.
+      if (client && client.role !== 'client') {
+        return res.status(403).json({
+          error:
+            'This email belongs to an Admin/Owner account. Continue from the Admin Sign In page.',
+          accountRole: client.role,
+          redirect:
+            client.role === 'owner' || client.role === 'admin'
+              ? '/admin/login.html'
+              : '/login.html',
+        });
+      }
+
+      const metadata = oauthUser.user_metadata || {};
+
+      const fullName = String(
+        metadata.full_name ||
+        metadata.name ||
+        metadata.user_name ||
+        metadata.preferred_username ||
+        email.split('@')[0]
+      ).trim().slice(0, 200);
+
+      const phone = String(
+        metadata.phone || ''
+      ).trim().slice(0, 40) || null;
+
+      if (!client) {
+        let username =
+          fullName ||
+          email.split('@')[0];
+
+        const existingUsername =
+          await User.findByUsername(username);
+
+        if (existingUsername) {
+          username =
+            `${username}-${String(oauthUser.id).slice(0, 8)}`
+              .slice(0, 80);
+        }
+
+        const randomPassword =
+          crypto.randomBytes(32).toString('hex');
+
+        client = await User.create({
+          username,
+          email,
+          phone,
+          password: randomPassword,
+          role: 'client',
+        });
+
+        // Social account-created notification.
+        // Only sent when OAuth actually creates a new client account.
+        sendEmail({
+          to: client.email,
+          subject: 'Welcome to Manlung Recovery — Account Created Successfully',
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033;line-height:1.6;">
+              <div style="padding:24px;border-radius:16px;background:#0f2747;color:#fff;">
+                <h1 style="margin:0;font-size:24px;">Welcome to Manlung Recovery</h1>
+                <p style="margin:8px 0 0;color:#dbeafe;">
+                  Your client account has been created successfully.
+                </p>
+              </div>
+
+              <div style="padding:24px 8px;">
+                <p>Hello ${String(client.username || 'Client')
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')},</p>
+
+                <p>
+                  Your Manlung Recovery account was created successfully using social sign-in.
+                </p>
+
+                <div style="padding:16px;border:1px solid #dbe3ef;border-radius:12px;background:#f8fafc;">
+                  <strong>Account email:</strong>
+                  ${String(client.email)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')}
+                </div>
+
+                <p style="margin-top:20px;">
+                  You can now use the Client Portal to submit recovery requests,
+                  track cases, receive Admin updates, and use the free Call Admin service.
+                </p>
+
+                <p style="margin-top:24px;">
+                  <a href="${process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'}"
+                     style="display:inline-block;padding:12px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700;">
+                    Open Manlung Recovery
+                  </a>
+                </p>
+              </div>
+            </div>
+          `,
+        }).catch(error => {
+          console.error(
+            'Social client account confirmation email failed:',
+            error?.message || error
+          );
+        });
+      }
+
+      const token = signToken(client);
+
+      return res.json({
+        success: true,
+        token,
+        user: {
+          id: client.id,
+          email: client.email,
+          username: client.username,
+          role: client.role,
+        },
+      });
+
+    } catch (error) {
+      console.error(
+        'Client OAuth error:',
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          error.message ||
+          'Could not complete social sign-in.',
+      });
+    }
+  }
+);
+
+
+
+// ============================================================
+// CLIENT: Delete Own Account
+// ============================================================
+
+router.delete(
+  '/client/account',
+  auth,
+  async (req, res) => {
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          error: 'Only client accounts can be deleted here.',
+        });
+      }
+
+      const cases = await Case.findByClientUserId(req.user.id);
+
+      const paths = [...new Set(
+        cases.flatMap(c =>
+          Array.isArray(c.files)
+            ? c.files.map(f => f?.path).filter(Boolean)
+            : []
+        )
+      )];
+
+      if (paths.length) {
+        const { error: storageError } =
+          await supabase.storage
+            .from(EVIDENCE_BUCKET)
+            .remove(paths);
+
+        if (storageError) {
+          console.error(
+            'Account deletion evidence cleanup failed:',
+            storageError
+          );
+
+          return res.status(500).json({
+            error:
+              'Your account could not be deleted because some case files could not be removed.',
+          });
+        }
+      }
+
+      for (const caseRow of cases) {
+        await Case.removeForClient(
+          caseRow.case_id,
+          req.user.id
+        );
+      }
+
+      const deleted = await User.deleteById(req.user.id);
+
+      if (!deleted) {
+        return res.status(500).json({
+          error: 'Account could not be deleted.',
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Your account and your linked cases have been deleted.',
+      });
+    } catch (error) {
+      console.error(
+        'Client account deletion error:',
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          error.message ||
+          'Could not delete your account.',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// ADMIN / OWNER FORGOT PASSWORD
+// ============================================================
+
+router.post(
+  '/admin/forgot-password',
+  [
+    body('email')
+      .trim()
+      .isEmail()
+      .withMessage('A valid email is required')
+      .normalizeEmail(),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const { email } = req.body;
+
+      const user =
+        await User.findByEmail(email);
+
+      if (
+        !user ||
+        !['admin', 'owner'].includes(user.role)
+      ) {
+        return res.json({
+          success: true,
+          message:
+            'If that admin account exists, a reset link has been sent.',
+        });
+      }
+
+      const rawToken =
+        crypto.randomBytes(32).toString('hex');
+
+      const tokenHash =
+        hashToken(rawToken);
+
+      const expires =
+        new Date(
+          Date.now() + 60 * 60 * 1000
+        ).toISOString();
+
+      await User.setResetToken(
+        email,
+        tokenHash,
+        expires
+      );
+
+      const base =
+        process.env.PUBLIC_APP_URL ||
+        `${req.protocol}://${req.get('host')}`;
+
+      const resetLink =
+        `${base}/admin/reset-password.html?token=${rawToken}&email=${encodeURIComponent(email)}`;
+
+      const emailResult =
+        await sendEmail({
+          to: email,
+          subject:
+            'Manlung Recovery admin password reset',
+          html: `
+            <p>
+              We received a password reset request
+              for your Manlung Recovery Admin account.
+            </p>
+
+            <p>
+              <a href="${resetLink}">
+                Reset your Admin password
+              </a>
+            </p>
+
+            <p>
+              This link expires in one hour.
+            </p>
+          `,
+        });
+
+      const response = {
+        success: true,
+        message:
+          'If that admin account exists, a reset link has been sent.',
+      };
+
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        !emailResult.sent
+      ) {
+        response.devResetLink = resetLink;
+      }
+
+      res.json(response);
+    } catch (error) {
+      console.error(
+        'Admin forgot password error:',
+        error
+      );
+
+      res.status(500).json({
+        error:
+          error.message ||
+          'Server error',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// ADMIN / OWNER RESET PASSWORD
+// ============================================================
+
+router.post(
+  '/admin/reset-password',
+  [
+    body('token')
+      .notEmpty()
+      .withMessage('Reset token is required'),
+
+    body('password')
+      .isLength({ min: 8 })
+      .withMessage(
+        'Password must be at least 8 characters'
+      ),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const {
+        token,
+        password,
+      } = req.body;
+
+      const tokenHash =
+        hashToken(token);
+
+      const user =
+        await User.findByValidResetToken(
+          tokenHash
+        );
+
+      if (
+        !user ||
+        !['admin', 'owner'].includes(user.role)
+      ) {
+        return res.status(400).json({
+          error:
+            'This reset link is invalid or has expired. Please request a new one.',
+        });
+      }
+
+      await User.resetPassword(
+        user.id,
+        password
+      );
+
+      res.json({
+        success: true,
+        message:
+          'Admin password updated. You can now sign in.',
+      });
+    } catch (error) {
+      console.error(
+        'Admin reset password error:',
+        error
+      );
+
+      res.status(500).json({
+        error:
+          error.message ||
+          'Server error',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// CLIENT FORGOT PASSWORD
+// ============================================================
+
+router.post(
+  '/client/forgot-password',
+  [
+    body('email')
+      .trim()
+      .isEmail()
+      .withMessage('A valid email is required')
+      .normalizeEmail(),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const { email } = req.body;
+
+      const client =
+        await User.findByEmailAndRole(email, 'client');
+
+      if (!client) {
+        return res.json({
+          success: true,
+          message:
+            'If that account exists, a reset link has been generated.',
+        });
+      }
+
+      const rawToken =
+        crypto.randomBytes(32).toString('hex');
+
+      const tokenHash = hashToken(rawToken);
+
+      const expires =
+        new Date(
+          Date.now() + 60 * 60 * 1000
+        ).toISOString();
+
+      await User.setResetToken(
+        email,
+        tokenHash,
+        expires
+      );
+
+      const base =
+        process.env.PUBLIC_APP_URL ||
+        `${req.protocol}://${req.get('host')}`;
+
+      const resetLink =
+        `${base}/reset-password.html?token=${rawToken}&email=${encodeURIComponent(email)}`;
+
+      const emailResult = await sendEmail({
+        to: email,
+        subject:
+          'Manlung Recovery password reset',
+        html: `
+          <p>
+            We received a password reset request
+            for your Manlung Recovery account.
+          </p>
+
+          <p>
+            <a href="${resetLink}">
+              Reset your password
+            </a>
+          </p>
+
+          <p>
+            This link expires in one hour.
+          </p>
+        `,
+      });
+
+      const response = {
+        success: true,
+        message:
+          'If that account exists, a reset link has been generated.',
+      };
+
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        !emailResult.sent
+      ) {
+        response.devResetLink = resetLink;
+      }
+
+      res.json(response);
+    } catch (error) {
+      console.error(
+        'Forgot password error:',
+        error
+      );
+
+      res.status(500).json({
+        error:
+          error.message || 'Server error',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// CLIENT RESET PASSWORD
+// ============================================================
+
+router.post(
+  '/client/reset-password',
+  [
+    body('token')
+      .notEmpty()
+      .withMessage('Reset token is required'),
+
+    body('password')
+      .isLength({ min: 6 })
+      .withMessage(
+        'Password must be at least 6 characters'
+      ),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const {
+        token,
+        password,
+      } = req.body;
+
+      const tokenHash = hashToken(token);
+
+      const user =
+        await User.findByValidResetToken(tokenHash);
+
+      if (!user) {
+        return res.status(400).json({
+          error:
+            'This reset link is invalid or has expired. Please request a new one.',
+        });
+      }
+
+      await User.resetPassword(
+        user.id,
+        password
+      );
+
+      res.json({
+        success: true,
+        message:
+          'Password updated. You can now sign in.',
+      });
+    } catch (error) {
+      console.error(
+        'Reset password error:',
+        error
+      );
+
+      res.status(500).json({
+        error:
+          error.message || 'Server error',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// VERIFY TOKEN
+// ============================================================
+
+router.get(
+  '/verify',
+  auth,
+  async (req, res) => {
+    res.json({
+      success: true,
+      user: {
+        id: req.user.id,
+        username: req.user.username,
+        email: req.user.email,
+        role: req.user.role,
+      },
+    });
+  }
+);
+
+
+module.exports = router;

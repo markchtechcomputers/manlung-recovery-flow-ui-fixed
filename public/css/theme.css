@@ -1,0 +1,108 @@
+
+/* ==========================================================
+   MANLUNG GLOBAL THEME + RESPONSIVE OVERRIDES
+   Light is the default. Dark is an explicit user choice.
+   ========================================================== */
+html, body { min-width: 0; }
+html { color-scheme: light; }
+html.dark { color-scheme: dark; }
+
+html:not(.dark) body,
+html:not(.dark) .admin-page-bg { background: var(--page-bg) !important; color: var(--text) !important; }
+html.dark body,
+html.dark .admin-page-bg { background: var(--page-bg) !important; color: var(--text) !important; }
+
+/* Floating toggle for pages without the standard header. */
+.manlung-floating-theme {
+  position: fixed !important;
+  top: max(14px, env(safe-area-inset-top)) !important;
+  right: max(14px, env(safe-area-inset-right)) !important;
+  z-index: 12000 !important;
+  min-height: 42px;
+  padding: .55rem .8rem;
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(15,23,42,.16);
+  cursor: pointer;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+.manlung-floating-theme:hover { transform: translateY(-1px); }
+.manlung-theme-toggle { white-space: nowrap; }
+
+/* Global responsive guardrails. */
+img, video, canvas, svg { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+pre, code { overflow-wrap: anywhere; }
+main, section, article, .container, .card { min-width: 0; }
+
+@media (max-width: 760px) {
+  .site-header .container { align-items: stretch !important; }
+  .site-header .brand { flex: 1 1 100%; }
+  .site-header .brand span { white-space: normal !important; }
+  .site-header .header-actions { width: 100%; justify-content: flex-start !important; overflow-x: auto; padding-bottom: .15rem; scrollbar-width: thin; }
+  .site-header .header-actions > * { flex: 0 0 auto; }
+  .site-header .header-actions .manlung-theme-toggle { order: -1; }
+  .container { padding-left: 1rem; padding-right: 1rem; }
+}
+@media (max-width: 480px) {
+  .site-header .brand h1 { font-size: 1rem !important; }
+  .site-header .header-actions a,
+  .site-header .header-actions button { min-height: 40px !important; padding: .45rem .65rem !important; font-size: .76rem !important; }
+  .manlung-floating-theme { top: 10px !important; right: 10px !important; }
+}
+
+/* Global production responsiveness and accessibility safeguards */
+html { overflow-x: hidden; }
+img, video, canvas, svg { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
+@media (max-width: 600px) {
+  .container, .main-container, .content-container { width: 100%; max-width: 100%; box-sizing: border-box; }
+  table { max-width: 100%; }
+}
+
+/* Manlung Recovery brand header: fixed dark-blue appearance in both themes. */
+.site-header {
+  background: #0b2a4a !important;
+  color: #ffffff !important;
+}
+
+.site-header .brand h1,
+.site-header .brand span,
+.site-header .header-actions a,
+.site-header .header-actions button {
+  color: #ffffff !important;
+}
+
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover {
+  color: #ffffff !important;
+}
+
+/* ==========================================================
+   Manlung Recovery shared public header — matches current site
+   Header stays black in both light and dark themes.
+   ========================================================== */
+.site-header{width:100%!important;position:sticky;top:0;z-index:1000;background:#000!important;color:#fff!important;border-bottom:3px solid #2451d6!important;box-shadow:none!important;overflow:visible!important}
+.site-header .container{width:100%!important;max-width:1320px!important;margin:0 auto!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:18px!important;padding:12px 20px!important;box-sizing:border-box!important}
+.site-header .brand{display:flex!important;flex:1 1 auto!important;min-width:0!important;max-width:none!important;align-items:center!important;justify-content:flex-start!important;gap:10px!important;flex-wrap:nowrap!important;text-align:left!important}
+.site-header .brand .manlung-home-logo{display:inline-flex!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;max-width:46px!important;max-height:46px!important;flex:0 0 46px!important;align-items:center!important;justify-content:center!important;padding:0!important;margin:0!important;background:#000!important;border-radius:11px!important;overflow:hidden!important;text-decoration:none!important;box-shadow:0 3px 12px rgba(0,0,0,.22);transition:transform .18s ease,box-shadow .18s ease}
+.site-header .brand .manlung-home-logo:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.site-header .brand .manlung-site-logo{display:block!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:100%!important;max-height:100%!important;flex:none!important;object-fit:cover!important;border:0!important;border-radius:0!important;margin:0!important;padding:0!important}
+.site-header .brand h1{flex:0 0 auto!important;min-width:0!important;max-width:none!important;margin:0!important;color:#fff!important;font-size:clamp(1.05rem,1.55vw,1.45rem)!important;line-height:1.15!important;font-weight:800!important;white-space:nowrap!important}.site-header .brand h1 i{margin-right:5px!important;color:#60a5fa!important}.site-header .brand span{flex:0 1 auto!important;min-width:0!important;margin:0!important;color:#dbeafe!important;font-size:clamp(.68rem,.9vw,.85rem)!important;line-height:1.25!important;white-space:nowrap!important}
+.site-header .header-actions{display:flex!important;flex:0 0 auto!important;width:auto!important;max-width:100%!important;min-width:0!important;align-items:center!important;justify-content:flex-end!important;flex-wrap:nowrap!important;gap:6px!important;margin:0!important}.site-header .header-actions>*{flex:0 0 auto!important;white-space:nowrap!important}.site-header .header-actions>.btn,.site-header .header-actions>a,.site-header .header-actions>button{display:inline-flex!important;flex:0 0 auto!important;width:auto!important;min-width:max-content!important;min-height:40px!important;align-items:center!important;justify-content:center!important;gap:6px!important;padding:9px 12px!important;border-radius:10px!important;font-size:.78rem!important;line-height:1!important;white-space:nowrap!important;box-sizing:border-box!important}
+.site-header .header-actions a.btn-outline,.site-header .header-actions button.btn-outline{background:transparent!important;border:2px solid rgba(255,255,255,.5)!important;color:#fff!important}.site-header .header-actions a.btn-outline:hover,.site-header .header-actions button.btn-outline:hover{background:rgba(255,255,255,.12)!important}.site-header .header-actions .btn-primary{background:#2451d6!important;border-color:#2451d6!important;color:#fff!important}
+.site-header .header-actions img.donation-nav-icon{width:18px!important;height:18px!important;max-width:18px!important;max-height:18px!important;object-fit:contain!important;display:inline-block!important;margin:0!important;vertical-align:middle!important}
+.site-header .header-actions i{font-size:.86rem!important;line-height:1!important}
+@media(min-width:1201px){.site-header .container{max-width:1400px!important;padding-left:24px!important;padding-right:24px!important}.site-header .header-actions{gap:7px!important}.site-header .header-actions>.btn,.site-header .header-actions>a,.site-header .header-actions>button{padding-left:13px!important;padding-right:13px!important}}
+@media(min-width:901px) and (max-width:1200px){.site-header .container{max-width:1200px!important;padding-left:14px!important;padding-right:14px!important;gap:12px!important}.site-header .brand{gap:8px!important}.site-header .brand .manlung-home-logo{width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;flex-basis:42px!important}.site-header .brand span{font-size:.74rem!important}.site-header .header-actions>.btn,.site-header .header-actions>a,.site-header .header-actions>button{padding-left:9px!important;padding-right:9px!important;font-size:.72rem!important}}
+@media(max-width:760px){.site-header .container{flex-wrap:wrap!important;gap:8px!important;padding:10px 14px!important}.site-header .brand{flex:1 1 100%!important;max-width:100%!important}.site-header .brand .manlung-home-logo{width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;flex-basis:42px!important}.site-header .brand h1{font-size:1.05rem!important}.site-header .brand span{white-space:normal!important;font-size:.7rem!important}.site-header .header-actions{width:100%!important;justify-content:flex-start!important;overflow-x:auto!important;padding-bottom:2px!important;scrollbar-width:thin}.site-header .header-actions>*{flex:0 0 auto!important}}
+@media(max-width:480px){.site-header .brand .manlung-home-logo{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;flex-basis:38px!important;border-radius:9px!important}.site-header .brand h1{font-size:.92rem!important}.site-header .brand span{font-size:.63rem!important}.site-header .header-actions>.btn,.site-header .header-actions>a,.site-header .header-actions>button{min-height:38px!important;padding:8px 9px!important;font-size:.7rem!important}.site-header .header-actions i{font-size:.8rem!important}}
+
+/* Small image icons — never let content icons become oversized. */
+.service-icon-image{width:40px!important;height:40px!important;max-width:40px!important;max-height:40px!important;object-fit:contain!important}.donation-heart img,.donation-head img{width:40px!important;height:40px!important;max-width:40px!important;max-height:40px!important;object-fit:contain!important}.manlung-footer-logo{width:58px!important;height:58px!important;max-width:58px!important;max-height:58px!important}

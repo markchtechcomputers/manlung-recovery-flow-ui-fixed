@@ -1,0 +1,1044 @@
+<html lang="en">
+<head>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#0a1a3a">
+    <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manlung Recovery · Cyber Recovery</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        #typing-text {
+            font-family: 'Poppins', 'Inter', -apple-system, sans-serif;
+            font-size: clamp(1.6rem, 5vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            text-align: center;
+            text-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
+            margin-bottom: 0.6rem;
+            min-height: 1.3em; /* prevents layout jump while the typewriter animates in */
+        }
+        #typing-text::after {
+            content: "|";
+            margin-left: 4px;
+            -webkit-text-fill-color: #38bdf8;
+            color: #38bdf8;
+            animation: typingCursorBlink 0.45s infinite;
+        }
+        @keyframes typingCursorBlink {
+            50% { opacity: 0; }
+        }
+        .hero {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+        .hero-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.60;
+            z-index: 0;
+            pointer-events: none;
+            background: var(--navy-900);
+            filter: saturate(0.9) contrast(0.95) brightness(0.95);
+        }
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(5, 20, 45, 0.38),
+                    rgba(5, 20, 45, 0.52)
+                );
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        @media (max-width: 600px) {
+            .hero-video {
+        object-position: 50% 50%;
+        opacity: 0.65;
+    }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hero-video { display: none; }
+        }
+        .service-icon-image {
+            width: 2.3rem;
+            height: 2.3rem;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 1rem;
+        }
+        @media (max-width: 480px) {
+            #typing-text { font-size: 1.5rem; letter-spacing: -0.3px; }
+        }
+    </style>
+
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:
+    linear-gradient(135deg,rgba(15,23,42,.98),rgba(17,35,56,.98)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 64px);
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 4px 18px rgba(2,6,23,.22);
+}
+.site-header .container{
+  max-width:1180px;
+  margin:0 auto;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:1rem;
+  padding:.55rem .8rem;
+}
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  min-width:0;
+}
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.05rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+.site-header .brand span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.72rem;
+  white-space:nowrap;
+}
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  min-height:38px;
+  padding:.45rem .68rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:700;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.35);
+  color:#fff;
+}
+.site-header .header-actions .btn-primary{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.site-header .header-actions .btn-primary:hover{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+}
+@media(max-width:900px){
+  .site-header .container{
+    min-height:58px;
+    padding:.45rem .7rem;
+  }
+  .site-header .brand h1{
+    font-size:.95rem;
+  }
+  .site-header .brand span{
+    font-size:.64rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:36px;
+    padding:.4rem .55rem;
+    font-size:.7rem;
+  }
+}
+@media(max-width:700px){
+  .site-header .container{
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+  .site-header .brand{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+  .site-header .brand span{
+    white-space:normal;
+  }
+  .site-header .header-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.35rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:38px;
+    padding:.35rem .2rem;
+    font-size:.68rem;
+  }
+}
+@media(max-width:480px){
+  .site-header .header-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
+  }
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    display:block;
+    font-size:1rem;
+    line-height:1;
+    margin:0;
+  }
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
+  }
+}
+@media(max-width:360px){
+  .site-header .brand h1{
+    font-size:.86rem;
+  }
+  .site-header .brand span{
+    font-size:.58rem;
+  }
+}
+</style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+
+<style id="manlung-home-mobile-nav">
+@media(max-width:650px){
+
+  .site-header .container{
+    min-height:auto !important;
+    padding:.65rem .7rem .72rem !important;
+    gap:.65rem !important;
+  }
+
+  .site-header .brand{
+    width:100% !important;
+    justify-content:flex-start !important;
+  }
+
+  .site-header .brand h1{
+    font-size:.9rem !important;
+  }
+
+  .site-header .brand span{
+    font-size:.58rem !important;
+    white-space:normal !important;
+  }
+
+  .site-header .manlung-site-logo{
+    width:38px !important;
+    height:38px !important;
+    flex:0 0 38px !important;
+  }
+
+  .site-header .header-actions{
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:.4rem !important;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100% !important;
+    min-height:52px !important;
+    padding:.45rem .25rem !important;
+    border-radius:11px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:.22rem !important;
+    font-size:.64rem !important;
+    line-height:1.05 !important;
+    white-space:normal !important;
+  }
+
+  .site-header .header-actions i{
+    display:block !important;
+    font-size:1rem !important;
+    line-height:1 !important;
+    margin:0 !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"]{
+    grid-column:1 / -1 !important;
+    min-height:50px !important;
+    flex-direction:row !important;
+    gap:.45rem !important;
+    font-size:.76rem !important;
+    background:#2563eb !important;
+    border-color:#2563eb !important;
+    color:#fff !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"] i{
+    font-size:.9rem !important;
+  }
+
+  .site-header .header-actions
+    button[data-theme-toggle="true"]{
+    position:absolute !important;
+    top:.7rem !important;
+    right:.7rem !important;
+    width:42px !important;
+    min-height:42px !important;
+    height:42px !important;
+    border-radius:50% !important;
+    padding:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    font-size:0 !important;
+    z-index:5 !important;
+  }
+
+  .site-header .header-actions
+    button[data-theme-toggle="true"] i{
+    font-size:1rem !important;
+  }
+
+}
+
+@media(max-width:390px){
+  .site-header .header-actions{
+    gap:.3rem !important;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:50px !important;
+    font-size:.6rem !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"]{
+    font-size:.72rem !important;
+  }
+}
+</style>
+
+
+<style id="manlung-colour-nav">
+/* Homepage navigation colours */
+.site-header .header-actions button[data-theme-toggle="true"]{
+  background:#1f2937 !important;
+  border-color:#374151 !important;
+  color:#f9fafb !important;
+}
+
+.site-header .header-actions button[data-theme-toggle="true"] i{
+  color:#facc15 !important;
+}
+
+.site-header .header-actions a[href="/client/dashboard.html"]{
+  background:#1d4ed8 !important;
+  border-color:#1d4ed8 !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/client/dashboard.html"] i{
+  color:#dbeafe !important;
+}
+
+.site-header .header-actions a[href="/blog.html"]{
+  background:#6d28d9 !important;
+  border-color:#6d28d9 !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/blog.html"] i{
+  color:#ede9fe !important;
+}
+
+.site-header .header-actions a[href="/donate.html"]{
+  background:#15803d !important;
+  border-color:#15803d !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/donate.html"] i{
+  color:#dcfce7 !important;
+}
+
+.site-header .header-actions a[href="/client/request.html"]{
+  background:#2563eb !important;
+  border-color:#2563eb !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/client/request.html"] i{
+  color:#fff !important;
+}
+
+/* Footer navigation colours */
+.manlung-footer-link[href="/"]{
+  border-color:rgba(245,158,11,.35) !important;
+  background:rgba(245,158,11,.10) !important;
+  color:#fbbf24 !important;
+}
+
+.manlung-footer-link[href="/login.html"]{
+  border-color:rgba(37,99,235,.35) !important;
+  background:rgba(37,99,235,.10) !important;
+  color:#93c5fd !important;
+}
+
+.manlung-footer-link[href="/client/dashboard.html"]{
+  border-color:rgba(37,99,235,.35) !important;
+  background:rgba(37,99,235,.10) !important;
+  color:#93c5fd !important;
+}
+
+.manlung-footer-link[href="/blog.html"]{
+  border-color:rgba(139,92,246,.35) !important;
+  background:rgba(139,92,246,.10) !important;
+  color:#c4b5fd !important;
+}
+
+.manlung-footer-link[href="/donate.html"]{
+  border-color:rgba(34,197,94,.35) !important;
+  background:rgba(34,197,94,.10) !important;
+  color:#86efac !important;
+}
+
+.manlung-footer-link:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+
+/* Keep the phone navigation colours strong */
+@media(max-width:650px){
+  .site-header .header-actions
+    a[href="/client/dashboard.html"],
+  .site-header .header-actions
+    a[href="/blog.html"],
+  .site-header .header-actions
+    a[href="/donate.html"]{
+    color:#fff !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"]{
+    box-shadow:0 8px 20px rgba(37,99,235,.25) !important;
+  }
+}
+</style>
+
+
+<link rel="icon" type="image/png" href="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Manlung Recovery">
+<meta property="og:description" content="Professional Cyber Recovery Services">
+<meta property="og:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+<meta property="og:url" content="https://manlungrecovery.manlungshop.co.ke/">
+<meta property="og:site_name" content="Manlung Recovery">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Manlung Recovery">
+<meta name="twitter:description" content="Professional Cyber Recovery Services">
+<meta name="twitter:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+<link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/footer.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                
+<a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home"><img
+  class="manlung-site-logo"
+  src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
+  alt="Manlung Recovery"
+></a>
+<h1><i class="fas fa-shield-halved"></i> Manlung Recovery</h1>
+                <span>Cyber Recovery & Digital Investigation Portal</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" data-theme-toggle="true">
+                    <i class="fas fa-moon"></i> Dark
+                </button>
+                <a href="/client/dashboard.html" class="btn btn-outline">
+                    <i class="fas fa-user"></i> My Cases
+                </a>
+                <a href="/blog.html" class="btn btn-outline">
+                    <i class="fas fa-newspaper"></i> Blog
+                </a>
+                <a href="/donate.html" class="btn btn-outline">
+                    <i class="fas fa-heart"></i> Donate
+                </a>
+                <a href="/client/request.html" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> New Request
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Hero -->
+        <section class="hero">
+            <video class="hero-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+                <source src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4" type="video/mp4">
+            </video>
+            <div class="hero-overlay" aria-hidden="true"></div>
+            <div class="hero-content">
+                <h1 id="typing-text"></h1>
+                <h2>Professional Cyber Recovery Services</h2>
+                <p>Submit your digital recovery request securely. Our team of experts will investigate and assist with your case.</p>
+                <a href="/client/request.html" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Submit a Request
+                </a>
+                <a href="/donate.html" class="btn btn-outline">
+                    <img src="/images/donation.png" alt="Donation" style="width:1.3rem;height:1.3rem;object-fit:contain;vertical-align:middle;margin-right:.35rem;"> Support Our Work
+                </a>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <div class="features">
+            <div class="feature-card" onclick="openServiceModal('device')" style="cursor:pointer;">
+                <img class="service-icon-image" src="/images/device-recovery.png" alt="Device Recovery">
+                <h3>Device Recovery</h3>
+                <p>Lost phone, laptop, tablet or smartwatch? We'll help track and recover your device.</p>
+                <span style="display:inline-block; margin-top:0.6rem; color:var(--accent); font-size:0.85rem; font-weight:600;">Learn more <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="feature-card" onclick="openServiceModal('identity')" style="cursor:pointer;">
+                <img class="service-icon-image" src="/images/identity-theft.png" alt="Identity Theft">
+                <h3>Identity Theft</h3>
+                <p>Protect your identity and recover compromised accounts with our expert assistance.</p>
+                <span style="display:inline-block; margin-top:0.6rem; color:var(--accent); font-size:0.85rem; font-weight:600;">Learn more <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="feature-card" onclick="openServiceModal('scam')" style="cursor:pointer;">
+                <img class="service-icon-image" src="/images/scam-investigation.png" alt="Scam Investigation">
+                <h3>Scam Investigation</h3>
+                <p>Online scams, fraud, and phishing — we investigate and help you recover lost assets.</p>
+                <span style="display:inline-block; margin-top:0.6rem; color:var(--accent); font-size:0.85rem; font-weight:600;">Learn more <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="feature-card" onclick="openServiceModal('security')" style="cursor:pointer;">
+                <img class="service-icon-image" src="/images/security-assessment.png" alt="Security Assessment">
+                <h3>Security Assessment</h3>
+                <p>Network security audits and vulnerability assessments for organizations.</p>
+                <span style="display:inline-block; margin-top:0.6rem; color:var(--accent); font-size:0.85rem; font-weight:600;">Learn more <i class="fas fa-arrow-right"></i></span>
+            </div>
+        </div>
+
+        
+<style id="service-modal-scroll-style">
+/* Service preview modal */
+#serviceModalOverlay{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:2000 !important;
+    display:none;
+    align-items:center !important;
+    justify-content:center !important;
+    padding:1rem !important;
+    background:rgba(10,18,40,.55);
+    overflow:hidden !important;
+    box-sizing:border-box;
+}
+
+#serviceModalOverlay > div{
+    width:min(640px,100%) !important;
+    max-width:640px !important;
+    max-height:calc(100dvh - 2rem) !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    box-sizing:border-box;
+    position:relative;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(100,116,139,.55) transparent;
+}
+
+#serviceModalOverlay > div::-webkit-scrollbar{width:7px}
+#serviceModalOverlay > div::-webkit-scrollbar-track{background:transparent}
+#serviceModalOverlay > div::-webkit-scrollbar-thumb{
+    background:rgba(100,116,139,.42);
+    border-radius:999px;
+}
+#serviceModalOverlay > div::-webkit-scrollbar-thumb:hover{
+    background:rgba(36,81,214,.68);
+}
+
+@media(max-width:768px){
+    #serviceModalOverlay{
+        align-items:center !important;
+        padding:.75rem .65rem !important;
+    }
+
+    #serviceModalOverlay > div{
+        width:100% !important;
+        max-width:100% !important;
+        max-height:calc(100dvh - 1.5rem) !important;
+        border-radius:16px !important;
+        padding:1.15rem !important;
+        margin:0 !important;
+    }
+
+    #serviceModalBody ul{
+        line-height:1.65 !important;
+    }
+
+    #serviceModalBody .btn{
+        max-width:100%;
+        white-space:normal;
+    }
+}
+
+body.service-modal-open{
+    overflow:hidden !important;
+}
+</style>
+        <!-- Service detail modal -->
+        <div id="serviceModalOverlay" class="service-modal-scroll" style="display:none;" onclick="if(event.target===this) closeServiceModal()">
+            <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; max-width:640px; width:100%; padding:2rem;">
+                <div id="serviceModalBody"></div>
+            </div>
+        </div>
+
+        <!-- Track Case -->
+        <div class="card">
+            <div class="card-title"><i class="fas fa-search"></i> Track Your Case</div>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <input type="text" id="trackInput" placeholder="Enter Case ID (e.g., MTC-2026-001)" style="flex:1; min-width:200px;">
+                <button class="btn btn-primary" onclick="trackCase()">
+                    <i class="fas fa-arrow-right"></i> Track
+                </button>
+            </div>
+            <div id="trackResult" style="margin-top: 1rem; padding: 1rem; border-radius: 12px; background: var(--page-bg); border: 1px solid var(--card-border); display: none;"></div>
+        </div>
+
+        <!-- Website Safety Scanner -->
+<a class="home-scanner-button" href="/link-scanner.html" aria-label="Open Manlung Recovery Website Safety Scanner">
+  <i class="fas fa-shield-halved" aria-hidden="true"></i>
+  <span>Website Safety Scanner</span>
+  <i class="fas fa-arrow-right" aria-hidden="true"></i>
+</a>
+    </div>
+
+        
+
+
+<style>
+.site-footer {
+  width: 100%;
+  margin-top: 40px;
+  border-top: 1px solid rgba(128,128,128,.25);
+  background: transparent;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 20px 18px;
+}
+
+.footer-brand h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.footer-brand p {
+  margin: 0;
+  opacity: .75;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.footer-links a,
+.footer-youtube,
+.footer-call-admin {
+  text-decoration: none;
+  font-size: .9rem;
+}
+
+.footer-links a:hover,
+.footer-youtube:hover,
+.footer-call-admin:hover {
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(128,128,128,.18);
+  font-size: .82rem;
+  opacity: .9;
+}
+
+.footer-youtube {
+  margin-left: auto;
+}
+
+.footer-call-admin {
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-youtube {
+    margin-left: 0;
+  }
+}
+</style>
+
+
+    <script>
+        // Typing/deleting header animation. Respects prefers-reduced-motion
+        // (some users get motion sickness from this kind of effect) and
+        // fails silently if the element isn't on the page for any reason.
+        (function typingHeader() {
+            const element = document.getElementById('typing-text');
+            if (!element) return;
+
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const text = 'Welcome to Manlung Recovery Portal';
+
+            if (prefersReducedMotion) {
+                element.textContent = text;
+                return;
+            }
+
+            let index = 0;
+            let deleting = false;
+            let colorIndex = 0;
+            const colors = ['#ffffff','#facc15','#22c55e','#f59e0b','#c0c0c0','#a855f7','#4f46e5','#ef4444','#3b82f6'];
+            function applyColor(){ element.style.color = colors[colorIndex % colors.length]; colorIndex++; }
+            applyColor();
+
+            function typeWriter() {
+                if (!deleting) {
+                    element.textContent = text.substring(0, index + 1);
+                    index++;
+                    if (index === text.length) {
+                        deleting = true;
+                        setTimeout(typeWriter, 1400);
+                        return;
+                    }
+                    setTimeout(typeWriter, 45);
+                } else {
+                    element.textContent = text.substring(0, index - 1);
+                    index--;
+                    if (index === 0) {
+                        deleting = false;
+                        applyColor();
+                        setTimeout(typeWriter, 400);
+                        return;
+                    }
+                    setTimeout(typeWriter, 25);
+                }
+            }
+            typeWriter();
+        })();
+
+        const SERVICE_DETAILS = {
+            device: {
+                image: '/images/device-recovery.png',
+                title: 'Device Recovery',
+                defaultCaseType: 'Lost Phone Recovery',
+                intro: 'Lost or stolen phones, laptops, tablets, and smartwatches — traced and recovered wherever possible, working within the law.',
+                points: [
+                    'GPS and last-known-location tracing using your device\'s Find My/Google account history, carrier records, and IMEI lookups.',
+                    'Coordination with your mobile carrier to flag or block a stolen device\'s IMEI, and with local police where a report is warranted.',
+                    'Guidance on remotely locking or wiping a device before it\'s recovered, so your data stays protected either way.',
+                    'If the device turns up with a third party (sold on, pawned, etc.), we help document the chain of custody for law enforcement.',
+                ],
+                needed: 'Have ready: device make/model, IMEI (dial *#06# on most phones to find it), approximate last known location, and the Google/Apple account linked to it.',
+            },
+            identity: {
+                image: '/images/identity-theft.png',
+                title: 'Identity Theft',
+                defaultCaseType: 'Identity Theft Assistance',
+                intro: 'Support recovering accounts and locking down your identity after a compromise — email, social media, banking, or government ID misuse.',
+                points: [
+                    'Step-by-step account recovery for compromised email, social media, and financial accounts, including working with each platform\'s own recovery/appeals process.',
+                    'Guidance on what to freeze or flag immediately (bank cards, credit lines, SIM swap protection) to stop further damage while the case is investigated.',
+                    'Help compiling the documentation platforms and banks typically require to prove identity theft occurred.',
+                    'Referral support for filing an official police report where required for insurance, bank disputes, or credit bureau action.',
+                ],
+                needed: 'Have ready: which accounts/services were affected, roughly when you noticed, and any suspicious emails, messages, or transactions you can show us.',
+            },
+            scam: {
+                image: '/images/scam-investigation.png',
+                title: 'Scam Investigation',
+                defaultCaseType: 'Online Scam Investigation',
+                intro: 'Investigation support for online scams, phishing, and fraud — from a fake seller to a full romance/investment scam.',
+                points: [
+                    'Evidence collection and preservation: chat logs, transaction records, screenshots, and scammer contact details, organized for a formal report.',
+                    'Tracing payment trails across bank transfers, mobile money (M-Pesa etc.), and crypto wallets where possible, to identify recovery options.',
+                    'Direct engagement with banks, mobile money providers, and platforms (social media, marketplaces) to report and request holds/reversals where applicable.',
+                    'Preparing a case file suitable for handing to police or a financial ombudsman if the case needs to escalate beyond what we can resolve directly.',
+                ],
+                needed: 'Have ready: any scammer contact info (phone, email, social handles, website), transaction references, and amounts lost.',
+            },
+            security: {
+                image: '/images/security-assessment.png',
+                title: 'Security Assessment',
+                defaultCaseType: 'Network Security Assessment',
+                intro: 'Network and systems security review for organizations — finding weaknesses before someone else does.',
+                points: [
+                    'Vulnerability scanning across your network, endpoints, and public-facing services to identify known exposures.',
+                    'Configuration review of firewalls, access controls, and Wi-Fi/network segmentation.',
+                    'A written report ranking findings by severity, with concrete remediation steps your team (or ours) can act on.',
+                    'Optional follow-up re-test after fixes are applied, to confirm the issues are actually closed.',
+                ],
+                needed: 'Have ready: a rough description of your network/systems and what prompted the request (routine audit, suspected incident, compliance requirement, etc.). Requires written authorization from someone with authority over the network — see the form\'s Network Investigation section.',
+            },
+        };
+
+        function openServiceModal(key) {
+            const s = SERVICE_DETAILS[key];
+            if (!s) return;
+            document.getElementById('serviceModalBody').innerHTML = `
+                <div style="position:relative; margin-bottom:1rem; text-align:center;">
+                    <div><img src="${s.image}" alt="${s.title}" style="width:2.3rem;height:2.3rem;object-fit:contain;display:block;margin:0 auto .65rem;"><h2 style="margin:0;">${s.title}</h2></div>
+                    <button class="btn btn-outline-dark" style="position:absolute;right:0;top:0;" onclick="closeServiceModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <p style="color:var(--text-muted); margin-bottom:1rem;">${s.intro}</p>
+                <ul style="margin:0 0 1rem 1.2rem; padding:0; line-height:1.7;">
+                    ${s.points.map(p => `<li>${p}</li>`).join('')}
+                </ul>
+                <div class="notice" style="display:block;"><i class="fas fa-clipboard-list"></i> ${s.needed}</div>
+                <div style="margin-top:1.5rem;">
+                    <a href="/client/request.html?type=${encodeURIComponent(s.defaultCaseType)}" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Start a ${s.title} Request</a>
+                </div>
+            `;
+            document.getElementById('serviceModalOverlay').style.display = 'flex';
+            document.body.classList.add('service-modal-open');
+        }
+        function closeServiceModal() {
+            document.getElementById('serviceModalOverlay').style.display = 'none';
+            document.body.classList.remove('service-modal-open');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+            const btn = document.querySelector('.header-actions .btn-outline');
+            btn.innerHTML = document.body.classList.contains('dark')
+                ? '<i class="fas fa-sun"></i> Light'
+                : '<i class="fas fa-moon"></i> Dark';
+        }
+        (function applySavedTheme() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+                const btn = document.querySelector('.header-actions .btn-outline');
+                if (btn) btn.innerHTML = '<i class="fas fa-sun"></i> Light';
+            }
+        })();
+
+        async function trackCase() {
+            const caseId = document.getElementById('trackInput').value.trim();
+            const token = localStorage.getItem('clientToken');
+            const result = document.getElementById('trackResult');
+
+            if (!token) {
+                result.style.display = 'block';
+                result.innerHTML = '<span class="error-text">Please sign in to track your case. Case IDs are private to their owner.</span>';
+                return;
+            }
+
+            if (!caseId) {
+                result.style.display = 'block';
+                result.innerHTML = '<span class="error-text">Please enter a Case ID.</span>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`, { headers: { Authorization: `Bearer ${token}` } });
+                const data = await response.json();
+
+                result.style.display = 'block';
+
+                if (data.success) {
+                    const c = data.case;
+                    result.innerHTML = `
+                        <div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:0.5rem;">
+                            <strong style="font-size:1.1rem;">${c.caseId}</strong>
+                            <span class="status-badge status-progress">${c.status}</span>
+                        </div>
+                        <div style="font-size:0.95rem; color:var(--text-muted);">
+                            <div><strong>Investigator:</strong> ${c.investigator || 'Not assigned'}</div>
+                            <div><strong>Last Updated:</strong> ${c.lastUpdated || 'N/A'}</div>
+                            ${c.publicNotes ? `<div style="margin-top:0.5rem;"><strong>Notes:</strong> ${c.publicNotes}</div>` : ''}
+                            ${c.recoveryLoc ? `<div><strong>Recovery Location:</strong> ${c.recoveryLoc}</div>` : ''}
+                            <div style="margin-top:0.5rem; background:var(--card-bg); padding:0.8rem; border-radius:12px;">
+                                <strong>Timeline</strong>
+                                <div style="margin-top:0.3rem; white-space:pre-line;">${c.timeline || 'Request Submitted ✅'}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `<span class="error-text">${data.error || 'Case not found'}</span>`;
+                }
+            } catch (error) {
+                result.style.display = 'block';
+                result.innerHTML = '<span class="error-text">Error tracking case. Please try again.</span>';
+                console.error('Track error:', error);
+            }
+        }
+
+        document.getElementById('trackInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') trackCase();
+        });
+    </script>
+  <script src="/js/pwa.js"></script>
+    <script src="/js/call-webrtc.js"></script>
+    <script src="/js/call-widget.js"></script>
+
+<footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+    <div class="manlung-footer-grid">
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row">
+          <img src="/icons/icon-512.png" alt="Manlung Recovery" class="manlung-footer-logo" width="58" height="58">
+          <div>
+            <h2 id="footer-brand-title">Manlung Recovery</h2>
+            <p class="manlung-footer-brand-subtitle">Cyber Recovery &amp; Digital Investigation Portal</p>
+          </div>
+        </div>
+        <p class="manlung-footer-description">Manlung Recovery provides structured digital recovery assistance, investigation support, account and device recovery guidance, cybersecurity awareness, and secure case-management services. Our goal is to help individuals and organizations respond to digital incidents responsibly, protect important information, and take appropriate steps toward recovery.</p>
+      </section>
+      <section class="manlung-footer-column">
+        <h3>Quick Links</h3>
+        <nav class="manlung-footer-links" aria-label="Quick links">
+          <a href="/">Home</a><a href="/about.html">About Manlung Recovery</a><a href="/knowledge.html">Knowledge Centre</a><a href="/blog.html">Security &amp; Recovery Blog</a><a href="/contact.html">Contact Us</a>
+        </nav>
+      </section>
+      <section class="manlung-footer-column">
+        <h3>Recovery Services</h3>
+        <nav class="manlung-footer-links" aria-label="Recovery services">
+          <a href="/client/request.html" class="footer-important">Submit Recovery Request</a><a href="/client/dashboard.html" class="footer-important">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/client/settings.html">Account Settings</a><a href="/login.html">Sign In</a>
+        </nav>
+      </section>
+      <section class="manlung-footer-column">
+        <h3>Security &amp; Trust</h3>
+        <div class="manlung-footer-trust"><p>We use access controls, authentication safeguards and responsible information-handling practices to help protect client and case information.</p></div>
+        <div class="manlung-footer-trust"><p>Personal-data processing is described in our Privacy Notice, including applicable rights and responsibilities under Kenya's Data Protection Act, 2019 and relevant regulations.</p></div>
+        <nav class="manlung-footer-links manlung-footer-security-links" aria-label="Legal and security links"><a href="/privacy.html" class="footer-important">Privacy Notice</a><a href="/terms.html" class="footer-important">Terms &amp; Conditions</a></nav>
+      </section>
+    </div>
+    <div class="manlung-footer-divider"></div>
+    <div class="manlung-footer-contact-row">
+      <div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com"><i class="fas fa-envelope" aria-hidden="true"></i> manlungrecovery@outlook.com</a><a href="tel:+254724356178"><i class="fas fa-phone" aria-hidden="true"></i> +254 724 356 178</a></div>
+      <div class="manlung-footer-social" aria-label="Manlung Recovery social media"><span class="manlung-footer-social-label">Follow Manlung Recovery</span><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="Manlung Recovery on YouTube"><i class="fab fa-youtube" aria-hidden="true"></i><span>YouTube</span></a><a href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer" aria-label="Manlung Recovery on LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i><span>LinkedIn</span></a><a href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer" aria-label="Manlung Recovery on GitHub"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub</span></a></div>
+    </div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+  </div>
+</footer>
+
+</body>
+</html>

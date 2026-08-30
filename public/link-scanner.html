@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Safety Scanner · Manlung Recovery</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    .scanner-page {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .scanner-hero {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .scanner-hero h1 {
+      margin-bottom: .7rem;
+    }
+
+    .scanner-hero p {
+      max-width: 720px;
+      margin: auto;
+      color: var(--text-muted);
+    }
+
+    .scanner-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 1.3rem;
+      box-shadow: 0 12px 35px rgba(2, 6, 23, .12);
+    }
+
+    .scanner-form {
+      display: flex;
+      gap: .7rem;
+    }
+
+    .scanner-form input {
+      flex: 1;
+      min-width: 0;
+      padding: .9rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: var(--page-bg);
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .scan-button {
+      min-width: 150px;
+    }
+
+    .scan-status {
+      margin-top: 1rem;
+      padding: .9rem;
+      border-radius: 12px;
+      display: none;
+    }
+
+    .scan-status.show {
+      display: block;
+    }
+
+    .overall {
+      margin-top: 1.2rem;
+      padding: 1.2rem;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+    }
+
+    .overall-critical {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, .09);
+    }
+
+    .overall-warning {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, .09);
+    }
+
+    .overall-good {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, .09);
+    }
+
+    .overall-info {
+      border-color: #94a3b8;
+      background: rgba(148, 163, 184, .09);
+    }
+
+    .overall-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: .3rem;
+    }
+
+    .official-box {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 14px;
+      background: rgba(34, 197, 94, .08);
+      border: 1px solid rgba(34, 197, 94, .3);
+    }
+
+    .official-box a {
+      word-break: break-all;
+      font-weight: 700;
+    }
+
+    .findings {
+      margin-top: 1rem;
+      display: grid;
+      gap: .7rem;
+    }
+
+    .finding {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 1rem;
+      align-items: start;
+      padding: 1rem;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+    }
+
+    .finding-level {
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: .75rem;
+      letter-spacing: .05em;
+    }
+
+    .finding-critical {
+      border-color: rgba(239,68,68,.5);
+      background: rgba(239,68,68,.08);
+    }
+
+    .finding-critical .finding-level {
+      color: #ef4444;
+    }
+
+    .finding-warning {
+      border-color: rgba(245,158,11,.5);
+      background: rgba(245,158,11,.08);
+    }
+
+    .finding-warning .finding-level {
+      color: #d97706;
+    }
+
+    .finding-good {
+      border-color: rgba(34,197,94,.5);
+      background: rgba(34,197,94,.08);
+    }
+
+    .finding-good .finding-level {
+      color: #16a34a;
+    }
+
+    .finding-info {
+      border-color: rgba(148,163,184,.5);
+      background: rgba(148,163,184,.08);
+    }
+
+    .finding-info .finding-level {
+      color: #64748b;
+    }
+
+    .finding-area {
+      font-weight: 800;
+    }
+
+    .finding-result {
+      margin-top: .2rem;
+      font-weight: 600;
+    }
+
+    .finding-detail {
+      margin-top: .35rem;
+      color: var(--text-muted);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+
+    .scanner-warning {
+      margin-top: 1.2rem;
+      padding: 1rem;
+      border-radius: 14px;
+      background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.3);
+      color: var(--text-muted);
+      font-size: .9rem;
+    }
+
+    .scan-meta {
+      margin-top: .8rem;
+      color: var(--text-muted);
+      font-size: .85rem;
+      word-break: break-word;
+    }
+
+    @media (max-width: 650px) {
+      .scanner-form {
+        flex-direction: column;
+      }
+
+      .scan-button {
+        width: 100%;
+      }
+
+      .finding {
+        grid-template-columns: 1fr;
+        gap: .35rem;
+      }
+    }
+  
+.official-box-verified{border:2px solid #16a34a;background:rgba(22,163,74,.08);box-shadow:0 8px 24px rgba(22,163,74,.12)}
+.official-badge{display:inline-flex;align-items:center;gap:.35rem;padding:.3rem .65rem;border-radius:999px;background:#16a34a;color:#fff;font-weight:800;font-size:.75rem;letter-spacing:.04em;margin-bottom:.6rem}
+.official-box-verified h3{margin:.1rem 0 .4rem}
+.overall-verified{border:2px solid #16a34a}
+
+.official-box-danger{border:2px solid #dc2626;background:rgba(220,38,38,.08);box-shadow:0 8px 24px rgba(220,38,38,.10)}
+.official-badge-danger{background:#dc2626}
+.scanner-reasons{margin:.5rem 0 .75rem;padding-left:1.25rem;line-height:1.55}
+.scanner-reasons li{margin:.2rem 0}
+.scanner-footer{display:flex;align-items:center;justify-content:center;gap:1rem;max-width:1000px;margin:1.5rem auto 0;padding:.65rem 1rem;border-top:1px solid rgba(148,163,184,.18);color:#64748b;font-size:.78rem}
+.scanner-footer-youtube{display:inline-flex;align-items:center;gap:.35rem;color:#cbd5e1;text-decoration:none;font-size:1.05rem}
+.scanner-footer-youtube:hover{color:#ef4444}
+</style>
+
+<style id="manlung-scanner-footer">
+.manlung-scanner-footer{
+  width:100%;
+  margin-top:1.25rem;
+  background:
+    radial-gradient(circle at 12% 15%,rgba(37,99,235,.14),transparent 30%),
+    linear-gradient(145deg,#06152d 0%,#081d3a 55%,#061225 100%);
+  color:#eaf2ff;
+  border-top:1px solid rgba(96,165,250,.2);
+}
+
+.manlung-scanner-footer-inner{
+  width:min(1120px,100%);
+  margin:auto;
+  padding:1rem 1rem .5rem;
+  box-sizing:border-box;
+}
+
+.manlung-scanner-footer-main{
+  display:grid;
+  grid-template-columns:1fr 1.7fr;
+  gap:1rem;
+  align-items:start;
+}
+
+.manlung-scanner-brand{
+  display:flex;
+  align-items:center;
+  gap:.65rem;
+}
+
+.manlung-scanner-logo{
+  width:32px;
+  height:32px;
+  flex:0 0 32px;
+  border-radius:9px;
+  object-fit:cover;
+  background:#fff;
+}
+
+.manlung-scanner-brand h2{
+  margin:0;
+  color:#fff;
+  font-size:.92rem;
+  line-height:1.2;
+}
+
+.manlung-scanner-brand p{
+  margin:.18rem 0 0;
+  color:#9fb5d2;
+  font-size:.7rem;
+  line-height:1.45;
+}
+
+.manlung-scanner-description{
+  margin:.55rem 0 0;
+  color:#bfd0e6;
+  font-size:.73rem;
+  line-height:1.55;
+  max-width:390px;
+}
+
+.manlung-scanner-links-title{
+  margin:0 0 .55rem;
+  color:#fff;
+  font-size:.72rem;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+
+.manlung-scanner-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.4rem;
+}
+
+.manlung-scanner-links a{
+  display:inline-flex;
+  align-items:center;
+  min-height:32px;
+  padding:.35rem .55rem;
+  border-radius:7px;
+  border:1px solid rgba(148,163,184,.16);
+  background:rgba(255,255,255,.045);
+  color:#dbeafe;
+  text-decoration:none;
+  font-size:.68rem;
+  font-weight:700;
+}
+
+.manlung-scanner-links a:hover{
+  background:rgba(59,130,246,.15);
+  border-color:rgba(96,165,250,.35);
+  color:#fff;
+}
+
+.manlung-scanner-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.35rem;
+  margin-top:.45rem;
+}
+
+.manlung-scanner-youtube{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  padding:.32rem .55rem;
+  border-radius:7px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.13);
+  color:#fff;
+  text-decoration:none;
+  font-size:.68rem;
+  font-weight:800;
+}
+
+.manlung-scanner-divider{
+  height:1px;
+  margin:.6rem 0 .45rem;
+  background:rgba(148,163,184,.16);
+}
+
+.manlung-scanner-bottom{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  gap:.7rem;
+  color:#8298b5;
+  font-size:.65rem;
+}
+
+@media(max-width:720px){
+  .manlung-scanner-footer-main{
+    grid-template-columns:1fr;
+    gap:1rem;
+  }
+
+  .manlung-scanner-description{
+    max-width:none;
+  }
+}
+
+@media(max-width:480px){
+  .manlung-scanner-footer-inner{
+    padding:.95rem .75rem .55rem;
+  }
+
+  .manlung-scanner-brand h2{
+    font-size:.92rem;
+  }
+
+  .manlung-scanner-links{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .manlung-scanner-links a{
+    justify-content:center;
+    text-align:center;
+  }
+
+  .manlung-scanner-bottom{
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+}
+</style>
+
+  <link rel="stylesheet" href="/css/theme.css">
+<style id="scanner-responsive-fixes">
+/* Scanner responsiveness and theme-aware surfaces */
+.scanner-page { width: min(100%, 1000px); box-sizing: border-box; }
+.scanner-card, .scanner-hero, .finding, .overall, .official-box { min-width: 0; }
+.scanner-form input { min-width: 0; width: 100%; }
+.scan-status { overflow-wrap: anywhere; }
+.finding-result, .finding-detail, .scan-meta, .official-box a { overflow-wrap: anywhere; }
+@media (max-width: 650px) {
+  .scanner-page { padding: 1rem .75rem 2rem; }
+  .scanner-hero { padding: 1.2rem .25rem; }
+  .scanner-hero h1 { font-size: clamp(1.45rem, 7vw, 2rem); line-height: 1.15; }
+  .scanner-hero p { font-size: .92rem; }
+  .scanner-card { padding: .9rem; border-radius: 16px; }
+  .scanner-form { display: grid; grid-template-columns: 1fr; }
+  .scan-button { width: 100%; min-width: 0; }
+  .finding { padding: .8rem; }
+  .overall { padding: .95rem; }
+  .overall-title { font-size: 1.12rem; }
+}
+</style>
+  <link rel="stylesheet" href="/css/footer.css">
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="brand">
+<a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home"><img class="manlung-site-logo" src="/icons/icon-512.png" alt="Manlung Recovery"></a>
+      <h1><i class="fas fa-shield-halved"></i> Manlung Recovery</h1>
+      <span>Website Safety Scanner</span>
+    </div>
+
+    <div class="header-actions">
+      <a href="/" class="btn btn-outline">Home</a>
+    </div>
+  </div>
+</header>
+
+<main class="scanner-page">
+
+  <section class="scanner-hero">
+    <h1>Check a Website Before You Trust It</h1>
+
+    <p>
+      Paste a website link before paying, signing in, downloading files,
+      sharing personal information or sending money. We check the website
+      from our server and show the evidence we can independently verify.
+    </p>
+  </section>
+
+  <section class="scanner-card">
+
+    <form id="linkScanForm">
+      <div class="scanner-form">
+        <input
+          id="urlInput"
+          type="url"
+          inputmode="url"
+          autocomplete="url"
+          placeholder="example.com or https://example.com"
+          required
+        >
+
+        <button
+          id="scanButton"
+          class="btn btn-primary scan-button"
+          type="submit"
+        >
+          <i class="fas fa-magnifying-glass"></i>
+          SCAN WEBSITE
+        </button>
+      </div>
+    </form>
+
+    <div id="scanStatus" class="scan-status"></div>
+
+    <div id="scanResult" hidden></div>
+
+    <div class="scanner-warning">
+      <strong>Important:</strong>
+      A website scan cannot guarantee that a website is legitimate or
+      fraudulent. A clean technical result is not proof that you should
+      send money or personal information. Always verify the organisation
+      independently.
+    </div>
+
+  </section>
+
+</main>
+
+<script src="/js/link-scanner.js"></script>
+
+<footer class="manlung-scanner-footer">
+  <div class="manlung-scanner-footer-inner">
+
+    <div class="manlung-scanner-footer-main">
+
+      <section>
+        <div class="manlung-scanner-brand">
+
+          <img
+            class="manlung-scanner-logo"
+            src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
+            alt="Manlung Recovery"
+          >
+
+          <div>
+            <h2>Manlung Recovery</h2>
+            <p>Cyber Recovery &amp; Digital Investigation Portal</p>
+          </div>
+
+        </div>
+
+        <div class="manlung-scanner-actions">
+          
+          <a
+            class="manlung-scanner-youtube"
+            href="https://www.youtube.com/@manlungrecory"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Manlung Recovery YouTube"
+          >
+            <i class="fab fa-youtube" aria-hidden="true"></i> YouTube
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="manlung-scanner-links-title">Quick Links</h3>
+
+        <nav class="manlung-scanner-links" aria-label="Footer navigation">
+
+          <a href="/">Home</a>
+
+          <a href="/about.html">About</a>
+
+          <a href="/blog.html">Blog</a>
+
+          <a href="/careers.html">Careers</a>
+
+          <a href="/terms.html">Terms</a>
+
+          <a href="/login.html">Client Portal</a>
+
+          <a href="/client/request.html">
+            New Recovery Request
+          </a>
+
+          <a href="/donate.html">
+            Support Our Work
+          </a>
+
+          <a href="/link-scanner.html">
+            Website Scanner
+          </a>
+
+        </nav>
+      </section>
+
+    </div>
+
+    <div class="manlung-scanner-divider"></div>
+
+    <div class="manlung-scanner-bottom">
+      <span>
+        &copy; 2026 <strong>Manlung Recovery</strong>.
+        All rights reserved.
+      </span>
+    </div>
+
+  </div>
+</footer>
+
+<script src="/js/pwa.js" defer></script>
+<footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+    <div class="manlung-footer-grid">
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row">
+          <img src="/icons/icon-512.png" alt="Manlung Recovery" class="manlung-footer-logo" width="58" height="58">
+          <div>
+            <h2 id="footer-brand-title">Manlung Recovery</h2>
+            <p class="manlung-footer-brand-subtitle">Cyber Recovery &amp; Digital Investigation Portal</p>
+          </div>
+        </div>
+        <p class="manlung-footer-description">Manlung Recovery provides structured digital recovery assistance, investigation support, account and device recovery guidance, cybersecurity awareness, and secure case-management services. Our goal is to help individuals and organizations respond to digital incidents responsibly, protect important information, and take appropriate steps toward recovery.</p>
+      </section>
+      <section class="manlung-footer-column">
+        <h3>Quick Links</h3>
+        <nav class="manlung-footer-links" aria-label="Quick links">
+          <a href="/">Home</a><a href="/about.html">About Manlung Recovery</a><a href="/knowledge.html">Knowledge Centre</a><a href="/blog.html">Security &amp; Recovery Blog</a><a href="/contact.html">Contact Us</a>
+        </nav>
+      </section>
+      <section class="manlung-footer-column">
+        <h3>Recovery Services</h3>
+        <nav class="manlung-footer-links" aria-label="Recovery services">
+          <a href="/client/request.html" class="footer-important">Submit Recovery Request</a><a href="/client/dashboard.html" class="footer-important">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/client/settings.html">Account Settings</a><a href="/login.html">Sign In</a>
+        </nav>
+      </section>
+      <section class="manlung-footer-column">
+        <h3>Security &amp; Trust</h3>
+        <div class="manlung-footer-trust"><p>We use access controls, authentication safeguards and responsible information-handling practices to help protect client and case information.</p></div>
+        <div class="manlung-footer-trust"><p>Personal-data processing is described in our Privacy Notice, including applicable rights and responsibilities under Kenya's Data Protection Act, 2019 and relevant regulations.</p></div>
+        <nav class="manlung-footer-links manlung-footer-security-links" aria-label="Legal and security links"><a href="/privacy.html" class="footer-important">Privacy Notice</a><a href="/terms.html" class="footer-important">Terms &amp; Conditions</a></nav>
+      </section>
+    </div>
+    <div class="manlung-footer-divider"></div>
+    <div class="manlung-footer-contact-row">
+      <div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com"><i class="fas fa-envelope" aria-hidden="true"></i> manlungrecovery@outlook.com</a><a href="tel:+254724356178"><i class="fas fa-phone" aria-hidden="true"></i> +254 724 356 178</a></div>
+      <div class="manlung-footer-social" aria-label="Manlung Recovery social media"><span class="manlung-footer-social-label">Follow Manlung Recovery</span><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="Manlung Recovery on YouTube"><i class="fab fa-youtube" aria-hidden="true"></i><span>YouTube</span></a><a href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer" aria-label="Manlung Recovery on LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i><span>LinkedIn</span></a><a href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer" aria-label="Manlung Recovery on GitHub"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub</span></a></div>
+    </div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+  </div>
+</footer>
+</body>
+</html>
