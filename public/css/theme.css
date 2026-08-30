@@ -829,3 +829,80 @@ html:not(.dark) .site-header .header-actions a i.fa-file-circle-plus {
     z-index: 999;
 }
 
+
+/* =========================================================
+   MANLUNG RECOVERY HEADER BRAND — LIGHT MODE FIX
+   ========================================================= */
+
+/* Main Manlung Recovery title */
+html:not(.dark) .site-header .site-header-brand,
+html:not(.dark) .site-header .brand,
+html:not(.dark) .site-header .brand-name,
+html:not(.dark) .site-header .logo-text,
+html:not(.dark) .site-header .site-title,
+html:not(.dark) .site-header h1,
+html:not(.dark) .site-header h2,
+html:not(.dark) .site-header h3 {
+    color: #071a33 !important;
+    -webkit-text-fill-color: #071a33 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Cyber Recovery subtitle */
+html:not(.dark) .site-header p,
+html:not(.dark) .site-header .tagline,
+html:not(.dark) .site-header .subtitle,
+html:not(.dark) .site-header .site-description,
+html:not(.dark) .site-header .brand-subtitle {
+    color: #334155 !important;
+    -webkit-text-fill-color: #334155 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Strong brand title */
+html:not(.dark) .site-header strong {
+    color: #071a33 !important;
+    -webkit-text-fill-color: #071a33 !important;
+    opacity: 1 !important;
+}
+
+/* Make the whole brand area visible */
+html:not(.dark) .site-header .site-brand,
+html:not(.dark) .site-header .header-brand,
+html:not(.dark) .site-header .brand-container,
+html:not(.dark) .site-header .logo-area {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Brand icon/logo */
+html:not(.dark) .site-header img {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* =========================================================
+   DARK MODE — KEEP BRAND CLEAR
+   ========================================================= */
+
+html.dark .site-header h1,
+html.dark .site-header h2,
+html.dark .site-header h3,
+html.dark .site-header strong,
+html.dark .site-header .brand-name,
+html.dark .site-header .site-title {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+html.dark .site-header p,
+html.dark .site-header .tagline,
+html.dark .site-header .subtitle,
+html.dark .site-header .site-description,
+html.dark .site-header .brand-subtitle {
+    color: #bfdbfe !important;
+    -webkit-text-fill-color: #bfdbfe !important;
+}
+
