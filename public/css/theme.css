@@ -1343,3 +1343,210 @@ html.dark .site-header .brand-subtitle {
 
 }
 
+
+/* =========================================================
+   MANLUNG RECOVERY — FINAL DARK MODE HEADER VISIBILITY FIX
+   ========================================================= */
+
+/*
+   DARK MODE:
+   Force every header navigation item to be visible.
+*/
+
+html.dark .site-header .header-actions a,
+html.dark-mode .site-header .header-actions a,
+body.dark .site-header .header-actions a,
+body.dark-mode .site-header .header-actions a,
+body[data-theme="dark"] .site-header .header-actions a,
+html[data-theme="dark"] .site-header .header-actions a {
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Force text INSIDE the links to white */
+html.dark .site-header .header-actions a *,
+html.dark-mode .site-header .header-actions a *,
+body.dark .site-header .header-actions a *,
+body.dark-mode .site-header .header-actions a *,
+body[data-theme="dark"] .site-header .header-actions a *,
+html[data-theme="dark"] .site-header .header-actions a * {
+
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Navigation rectangles in dark mode */
+html.dark .site-header .header-actions a,
+html.dark-mode .site-header .header-actions a,
+body.dark .site-header .header-actions a,
+body.dark-mode .site-header .header-actions a,
+body[data-theme="dark"] .site-header .header-actions a,
+html[data-theme="dark"] .site-header .header-actions a {
+
+    background: #10213b !important;
+
+    border: 1px solid #315b91 !important;
+    border-radius: 8px !important;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.30),
+        0 0 5px rgba(37,99,235,.18) !important;
+}
+
+/* Dark-mode hover */
+html.dark .site-header .header-actions a:hover,
+html.dark-mode .site-header .header-actions a:hover,
+body.dark .site-header .header-actions a:hover,
+body.dark-mode .site-header .header-actions a:hover,
+body[data-theme="dark"] .site-header .header-actions a:hover,
+html[data-theme="dark"] .site-header .header-actions a:hover {
+
+    background: #172d4d !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    border-color: #60a5fa !important;
+
+    box-shadow:
+        0 3px 12px rgba(37,99,235,.35),
+        0 0 10px rgba(37,99,235,.25) !important;
+}
+
+/* =========================================================
+   DARK MODE — THEME CONTROL
+   ========================================================= */
+
+html.dark .site-header .header-actions .theme-toggle,
+html.dark-mode .site-header .header-actions .theme-toggle,
+body.dark .site-header .header-actions .theme-toggle,
+body.dark-mode .site-header .header-actions .theme-toggle,
+body[data-theme="dark"] .site-header .header-actions .theme-toggle,
+html[data-theme="dark"] .site-header .header-actions .theme-toggle {
+
+    background: transparent !important;
+
+    border: none !important;
+
+    box-shadow: none !important;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* "Dark" / "Light" generated text */
+html.dark .site-header .header-actions .theme-toggle::after,
+html.dark-mode .site-header .header-actions .theme-toggle::after,
+body.dark .site-header .header-actions .theme-toggle::after,
+body.dark-mode .site-header .header-actions .theme-toggle::after,
+body[data-theme="dark"] .site-header .header-actions .theme-toggle::after,
+html[data-theme="dark"] .site-header .header-actions .theme-toggle::after {
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* =========================================================
+   DARK MODE — COLOURED ICONS
+   ========================================================= */
+
+/* My Cases */
+html.dark .site-header i.fa-user,
+html.dark .site-header i.fa-user-circle,
+body.dark .site-header i.fa-user,
+body.dark .site-header i.fa-user-circle {
+    color: #60a5fa !important;
+}
+
+/* Blog */
+html.dark .site-header i.fa-newspaper,
+html.dark .site-header i.fa-blog,
+html.dark .site-header i.fa-book-open,
+body.dark .site-header i.fa-newspaper,
+body.dark .site-header i.fa-blog,
+body.dark .site-header i.fa-book-open {
+    color: #c084fc !important;
+}
+
+/* Donate */
+html.dark .site-header i.fa-heart,
+html.dark .site-header i.fa-hand-holding-heart,
+html.dark .site-header i.fa-donate,
+body.dark .site-header i.fa-heart,
+body.dark .site-header i.fa-hand-holding-heart,
+body.dark .site-header i.fa-donate {
+    color: #34d399 !important;
+}
+
+/* New Request */
+html.dark .site-header i.fa-plus,
+html.dark .site-header i.fa-plus-circle,
+html.dark .site-header i.fa-file-circle-plus,
+body.dark .site-header i.fa-plus,
+body.dark .site-header i.fa-plus-circle,
+body.dark .site-header i.fa-file-circle-plus {
+    color: #22d3ee !important;
+}
+
+/* =========================================================
+   DARK MODE — BRAND
+   ========================================================= */
+
+html.dark .site-header h1,
+html.dark .site-header h2,
+html.dark .site-header h3,
+html.dark .site-header strong,
+html.dark-mode .site-header h1,
+html.dark-mode .site-header h2,
+html.dark-mode .site-header h3,
+html.dark-mode .site-header strong,
+body.dark .site-header h1,
+body.dark .site-header h2,
+body.dark .site-header h3,
+body.dark .site-header strong {
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+html.dark .site-header p,
+html.dark-mode .site-header p,
+body.dark .site-header p,
+body.dark-mode .site-header p {
+
+    color: #bfdbfe !important;
+    -webkit-text-fill-color: #bfdbfe !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* =========================================================
+   DARK MODE — HEADER GLOW
+   ========================================================= */
+
+html.dark .site-header,
+html.dark-mode .site-header,
+body.dark .site-header,
+body.dark-mode .site-header {
+
+    border-top-color: #1e3a8a !important;
+    border-bottom-color: #1e3a8a !important;
+
+    box-shadow:
+        0 -3px 12px rgba(15,47,104,.55),
+        0 3px 12px rgba(15,47,104,.55) !important;
+}
+
