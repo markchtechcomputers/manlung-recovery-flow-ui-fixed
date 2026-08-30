@@ -281,18 +281,21 @@
   }
 
   window.addEventListener('beforeinstallprompt', event => {
+    console.log('[Manlung PWA] beforeinstallprompt fired');
+
     event.preventDefault();
     deferredPrompt = event;
 
-    if (isStandalone() || wasRecentlyDismissed()) {
+    if (isStandalone()) {
+      console.log('[Manlung PWA] App is already installed');
       return;
     }
 
     const banner = createBanner();
 
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       banner.classList.add('is-visible');
-    }, 250);
+    });
   });
 
   window.addEventListener('appinstalled', () => {
@@ -308,6 +311,7 @@
 
   document.addEventListener('click', async event => {
     const button = event.target.closest('.manlung-pwa-download');
+
 
     if (!button || !deferredPrompt) {
       return;
