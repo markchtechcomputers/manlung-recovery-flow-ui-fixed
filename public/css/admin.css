@@ -142,3 +142,33 @@ table.admin-table tr:hover td { background: rgba(36,81,214,0.04); }
     width: 100%;
   }
 }
+
+/* =========================================================
+   ADMIN HEADER — LOGOUT VISIBILITY
+   Keep logout button red, icon + text WHITE
+   ========================================================= */
+
+header .header-actions .btn-danger,
+header .header-actions .btn-danger *,
+.admin-header .btn-danger,
+.admin-header .btn-danger * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+header .header-actions .btn-danger i,
+.admin-header .btn-danger i {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+header .header-actions .btn-danger:hover,
+header .header-actions .btn-danger:hover *,
+.admin-header .btn-danger:hover,
+.admin-header .btn-danger:hover * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
