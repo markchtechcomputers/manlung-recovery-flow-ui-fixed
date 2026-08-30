@@ -323,3 +323,65 @@ body[data-theme="dark"] .site-header .btn {
   }
 }
 
+
+/* =========================================================
+   MANLUNG RECOVERY — LOCAL FONT AWESOME ICON FIX
+   Icons are served locally so navigation does not depend
+   on an external CDN.
+   ========================================================= */
+
+.site-header i.fas,
+.site-header i.far,
+.site-header i.fab,
+.site-header i.fa,
+.site-header .fa-solid,
+.site-header .fa-regular,
+.site-header .fa-brands {
+    display: inline-block !important;
+    width: auto !important;
+    height: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: currentColor !important;
+    font-style: normal !important;
+    line-height: 1 !important;
+    flex: 0 0 auto !important;
+}
+
+.site-header .header-actions i {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: inline-block !important;
+}
+
+.site-header .header-actions a i,
+.site-header .header-actions button i {
+    color: inherit !important;
+}
+
+/* Keep the theme icon visible */
+.site-header button[data-theme-toggle="true"] i {
+    color: #facc15 !important;
+}
+
+/* Keep navigation icons visible in both themes */
+html:not(.dark) .site-header i,
+body:not(.dark) .site-header i {
+    color: inherit !important;
+}
+
+html.dark .site-header i,
+html.dark-mode .site-header i,
+body.dark .site-header i,
+body.dark-mode .site-header i,
+body[data-theme="dark"] .site-header i {
+    color: #ffffff !important;
+}
+
+/* Logo remains a real image and never gets affected by icon rules */
+.site-header .manlung-site-logo {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
