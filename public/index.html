@@ -1282,6 +1282,63 @@ img[src*="gctxrf7M"] {
 }
 </style>
 
+
+<style id="manlung-welcome-buttons-final">
+/* Welcome hero buttons only */
+.hero-content > a.btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    vertical-align: middle !important;
+}
+
+/* Decorative button icons */
+.hero-content > a.btn i,
+.hero-content > a.btn img {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    object-fit: contain !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    margin: 0 !important;
+}
+
+/* Keep both buttons together */
+.hero-content {
+    text-align: center !important;
+}
+
+.hero-content > a.btn + a.btn {
+    margin-left: 8px !important;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .hero-content > a.btn {
+        gap: 5px !important;
+        padding: 9px 11px !important;
+        font-size: 12px !important;
+    }
+
+    .hero-content > a.btn i,
+    .hero-content > a.btn img {
+        width: 17px !important;
+        height: 17px !important;
+        min-width: 17px !important;
+    }
+
+    .hero-content > a.btn + a.btn {
+        margin-left: 4px !important;
+    }
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
