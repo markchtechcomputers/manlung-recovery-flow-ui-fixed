@@ -1339,6 +1339,34 @@ img[src*="gctxrf7M"] {
 }
 </style>
 
+
+<style id="admin-call-button">
+.admin-contact-bottom {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0 1rem;
+}
+
+.admin-call-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    min-width: 180px;
+    text-decoration: none !important;
+    border-radius: 0 !important;
+    font-weight: 700;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.admin-call-btn i {
+    font-size: 16px;
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
@@ -1802,6 +1830,15 @@ body.service-modal-open{
   <script src="/js/pwa.js"></script>
     <script src="/js/call-webrtc.js"></script>
     <script src="/js/call-widget.js"></script>
+
+
+<!-- Admin contact button -->
+<div class="admin-contact-bottom">
+    <a href="tel:+254745682493" class="admin-call-btn">
+        <i class="fas fa-phone"></i>
+        Call Admin
+    </a>
+</div>
 
 <footer class="manlung-footer" aria-label="Manlung Recovery footer">
   <div class="manlung-footer-inner">
