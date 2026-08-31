@@ -301,7 +301,13 @@
           background:#1f6e4a; color:#fff; border:none; border-radius:50px;
           padding:0.7rem 1.1rem; font-weight:600; font-size:0.85rem; cursor:pointer;
           box-shadow:0 6px 20px rgba(0,0,0,0.25); display:flex; align-items:center; gap:8px;
-        "><i class="fas fa-phone"></i> <span id="callWidgetLabel">Call Admin</span></button>
+        "><img
+            src="https://i.postimg.cc/gctxrf7M/hd-blue-round-circle-phone-icon-transparent-png-701751695059659ul34evvlna-Photoroom.png"
+            alt="Call Admin"
+            class="manlung-floating-call-icon"
+            loading="eager"
+            onerror="this.style.display='none';"
+          > <span id="callWidgetLabel">Call Admin</span></button>
         <div id="callWidgetPanel" style="display:none; position:absolute; bottom:56px; right:0; width:min(320px, calc(100vw - 24px)); max-height:calc(100vh - 100px); overflow:auto; background:#101f42; color:#e6ecf5; border:1px solid #29385a; border-radius:16px; padding:1.1rem; box-shadow:0 10px 30px rgba(0,0,0,0.35);">
           <div style="display:flex;justify-content:flex-end;margin:-0.35rem -0.35rem 0.25rem 0;">
             <button id="callWidgetCloseBtn" type="button" aria-label="Close Call Admin panel" title="Close" style="width:34px;height:34px;border:0;border-radius:50%;background:#29385a;color:#fff;cursor:pointer;font-size:1rem;"><i class="fas fa-times"></i></button>
