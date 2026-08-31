@@ -88,6 +88,45 @@
       });
   }
 
+  // The floating Call Admin widget uses .manlung-floating-call-icon.
+  // Older fixes targeted .manlung-call-icon, so they never affected this image.
+  function installCallIconFix() {
+    if (document.getElementById('manlung-floating-call-icon-fix')) return;
+
+    const style = document.createElement('style');
+    style.id = 'manlung-floating-call-icon-fix';
+    style.textContent = `
+      #callWidgetBtn img.manlung-floating-call-icon {
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        flex: 0 0 20px !important;
+        display: inline-block !important;
+        object-fit: contain !important;
+        object-position: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        vertical-align: middle !important;
+      }
+
+      @media (max-width: 600px) {
+        #callWidgetBtn img.manlung-floating-call-icon {
+          width: 28px !important;
+          height: 28px !important;
+          min-width: 28px !important;
+          min-height: 28px !important;
+          max-width: 28px !important;
+          max-height: 28px !important;
+          flex: 0 0 28px !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function loadAdminCallIcons() {
     if (!location.pathname.startsWith('/admin/')) return;
     if (document.querySelector('script[data-manlung-admin-call-icons]')) return;
@@ -105,6 +144,7 @@
     createThemeButton();
     bindThemeButtons();
     setTheme(readTheme(), false);
+    installCallIconFix();
     loadAdminCallIcons();
 
     // Some legacy pages define toggleDarkMode themselves. Make that global API use the
