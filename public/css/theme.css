@@ -1870,3 +1870,259 @@ button.logout:hover,
   }
 }
 
+
+/* =========================================================
+   CONTACT US — CLEAN ICONS & RESPONSIVE LAYOUT
+   Small icons only. No oversized image/icon behaviour.
+   ========================================================= */
+
+/* Contact information wrapper */
+.contact-info,
+.contact-details,
+.contact-methods,
+.contact-cards,
+.contact-grid {
+  box-sizing: border-box;
+}
+
+/* Contact cards / individual contact items */
+.contact-info > *,
+.contact-details > *,
+.contact-methods > *,
+.contact-cards > *,
+.contact-grid > * {
+  box-sizing: border-box;
+}
+
+/* Keep Font Awesome / SVG contact icons SMALL */
+.contact-info i,
+.contact-details i,
+.contact-methods i,
+.contact-cards i,
+.contact-grid i,
+.contact-item i,
+.contact-card i,
+.contact-box i,
+.contact-info svg,
+.contact-details svg,
+.contact-methods svg,
+.contact-cards svg,
+.contact-grid svg,
+.contact-item svg,
+.contact-card svg,
+.contact-box svg {
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  max-width: 22px !important;
+  max-height: 22px !important;
+  font-size: 20px !important;
+  line-height: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 22px !important;
+  object-fit: contain !important;
+}
+
+/* Contact images/icons */
+.contact-info img,
+.contact-details img,
+.contact-methods img,
+.contact-cards img,
+.contact-grid img,
+.contact-item img,
+.contact-card img,
+.contact-box img {
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  max-width: 22px !important;
+  max-height: 22px !important;
+  object-fit: contain !important;
+  display: block !important;
+  flex: 0 0 22px !important;
+}
+
+/* Contact item alignment */
+.contact-item,
+.contact-card,
+.contact-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+/* Don't allow contact text to get pushed around by icons */
+.contact-item > *,
+.contact-card > *,
+.contact-box > * {
+  box-sizing: border-box;
+}
+
+/* Text portion */
+.contact-item .contact-text,
+.contact-card .contact-text,
+.contact-box .contact-text {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Contact headings */
+.contact-item h3,
+.contact-item h4,
+.contact-card h3,
+.contact-card h4,
+.contact-box h3,
+.contact-box h4 {
+  margin-top: 0;
+}
+
+/* Contact links */
+.contact-item a,
+.contact-card a,
+.contact-box a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Contact grid */
+.contact-grid,
+.contact-cards,
+.contact-methods {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* Individual cards should not stretch strangely */
+.contact-grid > *,
+.contact-cards > *,
+.contact-methods > * {
+  min-width: 0;
+  width: 100%;
+}
+
+/* =========================================================
+   CONTACT PAGE
+   ========================================================= */
+
+.contact-page .contact-info,
+.contact-page .contact-details,
+.contact-page .contact-methods,
+.contact-page .contact-cards,
+.contact-page .contact-grid {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Contact form layout */
+.contact-page form {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contact-page input,
+.contact-page textarea,
+.contact-page select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MOBILE CONTACT LAYOUT
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .contact-grid,
+  .contact-cards,
+  .contact-methods {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .contact-item,
+  .contact-card,
+  .contact-box {
+    width: 100%;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .contact-info i,
+  .contact-details i,
+  .contact-methods i,
+  .contact-cards i,
+  .contact-grid i,
+  .contact-item i,
+  .contact-card i,
+  .contact-box i,
+  .contact-info svg,
+  .contact-details svg,
+  .contact-methods svg,
+  .contact-cards svg,
+  .contact-grid svg,
+  .contact-item svg,
+  .contact-card svg,
+  .contact-box svg,
+  .contact-info img,
+  .contact-details img,
+  .contact-methods img,
+  .contact-cards img,
+  .contact-grid img,
+  .contact-item img,
+  .contact-card img,
+  .contact-box img {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    flex-basis: 20px !important;
+    font-size: 18px !important;
+  }
+}
+
+/* =========================================================
+   PREVENT GLOBAL IMAGE RULES FROM ENLARGING CONTACT ICONS
+   ========================================================= */
+
+.contact-info img,
+.contact-details img,
+.contact-methods img,
+.contact-cards img,
+.contact-grid img,
+.contact-item img,
+.contact-card img,
+.contact-box img {
+  object-fit: contain !important;
+}
+
+/* Don't allow generic image rules to override contact icons */
+.contact-info img[width],
+.contact-details img[width],
+.contact-methods img[width],
+.contact-cards img[width],
+.contact-grid img[width] {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+@media (max-width: 700px) {
+  .contact-info img[width],
+  .contact-details img[width],
+  .contact-methods img[width],
+  .contact-cards img[width],
+  .contact-grid img[width] {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
