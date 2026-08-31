@@ -461,3 +461,43 @@ textarea { min-height: 100px; resize: vertical; }
   }
 }
 
+
+/* ---------- Donation navigation icon fix ---------- */
+.header-actions .donation-nav-icon {
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  object-fit: contain !important;
+  display: inline-block !important;
+  flex: 0 0 20px !important;
+  vertical-align: middle;
+}
+
+/* Keep Donate button properly sized */
+.header-actions a.btn {
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+/* Mobile header protection */
+@media (max-width: 740px) {
+  .header-actions .donation-nav-icon {
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    flex-basis: 18px !important;
+  }
+
+  .header-actions a.btn {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.82rem;
+    gap: 6px;
+  }
+}
+
