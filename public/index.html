@@ -1054,53 +1054,44 @@ img[src*="gctxrf7M"] {
 </style>
 
 
+
+
+
 <style id="manlung-service-clean-final">
 
-/* ============================================================
-   SERVICE MODALS — ALWAYS WHITE
-   Device Recovery
-   Identity Theft
-   Scam Investigation
-   Security Assessment
-   ============================================================ */
-
-#serviceModalOverlay {
-    background: rgba(10, 18, 40, 0.55) !important;
-}
+/* =========================================================
+   SERVICE MODALS ONLY
+   WHITE CARD + SMALL RED X
+   ========================================================= */
 
 #serviceModalOverlay > div {
     background: #ffffff !important;
     color: #111827 !important;
-    border: 1px solid #e5e7eb !important;
 }
 
-/* Everything inside the service modal stays readable on white */
-#serviceModalOverlay #serviceModalBody,
+/* Text inside service modal */
 #serviceModalOverlay #serviceModalBody h1,
 #serviceModalOverlay #serviceModalBody h2,
 #serviceModalOverlay #serviceModalBody h3,
+#serviceModalOverlay #serviceModalBody h4,
 #serviceModalOverlay #serviceModalBody p,
 #serviceModalOverlay #serviceModalBody li,
 #serviceModalOverlay #serviceModalBody strong {
     color: #111827 !important;
 }
 
-#serviceModalOverlay #serviceModalBody p {
-    color: #374151 !important;
-}
-
-/* ============================================================
-   CLEAN SMALL RED X
-   NO CIRCLE
-   NO BORDER
-   NO BACKGROUND
-   NO BOOTSTRAP BUTTON
-   ============================================================ */
+/* =========================================================
+   CLOSE BUTTON
+   ONLY: small red ×
+   ========================================================= */
 
 #serviceModalOverlay .manlung-service-close {
     position: absolute !important;
+
     top: 10px !important;
-    right: 10px !important;
+    right: 12px !important;
+
+    display: block !important;
 
     width: auto !important;
     height: auto !important;
@@ -1110,80 +1101,78 @@ img[src*="gctxrf7M"] {
     padding: 0 !important;
     margin: 0 !important;
 
-    border: 0 !important;
-    outline: 0 !important;
-    box-shadow: none !important;
+    background: transparent !important;
+    background-image: none !important;
+
+    border: none !important;
+    border-width: 0 !important;
     border-radius: 0 !important;
 
-    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
 
     color: #ff0000 !important;
 
     font-family: Arial, sans-serif !important;
-    font-size: 27px !important;
+    font-size: 24px !important;
     font-weight: 700 !important;
-    line-height: 1 !important;
+    line-height: 20px !important;
 
-    cursor: pointer !important;
-
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-
-    z-index: 999999 !important;
+    text-decoration: none !important;
 
     appearance: none !important;
     -webkit-appearance: none !important;
+
+    cursor: pointer !important;
+
+    z-index: 999999 !important;
 }
 
-/* Keep it RED when hovered */
-#serviceModalOverlay .manlung-service-close:hover {
-    color: #ff0000 !important;
+/* Hover: still ONLY the red X */
+#serviceModalOverlay .manlung-service-close:hover,
+#serviceModalOverlay .manlung-service-close:focus,
+#serviceModalOverlay .manlung-service-close:active {
     background: transparent !important;
-    border: 0 !important;
+    background-image: none !important;
+
+    border: none !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+
     box-shadow: none !important;
+    outline: none !important;
+
+    color: #ff0000 !important;
+
     transform: none !important;
 }
 
-/* Remove anything old that could create another X */
+/* Absolutely no generated circle/X */
 #serviceModalOverlay .manlung-service-close::before,
 #serviceModalOverlay .manlung-service-close::after {
     content: none !important;
     display: none !important;
 }
 
-/* ============================================================
-   MOBILE — SMALL X
-   ============================================================ */
-
-@media (max-width: 600px) {
-    #serviceModalOverlay .manlung-service-close {
-        top: 8px !important;
-        right: 9px !important;
-
-        font-size: 25px !important;
-
-        width: auto !important;
-        height: auto !important;
-    }
-
-    #serviceModalOverlay > div {
-        background: #ffffff !important;
-    }
-}
-
-/* ============================================================
-   REMOVE OLD CIRCLE/BUTTON STYLING FROM SERVICE MODAL
-   ============================================================ */
-
-#serviceModalOverlay .btn-outline-dark,
-#serviceModalOverlay .close-modal,
-#serviceModalOverlay #closeModal {
+/* Prevent old button classes from affecting the modal close */
+#serviceModalOverlay .manlung-service-close.btn,
+#serviceModalOverlay .manlung-service-close.btn-outline-dark,
+#serviceModalOverlay .manlung-service-close.close,
+#serviceModalOverlay .manlung-service-close.close-modal {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
 }
 
-#serviceModalOverlay .manlung-service-close {
-    background-image: none !important;
+/* Mobile */
+@media (max-width: 600px) {
+    #serviceModalOverlay .manlung-service-close {
+        top: 8px !important;
+        right: 10px !important;
+        font-size: 23px !important;
+        line-height: 20px !important;
+    }
 }
 
 </style>
@@ -1558,7 +1547,7 @@ body.service-modal-open{
             document.getElementById('serviceModalBody').innerHTML = `
                 <div style="position:relative; margin-bottom:1rem; text-align:center;">
                     <div><img src="${s.image}" alt="${s.title}" style="width:2.3rem;height:2.3rem;object-fit:contain;display:block;margin:0 auto .65rem;"><h2 style="margin:0;">${s.title}</h2></div>
-                    <button type="button" class="manlung-service-close" aria-label="Close" title="Close" onclick="closeServiceModal()">×</button>
+                    <button type="button" class="manlung-service-close" aria-label="Close" onclick="closeServiceModal()">×</button>
                 </div>
                 <p style="color:var(--text-muted); margin-bottom:1rem;">${s.intro}</p>
                 <ul style="margin:0 0 1rem 1.2rem; padding:0; line-height:1.7;">
