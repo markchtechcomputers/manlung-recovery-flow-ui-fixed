@@ -1207,6 +1207,54 @@ img[src*="gctxrf7M"] {
 }
 </style>
 
+
+<style id="welcome-buttons-same-line">
+/* Welcome section buttons — same line */
+#hero .welcome-actions,
+.welcome-actions,
+.hero-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+}
+
+#hero .welcome-actions > *,
+.welcome-actions > *,
+.hero-actions > * {
+    flex: 0 1 auto !important;
+    width: auto !important;
+    margin: 0 !important;
+}
+
+/* Keep donation button on the same line */
+#hero .welcome-actions a,
+.welcome-actions a,
+.hero-actions a {
+    white-space: nowrap !important;
+}
+
+/* Mobile: still keep both on one line, but allow them to shrink */
+@media (max-width: 600px) {
+    #hero .welcome-actions,
+    .welcome-actions,
+    .hero-actions {
+        gap: 8px !important;
+    }
+
+    #hero .welcome-actions a,
+    .welcome-actions a,
+    .hero-actions a {
+        font-size: 0.85rem !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
