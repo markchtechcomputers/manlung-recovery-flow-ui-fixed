@@ -1167,3 +1167,181 @@ body.service-modal-open{
 
 </body>
 </html>
+
+<style id="manlung-final-ui-fix">
+/* ===== FINAL CALL ICON SIZE FIX ===== */
+img.manlung-call-icon,
+.manlung-call-icon {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    max-width: 26px !important;
+    max-height: 26px !important;
+    object-fit: contain !important;
+    display: inline-block !important;
+    flex: 0 0 26px !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+/* Laptop / desktop */
+@media (min-width: 601px) {
+    img.manlung-call-icon,
+    .manlung-call-icon,
+    .header-actions img.manlung-call-icon {
+        width: 24px !important;
+        height: 24px !important;
+        min-width: 24px !important;
+        min-height: 24px !important;
+        max-width: 24px !important;
+        max-height: 24px !important;
+        flex-basis: 24px !important;
+    }
+}
+
+/* Phone */
+@media (max-width: 600px) {
+    img.manlung-call-icon,
+    .manlung-call-icon {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        min-height: 30px !important;
+        max-width: 30px !important;
+        max-height: 30px !important;
+        flex-basis: 30px !important;
+    }
+}
+
+/* Prevent parent call button from stretching the image */
+a:has(.manlung-call-icon),
+button:has(.manlung-call-icon) {
+    overflow: hidden !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* ===== MAKE ALL CLOSE X BUTTONS VISIBLE ===== */
+.close,
+.close-btn,
+.close-button,
+.modal-close,
+.modal-close-btn,
+.btn-close,
+.popup-close,
+.dialog-close,
+.menu-close,
+.mobile-menu-close,
+.pwa-close,
+.manlung-pwa-close,
+[aria-label="Close"],
+[aria-label="close"],
+[aria-label*="Close"],
+[data-close],
+[data-dismiss="modal"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    z-index: 99999 !important;
+    cursor: pointer !important;
+}
+
+/* Make the X itself visible */
+.close *,
+.close-btn *,
+.close-button *,
+.modal-close *,
+.modal-close-btn *,
+.btn-close *,
+.popup-close *,
+.dialog-close *,
+.menu-close *,
+.mobile-menu-close *,
+.pwa-close *,
+.manlung-pwa-close * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* FontAwesome X */
+.close .fa,
+.close .fas,
+.close .fa-times,
+.close .fa-xmark,
+.close-btn .fa,
+.close-btn .fas,
+.close-button .fa,
+.modal-close .fa,
+.modal-close-btn .fa,
+.btn-close .fa,
+.popup-close .fa,
+.dialog-close .fa,
+.menu-close .fa,
+.mobile-menu-close .fa {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 20px !important;
+}
+
+/* Text/entity X */
+.close,
+.close-btn,
+.close-button,
+.modal-close,
+.modal-close-btn,
+.popup-close,
+.dialog-close,
+.menu-close,
+.mobile-menu-close {
+    color: #111827 !important;
+    text-shadow: none !important;
+}
+
+/* PWA close button */
+.manlung-pwa-close {
+    color: #475569 !important;
+    background: transparent !important;
+    border: 0 !important;
+    font-size: 28px !important;
+    line-height: 1 !important;
+}
+
+/* Never let an image inside a close button become huge */
+.close img,
+.close-btn img,
+.close-button img,
+.modal-close img,
+.modal-close-btn img,
+.popup-close img,
+.dialog-close img,
+.menu-close img,
+.mobile-menu-close img {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+}
+
+/* ===== EMERGENCY LIMIT FOR CALL AREA ===== */
+.header-actions {
+    overflow: hidden !important;
+}
+
+.header-actions a,
+.header-actions button {
+    overflow: hidden !important;
+}
+
+.header-actions .manlung-call-icon {
+    object-fit: contain !important;
+}
+</style>
