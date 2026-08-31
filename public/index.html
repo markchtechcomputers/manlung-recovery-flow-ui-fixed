@@ -1182,6 +1182,59 @@ img[src*="gctxrf7M"] {
 <meta name="application-name" content="Manlung Recovery">
 <meta name="apple-mobile-web-app-title" content="Manlung Recovery">
 
+
+<style id="manlung-welcome-rectangle-final">
+/* =========================================================
+   MANLUNG RECOVERY — WELCOME SECTION
+   FULL-WIDTH RECTANGLE, EDGE TO EDGE
+   ========================================================= */
+
+#hero {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Remove rounded corners from the actual welcome container */
+#hero > *,
+#hero .hero-content,
+#hero .hero-card,
+#hero .welcome-content {
+    border-radius: 0 !important;
+}
+
+/* Welcome action buttons stay in one horizontal line */
+#hero .welcome-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 12px !important;
+    width: 100% !important;
+}
+
+#hero .welcome-actions a {
+    white-space: nowrap !important;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    #hero .welcome-actions {
+        gap: 6px !important;
+    }
+
+    #hero .welcome-actions a {
+        font-size: 12px !important;
+        padding-left: 9px !important;
+        padding-right: 9px !important;
+    }
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
