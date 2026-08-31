@@ -205,6 +205,28 @@
       border-radius:50%;
     }
 
+
+    .manlung-call-avatar-small {
+      width:44px;
+      height:44px;
+      margin:0 auto .45rem;
+      border-radius:50%;
+      overflow:hidden;
+      border:2px solid rgba(74,222,128,.75);
+      background:#1f6e4a;
+      box-shadow:0 4px 14px rgba(0,0,0,.25);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .manlung-call-avatar-small img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
     @keyframes manlungCallPulse {
       0%,100% { transform:scale(1); }
       50% { transform:scale(1.06); }
