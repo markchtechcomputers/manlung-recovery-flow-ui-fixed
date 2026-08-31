@@ -2682,3 +2682,241 @@ body[data-theme="dark"] main .hero > section.card > p {
     }
 }
 
+
+
+/* =========================================================
+   CONTACT PAGE — DIRECT FINAL FIX
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   CONTACT FEATURE ICONS
+   --------------------------------------------------------- */
+
+.contact-feature-icon {
+    display: inline-flex !important;
+
+    width: 24px !important;
+    height: 24px !important;
+
+    min-width: 24px !important;
+    min-height: 24px !important;
+
+    max-width: 24px !important;
+    max-height: 24px !important;
+
+    font-size: 22px !important;
+    line-height: 24px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    flex: 0 0 24px !important;
+
+    margin: 0 0 10px 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    color: var(--accent) !important;
+
+    overflow: hidden !important;
+}
+
+
+/* ---------------------------------------------------------
+   CONTACT FEATURE CARDS
+   --------------------------------------------------------- */
+
+main .hero .features .feature-card {
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+main .hero .features .feature-card h3 {
+    margin-top: 0 !important;
+}
+
+main .hero .features .feature-card p {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+}
+
+
+/* ---------------------------------------------------------
+   BEFORE CONTACTING US
+   LIGHT MODE
+   --------------------------------------------------------- */
+
+.contact-safety-card {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #dddddd !important;
+}
+
+.contact-safety-card .card-title {
+    color: #000000 !important;
+}
+
+.contact-safety-card .card-title i {
+    color: #000000 !important;
+}
+
+.contact-safety-card > p {
+    color: #000000 !important;
+}
+
+
+/* ---------------------------------------------------------
+   DARK MODE
+   --------------------------------------------------------- */
+
+html[data-theme="dark"] .contact-safety-card,
+html.dark .contact-safety-card,
+html.dark-mode .contact-safety-card,
+body.dark .contact-safety-card,
+body.dark-mode .contact-safety-card,
+body[data-theme="dark"] .contact-safety-card {
+    background: #111111 !important;
+    color: #ffffff !important;
+    border-color: #333333 !important;
+}
+
+html[data-theme="dark"] .contact-safety-card .card-title,
+html.dark .contact-safety-card .card-title,
+html.dark-mode .contact-safety-card .card-title,
+body.dark .contact-safety-card .card-title,
+body.dark-mode .contact-safety-card .card-title,
+body[data-theme="dark"] .contact-safety-card .card-title {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .contact-safety-card .card-title i,
+html.dark .contact-safety-card .card-title i,
+html.dark-mode .contact-safety-card .card-title i,
+body.dark .contact-safety-card .card-title i,
+body.dark-mode .contact-safety-card .card-title i,
+body[data-theme="dark"] .contact-safety-card .card-title i {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .contact-safety-card > p,
+html.dark .contact-safety-card > p,
+html.dark-mode .contact-safety-card > p,
+body.dark .contact-safety-card > p,
+body.dark-mode .contact-safety-card > p,
+body[data-theme="dark"] .contact-safety-card > p {
+    color: #ffffff !important;
+}
+
+
+/* ---------------------------------------------------------
+   DONATION HEADER ICON
+   --------------------------------------------------------- */
+
+.site-header img[src*="donation.png"] {
+    display: inline-block !important;
+
+    width: 30px !important;
+    height: 30px !important;
+
+    min-width: 30px !important;
+    min-height: 30px !important;
+
+    max-width: 30px !important;
+    max-height: 30px !important;
+
+    object-fit: contain !important;
+
+    flex: 0 0 30px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+    .contact-feature-icon {
+        width: 21px !important;
+        height: 21px !important;
+
+        min-width: 21px !important;
+        min-height: 21px !important;
+
+        max-width: 21px !important;
+        max-height: 21px !important;
+
+        font-size: 19px !important;
+        line-height: 21px !important;
+
+        flex-basis: 21px !important;
+
+        margin-bottom: 8px !important;
+    }
+
+    .site-header img[src*="donation.png"] {
+        width: 27px !important;
+        height: 27px !important;
+
+        min-width: 27px !important;
+        min-height: 27px !important;
+
+        max-width: 27px !important;
+        max-height: 27px !important;
+
+        flex-basis: 27px !important;
+    }
+
+    main .hero .features {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    main .hero .features .feature-card {
+        width: 100% !important;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   SMALL PHONES
+   --------------------------------------------------------- */
+
+@media (max-width: 420px) {
+
+    .contact-feature-icon {
+        width: 20px !important;
+        height: 20px !important;
+
+        min-width: 20px !important;
+        min-height: 20px !important;
+
+        max-width: 20px !important;
+        max-height: 20px !important;
+
+        font-size: 18px !important;
+        line-height: 20px !important;
+
+        flex-basis: 20px !important;
+    }
+
+    .site-header img[src*="donation.png"] {
+        width: 25px !important;
+        height: 25px !important;
+
+        min-width: 25px !important;
+        min-height: 25px !important;
+
+        max-width: 25px !important;
+        max-height: 25px !important;
+
+        flex-basis: 25px !important;
+    }
+}
+
