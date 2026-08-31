@@ -1376,7 +1376,7 @@ img[src*="gctxrf7M"] {
     <div class="container">
         <!-- Hero -->
         <section class="hero">
-            <video class="hero-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+            <video class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true">
                 <source src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4" type="video/mp4">
             </video>
             <div class="hero-overlay" aria-hidden="true"></div>
@@ -1843,6 +1843,46 @@ body.service-modal-open{
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
+
+
+<script id="manlung-hero-video-watchdog">
+(function () {
+    const video = document.querySelector('.hero-video');
+    if (!video) return;
+
+    video.muted = true;
+    video.loop = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+
+    function keepPlaying() {
+        if (video.paused) {
+            const promise = video.play();
+            if (promise && typeof promise.catch === 'function') {
+                promise.catch(function () {});
+            }
+        }
+    }
+
+    video.addEventListener('pause', keepPlaying);
+    video.addEventListener('ended', function () {
+        video.currentTime = 0;
+        keepPlaying();
+    });
+
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            keepPlaying();
+        }
+    });
+
+    window.addEventListener('pageshow', keepPlaying);
+
+    video.addEventListener('canplay', keepPlaying);
+
+    keepPlaying();
+})();
+</script>
 
 </body>
 </html>
