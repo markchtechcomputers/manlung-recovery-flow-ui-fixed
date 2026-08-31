@@ -3,6 +3,215 @@
    this widget only starts calls, receives Admin callbacks, and manages the
    client-side ringtone preference. */
 
+
+(function injectCallWidgetStyles() {
+  if (document.getElementById('manlung-call-ui-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'manlung-call-ui-styles';
+  style.textContent = `
+    #callWidget {
+      --call-green:#20c77a;
+      --call-green-dark:#128a55;
+      --call-red:#ef4444;
+      --call-blue:#4f8cff;
+      --call-bg:#0b1428;
+      --call-card:#111d35;
+      --call-border:rgba(255,255,255,.10);
+      --call-muted:#9fb0ca;
+    }
+
+    #callWidgetBtn {
+      min-height:48px !important;
+      padding:.72rem 1.05rem !important;
+      border-radius:999px !important;
+      background:linear-gradient(135deg,#20c77a,#128a55) !important;
+      box-shadow:0 10px 30px rgba(18,138,85,.30) !important;
+      transition:transform .2s ease,box-shadow .2s ease !important;
+    }
+
+    #callWidgetBtn:hover {
+      transform:translateY(-2px) !important;
+      box-shadow:0 14px 34px rgba(18,138,85,.42) !important;
+    }
+
+    #callWidgetPanel {
+      background:
+        radial-gradient(circle at top,#1b315d 0,#101b32 42%,#0b1428 100%) !important;
+      border:1px solid var(--call-border) !important;
+      border-radius:22px !important;
+      padding:1rem !important;
+      box-shadow:0 24px 70px rgba(0,0,0,.48) !important;
+      backdrop-filter:blur(18px);
+    }
+
+    #callWidgetContent {
+      text-align:center;
+    }
+
+    .manlung-call-avatar {
+      width:82px;
+      height:82px;
+      margin:.35rem auto .85rem;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(145deg,#244b82,#162b50);
+      border:3px solid rgba(255,255,255,.10);
+      box-shadow:0 10px 35px rgba(0,0,0,.35);
+      position:relative;
+    }
+
+    .manlung-call-avatar i {
+      font-size:2.1rem;
+      color:#dce9ff;
+    }
+
+    .manlung-call-avatar.calling {
+      animation:manlungCallPulse 1.5s infinite;
+    }
+
+    .manlung-call-avatar.calling:after {
+      content:"";
+      position:absolute;
+      inset:-9px;
+      border:2px solid rgba(32,199,122,.45);
+      border-radius:50%;
+      animation:manlungRing 1.5s infinite;
+    }
+
+    .manlung-call-name {
+      font-size:1.05rem;
+      font-weight:800;
+      color:#fff;
+      margin:.15rem 0;
+    }
+
+    .manlung-call-status {
+      color:var(--call-muted);
+      font-size:.82rem;
+      margin:.2rem 0 .9rem;
+    }
+
+    .manlung-call-connected {
+      color:#4ade80 !important;
+      font-weight:800;
+    }
+
+    .manlung-call-timer {
+      font-size:2rem !important;
+      font-weight:800 !important;
+      letter-spacing:.08em;
+      color:#fff !important;
+      margin:.65rem 0 1rem !important;
+    }
+
+    .manlung-call-actions {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .manlung-call-action {
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:13px;
+      padding:.72rem .5rem;
+      color:#fff;
+      background:#1a2a49;
+      cursor:pointer;
+      font-weight:700;
+      transition:transform .15s ease,background .15s ease;
+    }
+
+    .manlung-call-action:hover {
+      transform:translateY(-1px);
+      background:#22375e;
+    }
+
+    .manlung-call-action.end,
+    .manlung-call-action.decline {
+      background:linear-gradient(135deg,#ef4444,#b91c1c);
+    }
+
+    .manlung-call-action.accept {
+      background:linear-gradient(135deg,#20c77a,#128a55);
+    }
+
+    .manlung-call-action.cancel {
+      width:100%;
+      margin-top:.7rem;
+      background:#7f1d1d;
+    }
+
+    .manlung-call-action i {
+      margin-right:5px;
+    }
+
+    .manlung-call-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:.35rem .7rem;
+      border-radius:999px;
+      background:rgba(32,199,122,.12);
+      color:#4ade80;
+      font-size:.72rem;
+      font-weight:800;
+      margin-bottom:.45rem;
+    }
+
+    .manlung-call-badge .dot {
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:#4ade80;
+      animation:manlungBlink 1s infinite;
+    }
+
+    @keyframes manlungCallPulse {
+      0%,100% { transform:scale(1); }
+      50% { transform:scale(1.06); }
+    }
+
+    @keyframes manlungRing {
+      0% { transform:scale(.85); opacity:.8; }
+      100% { transform:scale(1.25); opacity:0; }
+    }
+
+    @keyframes manlungBlink {
+      0%,100% { opacity:1; }
+      50% { opacity:.35; }
+    }
+
+    @media (max-width:600px) {
+      #callWidget {
+        right:10px !important;
+        bottom:calc(10px + env(safe-area-inset-bottom)) !important;
+      }
+
+      #callWidgetBtn {
+        min-width:48px !important;
+        width:48px !important;
+        height:48px !important;
+        padding:0 !important;
+        justify-content:center !important;
+      }
+
+      #callWidgetBtn #callWidgetLabel {
+        display:none;
+      }
+
+      #callWidgetPanel {
+        width:min(340px,calc(100vw - 20px)) !important;
+        right:0 !important;
+        bottom:58px !important;
+        border-radius:20px !important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
 (function () {
   let currentPeer = null;
   let currentSessionId = null;
