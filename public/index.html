@@ -1255,6 +1255,32 @@ img[src*="gctxrf7M"] {
 }
 </style>
 
+
+<style id="welcome-edge-to-edge-final">
+/* Welcome section ONLY — remove the parent container restriction */
+.container:has(> .hero) {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Welcome hero — rectangular and edge-to-edge */
+.container > .hero {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Keep the existing white background */
+.container > .hero {
+    background: #ffffff !important;
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
