@@ -1308,6 +1308,232 @@ img[src*="gctxrf7M"] {
 
 </style>
 
+
+<style id="manlung-service-red-x-v2">
+
+/* =========================================================
+   ALL SERVICE DETAIL WINDOWS
+   Device Recovery
+   Identity Theft
+   Scam Investigation
+   Security Assessment
+   ========================================================= */
+
+/* Modal must allow the X to sit above the content */
+#serviceModalOverlay {
+    position: fixed !important;
+    z-index: 2147483000 !important;
+}
+
+#serviceModalOverlay .modal-content {
+    position: relative !important;
+    overflow: visible !important;
+}
+
+/* REAL SERVICE MODAL CLOSE BUTTON */
+#serviceModalOverlay button.close-modal,
+#serviceModalOverlay a.close-modal,
+#serviceModalOverlay .close-modal,
+#serviceModalOverlay #closeModal {
+    position: absolute !important;
+
+    top: 10px !important;
+    right: 10px !important;
+
+    width: 46px !important;
+    height: 46px !important;
+
+    min-width: 46px !important;
+    min-height: 46px !important;
+    max-width: 46px !important;
+    max-height: 46px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: #ffffff !important;
+    color: #ff0000 !important;
+
+    border: 3px solid #ff0000 !important;
+    border-radius: 50% !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    z-index: 2147483647 !important;
+
+    overflow: visible !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+
+    font-family: Arial, sans-serif !important;
+    font-size: 0 !important;
+    line-height: 1 !important;
+}
+
+/* FORCE A RED X EVEN IF FONT AWESOME FAILS */
+#serviceModalOverlay button.close-modal::before,
+#serviceModalOverlay a.close-modal::before,
+#serviceModalOverlay .close-modal::before,
+#serviceModalOverlay #closeModal::before {
+    content: "×" !important;
+
+    display: block !important;
+
+    color: #ff0000 !important;
+
+    font-family: Arial, sans-serif !important;
+    font-size: 36px !important;
+    font-weight: 900 !important;
+    line-height: 38px !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    text-align: center !important;
+}
+
+/* Hide broken Font Awesome icon but keep our guaranteed X */
+#serviceModalOverlay .close-modal i,
+#serviceModalOverlay #closeModal i {
+    display: none !important;
+}
+
+/* Hover */
+#serviceModalOverlay .close-modal:hover,
+#serviceModalOverlay #closeModal:hover {
+    background: #ff0000 !important;
+    color: #ffffff !important;
+}
+
+#serviceModalOverlay .close-modal:hover::before,
+#serviceModalOverlay #closeModal:hover::before {
+    color: #ffffff !important;
+}
+
+
+/* =========================================================
+   CALL SECTION
+   ========================================================= */
+
+#callWidgetCloseBtn {
+    position: absolute !important;
+
+    width: 46px !important;
+    height: 46px !important;
+
+    min-width: 46px !important;
+    min-height: 46px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: #ffffff !important;
+    color: #ff0000 !important;
+
+    border: 3px solid #ff0000 !important;
+    border-radius: 50% !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    z-index: 2147483647 !important;
+
+    overflow: visible !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+
+    font-size: 0 !important;
+}
+
+/* GUARANTEED RED X FOR CALL BUTTON */
+#callWidgetCloseBtn::before {
+    content: "×" !important;
+
+    display: block !important;
+
+    color: #ff0000 !important;
+
+    font-family: Arial, sans-serif !important;
+    font-size: 34px !important;
+    font-weight: 900 !important;
+    line-height: 38px !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    text-align: center !important;
+}
+
+/* Remove broken/invisible icon */
+#callWidgetCloseBtn i,
+#callWidgetCloseBtn .fa-times,
+#callWidgetCloseBtn .fa-xmark {
+    display: none !important;
+}
+
+/* Call hover */
+#callWidgetCloseBtn:hover {
+    background: #ff0000 !important;
+}
+
+#callWidgetCloseBtn:hover::before {
+    color: #ffffff !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    #serviceModalOverlay button.close-modal,
+    #serviceModalOverlay a.close-modal,
+    #serviceModalOverlay .close-modal,
+    #serviceModalOverlay #closeModal {
+
+        width: 48px !important;
+        height: 48px !important;
+
+        min-width: 48px !important;
+        min-height: 48px !important;
+
+        top: 8px !important;
+        right: 8px !important;
+    }
+
+    #serviceModalOverlay .close-modal::before,
+    #serviceModalOverlay #closeModal::before {
+
+        font-size: 38px !important;
+        line-height: 40px !important;
+    }
+
+    #callWidgetCloseBtn {
+        width: 48px !important;
+        height: 48px !important;
+
+        min-width: 48px !important;
+        min-height: 48px !important;
+    }
+
+    #callWidgetCloseBtn::before {
+        font-size: 36px !important;
+        line-height: 40px !important;
+    }
+}
+
+</style>
+
 </head>
 <body>
     <header class="site-header">
