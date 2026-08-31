@@ -168,6 +168,43 @@
       animation:manlungBlink 1s infinite;
     }
 
+    .manlung-incoming-avatar {
+      width:72px;
+      height:72px;
+      margin:0 auto .75rem;
+      border-radius:50%;
+      overflow:hidden;
+      position:relative;
+      border:3px solid rgba(74,222,128,.85);
+      box-shadow:0 0 0 5px rgba(74,222,128,.10), 0 8px 25px rgba(0,0,0,.30);
+      animation:manlungCallPulse 1.4s ease-in-out infinite;
+      background:#1f6e4a;
+    }
+
+    .manlung-incoming-avatar img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .manlung-incoming-avatar i {
+      width:100%;
+      height:100%;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-size:28px;
+    }
+
+    .manlung-call-avatar img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      border-radius:50%;
+    }
+
     @keyframes manlungCallPulse {
       0%,100% { transform:scale(1); }
       50% { transform:scale(1.06); }
@@ -219,6 +256,11 @@
   let currentCallbackId = null;
   let callbackPollTimer = null;
 
+  // Call participant profile icons
+  const MANLUNG_ADMIN_ICON = "https://i.postimg.cc/FHBztf67/Chat-GPT-Image-Aug-31-2026-11-17-24-AM.png";
+  const MANLUNG_CLIENT_ICON = "https://i.postimg.cc/RFfNLMXT/Chat-GPT-Image-Aug-31-2026-11-16-19-AM.png";
+
+
   function el(html) {
     const div = document.createElement('div');
     div.innerHTML = html.trim();
@@ -261,6 +303,20 @@
   function closePanel() {
     const panel = document.getElementById('callWidgetPanel');
     if (panel) panel.style.display = 'none';
+  }
+
+  function callAvatar(iconUrl, extraClass = "") {
+    return `
+      <div class="manlung-call-avatar ${extraClass}">
+        <img
+          src="${iconUrl}"
+          alt="Call participant"
+          loading="eager"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+        >
+        <i class="fas fa-user-shield" style="display:none;"></i>
+      </div>
+    `;
   }
 
   function panelHtml(inner) {
@@ -614,8 +670,14 @@
     const adminName = call.admin_name || 'Manlung Admin';
     panel.innerHTML = panelHtml(`
       <div style="text-align:center;">
-        <div style="width:64px;height:64px;margin:0 auto .7rem;border-radius:50%;background:#1f6e4a;display:flex;align-items:center;justify-content:center;">
-          <i class="fas fa-phone-volume" style="font-size:28px;color:#fff;"></i>
+        <div class="manlung-incoming-avatar">
+          <img
+            src="${MANLUNG_ADMIN_ICON}"
+            alt="Manlung Admin"
+            loading="eager"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+          >
+          <i class="fas fa-user-shield" style="display:none;"></i>
         </div>
         <p style="font-weight:700;margin-bottom:.35rem;">Incoming Call From ${adminName}</p>
         <p style="color:#96abc4;margin-bottom:.8rem;">${call.case_id ? `Case ${call.case_id}` : 'Support callback'}</p>
