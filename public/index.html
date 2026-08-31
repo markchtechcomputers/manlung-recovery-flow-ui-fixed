@@ -1534,6 +1534,128 @@ img[src*="gctxrf7M"] {
 
 </style>
 
+
+<style id="manlung-service-close-real-fix">
+/* =====================================================
+   REAL SERVICE MODAL CLOSE X
+   Device Recovery / Identity Theft /
+   Scam Investigation / Security Assessment
+   ===================================================== */
+
+#serviceModalOverlay .manlung-service-modal-card {
+    position: relative !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+#serviceModalOverlay #serviceModalCloseBtn {
+    position: absolute !important;
+    top: 12px !important;
+    right: 12px !important;
+
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: #ffffff !important;
+    border: 2px solid #ff0000 !important;
+    border-radius: 50% !important;
+
+    color: #ff0000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+
+    z-index: 9999999 !important;
+    cursor: pointer !important;
+
+    line-height: 1 !important;
+    font-family: inherit !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+}
+
+#serviceModalOverlay #serviceModalCloseBtn i,
+#serviceModalOverlay #serviceModalCloseBtn .fa,
+#serviceModalOverlay #serviceModalCloseBtn .fas,
+#serviceModalOverlay #serviceModalCloseBtn .fa-xmark,
+#serviceModalOverlay #serviceModalCloseBtn .fa-times {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    color: #ff0000 !important;
+
+    font-size: 24px !important;
+    line-height: 1 !important;
+
+    width: auto !important;
+    height: auto !important;
+}
+
+#serviceModalOverlay #serviceModalCloseBtn:hover {
+    background: #ff0000 !important;
+    border-color: #ff0000 !important;
+    color: #ffffff !important;
+}
+
+#serviceModalOverlay #serviceModalCloseBtn:hover i,
+#serviceModalOverlay #serviceModalCloseBtn:hover .fa-xmark,
+#serviceModalOverlay #serviceModalCloseBtn:hover .fa-times {
+    color: #ffffff !important;
+}
+
+/* Make sure the modal card never clips the X */
+#serviceModalOverlay,
+#serviceModalOverlay > div,
+#serviceModalOverlay .manlung-service-modal-card {
+    overflow: visible !important;
+}
+
+/* Keep the modal body scrollable instead of the close button */
+#serviceModalOverlay .manlung-service-modal-card {
+    max-height: calc(100dvh - 2rem) !important;
+}
+
+#serviceModalOverlay #serviceModalBody {
+    max-height: calc(100dvh - 2rem) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    padding-top: 2rem !important;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    #serviceModalOverlay #serviceModalCloseBtn {
+        top: 8px !important;
+        right: 8px !important;
+
+        width: 46px !important;
+        height: 46px !important;
+        min-width: 46px !important;
+        min-height: 46px !important;
+        max-width: 46px !important;
+        max-height: 46px !important;
+    }
+
+    #serviceModalOverlay #serviceModalCloseBtn i,
+    #serviceModalOverlay #serviceModalCloseBtn .fa-xmark,
+    #serviceModalOverlay #serviceModalCloseBtn .fa-times {
+        font-size: 27px !important;
+    }
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
@@ -1687,7 +1809,17 @@ body.service-modal-open{
 </style>
         <!-- Service detail modal -->
         <div id="serviceModalOverlay" class="service-modal-scroll" style="display:none;" onclick="if(event.target===this) closeServiceModal()">
-            <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; max-width:640px; width:100%; padding:2rem;">
+            <div class="manlung-service-modal-card">
+                <button
+                    type="button"
+                    id="serviceModalCloseBtn"
+                    class="manlung-service-close"
+                    aria-label="Close service details"
+                    title="Close"
+                    onclick="event.stopPropagation(); closeServiceModal();">
+                    <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
+
                 <div id="serviceModalBody"></div>
             </div>
         </div>
