@@ -501,3 +501,134 @@ textarea { min-height: 100px; resize: vertical; }
   }
 }
 
+
+/* ==========================================================
+   MOBILE NAVIGATION — MATCH HEADER BUTTON STYLE
+   ========================================================== */
+
+.mobile-nav-panel {
+  width: min(92vw, 420px);
+  max-width: 100%;
+  padding: 1.25rem;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.mobile-nav-panel a {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 46px;
+  margin: 0.35rem 0;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  box-sizing: border-box;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  transition: all 0.2s ease;
+}
+
+/* Main navigation links */
+.mobile-nav-panel > a:not(.mobile-nav-action) {
+  background: rgba(255,255,255,0.06);
+  color: inherit;
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.mobile-nav-panel > a:not(.mobile-nav-action):hover,
+.mobile-nav-panel > a:not(.mobile-nav-action):focus {
+  background: rgba(255,255,255,0.12);
+  transform: translateX(2px);
+}
+
+/* Client Portal / Recovery Request / Sign In */
+.mobile-nav-panel a.mobile-nav-action {
+  background: var(--accent);
+  color: #fff !important;
+  border: 1px solid var(--accent);
+  justify-content: center;
+  text-align: center;
+}
+
+.mobile-nav-panel a.mobile-nav-action:hover,
+.mobile-nav-panel a.mobile-nav-action:focus {
+  background: var(--accent-hover);
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+/* Navigation title */
+.mobile-nav-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.mobile-nav-close,
+.mobile-menu-close {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+/* Dividers */
+.mobile-nav-divider {
+  width: 100%;
+  height: 1px;
+  margin: 0.8rem 0;
+  background: rgba(255,255,255,0.14);
+}
+
+/* Phone sizes */
+@media (max-width: 600px) {
+  .mobile-nav-panel {
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .mobile-nav-panel a {
+    min-height: 44px;
+    margin: 0.3rem 0;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.86rem;
+  }
+
+  .mobile-nav-title {
+    font-size: 0.95rem;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .mobile-nav-panel {
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+    padding: 0.8rem;
+  }
+
+  .mobile-nav-panel a {
+    min-height: 42px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.82rem;
+  }
+}
+
