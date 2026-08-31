@@ -2126,3 +2126,171 @@ button.logout:hover,
   }
 }
 
+
+/* =========================================================
+   CONTACT PAGE — FINAL ICON + LAYOUT FIX
+   Only affects public/contact.html
+   Does not change footer, header, or other pages.
+   ========================================================= */
+
+/* Main Contact page icons */
+body.contact-page .contact-icon,
+body.contact-page .contact-option i,
+body.contact-page .contact-card i,
+body.contact-page .contact-method i,
+body.contact-page .contact-item i {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    max-width: 22px !important;
+    max-height: 22px !important;
+    font-size: 18px !important;
+    line-height: 22px !important;
+    flex: 0 0 22px !important;
+    box-sizing: border-box !important;
+}
+
+/* Catch the actual phone icon even though it has inline font-size */
+body.contact-page i.fas.fa-phone {
+    font-size: 20px !important;
+    width: 22px !important;
+    min-width: 22px !important;
+    max-width: 22px !important;
+    height: 22px !important;
+    line-height: 22px !important;
+    flex: 0 0 22px !important;
+}
+
+/* Keep Font Awesome icons from becoming giant */
+body.contact-page i[class*="fa-"] {
+    max-width: 22px !important;
+    max-height: 22px !important;
+}
+
+/* Contact option/card arrangement */
+body.contact-page .contact-option,
+body.contact-page .contact-card,
+body.contact-page .contact-method,
+body.contact-page .contact-item {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+}
+
+/* Text beside contact icon */
+body.contact-page .contact-option > div,
+body.contact-page .contact-card > div,
+body.contact-page .contact-method > div,
+body.contact-page .contact-item > div {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+}
+
+/* Prevent long email / phone text from breaking layout */
+body.contact-page a {
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Contact page headings */
+body.contact-page .contact-option h3,
+body.contact-page .contact-card h3,
+body.contact-page .contact-method h3,
+body.contact-page .contact-item h3 {
+    margin-top: 0 !important;
+}
+
+/* Contact page images used as icons */
+body.contact-page img.contact-icon,
+body.contact-page .contact-option img,
+body.contact-page .contact-card img,
+body.contact-page .contact-method img,
+body.contact-page .contact-item img {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    max-width: 22px !important;
+    max-height: 22px !important;
+    object-fit: contain !important;
+    flex: 0 0 22px !important;
+}
+
+/* Desktop contact options */
+body.contact-page .contact-options,
+body.contact-page .contact-grid,
+body.contact-page .contact-methods,
+body.contact-page .contact-cards {
+    box-sizing: border-box !important;
+}
+
+/* Phone layout */
+@media (max-width: 700px) {
+
+    body.contact-page .contact-option,
+    body.contact-page .contact-card,
+    body.contact-page .contact-method,
+    body.contact-page .contact-item {
+        width: 100% !important;
+        gap: 10px !important;
+        align-items: flex-start !important;
+    }
+
+    body.contact-page i[class*="fa-"],
+    body.contact-page i.fas.fa-phone,
+    body.contact-page .contact-option img,
+    body.contact-page .contact-card img,
+    body.contact-page .contact-method img,
+    body.contact-page .contact-item img {
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        flex: 0 0 20px !important;
+        font-size: 17px !important;
+        line-height: 20px !important;
+    }
+
+    body.contact-page .contact-option > div,
+    body.contact-page .contact-card > div,
+    body.contact-page .contact-method > div,
+    body.contact-page .contact-item > div {
+        min-width: 0 !important;
+        width: auto !important;
+        flex: 1 1 auto !important;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 420px) {
+
+    body.contact-page .contact-option,
+    body.contact-page .contact-card,
+    body.contact-page .contact-method,
+    body.contact-page .contact-item {
+        gap: 8px !important;
+    }
+
+    body.contact-page i[class*="fa-"],
+    body.contact-page i.fas.fa-phone,
+    body.contact-page .contact-option img,
+    body.contact-page .contact-card img,
+    body.contact-page .contact-method img,
+    body.contact-page .contact-item img {
+        width: 19px !important;
+        height: 19px !important;
+        min-width: 19px !important;
+        max-width: 19px !important;
+        min-height: 19px !important;
+        max-height: 19px !important;
+        flex-basis: 19px !important;
+        font-size: 16px !important;
+        line-height: 19px !important;
+    }
+}
+
