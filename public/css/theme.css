@@ -2404,3 +2404,281 @@ main .hero .features .feature-card > .btn {
     }
 }
 
+
+/* =========================================================
+   FINAL CONTACT PAGE FIX
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   CONTACT FEATURE CARDS
+   Email / Phone / Client Portal icons
+   --------------------------------------------------------- */
+
+main .hero .features .feature-card {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Actual icons used by contact.html */
+main .hero .features .feature-card > i.fas,
+main .hero .features .feature-card > i.far,
+main .hero .features .feature-card > i.fab {
+    display: block !important;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+
+    font-size: 22px !important;
+    line-height: 24px !important;
+
+    margin: 0 0 10px 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+    flex: 0 0 24px !important;
+
+    overflow: hidden !important;
+}
+
+/* Kill the inline font-size:1.7rem on those icons */
+main .hero .features .feature-card > i[style] {
+    font-size: 22px !important;
+}
+
+/* Contact card headings */
+main .hero .features .feature-card > h3 {
+    margin-top: 0 !important;
+    margin-bottom: 8px !important;
+}
+
+/* Contact card descriptions */
+main .hero .features .feature-card > p {
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+    line-height: 1.6 !important;
+}
+
+/* Contact buttons */
+main .hero .features .feature-card > a.btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+
+/* ---------------------------------------------------------
+   BEFORE CONTACTING US
+   White card = black text in light mode
+   --------------------------------------------------------- */
+
+main .hero > section.card {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #e5e7eb !important;
+}
+
+/* Title */
+main .hero > section.card .card-title {
+    color: #000000 !important;
+}
+
+/* Title icon */
+main .hero > section.card .card-title i,
+main .hero > section.card .card-title svg {
+    color: #000000 !important;
+    fill: currentColor !important;
+
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+
+    font-size: 18px !important;
+    line-height: 20px !important;
+}
+
+/* Description */
+main .hero > section.card > p {
+    color: #000000 !important;
+}
+
+
+/* ---------------------------------------------------------
+   DARK MODE — BEFORE CONTACTING US
+   --------------------------------------------------------- */
+
+html[data-theme="dark"] main .hero > section.card,
+html.dark main .hero > section.card,
+html.dark-mode main .hero > section.card,
+body.dark main .hero > section.card,
+body.dark-mode main .hero > section.card,
+body[data-theme="dark"] main .hero > section.card {
+    background: #111111 !important;
+    color: #ffffff !important;
+    border-color: #333333 !important;
+}
+
+html[data-theme="dark"] main .hero > section.card .card-title,
+html.dark main .hero > section.card .card-title,
+html.dark-mode main .hero > section.card .card-title,
+body.dark main .hero > section.card .card-title,
+body.dark-mode main .hero > section.card .card-title,
+body[data-theme="dark"] main .hero > section.card .card-title {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] main .hero > section.card .card-title i,
+html.dark main .hero > section.card .card-title i,
+html.dark-mode main .hero > section.card .card-title i,
+body.dark main .hero > section.card .card-title i,
+body.dark-mode main .hero > section.card .card-title i,
+body[data-theme="dark"] main .hero > section.card .card-title i {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] main .hero > section.card > p,
+html.dark main .hero > section.card > p,
+html.dark-mode main .hero > section.card > p,
+body.dark main .hero > section.card > p,
+body.dark-mode main .hero > section.card > p,
+body[data-theme="dark"] main .hero > section.card > p {
+    color: #ffffff !important;
+}
+
+
+/* ---------------------------------------------------------
+   DONATION HEADER ICON
+   Prevent donation.png from becoming huge
+   --------------------------------------------------------- */
+
+/* Common header donation image */
+.site-header img[src*="donation.png"] {
+    width: 32px !important;
+    height: 32px !important;
+
+    min-width: 32px !important;
+    min-height: 32px !important;
+
+    max-width: 32px !important;
+    max-height: 32px !important;
+
+    object-fit: contain !important;
+    display: inline-block !important;
+
+    flex: 0 0 32px !important;
+    box-sizing: border-box !important;
+}
+
+/* Donation link containing the image */
+.site-header a:has(img[src*="donation.png"]) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    box-sizing: border-box !important;
+}
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+    main .hero .features {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        width: 100% !important;
+    }
+
+    main .hero .features .feature-card {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    main .hero .features .feature-card > i.fas,
+    main .hero .features .feature-card > i.far,
+    main .hero .features .feature-card > i.fab,
+    main .hero .features .feature-card > i[style] {
+        width: 21px !important;
+        height: 21px !important;
+
+        min-width: 21px !important;
+        min-height: 21px !important;
+
+        max-width: 21px !important;
+        max-height: 21px !important;
+
+        font-size: 19px !important;
+        line-height: 21px !important;
+
+        flex-basis: 21px !important;
+        margin-bottom: 8px !important;
+    }
+
+    /* Donation icon on phones */
+    .site-header img[src*="donation.png"] {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+        max-width: 28px !important;
+        max-height: 28px !important;
+        flex-basis: 28px !important;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   VERY SMALL PHONES
+   --------------------------------------------------------- */
+
+@media (max-width: 420px) {
+
+    main .hero .features {
+        gap: 12px !important;
+    }
+
+    main .hero .features .feature-card > i.fas,
+    main .hero .features .feature-card > i.far,
+    main .hero .features .feature-card > i.fab,
+    main .hero .features .feature-card > i[style] {
+        width: 20px !important;
+        height: 20px !important;
+
+        min-width: 20px !important;
+        min-height: 20px !important;
+
+        max-width: 20px !important;
+        max-height: 20px !important;
+
+        font-size: 18px !important;
+        line-height: 20px !important;
+
+        flex-basis: 20px !important;
+    }
+
+    .site-header img[src*="donation.png"] {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+        min-height: 26px !important;
+        max-width: 26px !important;
+        max-height: 26px !important;
+        flex-basis: 26px !important;
+    }
+}
+
