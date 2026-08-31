@@ -660,6 +660,277 @@ img[src*="gctxrf7M"] {
 }
 </style>
 
+
+<style id="manlung-close-buttons-final-fix">
+
+/* =========================================================
+   MANLUNG — MAKE EVERY REAL CLOSE / X BUTTON VISIBLE
+   ========================================================= */
+
+/* Main service modal X */
+.close-modal,
+#closeModal,
+
+/* Other common close controls */
+.close,
+.close-btn,
+.close-button,
+.modal-close,
+.modal-close-btn,
+.btn-close,
+.popup-close,
+.dialog-close,
+.menu-close,
+.mobile-menu-close,
+.pwa-close,
+.manlung-pwa-close,
+[aria-label="Close"],
+[aria-label="close"],
+[data-close],
+[data-dismiss="modal"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    position: absolute !important;
+    z-index: 999999 !important;
+
+    color: #ffffff !important;
+    background: transparent !important;
+    border: 0 !important;
+
+    font-family: Arial, sans-serif !important;
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+
+    text-shadow:
+        0 0 3px #000000,
+        0 0 6px #000000 !important;
+
+    cursor: pointer !important;
+
+    pointer-events: auto !important;
+}
+
+/* =========================================================
+   SERVICE MODAL — REAL X
+   ========================================================= */
+
+.modal-content .close-modal,
+.modal-content #closeModal {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    position: absolute !important;
+    top: 10px !important;
+    right: 12px !important;
+
+    width: 42px !important;
+    height: 42px !important;
+
+    color: #ffffff !important;
+    background: rgba(0,0,0,.35) !important;
+
+    border: 2px solid rgba(255,255,255,.75) !important;
+    border-radius: 50% !important;
+
+    font-size: 30px !important;
+    font-weight: 700 !important;
+    line-height: 38px !important;
+
+    text-align: center !important;
+
+    z-index: 999999 !important;
+}
+
+/* Make the actual × character visible */
+.close-modal::before {
+    content: none !important;
+}
+
+.close-modal {
+    text-indent: 0 !important;
+    overflow: visible !important;
+}
+
+/* Hover */
+.modal-content .close-modal:hover,
+.modal-content #closeModal:hover {
+    opacity: 1 !important;
+    color: #ffffff !important;
+    background: rgba(255,255,255,.15) !important;
+    transform: scale(1.08) !important;
+}
+
+/* =========================================================
+   CLOSE BUTTONS CONTAINED INSIDE OTHER POPUPS
+   ========================================================= */
+
+.modal .close-modal,
+.modal .close,
+.modal .close-btn,
+.modal .close-button,
+.modal .modal-close,
+.modal .modal-close-btn,
+.modal .popup-close,
+.modal .dialog-close {
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+}
+
+/* =========================================================
+   FONT AWESOME X ICONS
+   ========================================================= */
+
+.close-modal i,
+.close i,
+.close-btn i,
+.close-button i,
+.modal-close i,
+.modal-close-btn i,
+.popup-close i,
+.dialog-close i,
+.btn-close i {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    color: currentColor !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+}
+
+/* =========================================================
+   SVG X ICONS
+   ========================================================= */
+
+.close-modal svg,
+.close svg,
+.close-btn svg,
+.close-button svg,
+.modal-close svg,
+.modal-close-btn svg,
+.popup-close svg,
+.dialog-close svg,
+.btn-close svg {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 22px !important;
+    height: 22px !important;
+
+    fill: currentColor !important;
+    stroke: currentColor !important;
+}
+
+/* =========================================================
+   IMAGE X ICONS
+   ========================================================= */
+
+.close-modal img,
+.close img,
+.close-btn img,
+.close-button img,
+.modal-close img,
+.modal-close-btn img,
+.popup-close img,
+.dialog-close img,
+.btn-close img {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 22px !important;
+    height: 22px !important;
+
+    max-width: 22px !important;
+    max-height: 22px !important;
+
+    object-fit: contain !important;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .close-modal,
+    #closeModal,
+    .close,
+    .close-btn,
+    .close-button,
+    .modal-close,
+    .modal-close-btn,
+    .btn-close,
+    .popup-close,
+    .dialog-close,
+    .menu-close,
+    .mobile-menu-close,
+    .pwa-close,
+    .manlung-pwa-close {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        min-height: 42px !important;
+
+        font-size: 30px !important;
+    }
+
+    .modal-content .close-modal,
+    .modal-content #closeModal {
+        top: 8px !important;
+        right: 8px !important;
+    }
+}
+
+/* =========================================================
+   NEVER HIDE CLOSE BUTTONS
+   ========================================================= */
+
+.close-modal *,
+#closeModal *,
+.close *,
+.close-btn *,
+.close-button *,
+.modal-close *,
+.modal-close-btn *,
+.btn-close *,
+.popup-close *,
+.dialog-close *,
+.menu-close *,
+.mobile-menu-close *,
+.pwa-close *,
+.manlung-pwa-close * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Prevent parent containers from clipping the X */
+.modal,
+.modal-content,
+.popup,
+.dialog,
+.modal-body,
+.modal-header {
+    overflow: visible !important;
+}
+
+</style>
+
 </head>
 <body>
     <header class="site-header">
@@ -1167,181 +1438,3 @@ body.service-modal-open{
 
 </body>
 </html>
-
-<style id="manlung-final-ui-fix">
-/* ===== FINAL CALL ICON SIZE FIX ===== */
-img.manlung-call-icon,
-.manlung-call-icon {
-    width: 26px !important;
-    height: 26px !important;
-    min-width: 26px !important;
-    min-height: 26px !important;
-    max-width: 26px !important;
-    max-height: 26px !important;
-    object-fit: contain !important;
-    display: inline-block !important;
-    flex: 0 0 26px !important;
-    position: relative !important;
-    z-index: 10 !important;
-}
-
-/* Laptop / desktop */
-@media (min-width: 601px) {
-    img.manlung-call-icon,
-    .manlung-call-icon,
-    .header-actions img.manlung-call-icon {
-        width: 24px !important;
-        height: 24px !important;
-        min-width: 24px !important;
-        min-height: 24px !important;
-        max-width: 24px !important;
-        max-height: 24px !important;
-        flex-basis: 24px !important;
-    }
-}
-
-/* Phone */
-@media (max-width: 600px) {
-    img.manlung-call-icon,
-    .manlung-call-icon {
-        width: 30px !important;
-        height: 30px !important;
-        min-width: 30px !important;
-        min-height: 30px !important;
-        max-width: 30px !important;
-        max-height: 30px !important;
-        flex-basis: 30px !important;
-    }
-}
-
-/* Prevent parent call button from stretching the image */
-a:has(.manlung-call-icon),
-button:has(.manlung-call-icon) {
-    overflow: hidden !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-/* ===== MAKE ALL CLOSE X BUTTONS VISIBLE ===== */
-.close,
-.close-btn,
-.close-button,
-.modal-close,
-.modal-close-btn,
-.btn-close,
-.popup-close,
-.dialog-close,
-.menu-close,
-.mobile-menu-close,
-.pwa-close,
-.manlung-pwa-close,
-[aria-label="Close"],
-[aria-label="close"],
-[aria-label*="Close"],
-[data-close],
-[data-dismiss="modal"] {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-    min-height: 40px !important;
-    align-items: center !important;
-    justify-content: center !important;
-    position: relative !important;
-    z-index: 99999 !important;
-    cursor: pointer !important;
-}
-
-/* Make the X itself visible */
-.close *,
-.close-btn *,
-.close-button *,
-.modal-close *,
-.modal-close-btn *,
-.btn-close *,
-.popup-close *,
-.dialog-close *,
-.menu-close *,
-.mobile-menu-close *,
-.pwa-close *,
-.manlung-pwa-close * {
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-/* FontAwesome X */
-.close .fa,
-.close .fas,
-.close .fa-times,
-.close .fa-xmark,
-.close-btn .fa,
-.close-btn .fas,
-.close-button .fa,
-.modal-close .fa,
-.modal-close-btn .fa,
-.btn-close .fa,
-.popup-close .fa,
-.dialog-close .fa,
-.menu-close .fa,
-.mobile-menu-close .fa {
-    display: inline-block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    font-size: 20px !important;
-}
-
-/* Text/entity X */
-.close,
-.close-btn,
-.close-button,
-.modal-close,
-.modal-close-btn,
-.popup-close,
-.dialog-close,
-.menu-close,
-.mobile-menu-close {
-    color: #111827 !important;
-    text-shadow: none !important;
-}
-
-/* PWA close button */
-.manlung-pwa-close {
-    color: #475569 !important;
-    background: transparent !important;
-    border: 0 !important;
-    font-size: 28px !important;
-    line-height: 1 !important;
-}
-
-/* Never let an image inside a close button become huge */
-.close img,
-.close-btn img,
-.close-button img,
-.modal-close img,
-.modal-close-btn img,
-.popup-close img,
-.dialog-close img,
-.menu-close img,
-.mobile-menu-close img {
-    width: 20px !important;
-    height: 20px !important;
-    max-width: 20px !important;
-    max-height: 20px !important;
-}
-
-/* ===== EMERGENCY LIMIT FOR CALL AREA ===== */
-.header-actions {
-    overflow: hidden !important;
-}
-
-.header-actions a,
-.header-actions button {
-    overflow: hidden !important;
-}
-
-.header-actions .manlung-call-icon {
-    object-fit: contain !important;
-}
-</style>
