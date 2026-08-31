@@ -1,219 +1,865 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manlung Recovery | Cyber Recovery &amp; Digital Investigation</title>
 
+        <meta name="description" content="Manlung Recovery provides structured digital recovery assistance, account and device recovery guidance, cybersecurity awareness, investigation support, and secure client support.">
+    <meta name="application-name" content="Manlung Recovery">
+    <meta name="author" content="Manlung Recovery">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://manlungrecovery.manlungshop.co.ke/">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="shortcut icon" type="image/png" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#ffffff">
 
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Manlung Recovery">
+    <meta property="og:title" content="Manlung Recovery | Cyber Recovery &amp; Digital Investigation">
+    <meta property="og:description" content="Structured digital recovery assistance, investigation support, cybersecurity awareness, and secure client support.">
+    <meta property="og:url" content="https://manlungrecovery.manlungshop.co.ke/">
+    <meta property="og:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
 
-<style id="MANLUNG-FINAL-SERVICE-X-FIX">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Manlung Recovery | Cyber Recovery &amp; Digital Investigation">
+    <meta name="twitter:description" content="Structured digital recovery assistance and secure client support.">
+    <meta name="twitter:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
 
-/* =========================================================
-   SERVICE MODALS
-   WHITE PAGE / WHITE CONTENT
-   ========================================================= */
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"WebSite",
+      "name":"Manlung Recovery",
+      "alternateName":"Manlung Recovery Cyber Recovery",
+      "url":"https://manlungrecovery.manlungshop.co.ke/"
+    }
+    </script>
 
-#serviceModalOverlay {
-    background: rgba(0,0,0,0.45) !important;
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"Organization",
+      "name":"Manlung Recovery",
+      "url":"https://manlungrecovery.manlungshop.co.ke/",
+      "logo":"https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
+    }
+    </script>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <style>
+        #typing-text {
+            font-family: 'Poppins', 'Inter', -apple-system, sans-serif;
+            font-size: clamp(1.6rem, 5vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            text-align: center;
+            text-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
+            margin-bottom: 0.6rem;
+            min-height: 1.3em; /* prevents layout jump while the typewriter animates in */
+        }
+        #typing-text::after {
+            content: "|";
+            margin-left: 4px;
+            -webkit-text-fill-color: #38bdf8;
+            color: #38bdf8;
+            animation: typingCursorBlink 0.45s infinite;
+        }
+        @keyframes typingCursorBlink {
+            50% { opacity: 0; }
+        }
+        .hero {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+        .hero-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.60;
+            z-index: 0;
+            pointer-events: none;
+            background: var(--navy-900);
+            filter: saturate(0.9) contrast(0.95) brightness(0.95);
+        }
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(5, 20, 45, 0.38),
+                    rgba(5, 20, 45, 0.52)
+                );
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        @media (max-width: 600px) {
+            .hero-video {
+        object-position: 50% 50%;
+        opacity: 0.65;
+    }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hero-video { display: none; }
+        }
+        .service-icon-image {
+            width: 2.3rem;
+            height: 2.3rem;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 1rem;
+        }
+        @media (max-width: 480px) {
+            #typing-text { font-size: 1.5rem; letter-spacing: -0.3px; }
+        }
+    </style>
+
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:
+    linear-gradient(135deg,rgba(15,23,42,.98),rgba(17,35,56,.98)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 64px);
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 4px 18px rgba(2,6,23,.22);
+}
+.site-header .container{
+  max-width:1180px;
+  margin:0 auto;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:1rem;
+  padding:.55rem .8rem;
+}
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  min-width:0;
+}
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.05rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+.site-header .brand span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.72rem;
+  white-space:nowrap;
+}
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  min-height:38px;
+  padding:.45rem .68rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:700;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.35);
+  color:#fff;
+}
+.site-header .header-actions .btn-primary{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.site-header .header-actions .btn-primary:hover{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+}
+@media(max-width:900px){
+  .site-header .container{
+    min-height:58px;
+    padding:.45rem .7rem;
+  }
+  .site-header .brand h1{
+    font-size:.95rem;
+  }
+  .site-header .brand span{
+    font-size:.64rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:36px;
+    padding:.4rem .55rem;
+    font-size:.7rem;
+  }
+}
+@media(max-width:700px){
+  .site-header .container{
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+  .site-header .brand{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+  .site-header .brand span{
+    white-space:normal;
+  }
+  .site-header .header-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.35rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:38px;
+    padding:.35rem .2rem;
+    font-size:.68rem;
+  }
+}
+@media(max-width:480px){
+  .site-header .header-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
+  }
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    display:block;
+    font-size:1rem;
+    line-height:1;
+    margin:0;
+  }
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
+  }
+}
+@media(max-width:360px){
+  .site-header .brand h1{
+    font-size:.86rem;
+  }
+  .site-header .brand span{
+    font-size:.58rem;
+  }
+}
+</style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
 }
 
-#serviceModalOverlay > div,
-#serviceModalOverlay .manlung-service-modal-card,
-#serviceModalOverlay .modal-content,
-#serviceModalOverlay #serviceModalBody {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    color: #111827 !important;
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
 }
 
-/* Keep all text inside service modal readable */
-#serviceModalOverlay h1,
-#serviceModalOverlay h2,
-#serviceModalOverlay h3,
-#serviceModalOverlay h4,
-#serviceModalOverlay h5,
-#serviceModalOverlay p,
-#serviceModalOverlay li,
-#serviceModalOverlay strong,
-#serviceModalOverlay span {
-    color: #111827 !important;
+.site-header .brand h1{
+  min-width:0;
 }
 
-/* =========================================================
-   SERVICE MODAL CLOSE BUTTON
-   ONLY A SMALL RED X
-   NO CIRCLE
-   NO RED DOT
-   NO BORDER
-   NO BACKGROUND
-   ========================================================= */
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
 
-#serviceModalOverlay .manlung-service-close,
-#serviceModalOverlay .close-modal,
-#serviceModalOverlay #closeModal {
-    position: absolute !important;
 
-    top: 12px !important;
-    right: 14px !important;
+<style id="manlung-home-mobile-nav">
+@media(max-width:650px){
 
-    width: 30px !important;
-    height: 30px !important;
+  .site-header .container{
+    min-height:auto !important;
+    padding:.65rem .7rem .72rem !important;
+    gap:.65rem !important;
+  }
 
-    min-width: 30px !important;
-    min-height: 30px !important;
+  .site-header .brand{
+    width:100% !important;
+    justify-content:flex-start !important;
+  }
 
-    padding: 0 !important;
+  .site-header .brand h1{
+    font-size:.9rem !important;
+  }
+
+  .site-header .brand span{
+    font-size:.58rem !important;
+    white-space:normal !important;
+  }
+
+  .site-header .manlung-site-logo{
+    width:38px !important;
+    height:38px !important;
+    flex:0 0 38px !important;
+  }
+
+  .site-header .header-actions{
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:.4rem !important;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100% !important;
+    min-height:52px !important;
+    padding:.45rem .25rem !important;
+    border-radius:11px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:.22rem !important;
+    font-size:.64rem !important;
+    line-height:1.05 !important;
+    white-space:normal !important;
+  }
+
+  .site-header .header-actions i{
+    display:block !important;
+    font-size:1rem !important;
+    line-height:1 !important;
+    margin:0 !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"]{
+    grid-column:1 / -1 !important;
+    min-height:50px !important;
+    flex-direction:row !important;
+    gap:.45rem !important;
+    font-size:.76rem !important;
+    background:#2563eb !important;
+    border-color:#2563eb !important;
+    color:#fff !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"] i{
+    font-size:.9rem !important;
+  }
+
+  .site-header .header-actions
+    button[data-theme-toggle="true"]{
+    position:absolute !important;
+    top:.7rem !important;
+    right:.7rem !important;
+    width:42px !important;
+    min-height:42px !important;
+    height:42px !important;
+    border-radius:50% !important;
+    padding:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    font-size:0 !important;
+    z-index:5 !important;
+  }
+
+  .site-header .header-actions
+    button[data-theme-toggle="true"] i{
+    font-size:1rem !important;
+  }
+
+}
+
+@media(max-width:390px){
+  .site-header .header-actions{
+    gap:.3rem !important;
+  }
+
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:50px !important;
+    font-size:.6rem !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"]{
+    font-size:.72rem !important;
+  }
+}
+</style>
+
+
+<style id="manlung-colour-nav">
+/* Homepage navigation colours */
+.site-header .header-actions button[data-theme-toggle="true"]{
+  background:#1f2937 !important;
+  border-color:#374151 !important;
+  color:#f9fafb !important;
+}
+
+.site-header .header-actions button[data-theme-toggle="true"] i{
+  color:#facc15 !important;
+}
+
+.site-header .header-actions a[href="/client/dashboard.html"]{
+  background:#1d4ed8 !important;
+  border-color:#1d4ed8 !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/client/dashboard.html"] i{
+  color:#dbeafe !important;
+}
+
+.site-header .header-actions a[href="/blog.html"]{
+  background:#6d28d9 !important;
+  border-color:#6d28d9 !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/blog.html"] i{
+  color:#ede9fe !important;
+}
+
+.site-header .header-actions a[href="/donate.html"]{
+  background:#15803d !important;
+  border-color:#15803d !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/donate.html"] i{
+  color:#dcfce7 !important;
+}
+
+.site-header .header-actions a[href="/client/request.html"]{
+  background:#2563eb !important;
+  border-color:#2563eb !important;
+  color:#fff !important;
+}
+
+.site-header .header-actions a[href="/client/request.html"] i{
+  color:#fff !important;
+}
+
+/* Footer navigation colours */
+.manlung-footer-link[href="/"]{
+  border-color:rgba(245,158,11,.35) !important;
+  background:rgba(245,158,11,.10) !important;
+  color:#fbbf24 !important;
+}
+
+.manlung-footer-link[href="/login.html"]{
+  border-color:rgba(37,99,235,.35) !important;
+  background:rgba(37,99,235,.10) !important;
+  color:#93c5fd !important;
+}
+
+.manlung-footer-link[href="/client/dashboard.html"]{
+  border-color:rgba(37,99,235,.35) !important;
+  background:rgba(37,99,235,.10) !important;
+  color:#93c5fd !important;
+}
+
+.manlung-footer-link[href="/blog.html"]{
+  border-color:rgba(139,92,246,.35) !important;
+  background:rgba(139,92,246,.10) !important;
+  color:#c4b5fd !important;
+}
+
+.manlung-footer-link[href="/donate.html"]{
+  border-color:rgba(34,197,94,.35) !important;
+  background:rgba(34,197,94,.10) !important;
+  color:#86efac !important;
+}
+
+.manlung-footer-link:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+
+/* Keep the phone navigation colours strong */
+@media(max-width:650px){
+  .site-header .header-actions
+    a[href="/client/dashboard.html"],
+  .site-header .header-actions
+    a[href="/blog.html"],
+  .site-header .header-actions
+    a[href="/donate.html"]{
+    color:#fff !important;
+  }
+
+  .site-header .header-actions
+    a[href="/client/request.html"]{
+    box-shadow:0 8px 20px rgba(37,99,235,.25) !important;
+  }
+}
+</style>
+
+<link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/footer.css">
+
+    <!-- PWA -->
+
+    <!-- Open Graph / WhatsApp / Facebook / Telegram -->
+
+    <!-- Twitter / X -->
+
+
+
+
+
+
+
+
+<style id="manlung-call-icon-final-fix">
+.manlung-call-icon {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    object-fit: contain !important;
+    display: inline-block !important;
+    flex: 0 0 20px !important;
+}
+
+.header-actions .manlung-call-icon,
+.site-header .manlung-call-icon {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+}
+
+@media (max-width: 600px) {
+    .manlung-call-icon,
+    .header-actions .manlung-call-icon,
+    .site-header .manlung-call-icon {
+        width: 28px !important;
+        height: 28px !important;
+        max-width: 28px !important;
+        max-height: 28px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+        flex: 0 0 28px !important;
+    }
+}
+</style>
+
+
+<style id="manlung-call-icon-style">
+/* MANLUNG CALL ICON — FORCE SMALL SIZE */
+img.manlung-call-icon,
+a img.manlung-call-icon,
+button img.manlung-call-icon,
+.call-admin img.manlung-call-icon,
+.call-button img.manlung-call-icon,
+[href^="tel:"] img.manlung-call-icon,
+img[src="https://i.postimg.cc/gctxrf7M/hd-blue-round-circle-phone-icon-transparent-png-701751695059659ul34evvlna-Photoroom.png"],
+img[src*="gctxrf7M"] {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    max-width: 22px !important;
+    max-height: 22px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    flex: 0 0 22px !important;
     margin: 0 !important;
+    padding: 0 !important;
+}
 
+@media (max-width: 600px) {
+    img.manlung-call-icon,
+    a img.manlung-call-icon,
+    button img.manlung-call-icon,
+    .call-admin img.manlung-call-icon,
+    .call-button img.manlung-call-icon,
+    [href^="tel:"] img.manlung-call-icon,
+    img[src="https://i.postimg.cc/gctxrf7M/hd-blue-round-circle-phone-icon-transparent-png-701751695059659ul34evvlna-Photoroom.png"],
+    img[src*="gctxrf7M"] {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+        max-width: 28px !important;
+        max-height: 28px !important;
+        flex: 0 0 28px !important;
+    }
+}
+</style>
+
+
+<style id="manlung-close-buttons-final-fix">
+
+/* =========================================================
+   MANLUNG — MAKE EVERY REAL CLOSE / X BUTTON VISIBLE
+   ========================================================= */
+
+/* Main service modal X */
+.close-modal,
+#closeModal,
+
+/* Other common close controls */
+.close,
+.close-btn,
+.close-button,
+.modal-close,
+.modal-close-btn,
+.btn-close,
+.popup-close,
+.dialog-close,
+.menu-close,
+.mobile-menu-close,
+.pwa-close,
+.manlung-pwa-close,
+[aria-label="Close"],
+[aria-label="close"],
+[data-close],
+[data-dismiss="modal"] {
     display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+
     align-items: center !important;
     justify-content: center !important;
 
+    position: absolute !important;
+    z-index: 999999 !important;
+
+    color: #ffffff !important;
     background: transparent !important;
-    background-color: transparent !important;
-
     border: 0 !important;
-    border-width: 0 !important;
-    border-style: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-
-    color: #ff0000 !important;
 
     font-family: Arial, sans-serif !important;
-    font-size: 0 !important;
-
+    font-size: 32px !important;
+    font-weight: 700 !important;
     line-height: 1 !important;
 
-    opacity: 1 !important;
-    visibility: visible !important;
-
-    z-index: 9999999 !important;
+    text-shadow:
+        0 0 3px #000000,
+        0 0 6px #000000 !important;
 
     cursor: pointer !important;
-}
 
-/* Remove EVERY old icon inside the button */
-#serviceModalOverlay .manlung-service-close i,
-#serviceModalOverlay .manlung-service-close svg,
-#serviceModalOverlay .manlung-service-close .fa,
-#serviceModalOverlay .manlung-service-close .fas,
-#serviceModalOverlay .manlung-service-close .fa-times,
-#serviceModalOverlay .manlung-service-close .fa-xmark,
-#serviceModalOverlay .close-modal i,
-#serviceModalOverlay .close-modal svg,
-#serviceModalOverlay #closeModal i,
-#serviceModalOverlay #closeModal svg {
-    display: none !important;
-    visibility: hidden !important;
-}
-
-/* Create ONLY the X */
-#serviceModalOverlay .manlung-service-close::before,
-#serviceModalOverlay .close-modal::before,
-#serviceModalOverlay #closeModal::before {
-    content: "×" !important;
-
-    display: block !important;
-
-    width: auto !important;
-    height: auto !important;
-
-    color: #ff0000 !important;
-
-    background: transparent !important;
-
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-
-    font-family: Arial, sans-serif !important;
-    font-size: 28px !important;
-    font-weight: 700 !important;
-
-    line-height: 28px !important;
-
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-/* Hover = still only X, no circle */
-#serviceModalOverlay .manlung-service-close:hover,
-#serviceModalOverlay .close-modal:hover,
-#serviceModalOverlay #closeModal:hover {
-    background: transparent !important;
-    background-color: transparent !important;
-
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-
-    color: #ff0000 !important;
-}
-
-#serviceModalOverlay .manlung-service-close:hover::before,
-#serviceModalOverlay .close-modal:hover::before,
-#serviceModalOverlay #closeModal:hover::before {
-    color: #ff0000 !important;
-    background: transparent !important;
+    pointer-events: auto !important;
 }
 
 /* =========================================================
-   CALL CLOSE BUTTON
-   SMALL RED X ONLY
+   SERVICE MODAL — REAL X
    ========================================================= */
 
-#callWidgetCloseBtn {
-    width: 30px !important;
-    height: 30px !important;
-
-    min-width: 30px !important;
-    min-height: 30px !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
+.modal-content .close-modal,
+.modal-content #closeModal {
     display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 
-    background: transparent !important;
-    background-color: transparent !important;
+    position: absolute !important;
+    top: 10px !important;
+    right: 12px !important;
 
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+    width: 42px !important;
+    height: 42px !important;
 
-    color: #ff0000 !important;
+    color: #ffffff !important;
+    background: rgba(0,0,0,.35) !important;
 
-    font-size: 0 !important;
-}
+    border: 2px solid rgba(255,255,255,.75) !important;
+    border-radius: 50% !important;
 
-#callWidgetCloseBtn i,
-#callWidgetCloseBtn svg,
-#callWidgetCloseBtn .fa,
-#callWidgetCloseBtn .fas,
-#callWidgetCloseBtn .fa-times,
-#callWidgetCloseBtn .fa-xmark {
-    display: none !important;
-}
-
-#callWidgetCloseBtn::before {
-    content: "×" !important;
-
-    display: block !important;
-
-    color: #ff0000 !important;
-
-    background: transparent !important;
-
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-
-    font-family: Arial, sans-serif !important;
-    font-size: 28px !important;
+    font-size: 30px !important;
     font-weight: 700 !important;
+    line-height: 38px !important;
 
-    line-height: 28px !important;
+    text-align: center !important;
+
+    z-index: 999999 !important;
+}
+
+/* Make the actual × character visible */
+.close-modal::before {
+    content: none !important;
+}
+
+.close-modal {
+    text-indent: 0 !important;
+    overflow: visible !important;
+}
+
+/* Hover */
+.modal-content .close-modal:hover,
+.modal-content #closeModal:hover {
+    opacity: 1 !important;
+    color: #ffffff !important;
+    background: rgba(255,255,255,.15) !important;
+    transform: scale(1.08) !important;
+}
+
+/* =========================================================
+   CLOSE BUTTONS CONTAINED INSIDE OTHER POPUPS
+   ========================================================= */
+
+.modal .close-modal,
+.modal .close,
+.modal .close-btn,
+.modal .close-button,
+.modal .modal-close,
+.modal .modal-close-btn,
+.modal .popup-close,
+.modal .dialog-close {
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+}
+
+/* =========================================================
+   FONT AWESOME X ICONS
+   ========================================================= */
+
+.close-modal i,
+.close i,
+.close-btn i,
+.close-button i,
+.modal-close i,
+.modal-close-btn i,
+.popup-close i,
+.dialog-close i,
+.btn-close i {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    color: currentColor !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+}
+
+/* =========================================================
+   SVG X ICONS
+   ========================================================= */
+
+.close-modal svg,
+.close svg,
+.close-btn svg,
+.close-button svg,
+.modal-close svg,
+.modal-close-btn svg,
+.popup-close svg,
+.dialog-close svg,
+.btn-close svg {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 22px !important;
+    height: 22px !important;
+
+    fill: currentColor !important;
+    stroke: currentColor !important;
+}
+
+/* =========================================================
+   IMAGE X ICONS
+   ========================================================= */
+
+.close-modal img,
+.close img,
+.close-btn img,
+.close-button img,
+.modal-close img,
+.modal-close-btn img,
+.popup-close img,
+.dialog-close img,
+.btn-close img {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 22px !important;
+    height: 22px !important;
+
+    max-width: 22px !important;
+    max-height: 22px !important;
+
+    object-fit: contain !important;
 }
 
 /* =========================================================
@@ -222,31 +868,186 @@
 
 @media (max-width: 600px) {
 
+    .close-modal,
+    #closeModal,
+    .close,
+    .close-btn,
+    .close-button,
+    .modal-close,
+    .modal-close-btn,
+    .btn-close,
+    .popup-close,
+    .dialog-close,
+    .menu-close,
+    .mobile-menu-close,
+    .pwa-close,
+    .manlung-pwa-close {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        min-height: 42px !important;
+
+        font-size: 30px !important;
+    }
+
+    .modal-content .close-modal,
+    .modal-content #closeModal {
+        top: 8px !important;
+        right: 8px !important;
+    }
+}
+
+/* =========================================================
+   NEVER HIDE CLOSE BUTTONS
+   ========================================================= */
+
+.close-modal *,
+#closeModal *,
+.close *,
+.close-btn *,
+.close-button *,
+.modal-close *,
+.modal-close-btn *,
+.btn-close *,
+.popup-close *,
+.dialog-close *,
+.menu-close *,
+.mobile-menu-close *,
+.pwa-close *,
+.manlung-pwa-close * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Prevent parent containers from clipping the X */
+.modal,
+.modal-content,
+.popup,
+.dialog,
+.modal-body,
+.modal-header {
+    overflow: visible !important;
+}
+
+</style>
+
+
+<style id="clean-service-close-fix">
+
+/* =========================================
+   SERVICE MODALS
+   Keep the original page/card styling.
+   Only make the close X small and red.
+   ========================================= */
+
+#serviceModalOverlay > div {
+    background: #ffffff !important;
+    color: #111827 !important;
+    position: relative !important;
+}
+
+/* Remove old circle/button appearance */
+#serviceModalOverlay .manlung-service-close,
+#serviceModalOverlay .close-modal,
+#serviceModalOverlay #closeModal,
+#serviceModalOverlay button.close-modal,
+#serviceModalOverlay button#closeModal {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    position: absolute !important;
+    top: 12px !important;
+    right: 14px !important;
+
+    z-index: 999999 !important;
+
+    color: #ff0000 !important;
+    font-size: 0 !important;
+
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    cursor: pointer !important;
+}
+
+/* The ONLY X */
+#serviceModalOverlay .manlung-service-close::before,
+#serviceModalOverlay .close-modal::before,
+#serviceModalOverlay #closeModal::before,
+#serviceModalOverlay button.close-modal::before,
+#serviceModalOverlay button#closeModal::before {
+    content: "×" !important;
+
+    display: block !important;
+
+    color: #ff0000 !important;
+
+    font-family: Arial, sans-serif !important;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    line-height: 28px !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Never create a circle on hover */
+#serviceModalOverlay .manlung-service-close:hover,
+#serviceModalOverlay .close-modal:hover,
+#serviceModalOverlay #closeModal:hover {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: #cc0000 !important;
+}
+
+#serviceModalOverlay .manlung-service-close:hover::before,
+#serviceModalOverlay .close-modal:hover::before,
+#serviceModalOverlay #closeModal:hover::before {
+    color: #cc0000 !important;
+    background: transparent !important;
+}
+
+/* Make service text readable on white */
+#serviceModalOverlay #serviceModalBody,
+#serviceModalOverlay #serviceModalBody p,
+#serviceModalOverlay #serviceModalBody li {
+    color: #111827 !important;
+}
+
+#serviceModalOverlay #serviceModalBody h2,
+#serviceModalOverlay #serviceModalBody h3,
+#serviceModalOverlay #serviceModalBody h4 {
+    color: #111827 !important;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
     #serviceModalOverlay .manlung-service-close,
     #serviceModalOverlay .close-modal,
     #serviceModalOverlay #closeModal {
-        top: 8px !important;
-        right: 10px !important;
-
-        width: 30px !important;
-        height: 30px !important;
+        top: 9px !important;
+        right: 11px !important;
     }
 
     #serviceModalOverlay .manlung-service-close::before,
     #serviceModalOverlay .close-modal::before,
     #serviceModalOverlay #closeModal::before {
-        font-size: 28px !important;
-        line-height: 28px !important;
-    }
-
-    #callWidgetCloseBtn {
-        width: 30px !important;
-        height: 30px !important;
-    }
-
-    #callWidgetCloseBtn::before {
-        font-size: 28px !important;
-        line-height: 28px !important;
+        font-size: 26px !important;
+        line-height: 26px !important;
     }
 }
 
@@ -257,7 +1058,7 @@
     <header class="site-header">
         <div class="container">
             <div class="brand">
-
+                
 <a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home"><img
   class="manlung-site-logo"
   src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
@@ -334,21 +1135,78 @@
             </div>
         </div>
 
+        
+<style id="service-modal-scroll-style">
+/* Service preview modal */
+#serviceModalOverlay{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:2000 !important;
+    display:none;
+    align-items:center !important;
+    justify-content:center !important;
+    padding:1rem !important;
+    background:rgba(10,18,40,.55);
+    overflow:hidden !important;
+    box-sizing:border-box;
+}
 
+#serviceModalOverlay > div{
+    width:min(640px,100%) !important;
+    max-width:640px !important;
+    max-height:calc(100dvh - 2rem) !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    box-sizing:border-box;
+    position:relative;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(100,116,139,.55) transparent;
+}
 
+#serviceModalOverlay > div::-webkit-scrollbar{width:7px}
+#serviceModalOverlay > div::-webkit-scrollbar-track{background:transparent}
+#serviceModalOverlay > div::-webkit-scrollbar-thumb{
+    background:rgba(100,116,139,.42);
+    border-radius:999px;
+}
+#serviceModalOverlay > div::-webkit-scrollbar-thumb:hover{
+    background:rgba(36,81,214,.68);
+}
+
+@media(max-width:768px){
+    #serviceModalOverlay{
+        align-items:center !important;
+        padding:.75rem .65rem !important;
+    }
+
+    #serviceModalOverlay > div{
+        width:100% !important;
+        max-width:100% !important;
+        max-height:calc(100dvh - 1.5rem) !important;
+        border-radius:16px !important;
+        padding:1.15rem !important;
+        margin:0 !important;
+    }
+
+    #serviceModalBody ul{
+        line-height:1.65 !important;
+    }
+
+    #serviceModalBody .btn{
+        max-width:100%;
+        white-space:normal;
+    }
+}
+
+body.service-modal-open{
+    overflow:hidden !important;
+}
+</style>
         <!-- Service detail modal -->
         <div id="serviceModalOverlay" class="service-modal-scroll" style="display:none;" onclick="if(event.target===this) closeServiceModal()">
-            <div class="manlung-service-modal-card" style="background:#ffffff !important; color:#111827 !important;">
-                <button
-                    type="button"
-                    id="serviceModalCloseBtn"
-                    class="manlung-service-close"
-                    aria-label="Close service details"
-                    title="Close"
-                    onclick="event.stopPropagation(); closeServiceModal();">
-                    <i class="fas fa-xmark" aria-hidden="true"></i>
-                </button>
-
+            <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; max-width:640px; width:100%; padding:2rem;">
                 <div id="serviceModalBody"></div>
             </div>
         </div>
@@ -373,7 +1231,7 @@
 </a>
     </div>
 
-
+        
 
 
 <style>
