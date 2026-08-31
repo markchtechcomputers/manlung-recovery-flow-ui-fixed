@@ -2920,3 +2920,404 @@ body[data-theme="dark"] .contact-safety-card > p {
     }
 }
 
+
+
+/* =========================================================
+   CONTACT PAGE — CLEAN FINAL COMPONENT
+   ========================================================= */
+
+.contact-page-content {
+    width: 100% !important;
+    max-width: 900px !important;
+    margin: 2rem auto !important;
+    box-sizing: border-box !important;
+}
+
+
+/* INTRO */
+
+.contact-page-content .contact-intro {
+    text-align: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.contact-page-content .contact-intro-icon {
+    width: 56px !important;
+    height: 56px !important;
+
+    margin: 0 auto 14px auto !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 14px !important;
+
+    background: rgba(36,81,214,.10) !important;
+    color: var(--accent) !important;
+
+    box-sizing: border-box !important;
+}
+
+.contact-page-content .contact-intro-icon i {
+    width: 24px !important;
+    height: 24px !important;
+
+    font-size: 22px !important;
+    line-height: 24px !important;
+
+    display: block !important;
+
+    color: var(--accent) !important;
+}
+
+
+/* CONTACT OPTIONS */
+
+.contact-page-content .contact-options {
+    width: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 18px !important;
+
+    margin-top: 1.5rem !important;
+
+    box-sizing: border-box !important;
+}
+
+
+.contact-page-content .contact-option-card {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    align-items: flex-start !important;
+
+    padding: 22px !important;
+
+    overflow: hidden !important;
+}
+
+
+/* ICON CONTAINER */
+
+.contact-page-content .contact-option-icon {
+    width: 42px !important;
+    height: 42px !important;
+
+    min-width: 42px !important;
+    min-height: 42px !important;
+
+    max-width: 42px !important;
+    max-height: 42px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 0 14px 0 !important;
+
+    border-radius: 10px !important;
+
+    background: rgba(36,81,214,.10) !important;
+
+    box-sizing: border-box !important;
+
+    flex: 0 0 42px !important;
+
+    overflow: hidden !important;
+}
+
+
+/* ACTUAL ICON */
+
+.contact-page-content .contact-option-icon i {
+    display: block !important;
+
+    width: 22px !important;
+    height: 22px !important;
+
+    min-width: 22px !important;
+    min-height: 22px !important;
+
+    max-width: 22px !important;
+    max-height: 22px !important;
+
+    font-size: 20px !important;
+    line-height: 22px !important;
+
+    color: var(--accent) !important;
+
+    box-sizing: border-box !important;
+
+    flex: 0 0 22px !important;
+}
+
+
+/* CARD TEXT */
+
+.contact-page-content .contact-option-card h3 {
+    width: 100% !important;
+
+    margin: 0 0 8px 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+.contact-page-content .contact-option-card p {
+    width: 100% !important;
+
+    margin: 0 0 16px 0 !important;
+
+    line-height: 1.6 !important;
+
+    box-sizing: border-box !important;
+
+    overflow-wrap: anywhere !important;
+}
+
+
+/* BUTTON */
+
+.contact-page-content .contact-option-card .btn {
+    margin-top: auto !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    max-width: 100% !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   BEFORE CONTACTING US
+   ========================================================= */
+
+.contact-page-content .contact-safety {
+    width: 100% !important;
+
+    margin-top: 1.5rem !important;
+
+    padding: 18px 20px !important;
+
+    box-sizing: border-box !important;
+
+    background: #ffffff !important;
+
+    color: #000000 !important;
+
+    border: 1px solid #dddddd !important;
+
+    border-radius: 12px !important;
+}
+
+
+.contact-page-content .contact-safety-title {
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 9px !important;
+
+    margin: 0 !important;
+
+    color: #000000 !important;
+}
+
+
+.contact-page-content .contact-safety-title i {
+    display: inline-block !important;
+
+    width: 20px !important;
+    height: 20px !important;
+
+    min-width: 20px !important;
+
+    max-width: 20px !important;
+
+    font-size: 18px !important;
+
+    line-height: 20px !important;
+
+    color: #000000 !important;
+
+    flex: 0 0 20px !important;
+}
+
+
+.contact-page-content .contact-safety p {
+    margin: 8px 0 0 0 !important;
+
+    color: #000000 !important;
+
+    line-height: 1.6 !important;
+}
+
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+html[data-theme="dark"] .contact-page-content .contact-safety,
+html.dark .contact-page-content .contact-safety,
+html.dark-mode .contact-page-content .contact-safety,
+body.dark .contact-page-content .contact-safety,
+body.dark-mode .contact-page-content .contact-safety,
+body[data-theme="dark"] .contact-page-content .contact-safety {
+    background: #111111 !important;
+
+    color: #ffffff !important;
+
+    border-color: #333333 !important;
+}
+
+
+html[data-theme="dark"] .contact-page-content .contact-safety-title,
+html.dark .contact-page-content .contact-safety-title,
+html.dark-mode .contact-page-content .contact-safety-title,
+body.dark .contact-page-content .contact-safety-title,
+body.dark-mode .contact-page-content .contact-safety-title,
+body[data-theme="dark"] .contact-page-content .contact-safety-title {
+    color: #ffffff !important;
+}
+
+
+html[data-theme="dark"] .contact-page-content .contact-safety-title i,
+html.dark .contact-page-content .contact-safety-title i,
+html.dark-mode .contact-page-content .contact-safety-title i,
+body.dark .contact-page-content .contact-safety-title i,
+body.dark-mode .contact-page-content .contact-safety-title i,
+body[data-theme="dark"] .contact-page-content .contact-safety-title i {
+    color: #ffffff !important;
+}
+
+
+html[data-theme="dark"] .contact-page-content .contact-safety p,
+html.dark .contact-page-content .contact-safety p,
+html.dark-mode .contact-page-content .contact-safety p,
+body.dark .contact-page-content .contact-safety p,
+body.dark-mode .contact-page-content .contact-safety p,
+body[data-theme="dark"] .contact-page-content .contact-safety p {
+    color: #ffffff !important;
+}
+
+
+/* =========================================================
+   DONATE HEADER ICON
+   ========================================================= */
+
+.site-header a[href*="donate"] img {
+    width: 30px !important;
+    height: 30px !important;
+
+    min-width: 30px !important;
+    min-height: 30px !important;
+
+    max-width: 30px !important;
+    max-height: 30px !important;
+
+    object-fit: contain !important;
+
+    display: block !important;
+
+    flex: 0 0 30px !important;
+}
+
+
+/* =========================================================
+   PHONE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .contact-page-content {
+        width: 100% !important;
+
+        margin: 1.5rem auto !important;
+
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+    .contact-page-content .contact-options {
+        grid-template-columns: 1fr !important;
+
+        gap: 14px !important;
+    }
+
+    .contact-page-content .contact-option-card {
+        padding: 18px !important;
+    }
+
+    .contact-page-content .contact-option-icon {
+        width: 38px !important;
+        height: 38px !important;
+
+        min-width: 38px !important;
+        min-height: 38px !important;
+
+        max-width: 38px !important;
+        max-height: 38px !important;
+
+        flex-basis: 38px !important;
+    }
+
+    .contact-page-content .contact-option-icon i {
+        width: 20px !important;
+        height: 20px !important;
+
+        min-width: 20px !important;
+        min-height: 20px !important;
+
+        max-width: 20px !important;
+        max-height: 20px !important;
+
+        font-size: 18px !important;
+        line-height: 20px !important;
+
+        flex-basis: 20px !important;
+    }
+
+    .site-header a[href*="donate"] img {
+        width: 27px !important;
+        height: 27px !important;
+
+        min-width: 27px !important;
+        min-height: 27px !important;
+
+        max-width: 27px !important;
+        max-height: 27px !important;
+
+        flex-basis: 27px !important;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .contact-page-content {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .contact-page-content .contact-option-card {
+        padding: 16px !important;
+    }
+}
+
