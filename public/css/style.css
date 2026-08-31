@@ -632,3 +632,11 @@ textarea { min-height: 100px; resize: vertical; }
   }
 }
 
+
+/* Softer mobile navigation panel */
+.mobile-nav-panel {
+  background: rgba(10, 26, 58, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
