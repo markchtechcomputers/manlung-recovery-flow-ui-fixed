@@ -570,29 +570,52 @@
     <!-- Twitter / X -->
 
 
-<style id="manlung-call-icon-style">
+
+
+
+<style id="manlung-call-icon-final-fix">
+/* DESKTOP / LAPTOP */
 .manlung-call-icon {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
-    display: inline-block;
-    vertical-align: middle;
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    object-fit: contain !important;
+    display: inline-block !important;
+    flex: 0 0 18px !important;
 }
 
+/* Prevent parent/button from enlarging the image */
 .header-actions .manlung-call-icon {
-    width: 25px;
-    height: 25px;
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
 }
 
+/* PHONE */
 @media (max-width: 600px) {
     .manlung-call-icon {
-        width: 32px;
-        height: 32px;
+        width: 30px !important;
+        height: 30px !important;
+        max-width: 30px !important;
+        max-height: 30px !important;
+        min-width: 30px !important;
+        min-height: 30px !important;
+        flex: 0 0 30px !important;
     }
 
     .header-actions .manlung-call-icon {
-        width: 30px;
-        height: 30px;
+        width: 30px !important;
+        height: 30px !important;
+        max-width: 30px !important;
+        max-height: 30px !important;
+        min-width: 30px !important;
+        min-height: 30px !important;
     }
 }
 </style>
