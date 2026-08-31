@@ -550,6 +550,14 @@
       `,
       'connecting': `<p><i class="fas fa-spinner fa-spin"></i> Connecting…</p>`,
       'connected': `
+        <div id="connectedAdminAvatar" class="manlung-call-avatar-small" style="width:56px;height:56px;margin:0 auto .55rem;">
+          <img
+            src="${MANLUNG_ADMIN_ICON}"
+            alt="Manlung Admin"
+            loading="eager"
+            onerror="this.style.display='none';"
+          >
+        </div>
         <p style="font-weight:600; color:#4ade80;">🟢 Connected</p>
         <p id="connectedAdminName" style="color:#96abc4;margin:.2rem 0 .5rem;"></p>
         <p id="callDuration" style="font-size:1.4rem; margin:0.4rem 0;">00:00</p>
