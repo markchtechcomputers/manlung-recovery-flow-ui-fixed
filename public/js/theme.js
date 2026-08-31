@@ -88,12 +88,24 @@
       });
   }
 
+  function loadAdminCallIcons() {
+    if (!location.pathname.startsWith('/admin/')) return;
+    if (document.querySelector('script[data-manlung-admin-call-icons]')) return;
+
+    const script = document.createElement('script');
+    script.src = '/js/admin-call-icons.js';
+    script.defer = true;
+    script.dataset.manlungAdminCallIcons = 'true';
+    document.head.appendChild(script);
+  }
+
   function boot() {
     convertLegacyButtons();
     bindThemeButtons();
     createThemeButton();
     bindThemeButtons();
     setTheme(readTheme(), false);
+    loadAdminCallIcons();
 
     // Some legacy pages define toggleDarkMode themselves. Make that global API use the
     // same shared state so old integrations cannot desynchronise the site theme.
