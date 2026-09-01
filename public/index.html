@@ -1449,9 +1449,13 @@ img[src*="gctxrf7M"] {
     <div class="container">
         <!-- Hero -->
         <section class="hero">
-            <video class="hero-video" autoplay muted playsinline webkit-playsinline preload="auto" aria-hidden="true" data-video-2="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4">
-                <source src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4" type="video/mp4">
-            </video>
+            <video id="heroVideo1" class="hero-video" autoplay muted playsinline preload="auto">
+    <source src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4" type="video/mp4">
+</video>
+
+<video id="heroVideo2" class="hero-video" muted playsinline preload="auto" style="display:none;">
+    <source src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4" type="video/mp4">
+</video>
             <div class="hero-overlay" aria-hidden="true"></div>
             <div class="hero-content">
                 <h1 id="typing-text"></h1>
@@ -1968,38 +1972,49 @@ body.service-modal-open{
 </script>
 
 
+
 <script id="manlung-two-background-videos">
 (function () {
-    const video = document.querySelector('.hero-video');
-    if (!video) return;
+    const video1 = document.getElementById("heroVideo1");
+    const video2 = document.getElementById("heroVideo2");
 
-    const source = video.querySelector('source');
-    if (!source) return;
+    if (!video1 || !video2) return;
 
-    const firstVideo = source.src;
-    const secondVideo = video.dataset.video2;
+    let current = 1;
 
-    if (!secondVideo) return;
+    video1.muted = true;
+    video2.muted = true;
 
-    let currentVideo = 1;
+    video1.play().catch(() => {});
 
-    video.addEventListener('ended', function () {
-        currentVideo = currentVideo === 1 ? 2 : 1;
+    function switchVideo() {
+        if (current === 1) {
+            video1.style.display = "none";
+            video2.style.display = "block";
+            video2.currentTime = 0;
+            video2.play().catch(() => {});
+            current = 2;
+        } else {
+            video2.style.display = "none";
+            video1.style.display = "block";
+            video1.currentTime = 0;
+            video1.play().catch(() => {});
+            current = 1;
+        }
+    }
 
-        source.src = currentVideo === 1 ? firstVideo : secondVideo;
-        video.load();
+    video1.addEventListener("ended", switchVideo);
+    video2.addEventListener("ended", switchVideo);
 
-        const playPromise = video.play();
-
-        if (playPromise !== undefined) {
-            playPromise.catch(function () {
-                // Browser autoplay policy may temporarily block playback.
-            });
+    document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) {
+            if (current === 1) {
+                video1.play().catch(() => {});
+            } else {
+                video2.play().catch(() => {});
+            }
         }
     });
-
-    // Start the first clip automatically.
-    video.play().catch(function () {});
 })();
 </script>
 
