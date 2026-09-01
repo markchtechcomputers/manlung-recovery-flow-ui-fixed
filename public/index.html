@@ -1449,7 +1449,7 @@ img[src*="gctxrf7M"] {
     <div class="container">
         <!-- Hero -->
         <section class="hero">
-            <video class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true">
+            <video class="hero-video" autoplay muted playsinline webkit-playsinline preload="auto" aria-hidden="true" data-video-2="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4">
                 <source src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4" type="video/mp4">
             </video>
             <div class="hero-overlay" aria-hidden="true"></div>
@@ -1964,6 +1964,42 @@ body.service-modal-open{
     video.addEventListener('canplay', keepPlaying);
 
     keepPlaying();
+})();
+</script>
+
+
+<script id="manlung-two-background-videos">
+(function () {
+    const video = document.querySelector('.hero-video');
+    if (!video) return;
+
+    const source = video.querySelector('source');
+    if (!source) return;
+
+    const firstVideo = source.src;
+    const secondVideo = video.dataset.video2;
+
+    if (!secondVideo) return;
+
+    let currentVideo = 1;
+
+    video.addEventListener('ended', function () {
+        currentVideo = currentVideo === 1 ? 2 : 1;
+
+        source.src = currentVideo === 1 ? firstVideo : secondVideo;
+        video.load();
+
+        const playPromise = video.play();
+
+        if (playPromise !== undefined) {
+            playPromise.catch(function () {
+                // Browser autoplay policy may temporarily block playback.
+            });
+        }
+    });
+
+    // Start the first clip automatically.
+    video.play().catch(function () {});
 })();
 </script>
 
