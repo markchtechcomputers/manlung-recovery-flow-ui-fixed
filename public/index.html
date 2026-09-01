@@ -1974,41 +1974,107 @@ body.service-modal-open{
 
 
 
+
 <script id="manlung-two-background-videos">
 (function () {
-    const video = document.querySelector(".hero-video");
-    if (!video) return;
+    const hero = document.querySelector('.hero');
+    const existingVideo = document.querySelector('.hero-video');
 
-    const clips = [
-        "https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4",
-        "https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4"
-    ];
+    if (!hero || !existingVideo) return;
 
-    let index = 0;
+    const clip1 = existingVideo.querySelector('source')?.src ||
+                  existingVideo.currentSrc ||
+                  existingVideo.src;
 
-    function playClip() {
-        video.src = clips[index];
-        video.load();
-        video.play().catch(() => {});
+    const clip2 = "https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4";
+
+    if (!clip1 || !clip2) return;
+
+    // Use two video elements so the next clip is preloaded.
+    let videos = hero.querySelectorAll('.manlung-bg-video');
+
+    if (videos.length !== 2) {
+        existingVideo.classList.add('manlung-bg-video');
+
+        const second = document.createElement('video');
+        second.className = 'hero-video manlung-bg-video';
+        second.muted = true;
+        second.playsInline = true;
+        second.preload = 'auto';
+        second.setAttribute('aria-hidden', 'true');
+
+        hero.insertBefore(second, existingVideo.nextSibling);
+        videos = hero.querySelectorAll('.manlung-bg-video');
     }
 
-    video.addEventListener("ended", function () {
-        index = (index + 1) % clips.length;
-        playClip();
+    const v1 = videos[0];
+    const v2 = videos[1];
+
+    // Required order: Clip 2 -> Clip 1 -> Clip 2 -> Clip 1
+    v1.src = clip2;
+    v2.src = clip1;
+
+    [v1, v2].forEach(v => {
+        v.muted = true;
+        v.playsInline = true;
+        v.loop = false;
+        v.preload = 'auto';
+        v.setAttribute('muted', '');
+        v.setAttribute('playsinline', '');
+        v.setAttribute('autoplay', '');
     });
 
-    video.addEventListener("error", function () {
-        index = (index + 1) % clips.length;
-        setTimeout(playClip, 500);
-    });
+    let current = v1;
+    let next = v2;
 
-    playClip();
+    function playCurrent() {
+        current.currentTime = 0;
 
-    document.addEventListener("visibilitychange", function () {
-        if (!document.hidden) {
-            video.play().catch(() => {});
+        const promise = current.play();
+
+        if (promise) {
+            promise.catch(() => {
+                // Browser may block autoplay temporarily.
+                document.addEventListener('touchstart', () => current.play(), {once:true});
+                document.addEventListener('click', () => current.play(), {once:true});
+            });
         }
-    });
+    }
+
+    function switchVideo() {
+        next.currentTime = 0;
+
+        next.play().then(() => {
+            current.style.opacity = '0';
+            next.style.opacity = '1';
+
+            const old = current;
+            current = next;
+            next = old;
+
+            // Keep the next clip ready.
+            next.pause();
+            next.currentTime = 0;
+            next.load();
+        }).catch(() => {
+            setTimeout(switchVideo, 500);
+        });
+    }
+
+    v1.addEventListener('ended', switchVideo);
+    v2.addEventListener('ended', switchVideo);
+
+    // Make the active video visible immediately.
+    v1.style.opacity = '1';
+    v2.style.opacity = '0';
+
+    // Start Clip 2 immediately when the page opens.
+    v1.load();
+    v2.load();
+    playCurrent();
+
+    // Try again once the browser has loaded enough data.
+    v1.addEventListener('canplay', playCurrent, {once:true});
 })();
 </script>
 
