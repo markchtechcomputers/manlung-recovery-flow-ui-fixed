@@ -1450,7 +1450,7 @@ img[src*="gctxrf7M"] {
         <!-- Hero -->
         <section class="hero">
             <video id="heroVideo1" class="hero-video" autoplay muted playsinline preload="auto">
-    <source src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4" type="video/mp4">
+                <source src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4" type="video/mp4">
 </video>
 
 <video id="heroVideo2" class="hero-video" muted playsinline preload="auto" style="display:none;">
@@ -1973,46 +1973,40 @@ body.service-modal-open{
 
 
 
+
 <script id="manlung-two-background-videos">
 (function () {
-    const video1 = document.getElementById("heroVideo1");
-    const video2 = document.getElementById("heroVideo2");
+    const video = document.querySelector(".hero-video");
+    if (!video) return;
 
-    if (!video1 || !video2) return;
+    const clips = [
+        "https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4",
+        "https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4"
+    ];
 
-    let current = 1;
+    let index = 0;
 
-    video1.muted = true;
-    video2.muted = true;
-
-    video1.play().catch(() => {});
-
-    function switchVideo() {
-        if (current === 1) {
-            video1.style.display = "none";
-            video2.style.display = "block";
-            video2.currentTime = 0;
-            video2.play().catch(() => {});
-            current = 2;
-        } else {
-            video2.style.display = "none";
-            video1.style.display = "block";
-            video1.currentTime = 0;
-            video1.play().catch(() => {});
-            current = 1;
-        }
+    function playClip() {
+        video.src = clips[index];
+        video.load();
+        video.play().catch(() => {});
     }
 
-    video1.addEventListener("ended", switchVideo);
-    video2.addEventListener("ended", switchVideo);
+    video.addEventListener("ended", function () {
+        index = (index + 1) % clips.length;
+        playClip();
+    });
+
+    video.addEventListener("error", function () {
+        index = (index + 1) % clips.length;
+        setTimeout(playClip, 500);
+    });
+
+    playClip();
 
     document.addEventListener("visibilitychange", function () {
         if (!document.hidden) {
-            if (current === 1) {
-                video1.play().catch(() => {});
-            } else {
-                video2.play().catch(() => {});
-            }
+            video.play().catch(() => {});
         }
     });
 })();
