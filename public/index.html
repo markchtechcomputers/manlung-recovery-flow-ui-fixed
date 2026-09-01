@@ -2033,5 +2033,134 @@ body.service-modal-open{
 })();
 </script>
 
+
+<script id="manlung-two-background-videos">
+(function () {
+    const hero = document.querySelector('.hero');
+    const firstVideo = document.querySelector('.hero-video');
+
+    if (!hero || !firstVideo) return;
+
+    const clip1 =
+        'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4';
+
+    const clip2 =
+        'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4';
+
+    // Start with Clip 2
+    firstVideo.src = clip2;
+    firstVideo.muted = true;
+    firstVideo.defaultMuted = true;
+    firstVideo.autoplay = true;
+    firstVideo.loop = false;
+    firstVideo.playsInline = true;
+    firstVideo.preload = 'auto';
+
+    // Second video element for seamless preparation
+    const secondVideo = document.createElement('video');
+    secondVideo.className = 'hero-video hero-video-secondary';
+    secondVideo.muted = true;
+    secondVideo.defaultMuted = true;
+    secondVideo.autoplay = false;
+    secondVideo.loop = false;
+    secondVideo.playsInline = true;
+    secondVideo.preload = 'auto';
+    secondVideo.setAttribute('aria-hidden', 'true');
+
+    secondVideo.style.position = 'absolute';
+    secondVideo.style.inset = '0';
+    secondVideo.style.width = '100%';
+    secondVideo.style.height = '100%';
+    secondVideo.style.objectFit = 'cover';
+    secondVideo.style.objectPosition = 'center';
+    secondVideo.style.opacity = '0';
+    secondVideo.style.zIndex = '0';
+    secondVideo.style.pointerEvents = 'none';
+
+    hero.insertBefore(secondVideo, hero.firstChild);
+
+    let current = firstVideo;
+    let next = secondVideo;
+
+    let currentUrl = clip2;
+    let nextUrl = clip1;
+
+    function prepare(video, url) {
+        video.pause();
+        video.src = url;
+        video.load();
+    }
+
+    function playImmediately(video) {
+        video.muted = true;
+        video.defaultMuted = true;
+
+        const promise = video.play();
+
+        if (promise && promise.catch) {
+            promise.catch(function () {
+                // Browser autoplay policy may block it until interaction.
+            });
+        }
+    }
+
+    function switchVideo() {
+        const oldVideo = current;
+        const newVideo = next;
+
+        prepare(newVideo, nextUrl);
+
+        const startNew = function () {
+            newVideo.currentTime = 0;
+            newVideo.style.opacity = '0';
+
+            playImmediately(newVideo);
+
+            requestAnimationFrame(function () {
+                newVideo.style.opacity = '1';
+                oldVideo.style.opacity = '0';
+            });
+
+            current = newVideo;
+            next = oldVideo;
+
+            const oldUrl = currentUrl;
+            currentUrl = nextUrl;
+            nextUrl = oldUrl;
+
+            // Prepare the now-hidden video with the next clip.
+            setTimeout(function () {
+                prepare(next, nextUrl);
+            }, 100);
+        };
+
+        if (newVideo.readyState >= 2) {
+            startNew();
+        } else {
+            newVideo.addEventListener('canplay', startNew, { once: true });
+        }
+    }
+
+    firstVideo.style.opacity = '1';
+    secondVideo.style.opacity = '0';
+
+    prepare(secondVideo, clip1);
+
+    // Start Clip 2 immediately.
+    playImmediately(firstVideo);
+
+    // Clip 2 -> Clip 1 -> Clip 2 -> Clip 1...
+    firstVideo.addEventListener('ended', switchVideo);
+    secondVideo.addEventListener('ended', switchVideo);
+
+    // Keep playback alive if a browser interrupts it.
+    setInterval(function () {
+        if (current.paused && !document.hidden) {
+            playImmediately(current);
+        }
+    }, 1500);
+})();
+</script>
+
 </body>
 </html>
