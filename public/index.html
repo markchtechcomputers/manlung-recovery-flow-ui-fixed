@@ -1975,106 +1975,61 @@ body.service-modal-open{
 
 
 
-<script id="manlung-two-background-videos">
+
+<script id="manlung-background-video-controller">
 (function () {
     const hero = document.querySelector('.hero');
-    const existingVideo = document.querySelector('.hero-video');
+    if (!hero) return;
 
-    if (!hero || !existingVideo) return;
+    const oldVideo = hero.querySelector('.hero-video');
+    if (!oldVideo) return;
 
-    const clip1 = existingVideo.querySelector('source')?.src ||
-                  existingVideo.currentSrc ||
-                  existingVideo.src;
+    const clip1 =
+        "https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4";
 
-    const clip2 = "https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4";
+    const clip2 =
+        "https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4";
 
-    if (!clip1 || !clip2) return;
+    const videos = [clip2, clip1];
+    let current = 0;
 
-    // Use two video elements so the next clip is preloaded.
-    let videos = hero.querySelectorAll('.manlung-bg-video');
+    // Use the existing video element so the hero styling stays unchanged.
+    const video = oldVideo;
 
-    if (videos.length !== 2) {
-        existingVideo.classList.add('manlung-bg-video');
-
-        const second = document.createElement('video');
-        second.className = 'hero-video manlung-bg-video';
-        second.muted = true;
-        second.playsInline = true;
-        second.preload = 'auto';
-        second.setAttribute('aria-hidden', 'true');
-
-        hero.insertBefore(second, existingVideo.nextSibling);
-        videos = hero.querySelectorAll('.manlung-bg-video');
-    }
-
-    const v1 = videos[0];
-    const v2 = videos[1];
-
-    // Required order: Clip 2 -> Clip 1 -> Clip 2 -> Clip 1
-    v1.src = clip2;
-    v2.src = clip1;
-
-    [v1, v2].forEach(v => {
-        v.muted = true;
-        v.playsInline = true;
-        v.loop = false;
-        v.preload = 'auto';
-        v.setAttribute('muted', '');
-        v.setAttribute('playsinline', '');
-        v.setAttribute('autoplay', '');
-    });
-
-    let current = v1;
-    let next = v2;
+    video.muted = true;
+    video.autoplay = true;
+    video.loop = false;
+    video.playsInline = true;
+    video.preload = "auto";
 
     function playCurrent() {
-        current.currentTime = 0;
+        video.src = videos[current];
+        video.load();
 
-        const promise = current.play();
+        const playPromise = video.play();
 
-        if (promise) {
-            promise.catch(() => {
-                // Browser may block autoplay temporarily.
-                document.addEventListener('touchstart', () => current.play(), {once:true});
-                document.addEventListener('click', () => current.play(), {once:true});
+        if (playPromise !== undefined) {
+            playPromise.catch(function () {
+                // Browser autoplay policy fallback.
+                const start = function () {
+                    video.play().catch(function () {});
+                    document.removeEventListener("touchstart", start);
+                    document.removeEventListener("click", start);
+                };
+
+                document.addEventListener("touchstart", start, { once: true });
+                document.addEventListener("click", start, { once: true });
             });
         }
     }
 
-    function switchVideo() {
-        next.currentTime = 0;
+    video.addEventListener("ended", function () {
+        current = (current + 1) % videos.length;
+        playCurrent();
+    });
 
-        next.play().then(() => {
-            current.style.opacity = '0';
-            next.style.opacity = '1';
-
-            const old = current;
-            current = next;
-            next = old;
-
-            // Keep the next clip ready.
-            next.pause();
-            next.currentTime = 0;
-            next.load();
-        }).catch(() => {
-            setTimeout(switchVideo, 500);
-        });
-    }
-
-    v1.addEventListener('ended', switchVideo);
-    v2.addEventListener('ended', switchVideo);
-
-    // Make the active video visible immediately.
-    v1.style.opacity = '1';
-    v2.style.opacity = '0';
-
-    // Start Clip 2 immediately when the page opens.
-    v1.load();
-    v2.load();
+    // Start immediately: Clip 2 -> Clip 1 -> Clip 2 -> Clip 1...
     playCurrent();
-
-    // Try again once the browser has loaded enough data.
-    v1.addEventListener('canplay', playCurrent, {once:true});
 })();
 </script>
 
