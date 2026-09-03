@@ -14,13 +14,13 @@
   let lastSentAt = 0;
 
   const LOCAL = {
-    identity: 'Manlung Recovery is a Cyber Recovery & Digital Investigation Portal. The main areas are New Recovery Request, Client Portal, Track a Case, device recovery, account recovery, scam investigation, identity-theft assistance and cybersecurity/security cases.',
-    workflow: 'Start with New Recovery Request, choose the case type, enter your contact and incident details, add device information when relevant, provide useful evidence and submit. The request is reviewed and a case ID can be used to follow progress.',
-    contact: 'The site lists phone +254 724 356 178 and email manlungrecovery@outlook.com. Human Support is also available through the WhatsApp option.',
-    call: 'Yes. Call Admin is a real browser voice feature using WebRTC. It rings available admins and the first admin to accept gets the call. Call Admin is presented as free, but I cannot see live admin availability or guarantee an answer.',
-    phone: 'For a lost or stolen phone, submit Lost Phone Recovery. Include the brand/model, colour, IMEI 1/2, serial number if available, when and where it was last seen, and useful evidence. Use official Find My/Google and carrier tools where appropriate, and do not confront a suspected thief.',
+    identity: 'Manlung Recovery is a Cyber Recovery & Digital Investigation Portal. I can guide you through New Recovery Request, Client Portal, Track a Case, device recovery, account recovery, scam investigation, identity-theft assistance and cybersecurity cases.',
+    workflow: 'For a recovery request, start with New Recovery Request, choose the case type, enter your contact and incident details, add device information when relevant, provide useful evidence and submit. The request is then reviewed, and a case ID can be used to follow progress.',
+    contact: 'You can reach Manlung Recovery through the listed phone +254 724 356 178, email manlungrecovery@outlook.com, or the Human Support/WhatsApp option on the site.',
+    call: 'Yes — Call Admin is a real browser voice feature using WebRTC. It rings available admins and the first admin to accept gets the call. It is presented as free. I cannot see live admin availability or guarantee that someone will answer.',
+    phone: 'I’m sorry your phone was stolen. The right option on Manlung Recovery is **New Recovery Request → Lost Phone Recovery**. You can provide the phone brand/model, colour, IMEI 1 and IMEI 2 if available, serial number, when and where it was last seen, and any useful evidence. If your phone has Find My iPhone, Find My Device, or another official tracking service enabled, use the official service to lock or locate it. Contact your mobile carrier if appropriate. Please don’t confront or chase a suspected thief yourself.',
     account: 'For a hacked account, use the platform’s official recovery process, change reused passwords, enable stronger authentication, review active sessions and preserve screenshots/evidence. Manlung Recovery includes Social Media Account Recovery and Email Account Recovery.',
-    scam: 'For a scam, preserve chats, screenshots, receipts, transaction references, phone numbers, usernames and links. Do not send more money to anyone promising to recover the money. The site has an Online Scam Investigation case type.',
+    scam: 'For a scam, preserve chats, screenshots, receipts, transaction references, phone numbers, usernames and links. Do not send more money to anyone promising to recover the money. Manlung Recovery has an Online Scam Investigation case type.',
     safety: 'Never send passwords, PINs, OTPs, recovery codes or API keys to this AI. For immediate physical danger or a theft happening now, contact appropriate local emergency services or law enforcement first.'
   };
 
@@ -65,25 +65,36 @@
 
   function removeTyping() { document.getElementById('manlungAiLiveTyping')?.remove(); }
 
+  function normalizeText(text) {
+    return String(text || '')
+      .toLowerCase()
+      .replace(/[’‘]/g, "'")
+      .replace(/[^a-z0-9+@._ -]/g, ' ')
+      .replace(/(.)\1{2,}/g, '$1$1')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   function localReply(text) {
-    const s = String(text || '').toLowerCase().replace(/[^a-z0-9+@._ -]/g, ' ').replace(/\s+/g, ' ').trim();
+    const s = normalizeText(text);
     if (!s) return 'I’m here with you. Tell me what happened and I’ll guide you.';
     if (/^(hi|hello|hey|hallo|yo|good morning|good afternoon|good evening)\b/.test(s)) return 'Hey 👋 Welcome to Manlung Recovery. Tell me what happened and I’ll guide you through the right part of the site.';
     if (s === 'eeh' || s === 'eh' || s === 'hmm' || s === 'okay' || s === 'ok') return 'Yeah 😄 I’m here. Tell me what you need help with — a stolen phone, hacked account, scam, identity theft, security issue, existing case, or contacting an admin.';
     if (s.includes('how does the site work') || s.includes('how does recovery work') || s.includes('how it works')) return LOCAL.workflow;
-    if (s.includes('what can i submit') || s.includes('what services') || s.includes('case types')) return 'You can submit device recovery, online scam investigation, identity-theft assistance, social-media or email account recovery, website security incidents, malware/virus investigations, network security assessments and other cyber incidents.';
+    if (s.includes('what can i submit') || s.includes('what services') || s.includes('case types')) return 'You can submit Lost Phone, Laptop, Tablet or Smartwatch Recovery, Vehicle GPS Investigation, Online Scam Investigation, Identity Theft Assistance, Social Media or Email Account Recovery, Website Security Incident, Malware or Virus Investigation, Network Security Assessment, and other cyber incidents.';
     if ((s.includes('admin') || s.includes('support')) && (s.includes('call') || s.includes('phone') || s.includes('pick') || s.includes('answer'))) return LOCAL.call;
-    if (s.includes('stolen phone') || s.includes('lost phone') || s.includes('phone was stolen') || s.includes('imei')) return LOCAL.phone;
+    if (/(stolen|stole|robbed|lost|missing)\b/.test(s) && /\b(phone|mobile|iphone|android|handset|cell)\b/.test(s)) return LOCAL.phone;
+    if (s.includes('imei')) return LOCAL.phone;
     if (s.includes('hacked') || s.includes('account hacked') || s.includes('cannot login') || s.includes('cant login') || s.includes('lost access')) return LOCAL.account;
     if (s.includes('scam') || s.includes('fraud') || s.includes('mpesa') || s.includes('m-pesa') || s.includes('stolen my money')) return LOCAL.scam;
-    if (s.includes('identity theft') || s.includes('id stolen') || s.includes('sim swap')) return 'That fits Identity Theft Assistance. Secure affected bank/mobile accounts immediately, preserve evidence and use New Recovery Request for the case.';
-    if (s.includes('track case') || s.includes('case status') || s.includes('case progress') || s.includes('case id')) return 'Use Track a Case or the Client Portal for an existing case. I cannot see private case status from this chat unless a real case lookup is connected.';
-    if (s.includes('security') || s.includes('malware') || s.includes('virus') || s.includes('vulnerability') || s.includes('website hacked')) return 'The site supports Website Security Incident, Malware or Virus Investigation and Network Security Assessment. Tell me what you are seeing and I’ll help choose the right case type.';
+    if (s.includes('identity theft') || s.includes('id stolen') || s.includes('sim swap')) return 'That fits **Identity Theft Assistance**. Secure affected bank/mobile accounts immediately, preserve evidence and use New Recovery Request for the case.';
+    if (s.includes('track case') || s.includes('case status') || s.includes('case progress') || s.includes('case id')) return 'Use **Track a Case** or the **Client Portal** for an existing case. I cannot see private case status from this chat unless a real case lookup tool is connected.';
+    if (s.includes('security') || s.includes('malware') || s.includes('virus') || s.includes('vulnerability') || s.includes('website hacked')) return 'The site supports **Website Security Incident**, **Malware or Virus Investigation**, and **Network Security Assessment**. Tell me what you are seeing and I’ll help choose the right case type.';
     if (s.includes('human') || s.includes('admin') || s.includes('agent') || s.includes('person')) return `Of course. ${LOCAL.contact} You can also use Human Support in the chat.`;
     if (s.includes('email') || s.includes('contact') || s.includes('whatsapp') || s.includes('phone number')) return LOCAL.contact;
     if (s.includes('password') || s.includes('otp') || s.includes('pin') || s.includes('recovery code') || s.includes('secret')) return LOCAL.safety;
     if (s.includes('thank')) return 'You’re welcome 🙌 Tell me what happened and we’ll take it step by step.';
-    return 'I understand. Tell me a little more about what happened, and I’ll help you choose the correct Manlung Recovery feature or next step.';
+    return 'I can help. Tell me what happened in your own words — for example, “my phone was stolen”, “my account was hacked”, or “I was scammed” — and I’ll guide you to the correct Manlung Recovery feature.';
   }
 
   async function ask(input, messages, text) {
@@ -143,8 +154,6 @@
     const status = document.querySelector('.manlung-ai-status');
     if (status) status.textContent = '● Live AI • Site-aware • Web connected';
 
-    // CAPTURE is intentional: it runs before the legacy v2 submit listener,
-    // preventing the old handler from rendering the same message twice.
     form.addEventListener('submit', event => {
       event.preventDefault();
       event.stopPropagation();
