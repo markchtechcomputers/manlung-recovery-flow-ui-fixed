@@ -7,6 +7,13 @@
   const WHATSAPP_URL = 'https://wa.me/254745682493?text=Hello%20Manlung%20Recovery%2C%20I%20need%20help.';
   const EMAIL_URL = 'mailto:manlungrecovery@outlook.com?subject=Manlung%20Recovery%20Support';
 
+  // Supplied custom icons. They are displayed small enough to fit neatly inside the circles.
+  const ICONS = {
+    whatsapp: 'https://i.postimg.cc/Y99J1yqZ/whatsapp-whatsapp-app-logo-in-green-circle-AZU1A2SU-t-Photoroom.png',
+    email: 'https://i.postimg.cc/zGNDn8Zm/125376099-mail-symbol-icon-red-simple-with-rounded-corners-isolated-vector-illustration-Photoroom.png',
+    call: 'https://i.postimg.cc/wv196BJF/istockphoto-971654072-612x612-Photoroom.png'
+  };
+
   function injectStyles() {
     if (document.getElementById('manlung-contact-fab-styles')) return;
 
@@ -61,6 +68,7 @@
         height: 46px;
         min-width: 46px;
         min-height: 46px;
+        padding: 0 !important;
         border: 2px solid rgba(255,255,255,.72);
         border-radius: 50%;
         display: inline-flex;
@@ -73,6 +81,7 @@
         opacity: 0;
         transform: translateY(8px) scale(.72);
         transition: opacity .18s ease, transform .2s ease;
+        overflow: hidden !important;
       }
 
       #manlungContactMenu:not([hidden]) .manlung-contact-choice {
@@ -88,9 +97,19 @@
         outline: none;
       }
 
-      .manlung-contact-choice i {
-        margin: 0 !important;
-        font-size: 1.05rem;
+      /* Supplied icons stay compact and never overflow the contact circles. */
+      .manlung-contact-choice .manlung-contact-icon {
+        display: block !important;
+        width: 27px !important;
+        height: 27px !important;
+        max-width: 27px !important;
+        max-height: 27px !important;
+        min-width: 27px !important;
+        min-height: 27px !important;
+        object-fit: contain !important;
+        object-position: center !important;
+        border-radius: 50%;
+        flex: 0 0 27px !important;
       }
 
       .manlung-contact-choice.call {
@@ -158,12 +177,26 @@
           min-height: 44px;
         }
 
+        .manlung-contact-choice .manlung-contact-icon {
+          width: 25px !important;
+          height: 25px !important;
+          max-width: 25px !important;
+          max-height: 25px !important;
+          min-width: 25px !important;
+          min-height: 25px !important;
+          flex-basis: 25px !important;
+        }
+
         .manlung-contact-tooltip {
           display: none;
         }
       }
     `;
     document.head.appendChild(style);
+  }
+
+  function iconMarkup(type, alt) {
+    return `<img class="manlung-contact-icon" src="${ICONS[type]}" alt="${alt}" width="27" height="27" loading="eager" decoding="async">`;
   }
 
   function createMenu(button) {
@@ -175,15 +208,15 @@
     menu.setAttribute('aria-label', 'Choose a contact method');
     menu.innerHTML = `
       <button type="button" class="manlung-contact-choice call" aria-label="Call Admin" title="Call Admin">
-        <i class="fas fa-phone" aria-hidden="true"></i>
+        ${iconMarkup('call', 'Call')}
         <span class="manlung-contact-tooltip">Call Admin</span>
       </button>
       <a class="manlung-contact-choice whatsapp" href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">
-        <i class="fab fa-whatsapp" aria-hidden="true"></i>
+        ${iconMarkup('whatsapp', 'WhatsApp')}
         <span class="manlung-contact-tooltip">WhatsApp</span>
       </a>
       <a class="manlung-contact-choice email" href="${EMAIL_URL}" aria-label="Email support" title="Email support">
-        <i class="fas fa-envelope" aria-hidden="true"></i>
+        ${iconMarkup('email', 'Email')}
         <span class="manlung-contact-tooltip">Email</span>
       </a>
     `;
