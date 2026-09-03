@@ -141,6 +141,17 @@ async function callOpenAI(payload) {
   });
 }
 
+// Safe diagnostic endpoint. It never returns the API key or any secret.
+router.get('/health', (_req, res) => {
+  res.json({
+    success: true,
+    configured: Boolean(process.env.OPENAI_API_KEY),
+    model: MODEL,
+    route: '/api/ai/chat',
+    webSearch: true
+  });
+});
+
 router.post('/chat', async (req, res) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -161,8 +172,6 @@ router.post('/chat', async (req, res) => {
           .map(x => ({ role: x.role, content: x.content.slice(0, 6000) }))
       : [];
 
-    // The browser may include the current user message in history. Remove that
-    // duplicate because the current message is appended separately below.
     if (history.length && history[history.length - 1].role === 'user' && history[history.length - 1].content === message) {
       history.pop();
     }
@@ -171,9 +180,6 @@ router.post('/chat', async (req, res) => {
     const context = buildSiteContext(pagePath);
     const input = makeInput(message, history, context);
 
-    // Use the current Responses API web-search tool name first. If an account,
-    // model, or deployment rejects web search, retry without it so ordinary
-    // Manlung questions remain available.
     let response = await callOpenAI({
       model: MODEL,
       tools: [{ type: 'web_search_preview' }],
