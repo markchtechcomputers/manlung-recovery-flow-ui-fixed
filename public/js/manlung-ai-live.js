@@ -1,5 +1,6 @@
 /* Manlung Recovery AI — single submission bridge
- * Prevents duplicate user/AI messages when the local and live handlers coexist.
+ * The live bridge owns submission in CAPTURE phase so the legacy local
+ * submit listener in manlung-ai-v2.js cannot render the same message twice.
  */
 (() => {
   'use strict';
@@ -56,21 +57,13 @@
     document.getElementById('manlungAiLiveTyping')?.remove();
   }
 
-  function localFallback(form, input, text) {
-    const handler = form.__manlungOriginalSubmit;
-    if (typeof handler !== 'function') return false;
-    input.value = text;
-    handler({ preventDefault() {} });
-    return true;
-  }
-
-  async function ask(form, input, messages, text) {
+  async function ask(input, messages, text) {
     const now = Date.now();
     const normalized = text.trim().toLowerCase();
 
-    // Stop double clicks, Enter + click races, and duplicate submit events.
     if (sending) return;
     if (normalized && normalized === lastSentText && now - lastSentAt < 1500) return;
+
     sending = true;
     lastSentText = normalized;
     lastSentAt = now;
@@ -114,11 +107,6 @@
       removeTyping();
       console.warn('Manlung live AI unavailable:', error);
       history.pop();
-
-      // The local engine is used only as a response fallback. It must not be
-      // allowed to submit through the live bridge again.
-      if (localFallback(form, input, text)) return;
-
       addMessage(messages, 'The live AI connection is temporarily unavailable. I can still help with Manlung Recovery information, or you can use Human Support to reach an admin.', 'ai');
     } finally {
       sending = false;
@@ -127,34 +115,41 @@
 
   waitForChat((form, input, messages) => {
     if (form.dataset.liveAiBound === 'true') return;
-
-    // Capture the existing local handler exactly once, then replace the form
-    // handler. This leaves one active onsubmit path instead of two.
-    form.__manlungOriginalSubmit = typeof form.onsubmit === 'function' ? form.onsubmit : null;
     form.dataset.liveAiBound = 'true';
 
     const status = document.querySelector('.manlung-ai-status');
     if (status) status.textContent = '● Live AI • Site-aware • Web connected';
 
-    form.onsubmit = event => {
+    // CAPTURE is intentional: manlung-ai-v2.js has its own legacy submit
+    // listener. Stopping propagation here prevents that listener from also
+    // adding the user's message and generating a second response.
+    form.addEventListener('submit', event => {
       event.preventDefault();
       event.stopPropagation();
-      event.stopImmediatePropagation?.();
+      event.stopImmediatePropagation();
 
       if (sending) return;
       const text = input.value.trim();
       if (!text) return;
       input.value = '';
       input.style.height = 'auto';
-      ask(form, input, messages, text);
-    };
+      ask(input, messages, text);
+    }, true);
 
+    // Handle Enter directly instead of requestSubmit(), which would otherwise
+    // create another submit event and give the old handler a chance to run.
     input.addEventListener('keydown', event => {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (!sending) form.requestSubmit();
-      }
+      if (event.key !== 'Enter' || event.shiftKey) return;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      if (sending) return;
+
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      input.style.height = 'auto';
+      ask(input, messages, text);
     }, true);
   });
 })();
