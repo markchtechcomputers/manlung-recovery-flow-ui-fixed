@@ -13,6 +13,7 @@
     const style = document.createElement('style');
     style.id = 'manlung-contact-fab-styles';
     style.textContent = `
+      /* Only ONE floating support circle is visible by default. */
       #callWidgetBtn.manlung-contact-trigger {
         width: 54px !important;
         min-width: 54px !important;
@@ -36,6 +37,11 @@
       }
 
       #callWidgetBtn.manlung-contact-trigger #callWidgetLabel {
+        display: none !important;
+      }
+
+      /* IMPORTANT: author display rules must not override the hidden attribute. */
+      #manlungContactMenu[hidden] {
         display: none !important;
       }
 
@@ -64,7 +70,14 @@
         text-decoration: none !important;
         cursor: pointer;
         box-shadow: 0 8px 22px rgba(0,0,0,.30);
-        transition: transform .18s ease, box-shadow .18s ease;
+        opacity: 0;
+        transform: translateY(8px) scale(.72);
+        transition: opacity .18s ease, transform .2s ease;
+      }
+
+      #manlungContactMenu:not([hidden]) .manlung-contact-choice {
+        opacity: 1;
+        transform: translateY(0) scale(1);
         animation: manlungContactPop .2s ease both;
       }
 
@@ -117,6 +130,11 @@
       @keyframes manlungContactPop {
         from { opacity: 0; transform: translateY(8px) scale(.72); }
         to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      /* Remove the older standalone Admin contact circle so it cannot create a second FAB. */
+      .admin-contact-bottom {
+        display: none !important;
       }
 
       @media (max-width:600px) {
@@ -207,6 +225,7 @@
     button.classList.add('manlung-contact-trigger');
     button.setAttribute('aria-label', 'Choose a contact method');
     button.setAttribute('title', 'Contact Manlung Recovery');
+    button.setAttribute('aria-expanded', 'false');
     createMenu(button);
 
     // Capture the existing Call Admin button click before call-widget.js's listener.
@@ -222,16 +241,21 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       toggleMenu();
+      button.setAttribute('aria-expanded', String(!document.getElementById('manlungContactMenu')?.hidden));
     }, true);
 
     document.addEventListener('click', (event) => {
       if (event.target instanceof Element && event.target.closest('#manlungContactMenu')) return;
       if (event.target instanceof Element && event.target.closest('#callWidgetBtn')) return;
       closeMenu();
+      button.setAttribute('aria-expanded', 'false');
     });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeMenu();
+      if (event.key === 'Escape') {
+        closeMenu();
+        button.setAttribute('aria-expanded', 'false');
+      }
     });
   }
 
