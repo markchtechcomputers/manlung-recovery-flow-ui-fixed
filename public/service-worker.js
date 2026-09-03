@@ -1,14 +1,22 @@
-const CACHE_NAME = 'manlung-recovery-static-v4';
+const CACHE_NAME = 'manlung-recovery-static-v5';
 
+// Only public/static pages are cached. Authenticated dashboards, settings,
+// admin pages, API responses, evidence, and other private data stay network-only.
 const STATIC_ASSETS = [
   '/',
   '/about.html',
   '/blog.html',
   '/careers.html',
+  '/contact.html',
   '/donate.html',
   '/knowledge.html',
   '/link-scanner.html',
   '/terms.html',
+  '/privacy.html',
+  '/login.html',
+  '/reset-password.html',
+  '/client/request.html',
+  '/client/track.html',
   '/manifest.webmanifest',
   '/favicon.svg',
   '/css/style.css',
@@ -19,6 +27,23 @@ const STATIC_ASSETS = [
   '/icons/icon-192.png',
   '/icons/icon-512.png'
 ];
+
+const PUBLIC_DOCUMENTS = new Set([
+  '/',
+  '/about.html',
+  '/blog.html',
+  '/careers.html',
+  '/contact.html',
+  '/donate.html',
+  '/knowledge.html',
+  '/link-scanner.html',
+  '/terms.html',
+  '/privacy.html',
+  '/login.html',
+  '/reset-password.html',
+  '/client/request.html',
+  '/client/track.html'
+]);
 
 const OFFLINE_PAGE = `<!doctype html>
 <html lang="en">
@@ -51,6 +76,11 @@ self.addEventListener('activate', event => {
       .then(keys => Promise.all(
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       ))
+      .then(async () => {
+        if ('navigationPreload' in self.registration) {
+          try { await self.registration.navigationPreload.enable(); } catch {}
+        }
+      })
       .then(() => self.clients.claim())
   );
 });
@@ -62,31 +92,42 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Never cache API, authentication, call, signaling, or other dynamic data.
+  // Never cache API, authentication endpoints, calls, signaling, evidence,
+  // or other dynamic data.
   if (url.pathname.startsWith('/api/')) return;
 
   if (request.mode === 'navigate' || request.destination === 'document') {
+    if (!PUBLIC_DOCUMENTS.has(url.pathname)) {
+      // Private/authenticated pages remain network-only for security.
+      event.respondWith(
+        (event.preloadResponse || fetch(request)).catch(() => new Response(
+          OFFLINE_PAGE,
+          {status: 503, headers: {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control':'no-store'}}
+        ))
+      );
+      return;
+    }
+
+    // Public pages use cache-first navigation so an installed PWA opens
+    // immediately instead of waiting on the network. A background refresh
+    // keeps the next launch up to date without delaying the current click.
     event.respondWith(
-      fetch(request)
-        .then(response => response)
-        .catch(() => {
-          // Only return cached public pages. Never substitute a private page
-          // with another cached document.
-          const publicPages = new Set([
-            '/', '/about.html', '/blog.html', '/careers.html',
-            '/donate.html', '/knowledge.html', '/link-scanner.html', '/terms.html'
-          ]);
-          if (publicPages.has(url.pathname)) {
-            return caches.match(request).then(cached => cached || new Response(
-              OFFLINE_PAGE,
-              {status: 503, headers: {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control':'no-store'}}
-            ));
-          }
-          return new Response(
+      caches.match(request).then(cached => {
+        const refresh = (event.preloadResponse || fetch(request))
+          .then(response => {
+            if (response && response.ok) {
+              const copy = response.clone();
+              caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
+            }
+            return response;
+          })
+          .catch(() => cached || new Response(
             OFFLINE_PAGE,
             {status: 503, headers: {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control':'no-store'}}
-          );
-        })
+          ));
+
+        return cached || refresh;
+      })
     );
     return;
   }
