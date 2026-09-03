@@ -53,23 +53,24 @@
   }
   function installCallIconFix() {
     if (document.getElementById('manlung-floating-call-icon-fix')) return;
-    const style = document.createElement('style'); style.id = 'manlung-floating-call-icon-fix'; style.textContent = `
-      #callWidgetBtn img.manlung-floating-call-icon{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;flex:0 0 20px!important;display:inline-block!important;object-fit:contain!important;object-position:center!important;margin:0!important;padding:0!important;vertical-align:middle!important}
-      @media(max-width:600px){#callWidgetBtn img.manlung-floating-call-icon{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;max-width:28px!important;max-height:28px!important;flex:0 0 28px!important}}
-    `; document.head.appendChild(style);
+    const s=document.createElement('style'); s.id='manlung-floating-call-icon-fix'; s.textContent=`#callWidgetBtn img.manlung-floating-call-icon{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;flex:0 0 20px!important;display:inline-block!important;object-fit:contain!important;object-position:center!important;margin:0!important;padding:0!important;vertical-align:middle!important}@media(max-width:600px){#callWidgetBtn img.manlung-floating-call-icon{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;max-width:28px!important;max-height:28px!important;flex:0 0 28px!important}}`; document.head.appendChild(s);
   }
   function loadAdminCallIcons() {
     if (!location.pathname.startsWith('/admin/')) return;
     if (document.querySelector('script[data-manlung-admin-call-icons]')) return;
-    const script = document.createElement('script'); script.src = '/js/admin-call-icons.js'; script.defer = true; script.dataset.manlungAdminCallIcons = 'true'; document.head.appendChild(script);
+    const script = document.createElement('script'); script.src='/js/admin-call-icons.js'; script.defer=true; script.dataset.manlungAdminCallIcons='true'; document.head.appendChild(script);
   }
   function loadContactFab() {
     if (document.querySelector('script[data-manlung-contact-fab]')) return;
-    const script = document.createElement('script'); script.src = '/js/contact-fab.js'; script.defer = true; script.dataset.manlungContactFab = 'true'; document.head.appendChild(script);
+    const script = document.createElement('script'); script.src='/js/contact-fab.js'; script.defer=true; script.dataset.manlungContactFab='true'; document.head.appendChild(script);
   }
   function loadManlungAI() {
     if (document.querySelector('script[data-manlung-ai]')) return;
-    const script = document.createElement('script'); script.src = '/js/manlung-ai-v2.js'; script.defer = true; script.dataset.manlungAi = 'true'; document.head.appendChild(script);
+    const script = document.createElement('script'); script.src='/js/manlung-ai-v2.js'; script.defer=true; script.dataset.manlungAi='true'; document.head.appendChild(script);
+    script.addEventListener('load', () => {
+      if (document.querySelector('script[data-manlung-ai-live]')) return;
+      const live = document.createElement('script'); live.src='/js/manlung-ai-live.js'; live.defer=true; live.dataset.manlungAiLive='true'; document.head.appendChild(live);
+    });
   }
   function boot() {
     convertLegacyButtons(); bindThemeButtons(); createThemeButton(); bindThemeButtons(); setTheme(readTheme(), false);
