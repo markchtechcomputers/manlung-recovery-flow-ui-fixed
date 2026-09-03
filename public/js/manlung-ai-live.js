@@ -1,7 +1,5 @@
 /* Manlung Recovery AI Live Bridge
- * Keeps the existing chat UI but replaces the local rule engine with the
- * secure /api/ai/chat backend. The backend supplies current site context and
- * can use web search for outside-world questions. No API key is stored here.
+ * Secure live AI connection with a local assistant fallback.
  */
 (() => {
   'use strict';
@@ -50,39 +48,74 @@
     messages.scrollTop = messages.scrollHeight;
   }
 
-  async function ask(messages, text) {
+  function runLocalFallback(form, input, text) {
+    // v2 owns the local knowledge engine. Calling its original handler keeps
+    // the site useful if the server/API is temporarily unavailable.
+    if (typeof form.__manlungOriginalSubmit === 'function') {
+      input.value = text;
+      form.__manlungOriginalSubmit({ preventDefault() {} });
+      return true;
+    }
+    return false;
+  }
+
+  async function ask(form, input, messages, text) {
     addMessage(messages, text, 'user');
     history.push({role:'user', content:text});
     while (history.length > MAX_HISTORY) history.shift();
     showTyping(messages);
 
     try {
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          message: text,
-          history,
-          pagePath: window.location.pathname
-        })
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Live AI unavailable');
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 50000);
+      let response;
+      try {
+        response = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json', 'Accept':'application/json'},
+          credentials: 'same-origin',
+          cache: 'no-store',
+          signal: controller.signal,
+          body: JSON.stringify({
+            message: text,
+            history: history.slice(0, -1),
+            pagePath: window.location.pathname
+          })
+        });
+      } finally {
+        clearTimeout(timer);
       }
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.success || !data.answer) {
+        throw new Error(data.code || `HTTP_${response.status}`);
+      }
+
       document.getElementById('manlungAiLiveTyping')?.remove();
       addMessage(messages, data.answer, 'ai');
       history.push({role:'assistant', content:data.answer});
       while (history.length > MAX_HISTORY) history.shift();
     } catch (error) {
       document.getElementById('manlungAiLiveTyping')?.remove();
-      addMessage(messages, 'I’m having trouble reaching the live AI service right now. You can still use Human Support, Call Admin, WhatsApp, phone or email from the options below.', 'ai');
+      console.warn('Manlung live AI unavailable:', error);
+
+      // Never leave the user with a dead chatbot. Use the existing local
+      // Manlung knowledge engine when the live service cannot be reached.
+      if (runLocalFallback(form, input, text)) {
+        history.pop();
+        return;
+      }
+
+      addMessage(messages, 'The live AI connection is temporarily unavailable. I can still help with Manlung Recovery information, or you can use Human Support to reach an admin.', 'ai');
     }
   }
 
   waitForChat((form, input, messages) => {
     if (form.dataset.liveAiBound === 'true') return;
+
+    // Capture the v2 local handler before replacing it. This is an intentional
+    // resilience fallback, not a second submit handler.
+    form.__manlungOriginalSubmit = form.onsubmit;
     form.dataset.liveAiBound = 'true';
 
     const status = document.querySelector('.manlung-ai-status');
@@ -94,7 +127,7 @@
       if (!text) return;
       input.value = '';
       input.style.height = 'auto';
-      ask(messages, text);
+      ask(form, input, messages, text);
     };
 
     input.addEventListener('keydown', event => {
