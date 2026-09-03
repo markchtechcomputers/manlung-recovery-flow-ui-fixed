@@ -1,5 +1,5 @@
-/* Manlung Recovery AI Live Bridge
- * Secure live AI connection with a local assistant fallback.
+/* Manlung Recovery AI — single submission bridge
+ * Prevents duplicate user/AI messages when the local and live handlers coexist.
  */
 (() => {
   'use strict';
@@ -8,6 +8,9 @@
 
   const history = [];
   const MAX_HISTORY = 16;
+  let sending = false;
+  let lastSentText = '';
+  let lastSentAt = 0;
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -40,6 +43,7 @@
   }
 
   function showTyping(messages) {
+    if (document.getElementById('manlungAiLiveTyping')) return;
     const row = document.createElement('div');
     row.id = 'manlungAiLiveTyping';
     row.className = 'manlung-ai-msg';
@@ -48,18 +52,29 @@
     messages.scrollTop = messages.scrollHeight;
   }
 
-  function runLocalFallback(form, input, text) {
-    // v2 owns the local knowledge engine. Calling its original handler keeps
-    // the site useful if the server/API is temporarily unavailable.
-    if (typeof form.__manlungOriginalSubmit === 'function') {
-      input.value = text;
-      form.__manlungOriginalSubmit({ preventDefault() {} });
-      return true;
-    }
-    return false;
+  function removeTyping() {
+    document.getElementById('manlungAiLiveTyping')?.remove();
+  }
+
+  function localFallback(form, input, text) {
+    const handler = form.__manlungOriginalSubmit;
+    if (typeof handler !== 'function') return false;
+    input.value = text;
+    handler({ preventDefault() {} });
+    return true;
   }
 
   async function ask(form, input, messages, text) {
+    const now = Date.now();
+    const normalized = text.trim().toLowerCase();
+
+    // Stop double clicks, Enter + click races, and duplicate submit events.
+    if (sending) return;
+    if (normalized && normalized === lastSentText && now - lastSentAt < 1500) return;
+    sending = true;
+    lastSentText = normalized;
+    lastSentAt = now;
+
     addMessage(messages, text, 'user');
     history.push({role:'user', content:text});
     while (history.length > MAX_HISTORY) history.shift();
@@ -91,31 +106,31 @@
         throw new Error(data.code || `HTTP_${response.status}`);
       }
 
-      document.getElementById('manlungAiLiveTyping')?.remove();
+      removeTyping();
       addMessage(messages, data.answer, 'ai');
       history.push({role:'assistant', content:data.answer});
       while (history.length > MAX_HISTORY) history.shift();
     } catch (error) {
-      document.getElementById('manlungAiLiveTyping')?.remove();
+      removeTyping();
       console.warn('Manlung live AI unavailable:', error);
+      history.pop();
 
-      // Never leave the user with a dead chatbot. Use the existing local
-      // Manlung knowledge engine when the live service cannot be reached.
-      if (runLocalFallback(form, input, text)) {
-        history.pop();
-        return;
-      }
+      // The local engine is used only as a response fallback. It must not be
+      // allowed to submit through the live bridge again.
+      if (localFallback(form, input, text)) return;
 
       addMessage(messages, 'The live AI connection is temporarily unavailable. I can still help with Manlung Recovery information, or you can use Human Support to reach an admin.', 'ai');
+    } finally {
+      sending = false;
     }
   }
 
   waitForChat((form, input, messages) => {
     if (form.dataset.liveAiBound === 'true') return;
 
-    // Capture the v2 local handler before replacing it. This is an intentional
-    // resilience fallback, not a second submit handler.
-    form.__manlungOriginalSubmit = form.onsubmit;
+    // Capture the existing local handler exactly once, then replace the form
+    // handler. This leaves one active onsubmit path instead of two.
+    form.__manlungOriginalSubmit = typeof form.onsubmit === 'function' ? form.onsubmit : null;
     form.dataset.liveAiBound = 'true';
 
     const status = document.querySelector('.manlung-ai-status');
@@ -123,6 +138,10 @@
 
     form.onsubmit = event => {
       event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+
+      if (sending) return;
       const text = input.value.trim();
       if (!text) return;
       input.value = '';
@@ -133,8 +152,9 @@
     input.addEventListener('keydown', event => {
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
-        form.requestSubmit();
+        event.stopPropagation();
+        if (!sending) form.requestSubmit();
       }
-    });
+    }, true);
   });
 })();
