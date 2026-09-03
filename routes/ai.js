@@ -29,6 +29,7 @@ Your job:
 - For human support, direct users to the site's Call Admin, WhatsApp, phone or email options.
 - When discussing a site feature, explain where the user can find it and what it does when the site context supports that.
 - If a user provides a case ID, do not pretend you can see its private status unless a real case lookup tool is connected. Explain that Track a Case is used for actual case information.
+- When the user asks to contact an admin, explain the available Call Admin/WhatsApp/phone/email options and do not claim a live admin is available unless the site provides live presence.
 - When the user is vague, ask one useful clarifying question instead of dumping a generic list.
 - Keep answers concise unless the user asks for detail.
 
@@ -153,29 +154,35 @@ router.post('/chat', async (req, res) => {
     const message = String(req.body?.message || '').trim().slice(0, 8000);
     if (!message) return res.status(400).json({ success: false, code: 'EMPTY_MESSAGE', error: 'Message is required.' });
 
-    const history = Array.isArray(req.body?.history)
+    let history = Array.isArray(req.body?.history)
       ? req.body.history
           .filter(x => x && (x.role === 'user' || x.role === 'assistant') && typeof x.content === 'string')
           .slice(-MAX_HISTORY)
           .map(x => ({ role: x.role, content: x.content.slice(0, 6000) }))
       : [];
 
+    // The browser may include the current user message in history. Remove that
+    // duplicate because the current message is appended separately below.
+    if (history.length && history[history.length - 1].role === 'user' && history[history.length - 1].content === message) {
+      history.pop();
+    }
+
     const pagePath = String(req.body?.pagePath || '/').slice(0, 300);
     const context = buildSiteContext(pagePath);
     const input = makeInput(message, history, context);
 
-    // First try the full live configuration with web search.
+    // Use the current Responses API web-search tool name first. If an account,
+    // model, or deployment rejects web search, retry without it so ordinary
+    // Manlung questions remain available.
     let response = await callOpenAI({
       model: MODEL,
-      tools: [{ type: 'web_search' }],
+      tools: [{ type: 'web_search_preview' }],
       input,
       max_output_tokens: 1200
     });
 
-    // If the account/model rejects web search, retry without it so ordinary
-    // Manlung questions still work instead of showing a generic outage.
     if (response.status < 200 || response.status >= 300) {
-      console.error('Manlung AI primary request failed:', response.status, response.data);
+      console.error('Manlung AI web-search request failed:', response.status, response.data);
       response = await callOpenAI({
         model: MODEL,
         input,
