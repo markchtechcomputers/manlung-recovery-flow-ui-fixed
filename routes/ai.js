@@ -9,27 +9,31 @@ const PUBLIC_ROOT = path.join(__dirname, '..', 'public');
 const ROOT = path.join(__dirname, '..');
 const MODEL = process.env.MANLUNG_AI_MODEL || 'gpt-5.6-luna';
 const MAX_HISTORY = 16;
+const OPENAI_URL = 'https://api.openai.com/v1/responses';
 
 const SITE_RULES = `
 You are Manlung Recovery AI, the official customer-support assistant for the Manlung Recovery website.
 
 Your job:
 - Explain the actual Manlung Recovery website, its features, workflows and public information accurately.
-- Speak naturally like a helpful human support assistant. Do not sound like a keyword bot.
+- Speak naturally like a helpful human support assistant, not like a keyword bot.
 - Use the supplied current-site context as the primary source for Manlung-specific facts.
-- If the user asks about current events, current prices, current laws, current threats, current technology, a public website, or other outside-world information, use web search when available. Clearly distinguish web-sourced information from Manlung's own policies.
-- If information is unavailable, say so rather than inventing it.
+- For current events, current laws, current threats, current technology, public websites, or other changing outside-world information, use web search when available.
+- If web search is unavailable, answer from your existing knowledge and clearly say when information may be current-sensitive.
+- Never invent a Manlung feature, policy, price, case status, human availability, or result.
 - Never claim to be a human admin or investigator.
-- Never claim that a recovery will succeed or that a human is available unless the current system explicitly confirms it.
-- Never ask for or repeat passwords, PINs, OTPs, recovery codes, API keys, payment-card secrets or other authentication secrets.
-- Guide users toward legitimate recovery, investigation and defensive cybersecurity activity. Do not facilitate unauthorized access, credential theft, phishing, malware deployment or abuse.
+- Never claim recovery is guaranteed.
+- Never ask for or repeat passwords, PINs, OTPs, recovery codes, API keys, payment-card secrets, or other authentication secrets.
+- Help only with legitimate recovery, investigation and defensive cybersecurity activity. Do not facilitate unauthorized access, credential theft, phishing, malware deployment or abuse.
 - For immediate physical danger or an incident happening now, advise appropriate local emergency services/law enforcement first.
 - For human support, direct users to the site's Call Admin, WhatsApp, phone or email options.
 - When discussing a site feature, explain where the user can find it and what it does when the site context supports that.
+- If a user provides a case ID, do not pretend you can see its private status unless a real case lookup tool is connected. Explain that Track a Case is used for actual case information.
 - When the user is vague, ask one useful clarifying question instead of dumping a generic list.
 - Keep answers concise unless the user asks for detail.
 
-Current Manlung Recovery public product facts include: New Recovery Request intake; client authentication and portal; Track a Case; case notifications/timeline/messages; device recovery; social/email account recovery; identity-theft assistance; online scam investigation; website security incidents; malware/virus investigation; network security assessment; human support; and real WebRTC Call Admin. Call Admin is currently documented as free, rings available admins, and the first admin to accept gets the call. Live human availability must not be guessed.
+Manlung Recovery is a Cyber Recovery & Digital Investigation Portal. Public features include New Recovery Request, client authentication/portal, Track a Case, case notifications/timeline/messages, device recovery, social/email account recovery, identity-theft assistance, online scam investigation, website security incidents, malware/virus investigation, network security assessment, human support, and WebRTC Call Admin.
+Call Admin is documented as free, rings available admins, and the first admin to accept gets the call. Never guess whether an admin is online; use live availability only when the website explicitly provides it.
 `;
 
 function safePublicPath(requestPath) {
@@ -116,17 +120,38 @@ function extractOutput(data) {
   return parts.join('\n').trim();
 }
 
+function makeInput(message, history, context) {
+  return [
+    { role: 'system', content: [{ type: 'input_text', text: SITE_RULES }] },
+    { role: 'system', content: [{ type: 'input_text', text: `Live site context follows. Treat it as the source of truth for Manlung-specific UI/features.\n\n${context}` }] },
+    ...history,
+    { role: 'user', content: [{ type: 'input_text', text: message }] }
+  ];
+}
+
+async function callOpenAI(payload) {
+  return axios.post(OPENAI_URL, payload, {
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    timeout: 45000,
+    validateStatus: () => true
+  });
+}
+
 router.post('/chat', async (req, res) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
       return res.status(503).json({
         success: false,
+        code: 'AI_NOT_CONFIGURED',
         error: 'Manlung AI backend is not configured yet. Add OPENAI_API_KEY to the server environment.'
       });
     }
 
     const message = String(req.body?.message || '').trim().slice(0, 8000);
-    if (!message) return res.status(400).json({ success: false, error: 'Message is required.' });
+    if (!message) return res.status(400).json({ success: false, code: 'EMPTY_MESSAGE', error: 'Message is required.' });
 
     const history = Array.isArray(req.body?.history)
       ? req.body.history
@@ -137,38 +162,60 @@ router.post('/chat', async (req, res) => {
 
     const pagePath = String(req.body?.pagePath || '/').slice(0, 300);
     const context = buildSiteContext(pagePath);
+    const input = makeInput(message, history, context);
 
-    const response = await axios.post(
-      'https://api.openai.com/v1/responses',
-      {
+    // First try the full live configuration with web search.
+    let response = await callOpenAI({
+      model: MODEL,
+      tools: [{ type: 'web_search' }],
+      input,
+      max_output_tokens: 1200
+    });
+
+    // If the account/model rejects web search, retry without it so ordinary
+    // Manlung questions still work instead of showing a generic outage.
+    if (response.status < 200 || response.status >= 300) {
+      console.error('Manlung AI primary request failed:', response.status, response.data);
+      response = await callOpenAI({
         model: MODEL,
-        tools: [{ type: 'web_search' }],
-        input: [
-          { role: 'system', content: [{ type: 'input_text', text: SITE_RULES }] },
-          { role: 'system', content: [{ type: 'input_text', text: `Live site context follows. Treat it as the source of truth for Manlung-specific UI/features.\n\n${context}` }] },
-          ...history,
-          { role: 'user', content: [{ type: 'input_text', text: message }] }
-        ],
+        input,
         max_output_tokens: 1200
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000
-      }
-    );
+      });
+    }
+
+    if (response.status < 200 || response.status >= 300) {
+      const apiMessage = response.data?.error?.message || response.data?.message || 'OpenAI request failed';
+      console.error('Manlung AI fallback request failed:', response.status, apiMessage);
+      return res.status(502).json({
+        success: false,
+        code: 'AI_PROVIDER_ERROR',
+        error: 'The AI provider rejected the request. Please try again shortly or use Human Support.'
+      });
+    }
 
     const answer = extractOutput(response.data);
-    if (!answer) throw new Error('The AI returned an empty response.');
+    if (!answer) {
+      console.error('Manlung AI returned no text:', JSON.stringify(response.data).slice(0, 4000));
+      return res.status(502).json({
+        success: false,
+        code: 'AI_EMPTY_RESPONSE',
+        error: 'The AI returned an empty response. Please try again.'
+      });
+    }
 
-    return res.json({ success: true, answer, model: MODEL, webSearchEnabled: true });
+    return res.json({
+      success: true,
+      answer,
+      model: MODEL,
+      webSearchEnabled: Array.isArray(response.data?.output)
+        ? response.data.output.some(item => item?.type === 'web_search_call')
+        : false
+    });
   } catch (error) {
-    const status = error.response?.status;
-    console.error('Manlung AI error:', status || '', error.response?.data || error.message);
+    console.error('Manlung AI unexpected error:', error.response?.data || error.stack || error.message);
     return res.status(502).json({
       success: false,
+      code: 'AI_UNEXPECTED_ERROR',
       error: 'The live AI service is temporarily unavailable. Please try again or use Human Support.'
     });
   }
