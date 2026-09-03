@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const WHATSAPP_URL = 'https://wa.me/254745682493?text=Hello%20Manlung%20Recovery%2C%20I%20need%20help.';
+  const WHATSAPP_URL = 'https://wa.me/254745682493?text=Hello%20Manlung%20Recovery%20%F0%9F%91%8B%2C%20I%20came%20across%20your%20website%20and%20I%E2%80%99d%20like%20to%20get%20some%20help%20with%20my%20recovery%20request.%20Could%20you%20please%20guide%20me%20on%20what%20I%20need%20to%20do%20next%3F%20Thank%20you%21';
   const EMAIL_URL = 'mailto:manlungrecovery@outlook.com?subject=Manlung%20Recovery%20Support';
 
   // Supplied custom icons. They are displayed small enough to fit neatly inside the circles.
