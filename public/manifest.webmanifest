@@ -1,10 +1,12 @@
 {
+  "id":"/",
   "name":"Manlung Recovery",
   "short_name":"Manlung Recovery",
   "description":"Cyber Recovery & Digital Investigation Portal",
   "start_url":"/",
   "scope":"/",
   "display":"standalone",
+  "display_override":["standalone","minimal-ui"],
   "orientation":"portrait-primary",
   "background_color":"#ffffff",
   "theme_color":"#ffffff",
