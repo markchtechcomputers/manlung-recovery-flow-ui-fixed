@@ -138,6 +138,16 @@
     document.head.appendChild(script);
   }
 
+  function loadContactFab() {
+    if (document.querySelector('script[data-manlung-contact-fab]')) return;
+
+    const script = document.createElement('script');
+    script.src = '/js/contact-fab.js';
+    script.defer = true;
+    script.dataset.manlungContactFab = 'true';
+    document.head.appendChild(script);
+  }
+
   function boot() {
     convertLegacyButtons();
     bindThemeButtons();
@@ -146,6 +156,7 @@
     setTheme(readTheme(), false);
     installCallIconFix();
     loadAdminCallIcons();
+    loadContactFab();
 
     // Some legacy pages define toggleDarkMode themselves. Make that global API use the
     // same shared state so old integrations cannot desynchronise the site theme.
