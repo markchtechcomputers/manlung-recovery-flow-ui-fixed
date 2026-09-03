@@ -45,7 +45,6 @@
     return next;
   }
 
-  // Apply before the rest of the page paints. Light is the default.
   setTheme(readTheme(), false);
 
   function bindThemeButtons() {
@@ -71,7 +70,6 @@
     if (actions) {
       actions.insertBefore(button, actions.firstChild);
     } else {
-      // Authentication/callback pages without a normal site header still get a theme control.
       button.className = 'manlung-floating-theme';
       button.innerHTML = '<i class="fas fa-moon" aria-hidden="true"></i><span data-theme-label>Dark</span>';
       document.body.appendChild(button);
@@ -88,8 +86,6 @@
       });
   }
 
-  // The floating Call Admin widget uses .manlung-floating-call-icon.
-  // Older fixes targeted .manlung-call-icon, so they never affected this image.
   function installCallIconFix() {
     if (document.getElementById('manlung-floating-call-icon-fix')) return;
 
@@ -148,6 +144,16 @@
     document.head.appendChild(script);
   }
 
+  function loadManlungAI() {
+    if (document.querySelector('script[data-manlung-ai]')) return;
+
+    const script = document.createElement('script');
+    script.src = '/js/manlung-ai.js';
+    script.defer = true;
+    script.dataset.manlungAi = 'true';
+    document.head.appendChild(script);
+  }
+
   function boot() {
     convertLegacyButtons();
     bindThemeButtons();
@@ -157,9 +163,8 @@
     installCallIconFix();
     loadAdminCallIcons();
     loadContactFab();
+    loadManlungAI();
 
-    // Some legacy pages define toggleDarkMode themselves. Make that global API use the
-    // same shared state so old integrations cannot desynchronise the site theme.
     window.setManlungTheme = (theme) => setTheme(theme, true);
     window.toggleDarkMode = () => setTheme(readTheme() === DARK ? LIGHT : DARK, true);
   }
