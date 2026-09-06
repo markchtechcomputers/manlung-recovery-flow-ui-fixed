@@ -2,6 +2,41 @@
   const STORAGE_KEY = 'theme';
   const LIGHT = 'light';
   const DARK = 'dark';
+  const CLIP_1 = 'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/Futuristic%20HUD%20Interface%20Sound%20Design%20-%20Binary%20Code%203%20Example%20(1).mp4';
+
+  // Start downloading the first hero clip immediately, before the hero DOM exists.
+  // This removes the blank/whitish wait caused by starting the request only after DOMContentLoaded.
+  if (!document.querySelector('link[data-manlung-hero-preload]')) {
+    const preload = document.createElement('link');
+    preload.rel = 'preload';
+    preload.as = 'video';
+    preload.href = CLIP_1;
+    preload.setAttribute('data-manlung-hero-preload', 'true');
+    document.head.appendChild(preload);
+  }
+
+  function installHeroBaseStyle() {
+    if (document.getElementById('manlung-hero-video-final-style')) return;
+    const style = document.createElement('style');
+    style.id = 'manlung-hero-video-final-style';
+    style.textContent = `
+      .hero { background:#020617 !important; }
+      .hero::before { background:#020617 !important; }
+      .hero-video {
+        background:#020617 !important;
+        opacity:.78 !important;
+        filter:saturate(1.05) contrast(1.03) brightness(.78) !important;
+      }
+      .hero-overlay {
+        background:
+          linear-gradient(135deg,rgba(2,6,23,.28),rgba(2,6,23,.58)),
+          linear-gradient(180deg,rgba(2,6,23,.08),rgba(2,6,23,.32)) !important;
+      }
+      .hero-content { text-shadow:0 2px 18px rgba(0,0,0,.8); }
+    `;
+    document.head.appendChild(style);
+  }
+  installHeroBaseStyle();
 
   function readTheme() {
     try { return localStorage.getItem(STORAGE_KEY) === DARK ? DARK : LIGHT; } catch (_) { return LIGHT; }
@@ -75,7 +110,7 @@
 
   function installHeroVideoPlaylist() {
     const CLIPS = [
-      'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/Futuristic%20HUD%20Interface%20Sound%20Design%20-%20Binary%20Code%203%20Example%20(1).mp4',
+      CLIP_1,
       'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4',
       'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4'
     ];
@@ -85,10 +120,7 @@
     const existing = Array.from(hero.querySelectorAll('.hero-video'));
     if (!existing.length) return;
 
-    // Replace all legacy players with one clean player. Keep the first element's
-    // already-declared source so the browser can begin fetching clip 1 immediately.
     const seed = existing[0];
-    const initialSource = seed.currentSrc || seed.querySelector('source')?.src || seed.getAttribute('src') || CLIPS[0];
     const video = seed.cloneNode(true);
     existing.forEach((node) => node.remove());
 
@@ -106,76 +138,54 @@
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
     video.preload = 'auto';
-    video.removeAttribute('poster');
     video.style.opacity = '0';
-    video.style.visibility = 'visible';
-    video.style.transition = 'opacity .35s ease';
+    video.style.transition = 'opacity .25s ease';
     hero.insertBefore(video, hero.firstChild);
 
     let current = 0;
     let switching = false;
     let loadTimer = null;
-    let readyTimer = null;
     let hasStarted = false;
 
-    function clearTimers() {
+    function clearLoadTimer() {
       if (loadTimer) clearTimeout(loadTimer);
-      if (readyTimer) clearTimeout(readyTimer);
       loadTimer = null;
-      readyTimer = null;
     }
-
     function reveal() {
-      video.style.opacity = '0.78';
       hasStarted = true;
-      clearTimers();
+      clearLoadTimer();
+      video.style.opacity = '0.78';
     }
-
     function startPlayback() {
       if (document.hidden) return;
       const p = video.play();
       if (p && p.catch) p.catch(() => {});
     }
-
-    function nextClip() {
-      if (switching) return;
-      switching = true;
-      clearTimers();
-      video.style.opacity = '0';
-      const next = (current + 1) % CLIPS.length;
-      playClip(next);
-    }
-
     function playClip(index) {
       current = (index + CLIPS.length) % CLIPS.length;
       switching = false;
       hasStarted = false;
-      clearTimers();
-
-      // Clip 1 may already be downloading from the HTML source. Do not reset it.
+      clearLoadTimer();
       const wanted = CLIPS[current];
       const active = video.currentSrc || video.src || video.querySelector('source')?.src || '';
-      const normalizedActive = active.split('?')[0];
-      const normalizedWanted = wanted.split('?')[0];
-
-      if (normalizedActive !== normalizedWanted && !(current === 0 && initialSource === wanted)) {
+      if (active.split('?')[0] !== wanted.split('?')[0]) {
         video.pause();
         video.removeAttribute('src');
         video.innerHTML = '';
         video.src = wanted;
         video.load();
       }
-
-      // Give the browser time to buffer, but never leave the hero stuck forever.
       loadTimer = setTimeout(() => {
         if (!hasStarted && !switching) nextClip();
-      }, 6000);
-
-      readyTimer = setTimeout(() => {
-        if (!hasStarted && !switching) nextClip();
-      }, 12000);
-
+      }, 15000);
       startPlayback();
+    }
+    function nextClip() {
+      if (switching) return;
+      switching = true;
+      clearLoadTimer();
+      video.style.opacity = '0';
+      playClip(current + 1);
     }
 
     video.addEventListener('loadeddata', () => { reveal(); startPlayback(); });
@@ -183,19 +193,13 @@
     video.addEventListener('playing', reveal);
     video.addEventListener('ended', nextClip);
     video.addEventListener('error', nextClip);
-    video.addEventListener('stalled', () => {
-      if (!hasStarted) nextClip();
-    });
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) startPlayback();
-    });
+    // Do NOT switch on 'stalled': browsers legitimately fire it while buffering.
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) startPlayback(); });
     window.addEventListener('pageshow', startPlayback);
 
-    // Clip 1 is the page's eager source; clip 2/3 are loaded only when needed.
-    if (initialSource !== CLIPS[0]) {
-      video.src = CLIPS[0];
-      video.load();
-    }
+    // The preload request started in the document head; use the same URL for clip 1.
+    video.src = CLIPS[0];
+    video.load();
     playClip(0);
   }
 
