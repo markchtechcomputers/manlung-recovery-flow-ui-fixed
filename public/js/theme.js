@@ -3,222 +3,24 @@
   const LIGHT = 'light';
   const DARK = 'dark';
   const CLIP_1 = 'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/Futuristic%20HUD%20Interface%20Sound%20Design%20-%20Binary%20Code%203%20Example%20(1).mp4';
-
-  // Start downloading the first hero clip immediately, before the hero DOM exists.
-  // This removes the blank/whitish wait caused by starting the request only after DOMContentLoaded.
   if (!document.querySelector('link[data-manlung-hero-preload]')) {
-    const preload = document.createElement('link');
-    preload.rel = 'preload';
-    preload.as = 'video';
-    preload.href = CLIP_1;
-    preload.setAttribute('data-manlung-hero-preload', 'true');
-    document.head.appendChild(preload);
+    const preload = document.createElement('link'); preload.rel = 'preload'; preload.as = 'video'; preload.href = CLIP_1; preload.setAttribute('data-manlung-hero-preload','true'); document.head.appendChild(preload);
   }
-
-  function installHeroBaseStyle() {
-    if (document.getElementById('manlung-hero-video-final-style')) return;
-    const style = document.createElement('style');
-    style.id = 'manlung-hero-video-final-style';
-    style.textContent = `
-      .hero { background:#020617 !important; }
-      .hero::before { background:#020617 !important; }
-      .hero-video {
-        background:#020617 !important;
-        opacity:.78 !important;
-        filter:saturate(1.05) contrast(1.03) brightness(.78) !important;
-      }
-      .hero-overlay {
-        background:
-          linear-gradient(135deg,rgba(2,6,23,.28),rgba(2,6,23,.58)),
-          linear-gradient(180deg,rgba(2,6,23,.08),rgba(2,6,23,.32)) !important;
-      }
-      .hero-content { text-shadow:0 2px 18px rgba(0,0,0,.8); }
-    `;
-    document.head.appendChild(style);
-  }
+  function installHeroBaseStyle(){if(document.getElementById('manlung-hero-video-final-style'))return;const style=document.createElement('style');style.id='manlung-hero-video-final-style';style.textContent=`
+    .hero{background:#020617!important}.hero::before{background:#020617!important}.hero-video{display:block!important;visibility:visible!important;background:#020617!important;opacity:.78!important;filter:saturate(1.05) contrast(1.03) brightness(.78)!important}.hero-overlay{background:linear-gradient(135deg,rgba(2,6,23,.28),rgba(2,6,23,.58)),linear-gradient(180deg,rgba(2,6,23,.08),rgba(2,6,23,.32))!important}.hero-content{text-shadow:0 2px 18px rgba(0,0,0,.8)}@media(max-width:600px){.hero-video{display:block!important;visibility:visible!important;width:100%!important;height:100%!important;opacity:.78!important}}@media(prefers-reduced-motion:reduce){.hero-video{display:block!important;visibility:visible!important}}
+  `;document.head.appendChild(style)}
   installHeroBaseStyle();
-
-  function readTheme() {
-    try { return localStorage.getItem(STORAGE_KEY) === DARK ? DARK : LIGHT; } catch (_) { return LIGHT; }
-  }
-  function writeTheme(theme) { try { localStorage.setItem(STORAGE_KEY, theme); } catch (_) {} }
-  function setTheme(theme, persist = true) {
-    const next = theme === DARK ? DARK : LIGHT;
-    const root = document.documentElement;
-    root.classList.toggle('dark', next === DARK);
-    root.dataset.theme = next;
-    root.style.colorScheme = next;
-    if (document.body) document.body.classList.toggle('dark', next === DARK);
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', next === DARK ? '#050b16' : '#ffffff');
-    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-      const isDark = next === DARK;
-      button.setAttribute('aria-pressed', String(isDark));
-      button.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-      button.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
-      const icon = button.querySelector('i');
-      const label = button.querySelector('[data-theme-label]');
-      if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-      if (label) label.textContent = isDark ? 'Light' : 'Dark';
-      else button.innerHTML = `<i class="fas ${isDark ? 'fa-sun' : 'fa-moon'}" aria-hidden="true"></i><span data-theme-label>${isDark ? 'Light' : 'Dark'}</span>`;
-    });
-    if (persist) writeTheme(next);
-    return next;
-  }
-  setTheme(readTheme(), false);
-  function bindThemeButtons() {
-    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-      if (button.dataset.themeBound === 'true') return;
-      button.dataset.themeBound = 'true';
-      button.addEventListener('click', () => setTheme(readTheme() === DARK ? LIGHT : DARK, true));
-    });
-  }
-  function createThemeButton() {
-    if (document.querySelector('[data-theme-toggle]')) return;
-    const button = document.createElement('button');
-    button.type = 'button'; button.className = 'btn btn-outline manlung-theme-toggle'; button.dataset.themeToggle = 'true';
-    button.innerHTML = '<i class="fas fa-moon" aria-hidden="true"></i><span data-theme-label>Dark</span>';
-    const actions = document.querySelector('.site-header .header-actions');
-    if (actions) actions.insertBefore(button, actions.firstChild);
-    else { button.className = 'manlung-floating-theme'; document.body.appendChild(button); }
-    bindThemeButtons();
-  }
-  function convertLegacyButtons() {
-    document.querySelectorAll('[onclick="toggleDarkMode()"]').forEach((button) => { button.removeAttribute('onclick'); button.dataset.themeToggle = 'true'; });
-  }
-  function installCallIconFix() {
-    if (document.getElementById('manlung-floating-call-icon-fix')) return;
-    const s=document.createElement('style'); s.id='manlung-floating-call-icon-fix'; s.textContent=`#callWidgetBtn img.manlung-floating-call-icon{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;flex:0 0 20px!important;display:inline-block!important;object-fit:contain!important;object-position:center!important;margin:0!important;padding:0!important;vertical-align:middle!important}@media(max-width:600px){#callWidgetBtn img.manlung-floating-call-icon{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;max-width:28px!important;max-height:28px!important;flex:0 0 28px!important}}`; document.head.appendChild(s);
-  }
-  function loadAdminCallIcons() {
-    if (!location.pathname.startsWith('/admin/')) return;
-    if (document.querySelector('script[data-manlung-admin-call-icons]')) return;
-    const script = document.createElement('script'); script.src='/js/admin-call-icons.js'; script.defer=true; script.dataset.manlungAdminCallIcons='true'; document.head.appendChild(script);
-  }
-  function loadContactFab() {
-    if (document.querySelector('script[data-manlung-contact-fab]')) return;
-    const script = document.createElement('script'); script.src='/js/contact-fab.js'; script.defer=true; script.dataset.manlungContactFab='true'; document.head.appendChild(script);
-  }
-  function loadManlungAI() {
-    if (document.querySelector('script[data-manlung-ai]')) return;
-    const script = document.createElement('script'); script.src='/js/manlung-ai-v2.js'; script.defer=true; script.dataset.manlungAi='true'; document.head.appendChild(script);
-    script.addEventListener('load', () => {
-      if (document.querySelector('script[data-manlung-ai-live]')) return;
-      const live = document.createElement('script'); live.src='/js/manlung-ai-live.js'; live.defer=true; live.dataset.manlungAiLive='true'; document.head.appendChild(live);
-    });
-  }
-  function loadClientCaseChat() {
-    if (!location.pathname.startsWith('/client/track.html')) return;
-    if (document.querySelector('script[data-manlung-client-case-chat]')) return;
-    const script = document.createElement('script');
-    script.src = '/js/client-case-chat.js?v=20260906';
-    script.defer = true;
-    script.dataset.manlungClientCaseChat = 'true';
-    document.head.appendChild(script);
-  }
-
-  function installHeroVideoPlaylist() {
-    const CLIPS = [
-      CLIP_1,
-      'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4',
-      'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4'
-    ];
-    const hero = document.querySelector('.hero');
-    if (!hero || !CLIPS.length) return;
-
-    const existing = Array.from(hero.querySelectorAll('.hero-video'));
-    if (!existing.length) return;
-
-    const seed = existing[0];
-    const video = seed.cloneNode(true);
-    existing.forEach((node) => node.remove());
-
-    video.id = 'heroVideoPlaylist';
-    video.className = 'hero-video';
-    video.dataset.manlungPlaylist = 'true';
-    video.muted = true;
-    video.defaultMuted = true;
-    video.autoplay = true;
-    video.loop = false;
-    video.controls = false;
-    video.playsInline = true;
-    video.setAttribute('muted', '');
-    video.setAttribute('autoplay', '');
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
-    video.preload = 'auto';
-    video.style.opacity = '0';
-    video.style.transition = 'opacity .25s ease';
-    hero.insertBefore(video, hero.firstChild);
-
-    let current = 0;
-    let switching = false;
-    let loadTimer = null;
-    let hasStarted = false;
-
-    function clearLoadTimer() {
-      if (loadTimer) clearTimeout(loadTimer);
-      loadTimer = null;
-    }
-    function reveal() {
-      hasStarted = true;
-      clearLoadTimer();
-      video.style.opacity = '0.78';
-    }
-    function startPlayback() {
-      if (document.hidden) return;
-      const p = video.play();
-      if (p && p.catch) p.catch(() => {});
-    }
-    function playClip(index) {
-      current = (index + CLIPS.length) % CLIPS.length;
-      switching = false;
-      hasStarted = false;
-      clearLoadTimer();
-      const wanted = CLIPS[current];
-      const active = video.currentSrc || video.src || video.querySelector('source')?.src || '';
-      if (active.split('?')[0] !== wanted.split('?')[0]) {
-        video.pause();
-        video.removeAttribute('src');
-        video.innerHTML = '';
-        video.src = wanted;
-        video.load();
-      }
-      loadTimer = setTimeout(() => {
-        if (!hasStarted && !switching) nextClip();
-      }, 15000);
-      startPlayback();
-    }
-    function nextClip() {
-      if (switching) return;
-      switching = true;
-      clearLoadTimer();
-      video.style.opacity = '0';
-      playClip(current + 1);
-    }
-
-    video.addEventListener('loadeddata', () => { reveal(); startPlayback(); });
-    video.addEventListener('canplay', () => { reveal(); startPlayback(); });
-    video.addEventListener('playing', reveal);
-    video.addEventListener('ended', nextClip);
-    video.addEventListener('error', nextClip);
-    // Do NOT switch on 'stalled': browsers legitimately fire it while buffering.
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) startPlayback(); });
-    window.addEventListener('pageshow', startPlayback);
-
-    // The preload request started in the document head; use the same URL for clip 1.
-    video.src = CLIPS[0];
-    video.load();
-    playClip(0);
-  }
-
-  function boot() {
-    convertLegacyButtons(); bindThemeButtons(); createThemeButton(); bindThemeButtons(); setTheme(readTheme(), false);
-    installCallIconFix(); loadAdminCallIcons(); loadContactFab(); loadManlungAI(); loadClientCaseChat();
-    installHeroVideoPlaylist();
-    window.setManlungTheme = (theme) => setTheme(theme, true);
-    window.toggleDarkMode = () => setTheme(readTheme() === DARK ? LIGHT : DARK, true);
-  }
-  window.addEventListener('storage', (event) => { if (event.key === STORAGE_KEY) setTheme(readTheme(), false); });
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true }); else boot();
+  function readTheme(){try{return localStorage.getItem(STORAGE_KEY)===DARK?DARK:LIGHT}catch(_){return LIGHT}}function writeTheme(theme){try{localStorage.setItem(STORAGE_KEY,theme)}catch(_){} }
+  function setTheme(theme,persist=true){const next=theme===DARK?DARK:LIGHT,root=document.documentElement;root.classList.toggle('dark',next===DARK);root.dataset.theme=next;root.style.colorScheme=next;if(document.body)document.body.classList.toggle('dark',next===DARK);const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',next===DARK?'#050b16':'#ffffff');document.querySelectorAll('[data-theme-toggle]').forEach(button=>{const isDark=next===DARK;button.setAttribute('aria-pressed',String(isDark));button.setAttribute('aria-label',isDark?'Switch to light mode':'Switch to dark mode');button.title=isDark?'Switch to light mode':'Switch to dark mode';const icon=button.querySelector('i'),label=button.querySelector('[data-theme-label]');if(icon)icon.className=isDark?'fas fa-sun':'fas fa-moon';if(label)label.textContent=isDark?'Light':'Dark';else button.innerHTML=`<i class="fas ${isDark?'fa-sun':'fa-moon'}" aria-hidden="true"></i><span data-theme-label>${isDark?'Light':'Dark'}</span>`});if(persist)writeTheme(next);return next}
+  setTheme(readTheme(),false);function bindThemeButtons(){document.querySelectorAll('[data-theme-toggle]').forEach(button=>{if(button.dataset.themeBound==='true')return;button.dataset.themeBound='true';button.addEventListener('click',()=>setTheme(readTheme()===DARK?LIGHT:DARK,true))})}
+  function createThemeButton(){if(document.querySelector('[data-theme-toggle]'))return;const button=document.createElement('button');button.type='button';button.className='btn btn-outline manlung-theme-toggle';button.dataset.themeToggle='true';button.innerHTML='<i class="fas fa-moon" aria-hidden="true"></i><span data-theme-label>Dark</span>';const actions=document.querySelector('.site-header .header-actions');if(actions)actions.insertBefore(button,actions.firstChild);else{button.className='manlung-floating-theme';document.body.appendChild(button)}bindThemeButtons()}
+  function convertLegacyButtons(){document.querySelectorAll('[onclick="toggleDarkMode()"]').forEach(button=>{button.removeAttribute('onclick');button.dataset.themeToggle='true'})}
+  function installCallIconFix(){if(document.getElementById('manlung-floating-call-icon-fix'))return;const s=document.createElement('style');s.id='manlung-floating-call-icon-fix';s.textContent=`#callWidgetBtn img.manlung-floating-call-icon{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;flex:0 0 20px!important;display:inline-block!important;object-fit:contain!important;object-position:center!important;margin:0!important;padding:0!important;vertical-align:middle!important}@media(max-width:600px){#callWidgetBtn img.manlung-floating-call-icon{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;max-width:28px!important;max-height:28px!important;flex:0 0 28px!important}}`;document.head.appendChild(s)}
+  function loadAdminCallIcons(){if(!location.pathname.startsWith('/admin/'))return;if(document.querySelector('script[data-manlung-admin-call-icons]'))return;const script=document.createElement('script');script.src='/js/admin-call-icons.js';script.defer=true;script.dataset.manlungAdminCallIcons='true';document.head.appendChild(script)}
+  function loadContactFab(){if(document.querySelector('script[data-manlung-contact-fab]'))return;const script=document.createElement('script');script.src='/js/contact-fab.js';script.defer=true;script.dataset.manlungContactFab='true';document.head.appendChild(script)}
+  function loadManlungAI(){if(document.querySelector('script[data-manlung-ai]'))return;const script=document.createElement('script');script.src='/js/manlung-ai-v2.js';script.defer=true;script.dataset.manlungAi='true';document.head.appendChild(script);script.addEventListener('load',()=>{if(document.querySelector('script[data-manlung-ai-live]'))return;const live=document.createElement('script');live.src='/js/manlung-ai-live.js';live.defer=true;live.dataset.manlungAiLive='true';document.head.appendChild(live)})}
+  function loadClientCaseChat(){if(!location.pathname.startsWith('/client/track.html'))return;if(document.querySelector('script[data-manlung-client-case-chat]'))return;const script=document.createElement('script');script.src='/js/client-case-chat.js?v=20260906b';script.defer=true;script.dataset.manlungClientCaseChat='true';document.head.appendChild(script)}
+  function installHeroVideoPlaylist(){const CLIPS=[CLIP_1,'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4','https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4'],hero=document.querySelector('.hero');if(!hero||!CLIPS.length)return;const existing=Array.from(hero.querySelectorAll('.hero-video'));if(!existing.length)return;const seed=existing[0],video=seed.cloneNode(true);existing.forEach(node=>node.remove());video.id='heroVideoPlaylist';video.className='hero-video';video.dataset.manlungPlaylist='true';video.muted=true;video.defaultMuted=true;video.autoplay=true;video.loop=false;video.controls=false;video.playsInline=true;video.setAttribute('muted','');video.setAttribute('autoplay','');video.setAttribute('playsinline','');video.setAttribute('webkit-playsinline','');video.preload='auto';video.style.opacity='0';video.style.transition='opacity .25s ease';hero.insertBefore(video,hero.firstChild);let current=0,switching=false,loadTimer=null,hasStarted=false;function clearLoadTimer(){if(loadTimer)clearTimeout(loadTimer);loadTimer=null}function reveal(){hasStarted=true;clearLoadTimer();video.style.opacity='0.78'}function startPlayback(){if(document.hidden)return;const p=video.play();if(p&&p.catch)p.catch(()=>{})}function playClip(index){current=(index+CLIPS.length)%CLIPS.length;switching=false;hasStarted=false;clearLoadTimer();const wanted=CLIPS[current],active=video.currentSrc||video.src||video.querySelector('source')?.src||'';if(active.split('?')[0]!==wanted.split('?')[0]){video.pause();video.removeAttribute('src');video.innerHTML='';video.src=wanted;video.load()}loadTimer=setTimeout(()=>{if(!hasStarted&&!switching)nextClip()},15000);startPlayback()}function nextClip(){if(switching)return;switching=true;clearLoadTimer();video.style.opacity='0';playClip(current+1)}video.addEventListener('loadeddata',()=>{reveal();startPlayback()});video.addEventListener('canplay',()=>{reveal();startPlayback()});video.addEventListener('playing',reveal);video.addEventListener('ended',nextClip);video.addEventListener('error',nextClip);document.addEventListener('visibilitychange',()=>{if(!document.hidden)startPlayback()});window.addEventListener('pageshow',startPlayback);['touchstart','pointerdown','click'].forEach(eventName=>document.addEventListener(eventName,startPlayback,{passive:true,once:true}));video.src=CLIPS[0];video.load();playClip(0)}
+  function boot(){convertLegacyButtons();bindThemeButtons();createThemeButton();bindThemeButtons();setTheme(readTheme(),false);installCallIconFix();loadAdminCallIcons();loadContactFab();loadManlungAI();loadClientCaseChat();installHeroVideoPlaylist();window.setManlungTheme=theme=>setTheme(theme,true);window.toggleDarkMode=()=>setTheme(readTheme()===DARK?LIGHT:DARK,true)}
+  window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY)setTheme(readTheme(),false)});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
