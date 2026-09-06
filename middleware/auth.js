@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const AdminPermission = require('../models/AdminPermission');
+const { isTokenRevoked } = require('./sessionRevocation');
 
 const ADMIN_COOKIE = 'manlung_admin_session';
 const SESSION_MAX_AGE = {
@@ -12,7 +13,8 @@ const SESSION_MAX_AGE = {
 function getCookie(req, name) {
   const raw = req.headers.cookie || '';
   const match = raw.split(';').map((v) => v.trim()).find((v) => v.startsWith(`${name}=`));
-  return match ? decodeURIComponent(match.slice(name.length + 1)) : null;
+  if (!match) return null;
+  try { return decodeURIComponent(match.slice(name.length + 1)); } catch (_) { return null; }
 }
 
 function isSessionExpired(decoded, user) {
@@ -21,38 +23,36 @@ function isSessionExpired(decoded, user) {
   return Math.floor(Date.now() / 1000) - decoded.iat > maxAge;
 }
 
+async function verifyRequestToken(req) {
+  const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, ADMIN_COOKIE);
+  if (!token) return { token: null, decoded: null, user: null };
+  if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
+  const user = await User.findById(decoded.id);
+  return { token, decoded, user };
+}
+
 const auth = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '') || getCookie(req, ADMIN_COOKIE);
-
-    if (!token) return res.status(401).json({ error: 'Authentication required' });
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (!user) return res.status(401).json({ error: 'User not found' });
-
-    if (isSessionExpired(decoded, user)) {
-      return res.status(401).json({ error: 'Session expired. Please sign in again.', code: 'SESSION_EXPIRED' });
-    }
-
-    if ((user.role === 'owner' || user.role === 'admin') && user.mfa_enabled === true && decoded.mfa !== true) {
-      return res.status(403).json({ error: 'MFA verification required', code: 'MFA_REQUIRED' });
-    }
-
+    const { decoded, user } = await verifyRequestToken(req);
+    if (!user) return res.status(401).json({ error: 'Authentication required' });
+    if (isSessionExpired(decoded, user)) return res.status(401).json({ error: 'Session expired. Please sign in again.', code: 'SESSION_EXPIRED' });
+    if ((user.role === 'owner' || user.role === 'admin') && user.mfa_enabled === true && decoded.mfa !== true) return res.status(403).json({ error: 'MFA verification required', code: 'MFA_REQUIRED' });
     req.user = user;
     next();
   } catch (error) {
+    if (error.message === 'TOKEN_REVOKED') return res.status(401).json({ error: 'Session revoked. Please sign in again.', code: 'SESSION_REVOKED' });
     console.error('Authentication error:', error);
     return res.status(401).json({ error: 'Invalid token' });
   }
 };
 
 const optionalAuth = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '');
   if (!token) return next();
-
   try {
+    if (isTokenRevoked(token)) return res.status(401).json({ error: 'Session revoked.', code: 'SESSION_REVOKED' });
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) return res.status(401).json({ error: 'User not found' });
@@ -77,7 +77,7 @@ const ownerAuth = async (req, res, next) => {
   await auth(req, res, () => {
     if (req.user.role !== 'owner') return res.status(403).json({ error: 'Owner access required' });
     if (req.user.mfa_enabled === true) {
-      const token = req.header('Authorization')?.replace('Bearer ', '') || getCookie(req, ADMIN_COOKIE);
+      const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, ADMIN_COOKIE);
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       if (decoded.mfa !== true) return res.status(403).json({ error: 'Owner MFA verification required', code: 'MFA_REQUIRED' });
     }
@@ -99,6 +99,6 @@ function requirePermission(permission) {
       }
     });
   };
-};
+}
 
 module.exports = { auth, optionalAuth, adminAuth, ownerAuth, requirePermission };
