@@ -81,3 +81,82 @@
   window.addEventListener('storage', (event) => { if (event.key === STORAGE_KEY) setTheme(readTheme(), false); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true }); else boot();
 })();
+
+/* Manlung Recovery hero video controller.
+   Runs after the page's legacy video scripts and replaces their listeners
+   with one reliable 3-clip playlist: newest clip first. */
+(function installThreeClipHero() {
+  const CLIPS = [
+    'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/Futuristic%20HUD%20Interface%20Sound%20Design%20-%20Binary%20Code%203%20Example%20(1).mp4',
+    'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4',
+    'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4'
+  ];
+
+  function start() {
+    const hero = document.querySelector('.hero');
+    if (!hero || !CLIPS.length) return;
+
+    const existing = Array.from(hero.querySelectorAll('.hero-video'));
+    if (!existing.length) return;
+
+    // Clone the original element so legacy ended/pause handlers are removed.
+    const video = existing[0].cloneNode(false);
+    existing.forEach((node) => node.remove());
+    video.id = 'heroVideoPlaylist';
+    video.className = 'hero-video';
+    video.controls = false;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.autoplay = true;
+    video.loop = false;
+    video.playsInline = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.preload = 'auto';
+
+    hero.insertBefore(video, hero.firstChild);
+
+    let current = 0;
+    let advancing = false;
+
+    function loadAndPlay(index) {
+      current = ((index % CLIPS.length) + CLIPS.length) % CLIPS.length;
+      advancing = false;
+      video.src = CLIPS[current];
+      video.load();
+      const promise = video.play();
+      if (promise && typeof promise.catch === 'function') {
+        promise.catch(() => {});
+      }
+    }
+
+    function nextClip() {
+      if (advancing) return;
+      advancing = true;
+      loadAndPlay(current + 1);
+    }
+
+    video.addEventListener('ended', nextClip);
+    video.addEventListener('error', () => {
+      // Skip a broken/unavailable clip instead of leaving the hero blank.
+      if (!advancing) nextClip();
+    });
+    video.addEventListener('canplay', () => {
+      if (video.paused && !document.hidden) video.play().catch(() => {});
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && video.paused) video.play().catch(() => {});
+    });
+    window.addEventListener('pageshow', () => video.play().catch(() => {}));
+
+    loadAndPlay(0);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
+})();
