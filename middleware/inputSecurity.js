@@ -38,7 +38,8 @@ function isPlainObject(value) { return value !== null && typeof value === 'objec
 function parseCookie(req, name) {
   const raw = req.headers.cookie || '';
   const match = raw.split(';').map(v => v.trim()).find(v => v.startsWith(`${name}=`));
-  return match ? decodeURIComponent(match.slice(name.length + 1)) : null;
+  if (!match) return null;
+  try { return decodeURIComponent(match.slice(name.length + 1)); } catch (_) { return null; }
 }
 
 function ensureCsrfCookie(req, res) {
@@ -54,21 +55,27 @@ function ensureCsrfCookie(req, res) {
   }
 }
 
+function safeEqual(a, b) {
+  if (!a || !b) return false;
+  const left = Buffer.from(String(a));
+  const right = Buffer.from(String(b));
+  if (left.length !== right.length) return false;
+  return crypto.timingSafeEqual(left, right);
+}
+
 function enforceCsrf(req, res) {
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) return true;
   if (!req.headers.cookie?.includes('manlung_admin_session=')) return true;
   if (req.headers.authorization) return true;
 
-  const allowedOrigins = new Set(['https://manlungrecovery.manlungshop.co.ke', 'http://localhost:3000', 'http://127.0.0.1:3000']);
-  const origin = req.headers.origin;
-  const referer = req.headers.referer;
-  const originAllowed = (origin && allowedOrigins.has(origin)) || (referer && [...allowedOrigins].some(base => referer.startsWith(`${base}/`)));
   const cookieToken = parseCookie(req, CSRF_COOKIE);
   const headerToken = req.headers['x-csrf-token'];
-  const tokenValid = cookieToken && headerToken && crypto.timingSafeEqual(Buffer.from(cookieToken), Buffer.from(String(headerToken)));
 
-  if (!originAllowed && !tokenValid) {
-    return res.status(403).json({ success: false, error: 'CSRF validation failed.' });
+  // Cookie-authenticated state changes must carry the CSRF token.
+  // Same-origin Origin/Referer checks remain useful defense-in-depth, but
+  // they are no longer accepted as a substitute for the token.
+  if (!safeEqual(cookieToken, headerToken)) {
+    return res.status(403).json({ success: false, error: 'CSRF validation failed.', code: 'CSRF_INVALID' });
   }
   return true;
 }
