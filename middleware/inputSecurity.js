@@ -35,6 +35,17 @@ const loginFailures = new Map();
 const CSRF_COOKIE = process.env.NODE_ENV === 'production' ? '__Host-mlc_csrf' : 'mlc_csrf';
 const ADMIN_COOKIE = 'manlung_admin_session';
 
+function securityLog(event, req, extra = {}) {
+  const safe = {
+    event,
+    method: req.method,
+    path: req.path,
+    ipHash: crypto.createHash('sha256').update(String(req.ip || '')).digest('hex').slice(0, 16),
+    ...extra,
+  };
+  console.warn('[SECURITY]', JSON.stringify(safe));
+}
+
 function isPlainObject(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
 
 function parseCookie(req, name) {
@@ -71,7 +82,10 @@ function enforceCsrf(req, res) {
   if (req.headers.authorization) return true;
   const cookieToken = parseCookie(req, CSRF_COOKIE);
   const headerToken = req.headers['x-csrf-token'];
-  if (!safeEqual(cookieToken, headerToken)) return res.status(403).json({ success: false, error: 'CSRF validation failed.', code: 'CSRF_INVALID' });
+  if (!safeEqual(cookieToken, headerToken)) {
+    securityLog('csrf_blocked', req);
+    return res.status(403).json({ success: false, error: 'CSRF validation failed.', code: 'CSRF_INVALID' });
+  }
   return true;
 }
 
@@ -86,7 +100,10 @@ function enforceLoginLockout(req, res) {
   const record = loginFailures.get(key);
   if (!record) return true;
   if (record.expiresAt <= Date.now()) { loginFailures.delete(key); return true; }
-  if (record.failures >= LOGIN_MAX_FAILURES) return res.status(429).json({ success: false, error: 'Account temporarily blocked after 3 failed login attempts. Please wait 15 minutes before trying again.', code: 'LOGIN_LOCKED' });
+  if (record.failures >= LOGIN_MAX_FAILURES) {
+    securityLog('login_locked', req, { keyHash: key.slice(0, 16), failures: record.failures });
+    return res.status(429).json({ success: false, error: 'Account temporarily blocked after 3 failed login attempts. Please wait 15 minutes before trying again.', code: 'LOGIN_LOCKED' });
+  }
   return true;
 }
 
@@ -99,6 +116,8 @@ function trackLoginResult(req, res) {
     const existing = loginFailures.get(key);
     const failures = (existing && existing.expiresAt > Date.now() ? existing.failures : 0) + 1;
     loginFailures.set(key, { failures, expiresAt: Date.now() + LOGIN_WINDOW_MS });
+    securityLog('login_failed', req, { keyHash: key.slice(0, 16), failures });
+    if (failures >= LOGIN_MAX_FAILURES) securityLog('login_lockout_triggered', req, { keyHash: key.slice(0, 16), failures });
   });
 }
 
@@ -109,7 +128,10 @@ function trackLogoutRevocation(req, res) {
   let decoded = null;
   try { decoded = require('jsonwebtoken').decode(token); } catch (_) { decoded = null; }
   res.on('finish', () => {
-    if (res.statusCode >= 200 && res.statusCode < 400) revokeToken(token, decoded?.exp);
+    if (res.statusCode >= 200 && res.statusCode < 400) {
+      revokeToken(token, decoded?.exp);
+      securityLog('session_revoked', req);
+    }
   });
 }
 
@@ -143,13 +165,17 @@ function inputSecurity(req, res, next) {
     if (!enforceCsrf(req, res)) return;
     for (const [sourceName, value] of [['body', req.body], ['query', req.query], ['params', req.params]]) {
       const error = inspectValue(value, sourceName);
-      if (error) return res.status(400).json({ success: false, error });
+      if (error) {
+        securityLog('malicious_input_blocked', req, { source: sourceName });
+        return res.status(400).json({ success: false, error });
+      }
     }
     trackLoginResult(req, res);
     trackLogoutRevocation(req, res);
     return next();
   } catch (error) {
     console.error('Input security middleware error:', error);
+    securityLog('security_middleware_error', req);
     return res.status(400).json({ success: false, error: 'Invalid request data.' });
   }
 }
