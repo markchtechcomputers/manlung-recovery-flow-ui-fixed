@@ -80,14 +80,20 @@
       'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4'
     ];
     const hero = document.querySelector('.hero');
-    const oldVideo = hero && hero.querySelector('.hero-video');
-    if (!hero || !oldVideo || oldVideo.dataset.manlungPlaylist === 'true') return;
+    if (!hero) return;
 
-    const video = oldVideo.cloneNode(false);
-    oldVideo.remove();
+    // The original page contains multiple legacy hero videos/scripts. Keep exactly
+    // one video element so old players cannot compete for playback/network bandwidth.
+    const existing = Array.from(hero.querySelectorAll('.hero-video'));
+    if (!existing.length) return;
+    const video = existing[0].cloneNode(false);
+    existing.forEach((node) => node.remove());
+
     video.id = 'heroVideoPlaylist';
     video.className = 'hero-video';
     video.dataset.manlungPlaylist = 'true';
+    video.removeAttribute('src');
+    video.innerHTML = '';
     video.muted = true;
     video.defaultMuted = true;
     video.autoplay = true;
@@ -98,42 +104,72 @@
     video.setAttribute('autoplay', '');
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
-    video.preload = 'auto';
+    video.preload = 'metadata';
     hero.insertBefore(video, hero.firstChild);
 
     let current = 0;
-    let moving = false;
-    let errorTimer = null;
+    let switching = false;
+    let loadTimer = null;
+    let started = false;
+
+    function clearLoadTimer() {
+      if (loadTimer) {
+        clearTimeout(loadTimer);
+        loadTimer = null;
+      }
+    }
+
+    function startPlayback() {
+      if (document.hidden) return;
+      const promise = video.play();
+      if (promise && promise.catch) promise.catch(() => {});
+    }
 
     function playClip(index) {
       current = (index + CLIPS.length) % CLIPS.length;
-      moving = false;
-      clearTimeout(errorTimer);
+      switching = false;
+      started = false;
+      clearLoadTimer();
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
       video.src = CLIPS[current];
       video.load();
-      const p = video.play();
-      if (p && p.catch) p.catch(() => {});
-      errorTimer = setTimeout(() => {
-        if (video.readyState === 0 && !moving) nextClip();
-      }, 5000);
+
+      // If a source cannot load, move on instead of leaving a frozen/blank hero.
+      loadTimer = setTimeout(() => {
+        if (!started && !switching) nextClip();
+      }, 8000);
     }
 
     function nextClip() {
-      if (moving) return;
-      moving = true;
+      if (switching) return;
+      switching = true;
+      clearLoadTimer();
       playClip(current + 1);
     }
 
+    video.addEventListener('loadeddata', () => {
+      started = true;
+      clearLoadTimer();
+      startPlayback();
+    });
+    video.addEventListener('canplay', () => {
+      started = true;
+      clearLoadTimer();
+      startPlayback();
+    });
+    video.addEventListener('playing', () => {
+      started = true;
+      clearLoadTimer();
+    });
     video.addEventListener('ended', nextClip);
     video.addEventListener('error', nextClip);
-    video.addEventListener('canplay', () => {
-      clearTimeout(errorTimer);
-      if (video.paused && !document.hidden) video.play().catch(() => {});
-    });
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && video.paused) video.play().catch(() => {});
+      if (!document.hidden) startPlayback();
     });
-    window.addEventListener('pageshow', () => video.play().catch(() => {}));
+    window.addEventListener('pageshow', startPlayback);
+
     playClip(0);
   }
 
