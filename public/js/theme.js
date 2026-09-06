@@ -107,6 +107,15 @@
       const live = document.createElement('script'); live.src='/js/manlung-ai-live.js'; live.defer=true; live.dataset.manlungAiLive='true'; document.head.appendChild(live);
     });
   }
+  function loadClientCaseChat() {
+    if (!location.pathname.startsWith('/client/track.html')) return;
+    if (document.querySelector('script[data-manlung-client-case-chat]')) return;
+    const script = document.createElement('script');
+    script.src = '/js/client-case-chat.js?v=20260906';
+    script.defer = true;
+    script.dataset.manlungClientCaseChat = 'true';
+    document.head.appendChild(script);
+  }
 
   function installHeroVideoPlaylist() {
     const CLIPS = [
@@ -205,7 +214,7 @@
 
   function boot() {
     convertLegacyButtons(); bindThemeButtons(); createThemeButton(); bindThemeButtons(); setTheme(readTheme(), false);
-    installCallIconFix(); loadAdminCallIcons(); loadContactFab(); loadManlungAI();
+    installCallIconFix(); loadAdminCallIcons(); loadContactFab(); loadManlungAI(); loadClientCaseChat();
     installHeroVideoPlaylist();
     window.setManlungTheme = (theme) => setTheme(theme, true);
     window.toggleDarkMode = () => setTheme(readTheme() === DARK ? LIGHT : DARK, true);
