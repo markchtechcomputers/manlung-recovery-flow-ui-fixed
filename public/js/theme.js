@@ -15,7 +15,7 @@
     root.style.colorScheme = next;
     if (document.body) document.body.classList.toggle('dark', next === DARK);
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', next === DARK ? '#0b1424' : '#ffffff');
+    if (meta) meta.setAttribute('content', next === DARK ? '#050b16' : '#ffffff');
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
       const isDark = next === DARK;
       button.setAttribute('aria-pressed', String(isDark));
@@ -80,20 +80,21 @@
       'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/WhatsApp%20Video%202026-08-18%20at%203.06.03%20PM.mp4'
     ];
     const hero = document.querySelector('.hero');
-    if (!hero) return;
+    if (!hero || !CLIPS.length) return;
 
-    // The original page contains multiple legacy hero videos/scripts. Keep exactly
-    // one video element so old players cannot compete for playback/network bandwidth.
     const existing = Array.from(hero.querySelectorAll('.hero-video'));
     if (!existing.length) return;
-    const video = existing[0].cloneNode(false);
+
+    // Replace all legacy players with one clean player. Keep the first element's
+    // already-declared source so the browser can begin fetching clip 1 immediately.
+    const seed = existing[0];
+    const initialSource = seed.currentSrc || seed.querySelector('source')?.src || seed.getAttribute('src') || CLIPS[0];
+    const video = seed.cloneNode(true);
     existing.forEach((node) => node.remove());
 
     video.id = 'heroVideoPlaylist';
     video.className = 'hero-video';
     video.dataset.manlungPlaylist = 'true';
-    video.removeAttribute('src');
-    video.innerHTML = '';
     video.muted = true;
     video.defaultMuted = true;
     video.autoplay = true;
@@ -104,72 +105,97 @@
     video.setAttribute('autoplay', '');
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
-    video.preload = 'metadata';
+    video.preload = 'auto';
+    video.removeAttribute('poster');
+    video.style.opacity = '0';
+    video.style.visibility = 'visible';
+    video.style.transition = 'opacity .35s ease';
     hero.insertBefore(video, hero.firstChild);
 
     let current = 0;
     let switching = false;
     let loadTimer = null;
-    let started = false;
+    let readyTimer = null;
+    let hasStarted = false;
 
-    function clearLoadTimer() {
-      if (loadTimer) {
-        clearTimeout(loadTimer);
-        loadTimer = null;
-      }
+    function clearTimers() {
+      if (loadTimer) clearTimeout(loadTimer);
+      if (readyTimer) clearTimeout(readyTimer);
+      loadTimer = null;
+      readyTimer = null;
+    }
+
+    function reveal() {
+      video.style.opacity = '0.78';
+      hasStarted = true;
+      clearTimers();
     }
 
     function startPlayback() {
       if (document.hidden) return;
-      const promise = video.play();
-      if (promise && promise.catch) promise.catch(() => {});
-    }
-
-    function playClip(index) {
-      current = (index + CLIPS.length) % CLIPS.length;
-      switching = false;
-      started = false;
-      clearLoadTimer();
-      video.pause();
-      video.removeAttribute('src');
-      video.load();
-      video.src = CLIPS[current];
-      video.load();
-
-      // If a source cannot load, move on instead of leaving a frozen/blank hero.
-      loadTimer = setTimeout(() => {
-        if (!started && !switching) nextClip();
-      }, 8000);
+      const p = video.play();
+      if (p && p.catch) p.catch(() => {});
     }
 
     function nextClip() {
       if (switching) return;
       switching = true;
-      clearLoadTimer();
-      playClip(current + 1);
+      clearTimers();
+      video.style.opacity = '0';
+      const next = (current + 1) % CLIPS.length;
+      playClip(next);
     }
 
-    video.addEventListener('loadeddata', () => {
-      started = true;
-      clearLoadTimer();
+    function playClip(index) {
+      current = (index + CLIPS.length) % CLIPS.length;
+      switching = false;
+      hasStarted = false;
+      clearTimers();
+
+      // Clip 1 may already be downloading from the HTML source. Do not reset it.
+      const wanted = CLIPS[current];
+      const active = video.currentSrc || video.src || video.querySelector('source')?.src || '';
+      const normalizedActive = active.split('?')[0];
+      const normalizedWanted = wanted.split('?')[0];
+
+      if (normalizedActive !== normalizedWanted && !(current === 0 && initialSource === wanted)) {
+        video.pause();
+        video.removeAttribute('src');
+        video.innerHTML = '';
+        video.src = wanted;
+        video.load();
+      }
+
+      // Give the browser time to buffer, but never leave the hero stuck forever.
+      loadTimer = setTimeout(() => {
+        if (!hasStarted && !switching) nextClip();
+      }, 6000);
+
+      readyTimer = setTimeout(() => {
+        if (!hasStarted && !switching) nextClip();
+      }, 12000);
+
       startPlayback();
-    });
-    video.addEventListener('canplay', () => {
-      started = true;
-      clearLoadTimer();
-      startPlayback();
-    });
-    video.addEventListener('playing', () => {
-      started = true;
-      clearLoadTimer();
-    });
+    }
+
+    video.addEventListener('loadeddata', () => { reveal(); startPlayback(); });
+    video.addEventListener('canplay', () => { reveal(); startPlayback(); });
+    video.addEventListener('playing', reveal);
     video.addEventListener('ended', nextClip);
     video.addEventListener('error', nextClip);
+    video.addEventListener('stalled', () => {
+      if (!hasStarted) nextClip();
+    });
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) startPlayback();
     });
     window.addEventListener('pageshow', startPlayback);
 
+    // Clip 1 is the page's eager source; clip 2/3 are loaded only when needed.
+    if (initialSource !== CLIPS[0]) {
+      video.src = CLIPS[0];
+      video.load();
+    }
     playClip(0);
   }
 
