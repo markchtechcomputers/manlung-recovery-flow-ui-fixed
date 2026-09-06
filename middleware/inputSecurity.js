@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { revokeToken } = require('./sessionRevocation');
 
 const DANGEROUS_SCHEMES = /(?:^|\s)(?:javascript|vbscript|file|data):/i;
 const PATH_TRAVERSAL = /(?:^|[\\/])\.\.(?:[\\/]|$)/;
@@ -32,6 +33,7 @@ const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const LOGIN_MAX_FAILURES = 3;
 const loginFailures = new Map();
 const CSRF_COOKIE = process.env.NODE_ENV === 'production' ? '__Host-mlc_csrf' : 'mlc_csrf';
+const ADMIN_COOKIE = 'manlung_admin_session';
 
 function isPlainObject(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
 
@@ -65,18 +67,11 @@ function safeEqual(a, b) {
 
 function enforceCsrf(req, res) {
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) return true;
-  if (!req.headers.cookie?.includes('manlung_admin_session=')) return true;
+  if (!req.headers.cookie?.includes(`${ADMIN_COOKIE}=`)) return true;
   if (req.headers.authorization) return true;
-
   const cookieToken = parseCookie(req, CSRF_COOKIE);
   const headerToken = req.headers['x-csrf-token'];
-
-  // Cookie-authenticated state changes must carry the CSRF token.
-  // Same-origin Origin/Referer checks remain useful defense-in-depth, but
-  // they are no longer accepted as a substitute for the token.
-  if (!safeEqual(cookieToken, headerToken)) {
-    return res.status(403).json({ success: false, error: 'CSRF validation failed.', code: 'CSRF_INVALID' });
-  }
+  if (!safeEqual(cookieToken, headerToken)) return res.status(403).json({ success: false, error: 'CSRF validation failed.', code: 'CSRF_INVALID' });
   return true;
 }
 
@@ -91,10 +86,7 @@ function enforceLoginLockout(req, res) {
   const record = loginFailures.get(key);
   if (!record) return true;
   if (record.expiresAt <= Date.now()) { loginFailures.delete(key); return true; }
-  if (record.failures >= LOGIN_MAX_FAILURES) {
-    res.status(429).json({ success: false, error: 'Account temporarily blocked after 3 failed login attempts. Please wait 15 minutes before trying again.', code: 'LOGIN_LOCKED' });
-    return false;
-  }
+  if (record.failures >= LOGIN_MAX_FAILURES) return res.status(429).json({ success: false, error: 'Account temporarily blocked after 3 failed login attempts. Please wait 15 minutes before trying again.', code: 'LOGIN_LOCKED' });
   return true;
 }
 
@@ -107,6 +99,17 @@ function trackLoginResult(req, res) {
     const existing = loginFailures.get(key);
     const failures = (existing && existing.expiresAt > Date.now() ? existing.failures : 0) + 1;
     loginFailures.set(key, { failures, expiresAt: Date.now() + LOGIN_WINDOW_MS });
+  });
+}
+
+function trackLogoutRevocation(req, res) {
+  if (req.method !== 'POST' || !req.path.endsWith('/admin/logout')) return;
+  const token = req.headers.authorization?.replace(/^Bearer\s+/i, '') || parseCookie(req, ADMIN_COOKIE);
+  if (!token) return;
+  let decoded = null;
+  try { decoded = require('jsonwebtoken').decode(token); } catch (_) { decoded = null; }
+  res.on('finish', () => {
+    if (res.statusCode >= 200 && res.statusCode < 400) revokeToken(token, decoded?.exp);
   });
 }
 
@@ -143,6 +146,7 @@ function inputSecurity(req, res, next) {
       if (error) return res.status(400).json({ success: false, error });
     }
     trackLoginResult(req, res);
+    trackLogoutRevocation(req, res);
     return next();
   } catch (error) {
     console.error('Input security middleware error:', error);
