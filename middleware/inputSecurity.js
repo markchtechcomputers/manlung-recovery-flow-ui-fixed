@@ -29,7 +29,7 @@ const PROMPT_INJECTION_PATTERNS = [
 const URL_LIKE_KEYS = new Set(['url', 'redirect', 'redirectTo', 'callbackUrl', 'returnUrl', 'website', 'link']);
 const PATH_LIKE_KEYS = new Set(['path', 'filename', 'fileName', 'storagePath', 'filePath']);
 const PROMPT_LIKE_KEYS = new Set(['prompt', 'systemPrompt', 'instructions', 'aiPrompt', 'assistantPrompt', 'automationPrompt']);
-const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const LOGIN_WINDOW_MS = 132 * 1000;
 const LOGIN_MAX_FAILURES = 3;
 const loginFailures = new Map();
 const CSRF_COOKIE = process.env.NODE_ENV === 'production' ? '__Host-mlc_csrf' : 'mlc_csrf';
@@ -102,7 +102,7 @@ function enforceLoginLockout(req, res) {
   if (record.expiresAt <= Date.now()) { loginFailures.delete(key); return true; }
   if (record.failures >= LOGIN_MAX_FAILURES) {
     securityLog('login_locked', req, { keyHash: key.slice(0, 16), failures: record.failures });
-    return res.status(429).json({ success: false, error: 'Account temporarily blocked after 3 failed login attempts. Please wait 15 minutes before trying again.', code: 'LOGIN_LOCKED' });
+    return res.status(429).json({ success: false, error: 'Account temporarily blocked after 3 failed login attempts. Please wait 132 seconds before trying again.', code: 'LOGIN_LOCKED' });
   }
   return true;
 }
