@@ -1,0 +1,41 @@
+name: Operations completion
+on:
+  push:
+    paths:
+      - 'scripts/apply-operations-completion.js'
+      - 'routes/operations.js'
+      - 'db/migrations/016_operations_completion.sql'
+      - 'server.js'
+      - '.github/workflows/apply-operations-completion.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Apply route wiring
+        run: node scripts/apply-operations-completion.js
+      - name: Syntax checks
+        run: |
+          node --check routes/operations.js
+          node --check server.js
+          node --check middleware/auth.js
+          node --check routes/auth.js
+      - name: Run regression tests
+        run: npm test
+        env:
+          NODE_ENV: test
+      - name: Commit wiring if changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add server.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore: wire operations completion routes [skip ci]'
+            git push
+          fi
