@@ -17,7 +17,7 @@ const {
 
 const signToken = (user) =>
   jwt.sign(
-    { id: user.id, role: user.role, mfa: ['admin', 'owner'].includes(user.role) ? Boolean(user.mfa_enabled) : undefined },
+    { id: user.id, role: user.role, sessionVersion: Number(user.session_version || 0), mfa: ['admin', 'owner'].includes(user.role) ? Boolean(user.mfa_enabled) : undefined },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRE || '7d',
@@ -424,6 +424,17 @@ router.post(
 // ============================================================
 // ADMIN / OWNER SESSION + MFA
 // ============================================================
+
+router.post('/client/logout-all', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required.' });
+    await User.bumpSessionVersion(req.user.id);
+    res.json({ success: true, message: 'All client sessions have been revoked. Sign in again.' });
+  } catch (error) {
+    console.error('Client logout-all error:', error);
+    res.status(500).json({ success: false, error: 'Could not revoke sessions.' });
+  }
+});
 
 router.post('/admin/logout', (req, res) => {
   clearAdminCookie(res);

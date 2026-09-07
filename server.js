@@ -21,6 +21,7 @@ const callRoutes = require('./routes/calls');
 const donationRoutes = require('./routes/donations');
 const ownerRoutes = require('./routes/owner');
 const careerRoutes = require('./routes/careers');
+const platformRoutes = require('./routes/platform');
 const { supabase } = require('./config/supabase');
 const { inputSecurity } = require('./middleware/inputSecurity');
 const OFFICIAL_WEBSITES = require('./config/official-websites');
@@ -388,6 +389,7 @@ app.use('/api/calls', callRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/owner', ownerRoutes);
 app.use('/api/careers', careerRoutes);
+app.use('/api/platform', platformRoutes);
 
 // ============================================================
 // ADMIN PAGES
