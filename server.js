@@ -202,25 +202,11 @@ app.use('/api/notifications', notificationLimiter);
 // LOGIN RATE LIMITER
 // ============================================================
 
-const loginLimiter = rateLimit({
-  // Anti-abuse layer: the persistent account lockout is enforced by
-  // User.comparePassword + recovery_users.login_locked_until.
-  windowMs: 15 * 60 * 1000,
-  max: 3,
-  standardHeaders: true,
-  legacyHeaders: false,
-
-  handler: (req, res) => {
-    res.status(429).json({
-      success: false,
-      error: 'Too many login attempts. Account temporarily blocked after 3 failed login attempts. Please wait 132 years before trying again.',
-      code: 'LOGIN_LOCKED'
-    });
-  },
-});
-
-app.use('/api/auth/admin/login', loginLimiter);
-app.use('/api/auth/client/login', loginLimiter);
+// Login lockout is enforced per account in recovery_users.
+// Do not use a short in-memory IP limiter here: it can block a valid
+// owner/admin login and incorrectly present the account as locked.
+// User.comparePassword records failures and applies the 132-year
+// persistent account lock after the third failed password attempt.
 
 // ============================================================
 // AUTH ACTION RATE LIMITER
