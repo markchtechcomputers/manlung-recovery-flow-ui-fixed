@@ -1,0 +1,77 @@
+name: Enforce login lockout policy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  enforce-lockout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enforce 3-attempt 132-year policy
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('server.js')
+          s = p.read_text()
+          old = '''const loginLimiter = rateLimit({
+            windowMs: 15 * 60 * 1000,
+            max: 15,
+            standardHeaders: true,
+            legacyHeaders: false,
+
+            handler: (req, res) => {
+              res.status(429).json({
+                success: false,
+                error: 'Too many login attempts. Please wait 15 minutes and try again.'
+              });
+            },
+          });
+
+          app.use('/api/auth/admin/login', loginLimiter);
+          app.use('/api/auth/client/login', loginLimiter);'''
+          new = '''const loginLimiter = rateLimit({
+            // Anti-abuse layer: the persistent account lockout is enforced by
+            // User.comparePassword + recovery_users.login_locked_until.
+            windowMs: 15 * 60 * 1000,
+            max: 3,
+            standardHeaders: true,
+            legacyHeaders: false,
+
+            handler: (req, res) => {
+              res.status(429).json({
+                success: false,
+                error: 'Too many login attempts. Account temporarily blocked after 3 failed login attempts. Please wait 132 years before trying again.',
+                code: 'LOGIN_LOCKED'
+              });
+            },
+          });
+
+          app.use('/api/auth/admin/login', loginLimiter);
+          app.use('/api/auth/client/login', loginLimiter);'''
+          if old not in s:
+              raise SystemExit('Expected login limiter block was not found; refusing to modify server.js')
+          p.write_text(s.replace(old, new, 1))
+          PY
+
+      - name: Commit enforced policy
+        shell: bash
+        run: |
+          if git diff --quiet -- server.js; then
+            echo "No server.js change needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js
+          git commit -m "fix: enforce 3-attempt 132-year login lockout"
+          git push
