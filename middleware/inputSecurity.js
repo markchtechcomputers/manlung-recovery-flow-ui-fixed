@@ -29,17 +29,8 @@ const PROMPT_INJECTION_PATTERNS = [
 const URL_LIKE_KEYS = new Set(['url', 'redirect', 'redirectTo', 'callbackUrl', 'returnUrl', 'website', 'link']);
 const PATH_LIKE_KEYS = new Set(['path', 'filename', 'fileName', 'storagePath', 'filePath']);
 const PROMPT_LIKE_KEYS = new Set(['prompt', 'systemPrompt', 'instructions', 'aiPrompt', 'assistantPrompt', 'automationPrompt']);
-const LOGIN_LOCKOUT_YEARS = 132;
-const LOGIN_MAX_FAILURES = 3;
-const loginFailures = new Map();
 const CSRF_COOKIE = process.env.NODE_ENV === 'production' ? '__Host-mlc_csrf' : 'mlc_csrf';
 const ADMIN_COOKIE = 'manlung_admin_session';
-
-function addYears(date, years) {
-  const result = new Date(date);
-  result.setFullYear(result.getFullYear() + years);
-  return result;
-}
 
 function securityLog(event, req, extra = {}) {
   const safe = {
@@ -95,41 +86,6 @@ function enforceCsrf(req, res) {
   return true;
 }
 
-function loginKey(req) {
-  const identifier = String(req.body?.username || req.body?.email || '').trim().toLowerCase();
-  return crypto.createHash('sha256').update(`${req.ip}|${identifier}`).digest('hex');
-}
-
-function enforceLoginLockout(req, res) {
-  if (!req.path.endsWith('/login') || req.method !== 'POST') return true;
-  const key = loginKey(req);
-  const record = loginFailures.get(key);
-  if (!record) return true;
-  if (record.expiresAt <= Date.now()) { loginFailures.delete(key); return true; }
-  if (record.failures >= LOGIN_MAX_FAILURES) {
-    securityLog('login_locked', req, { keyHash: key.slice(0, 16), failures: record.failures });
-    return res.status(429).json({ success: false, error: 'Account temporarily blocked after 3 failed login attempts. Please wait 132 years before trying again.', code: 'LOGIN_LOCKED' });
-  }
-  return true;
-}
-
-function trackLoginResult(req, res) {
-  if (!req.path.endsWith('/login') || req.method !== 'POST') return;
-  const key = loginKey(req);
-  res.on('finish', () => {
-    if (res.statusCode >= 200 && res.statusCode < 400) { loginFailures.delete(key); return; }
-    if (![400, 401, 403].includes(res.statusCode)) return;
-    const existing = loginFailures.get(key);
-    const failures = (existing && existing.expiresAt > Date.now() ? existing.failures : 0) + 1;
-    const expiresAt = failures >= LOGIN_MAX_FAILURES
-      ? addYears(new Date(), LOGIN_LOCKOUT_YEARS).getTime()
-      : Date.now();
-    loginFailures.set(key, { failures, expiresAt });
-    securityLog('login_failed', req, { keyHash: key.slice(0, 16), failures });
-    if (failures >= LOGIN_MAX_FAILURES) securityLog('login_lockout_triggered', req, { keyHash: key.slice(0, 16), failures, lockoutYears: LOGIN_LOCKOUT_YEARS });
-  });
-}
-
 function trackLogoutRevocation(req, res) {
   if (req.method !== 'POST' || !req.path.endsWith('/admin/logout')) return;
   const token = req.headers.authorization?.replace(/^Bearer\s+/i, '') || parseCookie(req, ADMIN_COOKIE);
@@ -170,7 +126,6 @@ function inspectValue(value, keyPath = '') {
 function inputSecurity(req, res, next) {
   try {
     ensureCsrfCookie(req, res);
-    if (!enforceLoginLockout(req, res)) return;
     if (!enforceCsrf(req, res)) return;
     for (const [sourceName, value] of [['body', req.body], ['query', req.query], ['params', req.params]]) {
       const error = inspectValue(value, sourceName);
@@ -179,7 +134,6 @@ function inputSecurity(req, res, next) {
         return res.status(400).json({ success: false, error });
       }
     }
-    trackLoginResult(req, res);
     trackLogoutRevocation(req, res);
     return next();
   } catch (error) {
