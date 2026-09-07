@@ -16,51 +16,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Enforce 3-attempt 132-year policy
+      - name: Verify per-account lockout implementation
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
-          p = Path('server.js')
-          s = p.read_text()
-          old = '''const loginLimiter = rateLimit({
-            // Anti-abuse layer: the persistent account lockout is enforced by
-            // User.comparePassword + recovery_users.login_locked_until.
-            windowMs: 15 * 60 * 1000,
-            max: 3,
-            standardHeaders: true,
-            legacyHeaders: false,
-
-            handler: (req, res) => {
-              res.status(429).json({
-                success: false,
-                error: 'Too many login attempts. Account temporarily blocked after 3 failed login attempts. Please wait 132 years before trying again.',
-                code: 'LOGIN_LOCKED'
-              });
-            },
-          });
-
-          app.use('/api/auth/admin/login', loginLimiter);
-          app.use('/api/auth/client/login', loginLimiter);'''
-          new = '''// Login lockout is enforced per account in recovery_users.
-          // Do not use a short in-memory IP limiter here: it can block a valid
-          // owner/admin login and incorrectly present the account as locked.
-          // User.comparePassword records failures and applies the 132-year
-          // persistent account lock after the third failed password attempt.'''
-          if old not in s:
-              raise SystemExit('Expected current login limiter block was not found; refusing to modify server.js')
-          p.write_text(s.replace(old, new, 1))
+          user = Path('models/User.js').read_text()
+          server = Path('server.js').read_text()
+          required_user = [
+              'MAX_LOGIN_FAILURES = 3',
+              'LOCKOUT_YEARS = 132',
+              'login_locked_until',
+              'failed_login_attempts',
+          ]
+          for marker in required_user:
+              if marker not in user:
+                  raise SystemExit(f'Missing required lockout marker: {marker}')
+          if 'const loginLimiter = rateLimit' in server and '/api/auth/admin/login' in server:
+              raise SystemExit('Conflicting short-window login limiter detected in server.js')
+          print('Per-account persistent 3-attempt / 132-year lockout policy verified.')
           PY
-
-      - name: Commit enforced policy
-        shell: bash
-        run: |
-          if git diff --quiet -- server.js; then
-            echo "No server.js change needed."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add server.js
-          git commit -m "fix: remove conflicting login rate limiter"
-          git push
