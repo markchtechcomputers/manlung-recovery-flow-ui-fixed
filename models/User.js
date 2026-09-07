@@ -40,7 +40,7 @@ async function create({ username, password, role = 'client', email, phone }) {
   const hashed = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const { data, error } = await supabase
     .from(TABLE)
-    .insert({ username, password: hashed, role, email, phone, failed_login_attempts: 0, login_locked_until: null })
+    .insert({ username, password: hashed, role, email, phone, failed_login_attempts: 0, login_locked_until: null, session_version: 0 })
     .select()
     .single();
   if (error) throw error;
@@ -76,6 +76,20 @@ async function comparePassword(user, candidatePassword) {
   return false;
 }
 
+async function bumpSessionVersion(userId) {
+  const current = await findById(userId);
+  if (!current) return null;
+  const next = Number(current.session_version || 0) + 1;
+  const { data, error } = await supabase
+    .from(TABLE)
+    .update({ session_version: next })
+    .eq('id', userId)
+    .select('id, session_version')
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 async function setResetToken(email, tokenHash, expiresAt) {
   const { error } = await supabase
     .from(TABLE)
@@ -99,7 +113,7 @@ async function resetPassword(id, newPassword) {
   const hashed = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
   const { error } = await supabase
     .from(TABLE)
-    .update({ password: hashed, reset_token_hash: null, reset_token_expires: null, failed_login_attempts: 0, login_locked_until: null })
+    .update({ password: hashed, reset_token_hash: null, reset_token_expires: null, failed_login_attempts: 0, login_locked_until: null, session_version: (await findById(id))?.session_version + 1 || 1 })
     .eq('id', id);
   if (error) throw error;
 }
@@ -124,6 +138,8 @@ async function updateProfile(userId, { username, phone }) {
 
 async function updatePassword(userId, newPassword) {
   const hashed = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+  const current = await findById(userId);
+  const nextVersion = Number(current?.session_version || 0) + 1;
 
   const { error } = await supabase
     .from(TABLE)
@@ -133,6 +149,7 @@ async function updatePassword(userId, newPassword) {
       reset_token_expires: null,
       failed_login_attempts: 0,
       login_locked_until: null,
+      session_version: nextVersion,
     })
     .eq('id', userId)
     .eq('role', 'client');
@@ -157,7 +174,7 @@ async function deleteById(userId) {
 async function listAdminsAndOwner() {
   const { data, error } = await supabase
     .from(TABLE)
-    .select('id, username, email, phone, role, admin_status, appointed_at, appointed_by, created_at, failed_login_attempts, login_locked_until, last_login_at, mfa_enabled')
+    .select('id, username, email, phone, role, admin_status, appointed_at, appointed_by, created_at, failed_login_attempts, login_locked_until, last_login_at, mfa_enabled, session_version')
     .in('role', ['owner', 'admin'])
     .order('role', { ascending: true })
     .order('appointed_at', { ascending: true });
@@ -241,7 +258,7 @@ async function removeAdminPrivileges(userId) {
 
 async function createAdminFromInvitation({ username, password, email, phone, invitationId, appointedBy }) {
   const hashed = await bcrypt.hash(password, BCRYPT_ROUNDS);
-  const { data, error } = await supabase.from(TABLE).insert({ username, password: hashed, role: 'admin', email, phone, admin_status: 'pending', appointed_at: new Date().toISOString(), appointed_by: appointedBy, failed_login_attempts: 0, login_locked_until: null }).select().single();
+  const { data, error } = await supabase.from(TABLE).insert({ username, password: hashed, role: 'admin', email, phone, admin_status: 'pending', appointed_at: new Date().toISOString(), appointed_by: appointedBy, failed_login_attempts: 0, login_locked_until: null, session_version: 0 }).select().single();
   if (error) throw error;
   return data;
 }
@@ -295,7 +312,7 @@ async function consumeRecoveryCode(userId, remainingHashes) {
 }
 
 module.exports = {
-  findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword,
+  findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword, bumpSessionVersion,
   setResetToken, findByValidResetToken, resetPassword, updateProfile, updatePassword, deleteById, createAdminFromInvitation,
   listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, convertClientToPendingAdmin, setAdminStatus, removeAdminPrivileges,
   setMfaSetup, enableMfa, disableMfa, consumeRecoveryCode,
