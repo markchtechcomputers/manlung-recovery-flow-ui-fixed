@@ -11,7 +11,7 @@ function patch(path, transform) {
 
 let changed = false;
 
-changed ||= patch('server.js', (s) => {
+if (patch('server.js', (s) => {
   if (!s.includes("const platformRoutes = require('./routes/platform');")) {
     s = s.replace("const careerRoutes = require('./routes/careers');", "const careerRoutes = require('./routes/careers');\nconst platformRoutes = require('./routes/platform');");
   }
@@ -19,9 +19,9 @@ changed ||= patch('server.js', (s) => {
     s = s.replace("app.use('/api/careers', careerRoutes);", "app.use('/api/careers', careerRoutes);\napp.use('/api/platform', platformRoutes);");
   }
   return s;
-});
+})) changed = true;
 
-changed ||= patch('routes/auth.js', (s) => {
+if (patch('routes/auth.js', (s) => {
   s = s.replace(
     "{ id: user.id, role: user.role, mfa: ['admin', 'owner'].includes(user.role) ? Boolean(user.mfa_enabled) : undefined },",
     "{ id: user.id, role: user.role, sessionVersion: Number(user.session_version || 0), mfa: ['admin', 'owner'].includes(user.role) ? Boolean(user.mfa_enabled) : undefined },"
@@ -33,7 +33,6 @@ changed ||= patch('routes/auth.js', (s) => {
     s = s.replace(marker, insert + marker);
   }
   return s;
-});
+})) changed = true;
 
-if (changed) console.log('Platform completion patch applied.');
-else console.log('Platform completion patch already applied.');
+console.log(changed ? 'Platform completion patch applied.' : 'Platform completion patch already applied.');
