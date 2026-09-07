@@ -23,6 +23,12 @@ function isSessionExpired(decoded, user) {
   return Math.floor(Date.now() / 1000) - decoded.iat > maxAge;
 }
 
+function isDurablyRevoked(decoded, user) {
+  const tokenVersion = Number(decoded.sessionVersion ?? 0);
+  const currentVersion = Number(user.session_version ?? 0);
+  return tokenVersion !== currentVersion;
+}
+
 async function verifyRequestToken(req) {
   const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, ADMIN_COOKIE);
   if (!token) return { token: null, decoded: null, user: null };
@@ -30,6 +36,7 @@ async function verifyRequestToken(req) {
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
   if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
   const user = await User.findById(decoded.id);
+  if (user && isDurablyRevoked(decoded, user)) throw new Error('SESSION_VERSION_REVOKED');
   return { token, decoded, user };
 }
 
@@ -42,7 +49,7 @@ const auth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    if (error.message === 'TOKEN_REVOKED') return res.status(401).json({ error: 'Session revoked. Please sign in again.', code: 'SESSION_REVOKED' });
+    if (error.message === 'TOKEN_REVOKED' || error.message === 'SESSION_VERSION_REVOKED') return res.status(401).json({ error: 'Session revoked. Please sign in again.', code: 'SESSION_REVOKED' });
     console.error('Authentication error:', error);
     return res.status(401).json({ error: 'Invalid token' });
   }
@@ -56,6 +63,7 @@ const optionalAuth = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) return res.status(401).json({ error: 'User not found' });
+    if (isDurablyRevoked(decoded, user)) return res.status(401).json({ error: 'Session revoked.', code: 'SESSION_REVOKED' });
     if (isSessionExpired(decoded, user)) return res.status(401).json({ error: 'Session expired.', code: 'SESSION_EXPIRED' });
     req.user = user;
     next();
@@ -101,4 +109,4 @@ function requirePermission(permission) {
   };
 }
 
-module.exports = { auth, optionalAuth, adminAuth, ownerAuth, requirePermission };
+module.exports = { auth, optionalAuth, adminAuth, ownerAuth, requirePermission, isDurablyRevoked };
