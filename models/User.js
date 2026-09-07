@@ -157,7 +157,7 @@ async function deleteById(userId) {
 async function listAdminsAndOwner() {
   const { data, error } = await supabase
     .from(TABLE)
-    .select('id, username, email, phone, role, admin_status, appointed_at, appointed_by, created_at')
+    .select('id, username, email, phone, role, admin_status, appointed_at, appointed_by, created_at, failed_login_attempts, login_locked_until, last_login_at, mfa_enabled')
     .in('role', ['owner', 'admin'])
     .order('role', { ascending: true })
     .order('appointed_at', { ascending: true });
