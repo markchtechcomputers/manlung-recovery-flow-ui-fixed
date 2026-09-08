@@ -75,6 +75,10 @@ function safeEqual(a, b) {
 
 function enforceCsrf(req, res) {
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) return true;
+  // Client OAuth is a token exchange: the browser does not authenticate with the
+  // admin session cookie here, so requiring the admin CSRF token breaks social login.
+  // The Supabase access token in the request body is still required by the OAuth route.
+  if (req.method === 'POST' && req.path === '/api/auth/client/oauth') return true;
   if (!req.headers.cookie?.includes(`${ADMIN_COOKIE}=`)) return true;
   if (req.headers.authorization) return true;
   const cookieToken = parseCookie(req, CSRF_COOKIE);
