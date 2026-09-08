@@ -12,6 +12,7 @@ const ROOT = path.join(__dirname, '..');
 const MODEL = process.env.MANLUNG_AI_MODEL || 'gpt-5.6-luna';
 const MAX_HISTORY = 16;
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
+const CHATAT_URL = 'https://ch.at/';
 
 const SITE_RULES = `You are Manlung Recovery AI, the official customer-support assistant for the Manlung Recovery website.
 Speak naturally and conversationally. Never behave like a keyword bot or reset the conversation unnecessarily.
@@ -129,13 +130,46 @@ async function callOpenAI(payload) {
   return axios.post(OPENAI_URL, payload, { headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' }, timeout: 45000, validateStatus: () => true });
 }
 
+function cleanChatAtResponse(data) {
+  if (typeof data === 'string') return data.trim();
+  if (typeof data?.response === 'string') return data.response.trim();
+  if (typeof data?.answer === 'string') return data.answer.trim();
+  if (typeof data?.text === 'string') return data.text.trim();
+  if (typeof data?.message === 'string') return data.message.trim();
+  if (typeof data?.data === 'string') return data.data.trim();
+  return '';
+}
+
+async function callChatAt(message, history = []) {
+  const recent = history.slice(-6).map(x => `${x.role === 'assistant' ? 'Assistant' : 'User'}: ${String(x.content || '').slice(0, 1200)}`).join('\n');
+  const prompt = [
+    'You are the fallback general-purpose assistant for Manlung Recovery.',
+    'Answer the user clearly and safely. Do not claim access to Manlung private case data, accounts, databases, admin presence, or internal systems.',
+    'For Manlung-specific policies, case status, or private account information, tell the user to use the official Manlung Recovery features or human support instead of inventing an answer.',
+    recent ? `Recent conversation context:\n${recent}` : '',
+    `User question: ${message}`
+  ].filter(Boolean).join('\n\n');
+
+  const response = await axios.get(CHATAT_URL, {
+    params: { q: prompt },
+    timeout: 20000,
+    validateStatus: () => true,
+    responseType: 'text'
+  });
+  if (response.status < 200 || response.status >= 300) {
+    throw new Error(`ch.at returned HTTP ${response.status}`);
+  }
+  const answer = cleanChatAtResponse(response.data);
+  if (!answer) throw new Error('ch.at returned an empty response');
+  return answer;
+}
+
 router.get('/health', (_req, res) => {
-  res.json({ success: true, configured: Boolean(process.env.OPENAI_API_KEY), model: MODEL, route: '/api/ai/chat', webSearch: true, caseTracking: true });
+  res.json({ success: true, configured: Boolean(process.env.OPENAI_API_KEY) || process.env.MANLUNG_CHATAT_FALLBACK !== 'false', model: MODEL, route: '/api/ai/chat', webSearch: true, caseTracking: true, chatAtFallback: process.env.MANLUNG_CHATAT_FALLBACK !== 'false' });
 });
 
 router.post('/chat', optionalAuth, async (req, res) => {
   try {
-    if (!process.env.OPENAI_API_KEY) return res.status(503).json({ success: false, code: 'AI_NOT_CONFIGURED', error: 'OPENAI_API_KEY is not configured on the server.' });
     const message = String(req.body?.message || '').trim().slice(0, 8000);
     if (!message) return res.status(400).json({ success: false, code: 'EMPTY_MESSAGE', error: 'Message is required.' });
     let history = Array.isArray(req.body?.history) ? req.body.history.filter(x => x && (x.role === 'user' || x.role === 'assistant') && typeof x.content === 'string').slice(-MAX_HISTORY).map(x => ({ role: x.role, content: x.content.slice(0, 6000) })) : [];
@@ -145,21 +179,38 @@ router.post('/chat', optionalAuth, async (req, res) => {
     const caseId = extractCaseId(message, history);
     const liveCase = await getLiveCaseContext(caseId, req.user);
     const input = makeInput(message, history, context, liveCase.context);
-    let response = await callOpenAI({ model: MODEL, tools: [{ type: 'web_search' }], input, max_output_tokens: 1200 });
-    let usedWebSearch = response.status >= 200 && response.status < 300;
-    if (!usedWebSearch) {
-      console.error('Manlung AI web-search request failed:', response.status, response.data);
-      response = await callOpenAI({ model: MODEL, input, max_output_tokens: 1200 });
-      usedWebSearch = false;
+
+    if (process.env.OPENAI_API_KEY) {
+      let response = await callOpenAI({ model: MODEL, tools: [{ type: 'web_search' }], input, max_output_tokens: 1200 });
+      let usedWebSearch = response.status >= 200 && response.status < 300;
+      if (!usedWebSearch) {
+        console.error('Manlung AI web-search request failed:', response.status, response.data);
+        response = await callOpenAI({ model: MODEL, input, max_output_tokens: 1200 });
+        usedWebSearch = false;
+      }
+      if (response.status >= 200 && response.status < 300) {
+        const answer = extractOutput(response.data);
+        if (answer) {
+          return res.json({ success: true, answer, model: MODEL, provider: 'openai', webSearchEnabled: usedWebSearch && Array.isArray(response.data?.output) ? response.data.output.some(item => item?.type === 'web_search_call') : false, caseLookup: caseId ? { caseId, authenticated: liveCase.authenticated, found: liveCase.found, authorized: !liveCase.forbidden } : null });
+        }
+        console.error('Manlung AI OpenAI returned no text; trying fallback.');
+      } else {
+        const apiMessage = response.data?.error?.message || response.data?.message || 'OpenAI request failed';
+        console.error('Manlung AI provider error:', response.status, apiMessage);
+      }
     }
-    if (response.status < 200 || response.status >= 300) {
-      const apiMessage = response.data?.error?.message || response.data?.message || 'OpenAI request failed';
-      console.error('Manlung AI provider error:', response.status, apiMessage);
-      return res.status(502).json({ success: false, code: 'AI_PROVIDER_ERROR', error: apiMessage.slice(0, 500) });
+
+    if (process.env.MANLUNG_CHATAT_FALLBACK !== 'false') {
+      try {
+        const answer = await callChatAt(message, history);
+        return res.json({ success: true, answer, model: 'ch.at', provider: 'chat-at', webSearchEnabled: false, fallback: true, caseLookup: caseId ? { caseId, authenticated: liveCase.authenticated, found: liveCase.found, authorized: !liveCase.forbidden } : null });
+      } catch (fallbackError) {
+        console.error('Manlung AI ch.at fallback failed:', fallbackError.message);
+      }
     }
-    const answer = extractOutput(response.data);
-    if (!answer) return res.status(502).json({ success: false, code: 'AI_EMPTY_RESPONSE', error: 'The AI returned no text.' });
-    return res.json({ success: true, answer, model: MODEL, webSearchEnabled: usedWebSearch && Array.isArray(response.data?.output) ? response.data.output.some(item => item?.type === 'web_search_call') : false, caseLookup: caseId ? { caseId, authenticated: liveCase.authenticated, found: liveCase.found, authorized: !liveCase.forbidden } : null });
+
+    if (!process.env.OPENAI_API_KEY) return res.status(503).json({ success: false, code: 'AI_NOT_CONFIGURED', error: 'No AI provider is currently configured.' });
+    return res.status(502).json({ success: false, code: 'AI_PROVIDER_ERROR', error: 'The live AI service is temporarily unavailable.' });
   } catch (error) {
     console.error('Manlung AI unexpected error:', error.response?.data || error.stack || error.message);
     return res.status(502).json({ success: false, code: 'AI_UNEXPECTED_ERROR', error: 'The live AI service is temporarily unavailable.' });
