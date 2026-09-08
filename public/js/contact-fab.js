@@ -200,6 +200,30 @@
       @media (max-width: 700px) { #callWidgetBtn.manlung-contact-trigger { width: 50px !important; min-width: 50px !important; height: 50px !important; min-height: 50px !important; } #manlungContactMenu { bottom: 58px; } }
     `; document.head.appendChild(style);
   }
-  function init() { injectStyles(); }
+
+  function stripButtonGlow() {
+    const selectors = [
+      '.btn',
+      '.site-header .header-actions a',
+      '.site-header .header-actions button',
+      'button',
+      'input[type="button"]',
+      'input[type="submit"]'
+    ];
+    document.querySelectorAll(selectors.join(',')).forEach((el) => {
+      if (el.id === 'callWidgetBtn' || el.classList.contains('manlung-contact-choice')) return;
+      el.style.removeProperty('box-shadow');
+      el.style.removeProperty('text-shadow');
+      el.style.removeProperty('outline');
+      el.style.removeProperty('filter');
+    });
+  }
+
+  function init() {
+    injectStyles();
+    stripButtonGlow();
+    const observer = new MutationObserver(stripButtonGlow);
+    observer.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['style', 'class'] });
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();
