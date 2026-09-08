@@ -43,7 +43,7 @@
   function injectStyles() {
     if (document.getElementById('manlung-contact-fab-styles')) return;
     const style = document.createElement('style'); style.id = 'manlung-contact-fab-styles'; style.textContent = `
-      /* Clean solid header — light mode, absolutely no separator lines. */
+      /* Clean solid header: full width, no separator lines or decorative shapes. */
       .site-header,
       .site-header::before,
       .site-header::after {
@@ -59,14 +59,13 @@
         outline: 0 !important;
         background-image: none !important;
       }
-      .site-header .container,
-      .site-header .container::before,
-      .site-header .container::after {
-        width: min(100% - 48px, 1320px) !important;
-        max-width: 1320px !important;
+      .site-header .container {
+        width: 100% !important;
+        max-width: none !important;
         min-height: 84px !important;
-        margin: 0 auto !important;
-        padding: 14px 0 !important;
+        margin: 0 !important;
+        padding: 14px 48px !important;
+        box-sizing: border-box !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
@@ -78,24 +77,84 @@
         background: transparent !important;
         background-image: none !important;
       }
+      .site-header .container::before,
+      .site-header .container::after { content: none !important; display: none !important; }
       .site-header .brand { display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 13px !important; min-width: 0 !important; flex: 1 1 auto !important; text-align: left !important; }
       .site-header .manlung-home-logo { display: flex !important; align-items: center !important; justify-content: center !important; flex: 0 0 48px !important; width: 48px !important; height: 48px !important; margin: 0 !important; }
       .site-header .manlung-site-logo { width: 48px !important; height: 48px !important; flex: 0 0 48px !important; object-fit: cover !important; border-radius: 10px !important; background: #ffffff !important; border: 0 !important; box-shadow: none !important; }
       .site-header .brand h1 { margin: 0 !important; color: #111111 !important; font-size: 1.35rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -.025em !important; }
       .site-header .brand h1 i { color: #111111 !important; margin-right: 7px !important; }
       .site-header .brand span { display: block !important; margin: 4px 0 0 !important; color: #667085 !important; font-size: .74rem !important; line-height: 1.25 !important; font-weight: 500 !important; white-space: nowrap !important; }
+
+      /* Header navigation is plain text: no triangle, pill, box, border, radius or shadow. */
       .site-header .header-actions { display: flex !important; align-items: center !important; justify-content: flex-end !important; gap: 28px !important; flex: 0 0 auto !important; flex-wrap: nowrap !important; }
-      .site-header .header-actions a, .site-header .header-actions button { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 7px !important; min-height: 34px !important; width: auto !important; padding: 5px 0 !important; margin: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; color: #111111 !important; text-decoration: none !important; font-size: .84rem !important; font-weight: 600 !important; line-height: 1 !important; white-space: nowrap !important; transition: color .18s ease, opacity .18s ease !important; transform: none !important; }
+      .site-header .header-actions a,
+      .site-header .header-actions button,
+      .site-header .header-actions .btn,
+      .site-header .header-actions .btn-outline,
+      .site-header .header-actions .btn-primary {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 7px !important;
+        min-height: 32px !important;
+        width: auto !important;
+        padding: 4px 0 !important;
+        margin: 0 !important;
+        border: 0 !important;
+        border-width: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        outline: 0 !important;
+        color: #111111 !important;
+        text-decoration: none !important;
+        font-size: .84rem !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+        transform: none !important;
+        clip-path: none !important;
+        -webkit-clip-path: none !important;
+      }
+      .site-header .header-actions a::before,
+      .site-header .header-actions a::after,
+      .site-header .header-actions button::before,
+      .site-header .header-actions button::after { content: none !important; display: none !important; }
       .site-header .header-actions a i, .site-header .header-actions button i { color: #111111 !important; font-size: .82rem !important; margin: 0 !important; }
-      .site-header .header-actions a:hover, .site-header .header-actions button:hover { background: transparent !important; border: 0 !important; color: #2451d6 !important; }
+      .site-header .header-actions a:hover, .site-header .header-actions button:hover { background: transparent !important; border: 0 !important; box-shadow: none !important; color: #2451d6 !important; }
       .site-header .header-actions a:hover i, .site-header .header-actions button:hover i { color: #2451d6 !important; }
-      .site-header .header-actions .btn-primary, .site-header .header-actions .btn-primary:hover { color: #111111 !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
-      .site-header .header-actions .btn-primary i { color: #111111 !important; }
-      .site-header .header-actions .btn-primary:hover, .site-header .header-actions .btn-primary:hover i { color: #2451d6 !important; }
 
-      .site-header .header-actions button[data-theme-toggle="true"], .site-header .header-actions a[href="/client/dashboard.html"], .site-header .header-actions a[href="/blog.html"], .site-header .header-actions a[href="/donate.html"], .site-header .header-actions a[href="/client/request.html"] { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+      /* Other navigation containers: links stay independent text rather than shaped controls. */
+      nav a,
+      .nav-links a,
+      .mobile-nav a,
+      .admin-nav a,
+      .portal-nav a,
+      .page-nav a,
+      .top-nav a,
+      .navbar a {
+        background: transparent !important;
+        background-image: none !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        outline: 0 !important;
+        clip-path: none !important;
+        -webkit-clip-path: none !important;
+        text-decoration: none !important;
+      }
+      nav a::before, nav a::after,
+      .nav-links a::before, .nav-links a::after,
+      .mobile-nav a::before, .mobile-nav a::after,
+      .admin-nav a::before, .admin-nav a::after,
+      .portal-nav a::before, .portal-nav a::after,
+      .page-nav a::before, .page-nav a::after,
+      .top-nav a::before, .top-nav a::after,
+      .navbar a::before, .navbar a::after { content: none !important; display: none !important; }
 
-      /* Dark mode: solid surface, still no top/bottom lines. */
+      /* Dark mode: solid surface, still no navigation shapes or separator lines. */
       body.dark .site-header, body.dark .site-header::before, body.dark .site-header::after { background: #0b1424 !important; color: #e6ecf5 !important; border: 0 !important; box-shadow: none !important; outline: 0 !important; background-image: none !important; }
       body.dark .site-header .container, body.dark .site-header .container::before, body.dark .site-header .container::after { border: 0 !important; box-shadow: none !important; outline: 0 !important; }
       body.dark .site-header .brand h1 { color: #f8fafc !important; }
@@ -105,7 +164,7 @@
       body.dark .site-header .header-actions a i, body.dark .site-header .header-actions button i, body.dark .site-header .header-actions .btn-primary i { color: #c7d7f2 !important; }
       body.dark .site-header .header-actions a:hover, body.dark .site-header .header-actions button:hover, body.dark .site-header .header-actions .btn-primary:hover, body.dark .site-header .header-actions a:hover i, body.dark .site-header .header-actions button:hover i, body.dark .site-header .header-actions .btn-primary:hover i { color: #ffffff !important; }
 
-      @media (max-width: 1050px) and (min-width: 701px) { .site-header .container { width: min(100% - 32px, 1320px) !important; gap: 24px !important; } .site-header .header-actions { gap: 18px !important; } .site-header .header-actions a, .site-header .header-actions button { font-size: .78rem !important; } .site-header .brand h1 { font-size: 1.2rem !important; } .site-header .brand span { font-size: .68rem !important; } }
+      @media (max-width: 1050px) and (min-width: 701px) { .site-header .container { padding-left: 24px !important; padding-right: 24px !important; gap: 24px !important; } .site-header .header-actions { gap: 18px !important; } .site-header .header-actions a, .site-header .header-actions button { font-size: .78rem !important; } .site-header .brand h1 { font-size: 1.2rem !important; } .site-header .brand span { font-size: .68rem !important; } }
       @media (max-width: 700px) { .site-header .container { width: 100% !important; min-height: 68px !important; padding: 10px 14px !important; gap: 9px !important; flex-wrap: wrap !important; } .site-header .brand { width: 100% !important; flex: 1 1 100% !important; gap: 10px !important; } .site-header .manlung-home-logo, .site-header .manlung-site-logo { width: 40px !important; height: 40px !important; flex-basis: 40px !important; } .site-header .brand h1 { font-size: .98rem !important; } .site-header .brand span { font-size: .6rem !important; white-space: normal !important; } .site-header .header-actions { width: 100% !important; flex: 1 1 100% !important; justify-content: flex-start !important; gap: 20px !important; overflow-x: auto !important; flex-wrap: nowrap !important; padding: 2px 0 3px !important; scrollbar-width: none !important; } .site-header .header-actions::-webkit-scrollbar { display: none !important; } .site-header .header-actions a, .site-header .header-actions button { flex: 0 0 auto !important; min-height: 32px !important; padding: 4px 0 !important; font-size: .72rem !important; } .site-header .header-actions a i, .site-header .header-actions button i { font-size: .78rem !important; } }
       @media (max-width: 420px) { .site-header .container { padding-left: 12px !important; padding-right: 12px !important; } .site-header .brand h1 { font-size: .92rem !important; } .site-header .brand span { font-size: .56rem !important; } .site-header .header-actions { gap: 16px !important; } .site-header .header-actions a, .site-header .header-actions button { font-size: .68rem !important; } }
 
