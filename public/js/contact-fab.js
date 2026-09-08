@@ -154,6 +154,28 @@
       .top-nav a::before, .top-nav a::after,
       .navbar a::before, .navbar a::after { content: none !important; display: none !important; }
 
+      /* Remove blue glow from every real .btn while preserving layout, colors and functionality. */
+      .btn,
+      .btn:hover,
+      .btn:focus,
+      .btn:active,
+      .btn:focus-visible,
+      a.btn,
+      a.btn:hover,
+      a.btn:focus,
+      a.btn:active,
+      a.btn:focus-visible,
+      button.btn,
+      button.btn:hover,
+      button.btn:focus,
+      button.btn:active,
+      button.btn:focus-visible {
+        box-shadow: none !important;
+        text-shadow: none !important;
+        outline: none !important;
+        filter: none !important;
+      }
+
       /* Dark mode: solid surface, still no navigation shapes or separator lines. */
       body.dark .site-header, body.dark .site-header::before, body.dark .site-header::after { background: #0b1424 !important; color: #e6ecf5 !important; border: 0 !important; box-shadow: none !important; outline: 0 !important; background-image: none !important; }
       body.dark .site-header .container, body.dark .site-header .container::before, body.dark .site-header .container::after { border: 0 !important; box-shadow: none !important; outline: 0 !important; }
