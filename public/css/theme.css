@@ -50,7 +50,6 @@ html body .site-header .header-actions button::after {
   display: none !important;
 }
 
-/* Brand stays visually separate from navigation. */
 html body .site-header .brand {
   min-width: 0 !important;
   flex: 1 1 auto !important;
@@ -133,7 +132,6 @@ html body .site-header .brand span {
   white-space: nowrap !important;
 }
 
-/* Navigation is plain independent text + icons. No colored backing, pill, ring or box. */
 html body .site-header .header-actions {
   min-width: 0 !important;
   flex: 0 0 auto !important;
@@ -164,8 +162,12 @@ html body .site-header .header-actions .btn-primary {
   width: auto !important;
   min-width: 0 !important;
   min-height: 34px !important;
+  height: 34px !important;
+  align-self: center !important;
+  vertical-align: middle !important;
   margin: 0 !important;
   padding: 5px 0 !important;
+  box-sizing: border-box !important;
   color: #000 !important;
   background: transparent !important;
   background-image: none !important;
@@ -185,7 +187,18 @@ html body .site-header .header-actions .btn-primary {
   transform: none !important;
 }
 
-/* Keep text and icons black through every interaction state. */
+html body .site-header .header-actions a span,
+html body .site-header .header-actions button span,
+html body .site-header .header-actions .btn span {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
 html body .site-header .header-actions a:hover,
 html body .site-header .header-actions a:focus,
 html body .site-header .header-actions a:focus-visible,
@@ -252,12 +265,17 @@ html body .site-header .header-actions svg {
   outline: 0 !important;
   text-shadow: none !important;
   transform: none !important;
+  vertical-align: middle !important;
+  flex: 0 0 auto !important;
 }
 
-/* Theme toggle remains functional but visually matches the other navigation items. */
+html body .site-header .header-actions a i::before,
+html body .site-header .header-actions button i::before,
+html body .site-header .header-actions .btn i::before { vertical-align: middle !important; }
+
 html body .site-header .header-actions button[data-theme-toggle="true"] {
   width: auto !important;
-  height: auto !important;
+  height: 34px !important;
   min-width: 0 !important;
   min-height: 34px !important;
   margin: 0 !important;
@@ -268,14 +286,15 @@ html body .site-header .header-actions button[data-theme-toggle="true"] {
   color: #000 !important;
   font-weight: 800 !important;
   box-shadow: none !important;
+  align-self: center !important;
+  vertical-align: middle !important;
 }
 
-/* Dark mode still works without reintroducing rings or backgrounds. */
+html body .site-header .header-actions button[data-theme-toggle="true"]::before,
+html body .site-header .header-actions button[data-theme-toggle="true"]::after { content: none !important; display: none !important; }
+
 html.dark body .site-header,
-body.dark .site-header {
-  background: #111 !important;
-  color: #fff !important;
-}
+body.dark .site-header { background: #111 !important; color: #fff !important; }
 html.dark body .site-header .brand h1,
 html.dark body .site-header .brand span,
 html.dark body .site-header .brand h1 i,
@@ -293,36 +312,10 @@ body.dark .site-header .header-actions button,
 body.dark .site-header .header-actions .btn,
 body.dark .site-header .header-actions a i,
 body.dark .site-header .header-actions button i,
-body.dark .site-header .header-actions .btn i {
-  color: #fff !important;
-}
-
-html.dark body .site-header .header-actions a:hover,
-html.dark body .site-header .header-actions a:focus,
-html.dark body .site-header .header-actions a:focus-visible,
-html.dark body .site-header .header-actions a:active,
-html.dark body .site-header .header-actions button:hover,
-html.dark body .site-header .header-actions button:focus,
-html.dark body .site-header .header-actions button:focus-visible,
-html.dark body .site-header .header-actions button:active,
-html.dark body .site-header .header-actions .btn:hover,
-html.dark body .site-header .header-actions .btn:focus,
-html.dark body .site-header .header-actions .btn:focus-visible,
-html.dark body .site-header .header-actions .btn:active {
-  color: #fff !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  outline: 0 !important;
-  text-shadow: none !important;
-}
+body.dark .site-header .header-actions .btn i { color: #fff !important; }
 
 @media (max-width: 1100px) and (min-width: 701px) {
-  html body .site-header .container {
-    padding-left: 22px !important;
-    padding-right: 22px !important;
-    gap: 24px !important;
-  }
+  html body .site-header .container { padding-left: 22px !important; padding-right: 22px !important; gap: 24px !important; }
   html body .site-header .header-actions { gap: 21px !important; }
   html body .site-header .header-actions a,
   html body .site-header .header-actions button,
@@ -330,7 +323,6 @@ html.dark body .site-header .header-actions .btn:active {
 }
 
 @media (max-width: 700px) {
-  /* Mobile uses two clean rows so brand and navigation can never overlap. */
   html body .site-header .container {
     min-height: 0 !important;
     padding: 10px 14px 8px !important;
@@ -354,37 +346,63 @@ html.dark body .site-header .header-actions .btn:active {
     flex-basis: 40px !important;
   }
   html body .site-header .brand h1 { font-size: .98rem !important; }
-  html body .site-header .brand span {
-    font-size: .62rem !important;
-    white-space: normal !important;
-  }
+  html body .site-header .brand span { font-size: .62rem !important; white-space: normal !important; }
   html body .site-header .header-actions {
     width: 100% !important;
     flex: 1 1 100% !important;
     justify-content: flex-start !important;
+    align-items: center !important;
+    align-content: center !important;
     gap: 22px !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     flex-wrap: nowrap !important;
+    height: 40px !important;
     padding: 2px 0 4px !important;
     scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
   }
   html body .site-header .header-actions::-webkit-scrollbar { display: none !important; }
-  html body .site-header .header-actions > * { flex: 0 0 auto !important; }
+  html body .site-header .header-actions > *,
   html body .site-header .header-actions a,
   html body .site-header .header-actions button,
-  html body .site-header .header-actions .btn { font-size: .74rem !important; }
+  html body .site-header .header-actions .btn {
+    flex: 0 0 auto !important;
+    align-self: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    margin: 0 !important;
+    padding: 5px 0 !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+  }
+  html body .site-header .header-actions a span,
+  html body .site-header .header-actions button span,
+  html body .site-header .header-actions .btn span { height: 100% !important; line-height: 1 !important; }
+  html body .site-header .header-actions a,
+  html body .site-header .header-actions button,
+  html body .site-header .header-actions .btn { font-size: .74rem !important; font-weight: 800 !important; }
+  html body .site-header .header-actions button[data-theme-toggle="true"] {
+    height: 34px !important;
+    min-height: 34px !important;
+    align-self: center !important;
+    padding: 5px 0 !important;
+    font-size: .74rem !important;
+    font-weight: 800 !important;
+  }
 }
 
 @media (max-width: 420px) {
-  html body .site-header .container {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
+  html body .site-header .container { padding-left: 12px !important; padding-right: 12px !important; }
   html body .site-header .brand h1 { font-size: .9rem !important; }
   html body .site-header .brand span { font-size: .58rem !important; }
-  html body .site-header .header-actions { gap: 18px !important; }
+  html body .site-header .header-actions { gap: 18px !important; height: 38px !important; }
   html body .site-header .header-actions a,
   html body .site-header .header-actions button,
-  html body .site-header .header-actions .btn { font-size: .69rem !important; }
+  html body .site-header .header-actions .btn { font-size: .69rem !important; height: 32px !important; min-height: 32px !important; }
+  html body .site-header .header-actions button[data-theme-toggle="true"] { height: 32px !important; min-height: 32px !important; font-size: .69rem !important; }
 }
