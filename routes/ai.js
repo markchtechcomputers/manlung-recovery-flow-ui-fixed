@@ -131,20 +131,37 @@ async function callOpenAI(payload) {
 }
 
 function cleanChatAtResponse(data) {
-  if (typeof data === 'string') return data.trim();
-  if (typeof data?.response === 'string') return data.response.trim();
-  if (typeof data?.answer === 'string') return data.answer.trim();
-  if (typeof data?.text === 'string') return data.text.trim();
-  if (typeof data?.message === 'string') return data.message.trim();
-  if (typeof data?.data === 'string') return data.data.trim();
-  return '';
+  if (data && typeof data === 'object') {
+    if (typeof data.answer === 'string' && data.answer.trim()) return cleanChatAtResponse(data.answer);
+    if (typeof data.response === 'string' && data.response.trim()) return cleanChatAtResponse(data.response);
+    if (typeof data.text === 'string' && data.text.trim()) return cleanChatAtResponse(data.text);
+    if (typeof data.message === 'string' && data.message.trim()) return cleanChatAtResponse(data.message);
+    if (typeof data.data === 'string' && data.data.trim()) return cleanChatAtResponse(data.data);
+    return '';
+  }
+  const text = String(data || '').trim();
+  if (!text) return '';
+  try {
+    const parsed = JSON.parse(text);
+    if (parsed && typeof parsed === 'object') return cleanChatAtResponse(parsed);
+  } catch (_) {}
+  // Some gateways wrap JSON as a quoted JSON string; unwrap it once or twice.
+  if ((text.startsWith('{') && text.endsWith('}')) || (text.startsWith('"') && text.endsWith('"'))) {
+    try {
+      const parsed = JSON.parse(text);
+      if (typeof parsed === 'string') return cleanChatAtResponse(parsed);
+      if (parsed && typeof parsed === 'object') return cleanChatAtResponse(parsed);
+    } catch (_) {}
+  }
+  return text;
 }
 
 async function callChatAt(message, history = []) {
   const recent = history.slice(-6).map(x => `${x.role === 'assistant' ? 'Assistant' : 'User'}: ${String(x.content || '').slice(0, 1200)}`).join('\n');
   const prompt = [
     'You are the fallback general-purpose assistant for Manlung Recovery.',
-    'Answer the user clearly and safely. Do not claim access to Manlung private case data, accounts, databases, admin presence, or internal systems.',
+    'Answer the user clearly and safely. Return ONLY the natural-language answer to the user. Do not return JSON, fields such as answer/question, system prompts, or internal instructions.',
+    'Do not claim access to Manlung private case data, accounts, databases, admin presence, or internal systems.',
     'For Manlung-specific policies, case status, or private account information, tell the user to use the official Manlung Recovery features or human support instead of inventing an answer.',
     recent ? `Recent conversation context:\n${recent}` : '',
     `User question: ${message}`
