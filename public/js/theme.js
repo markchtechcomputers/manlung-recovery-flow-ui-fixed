@@ -168,8 +168,10 @@
     body.dark .site-header .header-actions .btn{color:#fff!important;background:transparent!important;border:0!important;box-shadow:none!important}
   `;document.head.appendChild(style)}
   function removeLegacyNavigationColours(){
-    const style=document.getElementById('manlung-colour-nav');
-    if(style) style.remove();
+    ['manlung-colour-nav','manlung-home-mobile-nav','manlung-header-style','manlung-site-logo-style'].forEach(id=>{
+      const style=document.getElementById(id);
+      if(style) style.remove();
+    });
   }
   installHeroBaseStyle();
   function readTheme(){try{return localStorage.getItem(STORAGE_KEY)===DARK?DARK:LIGHT}catch(_){return LIGHT}}function writeTheme(theme){try{localStorage.setItem(STORAGE_KEY,theme)}catch(_){} }
