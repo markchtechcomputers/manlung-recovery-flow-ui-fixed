@@ -43,17 +43,25 @@
   function injectStyles() {
     if (document.getElementById('manlung-contact-fab-styles')) return;
     const style = document.createElement('style'); style.id = 'manlung-contact-fab-styles'; style.textContent = `
-      /* Clean solid header — light mode */
-      .site-header {
+      /* Clean solid header — light mode, absolutely no separator lines. */
+      .site-header,
+      .site-header::before,
+      .site-header::after {
         position: sticky !important;
         top: 0 !important;
         z-index: 1000 !important;
         background: #ffffff !important;
         color: #111827 !important;
+        border: 0 !important;
+        border-top: 0 !important;
         border-bottom: 0 !important;
-        box-shadow: 0 1px 0 rgba(15,23,42,.06) !important;
+        box-shadow: none !important;
+        outline: 0 !important;
+        background-image: none !important;
       }
-      .site-header .container {
+      .site-header .container,
+      .site-header .container::before,
+      .site-header .container::after {
         width: min(100% - 48px, 1320px) !important;
         max-width: 1320px !important;
         min-height: 84px !important;
@@ -64,251 +72,53 @@
         justify-content: space-between !important;
         gap: 44px !important;
         flex-wrap: nowrap !important;
-      }
-      .site-header .brand {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        gap: 13px !important;
-        min-width: 0 !important;
-        flex: 1 1 auto !important;
-        text-align: left !important;
-      }
-      .site-header .manlung-home-logo {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        flex: 0 0 48px !important;
-        width: 48px !important;
-        height: 48px !important;
-        margin: 0 !important;
-      }
-      .site-header .manlung-site-logo {
-        width: 48px !important;
-        height: 48px !important;
-        flex: 0 0 48px !important;
-        object-fit: cover !important;
-        border-radius: 10px !important;
-        background: #ffffff !important;
-        border: 1px solid #e5e7eb !important;
-        box-shadow: none !important;
-      }
-      .site-header .brand h1 {
-        margin: 0 !important;
-        color: #111111 !important;
-        font-size: 1.35rem !important;
-        line-height: 1.1 !important;
-        font-weight: 800 !important;
-        letter-spacing: -.025em !important;
-      }
-      .site-header .brand h1 i {
-        color: #111111 !important;
-        margin-right: 7px !important;
-      }
-      .site-header .brand span {
-        display: block !important;
-        margin: 4px 0 0 !important;
-        color: #667085 !important;
-        font-size: .74rem !important;
-        line-height: 1.25 !important;
-        font-weight: 500 !important;
-        white-space: nowrap !important;
-      }
-      .site-header .header-actions {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-        gap: 28px !important;
-        flex: 0 0 auto !important;
-        flex-wrap: nowrap !important;
-      }
-      .site-header .header-actions a,
-      .site-header .header-actions button {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 7px !important;
-        min-height: 34px !important;
-        width: auto !important;
-        padding: 5px 0 !important;
-        margin: 0 !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        color: #111111 !important;
-        text-decoration: none !important;
-        font-size: .84rem !important;
-        font-weight: 600 !important;
-        line-height: 1 !important;
-        white-space: nowrap !important;
-        transition: color .18s ease, opacity .18s ease !important;
-        transform: none !important;
-      }
-      .site-header .header-actions a i,
-      .site-header .header-actions button i {
-        color: #111111 !important;
-        font-size: .82rem !important;
-        margin: 0 !important;
-      }
-      .site-header .header-actions a:hover,
-      .site-header .header-actions button:hover {
-        background: transparent !important;
-        border: 0 !important;
-        color: #2451d6 !important;
-      }
-      .site-header .header-actions a:hover i,
-      .site-header .header-actions button:hover i { color: #2451d6 !important; }
-      .site-header .header-actions .btn-primary,
-      .site-header .header-actions .btn-primary:hover {
-        color: #111111 !important;
-        background: transparent !important;
         border: 0 !important;
         box-shadow: none !important;
+        outline: 0 !important;
+        background: transparent !important;
+        background-image: none !important;
       }
+      .site-header .brand { display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 13px !important; min-width: 0 !important; flex: 1 1 auto !important; text-align: left !important; }
+      .site-header .manlung-home-logo { display: flex !important; align-items: center !important; justify-content: center !important; flex: 0 0 48px !important; width: 48px !important; height: 48px !important; margin: 0 !important; }
+      .site-header .manlung-site-logo { width: 48px !important; height: 48px !important; flex: 0 0 48px !important; object-fit: cover !important; border-radius: 10px !important; background: #ffffff !important; border: 0 !important; box-shadow: none !important; }
+      .site-header .brand h1 { margin: 0 !important; color: #111111 !important; font-size: 1.35rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -.025em !important; }
+      .site-header .brand h1 i { color: #111111 !important; margin-right: 7px !important; }
+      .site-header .brand span { display: block !important; margin: 4px 0 0 !important; color: #667085 !important; font-size: .74rem !important; line-height: 1.25 !important; font-weight: 500 !important; white-space: nowrap !important; }
+      .site-header .header-actions { display: flex !important; align-items: center !important; justify-content: flex-end !important; gap: 28px !important; flex: 0 0 auto !important; flex-wrap: nowrap !important; }
+      .site-header .header-actions a, .site-header .header-actions button { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 7px !important; min-height: 34px !important; width: auto !important; padding: 5px 0 !important; margin: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; color: #111111 !important; text-decoration: none !important; font-size: .84rem !important; font-weight: 600 !important; line-height: 1 !important; white-space: nowrap !important; transition: color .18s ease, opacity .18s ease !important; transform: none !important; }
+      .site-header .header-actions a i, .site-header .header-actions button i { color: #111111 !important; font-size: .82rem !important; margin: 0 !important; }
+      .site-header .header-actions a:hover, .site-header .header-actions button:hover { background: transparent !important; border: 0 !important; color: #2451d6 !important; }
+      .site-header .header-actions a:hover i, .site-header .header-actions button:hover i { color: #2451d6 !important; }
+      .site-header .header-actions .btn-primary, .site-header .header-actions .btn-primary:hover { color: #111111 !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
       .site-header .header-actions .btn-primary i { color: #111111 !important; }
-      .site-header .header-actions .btn-primary:hover,
-      .site-header .header-actions .btn-primary:hover i { color: #2451d6 !important; }
+      .site-header .header-actions .btn-primary:hover, .site-header .header-actions .btn-primary:hover i { color: #2451d6 !important; }
 
-      /* Remove all old header button treatment. */
-      .site-header .header-actions button[data-theme-toggle="true"],
-      .site-header .header-actions a[href="/client/dashboard.html"],
-      .site-header .header-actions a[href="/blog.html"],
-      .site-header .header-actions a[href="/donate.html"],
-      .site-header .header-actions a[href="/client/request.html"] {
-        background: transparent !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-      }
+      .site-header .header-actions button[data-theme-toggle="true"], .site-header .header-actions a[href="/client/dashboard.html"], .site-header .header-actions a[href="/blog.html"], .site-header .header-actions a[href="/donate.html"], .site-header .header-actions a[href="/client/request.html"] { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
 
-      /* Dark mode keeps the same clean spacing, with a dark solid surface. */
-      body.dark .site-header {
-        background: #0b1424 !important;
-        color: #e6ecf5 !important;
-        border-bottom: 0 !important;
-        box-shadow: 0 1px 0 rgba(255,255,255,.06) !important;
-      }
+      /* Dark mode: solid surface, still no top/bottom lines. */
+      body.dark .site-header, body.dark .site-header::before, body.dark .site-header::after { background: #0b1424 !important; color: #e6ecf5 !important; border: 0 !important; box-shadow: none !important; outline: 0 !important; background-image: none !important; }
+      body.dark .site-header .container, body.dark .site-header .container::before, body.dark .site-header .container::after { border: 0 !important; box-shadow: none !important; outline: 0 !important; }
       body.dark .site-header .brand h1 { color: #f8fafc !important; }
       body.dark .site-header .brand h1 i { color: #dbeafe !important; }
       body.dark .site-header .brand span { color: #96abc4 !important; }
-      body.dark .site-header .header-actions a,
-      body.dark .site-header .header-actions button,
-      body.dark .site-header .header-actions .btn-primary { color: #e6ecf5 !important; }
-      body.dark .site-header .header-actions a i,
-      body.dark .site-header .header-actions button i,
-      body.dark .site-header .header-actions .btn-primary i { color: #c7d7f2 !important; }
-      body.dark .site-header .header-actions a:hover,
-      body.dark .site-header .header-actions button:hover,
-      body.dark .site-header .header-actions .btn-primary:hover,
-      body.dark .site-header .header-actions a:hover i,
-      body.dark .site-header .header-actions button:hover i,
-      body.dark .site-header .header-actions .btn-primary:hover i { color: #ffffff !important; }
+      body.dark .site-header .header-actions a, body.dark .site-header .header-actions button, body.dark .site-header .header-actions .btn-primary { color: #e6ecf5 !important; }
+      body.dark .site-header .header-actions a i, body.dark .site-header .header-actions button i, body.dark .site-header .header-actions .btn-primary i { color: #c7d7f2 !important; }
+      body.dark .site-header .header-actions a:hover, body.dark .site-header .header-actions button:hover, body.dark .site-header .header-actions .btn-primary:hover, body.dark .site-header .header-actions a:hover i, body.dark .site-header .header-actions button:hover i, body.dark .site-header .header-actions .btn-primary:hover i { color: #ffffff !important; }
 
-      @media (max-width: 1050px) and (min-width: 701px) {
-        .site-header .container { width: min(100% - 32px, 1320px) !important; gap: 24px !important; }
-        .site-header .header-actions { gap: 18px !important; }
-        .site-header .header-actions a, .site-header .header-actions button { font-size: .78rem !important; }
-        .site-header .brand h1 { font-size: 1.2rem !important; }
-        .site-header .brand span { font-size: .68rem !important; }
-      }
+      @media (max-width: 1050px) and (min-width: 701px) { .site-header .container { width: min(100% - 32px, 1320px) !important; gap: 24px !important; } .site-header .header-actions { gap: 18px !important; } .site-header .header-actions a, .site-header .header-actions button { font-size: .78rem !important; } .site-header .brand h1 { font-size: 1.2rem !important; } .site-header .brand span { font-size: .68rem !important; } }
+      @media (max-width: 700px) { .site-header .container { width: 100% !important; min-height: 68px !important; padding: 10px 14px !important; gap: 9px !important; flex-wrap: wrap !important; } .site-header .brand { width: 100% !important; flex: 1 1 100% !important; gap: 10px !important; } .site-header .manlung-home-logo, .site-header .manlung-site-logo { width: 40px !important; height: 40px !important; flex-basis: 40px !important; } .site-header .brand h1 { font-size: .98rem !important; } .site-header .brand span { font-size: .6rem !important; white-space: normal !important; } .site-header .header-actions { width: 100% !important; flex: 1 1 100% !important; justify-content: flex-start !important; gap: 20px !important; overflow-x: auto !important; flex-wrap: nowrap !important; padding: 2px 0 3px !important; scrollbar-width: none !important; } .site-header .header-actions::-webkit-scrollbar { display: none !important; } .site-header .header-actions a, .site-header .header-actions button { flex: 0 0 auto !important; min-height: 32px !important; padding: 4px 0 !important; font-size: .72rem !important; } .site-header .header-actions a i, .site-header .header-actions button i { font-size: .78rem !important; } }
+      @media (max-width: 420px) { .site-header .container { padding-left: 12px !important; padding-right: 12px !important; } .site-header .brand h1 { font-size: .92rem !important; } .site-header .brand span { font-size: .56rem !important; } .site-header .header-actions { gap: 16px !important; } .site-header .header-actions a, .site-header .header-actions button { font-size: .68rem !important; } }
 
-      @media (max-width: 700px) {
-        .site-header .container {
-          width: 100% !important;
-          min-height: 68px !important;
-          padding: 10px 14px !important;
-          gap: 9px !important;
-          flex-wrap: wrap !important;
-        }
-        .site-header .brand {
-          width: 100% !important;
-          flex: 1 1 100% !important;
-          gap: 10px !important;
-        }
-        .site-header .manlung-home-logo,
-        .site-header .manlung-site-logo {
-          width: 40px !important;
-          height: 40px !important;
-          flex-basis: 40px !important;
-        }
-        .site-header .brand h1 { font-size: .98rem !important; }
-        .site-header .brand span { font-size: .6rem !important; white-space: normal !important; }
-        .site-header .header-actions {
-          width: 100% !important;
-          flex: 1 1 100% !important;
-          justify-content: flex-start !important;
-          gap: 20px !important;
-          overflow-x: auto !important;
-          flex-wrap: nowrap !important;
-          padding: 2px 0 3px !important;
-          scrollbar-width: none !important;
-        }
-        .site-header .header-actions::-webkit-scrollbar { display: none !important; }
-        .site-header .header-actions a,
-        .site-header .header-actions button {
-          flex: 0 0 auto !important;
-          min-height: 32px !important;
-          padding: 4px 0 !important;
-          font-size: .72rem !important;
-        }
-        .site-header .header-actions a i,
-        .site-header .header-actions button i { font-size: .78rem !important; }
-      }
-
-      @media (max-width: 420px) {
-        .site-header .container { padding-left: 12px !important; padding-right: 12px !important; }
-        .site-header .brand h1 { font-size: .92rem !important; }
-        .site-header .brand span { font-size: .56rem !important; }
-        .site-header .header-actions { gap: 16px !important; }
-        .site-header .header-actions a, .site-header .header-actions button { font-size: .68rem !important; }
-      }
-
-      /* Keep the existing contact widget behavior intact. */
       #callWidgetBtn.manlung-contact-trigger { width: 54px !important; min-width: 54px !important; height: 54px !important; min-height: 54px !important; padding: 0 !important; border-radius: 50% !important; justify-content: center !important; gap: 0 !important; overflow: hidden !important; }
       #callWidgetBtn.manlung-contact-trigger .manlung-floating-call-icon { width: 30px !important; height: 30px !important; min-width: 30px !important; min-height: 30px !important; max-width: 30px !important; max-height: 30px !important; flex: 0 0 30px !important; }
       #callWidgetBtn.manlung-contact-trigger #callWidgetLabel { display: none !important; }
       #manlungContactMenu[hidden] { display: none !important; }
       #manlungContactMenu { position: absolute; right: 3px; bottom: 62px; display: flex; flex-direction: column; align-items: center; gap: 9px; z-index: 210; }
-      .manlung-contact-choice { width: 46px; height: 46px; min-width: 46px; min-height: 46px; padding: 0 !important; border: 2px solid rgba(255,255,255,.72); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff !important; text-decoration: none !important; cursor: pointer; box-shadow: 0 8px 22px rgba(0,0,0,.30); opacity: 0; transform: translateY(8px) scale(.72); transition: opacity .18s ease, transform .2s ease; overflow: hidden !important; }
-      #manlungContactMenu:not([hidden]) .manlung-contact-choice { opacity: 1; transform: translateY(0) scale(1); animation: manlungContactPop .2s ease both; }
-      .manlung-contact-choice:hover, .manlung-contact-choice:focus-visible { transform: translateY(-2px) scale(1.06); box-shadow: 0 11px 27px rgba(0,0,0,.38); outline: none; }
-      .manlung-contact-choice .manlung-contact-icon { display: block !important; width: 27px !important; height: 27px !important; max-width: 27px !important; max-height: 27px !important; min-width: 27px !important; min-height: 27px !important; object-fit: contain !important; object-position: center !important; border-radius: 50%; flex: 0 0 27px !important; }
-      .manlung-contact-choice.call { background: linear-gradient(135deg,#20c77a,#128a55); }
-      .manlung-contact-choice.whatsapp { background: linear-gradient(135deg,#25d366,#128c4a); }
-      .manlung-contact-choice.email { background: linear-gradient(135deg,#4f8cff,#2451d6); }
-      .manlung-contact-tooltip { position: absolute; right: 56px; white-space: nowrap; padding: .38rem .55rem; border-radius: 8px; background: #0b1428; border: 1px solid rgba(255,255,255,.12); color: #fff; font: 700 .72rem/1.1 'Inter',-apple-system,sans-serif; pointer-events: none; opacity: 0; transform: translateX(4px); transition: opacity .15s ease, transform .15s ease; }
-      .manlung-contact-choice:hover .manlung-contact-tooltip, .manlung-contact-choice:focus-visible .manlung-contact-tooltip { opacity: 1; transform: translateX(0); }
-      @keyframes manlungContactPop { from { opacity: 0; transform: translateY(8px) scale(.72); } to { opacity: 1; transform: translateY(0) scale(1); } }
-      .admin-contact-bottom { display: none !important; }
-      @media (max-width:600px) { #callWidgetBtn.manlung-contact-trigger { width: 52px !important; min-width: 52px !important; height: 52px !important; min-height: 52px !important; } #manlungContactMenu { right: 2px; bottom: 60px; gap: 8px; } .manlung-contact-choice { width: 44px; height: 44px; min-width: 44px; min-height: 44px; } .manlung-contact-choice .manlung-contact-icon { width: 25px !important; height: 25px !important; max-width: 25px !important; max-height: 25px !important; min-width: 25px !important; min-height: 25px !important; flex-basis: 25px !important; } .manlung-contact-tooltip { display: none; } }
+      .manlung-contact-choice { width: 46px; height: 46px; min-width: 46px; min-height: 46px; padding: 0 !important; border: 2px solid rgba(255,255,255,.72); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #fff; box-shadow: 0 8px 22px rgba(0,0,0,.16); }
+      .manlung-contact-choice img { width: 27px; height: 27px; object-fit: contain; }
+      @media (max-width: 700px) { #callWidgetBtn.manlung-contact-trigger { width: 50px !important; min-width: 50px !important; height: 50px !important; min-height: 50px !important; } #manlungContactMenu { bottom: 58px; } }
     `; document.head.appendChild(style);
   }
-  function iconMarkup(type, alt) { return `<img class="manlung-contact-icon" src="${ICONS[type]}" alt="${alt}" width="27" height="27" loading="eager" decoding="async">`; }
-  function createMenu(button) {
-    if (document.getElementById('manlungContactMenu')) return;
-    const menu = document.createElement('div'); menu.id = 'manlungContactMenu'; menu.hidden = true; menu.setAttribute('aria-label', 'Choose a contact method');
-    menu.innerHTML = `<button type="button" class="manlung-contact-choice call" aria-label="Call Admin" title="Call Admin">${iconMarkup('call', 'Call')}<span class="manlung-contact-tooltip">Call Admin</span></button><a class="manlung-contact-choice whatsapp" href="${WHATSAPP_URL}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">${iconMarkup('whatsapp', 'WhatsApp')}<span class="manlung-contact-tooltip">WhatsApp</span></a><a class="manlung-contact-choice email" href="${EMAIL_URL}" aria-label="Email support" title="Email support">${iconMarkup('email', 'Email')}<span class="manlung-contact-tooltip">Email</span></a>`;
-    button.parentElement.appendChild(menu);
-    const callChoice = menu.querySelector('.call');
-    callChoice.addEventListener('click', () => { closeMenu(); button.dataset.manlungAllowOriginalClick = 'true'; button.click(); });
-    menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
-  }
-  function openMenu() { const menu = document.getElementById('manlungContactMenu'); if (menu) menu.hidden = false; }
-  function closeMenu() { const menu = document.getElementById('manlungContactMenu'); if (menu) menu.hidden = true; }
-  function toggleMenu() { const menu = document.getElementById('manlungContactMenu'); if (!menu) return; menu.hidden ? openMenu() : closeMenu(); }
-  function install(button) {
-    if (!button || button.dataset.manlungContactInstalled === 'true') return;
-    button.dataset.manlungContactInstalled = 'true'; button.classList.add('manlung-contact-trigger'); button.setAttribute('aria-label', 'Choose a contact method'); button.setAttribute('title', 'Contact Manlung Recovery'); button.setAttribute('aria-expanded', 'false'); createMenu(button);
-    document.addEventListener('click', (event) => { const target = event.target instanceof Element ? event.target.closest('#callWidgetBtn') : null; if (target !== button) return; if (button.dataset.manlungAllowOriginalClick === 'true') { delete button.dataset.manlungAllowOriginalClick; return; } event.preventDefault(); event.stopImmediatePropagation(); toggleMenu(); button.setAttribute('aria-expanded', String(!document.getElementById('manlungContactMenu')?.hidden)); }, true);
-    document.addEventListener('click', (event) => { if (event.target instanceof Element && event.target.closest('#manlungContactMenu')) return; if (event.target instanceof Element && event.target.closest('#callWidgetBtn')) return; closeMenu(); button.setAttribute('aria-expanded', 'false'); });
-    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { closeMenu(); button.setAttribute('aria-expanded', 'false'); } });
-  }
-  function waitForCallWidget() {
-    injectStyles(); const existing = document.getElementById('callWidgetBtn');
-    if (existing) { install(existing); return; }
-    const observer = new MutationObserver(() => { const button = document.getElementById('callWidgetBtn'); if (!button) return; observer.disconnect(); install(button); });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', waitForCallWidget, { once: true }); else waitForCallWidget();
+  function init() { injectStyles(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();
