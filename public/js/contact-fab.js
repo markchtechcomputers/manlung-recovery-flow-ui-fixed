@@ -43,25 +43,26 @@
   function injectStyles() {
     if (document.getElementById('manlung-contact-fab-styles')) return;
     const style = document.createElement('style'); style.id = 'manlung-contact-fab-styles'; style.textContent = `
-      /* Balanced, restrained site header */
+      /* Clean solid header — light mode */
       .site-header {
         position: sticky !important;
         top: 0 !important;
         z-index: 1000 !important;
-        background: #0a1a3a !important;
-        border-bottom: 1px solid rgba(255,255,255,.10) !important;
-        box-shadow: 0 1px 0 rgba(255,255,255,.03), 0 8px 24px rgba(2,6,23,.12) !important;
+        background: #ffffff !important;
+        color: #111827 !important;
+        border-bottom: 0 !important;
+        box-shadow: 0 1px 0 rgba(15,23,42,.06) !important;
       }
       .site-header .container {
-        width: min(100% - 40px, 1280px) !important;
-        max-width: 1280px !important;
-        min-height: 82px !important;
+        width: min(100% - 48px, 1320px) !important;
+        max-width: 1320px !important;
+        min-height: 84px !important;
         margin: 0 auto !important;
         padding: 14px 0 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        gap: 36px !important;
+        gap: 44px !important;
         flex-wrap: nowrap !important;
       }
       .site-header .brand {
@@ -87,27 +88,27 @@
         height: 48px !important;
         flex: 0 0 48px !important;
         object-fit: cover !important;
-        border-radius: 11px !important;
-        background: #fff !important;
-        border: 1px solid rgba(255,255,255,.12) !important;
+        border-radius: 10px !important;
+        background: #ffffff !important;
+        border: 1px solid #e5e7eb !important;
         box-shadow: none !important;
       }
       .site-header .brand h1 {
         margin: 0 !important;
-        color: #fff !important;
+        color: #111111 !important;
         font-size: 1.35rem !important;
         line-height: 1.1 !important;
         font-weight: 800 !important;
         letter-spacing: -.025em !important;
       }
       .site-header .brand h1 i {
-        color: #8db7ff !important;
+        color: #111111 !important;
         margin-right: 7px !important;
       }
       .site-header .brand span {
         display: block !important;
         margin: 4px 0 0 !important;
-        color: #aebdd4 !important;
+        color: #667085 !important;
         font-size: .74rem !important;
         line-height: 1.25 !important;
         font-weight: 500 !important;
@@ -117,7 +118,7 @@
         display: flex !important;
         align-items: center !important;
         justify-content: flex-end !important;
-        gap: 25px !important;
+        gap: 28px !important;
         flex: 0 0 auto !important;
         flex-wrap: nowrap !important;
       }
@@ -135,10 +136,10 @@
         border-radius: 0 !important;
         background: transparent !important;
         box-shadow: none !important;
-        color: #dbe5f4 !important;
+        color: #111111 !important;
         text-decoration: none !important;
         font-size: .84rem !important;
-        font-weight: 650 !important;
+        font-weight: 600 !important;
         line-height: 1 !important;
         white-space: nowrap !important;
         transition: color .18s ease, opacity .18s ease !important;
@@ -146,7 +147,7 @@
       }
       .site-header .header-actions a i,
       .site-header .header-actions button i {
-        color: #8fb5f5 !important;
+        color: #111111 !important;
         font-size: .82rem !important;
         margin: 0 !important;
       }
@@ -154,37 +155,59 @@
       .site-header .header-actions button:hover {
         background: transparent !important;
         border: 0 !important;
-        color: #fff !important;
+        color: #2451d6 !important;
       }
       .site-header .header-actions a:hover i,
-      .site-header .header-actions button:hover i { color: #b7d0ff !important; }
-      .site-header .header-actions .btn-primary {
-        color: #8db7ff !important;
+      .site-header .header-actions button:hover i { color: #2451d6 !important; }
+      .site-header .header-actions .btn-primary,
+      .site-header .header-actions .btn-primary:hover {
+        color: #111111 !important;
         background: transparent !important;
         border: 0 !important;
+        box-shadow: none !important;
       }
-      .site-header .header-actions .btn-primary i { color: #8db7ff !important; }
-      .site-header .header-actions .btn-primary:hover { color: #fff !important; }
-      .site-header .header-actions .btn-primary:hover i { color: #b7d0ff !important; }
+      .site-header .header-actions .btn-primary i { color: #111111 !important; }
+      .site-header .header-actions .btn-primary:hover,
+      .site-header .header-actions .btn-primary:hover i { color: #2451d6 !important; }
 
-      /* Homepage colour overrides: remove the previous multi-colour button blocks. */
+      /* Remove all old header button treatment. */
       .site-header .header-actions button[data-theme-toggle="true"],
       .site-header .header-actions a[href="/client/dashboard.html"],
       .site-header .header-actions a[href="/blog.html"],
-      .site-header .header-actions a[href="/donate.html"] {
+      .site-header .header-actions a[href="/donate.html"],
+      .site-header .header-actions a[href="/client/request.html"] {
         background: transparent !important;
         border: 0 !important;
-        color: #dbe5f4 !important;
+        border-radius: 0 !important;
         box-shadow: none !important;
       }
-      .site-header .header-actions button[data-theme-toggle="true"] i,
-      .site-header .header-actions a[href="/client/dashboard.html"] i,
-      .site-header .header-actions a[href="/blog.html"] i,
-      .site-header .header-actions a[href="/donate.html"] i { color: #8fb5f5 !important; }
+
+      /* Dark mode keeps the same clean spacing, with a dark solid surface. */
+      body.dark .site-header {
+        background: #0b1424 !important;
+        color: #e6ecf5 !important;
+        border-bottom: 0 !important;
+        box-shadow: 0 1px 0 rgba(255,255,255,.06) !important;
+      }
+      body.dark .site-header .brand h1 { color: #f8fafc !important; }
+      body.dark .site-header .brand h1 i { color: #dbeafe !important; }
+      body.dark .site-header .brand span { color: #96abc4 !important; }
+      body.dark .site-header .header-actions a,
+      body.dark .site-header .header-actions button,
+      body.dark .site-header .header-actions .btn-primary { color: #e6ecf5 !important; }
+      body.dark .site-header .header-actions a i,
+      body.dark .site-header .header-actions button i,
+      body.dark .site-header .header-actions .btn-primary i { color: #c7d7f2 !important; }
+      body.dark .site-header .header-actions a:hover,
+      body.dark .site-header .header-actions button:hover,
+      body.dark .site-header .header-actions .btn-primary:hover,
+      body.dark .site-header .header-actions a:hover i,
+      body.dark .site-header .header-actions button:hover i,
+      body.dark .site-header .header-actions .btn-primary:hover i { color: #ffffff !important; }
 
       @media (max-width: 1050px) and (min-width: 701px) {
-        .site-header .container { width: min(100% - 28px, 1280px) !important; gap: 22px !important; }
-        .site-header .header-actions { gap: 17px !important; }
+        .site-header .container { width: min(100% - 32px, 1320px) !important; gap: 24px !important; }
+        .site-header .header-actions { gap: 18px !important; }
         .site-header .header-actions a, .site-header .header-actions button { font-size: .78rem !important; }
         .site-header .brand h1 { font-size: 1.2rem !important; }
         .site-header .brand span { font-size: .68rem !important; }
@@ -195,14 +218,13 @@
           width: 100% !important;
           min-height: 68px !important;
           padding: 10px 14px !important;
-          gap: 10px !important;
+          gap: 9px !important;
           flex-wrap: wrap !important;
         }
         .site-header .brand {
           width: 100% !important;
           flex: 1 1 100% !important;
           gap: 10px !important;
-          justify-content: flex-start !important;
         }
         .site-header .manlung-home-logo,
         .site-header .manlung-site-logo {
@@ -216,7 +238,7 @@
           width: 100% !important;
           flex: 1 1 100% !important;
           justify-content: flex-start !important;
-          gap: 17px !important;
+          gap: 20px !important;
           overflow-x: auto !important;
           flex-wrap: nowrap !important;
           padding: 2px 0 3px !important;
@@ -232,14 +254,13 @@
         }
         .site-header .header-actions a i,
         .site-header .header-actions button i { font-size: .78rem !important; }
-        .site-header .header-actions .btn-primary { color: #8db7ff !important; }
       }
 
       @media (max-width: 420px) {
         .site-header .container { padding-left: 12px !important; padding-right: 12px !important; }
         .site-header .brand h1 { font-size: .92rem !important; }
         .site-header .brand span { font-size: .56rem !important; }
-        .site-header .header-actions { gap: 14px !important; }
+        .site-header .header-actions { gap: 16px !important; }
         .site-header .header-actions a, .site-header .header-actions button { font-size: .68rem !important; }
       }
 
