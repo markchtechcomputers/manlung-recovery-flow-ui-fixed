@@ -35,14 +35,22 @@
       button.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
       button.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
       button.setAttribute('aria-pressed', String(isDark));
+
       let icon = button.querySelector('i');
       if (!icon) {
         icon = document.createElement('i');
         button.appendChild(icon);
       }
+
       icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
       icon.setAttribute('aria-hidden', 'true');
-      button.querySelectorAll('span').forEach(span => span.remove());
+
+      // The old markup contains a literal text node such as "Dark".
+      // Remove every visible child except the real icon so the control is truly icon-only.
+      Array.from(button.childNodes).forEach(node => {
+        if (node !== icon) node.remove();
+      });
+
       button.dataset.manlungIconOnly = 'true';
     });
   }
