@@ -29,6 +29,13 @@
     });
   }
 
+  function themeIconSvg(isDark) {
+    if (isDark) {
+      return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>';
+    }
+    return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+  }
+
   function normalizeThemeButtons() {
     const isDark = document.documentElement.classList.contains('dark');
     document.querySelectorAll('[data-theme-toggle="true"]').forEach(button => {
@@ -36,21 +43,8 @@
       button.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
       button.setAttribute('aria-pressed', String(isDark));
 
-      let icon = button.querySelector('i');
-      if (!icon) {
-        icon = document.createElement('i');
-        button.appendChild(icon);
-      }
-
-      icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-      icon.setAttribute('aria-hidden', 'true');
-
-      // The old markup contains a literal text node such as "Dark".
-      // Remove every visible child except the real icon so the control is truly icon-only.
-      Array.from(button.childNodes).forEach(node => {
-        if (node !== icon) node.remove();
-      });
-
+      // Use an inline SVG so the icon never depends on Font Awesome or another icon font.
+      button.innerHTML = themeIconSvg(isDark);
       button.dataset.manlungIconOnly = 'true';
     });
   }
@@ -87,7 +81,6 @@
     button.type = 'button';
     button.className = 'manlung-theme-toggle';
     button.dataset.themeToggle = 'true';
-    button.innerHTML = '<i class="fas fa-moon" aria-hidden="true"></i>';
     actions.insertBefore(button, actions.firstChild);
     bindThemeButtons();
   }
@@ -108,18 +101,21 @@
       .site-header .header-actions button[data-theme-toggle="true"] {
         width:34px!important; height:34px!important; min-width:34px!important;
         padding:0!important; display:inline-flex!important; align-items:center!important;
-        justify-content:center!important; background:transparent!important;
+        justify-content:center!important; background:transparent!important; color:inherit!important;
+        overflow:visible!important;
       }
       .site-header .header-actions button[data-theme-toggle="true"]::before,
       .site-header .header-actions button[data-theme-toggle="true"]::after,
       .site-header .header-actions .theme-toggle::before,
       .site-header .header-actions .theme-toggle::after { content:none!important; display:none!important; }
       .site-header .header-actions button[data-theme-toggle="true"] span { display:none!important; }
-      .site-header .header-actions button[data-theme-toggle="true"] i {
-        display:inline-flex!important; align-items:center!important; justify-content:center!important;
-        width:1.1em!important; height:1.1em!important; font-size:1.05rem!important;
-        margin:0!important; padding:0!important; color:inherit!important; background:transparent!important;
-        border:0!important; box-shadow:none!important;
+      .site-header .header-actions button[data-theme-toggle="true"] svg {
+        display:block!important; width:22px!important; height:22px!important;
+        min-width:22px!important; min-height:22px!important; margin:0!important; padding:0!important;
+        fill:none!important; stroke:currentColor!important; stroke-width:2!important;
+        stroke-linecap:round!important; stroke-linejoin:round!important;
+        color:inherit!important; background:transparent!important; border:0!important;
+        box-shadow:none!important; opacity:1!important; visibility:visible!important;
       }
       @media(max-width:700px) {
         .site-header .header-actions {
@@ -140,6 +136,7 @@
         .site-header .header-actions a,
         .site-header .header-actions button,
         .site-header .header-actions .btn { font-size:.68rem!important; }
+        .site-header .header-actions button[data-theme-toggle="true"] svg { width:21px!important; height:21px!important; }
       }
       html.dark .site-header .header-actions a,
       html.dark .site-header .header-actions button,
