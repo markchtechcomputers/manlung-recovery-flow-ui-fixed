@@ -1,9 +1,18 @@
-/* Manlung Recovery — restored floating contact controls.
+/* Manlung Recovery — restored floating contact controls and AI bootstrap.
    The underlying WebRTC Call Admin widget remains untouched. */
 (() => {
   'use strict';
   if (window.__MANLUNG_SUPPORT_FAB__) return;
   window.__MANLUNG_SUPPORT_FAB__ = true;
+
+  function loadAI() {
+    if (document.getElementById('manlungAiRoot') || document.querySelector('script[data-manlung-ai-restore]')) return;
+    const s = document.createElement('script');
+    s.src = '/js/manlung-ai-v2.js?v=restore-1';
+    s.defer = true;
+    s.dataset.manlungAiRestore = 'true';
+    document.head.appendChild(s);
+  }
 
   const ICONS = {
     call: 'https://i.postimg.cc/wv196BJF/istockphoto-971654072-612x612-Photoroom.png',
@@ -94,6 +103,7 @@
 
   function waitForCallButton() {
     css();
+    loadAI();
     const existing = document.getElementById('callWidgetBtn');
     if (existing) return addMenu(existing);
     const observer = new MutationObserver(() => {
