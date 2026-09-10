@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v9';
+const CACHE_NAME = 'manlung-recovery-static-v10';
 
 // Only public/static pages are cached. Authenticated dashboards, settings,
 // admin pages, API responses, evidence, and other private data stay network-only.
@@ -8,7 +8,8 @@ const STATIC_ASSETS = [
   '/reset-password.html', '/client/request.html', '/client/track.html', '/manifest.webmanifest',
   '/favicon.svg', '/css/style.css', '/css/theme.css', '/js/theme.js', '/js/pwa.js',
   '/js/link-scanner.js', '/js/call-webrtc.js', '/js/call-widget.js', '/js/contact-fab.js',
-  '/js/manlung-ai-v2.js', '/js/manlung-ai.js', '/icons/icon-192.png', '/icons/icon-512.png'
+  '/js/support-fab.js', '/js/manlung-ai-v2.js', '/js/manlung-ai.js',
+  '/icons/icon-192.png', '/icons/icon-512.png'
 ];
 const PUBLIC_DOCUMENTS = new Set(STATIC_ASSETS.filter(path => path.endsWith('.html') || path === '/'));
 const OFFLINE_PAGE = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Manlung Recovery · Offline</title></head><body><h1>You are offline</h1><p>Reconnect and try again.</p></body></html>`;
