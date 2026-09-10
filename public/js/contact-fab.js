@@ -1,15 +1,38 @@
-/* Manlung Recovery — floating contact controls bootstrap.
-   Loads the restored contact menu without changing the WebRTC implementation. */
+/* Manlung Recovery — reliable floating contact controls bootstrap.
+   Restores the known-working Call Admin/WebRTC + WhatsApp/Email controls.
+   Does not replace or modify the WebRTC implementation. */
 (() => {
   'use strict';
-  function load() {
-    if (document.querySelector('script[data-manlung-support-fab]')) return;
-    const s = document.createElement('script');
-    s.src = '/js/support-fab.js?v=restore-1';
-    s.defer = true;
-    s.dataset.manlungSupportFab = 'true';
-    document.head.appendChild(s);
+  if (window.__MANLUNG_CONTACT_BOOT__) return;
+  window.__MANLUNG_CONTACT_BOOT__ = true;
+
+  function load(src, marker) {
+    return new Promise(resolve => {
+      if (document.querySelector(`script[data-${marker}]`)) {
+        resolve();
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      s.dataset[marker] = 'true';
+      s.onload = () => resolve();
+      s.onerror = () => resolve();
+      document.head.appendChild(s);
+    });
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load, {once:true});
-  else load();
+
+  async function boot() {
+    // These are the original call files. They are loaded in order so the
+    // contact menu can always find the #callWidgetBtn created by call-widget.js.
+    await load('/js/call-webrtc.js?v=restore-20260908', 'manlung-call-webrtc');
+    await load('/js/call-widget.js?v=restore-20260908', 'manlung-call-widget');
+    await load('/js/support-fab.js?v=restore-20260908', 'manlung-support-fab');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, {once:true});
+  } else {
+    boot();
+  }
 })();
