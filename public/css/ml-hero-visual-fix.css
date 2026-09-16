@@ -1,7 +1,6 @@
 
 /* ==========================================================
-   MANLUNG RECOVERY
-   PREMIUM HERO SYSTEM
+   MANLUNG RECOVERY — HERO FINAL BALANCED DESIGN
    ========================================================== */
 
 .ml-balanced-hero {
@@ -11,43 +10,44 @@
 
     min-height: 650px !important;
 
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(420px, .95fr) !important;
+    display: flex !important;
     align-items: center !important;
 
-    gap: 20px !important;
-
-    padding: 76px clamp(20px, 5vw, 72px) 70px !important;
+    padding:
+        76px
+        clamp(20px, 5vw, 72px)
+        70px !important;
 
     background:
         radial-gradient(
-            circle at 82% 42%,
-            rgba(37,99,235,.10),
+            circle at 82% 45%,
+            rgba(59,130,246,.12),
             transparent 34%
         ),
         linear-gradient(
             135deg,
             #ffffff 0%,
-            #f8fbff 58%,
+            #f8fbff 60%,
             #eef5ff 100%
         ) !important;
 }
 
 /* ==========================================================
-   IMAGE
+   HERO IMAGE
    ========================================================== */
 
 .ml-balanced-hero .ml-hero-device-visual {
+
     position: absolute !important;
 
-    right: -20px !important;
+    z-index: 2 !important;
+
+    width: min(790px, 59vw) !important;
+
+    right: -25px !important;
     top: 50% !important;
 
-    width: min(760px, 58vw) !important;
-
     transform: translateY(-50%) !important;
-
-    z-index: 1 !important;
 
     pointer-events: none !important;
 
@@ -55,6 +55,7 @@
 }
 
 .ml-balanced-hero .ml-hero-device-visual img {
+
     display: block !important;
 
     width: 100% !important;
@@ -62,107 +63,291 @@
 
     max-width: none !important;
 
+    opacity: .98 !important;
+
     mix-blend-mode: multiply !important;
 
-    opacity: .97 !important;
-
     filter:
-        drop-shadow(0 28px 50px rgba(15,23,42,.16))
-        saturate(.98) !important;
+        drop-shadow(
+            0 28px 48px rgba(15,23,42,.15)
+        ) !important;
 }
 
 /* ==========================================================
-   LIGHT FADE — TEXT REMAINS EASY TO READ
+   LEFT HERO INFORMATION
    ========================================================== */
 
-.ml-balanced-hero::before {
+.ml-balanced-hero .ml-hero-copy {
+
+    position: relative !important;
+
+    z-index: 20 !important;
+
+    width: min(650px, 52%) !important;
+
+    margin-right: auto !important;
+
+    text-align: left !important;
+
+    padding: 10px 0 !important;
+}
+
+/* Badge */
+
+.ml-hero-badge {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    gap: 9px !important;
+
+    padding:
+        8px
+        13px !important;
+
+    margin-bottom: 20px !important;
+
+    border:
+        1px solid
+        rgba(37,99,235,.18) !important;
+
+    border-radius: 999px !important;
+
+    background:
+        rgba(255,255,255,.78) !important;
+
+    color: #2563eb !important;
+
+    font-size: 13px !important;
+
+    font-weight: 700 !important;
+
+    letter-spacing: .01em !important;
+
+    box-shadow:
+        0 5px 18px rgba(37,99,235,.08) !important;
+
+    backdrop-filter: blur(10px) !important;
+}
+
+.ml-badge-dot {
+
+    width: 8px !important;
+    height: 8px !important;
+
+    border-radius: 50% !important;
+
+    background: #16a34a !important;
+
+    box-shadow:
+        0 0 0 4px rgba(22,163,74,.10) !important;
+}
+
+/* Heading */
+
+.ml-balanced-hero .ml-hero-copy h1 {
+
+    margin:
+        0
+        0
+        22px !important;
+
+    max-width: 680px !important;
+
+    color: #0f172a !important;
+
+    font-size:
+        clamp(2.7rem, 5vw, 4.6rem) !important;
+
+    line-height: 1.02 !important;
+
+    letter-spacing: -.045em !important;
+
+    font-weight: 800 !important;
+}
+
+.ml-balanced-hero .ml-hero-copy h1 span {
+
+    display: block !important;
+
+    color: #2563eb !important;
+}
+
+/* Description */
+
+.ml-balanced-hero .ml-hero-description {
+
+    max-width: 620px !important;
+
+    margin:
+        0
+        0
+        30px !important;
+
+    color: #64748b !important;
+
+    font-size: 17px !important;
+
+    line-height: 1.7 !important;
+}
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
+
+.ml-hero-actions {
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    flex-wrap: wrap !important;
+
+    gap: 12px !important;
+
+    margin-bottom: 27px !important;
+}
+
+.ml-hero-primary,
+.ml-hero-secondary {
+
+    min-height: 50px !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 10px !important;
+
+    padding:
+        0
+        19px !important;
+
+    border-radius: 12px !important;
+
+    text-decoration: none !important;
+
+    font-size: 14px !important;
+
+    font-weight: 700 !important;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease !important;
+}
+
+.ml-hero-primary {
+
+    color: #ffffff !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        ) !important;
+
+    box-shadow:
+        0 10px 25px rgba(37,99,235,.22) !important;
+}
+
+.ml-hero-secondary {
+
+    color: #0f172a !important;
+
+    background: #ffffff !important;
+
+    border:
+        1px solid #dbe3ef !important;
+
+    box-shadow:
+        0 8px 20px rgba(15,23,42,.06) !important;
+}
+
+.ml-hero-primary:hover,
+.ml-hero-secondary:hover {
+
+    transform: translateY(-2px) !important;
+}
+
+/* ==========================================================
+   SECURITY INFORMATION
+   ========================================================== */
+
+.ml-hero-security-row {
+
+    display: flex !important;
+
+    flex-wrap: wrap !important;
+
+    align-items: center !important;
+
+    gap:
+        10px
+        18px !important;
+
+    color: #64748b !important;
+
+    font-size: 12px !important;
+
+    font-weight: 600 !important;
+}
+
+.ml-security-item {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+}
+
+.ml-security-item i {
+
+    color: #2563eb !important;
+
+    font-size: 13px !important;
+}
+
+/* ==========================================================
+   IMAGE BLEND
+   ========================================================== */
+
+.ml-balanced-hero::after {
+
     content: "" !important;
 
     position: absolute !important;
+
     inset: 0 !important;
 
-    z-index: 2 !important;
+    z-index: 5 !important;
 
     pointer-events: none !important;
 
     background:
         linear-gradient(
             90deg,
-            rgba(255,255,255,1) 0%,
-            rgba(255,255,255,.98) 28%,
-            rgba(255,255,255,.88) 43%,
-            rgba(255,255,255,.38) 62%,
-            rgba(255,255,255,0) 82%
+            rgba(255,255,255,.98) 0%,
+            rgba(255,255,255,.96) 28%,
+            rgba(255,255,255,.72) 45%,
+            rgba(255,255,255,.22) 66%,
+            rgba(255,255,255,0) 84%
         ) !important;
 }
 
-/* ==========================================================
-   EXISTING HERO CONTENT
-   NEVER HIDE IT
-   ========================================================== */
+/* Copy stays above fade */
+.ml-balanced-hero .ml-hero-copy {
 
-.ml-balanced-hero > *:not(.ml-hero-device-visual) {
-    position: relative !important;
-    z-index: 10 !important;
+    z-index: 30 !important;
 }
 
-/* Main hero text */
-.ml-balanced-hero h1,
-.ml-balanced-hero h2,
-.ml-balanced-hero p,
-.ml-balanced-hero a,
-.ml-balanced-hero button,
-.ml-balanced-hero .hero-content,
-.ml-balanced-hero .hero-copy,
-.ml-balanced-hero .hero-text,
-.ml-balanced-hero .hero-actions,
-.ml-balanced-hero .hero-buttons {
-    position: relative !important;
-    z-index: 11 !important;
-}
+/* Image stays behind fade */
+.ml-balanced-hero .ml-hero-device-visual {
 
-/* Give the actual text a readable width */
-.ml-balanced-hero h1 {
-    max-width: 700px !important;
-}
-
-.ml-balanced-hero p {
-    max-width: 650px !important;
-}
-
-/* ==========================================================
-   HERO IMAGE DECORATIVE EDGE
-   ========================================================== */
-
-.ml-balanced-hero .ml-hero-device-visual::after {
-    content: "" !important;
-
-    position: absolute !important;
-
-    width: 260px !important;
-    height: 260px !important;
-
-    right: 20% !important;
-    top: 25% !important;
-
-    border-radius: 50% !important;
-
-    background: rgba(37,99,235,.08) !important;
-
-    filter: blur(60px) !important;
-
-    z-index: -1 !important;
-}
-
-/* ==========================================================
-   DESKTOP HEADER BALANCE
-   ========================================================== */
-
-header,
-.site-header,
-.navbar {
-    position: relative !important;
-    z-index: 100 !important;
+    z-index: 3 !important;
 }
 
 /* ==========================================================
@@ -172,23 +357,32 @@ header,
 @media (max-width: 1000px) and (min-width: 769px) {
 
     .ml-balanced-hero {
-        grid-template-columns: 1fr 1fr !important;
 
         min-height: 590px !important;
 
-        padding-left: 32px !important;
-        padding-right: 20px !important;
+        padding-left: 35px !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy {
+
+        width: 56% !important;
     }
 
     .ml-balanced-hero .ml-hero-device-visual {
-        width: 58vw !important;
-        right: -55px !important;
+
+        width: 57vw !important;
+
+        right: -70px !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy h1 {
+
+        font-size: 3.1rem !important;
     }
 }
 
 /* ==========================================================
-   MOBILE
-   IMAGE FIRST
+   MOBILE — IMAGE FIRST
    ========================================================== */
 
 @media (max-width: 768px) {
@@ -208,23 +402,21 @@ header,
             0
             45px !important;
 
-        gap: 0 !important;
-
         background:
             linear-gradient(
                 180deg,
-                #f8fbff 0%,
-                #ffffff 55%,
-                #ffffff 100%
+                #f5f9ff 0%,
+                #ffffff 60%
             ) !important;
     }
 
-    /* IMAGE IS PHYSICALLY FIRST */
+    /* IMAGE FIRST */
+
     .ml-balanced-hero .ml-hero-device-visual {
 
-        order: -100 !important;
-
         position: relative !important;
+
+        order: -100 !important;
 
         top: auto !important;
         right: auto !important;
@@ -235,8 +427,6 @@ header,
 
         margin: 0 !important;
 
-        padding: 0 !important;
-
         z-index: 3 !important;
     }
 
@@ -246,108 +436,127 @@ header,
 
         height: auto !important;
 
-        display: block !important;
-
         mix-blend-mode: multiply !important;
 
-        opacity: 1 !important;
-
         filter:
-            drop-shadow(0 18px 35px rgba(15,23,42,.12)) !important;
+            drop-shadow(
+                0 16px 32px rgba(15,23,42,.10)
+            ) !important;
     }
 
-    /* TEXT COMES UNDER IMAGE */
-    .ml-balanced-hero > *:not(.ml-hero-device-visual) {
+    /* COPY AFTER IMAGE */
+
+    .ml-balanced-hero .ml-hero-copy {
 
         order: 10 !important;
 
-        position: relative !important;
+        width: auto !important;
 
-        z-index: 10 !important;
+        margin: 0 !important;
+
+        padding:
+            20px
+            20px
+            0 !important;
+
+        z-index: 30 !important;
     }
 
-    /* Mobile fade */
-    .ml-balanced-hero::before {
+    .ml-balanced-hero .ml-hero-copy h1 {
+
+        font-size:
+            clamp(2.25rem, 10vw, 3.3rem) !important;
+
+        line-height: 1.04 !important;
+
+        letter-spacing: -.04em !important;
+    }
+
+    .ml-balanced-hero .ml-hero-description {
+
+        font-size: 15.5px !important;
+
+        line-height: 1.65 !important;
+
+        margin-bottom: 24px !important;
+    }
+
+    .ml-hero-badge {
+
+        font-size: 11.5px !important;
+
+        margin-bottom: 16px !important;
+    }
+
+    .ml-hero-actions {
+
+        flex-direction: column !important;
+
+        align-items: stretch !important;
+
+        width: 100% !important;
+    }
+
+    .ml-hero-primary,
+    .ml-hero-secondary {
+
+        width: 100% !important;
+
+        min-height: 50px !important;
+    }
+
+    .ml-hero-security-row {
+
+        display: grid !important;
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr)) !important;
+
+        gap: 12px !important;
+
+        margin-top: 5px !important;
+    }
+
+    /* Mobile fade only affects image */
+    .ml-balanced-hero::after {
 
         top: 0 !important;
-        bottom: auto !important;
 
-        height: 45% !important;
+        height: 42% !important;
+
+        bottom: auto !important;
 
         background:
             linear-gradient(
                 180deg,
                 rgba(255,255,255,0) 0%,
-                rgba(255,255,255,.03) 40%,
-                rgba(255,255,255,.75) 92%,
+                rgba(255,255,255,.05) 55%,
+                rgba(255,255,255,.82) 96%,
                 rgba(255,255,255,1) 100%
             ) !important;
-    }
-
-    .ml-balanced-hero h1 {
-
-        font-size:
-            clamp(2.1rem, 9vw, 3rem) !important;
-
-        line-height: 1.05 !important;
-
-        margin-top: 15px !important;
-    }
-
-    .ml-balanced-hero p {
-
-        font-size: 1rem !important;
-
-        line-height: 1.65 !important;
-    }
-
-    .ml-balanced-hero .hero-content,
-    .ml-balanced-hero .hero-copy,
-    .ml-balanced-hero .hero-text {
-
-        padding-left: 20px !important;
-        padding-right: 20px !important;
-    }
-
-    .ml-balanced-hero .hero-actions,
-    .ml-balanced-hero .hero-buttons {
-
-        padding-left: 20px !important;
-        padding-right: 20px !important;
     }
 }
 
 /* ==========================================================
-   SMALL PHONE
+   SMALL PHONES
    ========================================================== */
 
 @media (max-width: 480px) {
 
-    .ml-balanced-hero .ml-hero-device-visual {
-
-        width: 100% !important;
-
-        margin: 0 !important;
-    }
-
-    .ml-balanced-hero h1 {
-
-        font-size: 2.15rem !important;
-    }
-
-    .ml-balanced-hero .hero-content,
-    .ml-balanced-hero .hero-copy,
-    .ml-balanced-hero .hero-text {
+    .ml-balanced-hero .ml-hero-copy {
 
         padding-left: 16px !important;
         padding-right: 16px !important;
     }
 
-    .ml-balanced-hero .hero-actions,
-    .ml-balanced-hero .hero-buttons {
+    .ml-balanced-hero .ml-hero-copy h1 {
 
-        padding-left: 16px !important;
-        padding-right: 16px !important;
+        font-size: 2.25rem !important;
+    }
+
+    .ml-hero-security-row {
+
+        grid-template-columns: 1fr !important;
     }
 }
 
@@ -360,28 +569,74 @@ body.dark .ml-balanced-hero {
 
     background:
         radial-gradient(
-            circle at 80% 35%,
-            rgba(99,102,241,.14),
+            circle at 80% 42%,
+            rgba(99,102,241,.16),
             transparent 36%
         ),
         linear-gradient(
             135deg,
-            #0b0f19 0%,
-            #111827 100%
+            #0b0f19,
+            #111827
         ) !important;
 }
 
-html.dark .ml-balanced-hero::before,
-body.dark .ml-balanced-hero::before {
+html.dark .ml-balanced-hero .ml-hero-copy h1,
+body.dark .ml-balanced-hero .ml-hero-copy h1 {
+
+    color: #ffffff !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-copy h1 span,
+body.dark .ml-balanced-hero .ml-hero-copy h1 span {
+
+    color: #60a5fa !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-description,
+body.dark .ml-balanced-hero .ml-hero-description {
+
+    color: #94a3b8 !important;
+}
+
+html.dark .ml-hero-badge,
+body.dark .ml-hero-badge {
+
+    color: #60a5fa !important;
+
+    background:
+        rgba(30,41,59,.75) !important;
+
+    border-color:
+        rgba(96,165,250,.22) !important;
+}
+
+html.dark .ml-hero-secondary,
+body.dark .ml-hero-secondary {
+
+    color: #ffffff !important;
+
+    background: #1e293b !important;
+
+    border-color: #334155 !important;
+}
+
+html.dark .ml-security-item,
+body.dark .ml-security-item {
+
+    color: #94a3b8 !important;
+}
+
+html.dark .ml-balanced-hero::after,
+body.dark .ml-balanced-hero::after {
 
     background:
         linear-gradient(
             90deg,
             rgba(11,15,25,1) 0%,
-            rgba(11,15,25,.98) 28%,
-            rgba(11,15,25,.82) 48%,
-            rgba(11,15,25,.30) 70%,
-            rgba(11,15,25,0) 90%
+            rgba(11,15,25,.97) 28%,
+            rgba(11,15,25,.78) 48%,
+            rgba(11,15,25,.24) 70%,
+            rgba(11,15,25,0) 88%
         ) !important;
 }
 
@@ -392,30 +647,27 @@ body.dark .ml-balanced-hero .ml-hero-device-visual img {
 
     filter:
         drop-shadow(0 25px 45px rgba(0,0,0,.45))
-        brightness(.88)
-        saturate(.9) !important;
+        brightness(.88) !important;
 }
 
 @media (max-width: 768px) {
 
-    html.dark .ml-balanced-hero::before,
-    body.dark .ml-balanced-hero::before {
-
-        height: 45% !important;
+    html.dark .ml-balanced-hero::after,
+    body.dark .ml-balanced-hero::after {
 
         background:
             linear-gradient(
                 180deg,
                 rgba(11,15,25,0) 0%,
-                rgba(11,15,25,.04) 40%,
-                rgba(11,15,25,.80) 92%,
+                rgba(11,15,25,.04) 55%,
+                rgba(11,15,25,.82) 96%,
                 rgba(11,15,25,1) 100%
             ) !important;
     }
 }
 
 /* ==========================================================
-   ACCESSIBILITY
+   REDUCED MOTION
    ========================================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -426,6 +678,5 @@ body.dark .ml-balanced-hero .ml-hero-device-visual img {
 
         animation: none !important;
         transition: none !important;
-        scroll-behavior: auto !important;
     }
 }
