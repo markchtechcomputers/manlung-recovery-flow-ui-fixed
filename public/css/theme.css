@@ -1,0 +1,408 @@
+/* Manlung Recovery — clean, independent header styling */
+html, body { min-width: 0; }
+html { overflow-x: hidden; }
+
+/* Header foundation: clean white surface, no decorative frame. */
+html body .site-header,
+html body .site-header::before,
+html body .site-header::after {
+  width: 100% !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  background: #fff !important;
+  color: #000 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  background-image: none !important;
+}
+
+html body .site-header .container {
+  width: 100% !important;
+  max-width: 1440px !important;
+  min-width: 0 !important;
+  min-height: 78px !important;
+  margin: 0 auto !important;
+  padding: 14px 40px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 42px !important;
+  flex-wrap: nowrap !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html body .site-header .container::before,
+html body .site-header .container::after,
+html body .site-header .brand::before,
+html body .site-header .brand::after,
+html body .site-header .header-actions::before,
+html body .site-header .header-actions::after,
+html body .site-header .header-actions a::before,
+html body .site-header .header-actions a::after,
+html body .site-header .header-actions button::before,
+html body .site-header .header-actions button::after {
+  content: none !important;
+  display: none !important;
+}
+
+html body .site-header .brand {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html body .site-header .brand .manlung-home-logo,
+html body .site-header .brand .manlung-site-logo {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html body .site-header .brand .manlung-home-logo {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  flex: 0 0 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html body .site-header .brand .manlung-site-logo {
+  width: 44px !important;
+  height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  object-fit: contain !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html body .site-header .brand h1,
+html body .site-header .brand span {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+html body .site-header .brand h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #000 !important;
+  font-size: clamp(1.05rem, 1.55vw, 1.38rem) !important;
+  line-height: 1.15 !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+
+html body .site-header .brand h1 i {
+  color: #000 !important;
+  margin: 0 6px 0 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+html body .site-header .brand span {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #000 !important;
+  font-size: clamp(.68rem, .9vw, .82rem) !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+html body .site-header .header-actions {
+  min-width: 0 !important;
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 30px !important;
+  flex-wrap: nowrap !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html body .site-header .header-actions > *,
+html body .site-header .header-actions a,
+html body .site-header .header-actions button,
+html body .site-header .header-actions .btn,
+html body .site-header .header-actions .btn-outline,
+html body .site-header .header-actions .btn-primary {
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  align-self: center !important;
+  vertical-align: middle !important;
+  margin: 0 !important;
+  padding: 5px 0 !important;
+  box-sizing: border-box !important;
+  color: #000 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  text-shadow: none !important;
+  filter: none !important;
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+  text-decoration: none !important;
+  font-size: .86rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  transform: none !important;
+}
+
+html body .site-header .header-actions a span,
+html body .site-header .header-actions button span,
+html body .site-header .header-actions .btn span {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+html body .site-header .header-actions a:hover,
+html body .site-header .header-actions a:focus,
+html body .site-header .header-actions a:focus-visible,
+html body .site-header .header-actions a:active,
+html body .site-header .header-actions button:hover,
+html body .site-header .header-actions button:focus,
+html body .site-header .header-actions button:focus-visible,
+html body .site-header .header-actions button:active,
+html body .site-header .header-actions .btn:hover,
+html body .site-header .header-actions .btn:focus,
+html body .site-header .header-actions .btn:focus-visible,
+html body .site-header .header-actions .btn:active {
+  color: #000 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  text-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+html body .site-header .header-actions a:hover i,
+html body .site-header .header-actions a:focus i,
+html body .site-header .header-actions a:focus-visible i,
+html body .site-header .header-actions a:active i,
+html body .site-header .header-actions button:hover i,
+html body .site-header .header-actions button:focus i,
+html body .site-header .header-actions button:focus-visible i,
+html body .site-header .header-actions button:active i,
+html body .site-header .header-actions .btn:hover i,
+html body .site-header .header-actions .btn:focus i,
+html body .site-header .header-actions .btn:focus-visible i,
+html body .site-header .header-actions .btn:active i {
+  color: #000 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+html body .site-header .header-actions a i,
+html body .site-header .header-actions button i,
+html body .site-header .header-actions .btn i,
+html body .site-header .header-actions svg {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #000 !important;
+  fill: currentColor !important;
+  width: 1em !important;
+  height: 1em !important;
+  min-width: 1em !important;
+  min-height: 1em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 1em !important;
+  line-height: 1 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  text-shadow: none !important;
+  transform: none !important;
+  vertical-align: middle !important;
+  flex: 0 0 auto !important;
+}
+
+html body .site-header .header-actions a i::before,
+html body .site-header .header-actions button i::before,
+html body .site-header .header-actions .btn i::before { vertical-align: middle !important; }
+
+html body .site-header .header-actions button[data-theme-toggle="true"] {
+  width: auto !important;
+  height: 34px !important;
+  min-width: 0 !important;
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding: 5px 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #000 !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+  align-self: center !important;
+  vertical-align: middle !important;
+}
+
+html body .site-header .header-actions button[data-theme-toggle="true"]::before,
+html body .site-header .header-actions button[data-theme-toggle="true"]::after { content: none !important; display: none !important; }
+
+html.dark body .site-header,
+body.dark .site-header { background: #111 !important; color: #fff !important; }
+html.dark body .site-header .brand h1,
+html.dark body .site-header .brand span,
+html.dark body .site-header .brand h1 i,
+html.dark body .site-header .header-actions a,
+html.dark body .site-header .header-actions button,
+html.dark body .site-header .header-actions .btn,
+html.dark body .site-header .header-actions a i,
+html.dark body .site-header .header-actions button i,
+html.dark body .site-header .header-actions .btn i,
+body.dark .site-header .brand h1,
+body.dark .site-header .brand span,
+body.dark .site-header .brand h1 i,
+body.dark .site-header .header-actions a,
+body.dark .site-header .header-actions button,
+body.dark .site-header .header-actions .btn,
+body.dark .site-header .header-actions a i,
+body.dark .site-header .header-actions button i,
+body.dark .site-header .header-actions .btn i { color: #fff !important; }
+
+@media (max-width: 1100px) and (min-width: 701px) {
+  html body .site-header .container { padding-left: 22px !important; padding-right: 22px !important; gap: 24px !important; }
+  html body .site-header .header-actions { gap: 21px !important; }
+  html body .site-header .header-actions a,
+  html body .site-header .header-actions button,
+  html body .site-header .header-actions .btn { font-size: .78rem !important; }
+}
+
+@media (max-width: 700px) {
+  html body .site-header .container {
+    min-height: 0 !important;
+    padding: 10px 14px 8px !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
+  html body .site-header .brand {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+    gap: 10px !important;
+  }
+  html body .site-header .brand .manlung-home-logo,
+  html body .site-header .brand .manlung-site-logo {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    flex-basis: 40px !important;
+  }
+  html body .site-header .brand h1 { font-size: .98rem !important; }
+  html body .site-header .brand span { font-size: .62rem !important; white-space: normal !important; }
+  html body .site-header .header-actions {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    align-content: center !important;
+    gap: 22px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    flex-wrap: nowrap !important;
+    height: 40px !important;
+    padding: 2px 0 4px !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  html body .site-header .header-actions::-webkit-scrollbar { display: none !important; }
+  html body .site-header .header-actions > *,
+  html body .site-header .header-actions a,
+  html body .site-header .header-actions button,
+  html body .site-header .header-actions .btn {
+    flex: 0 0 auto !important;
+    align-self: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    margin: 0 !important;
+    padding: 5px 0 !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+  }
+  html body .site-header .header-actions a span,
+  html body .site-header .header-actions button span,
+  html body .site-header .header-actions .btn span { height: 100% !important; line-height: 1 !important; }
+  html body .site-header .header-actions a,
+  html body .site-header .header-actions button,
+  html body .site-header .header-actions .btn { font-size: .74rem !important; font-weight: 800 !important; }
+  html body .site-header .header-actions button[data-theme-toggle="true"] {
+    height: 34px !important;
+    min-height: 34px !important;
+    align-self: center !important;
+    padding: 5px 0 !important;
+    font-size: .74rem !important;
+    font-weight: 800 !important;
+  }
+}
+
+@media (max-width: 420px) {
+  html body .site-header .container { padding-left: 12px !important; padding-right: 12px !important; }
+  html body .site-header .brand h1 { font-size: .9rem !important; }
+  html body .site-header .brand span { font-size: .58rem !important; }
+  html body .site-header .header-actions { gap: 18px !important; height: 38px !important; }
+  html body .site-header .header-actions a,
+  html body .site-header .header-actions button,
+  html body .site-header .header-actions .btn { font-size: .69rem !important; height: 32px !important; min-height: 32px !important; }
+  html body .site-header .header-actions button[data-theme-toggle="true"] { height: 32px !important; min-height: 32px !important; font-size: .69rem !important; }
+}

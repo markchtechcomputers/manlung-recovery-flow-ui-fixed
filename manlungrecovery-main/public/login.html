@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+    <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Login · Manlung Recovery</title>
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .auth-wrap { min-height: calc(100vh - 90px); display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+        .auth-card { max-width: 420px; width: 100%; }
+        .toggle-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .toggle-row button {
+            flex: 1; padding: 0.6rem; border-radius: var(--radius-md); border: 1px solid var(--card-border);
+            background: var(--page-bg); color: var(--text-muted); font-weight: 600; cursor: pointer;
+        }
+        .toggle-row button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .social-row { display:grid; gap:.55rem; margin:.9rem 0 1rem; }
+        .social-btn { width:100%; justify-content:center; }
+        .auth-divider { display:flex; align-items:center; gap:.7rem; color:var(--text-muted); font-size:.8rem; margin:.8rem 0; }
+        .auth-divider::before,.auth-divider::after { content:""; flex:1; height:1px; background:var(--card-border); }
+    
+.social-btn{position:relative;min-height:46px;font-weight:700;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}.social-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(15,23,42,.12)}.social-btn .fab{font-size:1.05rem;margin-right:.35rem}.social-btn.is-loading{opacity:.7;pointer-events:none}
+</style>
+<style id="manlung-footer-style">
+.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:#06101d;border-top:1px solid rgba(255,255,255,.08);color:#dbeafe}
+.manlung-footer-inner{max-width:1000px;margin:auto}
+.manlung-footer-brand{text-align:center;margin-bottom:1rem}
+.manlung-footer-brand h2{margin:0 0 .3rem;font-size:clamp(1rem,1.7vw,1.25rem);color:#fff}
+.manlung-footer-brand p{margin:0;color:#94a3b8;font-size:.8rem}
+.manlung-footer-links{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1rem 0}
+.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.manlung-footer-link:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#fff}
+.manlung-footer-link:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
+.manlung-footer-link:active{background:rgba(255,255,255,.1)}
+.manlung-footer-bottom{padding-top:.7rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;color:#64748b;font-size:.7rem}
+.manlung-footer-bottom strong{color:#94a3b8}
+@media(max-width:900px){.manlung-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}}
+@media(max-width:380px){.manlung-footer-links{grid-template-columns:1fr}}
+</style>
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:
+    linear-gradient(135deg,rgba(15,23,42,.98),rgba(17,35,56,.98)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 64px);
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 4px 18px rgba(2,6,23,.22);
+}
+.site-header .container{
+  max-width:1180px;
+  margin:0 auto;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.55rem .8rem;
+}
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  min-width:0;
+}
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.05rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+.site-header .brand span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.72rem;
+  white-space:nowrap;
+}
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  min-height:38px;
+  padding:.45rem .68rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:700;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.35);
+  color:#fff;
+}
+.site-header .header-actions .btn-primary{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.site-header .header-actions .btn-primary:hover{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+}
+@media(max-width:900px){
+  .site-header .container{
+    min-height:58px;
+    padding:.45rem .7rem;
+  }
+  .site-header .brand h1{
+    font-size:.95rem;
+  }
+  .site-header .brand span{
+    font-size:.64rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:36px;
+    padding:.4rem .55rem;
+    font-size:.7rem;
+  }
+}
+@media(max-width:700px){
+  .site-header .container{
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+  .site-header .brand{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+  .site-header .brand span{
+    white-space:normal;
+  }
+  .site-header .header-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.35rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:38px;
+    padding:.35rem .2rem;
+    font-size:.68rem;
+  }
+}
+@media(max-width:480px){
+  .site-header .header-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
+  }
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    display:block;
+    font-size:1rem;
+    line-height:1;
+    margin:0;
+  }
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
+  }
+}
+@media(max-width:360px){
+  .site-header .brand h1{
+    font-size:.86rem;
+  }
+  .site-header .brand span{
+    font-size:.58rem;
+  }
+}
+</style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+  <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                
+<img
+  class="manlung-site-logo"
+  src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
+  alt="Manlung Recovery"
+>
+<h1><i class="fas fa-shield-halved"></i> Manlung Recovery</h1>
+                <span>Client Access</span>
+            </div>
+            <div class="header-actions">
+                <a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="auth-wrap">
+        <div class="card auth-card">
+            <div class="toggle-row">
+                <button id="tabLogin" class="active" onclick="showTab('login')">Sign In</button>
+                <button id="tabRegister" onclick="showTab('register')">Create Account</button>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required></div>
+                <div class="form-group"><label>Password</label><input type="password" id="loginPassword" required></div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Sign In
+                </button>
+                <div class="auth-divider">or continue with</div>
+                <div class="social-row">
+                    <button type="button" class="btn btn-outline-dark social-btn" onclick="startSocialSignup('google')"><i class="fab fa-google"></i> Continue with Google</button>
+                    <button type="button" class="btn btn-outline-dark social-btn" onclick="startSocialSignup('github')"><i class="fab fa-github"></i> Continue with GitHub</button>
+                </div>
+                <div id="loginError" class="error-text"></div>
+                <p style="text-align:center; margin-top:0.8rem;">
+                    <a href="#" onclick="showForgot(event)" style="color:var(--accent); font-size:0.85rem; text-decoration:none;">Forgot password?</a>
+                </p>
+            </form>
+
+            <form id="forgotForm" onsubmit="handleForgot(event)" style="display:none;">
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Enter your account email and we'll generate a reset link.</p>
+                <div class="form-group"><label>Email</label><input type="email" id="forgotEmail" required></div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-paper-plane"></i> Send Reset Link
+                </button>
+                <div id="forgotError" class="error-text"></div>
+                <div id="forgotResult" style="display:none; font-size:0.85rem; margin-top:0.8rem;"></div>
+                <p style="text-align:center; margin-top:0.8rem;">
+                    <a href="#" onclick="showTab('login')" style="color:var(--accent); font-size:0.85rem; text-decoration:none;">Back to sign in</a>
+                </p>
+            </form>
+
+            <form id="registerForm" onsubmit="handleRegister(event)" style="display:none;">
+                <div class="form-group"><label>Full Name</label><input id="regName" required></div>
+                <div class="form-group"><label>Email</label><input type="email" id="regEmail" required></div>
+                <div class="form-group"><label>Phone Number</label><input id="regPhone" required></div>
+                <div class="form-group"><label>Password</label><input type="password" id="regPassword" required minlength="6"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                <div class="auth-divider">or continue with</div>
+                <div class="social-row">
+                    <button type="button" class="btn btn-outline-dark social-btn" onclick="startSocialSignup('google')"><i class="fab fa-google"></i> Continue with Google</button>
+                    <button type="button" class="btn btn-outline-dark social-btn" onclick="startSocialSignup('github')"><i class="fab fa-github"></i> Continue with GitHub</button>
+                </div>
+                <div id="registerError" class="error-text"></div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="manlung-footer">
+<div class="manlung-footer-inner">
+<div class="manlung-footer-brand">
+<h2>Cyber Recovery &amp; Digital Investigation Portal</h2>
+<p>Secure support, recovery guidance, digital awareness and responsible assistance.</p>
+</div>
+<nav class="manlung-footer-links" aria-label="Footer navigation">
+<a class="manlung-footer-link" href="/about.html">About</a>
+<a class="manlung-footer-link" href="/blog.html">Blog</a>
+<a class="manlung-footer-link" href="/careers.html">Careers</a>
+<a class="manlung-footer-link" href="/terms.html">Terms</a>
+<a class="manlung-footer-link" href="/login.html">Client Portal</a>
+<a class="manlung-footer-link" href="/client/request.html">New Recovery Request</a>
+</nav>
+<div class="manlung-footer-social" aria-label="Social media">
+<a class="manlung-footer-link" href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="Manlung Recovery on YouTube"><i class="fab fa-youtube"></i> YouTube</a>
+</div>
+<div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</div>
+</div>
+</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        function showTab(tab) {
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('forgotForm').style.display = 'none';
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+        }
+
+        function showForgot(event) {
+            event.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotForm').style.display = 'block';
+        }
+
+        async function handleForgot(event) {
+            event.preventDefault();
+            const email = document.getElementById('forgotEmail').value;
+            const errorEl = document.getElementById('forgotError');
+            const resultEl = document.getElementById('forgotResult');
+            errorEl.textContent = '';
+            resultEl.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/auth/client/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    resultEl.style.display = 'block';
+                    resultEl.style.color = 'var(--success)';
+                    resultEl.innerHTML = data.message;
+                    if (data.devResetLink) {
+                        resultEl.innerHTML += `<br><span style="color:var(--text-muted);">Dev mode (no email provider configured yet): <a href="${data.devResetLink}">${data.devResetLink}</a></span>`;
+                    }
+                } else {
+                    errorEl.textContent = data.error || 'Could not process request';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Could not reach the server (' + err.message + ').';
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            errorEl.textContent = '';
+
+            try {
+                const res = await fetch('/api/auth/client/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('clientToken', data.token);
+                    localStorage.setItem('clientUser', JSON.stringify(data.user));
+                    window.location.href = '/client/dashboard.html';
+                } else {
+                    errorEl.textContent = data.error || 'Invalid credentials';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Could not reach the server (' + err.message + '). Is it running?';
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const fullName = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const phone = document.getElementById('regPhone').value;
+            const password = document.getElementById('regPassword').value;
+            const errorEl = document.getElementById('registerError');
+            errorEl.textContent = '';
+
+            try {
+                const res = await fetch('/api/auth/client/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, email, phone, password }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('clientToken', data.token);
+                    localStorage.setItem('clientUser', JSON.stringify(data.user));
+                    window.location.href = '/client/dashboard.html';
+                } else {
+                    errorEl.textContent = data.error || 'Could not create account';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Could not reach the server (' + err.message + '). Is it running?';
+            }
+        }
+
+        async function startSocialSignup(provider) {
+            const errorEl = document.getElementById('loginError');
+            const registerErrorEl = document.getElementById('registerError');
+            const buttons = document.querySelectorAll(`.social-btn[onclick=\"startSocialSignup('${provider}')\"]`);
+            errorEl.textContent = '';
+            registerErrorEl.textContent = '';
+            buttons.forEach(btn => {
+                btn.classList.add('is-loading');
+                btn.dataset.originalText = btn.innerHTML;
+                btn.innerHTML = '<i class=\"fas fa-spinner fa-spin\"></i> Connecting…';
+            });
+
+            try {
+                const configRes = await fetch('/api/config/public', { cache: 'no-store' });
+                if (!configRes.ok) throw new Error('Could not load authentication settings.');
+                const config = await configRes.json();
+
+                if (!config.supabaseUrl || !config.supabaseAnonKey) {
+                    throw new Error('Social sign-in is not configured yet. Please try again later.');
+                }
+                if (!window.supabase) throw new Error('Authentication library could not be loaded.');
+
+                const client = window.supabase.createClient(
+                    config.supabaseUrl,
+                    config.supabaseAnonKey,
+                    {
+                        auth: {
+                            persistSession: true,
+                            autoRefreshToken: true,
+                            detectSessionInUrl: true,
+                            flowType: 'implicit'
+                        }
+                    }
+                );
+
+                const { error } = await client.auth.signInWithOAuth({
+                    provider,
+                    options: {
+                        redirectTo: 'https://manlungrecovery.manlungshop.co.ke/oauth-callback.html'
+                    }
+                });
+
+                if (error) throw error;
+            } catch (err) {
+                const message = err?.message || 'Could not start social sign-in.';
+                errorEl.textContent = message;
+                registerErrorEl.textContent = message;
+                buttons.forEach(btn => {
+                    btn.classList.remove('is-loading');
+                    btn.innerHTML = btn.dataset.originalText || btn.innerHTML;
+                });
+            }
+        }
+
+        // Remember logins: if a valid session already exists, skip straight to the dashboard
+        (async function autoLogin() {
+            const token = localStorage.getItem('clientToken');
+            if (!token) return;
+            try {
+                const res = await fetch('/api/auth/verify', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                if (data.success && data.user.role === 'client') {
+                    window.location.href = '/client/dashboard.html';
+                }
+            } catch (e) { /* server unreachable — just stay on the login page */ }
+        })();
+    </script>
+<script src="/js/pwa.js" defer></script>
+</body>
+</html>

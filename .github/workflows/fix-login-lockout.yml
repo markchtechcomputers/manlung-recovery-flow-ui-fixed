@@ -1,0 +1,38 @@
+name: Enforce login lockout policy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  enforce-lockout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify per-account lockout implementation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          user = Path('models/User.js').read_text()
+          server = Path('server.js').read_text()
+          required_user = [
+              'MAX_LOGIN_FAILURES = 3',
+              'LOCKOUT_YEARS = 132',
+              'login_locked_until',
+              'failed_login_attempts',
+          ]
+          for marker in required_user:
+              if marker not in user:
+                  raise SystemExit(f'Missing required lockout marker: {marker}')
+          if 'const loginLimiter = rateLimit' in server and '/api/auth/admin/login' in server:
+              raise SystemExit('Conflicting short-window login limiter detected in server.js')
+          print('Per-account persistent 3-attempt / 132-year lockout policy verified.')
+          PY

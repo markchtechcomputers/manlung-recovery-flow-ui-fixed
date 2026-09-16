@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+    <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login · Manlung Recovery</title>
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { background: var(--navy-900); }
+        .center-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-container { background: #101f42; border: 1px solid #223257; }
+        .login-container .logo h1 { color: #fff; }
+        .login-container .logo span { color: #a9c0ec; }
+        .login-container label { color: #a9c0ec; }
+        .login-container input { background: #0b1730; border-color: #223257; color: #e6ecf5; }
+        .footer-text { text-align: center; margin-top: 1.5rem; color: #6b7a99; font-size: 0.8rem; }
+    </style>
+<style id="manlung-footer-style">
+.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:#06101d;border-top:1px solid rgba(255,255,255,.08);color:#dbeafe}
+.manlung-footer-inner{max-width:1000px;margin:auto}
+.manlung-footer-brand{text-align:center;margin-bottom:1rem}
+.manlung-footer-brand h2{margin:0 0 .3rem;font-size:clamp(1rem,1.7vw,1.25rem);color:#fff}
+.manlung-footer-brand p{margin:0;color:#94a3b8;font-size:.8rem}
+.manlung-footer-links{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1rem 0}
+.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.manlung-footer-link:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#fff}
+.manlung-footer-link:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
+.manlung-footer-link:active{background:rgba(255,255,255,.1)}
+.manlung-footer-bottom{padding-top:.7rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;color:#64748b;font-size:.7rem}
+.manlung-footer-bottom strong{color:#94a3b8}
+@media(max-width:900px){.manlung-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}}
+@media(max-width:380px){.manlung-footer-links{grid-template-columns:1fr}}
+</style>
+  <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body>
+    <div class="center-wrap">
+        <div class="login-container">
+            <div class="logo">
+                <i class="fas fa-shield-halved"></i>
+                <h1>Admin Portal</h1>
+                <span>Manlung Recovery · Secure Access</span>
+                <div><span class="admin-badge"><i class="fas fa-lock"></i> Restricted</span></div>
+            </div>
+
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="adminUsername" placeholder="Enter username" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Login
+                </button>
+                <div id="loginError" class="error-text"></div>
+            </form>
+
+            <section id="adminMfaEnroll" style="display:none;margin-top:1rem;">
+                <div style="padding:1rem;border:1px solid rgba(110,168,255,.35);border-radius:14px;background:rgba(20,40,75,.35);">
+                    <h3 style="margin:0 0 .5rem;"><i class="fas fa-mobile-screen-button"></i> Set up your Authenticator</h3>
+                    <p style="font-size:.82rem;color:#a9c0ec;margin:.4rem 0 1rem;">Scan this QR code with Google Authenticator, Microsoft Authenticator, 1Password, or another TOTP app.</p>
+                    <div style="text-align:center;background:#fff;border-radius:12px;padding:12px;margin:0 auto 1rem;max-width:240px;">
+                        <img id="mfaQrCode" alt="Authenticator setup QR code" style="display:block;width:100%;height:auto;">
+                    </div>
+                    <p style="font-size:.72rem;color:#a9c0ec;word-break:break-all;">Can't scan? Secret: <strong id="mfaSecret"></strong></p>
+                    <form id="mfaEnrollForm" onsubmit="enableMfa(event)">
+                        <div class="form-group">
+                            <label><i class="fas fa-key"></i> Enter the 6-digit code</label>
+                            <input type="text" id="mfaEnrollCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="123456" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-shield-check"></i> Enable MFA &amp; Continue</button>
+                    </form>
+                    <p id="mfaEnrollStatus" class="error-text"></p>
+                    <div id="mfaRecoveryCodes" style="display:none;margin-top:1rem;"></div>
+                </div>
+            </section>
+
+            <form id="adminMfaForm" onsubmit="verifyMfaLogin(event)" style="display:none;margin-top:1rem;">
+                <div class="form-group">
+                    <label><i class="fas fa-shield-halved"></i> Authenticator code</label>
+                    <input type="text" id="adminMfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" required>
+                </div>
+                <p style="font-size:.78rem;color:#a9c0ec;margin:.4rem 0 .8rem;">Enter the current 6-digit code from your authenticator app, or one unused recovery code.</p>
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                    <i class="fas fa-check"></i> Verify &amp; Sign In
+                </button>
+                <button type="button" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:.5rem;" onclick="cancelMfaLogin()">Back</button>
+                <div id="mfaLoginError" class="error-text"></div>
+            </form>
+
+<p style="margin-top:.8rem;text-align:center;">
+  <a
+    href="#"
+    id="adminForgotPassword"
+    style="font-size:.82rem;"
+  >
+    Forgot your password?
+  </a>
+</p>
+
+<div
+  id="adminForgotBox"
+  style="display:none;margin-top:1rem;"
+>
+  <div class="form-group">
+    <label for="adminResetEmail">
+      Admin Email
+    </label>
+
+    <input
+      id="adminResetEmail"
+      type="email"
+      autocomplete="email"
+      placeholder="you@example.com"
+    >
+  </div>
+
+  <button
+    type="button"
+    class="btn btn-primary"
+    onclick="requestAdminReset()"
+  >
+    Send Reset Link
+  </button>
+
+  <p
+    id="adminResetStatus"
+    style="margin-top:.6rem;font-size:.78rem;"
+  ></p>
+</div>
+
+
+            <p style="text-align:center; margin-top:1rem;"><a href="/admin/register.html" style="color:#6ea8ff; font-size:0.85rem;">Have an Admin invitation? Create your account</a></p>
+            <div class="footer-text"><i class="fas fa-shield"></i> Protected by 256-bit encryption</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+    <script>
+        let pendingMfaTicket = null;
+        let mfaEnrollmentUser = null;
+
+        function showMfaEnrollment(user) {
+            mfaEnrollmentUser = user;
+            document.getElementById('adminLoginForm').style.display = 'none';
+            document.getElementById('adminForgotPassword').style.display = 'none';
+            document.getElementById('adminMfaEnroll').style.display = 'block';
+            document.getElementById('mfaEnrollStatus').textContent = 'Creating your secure authenticator setup…';
+            startMfaEnrollment();
+        }
+
+        async function startMfaEnrollment() {
+            const status = document.getElementById('mfaEnrollStatus');
+            try {
+                const response = await fetch('/api/auth/admin/mfa/setup', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    status.textContent = data.error || 'Could not start MFA enrollment.';
+                    return;
+                }
+                document.getElementById('mfaSecret').textContent = data.secret;
+                if (!data.otpAuthUri) {
+                    status.textContent = 'MFA setup returned no authenticator URI.';
+                    return;
+                }
+
+                if (!window.QRCode || typeof window.QRCode.toDataURL !== 'function') {
+                    status.textContent = 'QR generator could not be loaded. Please refresh the page and try again.';
+                    return;
+                }
+
+                try {
+                    const qr = await window.QRCode.toDataURL(
+                        data.otpAuthUri,
+                        {
+                            width: 220,
+                            margin: 2,
+                            errorCorrectionLevel: 'M'
+                        }
+                    );
+
+                    if (!qr || !qr.startsWith('data:image/')) {
+                        throw new Error('QR generator returned an invalid image.');
+                    }
+
+                    document.getElementById('mfaQrCode').src = qr;
+                    document.getElementById('mfaQrCode').style.display = 'block';
+                    status.textContent = 'Scan the QR code, then enter the current 6-digit code.';
+                    document.getElementById('mfaEnrollCode').focus();
+                } catch (qrError) {
+                    console.error('MFA QR generation error:', qrError);
+                    status.textContent = 'Could not generate the QR code. Use the secret shown below to add Manlung Recovery manually in your authenticator app.';
+                }
+            } catch (error) {
+                console.error('MFA enrollment error:', error);
+                status.textContent = 'Connection error while starting MFA enrollment.';
+            }
+        }
+
+        async function enableMfa(event) {
+            event.preventDefault();
+            const code = document.getElementById('mfaEnrollCode').value.trim();
+            const status = document.getElementById('mfaEnrollStatus');
+            if (!/^\d{6}$/.test(code)) {
+                status.textContent = 'Enter the 6-digit code from your authenticator app.';
+                return;
+            }
+            status.textContent = 'Verifying authenticator code…';
+            try {
+                const response = await fetch('/api/auth/admin/mfa/enable', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    status.textContent = data.error || 'Invalid authenticator code.';
+                    return;
+                }
+                const recovery = document.getElementById('mfaRecoveryCodes');
+                recovery.style.display = 'block';
+                recovery.innerHTML = '<strong>Save these recovery codes now.</strong><br><small>Each code can be used once.</small><pre style="white-space:pre-wrap;background:#0b1730;padding:.75rem;border-radius:8px;margin-top:.5rem;">' + data.recoveryCodes.join('\\n') + '</pre><button type="button" class="btn btn-primary" style="width:100%;justify-content:center;" onclick="finishMfaEnrollment()">Continue to Dashboard</button>';
+                status.textContent = 'MFA enabled successfully.';
+            } catch (error) {
+                console.error('MFA enable error:', error);
+                status.textContent = 'Connection error while enabling MFA.';
+            }
+        }
+
+        function finishMfaEnrollment() {
+            if (mfaEnrollmentUser) sessionStorage.setItem('adminUser', JSON.stringify({ ...mfaEnrollmentUser, mfa: true }));
+            window.location.href = '/admin/dashboard.html';
+        }
+
+        function showMfaStep() {
+            document.getElementById('adminLoginForm').style.display = 'none';
+            document.getElementById('adminForgotPassword').style.display = 'none';
+            document.getElementById('adminMfaForm').style.display = 'block';
+            document.getElementById('adminMfaCode').focus();
+        }
+
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const errorEl = document.getElementById('loginError');
+            errorEl.textContent = '';
+
+            try {
+                const response = await fetch('/api/auth/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ username, password }),
+                });
+                const data = await response.json();
+
+                if (data.success && data.mfaRequired) {
+                    pendingMfaTicket = data.mfaTicket;
+                    sessionStorage.setItem('adminUser', JSON.stringify(data.user));
+                    showMfaStep();
+                    return;
+                }
+
+                if (data.success) {
+                    if (data.mfaConfigured === false && data.user?.role === 'owner') {
+                        showMfaEnrollment(data.user);
+                        return;
+                    }
+                    sessionStorage.setItem('adminUser', JSON.stringify(data.user));
+                    window.location.href = '/admin/dashboard.html';
+                    return;
+                }
+
+                errorEl.textContent = data.error || 'Invalid credentials';
+            } catch (error) {
+                errorEl.textContent = 'Connection error. Please try again.';
+                console.error('Login error:', error);
+            }
+        }
+
+        async function verifyMfaLogin(event) {
+            event.preventDefault();
+            const code = document.getElementById('adminMfaCode').value.trim();
+            const errorEl = document.getElementById('mfaLoginError');
+            errorEl.textContent = '';
+
+            if (!pendingMfaTicket) {
+                errorEl.textContent = 'Your MFA session expired. Please start again.';
+                return;
+            }
+
+            if (!/^\d{6}$/.test(code) && !/^[A-Fa-f0-9]{10}$/.test(code)) {
+                errorEl.textContent = 'Enter the 6-digit authenticator code or a recovery code.';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/admin/mfa/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ mfaTicket: pendingMfaTicket, code }),
+                });
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    errorEl.textContent = data.error || 'Invalid authentication code.';
+                    return;
+                }
+
+                sessionStorage.setItem('adminUser', JSON.stringify(data.user));
+                pendingMfaTicket = null;
+                window.location.href = '/admin/dashboard.html';
+            } catch (error) {
+                errorEl.textContent = 'Connection error. Please try again.';
+            }
+        }
+
+        function cancelMfaLogin() {
+            pendingMfaTicket = null;
+            document.getElementById('adminMfaForm').style.display = 'none';
+            document.getElementById('adminLoginForm').style.display = 'block';
+            document.getElementById('adminForgotPassword').style.display = '';
+            document.getElementById('adminMfaCode').value = '';
+        }
+
+        fetch('/api/auth/verify', { credentials: 'include' }).then(async (res) => {
+            if (res.ok) window.location.href = '/admin/dashboard.html';
+        }).catch(() => {});
+    </script>
+<footer class="manlung-footer">
+<div class="manlung-footer-inner">
+<div class="manlung-footer-brand">
+<h2>Cyber Recovery &amp; Digital Investigation Portal</h2>
+<p>Secure support, recovery guidance, digital awareness and responsible assistance.</p>
+</div>
+<nav class="manlung-footer-links" aria-label="Footer navigation">
+<a class="manlung-footer-link" href="/about.html">About</a>
+<a class="manlung-footer-link" href="/blog.html">Blog</a>
+<a class="manlung-footer-link" href="/careers.html">Careers</a>
+<a class="manlung-footer-link" href="/terms.html">Terms</a>
+<a class="manlung-footer-link" href="/login.html">Client Portal</a>
+<a class="manlung-footer-link" href="/client/request.html">New Recovery Request</a>
+</nav>
+<div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</div>
+</div>
+</footer>
+
+<script id="admin-forgot-password-script">
+(function(){
+  const link =
+    document.getElementById('adminForgotPassword');
+
+  const box =
+    document.getElementById('adminForgotBox');
+
+  if(link && box){
+    link.addEventListener('click', function(event){
+      event.preventDefault();
+
+      box.style.display =
+        box.style.display === 'none'
+          ? 'block'
+          : 'none';
+    });
+  }
+})();
+
+async function requestAdminReset(){
+  const email =
+    document.getElementById('adminResetEmail')
+      ?.value
+      ?.trim();
+
+  const status =
+    document.getElementById('adminResetStatus');
+
+  if(!email){
+    if(status){
+      status.textContent =
+        'Enter your admin email address.';
+    }
+    return;
+  }
+
+  if(status){
+    status.textContent =
+      'Sending reset link…';
+  }
+
+  try{
+    const res =
+      await fetch(
+        '/api/auth/admin/forgot-password',
+        {
+          method:'POST',
+          headers:{
+            'Content-Type':
+              'application/json'
+          },
+          body:
+            JSON.stringify({ email })
+        }
+      );
+
+    const data =
+      await res.json().catch(
+        () => ({})
+      );
+
+    if(!res.ok || !data.success){
+      throw new Error(
+        data.error ||
+        'Could not request password reset.'
+      );
+    }
+
+    if(status){
+      status.textContent =
+        data.message ||
+        'If the account exists, a reset link has been sent.';
+    }
+
+    if(
+      data.devResetLink &&
+      window.location.hostname === 'localhost'
+    ){
+      console.log(
+        'Admin reset link:',
+        data.devResetLink
+      );
+    }
+  }catch(error){
+    if(status){
+      status.textContent =
+        error.message ||
+        'Could not request password reset.';
+    }
+  }
+}
+</script>
+
+<script src="/js/pwa.js" defer></script>
+</body>
+</html>

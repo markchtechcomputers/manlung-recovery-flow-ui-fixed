@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <script src="/js/theme.js"></script>
+    <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Management · Manlung Recovery</title>
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .role-badge { padding: 0.15rem 0.7rem; border-radius: 40px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+        .role-owner { background: #f7e7b0; color: #7d5d0a; }
+        .role-admin-active { background: var(--success-bg); color: var(--success); }
+        .role-admin-suspended { background: var(--danger-bg); color: var(--danger); }
+        .search-result-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; border: 1px solid var(--card-border); border-radius: 10px; margin-bottom: 0.5rem; }
+    </style>
+<style id="manlung-footer-style">
+.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:#06101d;border-top:1px solid rgba(255,255,255,.08);color:#dbeafe}
+.manlung-footer-inner{max-width:1000px;margin:auto}
+.manlung-footer-brand{text-align:center;margin-bottom:1rem}
+.manlung-footer-brand h2{margin:0 0 .3rem;font-size:clamp(1rem,1.7vw,1.25rem);color:#fff}
+.manlung-footer-brand p{margin:0;color:#94a3b8;font-size:.8rem}
+.manlung-footer-links{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1rem 0}
+.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.manlung-footer-link:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#fff}
+.manlung-footer-link:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
+.manlung-footer-link:active{background:rgba(255,255,255,.1)}
+.manlung-footer-bottom{padding-top:.7rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;color:#64748b;font-size:.7rem}
+.manlung-footer-bottom strong{color:#94a3b8}
+@media(max-width:900px){.manlung-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}}
+@media(max-width:380px){.manlung-footer-links{grid-template-columns:1fr}}
+</style>
+<style id="manlung-header-style">
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:
+    linear-gradient(135deg,rgba(15,23,42,.98),rgba(17,35,56,.98)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 64px);
+  border-bottom:1px solid rgba(96,165,250,.18);
+  box-shadow:0 4px 18px rgba(2,6,23,.22);
+}
+.site-header .container{
+  max-width:1180px;
+  margin:0 auto;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.55rem .8rem;
+}
+.site-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  min-width:0;
+}
+.site-header .brand h1{
+  margin:0;
+  color:#f8fafc;
+  font-size:1.05rem;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.site-header .brand h1 i{
+  color:#60a5fa;
+  margin-right:.3rem;
+}
+.site-header .brand span{
+  display:block;
+  margin-top:.16rem;
+  color:#94a3b8;
+  font-size:.72rem;
+  white-space:nowrap;
+}
+.site-header .header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.4rem;
+}
+.site-header .header-actions a,
+.site-header .header-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  min-height:38px;
+  padding:.45rem .68rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  color:#e2e8f0;
+  text-decoration:none;
+  font-size:.78rem;
+  font-weight:700;
+  transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.site-header .header-actions a:hover,
+.site-header .header-actions button:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(148,163,184,.35);
+  color:#fff;
+}
+.site-header .header-actions .btn-primary{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.site-header .header-actions .btn-primary:hover{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+}
+@media(max-width:900px){
+  .site-header .container{
+    min-height:58px;
+    padding:.45rem .7rem;
+  }
+  .site-header .brand h1{
+    font-size:.95rem;
+  }
+  .site-header .brand span{
+    font-size:.64rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    min-height:36px;
+    padding:.4rem .55rem;
+    font-size:.7rem;
+  }
+}
+@media(max-width:700px){
+  .site-header .container{
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+  .site-header .brand{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+  .site-header .brand span{
+    white-space:normal;
+  }
+  .site-header .header-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.35rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    width:100%;
+    min-height:38px;
+    padding:.35rem .2rem;
+    font-size:.68rem;
+  }
+}
+@media(max-width:480px){
+  .site-header .header-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:.3rem;
+  }
+  .site-header .header-actions a,
+  .site-header .header-actions button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.2rem;
+    min-height:52px;
+    padding:.35rem .15rem;
+    font-size:.62rem !important;
+    line-height:1.05;
+    text-align:center;
+  }
+  .site-header .header-actions a i,
+  .site-header .header-actions button i{
+    display:block;
+    font-size:1rem;
+    line-height:1;
+    margin:0;
+  }
+  .site-header .header-actions .theme-toggle{
+    width:100%;
+    min-width:0;
+  }
+  .site-header .header-actions .theme-toggle::after{
+    content:"Dark";
+    font-size:.62rem;
+    line-height:1;
+    color:inherit;
+  }
+}
+@media(max-width:360px){
+  .site-header .brand h1{
+    font-size:.86rem;
+  }
+  .site-header .brand span{
+    font-size:.58rem;
+  }
+}
+</style>
+
+<style id="manlung-site-logo-style">
+.site-header .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.7rem !important;
+  min-width:0;
+}
+
+.site-header .manlung-site-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.site-header .brand h1{
+  min-width:0;
+}
+
+@media(max-width:650px){
+  .site-header .manlung-site-logo{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:10px;
+  }
+}
+</style>
+
+  <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body class="admin-page-bg">
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                
+<img
+  class="manlung-site-logo"
+  src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
+  alt="Manlung Recovery"
+>
+<h1><i class="fas fa-user-shield"></i> Admin Management</h1>
+                <span>Owner-only — assign, suspend, and remove admin access</span>
+            </div>
+            <div class="header-actions">
+                <a href="/admin/dashboard.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <button class="btn btn-danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" id="pageContent" style="display:none;">
+        <div class="card" style="border:2px solid var(--accent);">
+            <div class="card-title"><i class="fas fa-user-shield"></i> Owner Approval Queue</div>
+            <p style="color:var(--text-muted);font-size:.88rem;">Only the Owner can grant Admin access. Send an invitation below; after the invited person registers, their account appears here as <strong>Pending approval</strong>. Approving the request activates the Admin portal and case/call permissions.</p>
+            <div id="pendingAdminNotice" style="margin-top:.8rem;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-envelope"></i> Invite Admin</div>
+            <p style="color:var(--text-muted);font-size:.85rem;">The Owner sends an invitation. The invited person creates their own Admin username and password.</p>
+            <div style="display:flex;gap:.6rem;"><input id="inviteEmail" type="email" placeholder="admin@example.com" style="flex:1"><button class="btn btn-primary" onclick="inviteAdmin()">Send Invitation</button></div>
+            <div id="inviteResult" style="margin-top:.7rem;color:var(--text-muted);font-size:.85rem;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-users-gear"></i> Current Admins &amp; Owner</div>
+            <div id="adminsList"><p style="color:var(--text-muted);">Loading…</p></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-phone-volume"></i> Call Monitoring</div>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Owner-only call metadata. Admins and the Owner can go online from the main Admin dashboard and answer client calls; this page keeps the Owner in control of the audit trail.</p>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;">
+                <button class="btn btn-danger" onclick="clearCallLogs()"><i class="fas fa-trash"></i> Clear Call Logs</button>
+            </div>
+            <div id="ownerCalls"><p style="color:var(--text-muted);">Loading calls…</p></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-briefcase"></i> Careers / Job Applications</div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;"><button class="btn btn-danger" onclick="clearCareerApplications()"><i class="fas fa-trash"></i> Delete All Applications</button></div>
+            <div id="careerApplications"><p style="color:var(--text-muted);">Loading applications…</p></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Audit Log</div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;"><button class="btn btn-danger" onclick="clearAuditLog()"><i class="fas fa-eraser"></i> Clear Audit Log</button></div>
+            <div id="auditLog" class="admin-scroll" style="max-height:320px; overflow-y:auto;"><p style="color:var(--text-muted);">Loading…</p></div>
+        </div>
+    </div>
+
+    <div id="deniedContent" style="display:none;" class="container">
+        <div class="card" style="text-align:center; padding:3rem;">
+            <i class="fas fa-lock" style="font-size:2.5rem; color:var(--danger); margin-bottom:1rem;"></i>
+            <p>This section is restricted to the site Owner.</p>
+            <a href="/admin/dashboard.html" class="btn btn-primary" style="margin-top:1rem;">Back to Dashboard</a>
+        </div>
+    </div>
+
+    
+    <section class="container" style="margin-top:1.5rem;">
+      <div class="card">
+        <h2><i class="fas fa-shield-halved"></i> Owner Two-Factor Authentication</h2>
+        <p style="color:var(--text-muted);">Protect the Owner account with a time-based authenticator code. After activation, the Owner cannot access protected APIs without completing MFA at login.</p>
+        <div id="mfaStatus" style="margin:.8rem 0;font-weight:700;">Checking…</div>
+        <button class="btn btn-primary" type="button" onclick="startMfaSetup()" id="mfaSetupBtn">Set up MFA</button>
+        <div id="mfaSetupBox" style="display:none;margin-top:1rem;">
+          <div id="mfaQr" style="width:220px;min-height:220px;background:#fff;padding:10px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:.5rem 0 1rem;"></div>
+          <p><strong>Manual key:</strong> <code id="mfaSecret" style="user-select:all;word-break:break-all;"></code></p>
+          <p style="font-size:.85rem;color:var(--text-muted);">Scan the QR code with Google Authenticator, Microsoft Authenticator, Authy, or another TOTP app. If scanning is unavailable, use the manual key.</p>
+          <input id="mfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" style="max-width:180px;">
+          <button class="btn btn-primary" type="button" onclick="enableMfa()">Verify &amp; Enable</button>
+          <pre id="mfaRecovery" style="display:none;margin-top:1rem;white-space:pre-wrap;background:var(--page-bg);padding:1rem;border-radius:10px;"></pre>
+        </div>
+        <div id="mfaDisableBox" style="display:none;margin-top:1rem;">
+          <input id="mfaDisableCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Current 6-digit code" style="max-width:220px;">
+          <button class="btn btn-danger" type="button" onclick="disableMfa()">Disable MFA</button>
+        </div>
+        <div id="mfaMessage" style="margin-top:.7rem;"></div>
+      </div>
+    </section>
+
+<footer class="manlung-footer">
+<div class="manlung-footer-inner">
+<div class="manlung-footer-brand">
+<h2>Cyber Recovery &amp; Digital Investigation Portal</h2>
+<p>Secure support, recovery guidance, digital awareness and responsible assistance.</p>
+</div>
+<nav class="manlung-footer-links" aria-label="Footer navigation">
+<a class="manlung-footer-link" href="/about.html">About</a>
+<a class="manlung-footer-link" href="/blog.html">Blog</a>
+<a class="manlung-footer-link" href="/careers.html">Careers</a>
+<a class="manlung-footer-link" href="/terms.html">Terms</a>
+<a class="manlung-footer-link" href="/login.html">Client Portal</a>
+<a class="manlung-footer-link" href="/client/request.html">New Recovery Request</a>
+</nav>
+<div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</div>
+</div>
+</footer>
+
+    <script>
+        
+
+        function authHeaders() { return {}; }
+
+        async function handleUnauthorized(res) {
+            if (res.status === 401) {
+                localStorage.removeItem('adminUser');
+                fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
+                window.location.href = '/admin/login.html';
+                return true;
+            }
+            return false;
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('adminUser');
+            fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
+            window.location.href = '/admin/login.html';
+        }
+
+        function roleBadge(admin) {
+            if (admin.role === 'owner') return '<span class="role-badge role-owner">Owner</span>';
+            if (admin.role === 'admin' && admin.admin_status === 'pending') return '<span class="role-badge" style="background:#f7e7b0;color:#7d5d0a">Pending approval</span>';
+            const cls = admin.admin_status === 'suspended' ? 'role-admin-suspended' : 'role-admin-active';
+            const label = admin.admin_status === 'suspended' ? 'Suspended' : 'Active';
+            return `<span class="role-badge ${cls}">${label}</span>`;
+        }
+
+        async function inviteAdmin() {
+            const email=document.getElementById('inviteEmail').value.trim(); const out=document.getElementById('inviteResult');
+            if(!email){out.textContent='Enter an email.';return;} out.textContent='Sending…';
+            const res=await fetch('/api/owner/invitations',{method:'POST',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify({email})});
+            const d=await res.json(); if(d.success){out.innerHTML=d.emailSent?'Invitation email sent.':`Email provider is not configured. Secure invitation link: <a href="${d.invitation.link}" target="_blank">Open invitation</a>`;document.getElementById('inviteEmail').value='';}else out.textContent=d.error||'Could not send invitation';
+        }
+
+        async function loadAdmins() {
+            const container = document.getElementById('adminsList');
+            try {
+                const res = await fetch('/api/owner/admins', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                if (res.status === 403) { showDenied(); return; }
+                const data = await res.json();
+                if (!data.success) { container.innerHTML = `<p style="color:var(--danger);">${data.error}</p>`; return; }
+
+                const pending = data.admins.filter(a => a.role === 'admin' && a.admin_status === 'pending');
+                const notice = document.getElementById('pendingAdminNotice');
+                if (notice) notice.innerHTML = pending.length ? `<div style="padding:.8rem 1rem;border-radius:12px;background:var(--warning-bg);color:var(--warning-text);font-weight:700;"><i class="fas fa-bell"></i> ${pending.length} Admin approval request${pending.length === 1 ? '' : 's'} waiting</div>` : '<div style="padding:.7rem 1rem;border-radius:12px;background:var(--success-bg);color:var(--success);">No pending Admin approvals.</div>';
+                if (!data.admins.length) { container.innerHTML = '<p style="color:var(--text-muted);">No admins yet.</p>'; return; }
+
+                container.innerHTML = data.admins.map(a => `
+                    <div class="case-item">
+                        <div class="case-info">
+                            <strong>${a.username}</strong>
+                            <span style="color:var(--text-muted); font-size:0.85rem;">${a.email || 'no email'}</span>
+                            ${roleBadge(a)}
+                            ${a.appointed_at ? `<span style="color:var(--text-muted); font-size:0.78rem;">appointed ${new Date(a.appointed_at).toLocaleDateString()}</span>` : ''}
+                        </div>
+                        ${a.role === 'admin' ? `
+                        <div style="display:flex; gap:6px;">
+                            ${a.admin_status === 'pending'
+                                ? `<button class="btn btn-success" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="approveAdmin('${a.id}')"><i class="fas fa-check"></i> Approve</button>`
+                                : a.admin_status === 'suspended'
+                                ? `<button class="btn btn-success" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="setStatus('${a.id}','active')"><i class="fas fa-check"></i> Reactivate</button>`
+                                : `<button class="btn btn-outline-dark" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="setStatus('${a.id}','suspended')"><i class="fas fa-pause"></i> Suspend</button>`
+                            }
+                            <button class="btn btn-danger" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="removeAdmin('${a.id}','${a.username}')"><i class="fas fa-user-minus"></i> Remove</button>
+                        </div>` : '<span style="color:var(--text-muted); font-size:0.8rem;">Protected</span>'}
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p style="color:var(--danger);">Network error loading admins.</p>';
+            }
+        }
+
+        async function setStatus(userId, status) {
+            const verb = status === 'suspended' ? 'suspend' : 'reactivate';
+            if (!confirm(`Are you sure you want to ${verb} this admin?`)) return;
+            try {
+                const res = await fetch(`/api/owner/admins/${userId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ status }),
+                });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (data.success) { loadAdmins(); loadAuditLog(); }
+                else alert(data.error || 'Could not update status.');
+            } catch (e) {
+                console.error(e);
+                alert('Network error.');
+            }
+        }
+        window.setStatus = setStatus;
+
+        async function removeAdmin(userId, username) {
+            if (!confirm(`Remove admin privileges from ${username}? Their account, case history, and call history will be preserved — they'll just become a regular client account. You can reassign them as admin again later.`)) return;
+            try {
+                const res = await fetch(`/api/owner/admins/${userId}`, { method: 'DELETE', headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (data.success) { loadAdmins(); loadAuditLog(); }
+                else alert(data.error || 'Could not remove admin privileges.');
+            } catch (e) {
+                console.error(e);
+                alert('Network error.');
+            }
+        }
+        window.removeAdmin = removeAdmin;
+
+        async function approveAdmin(userId) { const res=await fetch(`/api/owner/admins/${userId}/approve`,{method:'PUT',headers:authHeaders()}); const d=await res.json(); if(!res.ok){alert(d.error||'Approval failed');return;} loadAdmins(); loadAuditLog(); }
+        async function clearCallLogs() {
+            if (!confirm('Clear all call logs? This cannot be undone.')) return;
+            try {
+                const res = await fetch('/api/calls/owner/logs', { method: 'DELETE', headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    alert(data.error || 'Could not clear call logs.');
+                    return;
+                }
+                loadOwnerCalls();
+            } catch (e) {
+                console.error(e);
+                alert('Network error clearing call logs.');
+            }
+        }
+        window.clearCallLogs = clearCallLogs;
+
+        async function loadOwnerCalls() {
+            const container = document.getElementById('ownerCalls');
+            try {
+                const res = await fetch('/api/calls/owner/monitor', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                if (res.status === 403) { container.innerHTML = '<p style="color:var(--danger);">Owner access required.</p>'; return; }
+                const data = await res.json();
+                if (!data.success || !data.calls.length) { container.innerHTML = '<p style="color:var(--text-muted);">No calls recorded yet.</p>'; return; }
+                container.innerHTML = data.calls.map(c => `
+                    <div class="case-item">
+                        <div class="case-info">
+                            <strong><i class="fas fa-phone"></i> ${c.client_name || 'Client'}</strong>
+                            <span style="color:var(--text-muted);">${c.client_email || ''}</span>
+                            <span class="status-badge">${c.status}</span>
+                            ${c.case_id ? `<span style="color:var(--text-muted);">Case: ${c.case_id}</span>` : ''}
+                        </div>
+                        <div style="font-size:0.78rem; color:var(--text-muted);">${new Date(c.created_at).toLocaleString()}</div>
+                    </div>`).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p style="color:var(--danger);">Network error loading calls.</p>';
+            }
+        }
+
+        async function loadAuditLog() {
+            const container = document.getElementById('auditLog');
+            try {
+                const res = await fetch('/api/owner/audit-log', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!data.success) { container.innerHTML = `<p style="color:var(--danger);">${data.error}</p>`; return; }
+                if (!data.log.length) { container.innerHTML = '<p style="color:var(--text-muted);">No actions recorded yet.</p>'; return; }
+
+                const actionLabels = {
+                    assigned_admin: 'assigned Admin role to',
+                    invited_admin: 'sent an Admin invitation to',
+                    approved_admin: 'approved Admin access for',
+                    removed_admin: 'removed Admin privileges from',
+                    suspended_admin: 'suspended',
+                    reactivated_admin: 'reactivated',
+                };
+                container.innerHTML = data.log.map(entry => `
+                    <div style="padding:0.5rem 0; border-bottom:1px solid var(--card-border); font-size:0.85rem;">
+                        <strong>${entry.actor_username}</strong> ${actionLabels[entry.action] || entry.action} <strong>${entry.target_username}</strong>
+                        <div style="color:var(--text-muted); font-size:0.78rem;">${new Date(entry.created_at).toLocaleString()}</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p style="color:var(--danger);">Network error loading audit log.</p>';
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+
+        async function loadCareerApplications() {
+            const box = document.getElementById('careerApplications');
+            try {
+                const res = await fetch('/api/careers/admin', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!res.ok || !data.success) { box.innerHTML = `<p style="color:var(--danger);">${data.error || 'Could not load applications.'}</p>`; return; }
+                if (!data.applications.length) { box.innerHTML = '<p style="color:var(--text-muted);">No applications yet.</p>'; return; }
+                box.innerHTML = data.applications.map(a => `
+                  <div class="case-item" style="margin-bottom:.7rem;">
+                    <div class="case-info" style="flex:1;">
+                      <strong>${escapeHtml(a.full_name)}</strong>
+                      <span>${escapeHtml(a.role_interested)} · ${escapeHtml(a.email)} · ${escapeHtml(a.phone)}</span>
+                      <span>${escapeHtml(a.location)}</span>
+                      <span class="status-badge">${escapeHtml(a.status)}</span>
+                      <details style="margin-top:.5rem;"><summary>View application</summary><div style="white-space:pre-wrap;margin-top:.5rem;color:var(--text-muted);"><strong>Education:</strong> ${escapeHtml(a.education)}\n\n<strong>Experience:</strong> ${escapeHtml(a.experience)}\n\n<strong>Skills:</strong> ${escapeHtml(a.skills)}\n\n<strong>Application:</strong> ${escapeHtml(a.cover_note)}</div></details>
+                    </div>
+                    <div style="display:flex;gap:.4rem;flex-wrap:wrap;justify-content:flex-end;">
+                      <button class="btn btn-outline" onclick="setCareerStatus('${a.id}','reviewing')">Reviewing</button>
+                      <button class="btn btn-outline" onclick="setCareerStatus('${a.id}','shortlisted')">Shortlist</button>
+                      <button class="btn btn-success" onclick="setCareerStatus('${a.id}','hired')">Hire</button>
+                      <button class="btn btn-danger" onclick="deleteCareerApplication('${a.id}')">Delete</button>
+                    </div>
+                  </div>`).join('');
+            } catch (e) { box.innerHTML = '<p style="color:var(--danger);">Network error loading applications.</p>'; }
+        }
+        async function setCareerStatus(id,status){
+            try { const res=await fetch(`/api/careers/admin/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify({status})}); const d=await res.json(); if(!res.ok||!d.success){alert(d.error||'Could not update application.');return;} loadCareerApplications(); } catch(e){alert('Network error.');}
+        }
+        async function deleteCareerApplication(id){ if(!confirm('Delete this application?')) return; try{const res=await fetch(`/api/careers/admin/${id}`,{method:'DELETE',headers:authHeaders()});const d=await res.json();if(!res.ok||!d.success){alert(d.error||'Could not delete application.');return;}loadCareerApplications();}catch(e){alert('Network error.');}}
+        async function clearCareerApplications(){ if(!confirm('Delete ALL career applications? This cannot be undone.')) return; try{const res=await fetch('/api/careers/admin',{method:'DELETE',headers:authHeaders()});const d=await res.json();if(!res.ok||!d.success){alert(d.error||'Could not clear applications.');return;}loadCareerApplications();}catch(e){alert('Network error.');}}
+        async function clearAuditLog(){ if(!confirm('Clear the entire Audit Log? This cannot be undone.')) return; try{const res=await fetch('/api/owner/audit-log',{method:'DELETE',headers:authHeaders()});const d=await res.json();if(!res.ok||!d.success){alert(d.error||'Could not clear audit log.');return;}loadAuditLog();}catch(e){alert('Network error.');}}
+        window.setCareerStatus=setCareerStatus; window.deleteCareerApplication=deleteCareerApplication; window.clearCareerApplications=clearCareerApplications; window.clearAuditLog=clearAuditLog;
+
+        function showDenied() {
+            document.getElementById('pageContent').style.display = 'none';
+            document.getElementById('deniedContent').style.display = 'block';
+        }
+
+        async function init() {
+            try {
+                const res = await fetch('/api/auth/verify', { headers: authHeaders() });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json();
+                if (!data.success || data.user.role !== 'owner') {
+                    showDenied();
+                    return;
+                }
+                document.getElementById('pageContent').style.display = 'block';
+                loadAdmins();
+                loadAuditLog();
+                loadCareerApplications();
+                loadOwnerCalls();
+                setInterval(loadOwnerCalls, 5000);
+            } catch (e) {
+                console.error(e);
+                showDenied();
+            }
+        }
+        init();
+    </script>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+async function loadMfaStatus() {
+  const res = await fetch('/api/auth/admin/mfa/status', { credentials:'include' });
+  if (res.status === 401 || res.status === 403) { window.location.href='/admin/login.html'; return; }
+  const data = await res.json();
+  const status = document.getElementById('mfaStatus');
+  const setup = document.getElementById('mfaSetupBtn');
+  const disable = document.getElementById('mfaDisableBox');
+  if (data.enabled) {
+    status.textContent = 'Authenticator MFA is enabled on the Owner account.';
+    setup.style.display = 'none';
+    disable.style.display = 'block';
+  } else {
+    status.textContent = 'Authenticator MFA is not enabled. Enable it before using Owner management in production.';
+    setup.style.display = 'inline-flex';
+    disable.style.display = 'none';
+  }
+}
+
+async function startMfaSetup() {
+  const res = await fetch('/api/auth/admin/mfa/setup', { method:'POST', credentials:'include' });
+  const data = await res.json();
+  const box = document.getElementById('mfaSetupBox');
+  if (!res.ok) { document.getElementById('mfaMessage').textContent = data.error || 'Could not start MFA setup.'; return; }
+  document.getElementById('mfaSecret').textContent = data.secret;
+  const qr = document.getElementById('mfaQr');
+  qr.innerHTML = '';
+  if (window.QRCode) {
+    new QRCode(qr, { text: data.otpAuthUri, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+  }
+  box.style.display = 'block';
+  document.getElementById('mfaMessage').textContent = 'Scan the QR code, then enter the current 6-digit code to activate MFA.';
+}
+
+async function enableMfa() {
+  const code = document.getElementById('mfaCode').value.trim();
+  const res = await fetch('/api/auth/admin/mfa/enable', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code}) });
+  const data = await res.json();
+  if (!res.ok) { document.getElementById('mfaMessage').textContent = data.error || 'Could not enable MFA.'; return; }
+  document.getElementById('mfaRecovery').style.display='block';
+  document.getElementById('mfaRecovery').textContent='SAVE THESE RECOVERY CODES IN A SECURE PLACE. Each works once:
+
+'+data.recoveryCodes.join('\n');
+  document.getElementById('mfaMessage').textContent='MFA is now enabled. Save the recovery codes. You will be signed out and must log in again with your authenticator code.';
+  setTimeout(() => { fetch('/api/auth/admin/logout', {method:'POST', credentials:'include'}).finally(() => { window.location.href='/admin/login.html'; }); }, 2500);
+}
+
+async function disableMfa() {
+  const code = document.getElementById('mfaDisableCode').value.trim();
+  if (!confirm('Disable MFA for the Owner account? This removes the second authentication factor.')) return;
+  const res = await fetch('/api/auth/admin/mfa/disable', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code}) });
+  const data = await res.json();
+  document.getElementById('mfaMessage').textContent = res.ok ? 'MFA disabled. Sign in again.' : (data.error || 'Could not disable MFA.');
+  if (res.ok) {
+    await fetch('/api/auth/admin/logout', {method:'POST', credentials:'include'});
+    window.location.href='/admin/login.html';
+  }
+}
+
+loadMfaStatus().catch(() => {});
+</script>
+<script>
+async function loadMfaStatus() {
+  const res = await fetch('/api/auth/admin/mfa/status');
+  if (res.status === 401) { window.location.href='/admin/login.html'; return; }
+  const data = await res.json();
+  const status = document.getElementById('mfaStatus');
+  const setup = document.getElementById('mfaSetupBtn');
+  const disable = document.getElementById('mfaDisableBox');
+  if (data.enabled) {
+    status.textContent = 'MFA is enabled on this account.';
+    setup.style.display = 'none';
+    disable.style.display = 'block';
+  } else {
+    status.textContent = 'MFA is not enabled.';
+    setup.style.display = 'inline-flex';
+    disable.style.display = 'none';
+  }
+}
+
+async function startMfaSetup() {
+  const res = await fetch('/api/auth/admin/mfa/setup', { method:'POST' });
+  const data = await res.json();
+  const box = document.getElementById('mfaSetupBox');
+  if (!res.ok) { document.getElementById('mfaMessage').textContent = data.error || 'Could not start MFA setup.'; return; }
+  document.getElementById('mfaSecret').textContent = data.secret;
+  box.style.display = 'block';
+  document.getElementById('mfaMessage').textContent = 'Add the account to your authenticator app, then verify it.';
+}
+
+async function enableMfa() {
+  const code = document.getElementById('mfaCode').value.trim();
+  const res = await fetch('/api/auth/admin/mfa/enable', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code}) });
+  const data = await res.json();
+  if (!res.ok) { document.getElementById('mfaMessage').textContent = data.error || 'Could not enable MFA.'; return; }
+  document.getElementById('mfaRecovery').style.display='block';
+  document.getElementById('mfaRecovery').textContent='SAVE THESE RECOVERY CODES IN A SECURE PLACE. Each works once:\n\n'+data.recoveryCodes.join('\n');
+  document.getElementById('mfaMessage').textContent='MFA is now enabled.';
+  loadMfaStatus();
+}
+
+async function disableMfa() {
+  const code = document.getElementById('mfaDisableCode').value.trim();
+  if (!confirm('Disable MFA for this admin account?')) return;
+  const res = await fetch('/api/auth/admin/mfa/disable', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code}) });
+  const data = await res.json();
+  document.getElementById('mfaMessage').textContent = res.ok ? 'MFA disabled.' : (data.error || 'Could not disable MFA.');
+  if (res.ok) loadMfaStatus();
+}
+
+loadMfaStatus().catch(() => {});
+</script>
+<script src="/js/pwa.js" defer></script>
+</body>
+</html>

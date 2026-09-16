@@ -1,0 +1,126 @@
+/* Manlung Recovery — clean mobile header layout. */
+html,body{min-width:0;overflow-x:hidden}
+
+.mobile-menu-toggle,.mobile-nav{display:none!important}
+
+@media screen and (max-width:767px){
+  .site-header,.site-header::before,.site-header::after{
+    position:relative!important;width:100%!important;background:#fff!important;color:#000!important;
+    border:0!important;box-shadow:none!important;outline:0!important;background-image:none!important;
+  }
+
+  .site-header .manlung-header-inner{
+    width:100%!important;min-height:auto!important;display:flex!important;flex-wrap:wrap!important;
+    align-items:center!important;justify-content:flex-start!important;gap:8px!important;
+    padding:10px 12px 8px!important;margin:0!important;box-sizing:border-box!important;position:relative!important;
+  }
+
+  .site-header .brand{
+    display:flex!important;align-items:center!important;flex:0 0 100%!important;width:100%!important;min-width:0!important;
+    max-width:100%!important;margin:0!important;padding:0!important;justify-content:flex-start!important;
+    text-align:left!important;gap:8px!important;background:transparent!important;border:0!important;box-shadow:none!important;
+  }
+
+  .site-header .manlung-home-logo{
+    display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 38px!important;
+    width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
+    margin:0!important;padding:0!important;overflow:hidden!important;text-decoration:none!important;
+    background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+  }
+
+  .site-header .manlung-home-logo img,.site-header .manlung-site-logo{
+    display:block!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
+    object-fit:contain!important;margin:0!important;padding:0!important;background:transparent!important;
+    border:0!important;border-radius:0!important;box-shadow:none!important;
+  }
+
+  .site-header .manlung-brand-copy{display:block!important;min-width:0!important;flex:1 1 auto!important;overflow:hidden!important}
+  .site-header .brand h1,.site-header .brand h1 i,.site-header .brand span{
+    background:transparent!important;border:0!important;box-shadow:none!important;text-shadow:none!important;color:#000!important;
+  }
+  .site-header .brand h1{display:block!important;width:100%!important;margin:0!important;padding:0!important;font-size:.9rem!important;line-height:1.15!important;font-weight:800!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .site-header .brand h1 i{display:inline-block!important;margin-right:5px!important}
+  .site-header .brand span{display:block!important;width:100%!important;margin:3px 0 0!important;padding:0!important;font-size:.56rem!important;line-height:1.2!important;font-weight:700!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+
+  /* The five requested actions are one single horizontal row. */
+  .site-header .header-actions{
+    display:flex!important;flex:0 0 100%!important;width:100%!important;min-width:0!important;
+    align-items:center!important;justify-content:flex-start!important;align-content:center!important;
+    flex-wrap:nowrap!important;gap:16px!important;overflow-x:auto!important;overflow-y:hidden!important;
+    white-space:nowrap!important;height:38px!important;min-height:38px!important;margin:0!important;padding:0 1px!important;
+    scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;background:transparent!important;
+    border:0!important;box-shadow:none!important;
+  }
+  .site-header .header-actions::-webkit-scrollbar{display:none!important}
+
+  .site-header .header-actions>a,
+  .site-header .header-actions>button,
+  .site-header .header-actions>.btn{
+    display:inline-flex!important;flex:0 0 auto!important;width:auto!important;min-width:max-content!important;
+    height:32px!important;min-height:32px!important;max-height:32px!important;align-self:center!important;
+    align-items:center!important;justify-content:center!important;flex-direction:row!important;gap:5px!important;
+    margin:0!important;padding:0!important;white-space:nowrap!important;line-height:1!important;
+    font-size:.68rem!important;font-weight:800!important;color:#000!important;background:transparent!important;
+    border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;text-shadow:none!important;
+    transform:none!important;filter:none!important;text-decoration:none!important;box-sizing:border-box!important;
+  }
+  .site-header .header-actions>a:hover,
+  .site-header .header-actions>a:focus,
+  .site-header .header-actions>a:active,
+  .site-header .header-actions>button:hover,
+  .site-header .header-actions>button:focus,
+  .site-header .header-actions>button:active{color:#000!important;background:transparent!important;border:0!important;box-shadow:none!important;outline:0!important}
+
+  .site-header .header-actions i,
+  .site-header .header-actions img{
+    display:inline-flex!important;flex:0 0 auto!important;width:1em!important;height:1em!important;
+    min-width:1em!important;min-height:1em!important;max-width:1em!important;max-height:1em!important;
+    align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;
+    object-fit:contain!important;color:#000!important;background:transparent!important;border:0!important;box-shadow:none!important;
+    vertical-align:middle!important;
+  }
+
+  .site-header .header-actions button[data-theme-toggle="true"]{
+    position:static!important;width:auto!important;height:32px!important;min-width:max-content!important;min-height:32px!important;
+    max-height:32px!important;padding:0!important;display:inline-flex!important;flex-direction:row!important;
+    align-self:center!important;font-size:.68rem!important;font-weight:800!important;color:#000!important;background:transparent!important;
+    border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;
+  }
+  .site-header .header-actions button[data-theme-toggle="true"]::before,
+  .site-header .header-actions button[data-theme-toggle="true"]::after{content:none!important;display:none!important}
+
+  /* Keep the hamburger functional, but never let it push the five actions out of line. */
+  .site-header .mobile-menu-toggle{
+    display:flex!important;align-items:center!important;justify-content:center!important;position:absolute!important;
+    top:9px!important;right:10px!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
+    padding:0!important;margin:0!important;border:0!important;border-radius:0!important;background:transparent!important;
+    color:#000!important;box-shadow:none!important;outline:0!important;z-index:100002!important;cursor:pointer!important;
+  }
+  .site-header .mobile-menu-toggle i{display:block!important;font-size:1rem!important;color:#000!important}
+
+  .site-header .mobile-nav{
+    display:none!important;position:absolute!important;top:100%!important;left:0!important;right:0!important;width:100%!important;
+    max-height:calc(100dvh - 70px)!important;margin:0!important;padding:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+    background:#fff!important;color:#000!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;
+    z-index:100001!important;box-sizing:border-box!important;
+  }
+  .site-header .mobile-nav.is-open{display:block!important}
+  .site-header .mobile-nav-panel{display:block!important;width:100%!important;padding:8px 14px 14px!important;box-sizing:border-box!important}
+  .site-header .mobile-nav-title{display:flex!important;align-items:center!important;justify-content:space-between!important;width:100%!important;min-height:42px!important;padding:4px 0 8px!important;color:#000!important;font-size:.7rem!important;font-weight:800!important;text-transform:uppercase!important;letter-spacing:.06em!important;background:transparent!important;border:0!important}
+  .site-header .mobile-menu-close{display:flex!important;align-items:center!important;justify-content:center!important;width:36px!important;height:36px!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#000!important;font-size:1.4rem!important;box-shadow:none!important;outline:0!important}
+  .site-header .mobile-nav a{display:flex!important;align-items:center!important;width:100%!important;min-height:44px!important;margin:0!important;padding:10px 0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#000!important;text-decoration:none!important;font-size:.84rem!important;font-weight:700!important;box-shadow:none!important;text-shadow:none!important}
+  .site-header .mobile-nav a i{display:inline-block!important;width:20px!important;margin-right:9px!important;color:#000!important;text-align:center!important}
+  .site-header .mobile-nav-divider{display:block!important;width:100%!important;height:1px!important;margin:7px 0!important;background:#e5e5e5!important}
+  body.mobile-menu-open,body.manlung-mobile-menu-open{overflow:hidden!important}
+}
+
+@media screen and (max-width:390px){
+  .site-header .manlung-home-logo,.site-header .manlung-home-logo img,.site-header .manlung-site-logo{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important}
+  .site-header .header-actions{gap:13px!important;height:36px!important;min-height:36px!important}
+  .site-header .header-actions>a,.site-header .header-actions>button,.site-header .header-actions>.btn{height:30px!important;min-height:30px!important;max-height:30px!important;font-size:.63rem!important}
+  .site-header .header-actions i,.site-header .header-actions img{font-size:.9rem!important;width:.9em!important;height:.9em!important;min-width:.9em!important;min-height:.9em!important}
+}
+
+@media screen and (min-width:768px){
+  .site-header .mobile-menu-toggle,.site-header .mobile-nav{display:none!important;visibility:hidden!important;pointer-events:none!important}
+}
