@@ -295,7 +295,7 @@
     <button class="amount-btn" data-amount="5000">KES 5,000</button>
     <button class="amount-btn" data-amount="10000">KES 10,000</button>
   </div>
-  <div class="field"><label for="amount">Custom amount (KES)</label><input id="amount" type="number" min="50" max="1000000" step="1" placeholder="Enter amount"></div>
+  <div class="field"><label for="amount">Custom amount (KES)</label><input id="amount" type="number" min="50" max="5700010" step="1" placeholder="Enter amount"></div>
   <div class="field"><label for="donorName">Your name</label><input id="donorName" type="text" maxlength="120" placeholder="Your full name"></div>
   <div class="field"><label for="email">Email for payment receipt</label><input id="email" type="email" required autocomplete="email" placeholder="you@example.com"></div>
   <button class="donate-action" id="donateBtn"><i class="fas fa-heart"></i> Donate Securely</button>
@@ -329,7 +329,7 @@ function showDonationThankYou(name){
 }
 async function donate(){
  const amount=Number(amountEl.value), donorName=(donorNameEl?.value||'').trim(), email=emailEl.value.trim();
- if(!Number.isInteger(amount)||amount<50||amount>1000000){statusEl.textContent='Enter a donation between KES 50 and KES 1,000,000.';return;}
+ if(!Number.isInteger(amount)||amount<50||amount>5700010){statusEl.textContent='Enter a donation between KES 50 and KES 1,000,000.';return;}
  if(donorName && donorName.length > 120){statusEl.textContent='Name is too long.';return;}
  if(!emailEl.checkValidity()){statusEl.textContent='Enter a valid email address.';emailEl.focus();return;}
  btn.disabled=true; statusEl.textContent='Preparing secure payment…';

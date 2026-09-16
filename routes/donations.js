@@ -8,8 +8,8 @@ const { supabase } = require('../config/supabase');
 
 const TABLE = 'recovery_donations';
 const MIN_KES = 50;
-const MAX_KES = 1000000;
-const DEFAULT_DONATION_TARGET_KES = 100000;
+const MAX_KES = 5700010;
+const DEFAULT_DONATION_TARGET_KES = 570001;
 
 function donationTargetKes() {
   const configured = Number(process.env.DONATION_TARGET_KES);

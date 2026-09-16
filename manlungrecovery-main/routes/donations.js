@@ -8,7 +8,7 @@ const { supabase } = require('../config/supabase');
 
 const TABLE = 'recovery_donations';
 const MIN_KES = 50;
-const MAX_KES = 1000000;
+const MAX_KES = 5700010;
 
 function validationError(req, res) {
   const errors = validationResult(req);
