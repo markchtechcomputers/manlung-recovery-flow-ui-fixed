@@ -42,10 +42,10 @@
 
     z-index: 2 !important;
 
-    width: min(790px, 59vw) !important;
+    width: min(680px, 53vw) !important;
 
     right: -25px !important;
-    top: 50% !important;
+    top: 46% !important;
 
     transform: translateY(-50%) !important;
 
@@ -370,9 +370,9 @@
 
     .ml-balanced-hero .ml-hero-device-visual {
 
-        width: 57vw !important;
+        width: 52vw !important;
 
-        right: -70px !important;
+        right: -55px !important;
     }
 
     .ml-balanced-hero .ml-hero-copy h1 {
@@ -423,9 +423,9 @@
 
         transform: none !important;
 
-        width: 100% !important;
+        width: 92% !important;
 
-        margin: 0 !important;
+        margin: -12px auto 0 !important;
 
         z-index: 3 !important;
     }
