@@ -9,6 +9,7 @@ const AdminPermission = require('../models/AdminPermission');
 const Case = require('../models/Case');
 const CallSession = require('../models/CallSession');
 const AdminPresence = require('../models/AdminPresence');
+const SecurityMonitoring = require('../models/SecurityMonitoring');
 const { sendEmail } = require('../services/email');
 
 function checkValidation(req, res) {
@@ -49,6 +50,178 @@ async function releaseAdminAssignments(adminId) {
 // no matter how trusted, gets a 403 here regardless of what the frontend
 // shows or what the request looks like.
 router.use(ownerAuth);
+
+// ============================================================
+// OWNER SECURITY & MONITORING
+// Every endpoint below is protected by router-level ownerAuth.
+// ============================================================
+
+router.get('/security/users', async (req, res) => {
+  try {
+    const users = await SecurityMonitoring.listUsers({
+      search: req.query.search,
+      status: req.query.status,
+      role: req.query.role,
+      limit: req.query.limit,
+    });
+
+    res.json({ success: true, users });
+  } catch (error) {
+    console.error('Security user list error:', error);
+    res.status(500).json({ error: 'Could not load security users.' });
+  }
+});
+
+router.get('/security/users/:userId', async (req, res) => {
+  try {
+    const user = await SecurityMonitoring.getUser(req.params.userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.json({ success: true, user });
+  } catch (error) {
+    console.error('Security user lookup error:', error);
+    res.status(500).json({ error: 'Could not load user.' });
+  }
+});
+
+router.put(
+  '/security/users/:userId/status',
+  [
+    body('status')
+      .isIn(['active', 'restricted', 'suspended', 'blocked'])
+      .withMessage('Invalid security status.'),
+    body('reason')
+      .optional()
+      .isString()
+      .trim()
+      .isLength({ max: 500 })
+      .withMessage('Reason must be 500 characters or fewer.'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const target = await SecurityMonitoring.getUser(req.params.userId);
+
+      if (!target) {
+        return res.status(404).json({ error: 'User not found.' });
+      }
+
+      if (target.role === 'owner') {
+        return res.status(403).json({
+          error: 'The Owner account cannot be restricted, suspended, or blocked.',
+        });
+      }
+
+      if (target.id === req.user.id) {
+        return res.status(403).json({
+          error: 'You cannot change your own security status.',
+        });
+      }
+
+      const updated = await SecurityMonitoring.setSecurityStatus(
+        target.id,
+        req.body.status,
+        req.body.reason,
+        req.user.id
+      );
+
+      const securityEventType =
+        req.body.status === 'active'
+          ? (target.security_status === 'blocked'
+              ? 'ACCOUNT_UNBLOCKED'
+              : 'ACCOUNT_REACTIVATED')
+          : `ACCOUNT_${req.body.status.toUpperCase()}`;
+
+      await SecurityMonitoring.recordEvent({
+        eventType: securityEventType,
+        userId: target.id,
+        actorUserId: req.user.id,
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+        details: {
+          reason: req.body.reason || null,
+          previous_status: target.security_status,
+          new_status: req.body.status,
+        },
+      });
+
+      await AdminAuditLog.record({
+        actor: req.user,
+        target: updated,
+        action: 'security_status_changed',
+        details: {
+          previous_status: target.security_status,
+          new_status: req.body.status,
+          reason: req.body.reason || null,
+        },
+      });
+
+      res.json({ success: true, user: updated });
+    } catch (error) {
+      console.error('Security status update error:', error);
+      res.status(500).json({ error: 'Could not update security status.' });
+    }
+  }
+);
+
+router.post('/security/users/:userId/revoke-sessions', async (req, res) => {
+  try {
+    const target = await SecurityMonitoring.getUser(req.params.userId);
+
+    if (!target) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    if (target.role === 'owner') {
+      return res.status(403).json({
+        error: 'The Owner session cannot be revoked from this control.',
+      });
+    }
+
+    await SecurityMonitoring.revokeSessions(target.id);
+
+    await SecurityMonitoring.recordEvent({
+      eventType: 'SESSIONS_REVOKED',
+      userId: target.id,
+      actorUserId: req.user.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {},
+    });
+
+    await AdminAuditLog.record({
+      actor: req.user,
+      target,
+      action: 'revoked_user_sessions',
+      details: {},
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Session revocation error:', error);
+    res.status(500).json({ error: 'Could not revoke sessions.' });
+  }
+});
+
+router.get('/security/events', async (req, res) => {
+  try {
+    const events = await SecurityMonitoring.listEvents({
+      userId: req.query.userId,
+      eventType: req.query.eventType,
+      limit: req.query.limit,
+    });
+
+    res.json({ success: true, events });
+  } catch (error) {
+    console.error('Security events error:', error);
+    res.status(500).json({ error: 'Could not load security events.' });
+  }
+});
+
 
 // Proper Admin invitation flow. The Owner creates the account invitation; the Admin creates their own credentials.
 router.post('/invitations', [body('email').trim().isEmail().normalizeEmail()], async (req, res) => {

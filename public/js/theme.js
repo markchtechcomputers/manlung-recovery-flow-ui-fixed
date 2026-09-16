@@ -168,20 +168,20 @@
     const script = document.createElement('script');
     script.src = src;
     script.defer = true;
-    script.dataset[marker] = 'true';
+    script.setAttribute('data-' + marker, 'true');
     document.head.appendChild(script);
   }
 
   function loadAdminCallIcons() {
-    if (location.pathname.startsWith('/admin/')) loadScriptOnce('/js/admin-call-icons.js', 'manlung-admin-call-icons');
+    if (location.pathname.startsWith('/admin/')) loadScriptOnce('/js/admin-call-icons.js', 'manlungAdminCallIcons');
   }
 
   function loadContactFab() {
-    loadScriptOnce('/js/contact-fab.js', 'manlung-contact-fab');
+    loadScriptOnce('/js/contact-fab.js', 'manlungContactFab');
   }
 
   function loadManlungAI() {
-    loadScriptOnce('/js/manlung-ai.js?v=20260915-' + Date.now(), 'manlung-functional-ai');
+    loadScriptOnce('/js/manlung-ai.js?v=20260915-' + Date.now(), 'manlungFunctionalAI');
   }
 
   function loadClientCaseChat() {

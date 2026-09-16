@@ -37,6 +37,15 @@ async function verifyRequestToken(req) {
   if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
   const user = await User.findById(decoded.id);
   if (user && isDurablyRevoked(decoded, user)) throw new Error('SESSION_VERSION_REVOKED');
+
+  if (
+    user &&
+    user.security_status &&
+    user.security_status !== 'active'
+  ) {
+    throw new Error(`ACCOUNT_${String(user.security_status).toUpperCase()}`);
+  }
+
   return { token, decoded, user };
 }
 
@@ -54,7 +63,24 @@ const auth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    if (error.message === 'TOKEN_REVOKED' || error.message === 'SESSION_VERSION_REVOKED') return res.status(401).json({ error: 'Session revoked. Please sign in again.', code: 'SESSION_REVOKED' });
+    if (error.message === 'TOKEN_REVOKED' || error.message === 'SESSION_VERSION_REVOKED') {
+      return res.status(401).json({
+        error: 'Session revoked. Please sign in again.',
+        code: 'SESSION_REVOKED',
+      });
+    }
+
+    if (
+      error.message === 'ACCOUNT_RESTRICTED' ||
+      error.message === 'ACCOUNT_SUSPENDED' ||
+      error.message === 'ACCOUNT_BLOCKED'
+    ) {
+      return res.status(403).json({
+        error: 'Account access has been restricted by the site owner.',
+        code: error.message,
+      });
+    }
+
     console.error('Authentication error:', error);
     return res.status(401).json({ error: 'Invalid token' });
   }

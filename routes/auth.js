@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const SecurityMonitoring = require('../models/SecurityMonitoring');
 const Case = require('../models/Case');
 const { auth } = require('../middleware/auth');
 const AdminInvitation = require('../models/AdminInvitation');
@@ -385,6 +386,23 @@ router.post(
       }
 
       // ------------------------------------------------------
+      // Owner Security & Monitoring account state
+      // ------------------------------------------------------
+
+      if (admin.security_status && admin.security_status !== 'active') {
+        const messages = {
+          restricted: 'Your account has been restricted. Contact the site owner.',
+          suspended: 'Your account has been suspended. Contact the site owner.',
+          blocked: 'Your account has been blocked. Contact the site owner.',
+        };
+
+        return res.status(403).json({
+          error: messages[admin.security_status] || 'Account access is restricted.',
+          code: `ACCOUNT_${admin.security_status.toUpperCase()}`,
+        });
+      }
+
+      // ------------------------------------------------------
       // Check password
       // ------------------------------------------------------
 
@@ -394,6 +412,16 @@ router.post(
       );
 
       if (!isMatch) {
+        await SecurityMonitoring.recordEvent({
+          eventType: 'LOGIN_FAILED',
+          userId: admin.id,
+          ipAddress: req.ip,
+          userAgent: req.get('user-agent'),
+          details: {
+            role: admin.role,
+          },
+        });
+
         return res.status(401).json({
           error: 'Invalid credentials',
         });
@@ -445,6 +473,18 @@ router.post('/client/logout-all', auth, async (req, res) => {
   try {
     if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required.' });
     await User.bumpSessionVersion(req.user.id);
+
+    await SecurityMonitoring.recordEvent({
+      eventType: 'LOGOUT',
+      userId: req.user.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {
+        role: req.user.role,
+        all_sessions: true,
+      },
+    });
+
     res.json({ success: true, message: 'All client sessions have been revoked. Sign in again.' });
   } catch (error) {
     console.error('Client logout-all error:', error);
@@ -452,9 +492,41 @@ router.post('/client/logout-all', auth, async (req, res) => {
   }
 });
 
-router.post('/admin/logout', (req, res) => {
-  clearAdminCookie(res);
-  res.json({ success: true });
+router.post('/admin/logout', async (req, res) => {
+  try {
+    const token =
+      req.header('Authorization')?.replace(/^Bearer\s+/i, '') ||
+      getCookie(req, ADMIN_COOKIE);
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const admin = await User.findById(decoded.id);
+
+        if (admin && (admin.role === 'admin' || admin.role === 'owner')) {
+          await SecurityMonitoring.recordEvent({
+            eventType: 'LOGOUT',
+            userId: admin.id,
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent'),
+            details: {
+              role: admin.role,
+              all_sessions: false,
+            },
+          });
+        }
+      } catch (_) {
+        // Logout must still succeed if the session is expired or invalid.
+      }
+    }
+
+    clearAdminCookie(res);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Admin logout monitoring error:', error);
+    clearAdminCookie(res);
+    res.json({ success: true });
+  }
 });
 
 router.post('/admin/mfa/login', [
@@ -479,8 +551,32 @@ router.post('/admin/mfa/login', [
         valid = true;
       }
     }
-    if (!valid) return res.status(401).json({ error: 'Invalid authentication code.' });
+    if (!valid) {
+      await SecurityMonitoring.recordEvent({
+        eventType: 'MFA_FAILED',
+        userId: admin.id,
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+        details: {
+          role: admin.role,
+        },
+      });
+
+      return res.status(401).json({ error: 'Invalid authentication code.' });
+    }
+
     issueAdminSession(res, admin);
+
+    await SecurityMonitoring.recordEvent({
+      eventType: 'MFA_SUCCESS',
+      userId: admin.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {
+        role: admin.role,
+      },
+    });
+
     return res.json({ success: true, user: { id: admin.id, username: admin.username, email: admin.email, role: admin.role } });
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired MFA session.' });
@@ -730,10 +826,34 @@ router.post(
         });
       }
 
+      // Owner-controlled security state.
+      if (client.security_status && client.security_status !== 'active') {
+        const messages = {
+          restricted: 'Your account has been restricted. Contact the site owner.',
+          suspended: 'Your account has been suspended. Contact the site owner.',
+          blocked: 'Your account has been blocked. Contact the site owner.',
+        };
+
+        return res.status(403).json({
+          error: messages[client.security_status] || 'Account access is restricted.',
+          code: `ACCOUNT_${client.security_status.toUpperCase()}`,
+        });
+      }
+
       const isMatch =
         await User.comparePassword(client, password);
 
       if (!isMatch) {
+        await SecurityMonitoring.recordEvent({
+          eventType: 'LOGIN_FAILED',
+          userId: client.id,
+          ipAddress: req.ip,
+          userAgent: req.get('user-agent'),
+          details: {
+            role: client.role,
+          },
+        });
+
         return res.status(401).json({
           error: 'Invalid credentials',
         });

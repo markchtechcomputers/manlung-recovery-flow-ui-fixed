@@ -11,7 +11,7 @@
       const s = document.createElement('script');
       s.src = src;
       s.defer = true;
-      s.dataset[marker] = 'true';
+      s.setAttribute('data-' + marker, 'true');
       s.onload = () => resolve(true);
       s.onerror = () => resolve(false);
       document.head.appendChild(s);
@@ -50,8 +50,8 @@
     addLoadingIndicator();
 
     // Load the original WebRTC stack first; do not replace it.
-    await load('/js/call-webrtc.js?v=restore-20260908', 'manlung-call-webrtc');
-    await load('/js/call-widget.js?v=restore-20260908', 'manlung-call-widget');
+    await load('/js/call-webrtc.js?v=restore-20260908', 'manlungCallWebRTC');
+    await load('/js/call-widget.js?v=restore-20260908', 'manlungCallWidget');
 
     // Restore the contact menu around the Call Admin control.
     await load('/js/support-fab.js?v=restore-20260908', 'manlung-support-fab');

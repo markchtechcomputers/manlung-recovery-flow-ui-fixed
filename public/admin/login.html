@@ -59,7 +59,7 @@
                 <div><span class="admin-badge"><i class="fas fa-lock"></i> Restricted</span></div>
             </div>
 
-            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+            <form id="adminLoginForm">
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> Username</label>
                     <input type="text" id="adminUsername" placeholder="Enter username" required autofocus>
@@ -158,6 +158,9 @@
     <script>
         let pendingMfaTicket = null;
         let mfaEnrollmentUser = null;
+
+        document.getElementById('adminLoginForm')
+            ?.addEventListener('submit', handleAdminLogin);
 
         function showMfaEnrollment(user) {
             mfaEnrollmentUser = user;
