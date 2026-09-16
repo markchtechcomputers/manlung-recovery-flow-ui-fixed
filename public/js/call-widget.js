@@ -43,6 +43,187 @@
     @media(max-width:600px){#callWidget{right:10px !important;bottom:calc(10px + env(safe-area-inset-bottom)) !important}#callWidgetBtn{min-width:48px !important;width:48px !important;height:48px !important;padding:0 !important;justify-content:center !important}#callWidgetBtn #callWidgetLabel{display:none}#callWidgetPanel{width:min(340px,calc(100vw - 20px)) !important;right:0 !important;bottom:58px !important;border-radius:20px !important}}
     #manlungContactMenu{position:absolute;right:0;bottom:68px;width:min(320px,calc(100vw - 24px));max-height:min(70vh,430px);overflow:auto;padding:.85rem;border:1px solid rgba(255,255,255,.13);border-radius:20px;background:rgba(10,23,46,.98);color:#eef5ff;box-shadow:0 22px 60px rgba(0,0,0,.42);backdrop-filter:blur(18px)}
     #manlungContactMenu[hidden]{display:none !important}.manlung-contact-menu-header{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.25rem .2rem .75rem;border-bottom:1px solid rgba(255,255,255,.09)}.manlung-contact-menu-header strong{display:block;font-size:.95rem}.manlung-contact-menu-header span{display:block;margin-top:.2rem;color:#aebdd2;font-size:.72rem;line-height:1.4}#manlungContactClose{width:34px;height:34px;flex:0 0 34px;border:1px solid rgba(255,255,255,.12);border-radius:50%;background:#172845;color:#fff;cursor:pointer}.manlung-contact-menu-actions{display:flex;flex-direction:column;align-items:center;gap:.8rem;padding:.8rem 0 0;background:transparent;box-shadow:none;border:0}.manlung-contact-choice{width:42px !important;height:42px !important;min-width:42px !important;min-height:42px !important;box-sizing:border-box;display:flex !important;align-items:center !important;justify-content:center !important;padding:0 !important;margin:0 auto !important;border:0 !important;border-radius:50% !important;background:transparent !important;color:#fff;text-decoration:none;cursor:pointer;transition:transform .16s ease;position:relative;overflow:hidden}.manlung-contact-choice img{width:34px !important;height:34px !important;min-width:34px !important;min-height:34px !important;max-width:34px !important;max-height:34px !important;object-fit:contain !important;border-radius:50% !important;display:block !important;visibility:visible !important;opacity:1 !important}.manlung-contact-choice:hover{background:transparent !important;border:0 !important;box-shadow:none !important;transform:scale(1.08)}.manlung-contact-choice .manlung-contact-choice-label{display:none !important}.manlung-contact-choice-icon{width:42px !important;height:42px !important;display:flex !important;align-items:center !important;justify-content:center !important}.manlung-contact-choice-icon img{width:34px !important;height:34px !important;max-width:34px !important;max-height:34px !important;object-fit:contain !important;display:block !important}.manlung-contact-choice:focus-visible,#manlungContactClose:focus-visible,#callWidgetBtn:focus-visible{outline:3px solid rgba(96,165,250,.85);outline-offset:3px}.manlung-contact-choice-icon{width:42px !important;height:42px !important;display:grid;place-items:center;border-radius:50%;overflow:hidden}.manlung-contact-choice-icon img{width:34px !important;height:34px !important;object-fit:contain;display:block}.manlung-contact-choice .manlung-contact-choice-label{position:absolute;left:50%;bottom:-30px;transform:translateX(-50%);white-space:nowrap;padding:.28rem .45rem;border-radius:7px;background:#071321;color:#fff;font-size:.64rem;opacity:0;pointer-events:none;transition:opacity .15s ease;z-index:5}.manlung-contact-choice:hover .manlung-contact-choice-label,.manlung-contact-choice:focus-visible .manlung-contact-choice-label{opacity:1}.manlung-contact-call .manlung-contact-choice-icon{background:#155e3d}.manlung-call-loading{display:grid;place-items:center;text-align:center;padding:1rem .5rem}.manlung-call-loading img{width:72px;height:72px;border-radius:18px;object-fit:cover;box-shadow:0 10px 30px rgba(0,0,0,.3);margin-bottom:.7rem}.manlung-call-dots{display:flex;gap:6px;justify-content:center;margin-top:.55rem}.manlung-call-dots span{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:manlungCallDot 1s infinite ease-in-out}.manlung-call-dots span:nth-child(2){animation-delay:.15s}.manlung-call-dots span:nth-child(3){animation-delay:.3s}@keyframes manlungCallDot{0%,70%,100%{opacity:.25;transform:translateY(0)}35%{opacity:1;transform:translateY(-5px)}}@media(max-width:600px){#manlungContactMenu{right:-2px;bottom:60px;width:min(320px,calc(100vw - 20px));max-height:calc(100vh - 90px)}.manlung-contact-menu-actions{gap:.6rem}.manlung-contact-choice{height:42px}.manlung-contact-choice-icon{width:42px;height:42px}}
+
+    /* Enhanced Contact Us / Call Admin presentation — UI only; WebRTC logic untouched. */
+    #callWidget{filter:drop-shadow(0 12px 28px rgba(0,0,0,.22));}
+    #callWidgetBtn{
+      position:relative;
+      overflow:visible !important;
+      background:linear-gradient(135deg,#0f2f63,#164b91 55%,#20a967) !important;
+      border:1px solid rgba(255,255,255,.18) !important;
+      box-shadow:0 12px 34px rgba(8,30,70,.42),0 0 0 1px rgba(32,199,122,.14) inset !important;
+    }
+    #callWidgetBtn:before{
+      content:"";
+      position:absolute;
+      inset:-5px;
+      border-radius:999px;
+      border:1px solid rgba(74,222,128,.32);
+      pointer-events:none;
+      animation:manlungContactGlow 2.4s ease-out infinite;
+    }
+    #callWidgetBtn:after{
+      content:"";
+      position:absolute;
+      right:7px;
+      top:6px;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#4ade80;
+      box-shadow:0 0 12px rgba(74,222,128,.9);
+    }
+
+    .manlung-floating-call-icon{
+      width:30px !important;
+      height:30px !important;
+      flex-basis:30px !important;
+      border:2px solid rgba(255,255,255,.28);
+      box-shadow:0 0 0 3px rgba(32,199,122,.16),0 5px 15px rgba(0,0,0,.25);
+    }
+
+    #manlungContactMenu{
+      padding:1rem !important;
+      background:linear-gradient(180deg,rgba(17,37,72,.99),rgba(7,20,40,.99)) !important;
+      border-color:rgba(96,165,250,.22) !important;
+    }
+
+    .manlung-contact-menu-header{
+      padding:.2rem .1rem .85rem !important;
+    }
+
+    .manlung-contact-menu-header strong{
+      font-size:1rem !important;
+      letter-spacing:.01em;
+    }
+
+    .manlung-contact-menu-header span{
+      color:#b7c7df !important;
+    }
+
+    #manlungContactClose{
+      background:linear-gradient(145deg,#20365d,#13233f) !important;
+      border-color:rgba(255,255,255,.15) !important;
+      box-shadow:0 5px 16px rgba(0,0,0,.22);
+    }
+
+    .manlung-contact-menu-actions{
+      display:grid !important;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:.7rem !important;
+      padding:.9rem 0 .1rem !important;
+      align-items:stretch !important;
+    }
+
+    .manlung-contact-choice{
+      width:100% !important;
+      height:70px !important;
+      min-width:0 !important;
+      min-height:70px !important;
+      display:flex !important;
+      flex-direction:column !important;
+      gap:.25rem !important;
+      justify-content:center !important;
+      padding:.55rem !important;
+      margin:0 !important;
+      border:1px solid rgba(255,255,255,.09) !important;
+      border-radius:16px !important;
+      background:linear-gradient(145deg,#172b4c,#10213a) !important;
+      box-shadow:0 8px 20px rgba(0,0,0,.18) !important;
+    }
+
+    .manlung-contact-choice:hover{
+      background:linear-gradient(145deg,#203b66,#163057) !important;
+      transform:translateY(-2px) scale(1.015) !important;
+      border-color:rgba(96,165,250,.35) !important;
+      box-shadow:0 12px 24px rgba(0,0,0,.24) !important;
+    }
+
+    .manlung-contact-choice-icon{
+      width:42px !important;
+      height:42px !important;
+      flex:0 0 42px !important;
+      border-radius:13px !important;
+      background:rgba(255,255,255,.06) !important;
+      box-shadow:0 5px 14px rgba(0,0,0,.18);
+    }
+
+    .manlung-contact-choice-icon img{
+      width:32px !important;
+      height:32px !important;
+      max-width:32px !important;
+      max-height:32px !important;
+    }
+
+    .manlung-contact-choice .manlung-contact-choice-label{
+      display:block !important;
+      position:static !important;
+      transform:none !important;
+      opacity:1 !important;
+      background:none !important;
+      padding:0 !important;
+      color:#eef5ff !important;
+      font-size:.7rem !important;
+      font-weight:800 !important;
+      pointer-events:none !important;
+    }
+
+    .manlung-contact-call{
+      background:linear-gradient(145deg,#0e6b46,#164f3a) !important;
+      border-color:rgba(74,222,128,.35) !important;
+      box-shadow:0 9px 24px rgba(18,138,85,.24) !important;
+    }
+
+    .manlung-contact-call:hover{
+      background:linear-gradient(145deg,#118154,#176b4b) !important;
+      border-color:rgba(74,222,128,.65) !important;
+    }
+
+    .manlung-contact-call .manlung-contact-choice-icon{
+      background:rgba(74,222,128,.16) !important;
+      box-shadow:0 0 0 4px rgba(74,222,128,.08),0 6px 16px rgba(0,0,0,.18);
+      animation:manlungPhonePulse 1.9s ease-in-out infinite;
+    }
+
+    #callWidgetPanel{
+      background:linear-gradient(180deg,#12254a,#0b1730) !important;
+      border-color:rgba(96,165,250,.22) !important;
+      box-shadow:0 24px 65px rgba(0,0,0,.5) !important;
+    }
+
+    @keyframes manlungContactGlow{
+      0%{transform:scale(.98);opacity:.7}
+      70%,100%{transform:scale(1.08);opacity:0}
+    }
+
+    @keyframes manlungPhonePulse{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.07)}
+    }
+
+    @media(max-width:600px){
+      #callWidgetBtn:after{
+        right:5px;
+        top:5px;
+        width:7px;
+        height:7px;
+      }
+
+      #manlungContactMenu{
+        width:min(330px,calc(100vw - 18px)) !important;
+        padding:.85rem !important;
+        right:-2px !important;
+      }
+
+      .manlung-contact-menu-actions{
+        gap:.6rem !important;
+      }
+
+      .manlung-contact-choice{
+        height:72px !important;
+        min-height:72px !important;
+      }
+    }
   `;
   document.head.appendChild(style);
 })();
