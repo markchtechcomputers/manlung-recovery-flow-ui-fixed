@@ -1,53 +1,34 @@
 
-/* Manlung Recovery startup loader */
+/* Manlung Recovery — instant lightweight startup loader */
 (function () {
   const root = document.documentElement;
-  const startedAt = performance.now();
 
   root.classList.add("manlung-startup-loading");
 
-  function finishLoader() {
+  function closeLoader() {
     if (root.classList.contains("manlung-startup-complete")) return;
 
-    const elapsed = performance.now() - startedAt;
-
-    /*
-      Fast load  -> 1 spin
-      Slower load -> 2 spins
-      This keeps the loader short while still giving slower connections
-      a visible loading animation.
-    */
-    if (elapsed > 1200) {
-      root.classList.add("manlung-loader-double");
-      root.style.setProperty("--manlung-loader-duration", "0.95s");
-    } else {
-      root.style.setProperty("--manlung-loader-duration", "0.85s");
-    }
-
-    const spins = elapsed > 1200 ? 2 : 1;
-    const duration = elapsed > 1200 ? 1900 : 850;
-
-    setTimeout(function () {
+    requestAnimationFrame(function () {
       root.classList.remove("manlung-startup-loading");
       root.classList.add("manlung-startup-complete");
 
       setTimeout(function () {
         root.classList.remove("manlung-startup-complete");
-        root.classList.remove("manlung-loader-double");
-      }, 450);
-    }, duration);
+      }, 300);
+    });
   }
 
-  if (document.readyState === "complete") {
-    finishLoader();
+  /*
+    Do not hold the website hostage to slow assets.
+    Maximum loader time is only 700ms.
+  */
+  if (document.readyState === "interactive" || document.readyState === "complete") {
+    setTimeout(closeLoader, 120);
   } else {
-    window.addEventListener("load", finishLoader, { once: true });
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(closeLoader, 120);
+    }, { once: true });
 
-    /* Safety fallback so a broken/slow resource never traps the user. */
-    setTimeout(function () {
-      if (!root.classList.contains("manlung-startup-complete")) {
-        finishLoader();
-      }
-    }, 7000);
+    setTimeout(closeLoader, 700);
   }
 })();
