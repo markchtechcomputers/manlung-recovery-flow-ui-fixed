@@ -1,11 +1,33 @@
 
+/* Homepage-only Manlung Recovery loading screen */
 (function () {
   const root = document.documentElement;
+
   root.classList.add("manlung-startup-loading");
 
-  /* Balanced startup intro: visible, but does not wait for the site/network. */
-  setTimeout(function () {
+  function finishLoader() {
+    if (root.classList.contains("manlung-startup-complete")) return;
+
     root.classList.add("manlung-startup-complete");
     root.classList.remove("manlung-startup-loading");
-  }, 450);
+
+    const loader = document.getElementById("manlungStartupLoader");
+    if (loader) {
+      loader.remove();
+    }
+  }
+
+  /*
+    DOMContentLoaded is intentionally used instead of window.load.
+    This means the loader does not wait for large images, external
+    resources, analytics, fonts, etc.
+  */
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", finishLoader, { once: true });
+  } else {
+    finishLoader();
+  }
+
+  /* Safety fallback so a broken resource can never keep the loader up. */
+  setTimeout(finishLoader, 3000);
 })();

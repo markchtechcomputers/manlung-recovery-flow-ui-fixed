@@ -1,51 +1,90 @@
 
-/* Ultra-fast Manlung Recovery startup screen */
+/* Manlung Recovery homepage PWA-style loader */
 html.manlung-startup-loading,
 html.manlung-startup-loading body {
   overflow: hidden !important;
 }
 
-body::before {
-  content: "";
+#manlungStartupLoader {
   position: fixed;
   inset: 0;
-  z-index: 2147483646;
-  background: #030b19;
-  pointer-events: none;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at center, rgba(31,73,135,.18), transparent 42%),
+    #030b19;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
 }
 
-body::after {
-  content: "...";
-  position: fixed;
-  z-index: 2147483647;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, 48px);
-  width: 90px;
-  height: 90px;
+#manlungStartupLoader .startup-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transform: translateY(-2vh);
+}
+
+#manlungStartupLoader img {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 10px 28px rgba(35,91,170,.28));
+}
+
+#manlungStartupLoader .startup-loading {
+  margin-top: 14px;
+  min-width: 54px;
   color: #dbeafe;
-  font-family: Arial, sans-serif;
+  font-family: Inter, system-ui, sans-serif;
   font-size: 22px;
   font-weight: 900;
   letter-spacing: 5px;
-  text-align: center;
-  padding-top: 100px;
-  background: url("https://i.postimg.cc/3w6BvBsT/icon-512.png") center top / 90px 90px no-repeat;
-  pointer-events: none;
+  line-height: 1;
 }
 
-html.manlung-startup-complete body::before,
-html.manlung-startup-complete body::after {
+#manlungStartupLoader .startup-loading span {
+  display: inline-block;
+  animation: manlungDot 1s infinite ease-in-out;
+}
+
+#manlungStartupLoader .startup-loading span:nth-child(2) {
+  animation-delay: .15s;
+}
+
+#manlungStartupLoader .startup-loading span:nth-child(3) {
+  animation-delay: .30s;
+}
+
+@keyframes manlungDot {
+  0%, 70%, 100% {
+    opacity: .25;
+    transform: translateY(0);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+html.manlung-startup-complete #manlungStartupLoader {
   display: none !important;
 }
 
 @media (max-width:650px) {
-  body::after {
-    width: 72px;
-    height: 72px;
-    background-size: 72px 72px;
-    padding-top: 80px;
-    transform: translate(-50%, 40px);
-    font-size: 18px;
+  #manlungStartupLoader img {
+    width: 78px;
+    height: 78px;
+  }
+
+  #manlungStartupLoader .startup-loading {
+    margin-top: 12px;
+    font-size: 19px;
+    letter-spacing: 4px;
   }
 }
