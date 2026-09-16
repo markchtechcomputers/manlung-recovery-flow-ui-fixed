@@ -1,19 +1,19 @@
 /* =========================================================
-   MANLUNG RECOVERY - HOME ONBOARDING POPUP
+   MANLUNG RECOVERY - CENTERED PHONE ONBOARDING
    ========================================================= */
 
 #manlung-onboarding {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 99999;
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 18px;
+  padding: 16px;
   box-sizing: border-box;
-  background: rgba(2, 6, 23, 0.48);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(2, 6, 23, 0.62);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 #manlung-onboarding.open {
@@ -22,27 +22,44 @@
 
 .manlung-onboarding-card {
   position: relative;
-  width: min(420px, 100%);
-  padding: 22px 20px 18px;
-  border-radius: 16px;
+  width: min(430px, 100%);
+  max-height: min(680px, calc(100vh - 32px));
+  overflow-y: auto;
+  padding: 24px 20px 18px;
+  border-radius: 18px;
   background: #ffffff;
   border: 1px solid rgba(37, 99, 235, 0.16);
-  box-shadow: 0 22px 70px rgba(2, 6, 23, 0.28);
+  box-shadow:
+    0 26px 80px rgba(2, 6, 23, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.25);
   color: #0f172a;
   box-sizing: border-box;
+  animation: manlungOnboardingIn .22s ease-out;
+}
+
+@keyframes manlungOnboardingIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .manlung-onboarding-close {
   position: absolute;
-  top: 9px;
+  top: 10px;
   right: 10px;
+  z-index: 2;
   width: 34px;
   height: 34px;
   border: 0;
-  border-radius: 9px;
+  border-radius: 10px;
   background: #f1f5f9;
   color: #475569;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
 }
@@ -53,16 +70,16 @@
 }
 
 .manlung-onboarding-icon {
-  width: 46px;
-  height: 46px;
-  margin: 0 auto 11px;
-  border-radius: 13px;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 12px;
+  border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #eff6ff;
   color: #2563eb;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }
 
 .manlung-onboarding-title {
@@ -75,66 +92,80 @@
 }
 
 .manlung-onboarding-text {
-  margin: 8px auto 14px;
-  max-width: 330px;
+  margin: 8px auto 16px;
+  max-width: 355px;
   text-align: center;
   color: #64748b;
-  font-size: 0.82rem;
+  font-size: .81rem;
   line-height: 1.5;
 }
 
 .manlung-onboarding-body {
-  min-height: 116px;
+  min-height: 205px;
 }
 
 .manlung-onboarding-tip {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 11px;
   margin: 8px 0;
-  padding: 9px 10px;
-  border-radius: 10px;
+  padding: 11px;
+  border-radius: 11px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
 }
 
 .manlung-onboarding-tip i {
-  width: 20px;
-  flex: 0 0 20px;
+  width: 22px;
+  flex: 0 0 22px;
   margin-top: 2px;
   text-align: center;
   color: #2563eb;
 }
 
-.manlung-onboarding-tip span {
-  font-size: 0.78rem;
-  line-height: 1.35;
-  color: #334155;
+.manlung-onboarding-tip-content {
+  min-width: 0;
+}
+
+.manlung-onboarding-tip-content strong {
+  display: block;
+  margin-bottom: 2px;
+  color: #0f172a;
+  font-size: .78rem;
+  line-height: 1.3;
+}
+
+.manlung-onboarding-tip-content span {
+  display: block;
+  color: #64748b;
+  font-size: .73rem;
+  line-height: 1.45;
 }
 
 .manlung-onboarding-footer {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 16px;
 }
 
 .manlung-onboarding-progress {
+  text-align: center;
   color: #64748b;
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: .70rem;
+  font-weight: 800;
 }
 
 .manlung-onboarding-next {
-  min-width: 92px;
-  min-height: 38px;
-  padding: 8px 13px;
+  min-width: 96px;
+  min-height: 39px;
+  padding: 8px 14px;
   border: 0;
-  border-radius: 9px;
+  border-radius: 10px;
   background: #2563eb;
   color: #ffffff;
-  font-size: 0.76rem;
+  font-size: .76rem;
   font-weight: 800;
   cursor: pointer;
 }
@@ -145,9 +176,10 @@
 
 .manlung-onboarding-skip {
   border: 0;
+  padding: 6px 0;
   background: transparent;
   color: #64748b;
-  font-size: 0.72rem;
+  font-size: .70rem;
   font-weight: 700;
   cursor: pointer;
 }
@@ -156,56 +188,110 @@
   color: #0f172a;
 }
 
-/* Mobile */
+/* Phone */
 @media (max-width: 650px) {
   #manlung-onboarding {
-    align-items: flex-end;
-    padding: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
   }
 
   .manlung-onboarding-card {
-    width: 100%;
-    max-width: 410px;
-    padding: 20px 15px 15px;
-    border-radius: 16px 16px 12px 12px;
+    width: min(94vw, 400px);
+    max-height: 82vh;
+    padding: 21px 15px 15px;
+    border-radius: 17px;
+  }
+
+  .manlung-onboarding-icon {
+    width: 46px;
+    height: 46px;
+    margin-bottom: 10px;
   }
 
   .manlung-onboarding-title {
-    font-size: 1.08rem;
+    font-size: 1.05rem;
   }
 
   .manlung-onboarding-text {
-    font-size: 0.76rem;
+    font-size: .74rem;
     margin-bottom: 11px;
   }
 
   .manlung-onboarding-body {
-    min-height: 108px;
+    min-height: 190px;
   }
 
   .manlung-onboarding-tip {
-    padding: 8px 9px;
+    padding: 9px;
+    gap: 9px;
   }
 
-  .manlung-onboarding-tip span {
-    font-size: 0.74rem;
+  .manlung-onboarding-tip-content strong {
+    font-size: .73rem;
+  }
+
+  .manlung-onboarding-tip-content span {
+    font-size: .69rem;
+  }
+
+  .manlung-onboarding-footer {
+    margin-top: 12px;
   }
 
   .manlung-onboarding-next {
-    min-height: 36px;
+    min-width: 90px;
+    min-height: 37px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 370px) {
+  #manlung-onboarding {
+    padding: 10px;
+  }
+
+  .manlung-onboarding-card {
+    width: 96vw;
+    max-height: 84vh;
+    padding: 18px 12px 13px;
+  }
+
+  .manlung-onboarding-body {
+    min-height: 175px;
+  }
+
+  .manlung-onboarding-tip {
+    margin: 6px 0;
+    padding: 8px;
+  }
+
+  .manlung-onboarding-tip-content strong {
+    font-size: .69rem;
+  }
+
+  .manlung-onboarding-tip-content span {
+    font-size: .66rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 651px) {
+  .manlung-onboarding-card {
+    width: min(460px, 92vw);
   }
 }
 
 /* Dark mode */
 html.dark #manlung-onboarding,
 body.dark #manlung-onboarding {
-  background: rgba(2, 6, 23, 0.68);
+  background: rgba(2, 6, 23, .74);
 }
 
 html.dark .manlung-onboarding-card,
 body.dark .manlung-onboarding-card {
   background: #0f172a;
-  border-color: rgba(96, 165, 250, 0.22);
+  border-color: rgba(96, 165, 250, .22);
   color: #f8fafc;
 }
 
@@ -243,9 +329,14 @@ body.dark .manlung-onboarding-tip {
   border-color: #334155;
 }
 
-html.dark .manlung-onboarding-tip span,
-body.dark .manlung-onboarding-tip span {
-  color: #cbd5e1;
+html.dark .manlung-onboarding-tip-content strong,
+body.dark .manlung-onboarding-tip-content strong {
+  color: #f8fafc;
+}
+
+html.dark .manlung-onboarding-tip-content span,
+body.dark .manlung-onboarding-tip-content span {
+  color: #94a3b8;
 }
 
 html.dark .manlung-onboarding-progress,
