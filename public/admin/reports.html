@@ -68,7 +68,190 @@
     .operations-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
     .operations-flow{overflow-x:auto;grid-template-columns:repeat(14,22px)}
 }
+
 </style>
+
+<style id="reports-flow-enhancement">
+/* Reports page flow */
+.reports-flow-nav{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    gap:.4rem;
+    padding:.55rem;
+    margin:0 auto .8rem;
+    max-width:1200px;
+    overflow-x:auto;
+    scrollbar-width:thin;
+    background:color-mix(in srgb,var(--card-bg) 94%,transparent);
+    border:1px solid var(--card-border);
+    border-radius:13px;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
+    backdrop-filter:blur(12px);
+}
+
+.reports-flow-nav::-webkit-scrollbar{
+    height:5px;
+}
+
+.reports-flow-nav::-webkit-scrollbar-thumb{
+    background:rgba(100,116,139,.35);
+    border-radius:999px;
+}
+
+.reports-flow-link{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+    min-height:34px;
+    padding:.42rem .7rem;
+    border:1px solid transparent;
+    border-radius:9px;
+    text-decoration:none;
+    color:var(--text-muted);
+    background:transparent;
+    font-size:.68rem;
+    font-weight:800;
+    white-space:nowrap;
+    transition:
+        background .18s ease,
+        color .18s ease,
+        border-color .18s ease,
+        transform .18s ease;
+}
+
+.reports-flow-link:hover{
+    color:var(--text);
+    background:rgba(37,99,235,.07);
+    border-color:rgba(37,99,235,.12);
+    transform:translateY(-1px);
+}
+
+.reports-flow-link.active{
+    color:#fff;
+    background:linear-gradient(135deg,#123a78,#2563eb);
+    border-color:#2563eb;
+    box-shadow:0 5px 14px rgba(37,99,235,.22);
+}
+
+.reports-flow-link i{
+    font-size:.7rem;
+}
+
+#manlungOperationsDashboard,
+#operationsDateAnalysis,
+#operationsCallAnalysis,
+#operationsAdminReport,
+#monthlyWorkCoverage{
+    scroll-margin-top:72px;
+}
+
+#operationsDateAnalysis{
+    order:1;
+}
+
+#operationsCallAnalysis{
+    order:2;
+}
+
+#operationsAdminReport{
+    order:3;
+}
+
+#monthlyWorkCoverage{
+    order:4;
+}
+
+.reports-flow-section-label{
+    display:flex;
+    align-items:center;
+    gap:.45rem;
+    margin:1rem 0 .45rem;
+    padding-left:.1rem;
+    color:var(--text-muted);
+    font-size:.66rem;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+
+.reports-flow-section-label i{
+    color:#2563eb;
+}
+
+.operations-shell{
+    margin-top:.4rem !important;
+}
+
+.operations-head{
+    padding-bottom:.45rem;
+}
+
+.operations-head h2{
+    letter-spacing:-.01em;
+}
+
+.operations-kpi,
+.operations-report-kpi,
+.coverage-insight{
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease;
+}
+
+.operations-kpi:hover,
+.operations-report-kpi:hover,
+.coverage-insight:hover{
+    transform:translateY(-2px);
+    border-color:rgba(37,99,235,.22);
+    box-shadow:0 9px 22px rgba(15,23,42,.07);
+}
+
+/* Give major report blocks a clearer vertical rhythm. */
+#operationsDateAnalysis{
+    margin-top:.85rem;
+}
+
+#operationsAdminReport{
+    margin-top:1rem;
+}
+
+#monthlyWorkCoverage{
+    margin-top:1rem;
+}
+
+/* Mobile flow */
+@media(max-width:700px){
+    .reports-flow-nav{
+        margin-bottom:.65rem;
+        border-radius:11px;
+        padding:.45rem;
+        gap:.3rem;
+    }
+
+    .reports-flow-link{
+        min-height:32px;
+        padding:.38rem .58rem;
+        font-size:.64rem;
+    }
+
+    .reports-flow-link i{
+        font-size:.65rem;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    .reports-flow-link,
+    .operations-kpi,
+    .operations-report-kpi,
+    .coverage-insight{
+        transition:none;
+    }
+}
 
 <style id="operations-report-section">
 .operations-report-section{margin-top:.9rem}
@@ -361,6 +544,35 @@
     </div>
 </header>
 
+<nav class="reports-flow-nav" aria-label="Reports sections">
+    <a href="#manlungOperationsDashboard" class="reports-flow-link active">
+        <i class="fas fa-chart-line"></i>
+        Overview
+    </a>
+
+    <a href="#operationsDateAnalysis" class="reports-flow-link">
+        <i class="fas fa-calendar-days"></i>
+        Date Analysis
+    </a>
+
+    <a href="#operationsCallAnalysis" class="reports-flow-link">
+        <i class="fas fa-phone-volume"></i>
+        Calls
+    </a>
+
+    <a href="#operationsAdminReport" class="reports-flow-link">
+        <i class="fas fa-users"></i>
+        Admin Performance
+    </a>
+
+    <a href="#monthlyWorkCoverage" class="reports-flow-link">
+        <i class="fas fa-chart-network"></i>
+        Work Coverage
+    </a>
+</nav>
+
+
+
 <main class="container">
 
 <section class="card operations-shell" id="manlungOperationsDashboard">
@@ -383,7 +595,7 @@
         </div>
     </div>
 
-    <section class="card operations-card operations-date-panel">
+    <section class="card operations-card operations-date-panel" id="operationsDateAnalysis">
 
         <div class="operations-report-header">
 
@@ -604,7 +816,7 @@
 
     </div>
 
-    <section class="card operations-card weekly-call-report-card">
+    <section class="card operations-card weekly-call-report-card" id="operationsCallAnalysis">
 
         <div class="data-center-heading">
 
@@ -989,6 +1201,56 @@ function logout() {
 
     script exactly as it is in your current file.
 -->
+
+
+<script id="reports-flow-navigation">
+(function(){
+    const links = [...document.querySelectorAll('.reports-flow-link')];
+
+    if(!links.length) return;
+
+    const targets = links
+        .map(link => document.querySelector(link.getAttribute('href')))
+        .filter(Boolean);
+
+    function setActive(id){
+        links.forEach(link => {
+            const active = link.getAttribute('href') === '#' + id;
+            link.classList.toggle('active', active);
+            if(active){
+                link.setAttribute('aria-current','page');
+            }else{
+                link.removeAttribute('aria-current');
+            }
+        });
+    }
+
+    const observer = new IntersectionObserver(
+        entries => {
+            const visible = entries
+                .filter(entry => entry.isIntersecting)
+                .sort((a,b) => b.intersectionRatio - a.intersectionRatio);
+
+            if(visible[0]){
+                setActive(visible[0].target.id);
+            }
+        },
+        {
+            rootMargin:'-90px 0px -55% 0px',
+            threshold:[0.1,0.25,0.5]
+        }
+    );
+
+    targets.forEach(target => observer.observe(target));
+
+    links.forEach(link => {
+        link.addEventListener('click', () => {
+            const id = link.getAttribute('href').slice(1);
+            setActive(id);
+        });
+    });
+})();
+</script>
 
 <script id="manlung-operations-script">
 
