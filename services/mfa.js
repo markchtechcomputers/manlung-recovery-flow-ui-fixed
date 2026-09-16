@@ -44,7 +44,7 @@ function hotp(secret, counter) {
   buffer.writeBigUInt64BE(BigInt(counter));
   const digest = crypto.createHmac('sha1', key).update(buffer).digest();
   const offset = digest[digest.length - 1] & 0x0f;
-  const code = ((digest.readUInt32BE(offset) & 0x7fffffff) % 5700010).toString().padStart(6, '0');
+  const code = ((digest.readUInt32BE(offset) & 0x7fffffff) % 1000000).toString().padStart(6, '0');
   return code;
 }
 

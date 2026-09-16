@@ -45,7 +45,7 @@ test('GET / serves the homepage', async () => {
   const res = await fetch(`${baseUrl}/`);
   assert.equal(res.status, 200);
   const text = await res.text();
-  assert.match(text, /Manlung Tech City/);
+  assert.match(text, /Manlung Recovery/);
 });
 
 test('GET /admin/dashboard.html serves without crashing (static route)', async () => {
@@ -53,12 +53,36 @@ test('GET /admin/dashboard.html serves without crashing (static route)', async (
   assert.equal(res.status, 200);
 });
 
-test('security headers are present but inline scripts are NOT blocked (CSP off)', async () => {
+test('security headers include a configured Content-Security-Policy', async () => {
   const res = await fetch(`${baseUrl}/`);
-  assert.equal(res.headers.get('x-frame-options'), 'SAMEORIGIN');
-  assert.equal(res.headers.get('content-security-policy'), null); // must stay off — see server.js comment
-});
 
+  assert.equal(res.status, 200);
+
+  const csp = res.headers.get('content-security-policy') || '';
+
+  assert.ok(
+    csp.length > 0,
+    'Content-Security-Policy header should be present'
+  );
+
+  assert.match(
+    csp,
+    /default-src\s+['"]self['"]/i,
+    'CSP should contain default-src self'
+  );
+
+  assert.match(
+    csp,
+    /script-src\s+['"]self['"]/i,
+    'CSP should contain script-src self'
+  );
+
+  assert.match(
+    csp,
+    /frame-ancestors\s+['"]none['"]/i,
+    'CSP should contain frame-ancestors none'
+  );
+});
 test('protected routes reject requests with no auth token', async () => {
   const { status, json } = await req('GET', '/api/cases/admin/stats');
   assert.equal(status, 401);
@@ -93,7 +117,7 @@ test('client register rejects a too-short password', async () => {
     password: '123',
   });
   assert.equal(status, 400);
-  assert.match(json.error, /6 characters/i);
+  assert.match(json.error, /8 characters/i);
 });
 
 test('case submit rejects missing required fields (never fakes success)', async () => {

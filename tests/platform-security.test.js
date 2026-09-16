@@ -1,3 +1,15 @@
+
+// Test-only environment bootstrap.
+// Never use these values in production.
+process.env.SUPABASE_URL =
+  process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+
+process.env.SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || 'test-service-role-key';
+
+process.env.JWT_SECRET =
+  process.env.JWT_SECRET || 'test-jwt-secret-for-tests-only';
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { isDurablyRevoked } = require('../middleware/auth');
