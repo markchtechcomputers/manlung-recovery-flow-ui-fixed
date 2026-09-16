@@ -1,126 +1,258 @@
-/* Manlung Recovery — clean mobile header layout. */
-html,body{min-width:0;overflow-x:hidden}
+/* =========================================================
+   MANLUNG RECOVERY - MOBILE HEADER
+   ========================================================= */
 
-.mobile-menu-toggle,.mobile-nav{display:none!important}
-
-@media screen and (max-width:767px){
-  .site-header,.site-header::before,.site-header::after{
-    position:relative!important;width:100%!important;background:#fff!important;color:#000!important;
-    border:0!important;box-shadow:none!important;outline:0!important;background-image:none!important;
-  }
-
-  .site-header .manlung-header-inner{
-    width:100%!important;min-height:auto!important;display:flex!important;flex-wrap:wrap!important;
-    align-items:center!important;justify-content:flex-start!important;gap:8px!important;
-    padding:10px 12px 8px!important;margin:0!important;box-sizing:border-box!important;position:relative!important;
-  }
-
-  .site-header .brand{
-    display:flex!important;align-items:center!important;flex:0 0 100%!important;width:100%!important;min-width:0!important;
-    max-width:100%!important;margin:0!important;padding:0!important;justify-content:flex-start!important;
-    text-align:left!important;gap:8px!important;background:transparent!important;border:0!important;box-shadow:none!important;
-  }
-
-  .site-header .manlung-home-logo{
-    display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 38px!important;
-    width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
-    margin:0!important;padding:0!important;overflow:hidden!important;text-decoration:none!important;
-    background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;
-  }
-
-  .site-header .manlung-home-logo img,.site-header .manlung-site-logo{
-    display:block!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
-    object-fit:contain!important;margin:0!important;padding:0!important;background:transparent!important;
-    border:0!important;border-radius:0!important;box-shadow:none!important;
-  }
-
-  .site-header .manlung-brand-copy{display:block!important;min-width:0!important;flex:1 1 auto!important;overflow:hidden!important}
-  .site-header .brand h1,.site-header .brand h1 i,.site-header .brand span{
-    background:transparent!important;border:0!important;box-shadow:none!important;text-shadow:none!important;color:#000!important;
-  }
-  .site-header .brand h1{display:block!important;width:100%!important;margin:0!important;padding:0!important;font-size:.9rem!important;line-height:1.15!important;font-weight:800!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-  .site-header .brand h1 i{display:inline-block!important;margin-right:5px!important}
-  .site-header .brand span{display:block!important;width:100%!important;margin:3px 0 0!important;padding:0!important;font-size:.56rem!important;line-height:1.2!important;font-weight:700!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-
-  /* The five requested actions are one single horizontal row. */
-  .site-header .header-actions{
-    display:flex!important;flex:0 0 100%!important;width:100%!important;min-width:0!important;
-    align-items:center!important;justify-content:flex-start!important;align-content:center!important;
-    flex-wrap:nowrap!important;gap:16px!important;overflow-x:auto!important;overflow-y:hidden!important;
-    white-space:nowrap!important;height:38px!important;min-height:38px!important;margin:0!important;padding:0 1px!important;
-    scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;background:transparent!important;
-    border:0!important;box-shadow:none!important;
-  }
-  .site-header .header-actions::-webkit-scrollbar{display:none!important}
-
-  .site-header .header-actions>a,
-  .site-header .header-actions>button,
-  .site-header .header-actions>.btn{
-    display:inline-flex!important;flex:0 0 auto!important;width:auto!important;min-width:max-content!important;
-    height:32px!important;min-height:32px!important;max-height:32px!important;align-self:center!important;
-    align-items:center!important;justify-content:center!important;flex-direction:row!important;gap:5px!important;
-    margin:0!important;padding:0!important;white-space:nowrap!important;line-height:1!important;
-    font-size:.68rem!important;font-weight:800!important;color:#000!important;background:transparent!important;
-    border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;text-shadow:none!important;
-    transform:none!important;filter:none!important;text-decoration:none!important;box-sizing:border-box!important;
-  }
-  .site-header .header-actions>a:hover,
-  .site-header .header-actions>a:focus,
-  .site-header .header-actions>a:active,
-  .site-header .header-actions>button:hover,
-  .site-header .header-actions>button:focus,
-  .site-header .header-actions>button:active{color:#000!important;background:transparent!important;border:0!important;box-shadow:none!important;outline:0!important}
-
-  .site-header .header-actions i,
-  .site-header .header-actions img{
-    display:inline-flex!important;flex:0 0 auto!important;width:1em!important;height:1em!important;
-    min-width:1em!important;min-height:1em!important;max-width:1em!important;max-height:1em!important;
-    align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;
-    object-fit:contain!important;color:#000!important;background:transparent!important;border:0!important;box-shadow:none!important;
-    vertical-align:middle!important;
-  }
-
-  .site-header .header-actions button[data-theme-toggle="true"]{
-    position:static!important;width:auto!important;height:32px!important;min-width:max-content!important;min-height:32px!important;
-    max-height:32px!important;padding:0!important;display:inline-flex!important;flex-direction:row!important;
-    align-self:center!important;font-size:.68rem!important;font-weight:800!important;color:#000!important;background:transparent!important;
-    border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;
-  }
-  .site-header .header-actions button[data-theme-toggle="true"]::before,
-  .site-header .header-actions button[data-theme-toggle="true"]::after{content:none!important;display:none!important}
-
-  /* Keep the hamburger functional, but never let it push the five actions out of line. */
-  .site-header .mobile-menu-toggle{
-    display:flex!important;align-items:center!important;justify-content:center!important;position:absolute!important;
-    top:9px!important;right:10px!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
-    padding:0!important;margin:0!important;border:0!important;border-radius:0!important;background:transparent!important;
-    color:#000!important;box-shadow:none!important;outline:0!important;z-index:100002!important;cursor:pointer!important;
-  }
-  .site-header .mobile-menu-toggle i{display:block!important;font-size:1rem!important;color:#000!important}
-
-  .site-header .mobile-nav{
-    display:none!important;position:absolute!important;top:100%!important;left:0!important;right:0!important;width:100%!important;
-    max-height:calc(100dvh - 70px)!important;margin:0!important;padding:0!important;overflow-y:auto!important;overflow-x:hidden!important;
-    background:#fff!important;color:#000!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;
-    z-index:100001!important;box-sizing:border-box!important;
-  }
-  .site-header .mobile-nav.is-open{display:block!important}
-  .site-header .mobile-nav-panel{display:block!important;width:100%!important;padding:8px 14px 14px!important;box-sizing:border-box!important}
-  .site-header .mobile-nav-title{display:flex!important;align-items:center!important;justify-content:space-between!important;width:100%!important;min-height:42px!important;padding:4px 0 8px!important;color:#000!important;font-size:.7rem!important;font-weight:800!important;text-transform:uppercase!important;letter-spacing:.06em!important;background:transparent!important;border:0!important}
-  .site-header .mobile-menu-close{display:flex!important;align-items:center!important;justify-content:center!important;width:36px!important;height:36px!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#000!important;font-size:1.4rem!important;box-shadow:none!important;outline:0!important}
-  .site-header .mobile-nav a{display:flex!important;align-items:center!important;width:100%!important;min-height:44px!important;margin:0!important;padding:10px 0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#000!important;text-decoration:none!important;font-size:.84rem!important;font-weight:700!important;box-shadow:none!important;text-shadow:none!important}
-  .site-header .mobile-nav a i{display:inline-block!important;width:20px!important;margin-right:9px!important;color:#000!important;text-align:center!important}
-  .site-header .mobile-nav-divider{display:block!important;width:100%!important;height:1px!important;margin:7px 0!important;background:#e5e5e5!important}
-  body.mobile-menu-open,body.manlung-mobile-menu-open{overflow:hidden!important}
+.mobile-friendly-header {
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 2px solid rgba(37, 99, 235, 0.18);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.10);
 }
 
-@media screen and (max-width:390px){
-  .site-header .manlung-home-logo,.site-header .manlung-home-logo img,.site-header .manlung-site-logo{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important}
-  .site-header .header-actions{gap:13px!important;height:36px!important;min-height:36px!important}
-  .site-header .header-actions>a,.site-header .header-actions>button,.site-header .header-actions>.btn{height:30px!important;min-height:30px!important;max-height:30px!important;font-size:.63rem!important}
-  .site-header .header-actions i,.site-header .header-actions img{font-size:.9rem!important;width:.9em!important;height:.9em!important;min-width:.9em!important;min-height:.9em!important}
+.mobile-friendly-header .header-inner {
+  width: 100%;
+  min-height: 64px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
 }
 
-@media screen and (min-width:768px){
-  .site-header .mobile-menu-toggle,.site-header .mobile-nav{display:none!important;visibility:hidden!important;pointer-events:none!important}
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.mobile-brand img {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+  background: #ffffff;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.14);
+}
+
+.mobile-brand-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-brand-text strong {
+  color: #0f172a;
+  font-size: 0.94rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.mobile-brand-text span {
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 0.60rem;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.mobile-menu-toggle {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  flex: 0 0 44px;
+  padding: 0;
+}
+
+.mobile-menu-toggle span {
+  display: block;
+  width: 21px;
+  height: 2px;
+  border-radius: 99px;
+  background: #0f172a;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.mobile-menu-toggle.active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-toggle.active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.mobile-menu {
+  display: none;
+  width: 100%;
+  padding: 8px 12px 14px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+}
+
+.mobile-menu.open {
+  display: grid;
+  gap: 7px;
+}
+
+.mobile-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 10px 13px;
+  border-radius: 10px;
+  color: #0f172a;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.mobile-menu a i {
+  width: 20px;
+  text-align: center;
+  color: #2563eb;
+}
+
+.mobile-menu a:active {
+  transform: scale(0.99);
+}
+
+/* Center hero/image/text on phones */
+@media (max-width: 650px) {
+  .hero {
+    text-align: center;
+  }
+
+  .hero-content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-left: 18px;
+    padding-right: 18px;
+    box-sizing: border-box;
+  }
+
+  .hero img,
+  .hero-image,
+  .hero-visual,
+  .hero-video {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero img {
+    max-width: 88%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  #typing-text,
+  .hero h1,
+  .hero h2,
+  .hero p {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #typing-text {
+    font-size: 1.65rem !important;
+    line-height: 1.15;
+  }
+
+  .hero p {
+    max-width: 340px;
+    font-size: 0.90rem;
+    line-height: 1.55;
+  }
+}
+
+@media (max-width: 390px) {
+  .mobile-friendly-header .header-inner {
+    min-height: 60px;
+    padding: 7px 10px;
+  }
+
+  .mobile-brand img {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .mobile-brand-text strong {
+    font-size: 0.84rem;
+  }
+
+  .mobile-brand-text span {
+    font-size: 0.54rem;
+  }
+
+  .mobile-menu-toggle {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+}
+
+/* Dark mode */
+html.dark .mobile-friendly-header,
+body.dark .mobile-friendly-header {
+  background: #0f172a;
+  border-bottom-color: rgba(96, 165, 250, 0.25);
+}
+
+html.dark .mobile-brand-text strong,
+body.dark .mobile-brand-text strong {
+  color: #f8fafc;
+}
+
+html.dark .mobile-brand-text span,
+body.dark .mobile-brand-text span {
+  color: #94a3b8;
+}
+
+html.dark .mobile-menu-toggle,
+body.dark .mobile-menu-toggle {
+  background: #1e293b;
+}
+
+html.dark .mobile-menu-toggle span,
+body.dark .mobile-menu-toggle span {
+  background: #f8fafc;
+}
+
+html.dark .mobile-menu,
+body.dark .mobile-menu {
+  background: #0f172a;
+  border-top-color: #1e293b;
+}
+
+html.dark .mobile-menu a,
+body.dark .mobile-menu a {
+  background: #111827;
+  border-color: #334155;
+  color: #f8fafc;
 }
