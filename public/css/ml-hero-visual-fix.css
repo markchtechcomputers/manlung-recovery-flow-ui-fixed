@@ -1,0 +1,343 @@
+
+/* =========================================================
+   MANLUNG RECOVERY — HERO VISUAL FIX
+   Right-side device illustration + balanced background
+   Desktop + tablet + mobile
+   ========================================================= */
+
+.ml-hero-visual {
+    position: absolute;
+    right: -3%;
+    top: 50%;
+    width: min(58vw, 760px);
+    height: min(600px, 58vw);
+    transform: translateY(-46%);
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+}
+
+/* Soft designed background behind the image */
+
+.ml-hero-visual::before {
+    content: "";
+    position: absolute;
+    inset: 5% 0 5% 5%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 52% 48%,
+            rgba(37,99,235,.25) 0%,
+            rgba(59,130,246,.16) 25%,
+            rgba(147,197,253,.12) 42%,
+            rgba(219,234,254,.06) 58%,
+            transparent 74%
+        );
+
+    filter: blur(8px);
+
+    z-index: -2;
+}
+
+/* Subtle futuristic rings */
+
+.ml-hero-visual::after {
+    content: "";
+    position: absolute;
+
+    width: 72%;
+    height: 45%;
+
+    left: 14%;
+    top: 32%;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(37,99,235,.18);
+
+    box-shadow:
+        0 0 45px rgba(37,99,235,.12),
+        inset 0 0 35px rgba(59,130,246,.08);
+
+    transform: rotate(-7deg);
+
+    z-index: -1;
+}
+
+/* Actual image */
+
+.ml-hero-visual img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    /*
+      Blend the pale image background into
+      the site's white/light hero.
+    */
+    mix-blend-mode: multiply;
+
+    filter:
+        saturate(1.05)
+        contrast(1.03)
+        drop-shadow(0 25px 45px rgba(15,23,42,.12));
+
+    opacity: .98;
+
+    animation: mlHeroFloat 7s ease-in-out infinite;
+}
+
+/* Floating movement */
+
+@keyframes mlHeroFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ---------------------------------------------------------
+   HERO LAYOUT
+   --------------------------------------------------------- */
+
+.ml-hero-enhanced {
+    position: relative !important;
+    overflow: hidden !important;
+    min-height: 680px;
+}
+
+.ml-hero-enhanced .hero-content,
+.ml-hero-enhanced .hero-copy,
+.ml-hero-enhanced .hero-text,
+.ml-hero-enhanced .hero-left {
+    position: relative;
+    z-index: 5;
+}
+
+/*
+   Keep the left text area clear of the illustration.
+*/
+
+.ml-hero-enhanced .hero-content,
+.ml-hero-enhanced .hero-copy,
+.ml-hero-enhanced .hero-text {
+    max-width: 52%;
+}
+
+/* ---------------------------------------------------------
+   DESKTOP HEADER BALANCE
+   --------------------------------------------------------- */
+
+header,
+.site-header {
+    z-index: 1000;
+}
+
+header .container,
+.site-header .container,
+header > .container {
+    max-width: 1240px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+header nav,
+.site-header nav {
+    gap: 4px;
+}
+
+header nav a,
+.site-header nav a {
+    white-space: nowrap;
+}
+
+/* Prevent the header becoming oversized */
+
+header img,
+.site-header img {
+    max-height: 48px;
+    width: auto;
+}
+
+/* ---------------------------------------------------------
+   TABLET
+   --------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+
+    .ml-hero-visual {
+        right: -8%;
+        width: 57vw;
+        height: 500px;
+    }
+
+    .ml-hero-enhanced .hero-content,
+    .ml-hero-enhanced .hero-copy,
+    .ml-hero-enhanced .hero-text {
+        max-width: 50%;
+    }
+}
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 768px) {
+
+    .ml-hero-enhanced {
+        min-height: auto !important;
+        padding-bottom: 30px !important;
+        overflow: hidden !important;
+    }
+
+    /*
+       Text first.
+    */
+
+    .ml-hero-enhanced .hero-content,
+    .ml-hero-enhanced .hero-copy,
+    .ml-hero-enhanced .hero-text,
+    .ml-hero-enhanced .hero-left {
+        max-width: 100% !important;
+        width: 100% !important;
+        position: relative;
+        z-index: 5;
+    }
+
+    /*
+       Put the visual underneath/below the text
+       instead of squeezing the desktop layout.
+    */
+
+    .ml-hero-visual {
+        position: relative !important;
+
+        right: auto !important;
+        top: auto !important;
+
+        width: 118% !important;
+        height: 390px !important;
+
+        margin:
+            5px
+            -9%
+            -35px
+            -9% !important;
+
+        transform: none !important;
+
+        z-index: 2;
+    }
+
+    .ml-hero-visual img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+
+        mix-blend-mode: multiply;
+    }
+
+    /*
+       Reduce glow on mobile.
+    */
+
+    .ml-hero-visual::before {
+        inset: 8% 5% !important;
+        filter: blur(15px);
+    }
+
+    .ml-hero-visual::after {
+        width: 75%;
+        height: 38%;
+        left: 12%;
+        top: 34%;
+    }
+
+    /*
+       Header must stay readable.
+    */
+
+    header,
+    .site-header {
+        max-width: calc(100% - 20px);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    header nav,
+    .site-header nav {
+        display: none;
+    }
+
+    header img,
+    .site-header img {
+        max-width: 42px;
+        max-height: 42px;
+    }
+}
+
+/* ---------------------------------------------------------
+   SMALL PHONES
+   --------------------------------------------------------- */
+
+@media (max-width: 480px) {
+
+    .ml-hero-visual {
+        width: 125% !important;
+        height: 330px !important;
+
+        margin-left: -12.5% !important;
+        margin-right: -12.5% !important;
+    }
+
+    .ml-hero-visual img {
+        filter:
+            saturate(1.02)
+            contrast(1.02)
+            drop-shadow(0 15px 30px rgba(15,23,42,.10));
+    }
+}
+
+/* ---------------------------------------------------------
+   REDUCED MOTION
+   --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .ml-hero-visual img {
+        animation: none !important;
+    }
+}
+
+/* ---------------------------------------------------------
+   DARK MODE
+   --------------------------------------------------------- */
+
+[data-theme="dark"] .ml-hero-visual::before,
+.dark .ml-hero-visual::before {
+    background:
+        radial-gradient(
+            circle,
+            rgba(37,99,235,.22),
+            rgba(30,64,175,.12) 40%,
+            transparent 72%
+        );
+}
+
+[data-theme="dark"] .ml-hero-visual img,
+.dark .ml-hero-visual img {
+    mix-blend-mode: screen;
+    opacity: .94;
+}
