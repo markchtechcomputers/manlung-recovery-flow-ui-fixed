@@ -1,102 +1,162 @@
 
-/* =========================================================
-   MANLUNG RECOVERY — HERO VISUAL
-   Desktop: image behind/right of text
-   Mobile: image FIRST, text underneath
-   ========================================================= */
+/* ==========================================================
+   MANLUNG RECOVERY
+   PREMIUM HERO SYSTEM
+   ========================================================== */
 
 .ml-balanced-hero {
     position: relative !important;
     isolation: isolate !important;
     overflow: hidden !important;
+
     min-height: 650px !important;
-    display: flex !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(420px, .95fr) !important;
     align-items: center !important;
-    padding: 80px 5% !important;
+
+    gap: 20px !important;
+
+    padding: 76px clamp(20px, 5vw, 72px) 70px !important;
+
+    background:
+        radial-gradient(
+            circle at 82% 42%,
+            rgba(37,99,235,.10),
+            transparent 34%
+        ),
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f8fbff 58%,
+            #eef5ff 100%
+        ) !important;
 }
 
-/* ---------------------------------------------------------
+/* ==========================================================
    IMAGE
-   --------------------------------------------------------- */
+   ========================================================== */
 
 .ml-balanced-hero .ml-hero-device-visual {
     position: absolute !important;
-    z-index: 3 !important;
 
-    width: min(760px, 61vw) !important;
-    max-width: 760px !important;
-
-    right: -25px !important;
+    right: -20px !important;
     top: 50% !important;
+
+    width: min(760px, 58vw) !important;
 
     transform: translateY(-50%) !important;
 
+    z-index: 1 !important;
+
     pointer-events: none !important;
+
     display: block !important;
-
-    opacity: .96 !important;
-    mix-blend-mode: multiply !important;
-
-    filter:
-        drop-shadow(0 25px 45px rgba(15, 42, 80, .18))
-        saturate(.98) !important;
 }
 
 .ml-balanced-hero .ml-hero-device-visual img {
     display: block !important;
+
     width: 100% !important;
-    max-width: 100% !important;
     height: auto !important;
+
+    max-width: none !important;
+
+    mix-blend-mode: multiply !important;
+
+    opacity: .97 !important;
+
+    filter:
+        drop-shadow(0 28px 50px rgba(15,23,42,.16))
+        saturate(.98) !important;
 }
 
-/* ---------------------------------------------------------
-   SOFT BLEND FROM LEFT TO RIGHT
-   --------------------------------------------------------- */
+/* ==========================================================
+   LIGHT FADE — TEXT REMAINS EASY TO READ
+   ========================================================== */
 
 .ml-balanced-hero::before {
     content: "" !important;
+
     position: absolute !important;
-    z-index: 4 !important;
     inset: 0 !important;
+
+    z-index: 2 !important;
+
     pointer-events: none !important;
 
     background:
         linear-gradient(
             90deg,
-            rgba(255,255,255,.98) 0%,
-            rgba(255,255,255,.94) 22%,
-            rgba(255,255,255,.65) 43%,
-            rgba(255,255,255,.12) 68%,
-            rgba(255,255,255,0) 100%
+            rgba(255,255,255,1) 0%,
+            rgba(255,255,255,.98) 28%,
+            rgba(255,255,255,.88) 43%,
+            rgba(255,255,255,.38) 62%,
+            rgba(255,255,255,0) 82%
         ) !important;
 }
 
-/* ---------------------------------------------------------
-   TEXT / BUTTONS ABOVE IMAGE
-   --------------------------------------------------------- */
+/* ==========================================================
+   EXISTING HERO CONTENT
+   NEVER HIDE IT
+   ========================================================== */
 
-.ml-balanced-hero > *:not(.ml-hero-device-visual),
-.ml-balanced-hero .hero-content,
-.ml-balanced-hero .hero-copy,
-.ml-balanced-hero .hero-text,
+.ml-balanced-hero > *:not(.ml-hero-device-visual) {
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+/* Main hero text */
 .ml-balanced-hero h1,
 .ml-balanced-hero h2,
 .ml-balanced-hero p,
 .ml-balanced-hero a,
-.ml-balanced-hero button {
+.ml-balanced-hero button,
+.ml-balanced-hero .hero-content,
+.ml-balanced-hero .hero-copy,
+.ml-balanced-hero .hero-text,
+.ml-balanced-hero .hero-actions,
+.ml-balanced-hero .hero-buttons {
     position: relative !important;
-    z-index: 6 !important;
+    z-index: 11 !important;
 }
 
-/* Keep hero text from becoming too wide */
-.ml-balanced-hero h1,
-.ml-balanced-hero .hero-title {
-    max-width: 720px;
+/* Give the actual text a readable width */
+.ml-balanced-hero h1 {
+    max-width: 700px !important;
 }
 
-/* ---------------------------------------------------------
-   HEADER
-   --------------------------------------------------------- */
+.ml-balanced-hero p {
+    max-width: 650px !important;
+}
+
+/* ==========================================================
+   HERO IMAGE DECORATIVE EDGE
+   ========================================================== */
+
+.ml-balanced-hero .ml-hero-device-visual::after {
+    content: "" !important;
+
+    position: absolute !important;
+
+    width: 260px !important;
+    height: 260px !important;
+
+    right: 20% !important;
+    top: 25% !important;
+
+    border-radius: 50% !important;
+
+    background: rgba(37,99,235,.08) !important;
+
+    filter: blur(60px) !important;
+
+    z-index: -1 !important;
+}
+
+/* ==========================================================
+   DESKTOP HEADER BALANCE
+   ========================================================== */
 
 header,
 .site-header,
@@ -105,162 +165,267 @@ header,
     z-index: 100 !important;
 }
 
-/* =========================================================
+/* ==========================================================
    TABLET
-   ========================================================= */
+   ========================================================== */
 
-@media (max-width: 900px) and (min-width: 769px) {
+@media (max-width: 1000px) and (min-width: 769px) {
 
     .ml-balanced-hero {
-        min-height: 600px !important;
-        padding-left: 5% !important;
-        padding-right: 3% !important;
+        grid-template-columns: 1fr 1fr !important;
+
+        min-height: 590px !important;
+
+        padding-left: 32px !important;
+        padding-right: 20px !important;
     }
 
     .ml-balanced-hero .ml-hero-device-visual {
         width: 58vw !important;
-        right: -45px !important;
+        right: -55px !important;
     }
 }
 
-/* =========================================================
-   PHONE
-   IMAGE MUST COME FIRST
-   ========================================================= */
+/* ==========================================================
+   MOBILE
+   IMAGE FIRST
+   ========================================================== */
 
 @media (max-width: 768px) {
 
     .ml-balanced-hero {
+
         display: flex !important;
+
         flex-direction: column !important;
+
         align-items: stretch !important;
 
         min-height: auto !important;
 
         padding:
-            25px
-            18px
+            0
+            0
             45px !important;
 
-        overflow: hidden !important;
+        gap: 0 !important;
+
+        background:
+            linear-gradient(
+                180deg,
+                #f8fbff 0%,
+                #ffffff 55%,
+                #ffffff 100%
+            ) !important;
     }
 
-    /* IMAGE IS FIRST ON PHONE */
+    /* IMAGE IS PHYSICALLY FIRST */
     .ml-balanced-hero .ml-hero-device-visual {
-        position: relative !important;
 
         order: -100 !important;
 
-        z-index: 3 !important;
+        position: relative !important;
 
-        width: 112% !important;
-        max-width: none !important;
-
-        margin:
-            -5px
-            auto
-            5px !important;
-
-        right: auto !important;
         top: auto !important;
+        right: auto !important;
 
         transform: none !important;
 
-        opacity: 1 !important;
-        mix-blend-mode: multiply !important;
+        width: 100% !important;
 
-        display: block !important;
+        margin: 0 !important;
+
+        padding: 0 !important;
+
+        z-index: 3 !important;
     }
 
     .ml-balanced-hero .ml-hero-device-visual img {
+
         width: 100% !important;
+
         height: auto !important;
+
         display: block !important;
+
+        mix-blend-mode: multiply !important;
+
+        opacity: 1 !important;
+
+        filter:
+            drop-shadow(0 18px 35px rgba(15,23,42,.12)) !important;
     }
 
-    /* Hero text comes AFTER image */
+    /* TEXT COMES UNDER IMAGE */
     .ml-balanced-hero > *:not(.ml-hero-device-visual) {
+
         order: 10 !important;
+
         position: relative !important;
-        z-index: 6 !important;
+
+        z-index: 10 !important;
     }
 
-    /* Remove desktop fade on phone */
+    /* Mobile fade */
     .ml-balanced-hero::before {
+
+        top: 0 !important;
+        bottom: auto !important;
+
+        height: 45% !important;
+
         background:
             linear-gradient(
                 180deg,
                 rgba(255,255,255,0) 0%,
-                rgba(255,255,255,.08) 55%,
-                rgba(255,255,255,.92) 86%,
+                rgba(255,255,255,.03) 40%,
+                rgba(255,255,255,.75) 92%,
                 rgba(255,255,255,1) 100%
             ) !important;
-
-        z-index: 4 !important;
     }
 
     .ml-balanced-hero h1 {
-        font-size: clamp(2rem, 9vw, 3rem) !important;
+
+        font-size:
+            clamp(2.1rem, 9vw, 3rem) !important;
+
         line-height: 1.05 !important;
+
+        margin-top: 15px !important;
+    }
+
+    .ml-balanced-hero p {
+
+        font-size: 1rem !important;
+
+        line-height: 1.65 !important;
+    }
+
+    .ml-balanced-hero .hero-content,
+    .ml-balanced-hero .hero-copy,
+    .ml-balanced-hero .hero-text {
+
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
+    .ml-balanced-hero .hero-actions,
+    .ml-balanced-hero .hero-buttons {
+
+        padding-left: 20px !important;
+        padding-right: 20px !important;
     }
 }
 
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
+/* ==========================================================
+   SMALL PHONE
+   ========================================================== */
 
 @media (max-width: 480px) {
 
-    .ml-balanced-hero {
-        padding:
-            12px
-            14px
-            40px !important;
+    .ml-balanced-hero .ml-hero-device-visual {
+
+        width: 100% !important;
+
+        margin: 0 !important;
     }
 
-    .ml-balanced-hero .ml-hero-device-visual {
-        width: 125% !important;
-        margin-left: -12.5% !important;
-        margin-right: 0 !important;
+    .ml-balanced-hero h1 {
 
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
+        font-size: 2.15rem !important;
+    }
+
+    .ml-balanced-hero .hero-content,
+    .ml-balanced-hero .hero-copy,
+    .ml-balanced-hero .hero-text {
+
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .ml-balanced-hero .hero-actions,
+    .ml-balanced-hero .hero-buttons {
+
+        padding-left: 16px !important;
+        padding-right: 16px !important;
     }
 }
 
-/* =========================================================
+/* ==========================================================
    DARK MODE
-   ========================================================= */
+   ========================================================== */
 
-html.dark .ml-balanced-hero::before,
-body.dark .ml-balanced-hero::before {
+html.dark .ml-balanced-hero,
+body.dark .ml-balanced-hero {
+
     background:
+        radial-gradient(
+            circle at 80% 35%,
+            rgba(99,102,241,.14),
+            transparent 36%
+        ),
         linear-gradient(
-            90deg,
-            rgba(7,14,27,.98) 0%,
-            rgba(7,14,27,.90) 25%,
-            rgba(7,14,27,.55) 45%,
-            rgba(7,14,27,.12) 72%,
-            rgba(7,14,27,0) 100%
+            135deg,
+            #0b0f19 0%,
+            #111827 100%
         ) !important;
 }
 
-html.dark .ml-balanced-hero .ml-hero-device-visual,
-body.dark .ml-balanced-hero .ml-hero-device-visual {
+html.dark .ml-balanced-hero::before,
+body.dark .ml-balanced-hero::before {
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(11,15,25,1) 0%,
+            rgba(11,15,25,.98) 28%,
+            rgba(11,15,25,.82) 48%,
+            rgba(11,15,25,.30) 70%,
+            rgba(11,15,25,0) 90%
+        ) !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-device-visual img,
+body.dark .ml-balanced-hero .ml-hero-device-visual img {
+
     mix-blend-mode: screen !important;
+
+    filter:
+        drop-shadow(0 25px 45px rgba(0,0,0,.45))
+        brightness(.88)
+        saturate(.9) !important;
 }
 
 @media (max-width: 768px) {
 
     html.dark .ml-balanced-hero::before,
     body.dark .ml-balanced-hero::before {
+
+        height: 45% !important;
+
         background:
             linear-gradient(
                 180deg,
-                rgba(7,14,27,0) 0%,
-                rgba(7,14,27,.08) 50%,
-                rgba(7,14,27,.92) 88%,
-                rgba(7,14,27,1) 100%
+                rgba(11,15,25,0) 0%,
+                rgba(11,15,25,.04) 40%,
+                rgba(11,15,25,.80) 92%,
+                rgba(11,15,25,1) 100%
             ) !important;
+    }
+}
+
+/* ==========================================================
+   ACCESSIBILITY
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .ml-balanced-hero *,
+    .ml-balanced-hero *::before,
+    .ml-balanced-hero *::after {
+
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
     }
 }
