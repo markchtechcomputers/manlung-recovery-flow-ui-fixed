@@ -1,0 +1,266 @@
+
+/* =========================================================
+   MANLUNG RECOVERY — HERO VISUAL
+   Desktop: image behind/right of text
+   Mobile: image FIRST, text underneath
+   ========================================================= */
+
+.ml-balanced-hero {
+    position: relative !important;
+    isolation: isolate !important;
+    overflow: hidden !important;
+    min-height: 650px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 80px 5% !important;
+}
+
+/* ---------------------------------------------------------
+   IMAGE
+   --------------------------------------------------------- */
+
+.ml-balanced-hero .ml-hero-device-visual {
+    position: absolute !important;
+    z-index: 3 !important;
+
+    width: min(760px, 61vw) !important;
+    max-width: 760px !important;
+
+    right: -25px !important;
+    top: 50% !important;
+
+    transform: translateY(-50%) !important;
+
+    pointer-events: none !important;
+    display: block !important;
+
+    opacity: .96 !important;
+    mix-blend-mode: multiply !important;
+
+    filter:
+        drop-shadow(0 25px 45px rgba(15, 42, 80, .18))
+        saturate(.98) !important;
+}
+
+.ml-balanced-hero .ml-hero-device-visual img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* ---------------------------------------------------------
+   SOFT BLEND FROM LEFT TO RIGHT
+   --------------------------------------------------------- */
+
+.ml-balanced-hero::before {
+    content: "" !important;
+    position: absolute !important;
+    z-index: 4 !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.98) 0%,
+            rgba(255,255,255,.94) 22%,
+            rgba(255,255,255,.65) 43%,
+            rgba(255,255,255,.12) 68%,
+            rgba(255,255,255,0) 100%
+        ) !important;
+}
+
+/* ---------------------------------------------------------
+   TEXT / BUTTONS ABOVE IMAGE
+   --------------------------------------------------------- */
+
+.ml-balanced-hero > *:not(.ml-hero-device-visual),
+.ml-balanced-hero .hero-content,
+.ml-balanced-hero .hero-copy,
+.ml-balanced-hero .hero-text,
+.ml-balanced-hero h1,
+.ml-balanced-hero h2,
+.ml-balanced-hero p,
+.ml-balanced-hero a,
+.ml-balanced-hero button {
+    position: relative !important;
+    z-index: 6 !important;
+}
+
+/* Keep hero text from becoming too wide */
+.ml-balanced-hero h1,
+.ml-balanced-hero .hero-title {
+    max-width: 720px;
+}
+
+/* ---------------------------------------------------------
+   HEADER
+   --------------------------------------------------------- */
+
+header,
+.site-header,
+.navbar {
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) and (min-width: 769px) {
+
+    .ml-balanced-hero {
+        min-height: 600px !important;
+        padding-left: 5% !important;
+        padding-right: 3% !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-visual {
+        width: 58vw !important;
+        right: -45px !important;
+    }
+}
+
+/* =========================================================
+   PHONE
+   IMAGE MUST COME FIRST
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .ml-balanced-hero {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+
+        min-height: auto !important;
+
+        padding:
+            25px
+            18px
+            45px !important;
+
+        overflow: hidden !important;
+    }
+
+    /* IMAGE IS FIRST ON PHONE */
+    .ml-balanced-hero .ml-hero-device-visual {
+        position: relative !important;
+
+        order: -100 !important;
+
+        z-index: 3 !important;
+
+        width: 112% !important;
+        max-width: none !important;
+
+        margin:
+            -5px
+            auto
+            5px !important;
+
+        right: auto !important;
+        top: auto !important;
+
+        transform: none !important;
+
+        opacity: 1 !important;
+        mix-blend-mode: multiply !important;
+
+        display: block !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-visual img {
+        width: 100% !important;
+        height: auto !important;
+        display: block !important;
+    }
+
+    /* Hero text comes AFTER image */
+    .ml-balanced-hero > *:not(.ml-hero-device-visual) {
+        order: 10 !important;
+        position: relative !important;
+        z-index: 6 !important;
+    }
+
+    /* Remove desktop fade on phone */
+    .ml-balanced-hero::before {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,.08) 55%,
+                rgba(255,255,255,.92) 86%,
+                rgba(255,255,255,1) 100%
+            ) !important;
+
+        z-index: 4 !important;
+    }
+
+    .ml-balanced-hero h1 {
+        font-size: clamp(2rem, 9vw, 3rem) !important;
+        line-height: 1.05 !important;
+    }
+}
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .ml-balanced-hero {
+        padding:
+            12px
+            14px
+            40px !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-visual {
+        width: 125% !important;
+        margin-left: -12.5% !important;
+        margin-right: 0 !important;
+
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+html.dark .ml-balanced-hero::before,
+body.dark .ml-balanced-hero::before {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(7,14,27,.98) 0%,
+            rgba(7,14,27,.90) 25%,
+            rgba(7,14,27,.55) 45%,
+            rgba(7,14,27,.12) 72%,
+            rgba(7,14,27,0) 100%
+        ) !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-device-visual,
+body.dark .ml-balanced-hero .ml-hero-device-visual {
+    mix-blend-mode: screen !important;
+}
+
+@media (max-width: 768px) {
+
+    html.dark .ml-balanced-hero::before,
+    body.dark .ml-balanced-hero::before {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(7,14,27,0) 0%,
+                rgba(7,14,27,.08) 50%,
+                rgba(7,14,27,.92) 88%,
+                rgba(7,14,27,1) 100%
+            ) !important;
+    }
+}

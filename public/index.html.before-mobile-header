@@ -47,8 +47,6 @@
     </script>
 
     <link rel="stylesheet" href="/css/style.css">
-<link rel="stylesheet" href="/css/onboarding.css">
-<link rel="stylesheet" href="/css/mobile-header.css">
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="/css/home-premium.css">
     <script src="/js/home-premium.js?v=20260916" defer></script>
@@ -1423,61 +1421,8 @@ img[src*="gctxrf7M"] {
 
 
     <link rel="stylesheet" href="/css/ml-hero-visual-fix.css?v=hero9">
-  <link rel="stylesheet" href="/css/startup-loader.css">
-  <script src="/js/startup-loader.js" defer></script>
 </head>
 <body>
-
-<header class="mobile-friendly-header" id="mobileHeader">
-  <div class="header-inner">
-    <a href="/" class="mobile-brand" aria-label="Manlung Recovery Home">
-      <img src="/icons/icon-192.png" alt="Manlung Recovery">
-      <div class="mobile-brand-text">
-        <strong>Manlung Recovery</strong>
-        <span>Cyber Recovery &amp; Digital Investigation</span>
-      </div>
-    </a>
-
-    <div class="mobile-header-actions">
-      <button
-        class="mobile-theme-toggle"
-        id="mobileThemeToggle"
-        type="button"
-        aria-label="Toggle dark mode"
-        title="Toggle dark mode"
-      >
-        <i class="fas fa-moon" aria-hidden="true"></i>
-      </button>
-
-      <button
-        class="mobile-menu-toggle"
-        id="mobileMenuToggle"
-        type="button"
-        aria-label="Open menu"
-        aria-expanded="false"
-        aria-controls="mobileMenu"
-        title="Open menu"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-    </div>
-  </div>
-
-  <nav class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <a href="/"><i class="fas fa-house"></i> Home</a>
-    <a href="/services.html"><i class="fas fa-shield-halved"></i> Services</a>
-    <a href="/client/request.html"><i class="fas fa-file-circle-plus"></i> New Request</a>
-    <a href="/client/dashboard.html"><i class="fas fa-folder-open"></i> My Cases</a>
-    <a href="/link-scanner.html"><i class="fas fa-link"></i> Link Scanner</a>
-    <a href="/donate.html"><i class="fas fa-heart"></i> Donate</a>
-    <a href="/contact.html"><i class="fas fa-phone"></i> Contact</a>
-    <a href="/login.html"><i class="fas fa-right-to-bracket"></i> Login</a>
-  </nav>
-</header>
-
-
     <header class="site-header" role="banner">
         <div class="container home-header-container">
             <a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home">
@@ -2229,53 +2174,5 @@ img[src*="gctxrf7M"] {
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
-<script src="/js/mobile-header.js" defer></script>
-
-<!-- Manlung Recovery Home Onboarding -->
-<div id="manlung-onboarding" aria-hidden="true">
-  <section class="manlung-onboarding-card" role="dialog" aria-modal="true" aria-labelledby="manlungOnboardingTitle">
-
-    <button
-      id="manlungOnboardingClose"
-      class="manlung-onboarding-close"
-      type="button"
-      aria-label="Close welcome guide"
-    >×</button>
-
-    <div id="manlungOnboardingIcon" class="manlung-onboarding-icon fas fa-shield-halved"></div>
-
-    <h2 id="manlungOnboardingTitle" class="manlung-onboarding-title">
-      Welcome to Manlung Recovery
-    </h2>
-
-    <p id="manlungOnboardingText" class="manlung-onboarding-text">
-      A quick guide to help you find the important parts of the site.
-    </p>
-
-    <div id="manlungOnboardingBody" class="manlung-onboarding-body"></div>
-
-    <div class="manlung-onboarding-footer">
-      <button
-        id="manlungOnboardingSkip"
-        class="manlung-onboarding-skip"
-        type="button"
-      >Skip</button>
-
-      <span
-        id="manlungOnboardingProgress"
-        class="manlung-onboarding-progress"
-      >1 of 3</span>
-
-      <button
-        id="manlungOnboardingNext"
-        class="manlung-onboarding-next"
-        type="button"
-      >Next →</button>
-    </div>
-
-  </section>
-</div>
-
-<script src="/js/onboarding.js" defer></script>
 </body>
 </html>

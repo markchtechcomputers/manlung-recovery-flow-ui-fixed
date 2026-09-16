@@ -1,0 +1,137 @@
+MANLUNG RECOVERY — MFA DIAGNOSTIC / RESET PREPARATION
+==========================================================
+
+UTC diagnostic time: 2026-09-16T07:38:49.657780+00:00
+
+SECURITY:
+This report intentionally does NOT contain MFA secrets,
+JWT secrets, passwords, QR secrets, recovery codes, or tokens.
+
+ENVIRONMENT CHECK
+----------------------------------------------------------
+JWT_SECRET: NOT PRESENT
+SUPABASE_URL: NOT PRESENT
+SUPABASE_SERVICE_ROLE_KEY: NOT PRESENT
+MFA_SECRET: NOT PRESENT
+TOTP_SECRET: NOT PRESENT
+
+RUNTIME CHECK
+----------------------------------------------------------
+node --version: v24.16.0
+npm --version: unavailable
+
+GIT CHECK
+----------------------------------------------------------
+Working tree:
+?? public/css/ml-hero-visual-fix.css.before-hero-repair
+?? public/index.html.before-hero-info-fix
+?? public/index.html.before-hero-repair
+
+MFA ROUTES
+----------------------------------------------------------
+FOUND: manlungrecovery-main/server.js
+FOUND: routes/auth.js
+FOUND: public/admin/login.html
+FOUND: public/admin/owner.html
+FOUND: manlungrecovery-main/routes/auth.js
+FOUND: manlungrecovery-main/public/admin/login.html
+FOUND: manlungrecovery-main/public/admin/owner.html
+
+TOTP IMPLEMENTATION
+----------------------------------------------------------
+FOUND: server.js
+FOUND: config/official-websites.js
+FOUND: manlungrecovery-main/server.js
+FOUND: middleware/auth.js
+FOUND: public/donate.html
+FOUND: public/link-scanner.html
+FOUND: public/login.html
+FOUND: public/oauth-callback.html
+FOUND: public/privacy.html
+FOUND: public/services.html
+FOUND: routes/auth.js
+FOUND: routes/donations.js
+FOUND: routes/subscription.js
+FOUND: services/mfa.js
+FOUND: public/admin/dashboard.html
+FOUND: public/admin/login.html
+FOUND: public/admin/owner.html
+FOUND: public/client/dashboard.html
+FOUND: public/client/request.html
+FOUND: public/js/admin-session-guard.js
+FOUND: public/js/call-widget.js
+FOUND: public/js/client-session-guard.js
+FOUND: public/js/link-scanner.js
+FOUND: public/js/site-auth.js
+FOUND: manlungrecovery-main/config/official-websites.js
+FOUND: manlungrecovery-main/middleware/auth.js
+FOUND: manlungrecovery-main/public/donate.html
+FOUND: manlungrecovery-main/public/link-scanner.html
+FOUND: manlungrecovery-main/public/login.html
+FOUND: manlungrecovery-main/public/oauth-callback.html
+
+MFA SECRETS
+----------------------------------------------------------
+FOUND: models/User.js
+FOUND: routes/auth.js
+FOUND: public/admin/login.html
+FOUND: public/admin/owner.html
+FOUND: manlungrecovery-main/models/User.js
+FOUND: manlungrecovery-main/routes/auth.js
+FOUND: manlungrecovery-main/public/admin/login.html
+FOUND: manlungrecovery-main/public/admin/owner.html
+FOUND: manlungrecovery-main/db/migrations/011_admin_mfa.sql
+FOUND: db/migrations/011_admin_mfa.sql
+
+JWT/SESSION
+----------------------------------------------------------
+FOUND: manlungrecovery-main/server.js
+FOUND: middleware/auth.js
+FOUND: routes/auth.js
+FOUND: services/mfa.js
+FOUND: tests/calls.test.js
+FOUND: tests/integration.test.js
+FOUND: tests/owner-rbac.test.js
+FOUND: public/admin/login.html
+FOUND: manlungrecovery-main/middleware/auth.js
+FOUND: manlungrecovery-main/routes/auth.js
+FOUND: manlungrecovery-main/services/mfa.js
+FOUND: manlungrecovery-main/tests/calls.test.js
+FOUND: manlungrecovery-main/tests/integration.test.js
+FOUND: manlungrecovery-main/tests/owner-rbac.test.js
+FOUND: manlungrecovery-main/public/admin/login.html
+
+RESET/ENROLLMENT
+----------------------------------------------------------
+FOUND: models/User.js
+FOUND: routes/auth.js
+FOUND: public/admin/login.html
+FOUND: public/admin/owner.html
+FOUND: manlungrecovery-main/models/User.js
+FOUND: manlungrecovery-main/routes/auth.js
+FOUND: manlungrecovery-main/public/admin/login.html
+FOUND: manlungrecovery-main/public/admin/owner.html
+
+TOTP PACKAGE CHECK
+----------------------------------------------------------
+speakeasy: not declared
+otplib: not declared
+qrcode: not declared
+jsonwebtoken: FOUND
+
+SAFE MFA RESET PREPARATION
+----------------------------------------------------------
+1. Do NOT disable MFA globally.
+2. Do NOT delete the MFA secret directly from the database.
+3. Identify the exact owner/admin MFA storage location.
+4. Confirm the server's UTC time is synchronized.
+5. Generate a NEW MFA secret only for the affected account.
+6. Display a fresh enrollment QR/secret only through authenticated
+   owner/admin setup flow.
+7. Scan the new QR with the Authenticator application.
+8. Verify one fresh 6-digit TOTP before replacing the old enrollment.
+9. Keep recovery-code generation available.
+10. Record the reset in the security/audit log.
+
+IMPORTANT:
+No MFA reset was performed by this diagnostic.
