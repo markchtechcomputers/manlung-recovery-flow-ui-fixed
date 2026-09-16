@@ -1,401 +1,180 @@
 
 /* =========================================================
-   MANLUNG RECOVERY
-   BALANCED HERO + DEVICE VISUAL
+   MANLUNG HERO — IMAGE IS THE VISUAL, NOT EXTRA CONTENT
    ========================================================= */
 
 .ml-balanced-hero {
     position: relative !important;
     isolation: isolate !important;
     overflow: hidden !important;
-
-    min-height: 700px;
-
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(480px, 1fr);
-    align-items: center;
-
-    padding: 70px 5vw 75px !important;
+    min-height: 620px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 80px 5% !important;
 }
 
-/* ---------------------------------------------------------
-   HERO BACKGROUND
-   --------------------------------------------------------- */
+/* Image stays behind the real hero text */
+.ml-balanced-hero .ml-hero-device-visual {
+    position: absolute !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
 
-.ml-balanced-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -5;
+    width: min(720px, 58vw) !important;
+    max-width: none !important;
+    height: auto !important;
 
-    background:
-        radial-gradient(
-            circle at 78% 48%,
-            rgba(37,99,235,.13),
-            transparent 38%
-        ),
-        radial-gradient(
-            circle at 95% 20%,
-            rgba(96,165,250,.10),
-            transparent 30%
-        ),
-        linear-gradient(
-            135deg,
-            #ffffff 0%,
-            #f8fbff 48%,
-            #eef5ff 100%
-        );
-}
+    right: -20px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
 
-/* soft light behind devices */
-
-.ml-balanced-hero::after {
-    content: "";
-    position: absolute;
-
-    width: 700px;
-    height: 500px;
-
-    right: 0;
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            ellipse,
-            rgba(59,130,246,.18) 0%,
-            rgba(96,165,250,.09) 40%,
-            transparent 72%
-        );
-
-    filter: blur(15px);
-
-    z-index: -3;
-    pointer-events: none;
-}
-
-/* ---------------------------------------------------------
-   IMAGE CONTAINER
-   --------------------------------------------------------- */
-
-.ml-hero-device-visual {
-    position: absolute;
-
-    right: -3%;
-    top: 50%;
-
-    width: min(59vw, 820px);
-    height: min(610px, 48vw);
-
-    transform: translateY(-48%);
-
-    z-index: 1;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    pointer-events: none;
-}
-
-/* blue atmospheric glow */
-
-.ml-hero-device-glow {
-    position: absolute;
-
-    width: 78%;
-    height: 68%;
-
-    left: 11%;
-    top: 16%;
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            ellipse,
-            rgba(37,99,235,.23) 0%,
-            rgba(59,130,246,.12) 38%,
-            rgba(147,197,253,.06) 58%,
-            transparent 74%
-        );
-
-    filter: blur(24px);
-
-    z-index: -1;
-}
-
-/* actual supplied artwork */
-
-.ml-hero-device-visual img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    display: block;
-
-    /*
-       Removes the harsh white rectangular feeling
-       against the website background.
-    */
-    mix-blend-mode: multiply;
+    opacity: .94 !important;
+    mix-blend-mode: multiply !important;
 
     filter:
-        saturate(1.04)
-        contrast(1.02)
-        drop-shadow(
-            0 28px 45px
-            rgba(15,23,42,.14)
-        );
-
-    opacity: .98;
-
-    animation: manlungHeroDeviceFloat 8s ease-in-out infinite;
+        drop-shadow(0 25px 45px rgba(15, 42, 80, .16))
+        saturate(.95) !important;
 }
 
-/* ---------------------------------------------------------
-   TEXT LAYER
-   --------------------------------------------------------- */
-
-.ml-balanced-hero > *:not(.ml-hero-device-visual) {
-    position: relative;
-    z-index: 4;
-}
-
+/* EVERYTHING already in the hero remains above the image */
+.ml-balanced-hero > *:not(.ml-hero-device-visual),
 .ml-balanced-hero .hero-content,
 .ml-balanced-hero .hero-copy,
 .ml-balanced-hero .hero-text,
-.ml-balanced-hero .hero-left {
+.ml-balanced-hero .container {
     position: relative !important;
-
-    width: min(620px, 100%) !important;
-    max-width: 620px !important;
-
     z-index: 5 !important;
 }
 
-/*
-   Keep text away from the artwork.
-*/
-
+/* Keep the actual hero copy on the left */
 .ml-balanced-hero h1,
-.ml-balanced-hero .hero-title {
-    max-width: 650px;
+.ml-balanced-hero h2,
+.ml-balanced-hero p,
+.ml-balanced-hero .hero-actions,
+.ml-balanced-hero .hero-buttons {
+    position: relative !important;
+    z-index: 6 !important;
 }
 
-/* ---------------------------------------------------------
-   HERO BUTTONS
-   --------------------------------------------------------- */
+/* Don't allow the image to create another vertical section */
+.ml-balanced-hero .ml-hero-device-visual img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+}
 
-.ml-balanced-hero .hero-actions {
+/* Soft visual fade into the page */
+.ml-balanced-hero::after {
+    content: "" !important;
+    position: absolute !important;
+    z-index: 2 !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.98) 0%,
+            rgba(255,255,255,.88) 32%,
+            rgba(255,255,255,.25) 64%,
+            rgba(255,255,255,0) 100%
+        ) !important;
+}
+
+/* Keep content above the fade */
+.ml-balanced-hero > *:not(.ml-hero-device-visual) {
+    z-index: 5 !important;
+}
+
+/* Header balance */
+header,
+.site-header,
+.navbar {
     position: relative;
-    z-index: 6;
-
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
+    z-index: 50;
 }
 
-/* ---------------------------------------------------------
-   FLOATING ANIMATION
-   --------------------------------------------------------- */
-
-@keyframes manlungHeroDeviceFloat {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-9px);
-    }
-}
-
-/* ---------------------------------------------------------
-   TABLET
-   --------------------------------------------------------- */
-
-@media (max-width: 1050px) {
-
-    .ml-balanced-hero {
-        grid-template-columns: 1fr;
-
-        min-height: 760px;
-
-        padding-top: 70px !important;
-        padding-bottom: 30px !important;
-    }
-
-    .ml-balanced-hero .hero-content,
-    .ml-balanced-hero .hero-copy,
-    .ml-balanced-hero .hero-text,
-    .ml-balanced-hero .hero-left {
-        max-width: 58% !important;
-    }
-
-    .ml-hero-device-visual {
-        right: -12%;
-        width: 65vw;
-        height: 500px;
-    }
-}
-
-/* ---------------------------------------------------------
+/* =========================================================
    MOBILE
-   --------------------------------------------------------- */
+   ========================================================= */
 
 @media (max-width: 768px) {
 
     .ml-balanced-hero {
-        display: flex !important;
-        flex-direction: column !important;
-
         min-height: auto !important;
-
-        padding:
-            35px
-            18px
-            15px !important;
-
-        text-align: left;
+        display: block !important;
+        padding: 55px 20px 20px !important;
+        overflow: hidden !important;
     }
 
-    .ml-balanced-hero .hero-content,
-    .ml-balanced-hero .hero-copy,
-    .ml-balanced-hero .hero-text,
-    .ml-balanced-hero .hero-left {
-        width: 100% !important;
-        max-width: 100% !important;
-
-        z-index: 5 !important;
-    }
-
-    /*
-       IMAGE COMES AFTER THE TEXT
-       AND IS NO LONGER ABSOLUTELY POSITIONED.
-    */
-
-    .ml-hero-device-visual {
+    .ml-balanced-hero .ml-hero-device-visual {
         position: relative !important;
+        z-index: 1 !important;
+
+        width: 115% !important;
+        max-width: 620px !important;
 
         right: auto !important;
         top: auto !important;
 
-        width: 125% !important;
-        height: 350px !important;
-
         margin:
-            -5px
-            -12.5%
-            -20px !important;
+            -15px
+            auto
+            -80px
+            auto !important;
 
         transform: none !important;
 
-        order: 10;
-
-        z-index: 2 !important;
+        opacity: .92 !important;
+        mix-blend-mode: multiply !important;
     }
 
-    .ml-hero-device-visual img {
-        width: 100% !important;
-        height: 100% !important;
-
-        object-fit: contain !important;
-
-        mix-blend-mode: multiply;
+    .ml-balanced-hero::after {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(255,255,255,.96) 0%,
+                rgba(255,255,255,.55) 42%,
+                rgba(255,255,255,0) 78%
+            ) !important;
     }
 
-    .ml-hero-device-glow {
-        width: 82%;
-        height: 70%;
-
-        left: 9%;
-        top: 15%;
-
-        filter: blur(18px);
-    }
-
-    .ml-balanced-hero .hero-actions {
-        width: 100%;
-        flex-direction: column;
-    }
-
-    .ml-balanced-hero .hero-actions a,
-    .ml-balanced-hero .hero-actions button {
-        width: 100%;
-        justify-content: center;
+    .ml-balanced-hero h1 {
+        font-size: clamp(2rem, 9vw, 3rem) !important;
+        line-height: 1.05 !important;
     }
 }
 
-/* ---------------------------------------------------------
-   SMALL PHONE
-   --------------------------------------------------------- */
-
+/* Small phones */
 @media (max-width: 480px) {
 
     .ml-balanced-hero {
-        padding:
-            25px
-            14px
-            5px !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        padding-top: 42px !important;
     }
 
-    .ml-hero-device-visual {
-        width: 138% !important;
-        height: 310px !important;
-
-        margin-left: -19% !important;
-        margin-right: -19% !important;
-    }
-
-    .ml-hero-device-visual img {
-        filter:
-            saturate(1.03)
-            contrast(1.01)
-            drop-shadow(
-                0 18px 30px
-                rgba(15,23,42,.10)
-            );
+    .ml-balanced-hero .ml-hero-device-visual {
+        width: 125% !important;
+        margin-top: -5px !important;
+        margin-left: -12% !important;
+        margin-bottom: -70px !important;
     }
 }
 
-/* ---------------------------------------------------------
-   DARK MODE
-   --------------------------------------------------------- */
-
-[data-theme="dark"] .ml-balanced-hero::before,
-.dark .ml-balanced-hero::before {
+/* Dark mode */
+html.dark .ml-balanced-hero::after,
+body.dark .ml-balanced-hero::after {
     background:
-        radial-gradient(
-            circle at 78% 48%,
-            rgba(37,99,235,.20),
-            transparent 38%
-        ),
         linear-gradient(
-            135deg,
-            #07111f,
-            #0b1730
-        );
+            90deg,
+            rgba(8,15,28,.98) 0%,
+            rgba(8,15,28,.88) 35%,
+            rgba(8,15,28,.25) 70%,
+            rgba(8,15,28,0) 100%
+        ) !important;
 }
 
-[data-theme="dark"] .ml-hero-device-visual img,
-.dark .ml-hero-device-visual img {
-    mix-blend-mode: screen;
-    opacity: .92;
-}
-
-/* ---------------------------------------------------------
-   REDUCED MOTION
-   --------------------------------------------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-
-    .ml-hero-device-visual img {
-        animation: none !important;
-    }
+html.dark .ml-balanced-hero .ml-hero-device-visual,
+body.dark .ml-balanced-hero .ml-hero-device-visual {
+    mix-blend-mode: screen !important;
 }
