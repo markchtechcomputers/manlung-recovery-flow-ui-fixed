@@ -47,6 +47,7 @@
     </script>
 
     <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/onboarding.css">
 <link rel="stylesheet" href="/css/mobile-header.css">
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="/css/home-premium.css">
@@ -2227,5 +2228,52 @@ img[src*="gctxrf7M"] {
   </div>
 </footer>
 <script src="/js/mobile-header.js" defer></script>
+
+<!-- Manlung Recovery Home Onboarding -->
+<div id="manlung-onboarding" aria-hidden="true">
+  <section class="manlung-onboarding-card" role="dialog" aria-modal="true" aria-labelledby="manlungOnboardingTitle">
+
+    <button
+      id="manlungOnboardingClose"
+      class="manlung-onboarding-close"
+      type="button"
+      aria-label="Close welcome guide"
+    >×</button>
+
+    <div id="manlungOnboardingIcon" class="manlung-onboarding-icon fas fa-shield-halved"></div>
+
+    <h2 id="manlungOnboardingTitle" class="manlung-onboarding-title">
+      Welcome to Manlung Recovery
+    </h2>
+
+    <p id="manlungOnboardingText" class="manlung-onboarding-text">
+      A quick guide to help you find the important parts of the site.
+    </p>
+
+    <div id="manlungOnboardingBody" class="manlung-onboarding-body"></div>
+
+    <div class="manlung-onboarding-footer">
+      <button
+        id="manlungOnboardingSkip"
+        class="manlung-onboarding-skip"
+        type="button"
+      >Skip</button>
+
+      <span
+        id="manlungOnboardingProgress"
+        class="manlung-onboarding-progress"
+      >1 of 3</span>
+
+      <button
+        id="manlungOnboardingNext"
+        class="manlung-onboarding-next"
+        type="button"
+      >Next →</button>
+    </div>
+
+  </section>
+</div>
+
+<script src="/js/onboarding.js" defer></script>
 </body>
 </html>
