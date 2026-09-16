@@ -108,8 +108,8 @@
     }
 
     .manlung-contact-menu-actions{
-      display:grid !important;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+      display:flex !important;
+      flex-direction:column !important;
       gap:.7rem !important;
       padding:.9rem 0 .1rem !important;
       align-items:stretch !important;
@@ -117,17 +117,18 @@
 
     .manlung-contact-choice{
       width:100% !important;
-      height:70px !important;
+      height:58px !important;
       min-width:0 !important;
-      min-height:70px !important;
+      min-height:58px !important;
       display:flex !important;
-      flex-direction:column !important;
-      gap:.25rem !important;
-      justify-content:center !important;
-      padding:.55rem !important;
+      flex-direction:row !important;
+      align-items:center !important;
+      justify-content:flex-start !important;
+      gap:.75rem !important;
+      padding:.45rem .7rem !important;
       margin:0 !important;
       border:1px solid rgba(255,255,255,.09) !important;
-      border-radius:16px !important;
+      border-radius:15px !important;
       background:linear-gradient(145deg,#172b4c,#10213a) !important;
       box-shadow:0 8px 20px rgba(0,0,0,.18) !important;
     }
