@@ -9,7 +9,6 @@ const USER_SELECT = `
   username,
   email,
   phone,
-  full_name,
   role,
   admin_status,
   security_status,
@@ -151,7 +150,7 @@ async function listUsers({ search, status, role, limit = 100 } = {}) {
     const like = `%${String(search).trim()}%`;
 
     query = query.or(
-      `username.ilike.${like},email.ilike.${like},full_name.ilike.${like},phone.ilike.${like}`
+      `username.ilike.${like},email.ilike.${like},phone.ilike.${like}`
     );
   }
 
