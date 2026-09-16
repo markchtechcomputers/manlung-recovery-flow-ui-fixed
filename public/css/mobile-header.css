@@ -3,6 +3,7 @@
    ========================================================= */
 
 .mobile-friendly-header {
+  display: none;
   position: sticky;
   top: 0;
   z-index: 2000;
@@ -141,6 +142,17 @@
 
 /* Center hero/image/text on phones */
 @media (max-width: 650px) {
+
+  /* Hide the original desktop header/navigation on phones. */
+  .site-header {
+    display: none !important;
+  }
+
+  /* Show the new mobile header only on phones. */
+  .mobile-friendly-header {
+    display: block;
+  }
+
   .hero {
     text-align: center;
   }
