@@ -40,7 +40,7 @@
     <main class="container oauth-callback-wrap">
         <section class="card oauth-callback-card" aria-live="polite">
             <h2 id="title">Signing you in securely…</h2>
-            <p id="status" style="color:var(--text-muted);">Verifying your Google account securely.</p>
+            <p id="status" style="color:var(--text-muted);">Verifying your GitHub account securely.</p>
             <a id="backLink" class="btn btn-primary oauth-back" href="/login.html" style="display:none;">Back to Sign In</a>
         </section>
     </main>
@@ -62,7 +62,7 @@
                 return;
             }
 
-            title.textContent = 'Google sign-in failed';
+            title.textContent = 'GitHub sign-in failed';
             status.textContent = message || 'Please return to sign in and try again.';
             status.classList.add('oauth-error');
             backLink.href = '/login.html';
@@ -121,7 +121,7 @@
                 const { data: restored, error: restoreError } = await client.auth.getSession();
                 if (restoreError) throw restoreError;
                 if (!restored?.session?.access_token) {
-                    throw new Error('No Google sign-in session was found. Please try again.');
+                    throw new Error('No GitHub sign-in session was found. Please try again.');
                 }
                 clearOAuthUrl();
             }
@@ -129,7 +129,7 @@
             const { data: sessionData, error: sessionError } = await client.auth.getSession();
             if (sessionError) throw sessionError;
             const session = sessionData?.session;
-            if (!session?.access_token) throw new Error('No Google sign-in session was found. Please try again.');
+            if (!session?.access_token) throw new Error('No GitHub sign-in session was found. Please try again.');
 
             const appSession = await fetchJson('/api/auth/client/oauth', {
                 method: 'POST',
@@ -138,7 +138,7 @@
             });
 
             if (!appSession.success || !appSession.token || !appSession.user) {
-                throw new Error('Could not complete Google sign-in.');
+                throw new Error('Could not complete GitHub sign-in.');
             }
 
             localStorage.setItem('clientToken', appSession.token);
