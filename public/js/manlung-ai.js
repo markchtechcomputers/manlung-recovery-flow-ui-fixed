@@ -54,7 +54,7 @@
       .manlung-ai-note{color:#64748b!important;background:#fff!important}
       .manlung-ai-tab{background:linear-gradient(135deg,#0ea5e9,#2563eb)!important;border-color:#38bdf8!important;color:#fff!important;font-weight:800!important}
       @media(max-width:650px){.manlung-ai-tab{font-size:.62rem!important}.manlung-ai-toolbar{padding:7px 10px}.manlung-ai-body{padding:12px!important}.manlung-ai-foot{padding:9px!important}}
-    `;`;
+    `;
     document.head.appendChild(style);
   }
 
@@ -78,6 +78,10 @@
   function now() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
 
   function addMessage(text, who) {
+    window.__MANLUNG_AI_HISTORY=window.__MANLUNG_AI_HISTORY||[];
+    if(who==='user') window.__MANLUNG_AI_HISTORY.push({role:'user',content:String(text)});
+    else window.__MANLUNG_AI_HISTORY.push({role:'assistant',content:String(text)});
+    if(window.__MANLUNG_AI_HISTORY.length>20) window.__MANLUNG_AI_HISTORY=window.__MANLUNG_AI_HISTORY.slice(-20);
     const body = document.getElementById('manlungAiMessages');
     if (!body) return;
     const row = document.createElement('div');
