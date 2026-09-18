@@ -1126,7 +1126,7 @@ router.get('/github/callback', async (req, res) => {
   try {
     const expectedState = getCookie(req, 'manlung_github_oauth_state');
     const receivedState = String(req.query.state || '');
-    if (!expectedState || !receivedState || !crypto.timingSafeEqual(Buffer.from(expectedState), Buffer.from(receivedState))) {
+    if (!expectedState || !receivedState || expectedState.length !== receivedState.length || !crypto.timingSafeEqual(Buffer.from(expectedState), Buffer.from(receivedState))) {
       return res.status(400).send('Invalid GitHub OAuth state. Please try again.');
     }
     if (req.query.error) return res.redirect(`/login.html?oauth_error=${encodeURIComponent(String(req.query.error_description || req.query.error))}`);
