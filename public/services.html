@@ -1,7 +1,16 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recovery Services | Manlung Recovery</title><meta name="description" content="Manlung Recovery services for lost, stolen and compromised devices, digital recovery guidance and human support."><meta name="robots" content="index,follow"><link rel="canonical" href="https://manlungrecovery.manlungshop.co.ke/services.html"><link rel="manifest" href="/manifest.webmanifest"><style>body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#07111d;color:#eaf2fb;line-height:1.6}.wrap{max-width:980px;margin:auto;padding:28px 18px}.nav{display:flex;gap:10px;flex-wrap:wrap}.nav a{color:#9bd0ff}.hero,.card{background:#0e1d2e;border:1px solid #203750;border-radius:18px;padding:22px;margin:14px 0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}@media(max-width:700px){.grid{grid-template-columns:1fr}}h1{font-size:clamp(2rem,7vw,3.4rem);line-height:1.05}h2{margin-top:0}.cta{display:inline-block;background:#eaf2fb;color:#07111d;padding:10px 15px;border-radius:10px;text-decoration:none;font-weight:800}</style>    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <script src="/js/manlung-ai.js?v=20260918-services"></script>
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
-</head><body><main class="wrap"><nav class="nav"><a href="/">Home</a><a href="/services.html">Services</a><a href="/faq.html">FAQ</a><a href="/privacy.html">Trust & Security</a><a href="/login.html">Client portal</a></nav><section class="hero"><h1>Recovery services</h1><p>Practical, privacy-conscious support for device recovery and digital recovery cases. We explain what we can verify, what we need from you, and what happens next.</p><a class="cta" href="/login.html">Start or track a case</a></section><section class="grid"><article class="card"><h2>Device recovery</h2><p>Support for lost or stolen phones and other devices, including case intake, evidence review and recovery coordination.</p></article><article class="card"><h2>Digital recovery guidance</h2><p>Structured assistance for account/device recovery workflows, with clear boundaries around passwords, PINs, OTPs and recovery codes.</p></article><article class="card"><h2>Case investigation</h2><p>Human investigators can review submitted evidence, communicate through your case timeline and record verified progress.</p></article><article class="card"><h2>Human support calls</h2><p>Eligible clients can request a secure browser call with an available investigator. Call availability and outcomes are recorded in the case history.</p></article></section><section class="card"><h2>Safety first</h2><p>Never send us a password, PIN, OTP, recovery code, API key or other secret. Use the secure portal for case information and evidence.</p></section></main><footer class="manlung-footer" aria-label="Manlung Recovery footer">
+</head><body><main class="wrap"><nav class="nav"><a href="/">Home</a><a href="/services.html">Services</a><a href="/faq.html">FAQ</a><a href="/privacy.html">Trust & Security</a><a href="/login.html">Client portal</a></nav><section class="hero"><h1>Recovery services</h1><p>Practical, privacy-conscious support for device recovery and digital recovery cases. We explain what we can verify, what we need from you, and what happens next.</p><a class="cta" href="/login.html">Start or track a case</a></section><section class="card" style="border-color:#2563eb;background:linear-gradient(135deg,#0e1d2e,#102b4a);">
+<h2>🤖 Manlung AI Support</h2>
+<p>Get quick guidance about Manlung Recovery services, starting a recovery request, tracking a case, device recovery, account recovery, scam support and when to contact human support.</p>
+<p style="margin-bottom:16px;">Manlung AI can help explain the recovery process and direct you to the right part of the portal. It does not replace human investigation or secure case review.</p>
+<button type="button" class="cta" id="openManlungAiServices">Open Manlung AI</button>
+</section>
+<section class="grid"><article class="card"><h2>Device recovery</h2><p>Support for lost or stolen phones and other devices, including case intake, evidence review and recovery coordination.</p></article><article class="card"><h2>Digital recovery guidance</h2><p>Structured assistance for account/device recovery workflows, with clear boundaries around passwords, PINs, OTPs and recovery codes.</p></article><article class="card"><h2>Case investigation</h2><p>Human investigators can review submitted evidence, communicate through your case timeline and record verified progress.</p></article><article class="card"><h2>Human support calls</h2><p>Eligible clients can request a secure browser call with an available investigator. Call availability and outcomes are recorded in the case history.</p></article></section><section class="card"><h2>Safety first</h2><p>Never send us a password, PIN, OTP, recovery code, API key or other secret. Use the secure portal for case information and evidence.</p></section></main><footer class="manlung-footer" aria-label="Manlung Recovery footer">
   <div class="manlung-footer-inner">
     <div class="manlung-footer-grid">
       <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
@@ -20,4 +29,14 @@
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
+<script>
+document.getElementById('openManlungAiServices')?.addEventListener('click',function(){
+  const tab=document.querySelector('.manlung-ai-tab');
+  if(tab) {
+    tab.click();
+  } else {
+    alert('Manlung AI is still loading. Please try again.');
+  }
+});
+</script>
 </body></html>

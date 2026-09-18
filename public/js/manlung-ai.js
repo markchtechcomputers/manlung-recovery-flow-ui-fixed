@@ -85,11 +85,118 @@
       .manlung-ai-quick{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 20px}
       .manlung-ai-quick button{border:1px solid #d7e3ed;background:#fff;color:#24516b;border-radius:999px;padding:8px 12px;font-weight:750;cursor:pointer}
       @media(max-width:650px){
-        .manlung-ai-head{min-height:68px;padding:10px 14px}.manlung-ai-avatar{width:42px;height:42px;border-radius:13px}.manlung-ai-close{width:40px;height:40px}
-        .manlung-ai-toolbar{padding:8px 12px}.manlung-ai-toolbar button{flex:1}
-        .manlung-ai-body{padding:18px 10px}.manlung-ai-msg>div{max-width:92%}.manlung-ai-bubble{font-size:.91rem;padding:12px 13px}
-        .manlung-ai-foot{padding:10px 10px 12px}.manlung-ai-links{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px}.manlung-ai-links a{justify-content:center;text-align:center;padding:9px 6px;font-size:.68rem;min-width:0}
-        .manlung-ai-compose{gap:7px}.manlung-ai-input{min-height:48px}.manlung-ai-mic,.manlung-ai-send{flex-basis:48px;width:48px}
+        #manlungAiWindow{
+          width:100vw;
+          height:100dvh;
+          min-height:100dvh;
+          border-radius:0;
+        }
+        .manlung-ai-head{
+          min-height:62px;
+          padding:8px 10px;
+          gap:10px;
+          flex-shrink:0;
+        }
+        .manlung-ai-avatar{
+          width:40px;
+          height:40px;
+          border-radius:12px;
+          font-size:15px;
+        }
+        .manlung-ai-title{font-size:.98rem}
+        .manlung-ai-status{font-size:.7rem}
+        .manlung-ai-close{
+          width:42px;
+          height:42px;
+          flex:0 0 42px;
+          font-size:25px;
+        }
+        .manlung-ai-toolbar{
+          padding:7px 9px;
+          gap:7px;
+          flex-shrink:0;
+        }
+        .manlung-ai-toolbar button{
+          flex:1;
+          min-height:42px;
+          padding:8px 6px;
+          font-size:.7rem;
+        }
+        .manlung-ai-body{
+          flex:1;
+          min-height:0;
+          padding:14px 9px 12px;
+          -webkit-overflow-scrolling:touch;
+          overscroll-behavior:contain;
+        }
+        .manlung-ai-msg{
+          margin-bottom:13px;
+        }
+        .manlung-ai-msg>div{
+          max-width:94%;
+        }
+        .manlung-ai-bubble{
+          font-size:.9rem;
+          line-height:1.5;
+          padding:11px 12px;
+          border-radius:16px;
+        }
+        .manlung-ai-quick{
+          gap:6px;
+          margin:2px 0 14px;
+        }
+        .manlung-ai-quick button{
+          padding:8px 10px;
+          font-size:.72rem;
+          min-height:38px;
+        }
+        .manlung-ai-foot{
+          padding:8px 9px calc(9px + env(safe-area-inset-bottom));
+          flex-shrink:0;
+        }
+        .manlung-ai-links{
+          display:grid;
+          grid-template-columns:repeat(3,minmax(0,1fr));
+          gap:6px;
+          margin-bottom:7px;
+        }
+        .manlung-ai-links a{
+          justify-content:center;
+          text-align:center;
+          padding:8px 4px;
+          font-size:.66rem;
+          line-height:1.15;
+          min-width:0;
+          min-height:38px;
+        }
+        .manlung-ai-voice-state{
+          margin:0 auto 7px;
+          padding:7px 10px;
+          font-size:.7rem;
+        }
+        .manlung-ai-compose{
+          gap:6px;
+          width:100%;
+        }
+        .manlung-ai-input{
+          min-height:46px;
+          max-height:110px;
+          padding:11px 12px;
+          font-size:.9rem;
+          border-radius:13px;
+        }
+        .manlung-ai-mic,
+        .manlung-ai-send{
+          flex:0 0 46px;
+          width:46px;
+          height:46px;
+          border-radius:13px;
+        }
+        .manlung-ai-note{
+          margin:5px auto 0;
+          font-size:.64rem;
+          line-height:1.25;
+        }
       }
       @keyframes manlungAiRecord{50%{transform:scale(1.06)}}
     `;
@@ -246,7 +353,11 @@
     if(!answer)answer=KNOWLEDGE[forcedKey||classify(displayText)]||KNOWLEDGE.unknown;
     ui.bubble.textContent=answer;ui.meta.textContent='Manlung AI';speaker.finish();
     appendAssistantHistory(answer);scrollChat('smooth');
-    if(window.__MANLUNG_AI_VOICE_ON&&voiceSession&&voiceAutoResume){setTimeout(()=>startListening(),900);}
+    /* Keep Manlung AI open after every response.
+       Voice listening only starts when the user explicitly taps the microphone. */
+    voiceAutoResume=false;
+    voiceSession=false;
+    setVoiceState('','');
   }
 
   function toggle(open){const win=document.getElementById('manlungAiWindow');const next=typeof open==='boolean'?open:!win.classList.contains('open');win.classList.toggle('open',next);win.setAttribute('aria-hidden',String(!next));document.body.style.overflow=next?'hidden':'';if(next)setTimeout(()=>document.getElementById('manlungAiInput')?.focus(),80);}
