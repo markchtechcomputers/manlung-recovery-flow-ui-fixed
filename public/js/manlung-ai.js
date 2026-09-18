@@ -431,7 +431,15 @@
           respond(t).finally(()=>{
             if(voiceSession&&voiceAutoResume){
               setVoiceState('','');
-              setTimeout(startListening,350);
+              const resumeListening=()=>{
+                if(voiceSession&&voiceAutoResume&&!recognition)startListening();
+              };
+              if('speechSynthesis'in window&&window.speechSynthesis.speaking){
+                window.speechSynthesis.addEventListener('end',resumeListening,{once:true});
+                setTimeout(resumeListening,1800);
+              }else{
+                setTimeout(resumeListening,350);
+              }
             }else{
               setVoiceState('','');
             }
