@@ -6,6 +6,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/auth-github.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "public/**",
       "use": "@vercel/static"
     }
@@ -97,6 +101,10 @@
     }
   ],
   "routes": [
+    {
+      "src": "/api/auth/github(?:/(.*))?",
+      "dest": "/api/auth-github.js"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
