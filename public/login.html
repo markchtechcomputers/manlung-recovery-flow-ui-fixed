@@ -185,12 +185,12 @@ async function startSocialSignup(provider){
       return;
     }
     if(provider!=='google')return;
-    const cfg=await fetch('/api/auth-google.js',{cache:'no-store'}).then(r=>r.json());
+    const cfg=await fetch('/api/auth/google',{cache:'no-store'}).then(r=>r.json());
     if(!cfg.clientId)throw new Error('Google Cloud authentication is not configured yet.');
-    if(!window.google?.accounts?.id)throw new Error('Google authentication is still loading. Please try again.');
+    if(!window.google?.accounts?.id){await new Promise((resolve,reject)=>{let n=0;const t=setInterval(()=>{if(window.google?.accounts?.id){clearInterval(t);resolve();}else if(++n>50){clearInterval(t);reject(new Error('Google authentication is still loading. Please try again.'));}},100);});}
     window.google.accounts.id.initialize({client_id:cfg.clientId,callback:async response=>{
       try{
-        const res=await fetch('/api/auth-google.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:response.credential})});
+        const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:response.credential})});
         const data=await res.json();
         if(data.success){localStorage.setItem('clientToken',data.token);localStorage.setItem('clientUser',JSON.stringify(data.user));window.location.href='/client/dashboard.html';}
         else showMessage(document.getElementById('loginError'),data.error||'Google sign-in failed');
