@@ -84,6 +84,10 @@
   ],
   "routes": [
     {
+      "src": "/api/auth/github(?:/(.*))?",
+      "dest": "/api/auth-github.js"
+    },
+    {
       "src": "/oauth-callback(?:\\\\.html)?",
       "dest": "/public/oauth-callback.html"
     },
