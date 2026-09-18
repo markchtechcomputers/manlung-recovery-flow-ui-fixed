@@ -1168,7 +1168,7 @@ router.get('/github/callback', async (req, res) => {
     }));
     const tokenParam = encodeURIComponent(token);
     res.setHeader('Set-Cookie', `manlung_github_oauth_state=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`);
-    return res.redirect(`/client/oauth-complete.html?token=${tokenParam}&user=${userJson}`);
+    return res.redirect(`/client/oauth-complete.html#token=${tokenParam}&user=${userJson}`);
   } catch (error) {
     console.error('GitHub OAuth callback error:', error);
     return res.redirect(`/login.html?oauth_error=${encodeURIComponent(error.message || 'Could not complete GitHub sign-in.')}`);
