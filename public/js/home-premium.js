@@ -23,7 +23,8 @@
       <article class="manlung-journey-card"><img src="https://i.postimg.cc/tCJWZ7rk/Chat-GPT-Image-Sep-16-2026-01-03-01-PM.png" alt="Daily weekly and monthly reports" loading="lazy"><div><h3>3. Reports &amp; Case Handling</h3><p>Daily, weekly and monthly reports give admins a structured view of activity.</p></div></article>
       <article class="manlung-journey-card"><img src="https://i.postimg.cc/kgrGJ5Lb/Chat-GPT-Image-Sep-16-2026-01-18-09-PM.png" alt="How to track your cases after submission" loading="lazy"><div><h3>4. Track Your Case</h3><p>After submission, clients can follow progress and updates through the portal.</p></div></article>
     </div></div>`;
-    document.body.appendChild(section);
+    const footer=document.querySelector('.manlung-footer, footer');
+    if(footer&&footer.parentNode)footer.parentNode.insertBefore(section,footer);else document.body.appendChild(section);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
