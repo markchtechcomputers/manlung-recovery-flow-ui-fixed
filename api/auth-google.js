@@ -11,11 +11,23 @@ app.get('/',(_req,res)=>res.json({success:true,clientId:GOOGLE_CLIENT_ID}));
 app.post('/',async(req,res)=>{
  try{
   const credential=String(req.body?.credential||'').trim();
-  if(!credential)return res.status(400).json({success:false,error:'Google credential is required.'});
+  const accessToken=String(req.body?.accessToken||'').trim();
+  if(!credential&&!accessToken)return res.status(400).json({success:false,error:'Google authentication credential is required.'});
   if(!GOOGLE_CLIENT_ID)return res.status(503).json({success:false,error:'Google Cloud authentication is not configured yet.'});
-  const v=await axios.get('https://oauth2.googleapis.com/tokeninfo',{params:{id_token:credential},timeout:10000,validateStatus:()=>true});
-  if(v.status!==200)return res.status(401).json({success:false,error:'Google authentication could not be verified.'});
-  const p=v.data;
+
+  let p;
+  if(accessToken){
+    const v=await axios.get('https://oauth2.googleapis.com/tokeninfo',{params:{access_token:accessToken},timeout:10000,validateStatus:()=>true});
+    if(v.status!==200)return res.status(401).json({success:false,error:'Google access token could not be verified.'});
+    if(v.data.aud&&v.data.aud!==GOOGLE_CLIENT_ID)return res.status(401).json({success:false,error:'Invalid Google authentication audience.'});
+    const u=await axios.get('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+accessToken},timeout:10000,validateStatus:()=>true});
+    if(u.status!==200)return res.status(401).json({success:false,error:'Google account could not be verified.'});
+    p={...u.data,email_verified:u.data.email_verified?'true':'false',iss:'https://accounts.google.com',aud:GOOGLE_CLIENT_ID};
+  }else{
+    const v=await axios.get('https://oauth2.googleapis.com/tokeninfo',{params:{id_token:credential},timeout:10000,validateStatus:()=>true});
+    if(v.status!==200)return res.status(401).json({success:false,error:'Google authentication could not be verified.'});
+    p=v.data;
+  }
   if(p.aud!==GOOGLE_CLIENT_ID||p.iss!=='https://accounts.google.com')return res.status(401).json({success:false,error:'Invalid Google authentication audience.'});
   if(p.email_verified!=='true')return res.status(403).json({success:false,error:'Your Google email is not verified.'});
   const email=String(p.email||'').trim().toLowerCase();if(!email)return res.status(400).json({success:false,error:'Google did not provide an email address.'});
