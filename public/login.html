@@ -198,6 +198,10 @@ async function startSocialSignup(provider){
       const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
       if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)throw new Error('GitHub sign-in is not configured yet.');
       const supabase=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+      // Force an explicit GitHub account choice instead of silently reusing an existing Supabase session.
+      try{await supabase.auth.signOut({scope:'local'});}catch(_){}
+      localStorage.removeItem('clientToken');
+      localStorage.removeItem('clientUser');
       const {error}=await supabase.auth.signInWithOAuth({
         provider:'github',
         options:{redirectTo:window.location.origin+'/login.html'}
@@ -269,7 +273,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   ['googleLoginBtn','googleRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('google')));
   ['githubLoginBtn','githubRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('github')));
 });
-(async function(){const isOAuthCallback=window.location.hash.includes('access_token=')||new URLSearchParams(window.location.search).has('code');if(isOAuthCallback)await handleSocialCallback();})();
+(async function(){const isOAuthCallback=window.location.hash.includes('access_token=')||new URLSearchParams(window.location.search).has('code');if(isOAuthCallback){await handleSocialCallback();}else{localStorage.removeItem('clientToken');localStorage.removeItem('clientUser');}})();
 
 /* Login page never auto-redirects. Users must explicitly choose Google, GitHub, or email/password. */
 </script>
