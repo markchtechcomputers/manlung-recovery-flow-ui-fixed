@@ -6,6 +6,10 @@ const User=require('../models/User');
 const app=express();
 const GOOGLE_CLIENT_ID=process.env.GOOGLE_CLIENT_ID||'750848085828-t1uo1rljsmkkmlv3sqiv13tjrb7j1a9f.apps.googleusercontent.com';
 app.use(express.json({limit:'64kb'}));
+app.use((req,_res,next)=>{
+ req.url=String(req.url||'/').replace(/^\/api\/auth\/google(?=\/|\?|$)/,'')||'/';
+ next();
+});
 function token(user){return jwt.sign({id:user.id,role:user.role,sessionVersion:Number(user.session_version||0)},process.env.JWT_SECRET,{expiresIn:'7d'});}
 app.get('/',(_req,res)=>res.json({success:true,clientId:GOOGLE_CLIENT_ID}));
 app.post('/',async(req,res)=>{
