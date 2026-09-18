@@ -49,7 +49,66 @@
       #callWidget { right:10px !important; bottom:10px !important; }
       #callWidgetPanel { width:min(300px,calc(100vw - 20px)) !important; right:0 !important; }
     }
-  </style>
+
+
+.account-delete-oauth{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  margin:18px 0;
+  padding:15px 16px;
+  border:1px solid rgba(30,64,175,.18);
+  border-radius:12px;
+  background:rgba(30,64,175,.06);
+}
+
+.account-delete-oauth[hidden]{
+  display:none;
+}
+
+.account-delete-oauth-icon{
+  flex:0 0 38px;
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:rgba(30,64,175,.12);
+  color:#1e40af;
+}
+
+.account-delete-oauth-content{
+  min-width:0;
+}
+
+.account-delete-oauth-content strong{
+  display:block;
+  margin-bottom:4px;
+  font-size:.95rem;
+}
+
+.account-delete-oauth-content p{
+  margin:0;
+  color:var(--text-muted);
+  font-size:.86rem;
+  line-height:1.5;
+}
+
+@media (max-width:600px){
+  .account-delete-oauth{
+    gap:11px;
+    padding:13px;
+  }
+
+  .account-delete-oauth-icon{
+    flex-basis:34px;
+    width:34px;
+    height:34px;
+  }
+}
+
+</style>
 <style id="manlung-header-style">
 .site-header{
   position:sticky;
@@ -456,6 +515,216 @@
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
     <script src="/js/client-session-guard.js"></script>
+<style id="account-delete-modal-styles">
+  .account-delete-modal{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:1rem;
+    background:rgba(2,8,23,.72);
+    backdrop-filter:blur(7px);
+  }
+
+  .account-delete-modal.is-open{
+    display:flex;
+  }
+
+  .account-delete-dialog{
+    width:min(100%,500px);
+    max-height:min(92vh,680px);
+    overflow-y:auto;
+    background:var(--card-bg,#fff);
+    color:var(--text,#111827);
+    border:1px solid rgba(220,38,38,.22);
+    border-radius:18px;
+    box-shadow:0 24px 70px rgba(0,0,0,.28);
+    padding:1.35rem;
+    animation:accountDeleteModalIn .18s ease-out;
+  }
+
+  @keyframes accountDeleteModalIn{
+    from{
+      opacity:0;
+      transform:translateY(10px) scale(.98);
+    }
+    to{
+      opacity:1;
+      transform:translateY(0) scale(1);
+    }
+  }
+
+  .account-delete-head{
+    display:flex;
+    align-items:flex-start;
+    gap:.9rem;
+  }
+
+  .account-delete-icon{
+    flex:0 0 46px;
+    width:46px;
+    height:46px;
+    display:grid;
+    place-items:center;
+    border-radius:14px;
+    background:rgba(220,38,38,.10);
+    color:#dc2626;
+    font-size:1.25rem;
+  }
+
+  .account-delete-title{
+    margin:0;
+    font-size:1.2rem;
+    font-weight:800;
+  }
+
+  .account-delete-close{
+    margin-left:auto;
+    width:40px;
+    height:40px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    color:inherit;
+    cursor:pointer;
+    font-size:1.15rem;
+  }
+
+  .account-delete-close:hover{
+    background:rgba(127,127,127,.10);
+  }
+
+  .account-delete-warning{
+    margin:1rem 0;
+    padding:.9rem 1rem;
+    border-radius:12px;
+    background:rgba(220,38,38,.08);
+    border:1px solid rgba(220,38,38,.16);
+    color:#b91c1c;
+    font-size:.9rem;
+    line-height:1.5;
+  }
+
+  .account-delete-copy{
+    margin:0 0 1rem;
+    color:var(--text-muted,#64748b);
+    font-size:.9rem;
+    line-height:1.55;
+  }
+
+  .account-delete-field{
+    position:relative;
+  }
+
+  .account-delete-field label{
+    display:block;
+    margin-bottom:.45rem;
+    font-size:.84rem;
+    font-weight:700;
+  }
+
+  .account-delete-field input{
+    width:100%;
+    min-height:46px;
+    box-sizing:border-box;
+    padding:.7rem 3rem .7rem .85rem;
+    border:1px solid var(--border,#cbd5e1);
+    border-radius:10px;
+    background:var(--input-bg,var(--card-bg,#fff));
+    color:inherit;
+    font:inherit;
+    outline:none;
+  }
+
+  .account-delete-field input:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,.12);
+  }
+
+  .account-delete-toggle{
+    position:absolute;
+    right:.35rem;
+    bottom:.35rem;
+    width:38px;
+    height:38px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:var(--text-muted,#64748b);
+    cursor:pointer;
+  }
+
+  .account-delete-toggle:hover{
+    background:rgba(127,127,127,.10);
+  }
+
+  .account-delete-error{
+    display:none;
+    margin-top:.7rem;
+    padding:.7rem .8rem;
+    border-radius:9px;
+    background:rgba(220,38,38,.08);
+    color:#b91c1c;
+    font-size:.82rem;
+    line-height:1.45;
+  }
+
+  .account-delete-error.is-visible{
+    display:block;
+  }
+
+  .account-delete-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:.65rem;
+    margin-top:1.2rem;
+  }
+
+  .account-delete-actions button{
+    min-height:44px;
+  }
+
+  .account-delete-confirm:disabled{
+    cursor:not-allowed;
+    opacity:.48;
+  }
+
+  .account-delete-confirm.is-loading{
+    pointer-events:none;
+  }
+
+  @media(max-width:560px){
+    .account-delete-modal{
+      padding:.7rem;
+      align-items:flex-end;
+    }
+
+    .account-delete-dialog{
+      width:100%;
+      max-height:88vh;
+      border-radius:18px 18px 12px 12px;
+      padding:1.05rem;
+    }
+
+    .account-delete-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+    }
+
+    .account-delete-actions button{
+      width:100%;
+    }
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    .account-delete-dialog{
+      animation:none;
+    }
+  }
+</style>
+
 </head>
 <body>
   <header class="site-header">
@@ -546,6 +815,121 @@
     <div class="manlung-empty">Loading notifications…</div>
   </div>
 </section>
+
+<!-- Account deletion confirmation modal -->
+<div
+  id="accountDeleteModal"
+  class="account-delete-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="accountDeleteTitle"
+  aria-describedby="accountDeleteDescription"
+  aria-hidden="true"
+>
+  <div class="account-delete-dialog" role="document">
+    <div class="account-delete-head">
+      <div class="account-delete-icon" aria-hidden="true">
+        <i class="fas fa-triangle-exclamation"></i>
+      </div>
+
+      <div>
+        <h2 id="accountDeleteTitle" class="account-delete-title">
+          Permanently delete your account?
+        </h2>
+      </div>
+
+      <button
+        type="button"
+        class="account-delete-close"
+        id="accountDeleteClose"
+        aria-label="Close account deletion dialog"
+      >
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="account-delete-warning">
+      <strong>This action cannot be undone.</strong><br>
+      Your Manlung Recovery account, linked recovery cases, and evidence
+      files attached to those cases will be permanently removed.
+    </div>
+
+    <p id="accountDeleteDescription" class="account-delete-copy">
+      To continue, enter your current account password. Your password is
+      verified securely on the server before anything is deleted.
+    </p>
+
+    <div class="account-delete-field" id="accountDeletePasswordField">
+      <label for="accountDeletePassword">Current password</label>
+
+      <input
+        type="password"
+        id="accountDeletePassword"
+        name="accountDeletePassword"
+        autocomplete="current-password"
+        placeholder="Enter your current password"
+      >
+
+      <button
+        type="button"
+        class="account-delete-toggle"
+        id="accountDeleteToggle"
+        aria-label="Show password"
+        aria-pressed="false"
+      >
+        <i class="fas fa-eye"></i>
+      </button>
+    </div>
+
+    <div
+      id="accountDeleteOAuth"
+      class="account-delete-oauth"
+      hidden
+    >
+      <div class="account-delete-oauth-icon" aria-hidden="true">
+        <i id="accountDeleteOAuthIcon" class="fas fa-shield-halved"></i>
+      </div>
+
+      <div class="account-delete-oauth-content">
+        <strong id="accountDeleteOAuthTitle">
+          Verify your identity
+        </strong>
+
+        <p id="accountDeleteOAuthText">
+          Continue with your sign-in provider to verify your identity
+          before permanently deleting your account.
+        </p>
+      </div>
+    </div>
+
+    <div
+      id="accountDeleteError"
+      class="account-delete-error"
+      role="alert"
+      aria-live="polite"
+    ></div>
+
+    <div class="account-delete-actions">
+      <button
+        type="button"
+        class="btn"
+        id="accountDeleteCancel"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-danger account-delete-confirm"
+        id="accountDeleteConfirm"
+        disabled
+      >
+        <i class="fas fa-trash-can"></i>
+        <span>Delete account</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 </main>
 
@@ -741,44 +1125,383 @@
       }
     }
 
-    async function deleteMyAccount(){
-      const first = confirm(
-        'Delete your Manlung Recovery account permanently? Your account, linked recovery cases, and uploaded evidence will be removed.'
+    function deleteMyAccount(){
+      const modal = document.getElementById('accountDeleteModal');
+      const passwordInput = document.getElementById('accountDeletePassword');
+      const passwordField = document.getElementById('accountDeletePasswordField');
+      const oauthBox = document.getElementById('accountDeleteOAuth');
+      const oauthTitle = document.getElementById('accountDeleteOAuthTitle');
+      const oauthText = document.getElementById('accountDeleteOAuthText');
+      const oauthIcon = document.getElementById('accountDeleteOAuthIcon');
+      const errorBox = document.getElementById('accountDeleteError');
+      const confirmButton = document.getElementById('accountDeleteConfirm');
+      const confirmText = confirmButton?.querySelector('span');
+
+      if(!modal || !passwordInput || !confirmButton){
+        console.error('Account deletion modal is not available.');
+        return;
+      }
+
+      const clientUser = JSON.parse(
+        localStorage.getItem('clientUser') || 'null'
       );
 
-      if(!first) return;
+      const provider = String(
+        clientUser?.auth_provider || ''
+      ).trim().toLowerCase();
 
-      const second = prompt(
-        'Type DELETE to confirm permanent account deletion.'
+      const isOAuth =
+        provider === 'google' ||
+        provider === 'github';
+
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden','false');
+
+      errorBox?.classList.remove('is-visible');
+
+      if(errorBox) errorBox.textContent='';
+
+      passwordInput.value='';
+
+      if(isOAuth){
+        passwordField?.setAttribute('hidden','');
+        oauthBox?.removeAttribute('hidden');
+
+        if(oauthTitle){
+          oauthTitle.textContent =
+            `Continue with ${provider === 'google' ? 'Google' : 'GitHub'}`;
+        }
+
+        if(oauthText){
+          oauthText.textContent =
+            `Continue with ${provider === 'google' ? 'Google' : 'GitHub'} to verify your identity before permanently deleting your account.`;
+        }
+
+        if(oauthIcon){
+          oauthIcon.className =
+            provider === 'google'
+              ? 'fab fa-google'
+              : 'fab fa-github';
+        }
+
+        confirmButton.disabled=false;
+
+        if(confirmText){
+          confirmText.textContent =
+            `Continue with ${provider === 'google' ? 'Google' : 'GitHub'}`;
+        }
+      }else{
+        passwordField?.removeAttribute('hidden');
+        oauthBox?.setAttribute('hidden','');
+
+        confirmButton.disabled=true;
+
+        if(confirmText){
+          confirmText.textContent='Delete account';
+        }
+
+        window.setTimeout(() => passwordInput.focus(), 50);
+      }
+    }
+
+    function closeDeleteAccountModal(){
+      const modal = document.getElementById('accountDeleteModal');
+      const passwordInput = document.getElementById('accountDeletePassword');
+      const errorBox = document.getElementById('accountDeleteError');
+      const confirmButton = document.getElementById('accountDeleteConfirm');
+
+      if(!modal) return;
+
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden','true');
+
+      if(passwordInput){
+        passwordInput.value='';
+        passwordInput.type='password';
+      }
+
+      if(errorBox){
+        errorBox.textContent='';
+        errorBox.classList.remove('is-visible');
+      }
+
+      if(confirmButton){
+        confirmButton.disabled=true;
+        confirmButton.classList.remove('is-loading');
+
+        const buttonText=confirmButton.querySelector('span');
+
+        if(buttonText){
+          buttonText.textContent='Delete account';
+        }
+      }
+
+      document.getElementById('accountDeleteToggle')?.setAttribute(
+        'aria-pressed',
+        'false'
       );
 
-      if(second !== 'DELETE'){
-        alert('Account deletion cancelled.');
+      const toggleIcon=document.querySelector('#accountDeleteToggle i');
+
+      if(toggleIcon){
+        toggleIcon.className='fas fa-eye';
+      }
+    }
+
+    async function startOAuthAccountDeletion(provider){
+      const normalizedProvider=String(provider||'').trim().toLowerCase();
+
+      if(normalizedProvider!=='google' && normalizedProvider!=='github'){
         return;
       }
 
       try{
-        const res = await fetch('/api/auth/client/account', {
-          method:'DELETE',
-          headers:authHeaders()
+        const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
+
+        if(!cfg.supabaseUrl || !cfg.supabaseAnonKey){
+          throw new Error('Social authentication is not configured.');
+        }
+
+        if(!window.supabase?.createClient){
+          throw new Error('Social authentication is unavailable.');
+        }
+
+        const supabase=window.supabase.createClient(
+          cfg.supabaseUrl,
+          cfg.supabaseAnonKey
+        );
+
+        const redirectUrl =
+          window.location.origin +
+          '/oauth-callback.html?action=delete-account&provider=' +
+          encodeURIComponent(normalizedProvider);
+
+        const {error}=await supabase.auth.signInWithOAuth({
+          provider:normalizedProvider,
+          options:{
+            redirectTo:redirectUrl,
+            queryParams:{
+              prompt:'select_account'
+            }
+          }
         });
 
-        const data = await res.json().catch(()=>({}));
+        if(error) throw error;
+      }catch(error){
+        console.error('OAuth account deletion sign-in error:',error);
+
+        const errorBox=document.getElementById('accountDeleteError');
+
+        if(errorBox){
+          errorBox.textContent =
+            error.message ||
+            'Social sign-in could not be started. Please try again.';
+          errorBox.classList.add('is-visible');
+        }
+      }
+    }
+
+    async function confirmDeleteMyAccount(){
+      const passwordInput=document.getElementById('accountDeletePassword');
+      const confirmButton=document.getElementById('accountDeleteConfirm');
+      const errorBox=document.getElementById('accountDeleteError');
+
+      if(!passwordInput || !confirmButton) return;
+
+      const password=passwordInput.value;
+
+      const clientUser=JSON.parse(
+        localStorage.getItem('clientUser') || 'null'
+      );
+
+      const provider=String(
+        clientUser?.auth_provider || ''
+      ).trim().toLowerCase();
+
+      if(provider==='google' || provider==='github'){
+        confirmButton.disabled=true;
+        confirmButton.classList.add('is-loading');
+
+        const buttonIcon=confirmButton.querySelector('i');
+        const buttonText=confirmButton.querySelector('span');
+
+        if(buttonIcon){
+          buttonIcon.className='fas fa-spinner fa-spin';
+        }
+
+        if(buttonText){
+          buttonText.textContent='Connecting…';
+        }
+
+        await startOAuthAccountDeletion(provider);
+        return;
+      }
+
+      if(!password) return;
+
+      if(errorBox){
+        errorBox.textContent='';
+        errorBox.classList.remove('is-visible');
+      }
+
+      confirmButton.disabled=true;
+      confirmButton.classList.add('is-loading');
+
+      const buttonIcon=confirmButton.querySelector('i');
+      const buttonText=confirmButton.querySelector('span');
+
+      if(buttonIcon){
+        buttonIcon.className='fas fa-spinner fa-spin';
+      }
+
+      if(buttonText){
+        buttonText.textContent='Deleting…';
+      }
+
+      try{
+        const res=await fetch('/api/auth/client/account',{
+          method:'DELETE',
+          headers:{
+            ...authHeaders(),
+            'Content-Type':'application/json'
+          },
+          body:JSON.stringify({password})
+        });
+
+        const data=await res.json().catch(()=>({}));
 
         if(!res.ok || !data.success){
-          throw new Error(data.error || `Could not delete account (${res.status})`);
+          const deleteError = new Error(
+            data.error ||
+            'Could not delete your account.'
+          );
+
+          deleteError.code = data.code || '';
+          deleteError.provider = data.provider || '';
+
+          throw deleteError;
         }
 
         localStorage.removeItem('clientToken');
         localStorage.removeItem('clientUser');
 
-        alert('Your account has been deleted.');
         window.location.href='/login.html';
       }catch(error){
-        console.error('Delete account error:', error);
-        alert(error.message || 'Could not delete your account.');
+        console.error('Delete account error:',error);
+
+        if(errorBox){
+          if(error.code==='OAUTH_REAUTH_REQUIRED'){
+            const provider =
+              error.provider==='google'
+                ? 'Google'
+                : error.provider==='github'
+                  ? 'GitHub'
+                  : 'your sign-in provider';
+
+            errorBox.textContent =
+              `This account uses ${provider} sign-in. Please sign in again with ${provider} to verify your identity before deleting your account.`;
+          }else{
+            errorBox.textContent =
+              error.message ||
+              'Could not delete your account. Please try again.';
+          }
+
+          errorBox.classList.add('is-visible');
+        }
+
+        confirmButton.disabled=false;
+        confirmButton.classList.remove('is-loading');
+
+        if(buttonIcon){
+          buttonIcon.className='fas fa-trash-can';
+        }
+
+        if(buttonText){
+          buttonText.textContent='Delete account';
+        }
+
+        passwordInput.focus();
       }
     }
+
+    (function setupAccountDeleteModal(){
+      const modal=document.getElementById('accountDeleteModal');
+      const passwordInput=document.getElementById('accountDeletePassword');
+      const confirmButton=document.getElementById('accountDeleteConfirm');
+      const cancelButton=document.getElementById('accountDeleteCancel');
+      const closeButton=document.getElementById('accountDeleteClose');
+      const toggleButton=document.getElementById('accountDeleteToggle');
+
+      if(!modal || !passwordInput || !confirmButton) return;
+
+      passwordInput.addEventListener('input',()=>{
+        confirmButton.disabled=passwordInput.value.length===0;
+      });
+
+      passwordInput.addEventListener('keydown',(event)=>{
+        if(
+          event.key==='Enter' &&
+          passwordInput.value &&
+          !confirmButton.disabled
+        ){
+          event.preventDefault();
+          confirmDeleteMyAccount();
+        }
+      });
+
+      confirmButton.addEventListener(
+        'click',
+        confirmDeleteMyAccount
+      );
+
+      cancelButton?.addEventListener(
+        'click',
+        closeDeleteAccountModal
+      );
+
+      closeButton?.addEventListener(
+        'click',
+        closeDeleteAccountModal
+      );
+
+      toggleButton?.addEventListener('click',()=>{
+        const showing=passwordInput.type==='text';
+
+        passwordInput.type=showing?'password':'text';
+
+        toggleButton.setAttribute(
+          'aria-pressed',
+          String(!showing)
+        );
+
+        toggleButton.setAttribute(
+          'aria-label',
+          showing?'Show password':'Hide password'
+        );
+
+        const icon=toggleButton.querySelector('i');
+
+        if(icon){
+          icon.className=
+            showing?'fas fa-eye':'fas fa-eye-slash';
+        }
+      });
+
+      modal.addEventListener('click',(event)=>{
+        if(event.target===modal){
+          closeDeleteAccountModal();
+        }
+      });
+
+      document.addEventListener('keydown',(event)=>{
+        if(
+          event.key==='Escape' &&
+          modal.classList.contains('is-open')
+        ){
+          closeDeleteAccountModal();
+        }
+      });
+    })();
 
     async function loadDonationSummary(){
       try{

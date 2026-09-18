@@ -47,6 +47,11 @@ async function create({ username, password, role = 'client', email, phone }) {
   return data;
 }
 
+async function verifyPassword(user, candidatePassword) {
+  if (!user || !user.password || !candidatePassword) return false;
+  return bcrypt.compare(String(candidatePassword), user.password);
+}
+
 async function comparePassword(user, candidatePassword) {
   if (!user || !user.password) return false;
 
@@ -352,7 +357,7 @@ async function consumeRecoveryCode(userId, remainingHashes) {
 }
 
 module.exports = {
-  findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword, bumpSessionVersion,
+  findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword, verifyPassword, bumpSessionVersion,
   setEmailVerificationToken, findByValidEmailVerificationToken, markEmailVerified,
   setResetToken, findByValidResetToken, resetPassword, updateProfile, updatePassword, deleteById, createAdminFromInvitation,
   listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, convertClientToPendingAdmin, setAdminStatus, removeAdminPrivileges,

@@ -1252,6 +1252,46 @@ router.delete(
         });
       }
 
+      const password = String(req.body?.password || '');
+
+      const client = await User.findById(req.user.id);
+
+      if (!client) {
+        return res.status(404).json({
+          error: 'Your account could not be found.',
+        });
+      }
+
+      const authProvider = String(
+        client.auth_provider || ''
+      ).trim().toLowerCase();
+
+      if (authProvider === 'google' || authProvider === 'github') {
+        return res.status(409).json({
+          error:
+            `This account uses ${authProvider === 'google' ? 'Google' : 'GitHub'} sign-in. Please re-authenticate with ${authProvider === 'google' ? 'Google' : 'GitHub'} before deleting your account.`,
+          code: 'OAUTH_REAUTH_REQUIRED',
+          provider: authProvider,
+        });
+      }
+
+      if (!password) {
+        return res.status(400).json({
+          error: 'Your current password is required to delete your account.',
+          code: 'PASSWORD_REQUIRED',
+        });
+      }
+
+      const passwordValid =
+        await User.verifyPassword(client, password);
+
+      if (!passwordValid) {
+        return res.status(401).json({
+          error: 'The password you entered is incorrect.',
+          code: 'INVALID_DELETE_PASSWORD',
+        });
+      }
+
       const cases = await Case.findByClientUserId(req.user.id);
 
       const paths = [...new Set(
@@ -1698,6 +1738,12 @@ router.post(
 
       const oauthUser = data.user;
 
+      const authProvider = String(
+        oauthUser.app_metadata?.provider ||
+        oauthUser.user_metadata?.provider ||
+        ''
+      ).trim().toLowerCase();
+
       const email = String(
         oauthUser.email || ''
       ).trim().toLowerCase();
@@ -1721,6 +1767,22 @@ router.post(
               ? '/admin/login.html'
               : '/login.html',
         });
+      }
+
+      if (client && authProvider && client.auth_provider !== authProvider) {
+        const { data: updatedClient, error: providerError } = await supabase
+          .from('recovery_users')
+          .update({ auth_provider: authProvider })
+          .eq('id', client.id)
+          .eq('role', 'client')
+          .select()
+          .maybeSingle();
+
+        if (providerError) throw providerError;
+
+        if (updatedClient) {
+          client = updatedClient;
+        }
       }
 
       const metadata = oauthUser.user_metadata || {};
@@ -1762,6 +1824,18 @@ router.post(
           role: 'client',
         });
 
+        if (authProvider) {
+          const { error: providerError } = await supabase
+            .from('recovery_users')
+            .update({ auth_provider: authProvider })
+            .eq('id', client.id)
+            .eq('role', 'client');
+
+          if (providerError) throw providerError;
+
+          client.auth_provider = authProvider;
+        }
+
         sendEmail({
           to: client.email,
           subject: 'Welcome to Manlung Recovery — Account Created Successfully',
@@ -1779,6 +1853,7 @@ router.post(
           email: client.email,
           phone: client.phone,
           role: client.role,
+          auth_provider: client.auth_provider || null,
         },
       });
     } catch (error) {
@@ -1788,6 +1863,163 @@ router.post(
         error:
           error.message ||
           'Social sign-in failed.',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// DELETE CLIENT ACCOUNT — OAUTH RE-AUTHENTICATION
+// ============================================================
+
+router.delete(
+  '/client/account/oauth',
+  auth,
+  async (req, res) => {
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          error: 'Only client accounts can be deleted here.',
+        });
+      }
+
+      const accessToken = String(
+        req.body?.accessToken || ''
+      ).trim();
+
+      if (!accessToken) {
+        return res.status(400).json({
+          error: 'A fresh social sign-in session is required.',
+          code: 'OAUTH_TOKEN_REQUIRED',
+        });
+      }
+
+      const client = await User.findById(req.user.id);
+
+      if (!client) {
+        return res.status(404).json({
+          error: 'Your account could not be found.',
+        });
+      }
+
+      const expectedProvider = String(
+        client.auth_provider || ''
+      ).trim().toLowerCase();
+
+      if (
+        expectedProvider !== 'google' &&
+        expectedProvider !== 'github'
+      ) {
+        return res.status(409).json({
+          error:
+            'This account is not configured for Google or GitHub sign-in.',
+          code: 'OAUTH_PROVIDER_NOT_CONFIGURED',
+        });
+      }
+
+      const { data, error } =
+        await supabase.auth.getUser(accessToken);
+
+      if (error || !data?.user) {
+        return res.status(401).json({
+          error:
+            'Your social sign-in session could not be verified. Please sign in again.',
+          code: 'OAUTH_REAUTH_FAILED',
+        });
+      }
+
+      const oauthUser = data.user;
+
+      const actualProvider = String(
+        oauthUser.app_metadata?.provider ||
+        oauthUser.user_metadata?.provider ||
+        ''
+      ).trim().toLowerCase();
+
+      const oauthEmail = String(
+        oauthUser.email || ''
+      ).trim().toLowerCase();
+
+      const clientEmail = String(
+        client.email || ''
+      ).trim().toLowerCase();
+
+      if (actualProvider !== expectedProvider) {
+        return res.status(403).json({
+          error:
+            'The social account does not match the authentication provider for this Manlung account.',
+          code: 'OAUTH_PROVIDER_MISMATCH',
+        });
+      }
+
+      if (!oauthEmail || oauthEmail !== clientEmail) {
+        return res.status(403).json({
+          error:
+            'The social account does not match the email address on this Manlung account.',
+          code: 'OAUTH_ACCOUNT_MISMATCH',
+        });
+      }
+
+      const cases = await Case.findByClientUserId(req.user.id);
+
+      const paths = [...new Set(
+        cases.flatMap(c =>
+          Array.isArray(c.files)
+            ? c.files.map(f => f?.path).filter(Boolean)
+            : []
+        )
+      )];
+
+      if (paths.length) {
+        const { error: storageError } =
+          await supabase.storage
+            .from(EVIDENCE_BUCKET)
+            .remove(paths);
+
+        if (storageError) {
+          console.error(
+            'OAuth account deletion evidence cleanup failed:',
+            storageError
+          );
+
+          return res.status(500).json({
+            error:
+              'Your account could not be deleted because some case files could not be removed.',
+          });
+        }
+      }
+
+      for (const caseRow of cases) {
+        await Case.removeForClient(
+          caseRow.case_id,
+          req.user.id
+        );
+      }
+
+      const deleted = await User.deleteById(req.user.id);
+
+      if (!deleted) {
+        return res.status(500).json({
+          error: 'Account could not be deleted.',
+        });
+      }
+
+      return res.json({
+        success: true,
+        message:
+          'Your account and your linked cases have been deleted.',
+      });
+    } catch (error) {
+      console.error(
+        'OAuth client account deletion error:',
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          error.message ||
+          'Your account could not be deleted.',
       });
     }
   }
@@ -1809,6 +2041,7 @@ router.get(
         username: req.user.username,
         email: req.user.email,
         role: req.user.role,
+        auth_provider: req.user.auth_provider || null,
       },
     });
   }
