@@ -42,13 +42,16 @@
     <link rel="stylesheet" href="/css/auth-premium.css">
     <script src="/js/support-fab.js"></script>
 <style>
-.manlung-auth-page{background:#fff url("https://i.postimg.cc/43DBwV0f/opentext-image-ov-hightech-en.jpg") center/cover fixed no-repeat!important;position:relative}
-.manlung-auth-page::before{content:"";position:fixed;inset:0;background:rgba(255,255,255,.88);z-index:-1;pointer-events:none}
+.manlung-auth-page{background:#fff!important}
 .manlung-auth-shell{display:block!important;max-width:620px!important;margin:32px auto!important}
-.manlung-auth-form{width:100%!important;background:rgba(255,255,255,.96);border:1px solid rgba(203,213,225,.9);border-radius:22px;padding:30px;box-shadow:0 18px 55px rgba(15,23,42,.14);backdrop-filter:blur(8px)}
+.manlung-auth-form{width:100%!important;background-image:linear-gradient(rgba(255,255,255,.88),rgba(255,255,255,.94)),url("https://i.postimg.cc/43DBwV0f/opentext-image-ov-hightech-en.jpg")!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;border:1px solid rgba(203,213,225,.9);border-radius:22px;padding:30px;box-shadow:0 18px 55px rgba(15,23,42,.14);backdrop-filter:blur(3px)}
 .manlung-auth-page .manlung-auth-wrap{min-height:calc(100vh - 80px);display:flex;align-items:center;padding:24px 16px}
 .manlung-auth-page .manlung-auth-heading h2{margin-bottom:6px}
 .manlung-auth-page .manlung-auth-heading p{color:#64748b}
+.manlung-auth-page .manlung-auth-tabs{background:rgba(255,255,255,.78);border-radius:14px;padding:4px}
+.manlung-auth-page .manlung-auth-form form,.manlung-auth-page .manlung-auth-heading{background:rgba(255,255,255,.72);border-radius:16px;padding:18px}
+.manlung-auth-page .manlung-auth-heading{margin-bottom:12px}
+@media (max-width:640px){.manlung-auth-form{padding:18px}.manlung-auth-page .manlung-auth-form form,.manlung-auth-page .manlung-auth-heading{padding:14px}}
 </style></head>
 <body class="manlung-auth-page">
 <header class="site-header">
