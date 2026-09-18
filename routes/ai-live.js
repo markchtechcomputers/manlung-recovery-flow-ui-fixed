@@ -14,7 +14,7 @@ Answer questions about the Manlung Recovery portal accurately. Never invent case
 Never request passwords, PINs, OTPs, recovery codes, API keys or payment secrets.
 For private case details, tell the user to sign in and use official case tracking.
 For physical emergencies, advise appropriate emergency services first.
-Keep answers practical, warm and reasonably concise. You are an AI, never claim to be human.`;
+Keep answers practical, warm and reasonably concise. Treat the conversation as a guided support flow: first acknowledge what the user said, then give the most relevant next step, then ask at most one focused follow-up question when a missing detail is needed. Use earlier messages to avoid repeating questions or generic introductions. If the user describes an incident, identify the likely support area and guide them toward evidence, safety, or the appropriate request/tracking action. If the user is unsure, ask a simple clarifying question instead of dumping a long list of services. When the user is ready, offer the exact next action (New Request, Track Case, or Human Support). Never claim to have taken an action that the user has not actually completed. You are an AI, never claim to be human.`;
 
 function cleanHistory(value){
   return Array.isArray(value)
@@ -26,7 +26,7 @@ function extractText(value){
   if(typeof value==='string'){
     const s=value.trim();
     if(!s||s==='[DONE]')return '';
-    try{return extractText(JSON.parse(s));}catch(_){return '';}
+    try{return extractText(JSON.parse(s));}catch(_){return s;}
   }
   return value?.choices?.[0]?.delta?.content
     ||value?.choices?.[0]?.message?.content
@@ -75,6 +75,7 @@ router.post('/chat',optionalAuth,async(req,res)=>{
 
     res.status(200).set({
       'Content-Type':'text/event-stream; charset=utf-8',
+      'X-Manlung-AI':'live-conversation',
       'Cache-Control':'no-cache, no-transform',
       'Connection':'keep-alive',
       'X-Accel-Buffering':'no'
