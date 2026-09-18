@@ -8,8 +8,7 @@
   if (window.__MANLUNG_AI_LOADED) return;
   window.__MANLUNG_AI_LOADED = true;
 
-  const AI_ICON = 'https://i.postimg.cc/QMcj6JDY/Chat-GPT-Image-Sep-3-2026-01-41-08-PM.png';
-  const WHATSAPP = 'https://wa.me/254745682493?text=Hello%20Manlung%20Recovery%20%F0%9F%91%8B%2C%20I%20came%20across%20your%20website%20and%20I%E2%80%99d%20like%20to%20get%20some%20help%20with%20my%20recovery%20request.%20Could%20you%20please%20guide%20me%20on%20what%20I%20need%20to%20do%20next%3F%20Thank%20you%21';
+    const WHATSAPP = 'https://wa.me/254745682493?text=Hello%20Manlung%20Recovery%20%F0%9F%91%8B%2C%20I%20came%20across%20your%20website%20and%20I%E2%80%99d%20like%20to%20get%20some%20help%20with%20my%20recovery%20request.%20Could%20you%20please%20guide%20me%20on%20what%20I%20need%20to%20do%20next%3F%20Thank%20you%21';
   const EMAIL = 'mailto:manlungrecovery@outlook.com?subject=Manlung%20Recovery%20AI%20Support';
   const REQUEST = '/client/request.html';
   const TRACK = '/client/track.html';
@@ -43,7 +42,7 @@
     const style = document.createElement('style');
     style.id = 'manlung-ai-styles';
     style.textContent = `
-      #manlungAiRoot{display:none!important}
+      #manlungAiRoot{display:block!important;position:static!important;visibility:visible!important;opacity:1!important}
       .manlung-ai-pulse{animation:none}.manlung-ai-typing span{animation:none}}
     `;
     document.head.appendChild(style);
@@ -73,10 +72,7 @@
     if (!body) return;
     const row = document.createElement('div');
     row.className = `manlung-ai-msg ${who}`;
-    row.innerHTML = who === 'ai'
-      ? `<img class="manlung-ai-mini" src="${AI_ICON}" alt="AI"><div><div class="manlung-ai-bubble">${format(text)}</div><div class="manlung-ai-time">${now()}</div></div>`
-      : `<div><div class="manlung-ai-bubble">${format(text)}</div><div class="manlung-ai-time" style="text-align:right">${now()}</div></div>`;
-    body.appendChild(row);
+    const wrap=document.createElement('div');const bubble=document.createElement('div');bubble.className='manlung-ai-bubble';bubble.textContent=text;wrap.appendChild(bubble);const meta=document.createElement('div');meta.className='manlung-ai-time';meta.textContent=who==='ai'?'Manlung AI':'You';wrap.appendChild(meta);row.appendChild(wrap);body.appendChild(row);
     body.scrollTop = body.scrollHeight;
   }
 
@@ -85,7 +81,7 @@
     const row = document.createElement('div');
     row.className = 'manlung-ai-msg';
     row.id = 'manlungAiTyping';
-    row.innerHTML = `<img class="manlung-ai-mini" src="${AI_ICON}" alt="AI"><div class="manlung-ai-bubble manlung-ai-typing"><span></span><span></span><span></span></div>`;
+    row.innerHTML='<div class="manlung-ai-bubble manlung-ai-typing"><span></span><span></span><span></span></div>';
     body.appendChild(row); body.scrollTop = body.scrollHeight;
   }
   function removeTyping(){document.getElementById('manlungAiTyping')?.remove();}
