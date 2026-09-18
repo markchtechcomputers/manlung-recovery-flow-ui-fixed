@@ -73,13 +73,14 @@
       .manlung-ai-input{flex:1;min-height:46px;max-height:140px;resize:none;padding:12px 14px;border:1px solid #cbd7e5;border-radius:14px;background:#f8fafc;color:#172033;outline:none;font:inherit}
       .manlung-ai-input:focus{border-color:#39a6c3;box-shadow:0 0 0 3px rgba(57,166,195,.12);background:#fff}
       .manlung-ai-mic,.manlung-ai-send{height:48px;border:0;border-radius:14px;cursor:pointer;font-size:17px;font-weight:900;flex:0 0 48px;transition:.18s}
-      .manlung-ai-mic{position:relative;background:#eef6fb;color:#12627d;border:1px solid #cfe0eb}.manlung-ai-mic.recording{background:#dc2626;color:#fff;border-color:#dc2626;box-shadow:0 0 0 5px rgba(220,38,38,.12);animation:manlungAiRecord 1s infinite}.manlung-ai-send{background:linear-gradient(135deg,#0e7490,#2563eb);color:#fff;box-shadow:0 7px 18px rgba(37,99,235,.2)}
+      .manlung-ai-mic{position:relative;background:#eef6fb;color:#12627d;border:1px solid #cfe0eb}.manlung-ai-mic.waiting{opacity:.72;box-shadow:0 0 0 3px rgba(37,99,235,.08)}.manlung-ai-mic.recording{background:#dc2626;color:#fff;border-color:#dc2626;box-shadow:0 0 0 5px rgba(220,38,38,.12);animation:manlungAiRecord 1s infinite}.manlung-ai-send{background:linear-gradient(135deg,#0e7490,#2563eb);color:#fff;box-shadow:0 7px 18px rgba(37,99,235,.2)}
       .manlung-ai-note{text-align:center;margin:8px auto 0;color:#8a97a8;font-size:.7rem}
       .manlung-ai-voice-state{display:none;align-items:center;justify-content:center;gap:9px;margin:0 auto 10px;padding:10px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;color:#334155;font-size:.78rem;font-weight:750;max-width:1000px}
       .manlung-ai-voice-state.show{display:flex}
       .manlung-ai-voice-dot{width:8px;height:8px;border-radius:50%;background:#2563eb;box-shadow:0 0 0 5px rgba(37,99,235,.10)}
       .manlung-ai-voice-state.recording .manlung-ai-voice-dot{background:#dc2626;box-shadow:0 0 0 5px rgba(220,38,38,.10);animation:manlungAiVoicePulse 1s infinite}
       .manlung-ai-voice-state.processing .manlung-ai-voice-dot{background:#64748b;animation:manlungAiProcessing 1s infinite}
+      .manlung-ai-voice-state.waiting .manlung-ai-voice-dot{background:#2563eb;animation:manlungAiProcessing 1.4s infinite}
       @keyframes manlungAiVoicePulse{50%{transform:scale(1.35);opacity:.55}}
       @keyframes manlungAiProcessing{50%{opacity:.35;transform:scale(.75)}}
       .manlung-ai-quick{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 20px}
@@ -442,6 +443,7 @@
      function clearVoiceRestartTimer(){if(voiceRestartTimer){clearTimeout(voiceRestartTimer);voiceRestartTimer=null;}}
      function waitUntilSpeechIsFinished(){
        clearVoiceRestartTimer();
+       setVoiceState('waiting','AI is speaking — I’ll listen when it finishes');
        const check=()=>{
          if(!voiceSession||!voiceAutoResume)return;
          if(('speechSynthesis'in window&&window.speechSynthesis.speaking)||Date.now()<voiceSpeechCooldownUntil){voiceRestartTimer=setTimeout(check,250);return;}
@@ -461,6 +463,7 @@
       const mic=document.getElementById('manlungAiMic'),input=document.getElementById('manlungAiInput');
       if(!mic)return;
       mic.classList.toggle('recording',on);
+      mic.classList.toggle('waiting',!on&&voiceSession&&voiceAutoResume);
       mic.textContent=on?'■':'🎙';
       mic.title=on?'Listening… tap to stop':'Speak';
       mic.setAttribute('aria-label',on?'Stop listening':'Start voice input');
@@ -489,20 +492,15 @@
 
         if(t){
           voiceAutoResume=true;
-          setVoiceState('processing','Processing your message…');
+          setVoiceState('processing','I heard you — thinking…');
           respond(t).finally(()=>{
             if(voiceSession&&voiceAutoResume){
-              setVoiceState('','');
-              const resumeListening=()=>{
-                if(voiceSession&&voiceAutoResume&&!recognition)startListening();
-              };
               waitUntilSpeechIsFinished();
             }else{
               setVoiceState('','');
             }
           });
         }else if(voiceSession&&voiceAutoResume){
-          setVoiceState('','');
           waitUntilSpeechIsFinished();
         }else{
           setVoiceState('','');
@@ -531,6 +529,7 @@
       if(!SR){alert('Voice input is not supported here. Try Chrome or Edge.');return;}
       if(document.getElementById('manlungAiMic')?.classList.contains('recording')){stopListening();return;}
       window.__MANLUNG_AI_VOICE_ON=true;voiceSession=true;voiceAutoResume=true;
+      setVoiceState('recording','Listening… speak naturally');
       const voice=document.getElementById('manlungAiVoice');if(voice)voice.textContent='🔊 Voice on';
       startListening();
     });
