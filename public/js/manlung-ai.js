@@ -432,6 +432,17 @@
     document.getElementById('manlungAiLang')?.addEventListener('click',()=>{const next=currentLanguage()==='sw'?'en':'sw';localStorage.setItem('manlung-ai-language',next);const b=document.getElementById('manlungAiLang');if(b)b.textContent=next==='sw'?'🌐 Auto: Kiswahili':'🌐 Auto: English';});
     document.getElementById('manlungAiVoice')?.addEventListener('click',()=>{window.__MANLUNG_AI_VOICE_ON=!window.__MANLUNG_AI_VOICE_ON;const b=document.getElementById('manlungAiVoice');b.textContent=window.__MANLUNG_AI_VOICE_ON?'🔊 Voice on':'🔊 Voice off';if(!window.__MANLUNG_AI_VOICE_ON&&'speechSynthesis'in window)window.speechSynthesis.cancel();});
     let recognition=null,voiceSession=false,voiceAutoResume=false,voiceFinal='';
+     let voiceRestartTimer=null,voiceSpeechCooldownUntil=0;
+     function clearVoiceRestartTimer(){if(voiceRestartTimer){clearTimeout(voiceRestartTimer);voiceRestartTimer=null;}}
+     function waitUntilSpeechIsFinished(){
+       clearVoiceRestartTimer();
+       const check=()=>{
+         if(!voiceSession||!voiceAutoResume)return;
+         if(('speechSynthesis'in window&&window.speechSynthesis.speaking)||Date.now()<voiceSpeechCooldownUntil){voiceRestartTimer=setTimeout(check,250);return;}
+         voiceRestartTimer=setTimeout(()=>{voiceRestartTimer=null;if(voiceSession&&voiceAutoResume&&!recognition)startListening();},900);
+       };
+       check();
+     }
     function setVoiceState(mode,text){
       const state=document.getElementById('manlungAiVoiceState');
       const label=document.getElementById('manlungAiVoiceStateText');
@@ -453,7 +464,11 @@
     function startListening(){
       const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
       if(!SR)return false;
-      if(recognition||document.getElementById('manlungAiMic')?.classList.contains('recording'))return true;
+      if(!voiceSession||!voiceAutoResume)return false;
+       if(recognition||document.getElementById('manlungAiMic')?.classList.contains('recording'))return true;
+       if('speechSynthesis'in window&&window.speechSynthesis.speaking){waitUntilSpeechIsFinished();return false;}
+       if(Date.now()<voiceSpeechCooldownUntil){waitUntilSpeechIsFinished();return false;}
+       clearVoiceRestartTimer();
       recognition=new SR();recognition.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';recognition.continuous=false;recognition.interimResults=true;recognition.maxAlternatives=1;voiceFinal='';
       setListening(true);
       recognition.onresult=e=>{
@@ -475,19 +490,14 @@
               const resumeListening=()=>{
                 if(voiceSession&&voiceAutoResume&&!recognition)startListening();
               };
-              if('speechSynthesis'in window&&window.speechSynthesis.speaking){
-                window.speechSynthesis.addEventListener('end',resumeListening,{once:true});
-                setTimeout(resumeListening,1800);
-              }else{
-                setTimeout(resumeListening,350);
-              }
+              waitUntilSpeechIsFinished();
             }else{
               setVoiceState('','');
             }
           });
         }else if(voiceSession&&voiceAutoResume){
           setVoiceState('','');
-          setTimeout(startListening,500);
+          waitUntilSpeechIsFinished();
         }else{
           setVoiceState('','');
         }
@@ -497,15 +507,17 @@
         setListening(false);
         resetComposer();
         setVoiceState('','');
-        if(voiceSession&&voiceAutoResume){setTimeout(startListening,1000);}
+        if(voiceSession&&voiceAutoResume){waitUntilSpeechIsFinished();}
       };
       try{recognition.start();return true;}catch(_){recognition=null;setListening(false);return false;}
     }
     function stopListening(){
       voiceSession=false;
-      voiceAutoResume=false;
-      if(recognition){try{recognition.stop();}catch(_){}}
-      setListening(false);
+       voiceAutoResume=false;
+       clearVoiceRestartTimer();
+       if(recognition){try{recognition.stop();}catch(_){}}
+       recognition=null;
+       setListening(false);
       setVoiceState('','');
     }
     document.getElementById('manlungAiMic')?.addEventListener('click',()=>{
