@@ -449,10 +449,6 @@
         }
 
         async async function startSocialSignup(provider) {
-  if (provider === 'github') {
-    window.location.assign('/api/auth/github/start');
-    return;
-  }
             const errorEl = document.getElementById('loginError');
             const registerErrorEl = document.getElementById('registerError');
             const buttons = document.querySelectorAll(`.social-btn[onclick=\"startSocialSignup('${provider}')\"]`);
