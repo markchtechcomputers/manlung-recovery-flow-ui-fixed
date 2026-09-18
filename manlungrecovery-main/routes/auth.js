@@ -915,6 +915,176 @@ router.post(
 
 
 // ============================================================
+ // GITHUB OAUTH
+ // ============================================================
+
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '';
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '';
+const GITHUB_APP_URL = (process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke').replace(/\/$/, '');
+const GITHUB_REDIRECT_URI =
+  process.env.GITHUB_REDIRECT_URI ||
+  GITHUB_APP_URL + '/api/auth/github/callback';
+const GITHUB_STATE_COOKIE = 'manlung_github_oauth_state';
+
+function setGithubStateCookie(res, state) {
+  res.setHeader(
+    'Set-Cookie',
+    GITHUB_STATE_COOKIE + '=' + encodeURIComponent(state) +
+      '; Max-Age=600; Path=/api/auth/github; HttpOnly; Secure; SameSite=Lax'
+  );
+}
+
+function getGithubCookie(req, name) {
+  const raw = String(req.headers.cookie || '');
+  const part = raw.split(';').map(v => v.trim()).find(v => v.startsWith(name + '='));
+  return part ? decodeURIComponent(part.slice(name.length + 1)) : '';
+}
+
+function clearGithubStateCookie(res) {
+  res.setHeader(
+    'Set-Cookie',
+    GITHUB_STATE_COOKIE + '=; Max-Age=0; Path=/api/auth/github; HttpOnly; Secure; SameSite=Lax'
+  );
+}
+
+router.get('/github/start', (req, res) => {
+  if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
+    return res.redirect('/login.html?oauth=github-error');
+  }
+
+  const state = crypto.randomBytes(32).toString('hex');
+  setGithubStateCookie(res, state);
+
+  const url = new URL('https://github.com/login/oauth/authorize');
+  url.searchParams.set('client_id', GITHUB_CLIENT_ID);
+  url.searchParams.set('redirect_uri', GITHUB_REDIRECT_URI);
+  url.searchParams.set('scope', 'read:user user:email');
+  url.searchParams.set('state', state);
+
+  return res.redirect(url.toString());
+});
+
+router.get('/github/callback', async (req, res) => {
+  const state = String(req.query.state || '');
+  const expected = getGithubCookie(req, GITHUB_STATE_COOKIE);
+  clearGithubStateCookie(res);
+
+  if (
+    !state ||
+    !expected ||
+    state.length !== expected.length ||
+    !crypto.timingSafeEqual(Buffer.from(state), Buffer.from(expected))
+  ) {
+    return res.redirect('/login.html?oauth=github-error');
+  }
+
+  if (req.query.error) {
+    return res.redirect('/login.html?oauth=github-cancelled');
+  }
+
+  const code = String(req.query.code || '');
+  if (!code) {
+    return res.redirect('/login.html?oauth=github-error');
+  }
+
+  try {
+    const axios = require('axios');
+
+    const tokenRes = await axios.post(
+      'https://github.com/login/oauth/access_token',
+      {
+        client_id: GITHUB_CLIENT_ID,
+        client_secret: GITHUB_CLIENT_SECRET,
+        code,
+        redirect_uri: GITHUB_REDIRECT_URI,
+        state,
+      },
+      {
+        headers: { Accept: 'application/json' },
+        timeout: 10000,
+        validateStatus: () => true,
+      }
+    );
+
+    if (tokenRes.status !== 200 || !tokenRes.data?.access_token) {
+      console.error('GitHub token exchange failed:', tokenRes.data);
+      return res.redirect('/login.html?oauth=github-error');
+    }
+
+    const accessToken = tokenRes.data.access_token;
+    const headers = {
+      Authorization: 'Bearer ' + accessToken,
+      Accept: 'application/vnd.github+json',
+    };
+
+    const userRes = await axios.get('https://api.github.com/user', {
+      headers,
+      timeout: 10000,
+    });
+
+    let email = String(userRes.data?.email || '').trim().toLowerCase();
+
+    if (!email) {
+      const emails = await axios.get('https://api.github.com/user/emails', {
+        headers,
+        timeout: 10000,
+      });
+      const verified =
+        (emails.data || []).find(x => x.verified && x.primary) ||
+        (emails.data || []).find(x => x.verified);
+      email = String(verified?.email || '').trim().toLowerCase();
+    }
+
+    if (!email) {
+      return res.redirect('/login.html?oauth=github-error');
+    }
+
+    let client = await User.findByEmail(email);
+
+    if (client && client.role !== 'client') {
+      return res.redirect('/login.html?oauth=github-error');
+    }
+
+    if (!client) {
+      let username =
+        String(userRes.data?.login || email.split('@')[0])
+          .replace(/[^a-zA-Z0-9_.-]/g, '')
+          .slice(0, 70) || 'client';
+
+      if (await User.findByUsername(username)) {
+        username = (username + '-' + String(userRes.data?.id || '')).slice(0, 80);
+      }
+
+      client = await User.create({
+        username,
+        email,
+        phone: null,
+        password: crypto.randomBytes(32).toString('hex'),
+        role: 'client',
+      });
+    }
+
+    const token = signToken(client);
+    const safeToken = JSON.stringify(String(token)).replace(/</g, '\\u003c');
+
+    res
+      .status(200)
+      .set('Content-Type', 'text/html; charset=utf-8')
+      .send(
+        '<!doctype html><html><head><meta charset="utf-8"><title>Signing in…</title></head>' +
+        '<body><p>Signing you in to Manlung Recovery…</p>' +
+        '<script>try{localStorage.setItem("clientToken",' + safeToken +
+        ');window.location.replace("/client/dashboard.html")}catch(e){window.location.replace("/login.html?oauth=github-error")}</script>' +
+        '</html>'
+      );
+  } catch (error) {
+    console.error('GitHub OAuth error:', error?.response?.data || error?.message || error);
+    return res.redirect('/login.html?oauth=github-error');
+  }
+});
+
+
+// ============================================================
 // CLIENT OAUTH
 // Google / GitHub / other Supabase OAuth providers
 // ============================================================
