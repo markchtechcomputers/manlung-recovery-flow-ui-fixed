@@ -42,18 +42,47 @@
     const style = document.createElement('style');
     style.id = 'manlung-ai-styles';
     style.textContent = `
-      #manlungAiRoot{display:block!important;position:static!important;visibility:visible!important;opacity:1!important}
-      #manlungAiRoot{display:block!important;position:static!important;visibility:visible!important;opacity:1!important}
-      #manlungAiWindow{position:fixed!important;inset:0!important;left:0!important;bottom:0!important;width:100vw!important;height:100vh!important;max-height:none!important;display:none;flex-direction:column;z-index:2147483647!important;border:0!important;border-radius:0!important;background:#f8fafc!important;color:#0f172a!important;box-shadow:none!important}
-      #manlungAiWindow.open{display:flex!important}
-      .manlung-ai-head{background:linear-gradient(135deg,#0f172a,#173b62)!important}
-      .manlung-ai-avatar{width:44px!important;height:44px!important;display:grid!important;place-items:center!important;background:#fff!important;color:#2563eb!important;font-weight:900!important;border-radius:12px!important}
-      .manlung-ai-toolbar{display:flex;gap:8px;padding:8px 14px;background:#fff;border-bottom:1px solid #e2e8f0}
-      .manlung-ai-toolbar button{border:1px solid #dbeafe;background:#f8fafc;color:#1e40af;border-radius:999px;padding:7px 10px;font-weight:800;font-size:.7rem}
-      .manlung-ai-mic{width:42px;height:42px;border:0;border-radius:12px;background:#e0f2fe;color:#0369a1;cursor:pointer}
-      .manlung-ai-note{color:#64748b!important;background:#fff!important}
-      .manlung-ai-tab{background:linear-gradient(135deg,#0ea5e9,#2563eb)!important;border-color:#38bdf8!important;color:#fff!important;font-weight:800!important}
-      @media(max-width:650px){.manlung-ai-tab{font-size:.62rem!important}.manlung-ai-toolbar{padding:7px 10px}.manlung-ai-body{padding:12px!important}.manlung-ai-foot{padding:9px!important}}
+      #manlungAiRoot{position:fixed;inset:0;z-index:2147483647;pointer-events:none}
+      #manlungAiWindow{position:fixed;inset:0;width:100vw;height:100dvh;display:none;flex-direction:column;background:#f7f9fc;color:#172033;overflow:hidden;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      #manlungAiWindow.open{display:flex;pointer-events:auto}
+      .manlung-ai-head{min-height:76px;display:flex;align-items:center;gap:14px;padding:12px 24px;background:linear-gradient(135deg,#071a33 0%,#0b3157 55%,#0b7491 100%);color:#fff;box-shadow:0 4px 18px rgba(15,23,42,.18)}
+      .manlung-ai-avatar{width:48px;height:48px;display:grid;place-items:center;background:linear-gradient(135deg,#22d3ee,#2563eb);color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:15px;font-size:17px;font-weight:900;letter-spacing:-.5px;box-shadow:0 8px 22px rgba(34,211,238,.25)}
+      .manlung-ai-title{font-size:1.05rem;font-weight:850;letter-spacing:-.2px}
+      .manlung-ai-status{margin-top:3px;color:#b9e9f5;font-size:.76rem;font-weight:650}
+      .manlung-ai-status i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:6px;box-shadow:0 0 10px rgba(34,197,94,.7)}
+      .manlung-ai-close{margin-left:auto;width:42px;height:42px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.08);color:#fff;font-size:28px;line-height:1;cursor:pointer}
+      .manlung-ai-close:hover{background:rgba(255,255,255,.16)}
+      .manlung-ai-toolbar{display:flex;justify-content:flex-end;gap:8px;padding:10px 24px;background:#fff;border-bottom:1px solid #e6ebf2}
+      .manlung-ai-toolbar button{border:1px solid #d9e2ef;background:#fff;color:#24405f;border-radius:10px;padding:8px 12px;font-weight:750;font-size:.75rem;cursor:pointer}
+      .manlung-ai-toolbar button:hover{border-color:#67b9d2;background:#f1fbfd}
+      .manlung-ai-body{flex:1;overflow-y:auto;padding:28px clamp(14px,5vw,90px);background:radial-gradient(circle at top,#ffffff 0%,#f7f9fc 52%,#f1f5f9 100%)}
+      .manlung-ai-msg{display:flex;width:100%;margin:0 0 18px}
+      .manlung-ai-msg.ai{justify-content:flex-start}.manlung-ai-msg.user{justify-content:flex-end}
+      .manlung-ai-msg>div{max-width:min(760px,82%);display:flex;flex-direction:column}
+      .manlung-ai-msg.ai>div{align-items:flex-start}.manlung-ai-msg.user>div{align-items:flex-end}
+      .manlung-ai-bubble{padding:13px 16px;border-radius:18px;line-height:1.55;font-size:.94rem;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 2px 10px rgba(15,23,42,.06)}
+      .manlung-ai-msg.ai .manlung-ai-bubble{background:#fff;color:#243447;border:1px solid #e3e9f1;border-top-left-radius:6px}
+      .manlung-ai-msg.user .manlung-ai-bubble{background:linear-gradient(135deg,#126f91,#2563eb);color:#fff;border:1px solid #126f91;border-top-right-radius:6px}
+      .manlung-ai-time{font-size:.68rem;font-weight:700;color:#8a97a8;margin:6px 4px 0}
+      .manlung-ai-msg.user .manlung-ai-time{color:#6d7c90}
+      .manlung-ai-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+      .manlung-ai-links a{display:inline-flex;align-items:center;padding:8px 12px;border:1px solid #d7e3ed;border-radius:10px;background:#fff;color:#17617b;text-decoration:none;font-size:.74rem;font-weight:800}
+      .manlung-ai-links a:hover{background:#edfafd;border-color:#7cc5d8}
+      .manlung-ai-foot{padding:12px 24px 16px;background:#fff;border-top:1px solid #e4eaf1;box-shadow:0 -4px 18px rgba(15,23,42,.05)}
+      .manlung-ai-compose{display:flex;align-items:flex-end;gap:9px;max-width:1000px;margin:0 auto}
+      .manlung-ai-input{flex:1;min-height:46px;max-height:140px;resize:none;padding:12px 14px;border:1px solid #cbd7e5;border-radius:14px;background:#f8fafc;color:#172033;outline:none;font:inherit}
+      .manlung-ai-input:focus{border-color:#39a6c3;box-shadow:0 0 0 3px rgba(57,166,195,.12);background:#fff}
+      .manlung-ai-mic,.manlung-ai-send{width:46px;height:46px;border:0;border-radius:14px;cursor:pointer;font-size:18px;font-weight:900}
+      .manlung-ai-mic{background:#e8f7fb;color:#12627d}.manlung-ai-send{background:linear-gradient(135deg,#0e7490,#2563eb);color:#fff;box-shadow:0 7px 18px rgba(37,99,235,.2)}
+      .manlung-ai-note{text-align:center;margin:8px auto 0;color:#8a97a8;font-size:.7rem}
+      .manlung-ai-quick{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 20px}
+      .manlung-ai-quick button{border:1px solid #d7e3ed;background:#fff;color:#24516b;border-radius:999px;padding:8px 12px;font-weight:750;cursor:pointer}
+      @media(max-width:650px){
+        .manlung-ai-head{min-height:68px;padding:10px 14px}.manlung-ai-avatar{width:42px;height:42px;border-radius:13px}.manlung-ai-close{width:40px;height:40px}
+        .manlung-ai-toolbar{justify-content:stretch;padding:8px 12px}.manlung-ai-toolbar button{flex:1}
+        .manlung-ai-body{padding:18px 12px}.manlung-ai-msg>div{max-width:90%}.manlung-ai-bubble{font-size:.9rem;padding:11px 13px}
+        .manlung-ai-foot{padding:9px 10px 12px}.manlung-ai-links{overflow-x:auto;flex-wrap:nowrap}.manlung-ai-links a{white-space:nowrap}
+      }
     `;
     document.head.appendChild(style);
   }
