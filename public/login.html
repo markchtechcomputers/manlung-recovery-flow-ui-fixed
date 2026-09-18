@@ -251,46 +251,14 @@ async function setupOfficialGoogleButtons(){
 }
 
 async function startSocialSignup(provider){
-  try{
-    if(provider==='github'){
-      const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
-
-      if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){
-        throw new Error('GitHub sign-in is not configured yet.');
-      }
-
-      const supabase=window.supabase.createClient(
-        cfg.supabaseUrl,
-        cfg.supabaseAnonKey
-      );
-
-      // Clear the local Manlung session before starting a new
-      // explicit social authentication flow.
-      try{
-        await supabase.auth.signOut({scope:'local'});
-      }catch(_){}
-
-      localStorage.removeItem('clientToken');
-      localStorage.removeItem('clientUser');
-
-      const {error}=await supabase.auth.signInWithOAuth({
-        provider:'github',
-        options:{
-          redirectTo:window.location.origin+'/oauth-callback.html'
-        }
-      });
-
-      if(error)throw error;
-      return;
-    }
-  }catch(err){
-    showMessage(
-      document.getElementById('loginError'),
-      err.message||'Social sign-in failed.'
-    );
+  if(provider==='github'){
+    localStorage.removeItem('clientToken');
+    localStorage.removeItem('clientUser');
+    window.location.assign('/api/auth/github/start');
+    return;
   }
+  return;
 }
-
 
 document.addEventListener('DOMContentLoaded',()=>{
   setupOfficialGoogleButtons();
