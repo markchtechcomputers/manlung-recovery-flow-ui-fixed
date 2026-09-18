@@ -255,11 +255,17 @@
         if(!window.__MANLUNG_AI_VOICE_ON)return;
         pending+=String(part||'');
         const m=pending.match(/^([\\s\\S]*?[.!?…](?:\\s+|$))/);
-        if(m){pending=pending.slice(m[1].length);const u=new SpeechSynthesisUtterance(m[1].trim());u.lang=speechLanguage(m[1]);u.rate=.98;window.speechSynthesis.speak(u);}
+        if(m){pending=pending.slice(m[1].length);const u=new SpeechSynthesisUtterance(m[1].trim());u.lang=speechLanguage(m[1]);u.rate=.98;
+           u.onstart=()=>{voiceSpeechCooldownUntil=Date.now()+1200;clearVoiceRestartTimer();};
+           u.onend=()=>{voiceSpeechCooldownUntil=Date.now()+1200;};
+           window.speechSynthesis.speak(u);}
       },
       finish(){
         if(!window.__MANLUNG_AI_VOICE_ON||!pending.trim())return;
-        const u=new SpeechSynthesisUtterance(pending.trim());u.lang=speechLanguage(pending);u.rate=.98;window.speechSynthesis.speak(u);pending='';
+        const u=new SpeechSynthesisUtterance(pending.trim());u.lang=speechLanguage(pending);u.rate=.98;
+         u.onstart=()=>{voiceSpeechCooldownUntil=Date.now()+1200;clearVoiceRestartTimer();};
+         u.onend=()=>{voiceSpeechCooldownUntil=Date.now()+1200;};
+         window.speechSynthesis.speak(u);pending='';
       }
     };
   }
