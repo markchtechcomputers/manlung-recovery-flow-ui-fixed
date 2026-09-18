@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const githubAuthRoutes = require('../api/auth-github');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
