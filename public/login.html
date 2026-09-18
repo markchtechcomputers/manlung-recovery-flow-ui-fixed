@@ -276,7 +276,7 @@ async function startSocialSignup(provider){
       const {error}=await supabase.auth.signInWithOAuth({
         provider:'github',
         options:{
-          redirectTo:window.location.origin+'/login.html'
+          redirectTo:window.location.origin+'/oauth-callback.html'
         }
       });
 
