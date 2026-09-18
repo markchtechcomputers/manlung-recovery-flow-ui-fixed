@@ -3,7 +3,7 @@
   <meta charset="UTF-8">
   <script src="/js/theme.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="/js/manlung-ai.js?v=20260915-home"></script>
+<script src="/js/manlung-ai.js?v=20260918-home"></script>
     <title>Manlung Recovery</title>
 
         <meta name="description" content="Manlung Recovery provides structured digital recovery assistance, account and device recovery guidance, cybersecurity awareness, investigation support, and secure client support.">
@@ -51,7 +51,7 @@
 <link rel="stylesheet" href="/css/mobile-header.css">
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="/css/home-premium.css">
-    <script src="/js/home-premium.js?v=20260916" defer></script>
+    <script src="/js/home-premium.js?v=20260918" defer></script>
     <style>
         #typing-text {
             font-family: 'Poppins', 'Inter', -apple-system, sans-serif;
@@ -1430,6 +1430,23 @@ img[src*="gctxrf7M"] {
     <link rel="stylesheet" href="/css/ml-hero-visual-fix.css?v=hero9">
   <link rel="stylesheet" href="/css/startup-loader.css">
   <script src="/js/startup-loader.js" defer></script>
+<style id="manlung-mobile-app-icon">
+.mobile-brand-mark{
+  width:42px !important;
+  height:42px !important;
+  flex:0 0 42px !important;
+  object-fit:cover !important;
+  display:block !important;
+  border-radius:10px !important;
+  background:#fff !important;
+  box-shadow:0 3px 10px rgba(15,23,42,.14) !important;
+}
+@media(max-width:390px){
+  .mobile-brand-mark{width:38px !important;height:38px !important;flex-basis:38px !important;border-radius:9px !important}
+}
+html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px rgba(0,0,0,.28) !important}
+</style>
+
 </head>
 <body>
 <div id="manlungStartupLoader" aria-label="Loading Manlung Recovery">
@@ -1450,7 +1467,7 @@ img[src*="gctxrf7M"] {
 <header class="mobile-friendly-header" id="mobileHeader">
   <div class="header-inner">
     <a href="/" class="mobile-brand" aria-label="Manlung Recovery Home">
-      <span class="mobile-brand-mark" aria-hidden="true">MR</span>
+      <img class="mobile-brand-mark" src="/icons/icon-192.png" alt="Manlung Recovery app icon" width="42" height="42">
       <div class="mobile-brand-text">
         <strong>Manlung Recovery</strong>
         <span>Cyber Recovery &amp; Digital Investigation</span>
@@ -1668,9 +1685,45 @@ img[src*="gctxrf7M"] {
                     <h2 id="how-title">How Manlung Recovery Works</h2>
                     <p>A clear four-step journey from your first request to the next recommended action.</p>
                 </div>
-                
+                <div class="process-flow" aria-label="Four-step recovery workflow">
+                    <article class="process-step">
+                        <span class="process-index">01</span>
+                        <div class="process-icon"><i class="fas fa-paper-plane" aria-hidden="true"></i></div>
+                        <h3>Request submitted</h3>
+                        <p>Tell us what happened and provide the relevant information or evidence you already have.</p>
+                    </article>
+                    <article class="process-step">
+                        <span class="process-index">02</span>
+                        <div class="process-icon"><i class="fas fa-user-shield" aria-hidden="true"></i></div>
+                        <h3>Case review</h3>
+                        <p>The request is organized for review and an authorized admin can claim the case for handling.</p>
+                    </article>
+                    <article class="process-step">
+                        <span class="process-index">03</span>
+                        <div class="process-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></div>
+                        <h3>Investigation &amp; updates</h3>
+                        <p>Case activity and reports are organized so progress can be communicated at meaningful stages.</p>
+                    </article>
+                    <article class="process-step">
+                        <span class="process-index">04</span>
+                        <div class="process-icon"><i class="fas fa-location-crosshairs" aria-hidden="true"></i></div>
+                        <h3>Track your case</h3>
+                        <p>Use your private case reference to view the updates available to you through the client portal.</p>
+                    </article>
                 </div>
-                <div class="demo-window" aria-label="Example Manlung Recovery interface">
+
+                <div class="demo-section home-demo-section">
+                    <div class="demo-copy">
+                        <span class="eyebrow">Example Interface</span>
+                        <h2>From submitted information to visible progress.</h2>
+                        <p>The example below shows how a recovery request can move through a structured workflow without exposing real client information.</p>
+                        <div class="demo-list">
+                            <div><i class="fas fa-circle-check" aria-hidden="true"></i> Request information received</div>
+                            <div><i class="fas fa-circle-check" aria-hidden="true"></i> Case review and ownership</div>
+                            <div><i class="fas fa-circle-check" aria-hidden="true"></i> Progress and reporting</div>
+                        </div>
+                    </div>
+                    <div class="demo-window" aria-label="Example Manlung Recovery interface">
                     <div class="demo-window-bar"><span></span><span></span><span></span><b>Example Interface</b></div>
                     <div class="demo-window-body">
                         <div class="demo-sidebar"><div class="demo-logo"><i class="fas fa-shield-halved" aria-hidden="true"></i></div><span></span><span></span><span></span><span></span></div>
@@ -1704,6 +1757,32 @@ img[src*="gctxrf7M"] {
             <section class="home-section final-cta" aria-labelledby="final-title">
                 <div><span class="eyebrow">Need assistance?</span><h2 id="final-title">Start with a clear next step.</h2><p>Submit a recovery or investigation request, or track an existing case.</p></div>
                 <div class="final-cta-actions"><a href="/client/request.html" class="btn btn-primary">Submit a Request</a><a href="#case-tracker" class="btn btn-outline">Track Existing Case</a></div>
+            </section>
+
+            <section id="recovery-journey" class="home-section recovery-journey-section" aria-labelledby="recovery-journey-title">
+                <div class="section-heading centered">
+                    <span class="eyebrow">How Manlung Recovery Works</span>
+                    <h2 id="recovery-journey-title">See the workflow from request to case tracking.</h2>
+                    <p>Calls and recovery requests enter the system, admins claim cases, reports are produced, and clients follow progress through the portal.</p>
+                </div>
+                <div class="recovery-journey-grid">
+                    <article class="recovery-journey-card">
+                        <img src="https://i.postimg.cc/g0ZKwr2D/Chat-GPT-Image-Sep-16-2026-12-52-03-PM.png" alt="Calls and recovery requests entering the system" loading="lazy">
+                        <div><span>01</span><h3>Requests &amp; Calls Arrive</h3><p>Client requests and calls enter the recovery workflow for review.</p></div>
+                    </article>
+                    <article class="recovery-journey-card">
+                        <img src="https://i.postimg.cc/jd36ZywK/Chat-GPT-Image-Sep-16-2026-12-55-35-PM.png" alt="Admins claim recovery cases" loading="lazy">
+                        <div><span>02</span><h3>Admins Claim Cases</h3><p>Authorized admins claim recovery cases from the dashboard and begin handling the work.</p></div>
+                    </article>
+                    <article class="recovery-journey-card">
+                        <img src="https://i.postimg.cc/tCJWZ7rk/Chat-GPT-Image-Sep-16-2026-01-03-01-PM.png" alt="Daily weekly and monthly reports" loading="lazy">
+                        <div><span>03</span><h3>Reports &amp; Case Handling</h3><p>Daily, weekly and monthly reports give admins a structured view of activity.</p></div>
+                    </article>
+                    <article class="recovery-journey-card">
+                        <img src="https://i.postimg.cc/kgrGJ5Lb/Chat-GPT-Image-Sep-16-2026-01-18-09-PM.png" alt="How to track your cases after submission" loading="lazy">
+                        <div><span>04</span><h3>Track Your Case</h3><p>After submission, clients can follow progress and updates through the portal.</p></div>
+                    </article>
+                </div>
             </section>
 
             <div id="serviceModalOverlay" class="service-modal-scroll" style="display:none;" onclick="if(event.target===this) closeServiceModal()" role="dialog" aria-modal="true" aria-label="Service details">
