@@ -225,16 +225,16 @@
     if(document.getElementById('manlungAiRoot'))return;
     const root=document.createElement('div');root.id='manlungAiRoot';
     root.innerHTML=`<div id="manlungAiWindow" role="dialog" aria-modal="true" aria-label="Manlung AI" aria-hidden="true">
-      <div class="manlung-ai-head"><div class="manlung-ai-avatar" aria-hidden="true">AI</div><div><div class="manlung-ai-title">Manlung AI</div><div class="manlung-ai-status"><i></i> Online • Fast support</div></div><button type="button" class="manlung-ai-close" aria-label="Close">×</button></div>
+      <div class="manlung-ai-head"><div class="manlung-ai-avatar" aria-hidden="true">AI</div><div><div class="manlung-ai-title">Manlung AI</div><div class="manlung-ai-status"><i></i> Online • Conversational support</div></div><button type="button" class="manlung-ai-close" aria-label="Close">×</button></div>
       <div class="manlung-ai-toolbar"><button type="button" id="manlungAiLang">🌐 Auto: English</button><button type="button" id="manlungAiVoice">🔊 Voice off</button></div>
       <div class="manlung-ai-body" id="manlungAiMessages"></div>
       <div class="manlung-ai-foot"><div class="manlung-ai-links"><a href="/client/request.html">New Request</a><a href="/client/track.html">Track Case</a><a href="https://wa.me/254745682493" target="_blank" rel="noopener">Human Support</a></div>
       <div class="manlung-ai-voice-state" id="manlungAiVoiceState" aria-live="polite"><span class="manlung-ai-voice-dot"></span><span id="manlungAiVoiceStateText">Ready</span></div>
       <form class="manlung-ai-compose" id="manlungAiForm"><button class="manlung-ai-mic" id="manlungAiMic" type="button" aria-label="Start voice input" title="Speak">🎙</button><textarea class="manlung-ai-input" id="manlungAiInput" rows="1" placeholder="Message Manlung AI…"></textarea><button class="manlung-ai-send" type="submit">➤</button></form>
-      <div class="manlung-ai-note">Speak naturally, switch English/Kiswahili, or type your message.</div></div></div>`;
+      <div class="manlung-ai-note">Tell me what happened in your own words. I’ll ask focused follow-up questions and guide the next step. Voice stays on until you stop it.</div></div></div>`;
     document.body.appendChild(root);bindEvents();
     addMessage(localStorage.getItem('manlung-ai-language')==='sw'?'Habari! Mimi ni Manlung AI. Naweza kukusaidia kuhusu portal, maombi ya recovery, ufuatiliaji wa kesi, au msaada wa binadamu.':'Hello! I’m Manlung AI. Ask me about the Manlung Recovery portal, requests, case tracking or support.','ai');
-    addQuickReplies();
+    addQuickReplies('greeting');
   }
   function currentLanguage(){return localStorage.getItem('manlung-ai-language')==='sw'?'sw':'en';}
   function detectLanguage(text){
@@ -291,18 +291,36 @@
   }
   function removeTyping(){document.getElementById('manlungAiTyping')?.remove();}
 
-  function addQuickReplies() {
+  function addQuickReplies(contextKey) {
     const body = document.getElementById('manlungAiMessages');
+    if (!body) return;
+    document.querySelectorAll('.manlung-ai-quick').forEach(x=>x.remove());
     const wrap = document.createElement('div');
     wrap.className = 'manlung-ai-quick';
-    [['How it works','how'],['Our services','services'],['Device recovery','device'],['Account recovery','account'],['Scam help','scam'],['Talk to a human','human']].forEach(([label,key])=>{
-      const b=document.createElement('button'); b.type='button'; b.textContent=label; b.addEventListener('click',()=>respond(label, key)); wrap.appendChild(b);
+    const sets = {
+      greeting:[['How it works','how'],['What can you help with?','services'],['Talk to a human','human']],
+      how:[['How do I start?','process'],['What information do I need?','process'],['Talk to a human','human']],
+      services:[['Device recovery','device'],['Account recovery','account'],['Scam help','scam'],['Security assessment','security']],
+      device:[['I lost my phone','device'],['What should I prepare?','device'],['Start a request','request']],
+      account:[['My account was hacked','account'],['What should I do first?','account'],['Start a request','request']],
+      scam:[['I was scammed','scam'],['What evidence do I need?','scam'],['Start a request','request']],
+      process:[['Start a new request','request'],['Track my case','track'],['Talk to a human','human']],
+      contact:[['WhatsApp support','human'],['Start a request','request']],
+      unknown:[['How it works','how'],['Our services','services'],['Talk to a human','human']]
+    };
+    (sets[contextKey]||sets.unknown).forEach(([label,key])=>{
+      const b=document.createElement('button');
+      b.type='button';
+      b.textContent=label;
+      b.addEventListener('click',()=>respond(label,key));
+      wrap.appendChild(b);
     });
-    body.appendChild(wrap); body.scrollTop=body.scrollHeight;
+    body.appendChild(wrap);
+    body.scrollTop=body.scrollHeight;
   }
 
   function classify(message) {
-    const m = message.toLowerCase();
+    const m = message.toLowerCase().trim();
     if (/\b(hi|hello|hey|good morning|good afternoon|good evening)\b/.test(m)) return 'greeting';
     if (/how.*work|works|process|procedure|steps|what do you do/.test(m)) return 'how';
     if (/service|what.*help|help.*with|offer/.test(m)) return 'services';
@@ -360,17 +378,40 @@
     return answer.trim();
   }
   async function respond(displayText,forcedKey){
+    const message=String(displayText||'').trim();
+    if(!message)return;
     const priorHistory=(window.__MANLUNG_AI_HISTORY||[]).slice(-14);
-    const lang=detectLanguage(displayText);
-    resetComposer();addMessage(displayText,'user');removeTyping();scrollChat('smooth');
+    const lang=detectLanguage(message);
+    const intent=forcedKey||classify(message);
+    resetComposer();addMessage(message,'user');removeTyping();scrollChat('smooth');
     const ui=addStreamingMessage();if(!ui)return;
-    let answer='';const speaker=createLiveSpeaker();
+    const speaker=createLiveSpeaker();
+    let answer='';
+    let failed=false;
     try{
-      answer=await streamBackend(displayText,part=>{ui.bubble.textContent+=part;ui.meta.textContent='Manlung AI • responding';speaker.push(part);const body=document.getElementById('manlungAiMessages'); if(body)body.scrollTo({top:body.scrollHeight,behavior:'smooth'});},priorHistory,lang);
-    }catch(_){}
-    if(!answer)answer=KNOWLEDGE[forcedKey||classify(displayText)]||KNOWLEDGE.unknown;
-    ui.bubble.textContent=answer;ui.meta.textContent='Manlung AI';speaker.finish();
-    appendAssistantHistory(answer);scrollChat('smooth');
+      answer=await streamBackend(message,part=>{
+        ui.bubble.textContent+=part;
+        ui.meta.textContent='Manlung AI • responding…';
+        speaker.push(part);
+        const body=document.getElementById('manlungAiMessages');
+        if(body)body.scrollTo({top:body.scrollHeight,behavior:'smooth'});
+      },priorHistory,lang);
+    }catch(error){
+      failed=true;
+      console.error('Manlung AI live response error',error);
+    }
+    if(!answer){
+      answer=KNOWLEDGE[intent]||KNOWLEDGE.unknown;
+      if(failed && intent==='unknown'){
+        answer='I’m having trouble reaching the live assistant right now. You can still tell me what happened, or use New Request / Human Support below and I’ll keep the conversation focused on your next step.';
+      }
+    }
+    ui.bubble.textContent=answer;
+    ui.meta.textContent=failed?'Manlung AI • offline guidance':'Manlung AI';
+    speaker.finish();
+    appendAssistantHistory(answer);
+    scrollChat('smooth');
+    addQuickReplies(intent);
     /* Keep an explicitly-started voice session alive after each answer.
        The user controls the session with the microphone button or AI close button. */
     if(voiceSession){
