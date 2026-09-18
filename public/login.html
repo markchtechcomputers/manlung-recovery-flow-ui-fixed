@@ -82,7 +82,6 @@
         <div class="manlung-auth-heading"><h2>Welcome back</h2><p>Sign in to access your client portal.</p></div>
         <div class="manlung-social-grid">
           <button type="button" class="manlung-social-btn" onclick="startSocialSignup('google')"><i class="fab fa-google" aria-hidden="true"></i> Continue with Google</button>
-          <button type="button" class="manlung-social-btn" onclick="startSocialSignup('github')"><i class="fab fa-github" aria-hidden="true"></i> Continue with GitHub</button>
         </div>
         <div class="manlung-auth-divider">or continue with email</div>
         <form id="loginForm" onsubmit="handleLogin(event)">
@@ -96,7 +95,7 @@
 
       <div id="registerPanel" hidden>
         <div class="manlung-auth-heading"><h2>Create your account</h2><p>Create a secure client account before submitting a recovery request.</p></div>
-        <div class="manlung-social-grid"><button type="button" class="manlung-social-btn" onclick="startSocialSignup('google')"><i class="fab fa-google" aria-hidden="true"></i> Continue with Google</button><button type="button" class="manlung-social-btn" onclick="startSocialSignup('github')"><i class="fab fa-github" aria-hidden="true"></i> Continue with GitHub</button></div>
+        <div class="manlung-social-grid"><button type="button" class="manlung-social-btn" onclick="startSocialSignup('google')"><i class="fab fa-google" aria-hidden="true"></i> Continue with Google</button></div>
         <div class="manlung-auth-divider">or create with email</div>
         <form id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group"><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="200" placeholder="Your full name" required></div>
@@ -123,7 +122,6 @@
 </main>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 function showTab(tab) {
   document.getElementById('loginPanel').hidden = tab !== 'login';
@@ -172,56 +170,42 @@ async function handleRegister(event) {
   catch(err){showMessage(errorEl,'Could not reach the server ('+err.message+'). Is it running?');}
 }
 async function startSocialSignup(provider){
+  if(provider!=='google')return;
+  const errorEl=document.getElementById('loginError');
+  showMessage(errorEl,'');
   try{
-    if(provider==='github'){
-      const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
-      if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)throw new Error('GitHub sign-in is not configured yet.');
-      const supabase=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
-      const {error}=await supabase.auth.signInWithOAuth({
-        provider:'github',
-        options:{redirectTo:window.location.origin+'/login.html'}
+    const cfgRes=await fetch('/api/auth/google',{cache:'no-store'});
+    const cfgText=await cfgRes.text();
+    let cfg;
+    try{cfg=JSON.parse(cfgText);}catch(_){throw new Error('Google authentication API returned an invalid response. Please try again after deployment.');}
+    if(!cfgRes.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
+    if(!window.google?.accounts?.id){
+      await new Promise((resolve,reject)=>{
+        let n=0;
+        const t=setInterval(()=>{
+          if(window.google?.accounts?.id){clearInterval(t);resolve();}
+          else if(++n>80){clearInterval(t);reject(new Error('Google authentication is still loading. Please refresh and try again.'));}
+        },100);
       });
-      if(error)throw error;
-      return;
     }
-    if(provider!=='google')return;
-    const cfg=await fetch('/api/auth/google',{cache:'no-store'}).then(r=>r.json());
-    if(!cfg.clientId)throw new Error('Google Cloud authentication is not configured yet.');
-    if(!window.google?.accounts?.id){await new Promise((resolve,reject)=>{let n=0;const t=setInterval(()=>{if(window.google?.accounts?.id){clearInterval(t);resolve();}else if(++n>50){clearInterval(t);reject(new Error('Google authentication is still loading. Please try again.'));}},100);});}
-    window.google.accounts.id.initialize({client_id:cfg.clientId,callback:async response=>{
-      try{
-        const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:response.credential})});
-        const data=await res.json();
-        if(data.success){localStorage.setItem('clientToken',data.token);localStorage.setItem('clientUser',JSON.stringify(data.user));window.location.href='/client/dashboard.html';}
-        else showMessage(document.getElementById('loginError'),data.error||'Google sign-in failed');
-      }catch(err){showMessage(document.getElementById('loginError'),'Google sign-in failed: '+err.message);}
-    }});
+    window.google.accounts.id.initialize({
+      client_id:cfg.clientId,
+      callback:async response=>{
+        try{
+          const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:response.credential})});
+          const text=await res.text();
+          let data;
+          try{data=JSON.parse(text);}catch(_){throw new Error('Google sign-in API returned an invalid response.');}
+          if(!res.ok||!data.success)throw new Error(data.error||'Google sign-in failed.');
+          localStorage.setItem('clientToken',data.token);
+          localStorage.setItem('clientUser',JSON.stringify(data.user));
+          window.location.href='/client/dashboard.html';
+        }catch(err){showMessage(errorEl,err.message||'Google sign-in failed');}
+      }
+    });
     window.google.accounts.id.prompt();
-  }catch(err){showMessage(document.getElementById('loginError'),err.message||'Social sign-in failed');}
+  }catch(err){showMessage(errorEl,err.message||'Google sign-in failed');}
 }
-
-async function handleSocialCallback(){
-  if(!window.supabase?.createClient)return;
-  try{
-    const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
-    if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)return;
-    const supabase=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
-    const {data,error}=await supabase.auth.getSession();
-    if(error||!data?.session?.access_token)return;
-    const res=await fetch('/api/auth/client/oauth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accessToken:data.session.access_token})});
-    const result=await res.json();
-    if(result.success){
-      localStorage.setItem('clientToken',result.token);
-      localStorage.setItem('clientUser',JSON.stringify(result.user));
-      window.history.replaceState({},document.title,window.location.pathname);
-      window.location.href='/client/dashboard.html';
-    }else{
-      showMessage(document.getElementById('loginError'),result.error||'Social sign-in failed');
-    }
-  }catch(err){console.error('Social callback error:',err);}
-}
-
-(async function(){await handleSocialCallback();})();
 
 (async function autoLogin(){const token=localStorage.getItem('clientToken');if(!token)return;try{const res=await fetch('/api/auth/verify',{headers:{'Authorization':`Bearer ${token}`}});const data=await res.json();if(data.success&&data.user.role==='client')window.location.href='/client/dashboard.html';}catch(e){}})();
 </script>
