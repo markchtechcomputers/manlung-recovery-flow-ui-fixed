@@ -42,8 +42,14 @@
     <link rel="stylesheet" href="/css/auth-premium.css">
     <script src="/js/support-fab.js"></script>
 <style>
-.manlung-auth-shell{display:block!important;max-width:620px!important;margin:32px auto!important}.manlung-auth-form{width:100%!important}.manlung-auth-page .manlung-auth-wrap{min-height:calc(100vh - 80px);display:flex;align-items:center;padding:24px 16px}.manlung-auth-page .manlung-auth-heading h2{margin-bottom:6px}.manlung-auth-page .manlung-auth-heading p{color:#64748b}
-</style>\n</head>
+.manlung-auth-page{background:#fff url("https://i.postimg.cc/43DBwV0f/opentext-image-ov-hightech-en.jpg") center/cover fixed no-repeat!important;position:relative}
+.manlung-auth-page::before{content:"";position:fixed;inset:0;background:rgba(255,255,255,.88);z-index:-1;pointer-events:none}
+.manlung-auth-shell{display:block!important;max-width:620px!important;margin:32px auto!important}
+.manlung-auth-form{width:100%!important;background:rgba(255,255,255,.96);border:1px solid rgba(203,213,225,.9);border-radius:22px;padding:30px;box-shadow:0 18px 55px rgba(15,23,42,.14);backdrop-filter:blur(8px)}
+.manlung-auth-page .manlung-auth-wrap{min-height:calc(100vh - 80px);display:flex;align-items:center;padding:24px 16px}
+.manlung-auth-page .manlung-auth-heading h2{margin-bottom:6px}
+.manlung-auth-page .manlung-auth-heading p{color:#64748b}
+</style></head>
 <body class="manlung-auth-page">
 <header class="site-header">
   <div class="container manlung-header-inner">
@@ -103,7 +109,7 @@
         <div class="manlung-auth-links" style="justify-content:center"><a href="#" onclick="showTab('login')">Back to Sign In</a></div>
       </form>
 
-      <p class="manlung-auth-footnote">Your account is for your own authorized recovery matters. Do not submit credentials, evidence or personal information that you do not have the right to share.<br><a href="/privacy.html">Privacy &amp; Data Protection</a> · <a href="/terms.html">Terms &amp; Conditions</a></p>
+      
     </section>
   </section>
 </main>
