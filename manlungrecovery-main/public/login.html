@@ -478,7 +478,7 @@
                             persistSession: true,
                             autoRefreshToken: true,
                             detectSessionInUrl: true,
-                            flowType: 'implicit'
+                            flowType: 'pkce'
                         }
                     }
                 );
@@ -486,7 +486,7 @@
                 const { error } = await client.auth.signInWithOAuth({
                     provider,
                     options: {
-                        redirectTo: 'https://manlungrecovery.manlungshop.co.ke/oauth-callback.html'
+                        redirectTo: `${window.location.origin}/oauth-callback.html`
                     }
                 });
 
