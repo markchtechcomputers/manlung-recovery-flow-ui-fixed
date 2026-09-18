@@ -351,6 +351,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+function startSocialSignup(provider){
+  if(provider==='github'){
+    localStorage.removeItem('clientToken');
+    localStorage.removeItem('clientUser');
+    window.location.assign('/api/auth/github/start');
+  }
+}
+
         function showTab(tab) {
             document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
             document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
