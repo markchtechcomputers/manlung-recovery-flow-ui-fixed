@@ -53,7 +53,7 @@
 .manlung-auth-page .manlung-auth-heading{margin-bottom:12px}
 @media (max-width:640px){.manlung-auth-form{padding:18px}.manlung-auth-page .manlung-auth-form form,.manlung-auth-page .manlung-auth-heading{padding:14px}}
 
-.manlung-auth-tabs,.manlung-auth-tabs button,.manlung-social-grid,.manlung-social-btn,.manlung-google-btn{position:relative;z-index:10000;pointer-events:auto!important}.manlung-social-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;width:100%!important;align-items:stretch!important}.manlung-social-btn,.manlung-google-btn{box-sizing:border-box!important;width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;max-width:100%!important}.manlung-social-btn{display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;white-space:nowrap!important;overflow:hidden!important}.manlung-google-btn{display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}.manlung-google-btn iframe{display:block!important;max-width:100%!important}.manlung-auth-tabs{display:flex!important}.manlung-auth-tabs button{cursor:pointer!important;flex:1!important}@media(max-width:640px){.manlung-social-grid{grid-template-columns:1fr!important}}
+.manlung-auth-tabs,.manlung-auth-tabs button,.manlung-social-grid,.manlung-social-btn,.manlung-google-btn{position:relative;z-index:10000;pointer-events:auto!important}.manlung-social-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;width:100%!important;align-items:stretch!important}.manlung-social-btn,.manlung-google-btn{box-sizing:border-box!important;width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;max-width:100%!important}.manlung-social-btn{display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;white-space:nowrap!important;overflow:hidden!important}.manlung-google-btn{display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;min-height:48px!important}.manlung-google-btn iframe{display:block!important;max-width:100%!important}.manlung-auth-tabs{display:flex!important}.manlung-auth-tabs button{cursor:pointer!important;flex:1!important}@media(max-width:640px){.manlung-social-grid{grid-template-columns:1fr!important}}
 </style></head>
 <body class="manlung-auth-page">
 <header class="site-header">
@@ -228,7 +228,7 @@ async function setupOfficialGoogleButtons(){
       const form=host.closest('.manlung-auth-form');
       const gridWidth=grid?.getBoundingClientRect().width||0;
       const formWidth=form?.clientWidth||400;
-      const buttonWidth=Math.max(200,Math.min(400,Math.floor(gridWidth>0?gridWidth:((formWidth-12)/2))));
+      const buttonWidth=Math.max(200,Math.min(360,Math.floor(gridWidth>0?gridWidth-8:((formWidth-12)/2))));
       google.accounts.id.renderButton(host,{
         type:'standard',
         theme:'outline',
