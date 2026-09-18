@@ -90,6 +90,46 @@ async function bumpSessionVersion(userId) {
   return data;
 }
 
+async function setEmailVerificationToken(email, tokenHash, expiresAt) {
+  const { error } = await supabase
+    .from(TABLE)
+    .update({
+      email_verification_token_hash: tokenHash,
+      email_verification_expires: expiresAt,
+    })
+    .eq('email', email);
+
+  if (error) throw error;
+}
+
+async function findByValidEmailVerificationToken(tokenHash) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select('*')
+    .eq('email_verification_token_hash', tokenHash)
+    .gt('email_verification_expires', new Date().toISOString())
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+async function markEmailVerified(id) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .update({
+      email_verified_at: new Date().toISOString(),
+      email_verification_token_hash: null,
+      email_verification_expires: null,
+    })
+    .eq('id', id)
+    .select('*')
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 async function setResetToken(email, tokenHash, expiresAt) {
   const { error } = await supabase
     .from(TABLE)
@@ -313,6 +353,7 @@ async function consumeRecoveryCode(userId, remainingHashes) {
 
 module.exports = {
   findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword, bumpSessionVersion,
+  setEmailVerificationToken, findByValidEmailVerificationToken, markEmailVerified,
   setResetToken, findByValidResetToken, resetPassword, updateProfile, updatePassword, deleteById, createAdminFromInvitation,
   listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, convertClientToPendingAdmin, setAdminStatus, removeAdminPrivileges,
   setMfaSetup, enableMfa, disableMfa, consumeRecoveryCode,

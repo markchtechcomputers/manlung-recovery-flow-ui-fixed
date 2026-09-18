@@ -91,6 +91,16 @@
           <div class="manlung-auth-links"><span></span><a href="#" onclick="showForgot(event)">Forgot password?</a></div>
           <button type="submit" class="btn btn-primary manlung-auth-primary"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> Sign In</button>
           <div id="loginError" class="manlung-auth-message error-text" role="alert"></div>
+          <button
+            type="button"
+            id="resendVerificationBtn"
+            class="btn"
+            style="display:none;margin-top:10px;width:100%;"
+            onclick="resendVerificationEmail()"
+          >
+            <i class="fas fa-envelope-circle-check" aria-hidden="true"></i>
+            Resend verification email
+          </button>
         </form>
       </div>
 
@@ -146,6 +156,44 @@ function showMessage(el, text, type='error') {
   el.textContent = text || '';
   el.className = 'manlung-auth-message ' + type + (text ? ' show' : '');
 }
+
+function handleEmailVerificationResult(){
+  const params=new URLSearchParams(window.location.search);
+  const status=params.get('verified');
+
+  if(!status)return;
+
+  const errorEl=document.getElementById('loginError');
+
+  if(status==='success'){
+    showTab('login');
+    showMessage(
+      errorEl,
+      'Email verified successfully. You can now sign in.',
+      'success'
+    );
+  }else if(status==='expired'){
+    showTab('login');
+    showMessage(
+      errorEl,
+      'Your verification link has expired. Please request a new verification email.'
+    );
+  }else if(status==='invalid'){
+    showTab('login');
+    showMessage(
+      errorEl,
+      'That email verification link is invalid. Please request a new verification email.'
+    );
+  }else if(status==='error'){
+    showTab('login');
+    showMessage(
+      errorEl,
+      'We could not verify your email right now. Please try again.'
+    );
+  }
+
+  window.history.replaceState({},document.title,window.location.pathname);
+}
 async function handleForgot(event) {
   event.preventDefault();
   const email = document.getElementById('forgotEmail').value;
@@ -161,16 +209,156 @@ async function handleForgot(event) {
 }
 async function handleLogin(event) {
   event.preventDefault();
-  const email=document.getElementById('loginEmail').value; const password=document.getElementById('loginPassword').value; const errorEl=document.getElementById('loginError'); showMessage(errorEl,'');
-  try { const res=await fetch('/api/auth/client/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})}); const data=await res.json(); if(data.success){localStorage.setItem('clientToken',data.token);localStorage.setItem('clientUser',JSON.stringify(data.user));window.location.href='/client/dashboard.html';} else showMessage(errorEl,data.error||'Invalid credentials'); }
-  catch(err){showMessage(errorEl,'Could not reach the server ('+err.message+'). Is it running?');}
+
+  const email=document.getElementById('loginEmail').value;
+  const password=document.getElementById('loginPassword').value;
+  const errorEl=document.getElementById('loginError');
+  showMessage(errorEl,'');
+
+  try {
+    const res=await fetch('/api/auth/client/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password})
+    });
+
+    const data=await res.json();
+
+    if(data.success){
+      localStorage.setItem('clientToken',data.token);
+      localStorage.setItem('clientUser',JSON.stringify(data.user));
+      window.location.href='/client/dashboard.html';
+      return;
+    }
+
+    if(data.code==='ACCOUNT_NOT_FOUND'){
+      showMessage(
+        errorEl,
+        'No account exists for this email. Please create your account first.'
+      );
+      showTab('register');
+      document.getElementById('regEmail').value=email;
+      return;
+    }
+
+    if(data.code==='EMAIL_NOT_VERIFIED'){
+      showMessage(
+        errorEl,
+        'Please verify your email address before signing in.'
+      );
+
+      const resendBtn=document.getElementById('resendVerificationBtn');
+      if(resendBtn)resendBtn.style.display='block';
+
+      return;
+    }
+
+    showMessage(errorEl,data.error||'Invalid credentials');
+  } catch(err){
+    showMessage(
+      errorEl,
+      'Could not reach the server ('+err.message+'). Is it running?'
+    );
+  }
 }
+
+async function resendVerificationEmail(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const errorEl=document.getElementById('loginError');
+  const resendBtn=document.getElementById('resendVerificationBtn');
+
+  if(!email){
+    showMessage(errorEl,'Enter your email address first.');
+    return;
+  }
+
+  if(resendBtn){
+    resendBtn.disabled=true;
+    resendBtn.innerHTML='<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
+  }
+
+  try{
+    const res=await fetch('/api/auth/client/resend-verification',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email})
+    });
+
+    const data=await res.json();
+
+    if(data.success){
+      showMessage(
+        errorEl,
+        data.message||'A new verification email has been sent.',
+        'success'
+      );
+    }else{
+      showMessage(
+        errorEl,
+        data.error||'Could not resend the verification email.'
+      );
+    }
+  }catch(err){
+    showMessage(
+      errorEl,
+      'Could not reach the server ('+err.message+'). Is it running?'
+    );
+  }finally{
+    if(resendBtn){
+      resendBtn.disabled=false;
+      resendBtn.innerHTML='<i class="fas fa-envelope-circle-check" aria-hidden="true"></i> Resend verification email';
+    }
+  }
+}
+
 async function handleRegister(event) {
   event.preventDefault();
-  const fullName=document.getElementById('regName').value; const email=document.getElementById('regEmail').value; const phone=document.getElementById('regPhone').value; const password=document.getElementById('regPassword').value; const errorEl=document.getElementById('registerError'); showMessage(errorEl,'');
-  try { const res=await fetch('/api/auth/client/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fullName,email,phone,password})}); const data=await res.json(); if(data.success){localStorage.setItem('clientToken',data.token);localStorage.setItem('clientUser',JSON.stringify(data.user));window.location.href='/client/dashboard.html';} else showMessage(errorEl,data.error||'Could not create account'); }
-  catch(err){showMessage(errorEl,'Could not reach the server ('+err.message+'). Is it running?');}
+
+  const fullName=document.getElementById('regName').value;
+  const email=document.getElementById('regEmail').value;
+  const phone=document.getElementById('regPhone').value;
+  const password=document.getElementById('regPassword').value;
+  const errorEl=document.getElementById('registerError');
+
+  showMessage(errorEl,'');
+
+  try {
+    const res=await fetch('/api/auth/client/register',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({fullName,email,phone,password})
+    });
+
+    const data=await res.json();
+
+    if(data.success){
+      showTab('login');
+      document.getElementById('loginEmail').value=email;
+      document.getElementById('loginPassword').value='';
+      showMessage(
+        document.getElementById('loginError'),
+        data.message||
+        'Account created. Please check your email and verify your address before signing in.',
+        'success'
+      );
+      return;
+    }
+
+    showMessage(
+      errorEl,
+      data.error||'Could not create account'
+    );
+  } catch(err){
+    showMessage(
+      errorEl,
+      'Could not reach the server ('+err.message+'). Is it running?'
+    );
+  }
 }
+document.addEventListener('DOMContentLoaded',()=>{
+  handleEmailVerificationResult();
+});
+
 async function ensureGoogleGIS(){
   if(window.google?.accounts?.id)return true;
   return new Promise((resolve,reject)=>{

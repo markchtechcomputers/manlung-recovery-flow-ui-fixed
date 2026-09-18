@@ -187,9 +187,8 @@
 </footer>
 <script>
 function openServicesAi(){
-  const tab=document.querySelector('.manlung-ai-tab');
-  if(tab) {
-    tab.click();
+  if(typeof window.openManlungAI === 'function'){
+    window.openManlungAI(true);
   } else {
     alert('Manlung AI is still loading. Please try again.');
   }
