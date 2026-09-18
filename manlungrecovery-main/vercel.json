@@ -98,6 +98,10 @@
   ],
   "routes": [
     {
+      "src": "/oauth-callback(?:\\.html)?",
+      "dest": "/public/oauth-callback.html"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
