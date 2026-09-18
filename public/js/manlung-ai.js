@@ -193,7 +193,18 @@
   function appendAssistantHistory(answer){window.__MANLUNG_AI_HISTORY=window.__MANLUNG_AI_HISTORY||[];window.__MANLUNG_AI_HISTORY.push({role:'assistant',content:String(answer)});if(window.__MANLUNG_AI_HISTORY.length>20)window.__MANLUNG_AI_HISTORY=window.__MANLUNG_AI_HISTORY.slice(-20);}
   function parseAIChunk(raw){
     raw=String(raw||'').trim();if(!raw||raw==='[DONE]')return '';
-    try{const o=JSON.parse(raw);return o?.choices?.[0]?.delta?.content||o?.choices?.[0]?.message?.content||o?.delta?.content||o?.content||o?.text||'';}catch(_){return raw;}
+    const lines=raw.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean);
+    let out='';
+    for(const line of lines){
+      const value=line.startsWith('data:')?line.slice(5).trim():line;
+      if(!value||value==='[DONE]')continue;
+      try{
+        const o=JSON.parse(value);
+        const part=o?.choices?.[0]?.delta?.content||o?.choices?.[0]?.message?.content||o?.delta?.content||o?.content||o?.text||o?.response||'';
+        if(part)out+=part;
+      }catch(_){}
+    }
+    return out;
   }
   async function streamBackend(message,onText,historyOverride,languageOverride){
     let history=(historyOverride||window.__MANLUNG_AI_HISTORY||[]).slice(-14);
@@ -219,7 +230,7 @@
     const ui=addStreamingMessage();if(!ui)return;
     let answer='';const speaker=createLiveSpeaker();
     try{
-      answer=await streamBackend(displayText,part=>{ui.bubble.textContent+=part;ui.meta.textContent='Manlung AI • responding';speaker.push(part);document.getElementById('manlungAiMessages').scrollTop=999999;},priorHistory,lang);
+      answer=await streamBackend(displayText,part=>{ui.bubble.textContent+=part;ui.meta.textContent='Manlung AI • responding';speaker.push(part);const body=document.getElementById('manlungAiMessages'); if(body)body.scrollTo({top:body.scrollHeight,behavior:'smooth'});},priorHistory,lang);
     }catch(_){}
     if(!answer)answer=KNOWLEDGE[forcedKey||classify(displayText)]||KNOWLEDGE.unknown;
     ui.bubble.textContent=answer;ui.meta.textContent='Manlung AI';speaker.finish();
@@ -232,7 +243,7 @@
     document.querySelector('.manlung-ai-close')?.addEventListener('click',()=>toggle(false));
     document.getElementById('manlungAiForm')?.addEventListener('submit',e=>{e.preventDefault();const i=document.getElementById('manlungAiInput'),v=i.value.trim();if(v){i.value='';respond(v);}});
     document.getElementById('manlungAiLang')?.addEventListener('click',()=>{const next=currentLanguage()==='sw'?'en':'sw';localStorage.setItem('manlung-ai-language',next);const b=document.getElementById('manlungAiLang');if(b)b.textContent=next==='sw'?'🌐 Auto: Kiswahili':'🌐 Auto: English';});
-    document.getElementById('manlungAiVoice')?.addEventListener('click',()=>{window.__MANLUNG_AI_VOICE_ON=!window.__MANLUNG_AI_VOICE_ON;document.getElementById('manlungAiVoice').textContent=window.__MANLUNG_AI_VOICE_ON?'🔊 Voice on':'🔊 Voice off';});
+    document.getElementById('manlungAiVoice')?.addEventListener('click',()=>{window.__MANLUNG_AI_VOICE_ON=!window.__MANLUNG_AI_VOICE_ON;const b=document.getElementById('manlungAiVoice');b.textContent=window.__MANLUNG_AI_VOICE_ON?'🔊 Voice on':'🔊 Voice off';if(!window.__MANLUNG_AI_VOICE_ON&&'speechSynthesis'in window)window.speechSynthesis.cancel();});
     document.getElementById('manlungAiMic')?.addEventListener('click',()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Voice input is not supported here. Try Chrome or Edge.');return;}const mic=document.getElementById('manlungAiMic');if(mic.classList.contains('recording'))return;const r=new SR();r.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';r.continuous=false;r.interimResults=true;r.maxAlternatives=1;mic.classList.add('recording');mic.textContent='■';mic.title='Listening…';r.onresult=e=>{const t=Array.from(e.results).map(x=>x[0].transcript).join(' ').trim();if(t)document.getElementById('manlungAiInput').value=t;};r.onend=()=>{mic.classList.remove('recording');mic.textContent='🎙';mic.title='Speak';const t=document.getElementById('manlungAiInput').value.trim();if(t)respond(t);};r.onerror=()=>{mic.classList.remove('recording');mic.textContent='🎙';mic.title='Speak';};r.start();});
   }
 
