@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   ['googleLoginBtn','googleRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('google')));
   ['githubLoginBtn','githubRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('github')));
 });
-(async function(){await handleSocialCallback();})();
+(async function(){const isOAuthCallback=window.location.hash.includes('access_token=')||new URLSearchParams(window.location.search).has('code');if(isOAuthCallback)await handleSocialCallback();})();
 
 /* Login page never auto-redirects. Users must explicitly choose Google, GitHub, or email/password. */
 </script>
