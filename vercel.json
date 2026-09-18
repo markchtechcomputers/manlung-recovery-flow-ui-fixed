@@ -14,6 +14,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/auth-github.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/ai-live.js",
       "use": "@vercel/node"
     },
