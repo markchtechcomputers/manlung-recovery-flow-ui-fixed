@@ -5,6 +5,7 @@ const crypto=require('crypto');
 const User=require('../models/User');
 const app=express();
 const GOOGLE_CLIENT_ID=process.env.GOOGLE_CLIENT_ID||'750848085828-t1uo1rljsmkkmlv3sqiv13tjrb7j1a9f.apps.googleusercontent.com';
+const GOOGLE_CLIENT_SECRET=process.env.GOOGLE_CLIENT_SECRET||'';
 app.use(express.json({limit:'64kb'}));
 app.use((req,_res,next)=>{
  req.url=String(req.url||'/').replace(/^\/api\/auth\/google(?=\/|\?|$)/,'')||'/';
@@ -16,11 +17,21 @@ app.post('/',async(req,res)=>{
  try{
   const credential=String(req.body?.credential||'').trim();
   const accessToken=String(req.body?.accessToken||'').trim();
-  if(!credential&&!accessToken)return res.status(400).json({success:false,error:'Google authentication credential is required.'});
+  const code=String(req.body?.code||'').trim();
+  if(!credential&&!accessToken&&!code)return res.status(400).json({success:false,error:'Google authentication result is required.'});
   if(!GOOGLE_CLIENT_ID)return res.status(503).json({success:false,error:'Google Cloud authentication is not configured yet.'});
 
   let p;
-  if(accessToken){
+  if(code){
+    if(!GOOGLE_CLIENT_SECRET)return res.status(503).json({success:false,error:'Google OAuth server configuration is incomplete.'});
+    const redirectUri=String(req.body?.redirectUri||process.env.GOOGLE_REDIRECT_URI||'').trim();
+    if(!redirectUri)return res.status(400).json({success:false,error:'Google OAuth redirect URI is not configured.'});
+    const exchange=await axios.post('https://oauth2.googleapis.com/token',new URLSearchParams({code,client_id:GOOGLE_CLIENT_ID,client_secret:GOOGLE_CLIENT_SECRET,redirect_uri:redirectUri,grant_type:'authorization_code'}).toString(),{headers:{'content-type':'application/x-www-form-urlencoded'},timeout:10000,validateStatus:()=>true});
+    if(exchange.status!==200||!exchange.data?.id_token)return res.status(401).json({success:false,error:'Google authorization code could not be verified.'});
+    const v=await axios.get('https://oauth2.googleapis.com/tokeninfo',{params:{id_token:exchange.data.id_token},timeout:10000,validateStatus:()=>true});
+    if(v.status!==200)return res.status(401).json({success:false,error:'Google authentication could not be verified.'});
+    p=v.data;
+  }else if(accessToken){
     const v=await axios.get('https://oauth2.googleapis.com/tokeninfo',{params:{access_token:accessToken},timeout:10000,validateStatus:()=>true});
     if(v.status!==200)return res.status(401).json({success:false,error:'Google access token could not be verified.'});
     if(v.data.aud&&v.data.aud!==GOOGLE_CLIENT_ID)return res.status(401).json({success:false,error:'Invalid Google authentication audience.'});
