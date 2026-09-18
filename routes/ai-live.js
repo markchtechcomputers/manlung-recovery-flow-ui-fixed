@@ -1,6 +1,12 @@
 const express=require('express');
 const axios=require('axios');
 const router=express.Router();
+const { optionalAuth }=require('../middleware/auth');
+const {
+  buildSiteContext,
+  extractCaseId,
+  getLiveCaseContext
+}=require('./ai');
 const RIPLE_URL=process.env.MANLUNG_RIPLE_AI_URL||'https://ai.riple.org/';
 const SYSTEM=`You are Manlung AI, the fast and natural customer-support assistant for Manlung Recovery.
 Speak naturally and conversationally. Detect whether the user is speaking English, Kiswahili, or a natural mix of both (Sheng/mixed English-Kiswahili) and answer in the same language style. Do not translate the user's message unless asked.
@@ -34,7 +40,7 @@ function emit(res,text){
   const value=String(text||'');
   if(value)res.write('data: '+JSON.stringify({content:value})+'\n\n');
 }
-router.post('/chat',async(req,res)=>{
+router.post('/chat',optionalAuth,async(req,res)=>{
   const message=String(req.body?.message||'').trim().slice(0,8000);
   if(!message)return res.status(400).json({success:false,error:'Message is required.'});
   const history=cleanHistory(req.body?.history);
@@ -42,7 +48,22 @@ router.post('/chat',async(req,res)=>{
   const instruction=language==='auto'
     ?'Detect the user language and reply in that same language or natural mixed style.'
     :`Reply in ${language} unless the user clearly asks for another language.`;
-  const messages=[{role:'system',content:SYSTEM+'\n'+instruction},...history,{role:'user',content:message}];
+  const pagePath=String(req.body?.pagePath||'/').slice(0,300);
+  const siteContext=buildSiteContext(pagePath);
+  const caseId=extractCaseId(message,history);
+  const liveCase=await getLiveCaseContext(caseId,req.user);
+
+  const caseInstruction=caseId
+    ? `LIVE CASE DATA — authoritative runtime information for this request. Use only what the authorization layer provides. Never expose internal database IDs, emails, phone numbers, IMEIs, credentials, or private fields. If the user is unauthorized or unauthenticated, do not reveal case existence or details.\n${liveCase.context||'No case data is available.'}`
+    : 'No case was requested. Do not invent private case information.';
+
+  const messages=[
+    {role:'system',content:SYSTEM+'\n'+instruction},
+    {role:'system',content:'LIVE MANLUNG SITE CONTEXT — use this as the source of truth for current Manlung pages, services and features.\n\n'+siteContext},
+    {role:'system',content:caseInstruction},
+    ...history,
+    {role:'user',content:message}
+  ];
 
   try{
     const upstream=await axios.post(

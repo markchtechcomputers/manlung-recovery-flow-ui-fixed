@@ -240,3 +240,6 @@ router.get('/site-context', (req, res) => {
 });
 
 module.exports = router;
+module.exports.buildSiteContext = buildSiteContext;
+module.exports.extractCaseId = extractCaseId;
+module.exports.getLiveCaseContext = getLiveCaseContext;

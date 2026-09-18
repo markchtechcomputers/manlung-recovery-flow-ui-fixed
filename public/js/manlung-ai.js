@@ -75,6 +75,13 @@
       .manlung-ai-mic,.manlung-ai-send{height:48px;border:0;border-radius:14px;cursor:pointer;font-size:17px;font-weight:900;flex:0 0 48px;transition:.18s}
       .manlung-ai-mic{position:relative;background:#eef6fb;color:#12627d;border:1px solid #cfe0eb}.manlung-ai-mic.recording{background:#dc2626;color:#fff;border-color:#dc2626;box-shadow:0 0 0 5px rgba(220,38,38,.12);animation:manlungAiRecord 1s infinite}.manlung-ai-send{background:linear-gradient(135deg,#0e7490,#2563eb);color:#fff;box-shadow:0 7px 18px rgba(37,99,235,.2)}
       .manlung-ai-note{text-align:center;margin:8px auto 0;color:#8a97a8;font-size:.7rem}
+      .manlung-ai-voice-state{display:none;align-items:center;justify-content:center;gap:9px;margin:0 auto 10px;padding:10px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;color:#334155;font-size:.78rem;font-weight:750;max-width:1000px}
+      .manlung-ai-voice-state.show{display:flex}
+      .manlung-ai-voice-dot{width:8px;height:8px;border-radius:50%;background:#2563eb;box-shadow:0 0 0 5px rgba(37,99,235,.10)}
+      .manlung-ai-voice-state.recording .manlung-ai-voice-dot{background:#dc2626;box-shadow:0 0 0 5px rgba(220,38,38,.10);animation:manlungAiVoicePulse 1s infinite}
+      .manlung-ai-voice-state.processing .manlung-ai-voice-dot{background:#64748b;animation:manlungAiProcessing 1s infinite}
+      @keyframes manlungAiVoicePulse{50%{transform:scale(1.35);opacity:.55}}
+      @keyframes manlungAiProcessing{50%{opacity:.35;transform:scale(.75)}}
       .manlung-ai-quick{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 20px}
       .manlung-ai-quick button{border:1px solid #d7e3ed;background:#fff;color:#24516b;border-radius:999px;padding:8px 12px;font-weight:750;cursor:pointer}
       @media(max-width:650px){
@@ -97,6 +104,7 @@
       <div class="manlung-ai-toolbar"><button type="button" id="manlungAiLang">🌐 Auto: English</button><button type="button" id="manlungAiVoice">🔊 Voice off</button></div>
       <div class="manlung-ai-body" id="manlungAiMessages"></div>
       <div class="manlung-ai-foot"><div class="manlung-ai-links"><a href="/client/request.html">New Request</a><a href="/client/track.html">Track Case</a><a href="https://wa.me/254745682493" target="_blank" rel="noopener">Human Support</a></div>
+      <div class="manlung-ai-voice-state" id="manlungAiVoiceState" aria-live="polite"><span class="manlung-ai-voice-dot"></span><span id="manlungAiVoiceStateText">Ready</span></div>
       <form class="manlung-ai-compose" id="manlungAiForm"><button class="manlung-ai-mic" id="manlungAiMic" type="button" aria-label="Start voice input" title="Speak">🎙</button><textarea class="manlung-ai-input" id="manlungAiInput" rows="1" placeholder="Message Manlung AI…"></textarea><button class="manlung-ai-send" type="submit">➤</button></form>
       <div class="manlung-ai-note">Speak naturally, switch English/Kiswahili, or type your message.</div></div></div>`;
     document.body.appendChild(root);bindEvents();
@@ -250,11 +258,23 @@
     document.getElementById('manlungAiLang')?.addEventListener('click',()=>{const next=currentLanguage()==='sw'?'en':'sw';localStorage.setItem('manlung-ai-language',next);const b=document.getElementById('manlungAiLang');if(b)b.textContent=next==='sw'?'🌐 Auto: Kiswahili':'🌐 Auto: English';});
     document.getElementById('manlungAiVoice')?.addEventListener('click',()=>{window.__MANLUNG_AI_VOICE_ON=!window.__MANLUNG_AI_VOICE_ON;const b=document.getElementById('manlungAiVoice');b.textContent=window.__MANLUNG_AI_VOICE_ON?'🔊 Voice on':'🔊 Voice off';if(!window.__MANLUNG_AI_VOICE_ON&&'speechSynthesis'in window)window.speechSynthesis.cancel();});
     let recognition=null,voiceSession=false,voiceAutoResume=false,voiceFinal='';
+    function setVoiceState(mode,text){
+      const state=document.getElementById('manlungAiVoiceState');
+      const label=document.getElementById('manlungAiVoiceStateText');
+      if(!state)return;
+      state.className='manlung-ai-voice-state'+(mode?' show '+mode:'');
+      if(label)label.textContent=text||'Ready';
+    }
+
     function setListening(on){
       const mic=document.getElementById('manlungAiMic'),input=document.getElementById('manlungAiInput');
       if(!mic)return;
-      mic.classList.toggle('recording',on);mic.textContent=on?'■':'🎙';mic.title=on?'Listening… tap to stop':'Speak';mic.setAttribute('aria-label',on?'Stop listening':'Start voice input');
+      mic.classList.toggle('recording',on);
+      mic.textContent=on?'■':'🎙';
+      mic.title=on?'Listening… tap to stop':'Speak';
+      mic.setAttribute('aria-label',on?'Stop listening':'Start voice input');
       if(input)input.placeholder=on?'Listening… speak now':'Message Manlung AI…';
+      if(on)setVoiceState('recording','Listening… speak now');
     }
     function startListening(){
       const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -267,12 +287,29 @@
         const input=document.getElementById('manlungAiInput');if(input){input.value=voiceFinal;input.scrollTop=input.scrollHeight;}
       };
       recognition.onend=()=>{
-        const t=voiceFinal.trim();recognition=null;setListening(false);resetComposer();
-        if(t){voiceAutoResume=true;respond(t);}
-        else if(voiceSession&&voiceAutoResume){setTimeout(startListening,500);}
+        const t=voiceFinal.trim();
+        recognition=null;
+        setListening(false);
+        resetComposer();
+
+        if(t){
+          voiceAutoResume=true;
+          setVoiceState('processing','Processing your message…');
+          respond(t).finally(()=>{
+            setVoiceState('','');
+          });
+        }else if(voiceSession&&voiceAutoResume){
+          setVoiceState('','');
+          setTimeout(startListening,500);
+        }else{
+          setVoiceState('','');
+        }
       };
       recognition.onerror=()=>{
-        recognition=null;setListening(false);resetComposer();
+        recognition=null;
+        setListening(false);
+        resetComposer();
+        setVoiceState('','');
         if(voiceSession&&voiceAutoResume){setTimeout(startListening,1000);}
       };
       try{recognition.start();return true;}catch(_){recognition=null;setListening(false);return false;}
