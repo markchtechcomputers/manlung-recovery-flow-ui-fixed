@@ -60,7 +60,7 @@
       .manlung-ai-msg.ai{justify-content:flex-start}.manlung-ai-msg.user{justify-content:flex-end}
       .manlung-ai-msg>div{max-width:min(760px,82%);display:flex;flex-direction:column}
       .manlung-ai-msg.ai>div{align-items:flex-start}.manlung-ai-msg.user>div{align-items:flex-end}
-      .manlung-ai-bubble{padding:13px 16px;border-radius:18px;line-height:1.55;font-size:.94rem;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 2px 10px rgba(15,23,42,.06)}
+      .manlung-ai-bubble{padding:13px 16px;border-radius:18px;line-height:1.55;font-size:.94rem;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 2px 10px rgba(15,23,42,.06)}\n      .manlung-ai-typing{display:inline-flex;gap:5px;align-items:center;min-width:52px}.manlung-ai-typing span{width:6px;height:6px;border-radius:50%;background:#7b8da5;animation:manlungAiPulse 1.1s infinite ease-in-out}.manlung-ai-typing span:nth-child(2){animation-delay:.15s}.manlung-ai-typing span:nth-child(3){animation-delay:.3s}@keyframes manlungAiPulse{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
       .manlung-ai-msg.ai .manlung-ai-bubble{background:#fff;color:#243447;border:1px solid #e3e9f1;border-top-left-radius:6px}
       .manlung-ai-msg.user .manlung-ai-bubble{background:linear-gradient(135deg,#126f91,#2563eb);color:#fff;border:1px solid #126f91;border-top-right-radius:6px}
       .manlung-ai-time{font-size:.68rem;font-weight:700;color:#8a97a8;margin:6px 4px 0}
@@ -157,17 +157,44 @@
     return 'unknown';
   }
 
-  async function backendReply(message){
-    try{
-      const history=(window.__MANLUNG_AI_HISTORY||[]).slice(-14, -1);
-      const res=await fetch('/api/ai-live/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify({message,history,language:currentLanguage(),pagePath:location.pathname})});
-      if(!res.ok||!res.body)return null;
-      const reader=res.body.getReader(),decoder=new TextDecoder();let buf='',answer='';
-      while(true){const x=await reader.read();if(x.done)break;buf+=decoder.decode(x.value,{stream:true});const packets=buf.split('\n\n');buf=packets.pop()||'';for(const packet of packets){for(const line of packet.split('\n')){if(!line.startsWith('data:'))continue;const raw=line.slice(5).trim();if(!raw||raw==='[DONE]')continue;try{const obj=JSON.parse(raw);answer+=obj?.choices?.[0]?.delta?.content||obj?.choices?.[0]?.message?.content||'';}catch(_){}}}}
-      return answer.trim()||null;
-    }catch(_){return null;}
+  function addStreamingMessage(){
+    const body=document.getElementById('manlungAiMessages'); if(!body)return null;
+    const row=document.createElement('div');row.className='manlung-ai-msg ai';
+    const wrap=document.createElement('div');const bubble=document.createElement('div');bubble.className='manlung-ai-bubble';wrap.appendChild(bubble);
+    const meta=document.createElement('div');meta.className='manlung-ai-time';meta.textContent='Manlung AI • responding';wrap.appendChild(meta);row.appendChild(wrap);body.appendChild(row);body.scrollTop=body.scrollHeight;
+    return {bubble,meta};
   }
-  async function respond(displayText,forcedKey){addMessage(displayText,'user');addTyping();let reply=await backendReply(displayText);if(!reply)reply=KNOWLEDGE[forcedKey||classify(displayText)]||KNOWLEDGE.unknown;removeTyping();addMessage(reply,'ai');if(window.__MANLUNG_AI_VOICE_ON)speak(reply);}
+  function appendAssistantHistory(answer){window.__MANLUNG_AI_HISTORY=window.__MANLUNG_AI_HISTORY||[];window.__MANLUNG_AI_HISTORY.push({role:'assistant',content:String(answer)});if(window.__MANLUNG_AI_HISTORY.length>20)window.__MANLUNG_AI_HISTORY=window.__MANLUNG_AI_HISTORY.slice(-20);}
+  function parseAIChunk(raw){
+    raw=String(raw||'').trim();if(!raw||raw==='[DONE]')return '';
+    try{const o=JSON.parse(raw);return o?.choices?.[0]?.delta?.content||o?.choices?.[0]?.message?.content||o?.delta?.content||o?.content||o?.text||'';}catch(_){return raw;}
+  }
+  async function streamBackend(message,onText){
+    const history=(window.__MANLUNG_AI_HISTORY||[]).slice(-14);
+    const res=await fetch('/api/ai-live/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify({message,history,language:currentLanguage(),pagePath:location.pathname})});
+    if(!res.ok||!res.body)throw new Error('Live AI connection failed');
+    const reader=res.body.getReader(),decoder=new TextDecoder();let buf='',answer='';
+    const consume=raw=>{const part=parseAIChunk(raw);if(part){answer+=part;onText(part);}};
+    while(true){
+      const x=await reader.read(); if(x.done)break;
+      buf+=decoder.decode(x.value,{stream:true});
+      const packets=buf.split(/\n\n/);buf=packets.pop()||'';
+      packets.forEach(packet=>packet.split(/\n/).forEach(line=>{if(line.startsWith('data:'))consume(line.slice(5));}));
+    }
+    if(buf.trim())buf.split(/\n/).forEach(line=>{if(line.startsWith('data:'))consume(line.slice(5));});
+    return answer.trim();
+  }
+  async function respond(displayText,forcedKey){
+    addMessage(displayText,'user');removeTyping();
+    const ui=addStreamingMessage();let answer='';
+    try{
+      answer=await streamBackend(displayText,part=>{ui.bubble.textContent+=part;ui.meta.textContent='Manlung AI • responding';document.getElementById('manlungAiMessages').scrollTop=999999;});
+    }catch(_){}
+    if(!answer)answer=KNOWLEDGE[forcedKey||classify(displayText)]||KNOWLEDGE.unknown;
+    ui.bubble.textContent=answer;ui.meta.textContent='Manlung AI';
+    appendAssistantHistory(answer);
+    if(window.__MANLUNG_AI_VOICE_ON)speak(answer);
+  }
 
   function toggle(open){const win=document.getElementById('manlungAiWindow');const next=typeof open==='boolean'?open:!win.classList.contains('open');win.classList.toggle('open',next);win.setAttribute('aria-hidden',String(!next));document.body.style.overflow=next?'hidden':'';if(next)setTimeout(()=>document.getElementById('manlungAiInput')?.focus(),80);}
 
