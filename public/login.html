@@ -53,7 +53,7 @@
 .manlung-auth-page .manlung-auth-heading{margin-bottom:12px}
 @media (max-width:640px){.manlung-auth-form{padding:18px}.manlung-auth-page .manlung-auth-form form,.manlung-auth-page .manlung-auth-heading{padding:14px}}
 
-.manlung-auth-tabs,.manlung-auth-tabs button,.manlung-social-grid,.manlung-social-btn{position:relative;z-index:10000;pointer-events:auto!important}.manlung-social-btn{position:relative!important;isolation:isolate!important}.manlung-auth-tabs{display:flex!important}.manlung-auth-tabs button{cursor:pointer!important;flex:1!important}
+.manlung-auth-tabs,.manlung-auth-tabs button,.manlung-social-grid,.manlung-social-btn,.manlung-google-btn{position:relative;z-index:10000;pointer-events:auto!important}.manlung-social-btn{position:relative!important;isolation:isolate!important}.manlung-google-btn{display:flex;justify-content:center;align-items:center;min-height:44px;width:100%;overflow:hidden}.manlung-google-btn iframe{max-width:100%!important}.manlung-auth-tabs{display:flex!important}.manlung-auth-tabs button{cursor:pointer!important;flex:1!important}
 </style></head>
 <body class="manlung-auth-page">
 <header class="site-header">
@@ -81,7 +81,7 @@
       <div id="loginPanel">
         <div class="manlung-auth-heading"><h2>Welcome back</h2><p>Sign in to access your client portal.</p></div>
         <div class="manlung-social-grid">
-          <button type="button" id="googleLoginBtn" class="manlung-social-btn" aria-label="Continue with Google"><i class="fab fa-google" aria-hidden="true"></i> Continue with Google</button>
+          <div id="googleLoginBtn" class="manlung-google-btn" aria-label="Continue with Google"></div>
           <button type="button" id="githubLoginBtn" class="manlung-social-btn" aria-label="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i> Continue with GitHub</button>
         </div>
         <div class="manlung-auth-divider">or continue with email</div>
@@ -96,7 +96,7 @@
 
       <div id="registerPanel" hidden>
         <div class="manlung-auth-heading"><h2>Create your account</h2><p>Create a secure client account before submitting a recovery request.</p></div>
-        <div class="manlung-social-grid"><button type="button" id="googleRegisterBtn" class="manlung-social-btn" aria-label="Continue with Google"><i class="fab fa-google" aria-hidden="true"></i> Continue with Google</button><button type="button" id="githubRegisterBtn" class="manlung-social-btn" aria-label="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i> Continue with GitHub</button></div>
+        <div class="manlung-social-grid"><div id="googleRegisterBtn" class="manlung-google-btn" aria-label="Continue with Google"></div><button type="button" id="githubRegisterBtn" class="manlung-social-btn" aria-label="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i> Continue with GitHub</button></div>
         <div class="manlung-auth-divider">or create with email</div>
         <form id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group"><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="200" placeholder="Your full name" required></div>
@@ -171,24 +171,77 @@ async function handleRegister(event) {
   catch(err){showMessage(errorEl,'Could not reach the server ('+err.message+'). Is it running?');}
 }
 async function ensureGoogleGIS(){
-  if(window.google?.accounts?.oauth2)return true;
+  if(window.google?.accounts?.id)return true;
   return new Promise((resolve,reject)=>{
-    const existing=document.querySelector('script[data-google-gis]');
-    if(existing){
-      const started=Date.now();
-      const timer=setInterval(()=>{
-        if(window.google?.accounts?.oauth2){clearInterval(timer);resolve(true);}
-        else if(Date.now()-started>10000){clearInterval(timer);reject(new Error('Google authentication could not load. Please refresh the page.'));}
-      },100);
-      return;
-    }
-    const s=document.createElement('script');
-    s.src='https://accounts.google.com/gsi/client';
-    s.async=true;s.defer=true;s.dataset.googleGis='1';
-    s.onload=()=>resolve(!!window.google?.accounts?.oauth2);
-    s.onerror=()=>reject(new Error('Google authentication could not load. Check your connection and refresh.'));
-    document.head.appendChild(s);
+    const started=Date.now();
+    const timer=setInterval(()=>{
+      if(window.google?.accounts?.id){clearInterval(timer);resolve(true);}
+      else if(Date.now()-started>10000){clearInterval(timer);reject(new Error('Google authentication could not load. Please refresh the page.'));}
+    },100);
   });
+}
+
+async function setupOfficialGoogleButtons(){
+  try{
+    const cfgRes=await fetch('/api/auth/google',{cache:'no-store'});
+    const cfgText=await cfgRes.text();
+    let cfg;
+    try{cfg=JSON.parse(cfgText);}catch(_){throw new Error('Google authentication API returned an invalid response.');}
+    if(!cfgRes.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
+    await ensureGoogleGIS();
+    if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh and try again.');
+
+    google.accounts.id.initialize({
+      client_id:cfg.clientId,
+      auto_select:false,
+      cancel_on_tap_outside:true,
+      callback:async response=>{
+        try{
+          if(!response?.credential)throw new Error('Google sign-in was cancelled.');
+          const errorTarget=window.__manlungGoogleErrorTarget||'loginError';
+          const res=await fetch('/api/auth/google',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({credential:response.credential})
+          });
+          const text=await res.text();
+          let data;
+          try{data=JSON.parse(text);}catch(_){throw new Error('Google sign-in API returned an invalid response.');}
+          if(!res.ok||!data.success)throw new Error(data.error||'Google authentication failed. Please try again.');
+          localStorage.setItem('clientToken',data.token);
+          localStorage.setItem('clientUser',JSON.stringify(data.user));
+          window.location.replace('/client/dashboard.html');
+        }catch(err){
+          showMessage(document.getElementById(window.__manlungGoogleErrorTarget||'loginError'),err.message||'Google authentication failed.');
+        }
+      }
+    });
+
+    [
+      ['googleLoginBtn','loginError'],
+      ['googleRegisterBtn','registerError']
+    ].forEach(([id,errorTarget])=>{
+      const host=document.getElementById(id);
+      if(!host)return;
+      host.innerHTML='';
+      google.accounts.id.renderButton(host,{
+        type:'standard',
+        theme:'filled_black',
+        size:'large',
+        text:'continue_with',
+        shape:'rectangular',
+        logo_alignment:'left',
+        width:400,
+        click_listener:()=>{
+          window.__manlungGoogleErrorTarget=errorTarget;
+          localStorage.removeItem('clientToken');
+          localStorage.removeItem('clientUser');
+        }
+      });
+    });
+  }catch(err){
+    showMessage(document.getElementById('loginError'),err.message||'Google authentication could not be loaded.');
+  }
 }
 
 async function startSocialSignup(provider){
@@ -199,42 +252,12 @@ async function startSocialSignup(provider){
       window.location.assign('/api/auth/github/start');
       return;
     }
-    if(provider!=='google')return;
-    localStorage.removeItem('clientToken');
-    localStorage.removeItem('clientUser');
-    const cfgRes=await fetch('/api/auth/google',{cache:'no-store'});
-    const cfgText=await cfgRes.text();
-    let cfg;
-    try{cfg=JSON.parse(cfgText);}catch(_){throw new Error('Google authentication API returned an invalid response.');}
-    if(!cfgRes.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
-    await ensureGoogleGIS();
-    if(!window.google?.accounts?.oauth2)throw new Error('Google authentication could not load. Please refresh and try again.');
-    if(!window.__manlungGoogleCodeClient){
-      window.__manlungGoogleCodeClient=window.google.accounts.oauth2.initCodeClient({
-        client_id:cfg.clientId,
-        scope:'openid email profile',
-        ux_mode:'popup',
-        callback:async codeResponse=>{
-          try{
-            if(!codeResponse?.code)throw new Error('Google sign-in was cancelled.');
-            const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:codeResponse.code,redirectUri:window.location.origin})});
-            const text=await res.text(); let data;
-            try{data=JSON.parse(text);}catch(_){throw new Error('Google sign-in API returned an invalid response.');}
-            if(!res.ok||!data.success)throw new Error(data.error||'Google authentication failed. Please try again.');
-            localStorage.setItem('clientToken',data.token);
-            localStorage.setItem('clientUser',JSON.stringify(data.user));
-            window.location.replace('/client/dashboard.html');
-          }catch(err){showMessage(document.getElementById('loginError'),err.message||'Google authentication failed.');}
-        }
-      });
-    }
-    window.__manlungGoogleCodeClient.requestCode({prompt:'select_account'});
   }catch(err){showMessage(document.getElementById('loginError'),err.message||'Social sign-in failed.');}
 }
 
 
 document.addEventListener('DOMContentLoaded',()=>{
-  ['googleLoginBtn','googleRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('google')));
+  setupOfficialGoogleButtons();
   ['githubLoginBtn','githubRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('github')));
 });
 (function(){
