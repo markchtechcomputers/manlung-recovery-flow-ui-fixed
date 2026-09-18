@@ -4,18 +4,19 @@ const jwt=require('jsonwebtoken');
 const crypto=require('crypto');
 const User=require('../models/User');
 const app=express();
+const GOOGLE_CLIENT_ID=process.env.GOOGLE_CLIENT_ID||'750848085828-t1uo1rljsmkkmlv3sqiv13tjrb7j1a9f.apps.googleusercontent.com';
 app.use(express.json({limit:'64kb'}));
 function token(user){return jwt.sign({id:user.id,role:user.role,sessionVersion:Number(user.session_version||0)},process.env.JWT_SECRET,{expiresIn:'7d'});}
-app.get('/',(_req,res)=>res.json({success:true,clientId:process.env.GOOGLE_CLIENT_ID||null}));
+app.get('/',(_req,res)=>res.json({success:true,clientId:GOOGLE_CLIENT_ID}));
 app.post('/',async(req,res)=>{
  try{
   const credential=String(req.body?.credential||'').trim();
   if(!credential)return res.status(400).json({success:false,error:'Google credential is required.'});
-  if(!process.env.GOOGLE_CLIENT_ID)return res.status(503).json({success:false,error:'Google Cloud authentication is not configured yet.'});
+  if(!GOOGLE_CLIENT_ID)return res.status(503).json({success:false,error:'Google Cloud authentication is not configured yet.'});
   const v=await axios.get('https://oauth2.googleapis.com/tokeninfo',{params:{id_token:credential},timeout:10000,validateStatus:()=>true});
   if(v.status!==200)return res.status(401).json({success:false,error:'Google authentication could not be verified.'});
   const p=v.data;
-  if(p.aud!==process.env.GOOGLE_CLIENT_ID||p.iss!=='https://accounts.google.com')return res.status(401).json({success:false,error:'Invalid Google authentication audience.'});
+  if(p.aud!==GOOGLE_CLIENT_ID||p.iss!=='https://accounts.google.com')return res.status(401).json({success:false,error:'Invalid Google authentication audience.'});
   if(p.email_verified!=='true')return res.status(403).json({success:false,error:'Your Google email is not verified.'});
   const email=String(p.email||'').trim().toLowerCase();if(!email)return res.status(400).json({success:false,error:'Google did not provide an email address.'});
   let user=await User.findByEmail(email);
