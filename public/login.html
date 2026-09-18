@@ -80,7 +80,6 @@
         <div class="manlung-auth-heading"><h2>Welcome back</h2><p>Sign in to access your client portal.</p></div>
         <div class="manlung-social-grid">
           <button type="button" class="manlung-social-btn" onclick="startSocialSignup('google')"><i class="fab fa-google" aria-hidden="true"></i> Continue with Google</button>
-          <button type="button" class="manlung-social-btn" onclick="startSocialSignup('github')"><i class="fab fa-github" aria-hidden="true"></i> Continue with GitHub</button>
         </div>
         <div class="manlung-auth-divider">or continue with email</div>
         <form id="loginForm" onsubmit="handleLogin(event)">
@@ -169,17 +168,13 @@ async function handleRegister(event) {
   catch(err){showMessage(errorEl,'Could not reach the server ('+err.message+'). Is it running?');}
 }
 async function startSocialSignup(provider){
-  if(provider==='github'){
-    window.location.href='/api/auth/github';
-    return;
-  }
   if(provider!=='google')return;
   try{
-    const cfg=await fetch('/api/auth/google',{cache:'no-store'}).then(r=>r.json());
+    const cfg=await fetch('/api/auth-google.js',{cache:'no-store'}).then(r=>r.json());
     if(!cfg.clientId)throw new Error('Google Cloud authentication is not configured yet.');
     if(!window.google?.accounts?.id)throw new Error('Google authentication is still loading. Please try again.');
     window.google.accounts.id.initialize({client_id:cfg.clientId,callback:async response=>{
-      const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:response.credential})});
+      const res=await fetch('/api/auth-google.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:response.credential})});
       const data=await res.json();
       if(data.success){localStorage.setItem('clientToken',data.token);localStorage.setItem('clientUser',JSON.stringify(data.user));window.location.href='/client/dashboard.html';}
       else showMessage(document.getElementById('loginError'),data.error||'Google sign-in failed');
