@@ -145,6 +145,10 @@ async function handleRegister(event) {
   catch(err){showMessage(errorEl,'Could not reach the server ('+err.message+').');}
 }
 async function startSocialSignup(provider) {
+  if (provider === 'github') {
+    window.location.assign('/api/auth/github/start');
+    return;
+  }
   const errorEl=document.getElementById('loginError'); const registerErrorEl=document.getElementById('registerError'); const buttons=document.querySelectorAll(`.manlung-social-btn[onclick="startSocialSignup('${provider}')"]`); showMessage(errorEl,''); showMessage(registerErrorEl,'');
   buttons.forEach(btn=>{btn.classList.add('is-loading');btn.dataset.originalText=btn.innerHTML;btn.innerHTML='<i class="fab fa-google" aria-hidden="true"></i> Connecting…';});
   try {
