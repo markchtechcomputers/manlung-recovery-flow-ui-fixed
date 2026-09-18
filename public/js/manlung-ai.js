@@ -43,77 +43,28 @@
     const style = document.createElement('style');
     style.id = 'manlung-ai-styles';
     style.textContent = `
-      #manlungAiRoot{display:block;visibility:visible;opacity:1;pointer-events:auto;position:fixed;left:18px;bottom:18px;z-index:2147483647;touch-action:none;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-      #manlungAiButton{display:grid;visibility:visible;opacity:1;pointer-events:auto;width:62px;height:62px;border:1px solid rgba(37,99,235,.55);border-radius:50%;padding:4px;background:linear-gradient(145deg,#0f172a,#1d4ed8);box-shadow:0 14px 40px rgba(15,23,42,.28),0 0 0 1px rgba(37,99,235,.08),0 0 24px rgba(37,99,235,.22);cursor:pointer;display:grid;place-items:center;position:relative;transition:transform .2s ease,box-shadow .2s ease}
-      #manlungAiButton:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 18px 46px rgba(15,23,42,.35),0 0 28px rgba(37,99,235,.28)}
-      #manlungAiButton img{width:49px;height:49px;border-radius:50%;object-fit:cover;display:block}
-      .manlung-ai-pulse{position:absolute;right:-1px;top:-1px;width:14px;height:14px;border-radius:50%;background:#22c55e;border:2px solid #0f172a;box-shadow:0 0 0 0 rgba(34,197,94,.65);animation:manlungAiPulse 2s infinite}
-      @keyframes manlungAiPulse{70%{box-shadow:0 0 0 9px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
-      #manlungAiWindow{position:absolute;left:0;bottom:74px;width:min(390px,calc(100vw - 28px));height:min(610px,calc(100vh - 105px));display:none;flex-direction:column;overflow:hidden;border:1px solid rgba(96,165,250,.24);border-radius:22px;background:linear-gradient(160deg,rgba(7,15,27,.98),rgba(5,12,20,.98));box-shadow:0 25px 80px rgba(0,0,0,.62),0 0 50px rgba(16,185,129,.08);backdrop-filter:blur(18px)}
-      #manlungAiWindow.open{display:flex;animation:manlungAiIn .22s ease both}
-      @keyframes manlungAiIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
-      .manlung-ai-head{min-height:74px;padding:12px 14px;display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,rgba(14,38,53,.98),rgba(10,25,37,.98));border-bottom:1px solid rgba(148,163,184,.12);position:relative}
-      .manlung-ai-head:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 5px,rgba(255,255,255,.018) 6px)}
-      .manlung-ai-avatar{width:45px;height:45px;border-radius:14px;object-fit:cover;border:1px solid rgba(74,222,128,.35);box-shadow:0 0 20px rgba(34,197,94,.15)}
-      .manlung-ai-title{font-weight:850;color:#f8fafc;font-size:.96rem;letter-spacing:.01em}.manlung-ai-status{font-size:.7rem;color:#86efac;margin-top:2px;display:flex;align-items:center;gap:5px}.manlung-ai-status i{width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;box-shadow:0 0 8px #22c55e}
-      .manlung-ai-close{margin-left:auto;z-index:2;width:34px;height:34px;border:1px solid rgba(148,163,184,.15);border-radius:10px;background:rgba(255,255,255,.04);color:#cbd5e1;cursor:pointer;font-size:1rem}.manlung-ai-close:hover{background:rgba(255,255,255,.1);color:#fff}
-      .manlung-ai-body{flex:1;overflow:auto;padding:15px 13px 12px;scroll-behavior:smooth;background:radial-gradient(circle at 20% 10%,rgba(34,197,94,.045),transparent 28%),radial-gradient(circle at 90% 90%,rgba(59,130,246,.055),transparent 30%)}
-      .manlung-ai-body::-webkit-scrollbar{width:5px}.manlung-ai-body::-webkit-scrollbar-thumb{background:rgba(148,163,184,.22);border-radius:9px}
-      .manlung-ai-msg{display:flex;gap:8px;margin:0 0 12px;align-items:flex-end}.manlung-ai-msg.user{justify-content:flex-end}.manlung-ai-mini{width:27px;height:27px;border-radius:9px;object-fit:cover;flex:0 0 27px;border:1px solid rgba(74,222,128,.22)}
-      .manlung-ai-bubble{max-width:82%;padding:10px 12px;border-radius:15px 15px 15px 4px;color:#dbeafe;background:linear-gradient(145deg,rgba(22,38,53,.96),rgba(12,27,39,.96));border:1px solid rgba(96,165,250,.13);font-size:.82rem;line-height:1.52;box-shadow:0 7px 22px rgba(0,0,0,.18)}
-      .manlung-ai-msg.user .manlung-ai-bubble{border-radius:15px 15px 4px 15px;background:linear-gradient(145deg,#14532d,#166534);border-color:rgba(74,222,128,.25);color:#f0fdf4}
-      .manlung-ai-time{font-size:.58rem;color:#64748b;margin:4px 2px 0}
-      .manlung-ai-typing{display:inline-flex;gap:4px;padding:11px 13px}.manlung-ai-typing span{width:5px;height:5px;border-radius:50%;background:#86efac;animation:manlungDot 1s infinite}.manlung-ai-typing span:nth-child(2){animation-delay:.15s}.manlung-ai-typing span:nth-child(3){animation-delay:.3s}@keyframes manlungDot{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
-      .manlung-ai-quick{display:flex;flex-wrap:wrap;gap:7px;padding:2px 0 4px}.manlung-ai-quick button{border:1px solid rgba(74,222,128,.2);background:rgba(34,197,94,.055);color:#bbf7d0;border-radius:999px;padding:7px 10px;font-size:.68rem;font-weight:750;cursor:pointer}.manlung-ai-quick button:hover{background:rgba(34,197,94,.13);border-color:rgba(74,222,128,.38)}
-      .manlung-ai-foot{padding:9px;border-top:1px solid rgba(148,163,184,.1);background:rgba(5,12,20,.98)}.manlung-ai-links{display:flex;gap:6px;margin-bottom:7px}.manlung-ai-links a{font-size:.62rem;color:#94a3b8;text-decoration:none;padding:4px 6px}.manlung-ai-links a:hover{color:#86efac}.manlung-ai-compose{display:flex;gap:7px;align-items:flex-end}.manlung-ai-input{flex:1;min-width:0;resize:none;max-height:92px;border:1px solid rgba(148,163,184,.18);border-radius:13px;padding:10px 11px;background:#0b1622;color:#f8fafc;outline:none;font:500 .8rem/1.35 inherit}.manlung-ai-input:focus{border-color:rgba(74,222,128,.42);box-shadow:0 0 0 3px rgba(34,197,94,.06)}.manlung-ai-send{width:42px;height:42px;border:0;border-radius:12px;background:linear-gradient(145deg,#22c55e,#15803d);color:#fff;cursor:pointer;box-shadow:0 7px 18px rgba(22,101,52,.3)}.manlung-ai-send:hover{filter:brightness(1.08)}
-      .manlung-ai-note{font-size:.58rem;color:#64748b;text-align:center;margin-top:5px}
-      #manlungAiRoot.manlung-ai-dragging{cursor:grabbing}
-      #manlungAiButton.manlung-ai-loading{cursor:default}
-      #manlungAiButton.manlung-ai-loading:before{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(59,130,246,.18);border-top-color:#60a5fa;animation:manlungAiRing 1s linear infinite}
-      #manlungAiButton.manlung-ai-loading:after{content:"...";position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:12px;letter-spacing:3px;color:#64748b;background:rgba(255,255,255,.94);padding:1px 5px;border-radius:8px}
-      @keyframes manlungAiRing{to{transform:rotate(360deg)}}
-      .manlung-ai-welcome-tip{position:absolute;left:0;bottom:74px;width:min(300px,calc(100vw - 30px));padding:13px 14px;border:1px solid rgba(37,99,235,.18);border-radius:15px;background:rgba(255,255,255,.98);color:#0f172a;box-shadow:0 16px 45px rgba(15,23,42,.18);font-size:.76rem;line-height:1.45}
-      .manlung-ai-welcome-tip strong{display:block;margin-bottom:4px;font-size:.82rem}
-      .manlung-ai-welcome-tip button{margin-top:8px;border:0;background:transparent;color:#2563eb;font-weight:800;cursor:pointer;padding:0}
-      @media(max-width:600px){#manlungAiRoot{left:12px;bottom:12px}#manlungAiButton{width:56px;height:56px}#manlungAiButton img{width:45px;height:45px}#manlungAiWindow{left:0;bottom:68px;width:calc(100vw - 24px);height:min(650px,calc(100vh - 92px));border-radius:20px}.manlung-ai-bubble{max-width:88%}}
-      @media(prefers-reduced-motion:reduce){#manlungAiWindow.open{animation:none}.manlung-ai-pulse{animation:none}.manlung-ai-typing span{animation:none}}
+      #manlungAiRoot{display:none!important}
+      .manlung-ai-pulse{animation:none}.manlung-ai-typing span{animation:none}}
     `;
     document.head.appendChild(style);
   }
 
-  function createUI() {
-    if (document.getElementById('manlungAiRoot')) return;
-    const root = document.createElement('div');
-    root.id = 'manlungAiRoot';
-    root.innerHTML = `
-      <div id="manlungAiWindow" role="dialog" aria-label="Manlung Recovery AI Support" aria-hidden="true">
-        <div class="manlung-ai-head">
-          <img class="manlung-ai-avatar" src="${AI_ICON}" alt="Manlung Recovery AI">
-          <div><div class="manlung-ai-title">Manlung Recovery AI</div><div class="manlung-ai-status"><i></i> Online • Ready to help</div></div>
-          <button type="button" class="manlung-ai-close" aria-label="Close AI support">×</button>
-        </div>
-        <div class="manlung-ai-body" id="manlungAiMessages"></div>
-        <div class="manlung-ai-foot">
-          <div class="manlung-ai-links"><a href="${REQUEST}">New Request</a><a href="${TRACK}">Track Case</a><a href="${WHATSAPP}" target="_blank" rel="noopener">Human Support</a></div>
-          <form class="manlung-ai-compose" id="manlungAiForm"><textarea class="manlung-ai-input" id="manlungAiInput" rows="1" placeholder="Ask Manlung Recovery AI…" aria-label="Message"></textarea><button class="manlung-ai-send" type="submit" aria-label="Send message">➤</button></form>
-          <div class="manlung-ai-note">AI support gives guidance — sensitive cases can be handed to human support.</div>
-        </div>
-      </div>
-      <button type="button" id="manlungAiButton" aria-label="Open Manlung Recovery AI" title="Manlung Recovery AI"><img src="${AI_ICON}" alt=""><span class="manlung-ai-pulse"></span></button>
-    `;
-    document.body.appendChild(root);
-    const aiButton = document.getElementById('manlungAiButton');
-    aiButton.classList.add('manlung-ai-loading');
-    const tip = document.createElement('div');
-    tip.className = 'manlung-ai-welcome-tip';
-    tip.innerHTML = '<strong>Need help with recovery?</strong><span>I can explain our services, help you start a request, track a case, or learn about website safety.</span><br><button type=\"button\">Explore help</button>';
-    root.appendChild(tip);
-    tip.querySelector('button').addEventListener('click',()=>{tip.remove();toggle(true);});
-    setTimeout(()=>{aiButton.classList.remove('manlung-ai-loading'); if(tip.isConnected) setTimeout(()=>tip.remove(),7000);},900);
-    bindEvents();
-    addMessage(KNOWLEDGE.greeting, 'ai');
-    addQuickReplies();
+  function createUI(){
+    if(document.getElementById('manlungAiRoot'))return;
+    const root=document.createElement('div');root.id='manlungAiRoot';
+    root.innerHTML=`<div id="manlungAiWindow" role="dialog" aria-modal="true" aria-label="Manlung AI" aria-hidden="true">
+      <div class="manlung-ai-head"><div class="manlung-ai-avatar" aria-hidden="true">AI</div><div><div class="manlung-ai-title">Manlung AI</div><div class="manlung-ai-status"><i></i> Online • Fast support</div></div><button type="button" class="manlung-ai-close" aria-label="Close">×</button></div>
+      <div class="manlung-ai-toolbar"><button type="button" id="manlungAiLang">English / Kiswahili</button><button type="button" id="manlungAiVoice">🔊 Voice off</button></div>
+      <div class="manlung-ai-body" id="manlungAiMessages"></div>
+      <div class="manlung-ai-foot"><div class="manlung-ai-links"><a href="/client/request.html">New Request</a><a href="/client/track.html">Track Case</a><a href="https://wa.me/254745682493" target="_blank" rel="noopener">Human Support</a></div>
+      <form class="manlung-ai-compose" id="manlungAiForm"><button class="manlung-ai-mic" id="manlungAiMic" type="button">🎙</button><textarea class="manlung-ai-input" id="manlungAiInput" rows="1" placeholder="Message Manlung AI…"></textarea><button class="manlung-ai-send" type="submit">➤</button></form>
+      <div class="manlung-ai-note">Speak naturally, switch English/Kiswahili, or type your message.</div></div></div>`;
+    document.body.appendChild(root);bindEvents();
+    addMessage(localStorage.getItem('manlung-ai-language')==='sw'?'Habari! Mimi ni Manlung AI. Naweza kukusaidia kuhusu portal, maombi ya recovery, ufuatiliaji wa kesi, au msaada wa binadamu.':'Hello! I’m Manlung AI. Ask me about the Manlung Recovery portal, requests, case tracking or support.','ai');
   }
+  function currentLanguage(){return localStorage.getItem('manlung-ai-language')==='sw'?'sw':'en';}
+  function speak(text){if(!('speechSynthesis'in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';u.rate=.98;window.speechSynthesis.speak(u);}
+  function injectHeaderTab(){const a=document.querySelector('.site-header .header-actions');if(!a||a.querySelector('[data-manlung-ai-tab]'))return;const b=document.createElement('button');b.type='button';b.dataset.manlungAiTab='true';b.className='manlung-ai-tab';b.textContent='Manlung AI';b.addEventListener('click',()=>toggle(true));a.insertBefore(b,a.querySelector('a[href="/client/request.html"]')||null);}
 
   function now() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
 
@@ -165,75 +116,28 @@
     return 'unknown';
   }
 
-  async function backendReply(message) {
-    const endpoint = window.MANLUNG_AI_ENDPOINT || '/api/ai/chat';
-    if (!endpoint) return null;
-    try {
-      const res = await fetch(endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message, pagePath:location.pathname})});
-      if (!res.ok) return null;
-      const data = await res.json();
-      return data.reply || data.message || null;
-    } catch (_) { return null; }
+  async function backendReply(message){
+    try{
+      const history=(window.__MANLUNG_AI_HISTORY||[]).slice(-14);
+      const res=await fetch('/api/ai-live/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify({message,history,language:currentLanguage(),pagePath:location.pathname})});
+      if(!res.ok||!res.body)return null;
+      const reader=res.body.getReader(),decoder=new TextDecoder();let buf='',answer='';
+      while(true){const x=await reader.read();if(x.done)break;buf+=decoder.decode(x.value,{stream:true});const packets=buf.split('\n\n');buf=packets.pop()||'';for(const packet of packets){for(const line of packet.split('\n')){if(!line.startsWith('data:'))continue;const raw=line.slice(5).trim();if(!raw||raw==='[DONE]')continue;try{const obj=JSON.parse(raw);answer+=obj?.choices?.[0]?.delta?.content||obj?.choices?.[0]?.message?.content||'';}catch(_){}}}}
+      return answer.trim()||null;
+    }catch(_){return null;}
+  }
+  async function respond(displayText,forcedKey){addMessage(displayText,'user');addTyping();let reply=await backendReply(displayText);if(!reply)reply=KNOWLEDGE[forcedKey||classify(displayText)]||KNOWLEDGE.unknown;removeTyping();addMessage(reply,'ai');if(window.__MANLUNG_AI_VOICE_ON)speak(reply);}
+
+  function toggle(open){const win=document.getElementById('manlungAiWindow');const next=typeof open==='boolean'?open:!win.classList.contains('open');win.classList.toggle('open',next);win.setAttribute('aria-hidden',String(!next));document.body.style.overflow=next?'hidden':'';if(next)setTimeout(()=>document.getElementById('manlungAiInput')?.focus(),80);}
+
+  function bindEvents(){
+    document.querySelector('.manlung-ai-close')?.addEventListener('click',()=>toggle(false));
+    document.getElementById('manlungAiForm')?.addEventListener('submit',e=>{e.preventDefault();const i=document.getElementById('manlungAiInput'),v=i.value.trim();if(v){i.value='';respond(v);}});
+    document.getElementById('manlungAiLang')?.addEventListener('click',()=>{localStorage.setItem('manlung-ai-language',currentLanguage()==='sw'?'en':'sw');location.reload();});
+    document.getElementById('manlungAiVoice')?.addEventListener('click',()=>{window.__MANLUNG_AI_VOICE_ON=!window.__MANLUNG_AI_VOICE_ON;document.getElementById('manlungAiVoice').textContent=window.__MANLUNG_AI_VOICE_ON?'🔊 Voice on':'🔊 Voice off';});
+    document.getElementById('manlungAiMic')?.addEventListener('click',()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Voice input is not supported here. Try Chrome or Edge.');return;}const r=new SR();r.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';r.interimResults=false;r.onresult=e=>{const t=e.results[0][0].transcript.trim();if(t){document.getElementById('manlungAiInput').value=t;respond(t);}};r.start();});
   }
 
-  async function respond(displayText, forcedKey) {
-    addMessage(displayText, 'user');
-    addTyping();
-    const key = forcedKey || classify(displayText);
-    let reply = null;
-    try { reply = await backendReply(displayText); } catch (_) {}
-    if (!reply) reply = KNOWLEDGE[key] || KNOWLEDGE.unknown;
-    const delay = Math.min(950, Math.max(350, reply.length * 4));
-    setTimeout(()=>{removeTyping();addMessage(reply,'ai');}, delay);
-  }
-
-  function toggle(open) {
-    const win = document.getElementById('manlungAiWindow');
-    const button = document.getElementById('manlungAiButton');
-    const next = typeof open === 'boolean' ? open : !win.classList.contains('open');
-    win.classList.toggle('open', next); win.setAttribute('aria-hidden', String(!next));
-    if (next) setTimeout(()=>document.getElementById('manlungAiInput')?.focus(),100);
-    button.setAttribute('aria-expanded', String(next));
-  }
-
-  function bindEvents() {
-    const button=document.getElementById('manlungAiButton');
-    let audioCtx=null;
-    const soundEnabled=()=>localStorage.getItem('manlung-ai-sound')!=='off';
-    const clickSound=()=>{
-      if(!soundEnabled()) return;
-      try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=620;g.gain.setValueAtTime(.0001,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.035,audioCtx.currentTime+.01);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+.07);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.08);}catch(_){}
-    };
-    button.addEventListener('click',()=>{if(button.dataset.dragged==='true'){button.dataset.dragged='false';return;} clickSound();toggle();});
-    document.querySelector('.manlung-ai-close').addEventListener('click',()=>{clickSound();toggle(false);});
-    document.getElementById('manlungAiForm').addEventListener('submit',e=>{e.preventDefault();const input=document.getElementById('manlungAiInput');const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';clickSound();respond(text);});
-    const input=document.getElementById('manlungAiInput');
-    input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,92)+'px';});
-    input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('manlungAiForm').requestSubmit();}});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')toggle(false);});
-
-    // Pointer-based drag: works with mouse, touch and pen without changing the AI endpoint.
-    let dragging=false,startX=0,startY=0,startLeft=0,startTop=0,moved=false;
-    button.addEventListener('pointerdown',e=>{
-      if(e.button!==undefined && e.button!==0) return;
-      const rect=document.getElementById('manlungAiRoot').getBoundingClientRect();
-      dragging=true;moved=false;startX=e.clientX;startY=e.clientY;startLeft=rect.left;startTop=rect.top;
-      button.setPointerCapture?.(e.pointerId);document.getElementById('manlungAiRoot').classList.add('manlung-ai-dragging');e.preventDefault();
-    });
-    button.addEventListener('pointermove',e=>{
-      if(!dragging)return;
-      const dx=e.clientX-startX,dy=e.clientY-startY;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;
-      const root=document.getElementById('manlungAiRoot'),r=root.getBoundingClientRect(),margin=10;
-      const left=Math.max(margin,Math.min(window.innerWidth-r.width-margin,startLeft+dx));
-      const top=Math.max(margin,Math.min(window.innerHeight-r.height-margin,startTop+dy));
-      root.style.left=left+'px';root.style.top=top+'px';root.style.right='auto';root.style.bottom='auto';
-    });
-    const endDrag=()=>{if(!dragging)return;dragging=false;document.getElementById('manlungAiRoot').classList.remove('manlung-ai-dragging');if(moved){button.dataset.dragged='true';try{localStorage.setItem('manlung-ai-position',JSON.stringify({left:parseFloat(document.getElementById('manlungAiRoot').style.left),top:parseFloat(document.getElementById('manlungAiRoot').style.top)}));}catch(_){} }};
-    button.addEventListener('pointerup',endDrag);button.addEventListener('pointercancel',endDrag);
-    try{const pos=JSON.parse(localStorage.getItem('manlung-ai-position')||'null');if(pos&&Number.isFinite(pos.left)&&Number.isFinite(pos.top)){const root=document.getElementById('manlungAiRoot');const r=root.getBoundingClientRect();root.style.left=Math.max(10,Math.min(window.innerWidth-r.width-10,pos.left))+'px';root.style.top=Math.max(10,Math.min(window.innerHeight-r.height-10,pos.top))+'px';root.style.right='auto';root.style.bottom='auto';}}catch(_){}
-    window.addEventListener('resize',()=>{const root=document.getElementById('manlungAiRoot');if(!root)return;const r=root.getBoundingClientRect();const left=Math.max(10,Math.min(window.innerWidth-r.width-10,r.left));const top=Math.max(10,Math.min(window.innerHeight-r.height-10,r.top));root.style.left=left+'px';root.style.top=top+'px';root.style.right='auto';root.style.bottom='auto';});
-  }
-
-  function boot(){injectStyles();createUI();}
+  function boot(){injectStyles();createUI();injectHeaderTab();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 })();
