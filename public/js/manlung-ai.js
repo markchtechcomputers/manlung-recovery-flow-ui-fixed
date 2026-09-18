@@ -99,10 +99,11 @@
       <div class="manlung-ai-note">Speak naturally, switch English/Kiswahili, or type your message.</div></div></div>`;
     document.body.appendChild(root);bindEvents();
     addMessage(localStorage.getItem('manlung-ai-language')==='sw'?'Habari! Mimi ni Manlung AI. Naweza kukusaidia kuhusu portal, maombi ya recovery, ufuatiliaji wa kesi, au msaada wa binadamu.':'Hello! I’m Manlung AI. Ask me about the Manlung Recovery portal, requests, case tracking or support.','ai');
+    addQuickReplies();
   }
   function currentLanguage(){return localStorage.getItem('manlung-ai-language')==='sw'?'sw':'en';}
   function speak(text){if(!('speechSynthesis'in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';u.rate=.98;window.speechSynthesis.speak(u);}
-  function injectHeaderTab(){const a=document.querySelector('.site-header .header-actions');if(!a||a.querySelector('[data-manlung-ai-tab]'))return;const b=document.createElement('button');b.type='button';b.dataset.manlungAiTab='true';b.className='manlung-ai-tab';b.textContent='Manlung AI';b.addEventListener('click',()=>toggle(true));a.insertBefore(b,a.querySelector('a[href="/client/request.html"]')||null);}
+  function injectHeaderTab(){const a=document.querySelector('.site-header .header-actions');if(!a||a.querySelector('[data-manlung-ai-tab]'))return;const b=document.createElement('button');b.type='button';b.dataset.manlungAiTab='true';b.className='manlung-ai-tab';b.textContent='Manlung AI';b.addEventListener('click',()=>toggle(true));a.appendChild(b);}
 
   function now() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
 
@@ -120,6 +121,7 @@
   }
 
   function addTyping() {
+    if(document.getElementById('manlungAiTyping')) return;
     const body = document.getElementById('manlungAiMessages');
     const row = document.createElement('div');
     row.className = 'manlung-ai-msg';
@@ -157,7 +159,7 @@
 
   async function backendReply(message){
     try{
-      const history=(window.__MANLUNG_AI_HISTORY||[]).slice(-14);
+      const history=(window.__MANLUNG_AI_HISTORY||[]).slice(-14, -1);
       const res=await fetch('/api/ai-live/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify({message,history,language:currentLanguage(),pagePath:location.pathname})});
       if(!res.ok||!res.body)return null;
       const reader=res.body.getReader(),decoder=new TextDecoder();let buf='',answer='';
