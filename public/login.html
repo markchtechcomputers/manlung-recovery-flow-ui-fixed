@@ -209,14 +209,15 @@ async function startSocialSignup(provider){
     if(!cfgRes.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
     await ensureGoogleGIS();
     if(!window.google?.accounts?.oauth2)throw new Error('Google authentication could not load. Please refresh and try again.');
-    if(!window.__manlungGoogleTokenClient){
-      window.__manlungGoogleTokenClient=window.google.accounts.oauth2.initTokenClient({
+    if(!window.__manlungGoogleCodeClient){
+      window.__manlungGoogleCodeClient=window.google.accounts.oauth2.initCodeClient({
         client_id:cfg.clientId,
         scope:'openid email profile',
-        callback:async tokenResponse=>{
+        ux_mode:'popup',
+        callback:async codeResponse=>{
           try{
-            if(!tokenResponse?.access_token)throw new Error('Google sign-in was cancelled.');
-            const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accessToken:tokenResponse.access_token})});
+            if(!codeResponse?.code)throw new Error('Google sign-in was cancelled.');
+            const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:codeResponse.code,redirectUri:window.location.origin})});
             const text=await res.text(); let data;
             try{data=JSON.parse(text);}catch(_){throw new Error('Google sign-in API returned an invalid response.');}
             if(!res.ok||!data.success)throw new Error(data.error||'Google authentication failed. Please try again.');
@@ -227,7 +228,7 @@ async function startSocialSignup(provider){
         }
       });
     }
-    window.__manlungGoogleTokenClient.requestAccessToken({prompt:'select_account'});
+    window.__manlungGoogleCodeClient.requestCode({prompt:'select_account'});
   }catch(err){showMessage(document.getElementById('loginError'),err.message||'Social sign-in failed.');}
 }
 
