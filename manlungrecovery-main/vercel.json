@@ -98,6 +98,10 @@
   ],
   "routes": [
     {
+      "src": "/api/auth/github(?:/(.*))?",
+      "dest": "/api/auth-github.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
