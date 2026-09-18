@@ -102,7 +102,23 @@
     addQuickReplies();
   }
   function currentLanguage(){return localStorage.getItem('manlung-ai-language')==='sw'?'sw':'en';}
-  function speak(text){if(!('speechSynthesis'in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';u.rate=.98;window.speechSynthesis.speak(u);}
+  function speak(text){if(!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(String(text));u.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';u.rate=.98;window.speechSynthesis.speak(u);}
+  function createLiveSpeaker(){
+    if(!('speechSynthesis'in window))return {push(){},finish(){}};
+    let pending='',started=false;
+    return {
+      push(part){
+        if(!window.__MANLUNG_AI_VOICE_ON)return;
+        pending+=String(part||'');
+        const m=pending.match(/^([\\s\\S]*?[.!?…](?:\\s+|$))/);
+        if(m){pending=pending.slice(m[1].length);const u=new SpeechSynthesisUtterance(m[1].trim());u.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';u.rate=.98;window.speechSynthesis.speak(u);started=true;}
+      },
+      finish(){
+        if(!window.__MANLUNG_AI_VOICE_ON||!pending.trim())return;
+        const u=new SpeechSynthesisUtterance(pending.trim());u.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';u.rate=.98;window.speechSynthesis.speak(u);pending='';started=true;
+      }
+    };
+  }
   function injectHeaderTab(){const a=document.querySelector('.site-header .header-actions');if(!a||a.querySelector('[data-manlung-ai-tab]'))return;const b=document.createElement('button');b.type='button';b.dataset.manlungAiTab='true';b.className='manlung-ai-tab';b.textContent='Manlung AI';b.addEventListener('click',()=>toggle(true));a.appendChild(b);}
 
   function now() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
@@ -186,14 +202,13 @@
   }
   async function respond(displayText,forcedKey){
     addMessage(displayText,'user');removeTyping();
-    const ui=addStreamingMessage();let answer='';
+    const ui=addStreamingMessage();let answer='';const speaker=createLiveSpeaker();
     try{
-      answer=await streamBackend(displayText,part=>{ui.bubble.textContent+=part;ui.meta.textContent='Manlung AI • responding';document.getElementById('manlungAiMessages').scrollTop=999999;});
+      answer=await streamBackend(displayText,part=>{ui.bubble.textContent+=part;ui.meta.textContent='Manlung AI • responding';speaker.push(part);document.getElementById('manlungAiMessages').scrollTop=999999;});
     }catch(_){}
     if(!answer)answer=KNOWLEDGE[forcedKey||classify(displayText)]||KNOWLEDGE.unknown;
-    ui.bubble.textContent=answer;ui.meta.textContent='Manlung AI';
+    ui.bubble.textContent=answer;ui.meta.textContent='Manlung AI';speaker.finish();
     appendAssistantHistory(answer);
-    if(window.__MANLUNG_AI_VOICE_ON)speak(answer);
   }
 
   function toggle(open){const win=document.getElementById('manlungAiWindow');const next=typeof open==='boolean'?open:!win.classList.contains('open');win.classList.toggle('open',next);win.setAttribute('aria-hidden',String(!next));document.body.style.overflow=next?'hidden':'';if(next)setTimeout(()=>document.getElementById('manlungAiInput')?.focus(),80);}
