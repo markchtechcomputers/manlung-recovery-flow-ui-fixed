@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const googleAuthRoutes = require('../api/auth-google');
+const githubAuthRoutes = require('../api/auth-github');
+
+
 router.use((_req, res, next) => {
   res.set('Cache-Control', 'no-store');
   next();
@@ -1518,5 +1522,8 @@ router.get(
   }
 );
 
+
+router.use('/google', googleAuthRoutes);
+router.use('/github', githubAuthRoutes);
 
 module.exports = router;
