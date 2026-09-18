@@ -122,6 +122,7 @@
   </section>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 function showTab(tab) {
@@ -252,12 +253,42 @@ async function setupOfficialGoogleButtons(){
 async function startSocialSignup(provider){
   try{
     if(provider==='github'){
+      const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
+
+      if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){
+        throw new Error('GitHub sign-in is not configured yet.');
+      }
+
+      const supabase=window.supabase.createClient(
+        cfg.supabaseUrl,
+        cfg.supabaseAnonKey
+      );
+
+      // Clear the local Manlung session before starting a new
+      // explicit social authentication flow.
+      try{
+        await supabase.auth.signOut({scope:'local'});
+      }catch(_){}
+
       localStorage.removeItem('clientToken');
       localStorage.removeItem('clientUser');
-      window.location.assign('/api/auth/github/start');
+
+      const {error}=await supabase.auth.signInWithOAuth({
+        provider:'github',
+        options:{
+          redirectTo:window.location.origin+'/login.html'
+        }
+      });
+
+      if(error)throw error;
       return;
     }
-  }catch(err){showMessage(document.getElementById('loginError'),err.message||'Social sign-in failed.');}
+  }catch(err){
+    showMessage(
+      document.getElementById('loginError'),
+      err.message||'Social sign-in failed.'
+    );
+  }
 }
 
 
@@ -265,14 +296,69 @@ document.addEventListener('DOMContentLoaded',()=>{
   setupOfficialGoogleButtons();
   ['githubLoginBtn','githubRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('github')));
 });
-(function(){
-  const params=new URLSearchParams(window.location.search);
-  const status=params.get('oauth');
-  if(status){
-    const el=document.getElementById('loginError');
-    if(status==='github-cancelled')showMessage(el,'GitHub sign-in was cancelled.');
-    else if(status==='github-error')showMessage(el,'GitHub authentication failed. Please try again.');
-    window.history.replaceState({},document.title,window.location.pathname);
+async function handleSocialCallback(){
+  if(!window.supabase?.createClient)return;
+
+  try{
+    const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
+
+    if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)return;
+
+    const supabase=window.supabase.createClient(
+      cfg.supabaseUrl,
+      cfg.supabaseAnonKey
+    );
+
+    const {data,error}=await supabase.auth.getSession();
+
+    if(error||!data?.session?.access_token)return;
+
+    const res=await fetch('/api/auth/client/oauth',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        accessToken:data.session.access_token
+      })
+    });
+
+    const result=await res.json();
+
+    if(result.success){
+      localStorage.setItem('clientToken',result.token);
+      localStorage.setItem('clientUser',JSON.stringify(result.user));
+
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+      );
+
+      window.location.href='/client/dashboard.html';
+    }else{
+      showMessage(
+        document.getElementById('loginError'),
+        result.error||'Social sign-in failed.'
+      );
+    }
+  }catch(err){
+    console.error('Social callback error:',err);
+    showMessage(
+      document.getElementById('loginError'),
+      err.message||'Social sign-in failed.'
+    );
+  }
+}
+
+(async function(){
+  const isOAuthCallback =
+    window.location.hash.includes('access_token=') ||
+    new URLSearchParams(window.location.search).has('code');
+
+  if(isOAuthCallback){
+    await handleSocialCallback();
+  }else{
+    localStorage.removeItem('clientToken');
+    localStorage.removeItem('clientUser');
   }
 })();
 
