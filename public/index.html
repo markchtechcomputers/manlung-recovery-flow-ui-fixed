@@ -2323,6 +2323,39 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
+<style id="manlung-footer-upgrade">
+.manlung-footer{background:linear-gradient(145deg,#061225,#0b1f3d 52%,#102d55);color:#dbeafe;border-top:1px solid rgba(96,165,250,.22);margin-top:4rem}
+.manlung-footer-inner{max-width:1220px;margin:0 auto;padding:3.4rem 1.4rem 1.25rem}
+.manlung-footer-grid{display:grid;grid-template-columns:1.45fr 1fr 1.15fr 1.2fr;gap:2.2rem;align-items:start}
+.manlung-footer-brand-row{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.manlung-footer-logo{width:52px;height:52px;border-radius:14px;object-fit:cover;background:#fff;border:1px solid rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(0,0,0,.24)}
+.manlung-footer h2{font-size:1.35rem;line-height:1.2;color:#fff;margin:0;font-weight:800}
+.manlung-footer-brand-subtitle{font-size:.9rem;color:#93c5fd;margin:.3rem 0 0;line-height:1.45}
+.manlung-footer-description,.manlung-footer-trust-text{font-size:1rem;line-height:1.75;color:#b8c9df;max-width:390px}
+.manlung-footer-column h3{font-size:1.08rem;color:#fff;margin:0 0 1rem;font-weight:800}
+.manlung-footer-links{display:flex;flex-direction:column;gap:.62rem}
+.manlung-footer-links a{font-size:.98rem;line-height:1.45;color:#c7d7ec;text-decoration:none;transition:color .18s ease,transform .18s ease}
+.manlung-footer-links a:hover{color:#fff;transform:translateX(3px)}
+.manlung-footer-links .footer-important{font-weight:800;color:#93c5fd}
+.manlung-footer-divider{height:1px;background:rgba(148,163,184,.16);margin:2.2rem 0 1.4rem}
+.manlung-footer-contact-row{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.manlung-footer-contact,.manlung-footer-social{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+.manlung-footer-contact a,.manlung-footer-social a{display:inline-flex;align-items:center;min-height:40px;padding:.55rem .8rem;border:1px solid rgba(148,163,184,.2);border-radius:10px;background:rgba(255,255,255,.045);color:#dbeafe;text-decoration:none;font-size:.94rem;font-weight:650}
+.manlung-footer-contact a:hover,.manlung-footer-social a:hover{background:rgba(255,255,255,.09);border-color:rgba(96,165,250,.38);color:#fff}
+.manlung-footer-bottom{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:1.45rem;padding-top:1.1rem;border-top:1px solid rgba(148,163,184,.12);font-size:.9rem;line-height:1.5;color:#8fa6c4}
+.manlung-footer-bottom strong{color:#cbdcf2}
+.manlung-footer-legal{display:flex;gap:1rem;flex-wrap:wrap}
+.manlung-footer-legal a{color:#9db3d0;text-decoration:none}.manlung-footer-legal a:hover{color:#fff}
+.manlung-footer-live{display:inline-flex;align-items:center;gap:.45rem;margin-top:1rem;padding:.5rem .7rem;border:1px solid rgba(34,197,94,.24);border-radius:999px;background:rgba(34,197,94,.07);color:#bbf7d0;font-size:.86rem;font-weight:700}
+.manlung-footer-live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.12);flex:0 0 8px}
+.manlung-footer-clock{margin-left:.15rem;color:#dbeafe;font-variant-numeric:tabular-nums}
+@media(max-width:900px){.manlung-footer-grid{grid-template-columns:1.2fr 1fr 1fr;gap:1.8rem}.manlung-footer-brand{grid-column:1/-1}.manlung-footer-description{max-width:680px}}
+@media(max-width:680px){.manlung-footer-inner{padding:2.5rem 1.1rem 1rem}.manlung-footer-grid{grid-template-columns:1fr 1fr;gap:1.8rem 1.2rem}.manlung-footer-brand{grid-column:1/-1}.manlung-footer-links a{font-size:.95rem}.manlung-footer-description,.manlung-footer-trust-text{font-size:.96rem}.manlung-footer-contact-row{align-items:stretch}.manlung-footer-contact,.manlung-footer-social{width:100%}.manlung-footer-contact a,.manlung-footer-social a{flex:1 1 auto;justify-content:center;text-align:center}.manlung-footer-bottom{flex-direction:column;align-items:flex-start;font-size:.88rem}}
+@media(max-width:430px){.manlung-footer-grid{grid-template-columns:1fr}.manlung-footer-brand{grid-column:auto}.manlung-footer-logo{width:48px;height:48px}.manlung-footer h2{font-size:1.2rem}.manlung-footer-contact,.manlung-footer-social{display:grid;grid-template-columns:1fr 1fr}.manlung-footer-contact a,.manlung-footer-social a{width:100%;font-size:.9rem}.manlung-footer-bottom{align-items:center;text-align:center}.manlung-footer-legal{justify-content:center}}
+</style>
+<script id="manlung-footer-live-clock">
+(function(){const footer=document.querySelector('.manlung-footer');if(!footer)return;const brand=footer.querySelector('.manlung-footer-brand');if(!brand)return;const live=document.createElement('div');live.className='manlung-footer-live';live.innerHTML='<span class="manlung-footer-live-dot" aria-hidden="true"></span><span>Manlung Recovery Online</span><span class="manlung-footer-clock" aria-live="polite"></span>';brand.appendChild(live);const clock=live.querySelector('.manlung-footer-clock');function tick(){clock.textContent='• '+new Intl.DateTimeFormat('en-KE',{timeZone:'Africa/Nairobi',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date())+' EAT'}tick();setInterval(tick,1000)})();
+</script>
 <script src="/js/mobile-header.js" defer></script>
 
 <!-- Manlung Recovery Home Onboarding -->
