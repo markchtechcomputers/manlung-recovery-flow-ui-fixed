@@ -112,7 +112,7 @@
           <div class="form-group"><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="200" placeholder="Your full name" required></div>
           <div class="form-group"><label for="regEmail">Email address</label><input type="email" id="regEmail" autocomplete="email" maxlength="254" placeholder="you@example.com" required></div>
           <div class="form-group"><label for="regPhone">Phone number</label><input id="regPhone" type="tel" autocomplete="tel" maxlength="40" placeholder="+254 7XX XXX XXX" required></div>
-          <div class="form-group"><label for="regPassword">Password</label><input type="password" id="regPassword" autocomplete="new-password" minlength="8" placeholder="Enter your password" required></div>
+          <div class="form-group"><div class="manlung-auth-message success-text" style="margin-top:.25rem;">Your password is created after you verify your email. We will send you a secure setup link.</div></div>
           <button type="submit" class="btn btn-primary manlung-auth-primary"><i class="fas fa-user-plus" aria-hidden="true"></i> Create Account</button>
           <div id="registerError" class="manlung-auth-message error-text" role="alert"></div>
         </form>
@@ -317,8 +317,7 @@ async function handleRegister(event) {
   const fullName=document.getElementById('regName').value;
   const email=document.getElementById('regEmail').value;
   const phone=document.getElementById('regPhone').value;
-  const password=document.getElementById('regPassword').value;
-  const errorEl=document.getElementById('registerError');
+    const errorEl=document.getElementById('registerError');
 
   showMessage(errorEl,'');
 
@@ -326,7 +325,7 @@ async function handleRegister(event) {
     const res=await fetch('/api/auth/client/register',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({fullName,email,phone,password})
+      body:JSON.stringify({fullName,email,phone})
     });
 
     const data=await res.json();
