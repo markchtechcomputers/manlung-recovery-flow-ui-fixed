@@ -486,6 +486,45 @@
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
     <script src="/js/admin-session-guard.js"></script>
+<style id="reports-premium-ui">
+:root{--rp-bg:#f6f8fb;--rp-surface:#fff;--rp-border:#e2e8f0;--rp-text:#0f172a;--rp-muted:#64748b}
+body.admin-page-bg{background:var(--rp-bg)!important;color:var(--rp-text)}
+body.admin-page-bg main.container{max-width:1220px;padding:1.05rem 1rem 2.5rem}
+body.admin-page-bg .operations-shell{background:#fff!important;border:1px solid var(--rp-border)!important;border-radius:18px!important;box-shadow:0 8px 26px rgba(15,23,42,.055)!important;padding:1.15rem}
+body.admin-page-bg .operations-head{padding:.1rem .1rem .9rem;border-bottom:1px solid #eef2f7}
+body.admin-page-bg .operations-head h2{font-size:1.35rem;letter-spacing:-.02em}
+body.admin-page-bg .operations-head h2 i{color:#2563eb}
+body.admin-page-bg .operations-kpis{gap:.7rem}
+body.admin-page-bg .operations-kpi{background:#fff!important;border:1px solid var(--rp-border)!important;border-radius:15px!important;box-shadow:0 5px 16px rgba(15,23,42,.045);padding:.9rem;transition:.18s}
+body.admin-page-bg .operations-kpi:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(15,23,42,.08);border-color:#bfdbfe!important}
+body.admin-page-bg .operations-kpi strong{font-size:1.3rem}
+body.admin-page-bg .operations-grid{gap:.9rem}
+body.admin-page-bg .operations-card{background:#fff!important;border:1px solid var(--rp-border)!important;border-radius:15px!important;box-shadow:0 5px 16px rgba(15,23,42,.04);padding:1rem}
+body.admin-page-bg .reports-flow-nav{background:rgba(255,255,255,.97)!important;border-color:var(--rp-border)!important;box-shadow:0 8px 24px rgba(15,23,42,.08)}
+body.admin-page-bg .reports-flow-link.active{background:linear-gradient(135deg,#123a78,#2563eb)!important}
+body.admin-page-bg .operations-admin-wrap{border:1px solid var(--rp-border);border-radius:14px;background:#fff}
+body.admin-page-bg .operations-admin-table th{background:#f8fafc!important;color:#475569}
+body.admin-page-bg .operations-admin-table td{color:#334155;border-bottom-color:#eef2f7}
+body.admin-page-bg .operations-admin-table tbody tr:hover{background:#f8fafc}
+body.admin-page-bg .operations-report-tab{background:#fff!important;border-color:#cbd5e1!important;color:#334155}
+body.admin-page-bg .operations-report-tab.active{background:#123a78!important;color:#fff!important;border-color:#123a78!important}
+body.admin-page-bg .operations-rank-row,body.admin-page-bg .coverage-row,body.admin-page-bg .coverage-insight,body.admin-page-bg .monthly-call-row{background:#fff!important;border-color:var(--rp-border)!important;box-shadow:0 4px 13px rgba(15,23,42,.035)}
+body.admin-page-bg .operations-rank-row:hover,body.admin-page-bg .coverage-row:hover,body.admin-page-bg .coverage-insight:hover,body.admin-page-bg .monthly-call-row:hover{border-color:#bfdbfe!important;box-shadow:0 8px 20px rgba(15,23,42,.07)}
+body.admin-page-bg .data-center-month{background:#eff6ff;color:#1d4ed8}
+body.admin-page-bg .weekly-call-report-card{background:#fff!important}
+html.dark body.admin-page-bg,body.dark.admin-page-bg{background:#07101a!important;color:#e5edf7}
+html.dark body.admin-page-bg .operations-shell,html.dark body.admin-page-bg .operations-card,html.dark body.admin-page-bg .operations-kpi,html.dark body.admin-page-bg .operations-admin-wrap,html.dark body.admin-page-bg .operations-rank-row,html.dark body.admin-page-bg .coverage-row,html.dark body.admin-page-bg .coverage-insight,html.dark body.admin-page-bg .monthly-call-row,html.dark body.admin-page-bg .weekly-call-report-card{background:#0d1722!important;border-color:rgba(148,163,184,.18)!important;color:#e5edf7}
+html.dark body.admin-page-bg .operations-head{border-bottom-color:rgba(148,163,184,.14)}
+html.dark body.admin-page-bg .reports-flow-nav{background:rgba(13,23,34,.96)!important;border-color:rgba(148,163,184,.18)!important}
+html.dark body.admin-page-bg .operations-admin-wrap{background:#0a131e!important}
+html.dark body.admin-page-bg .operations-admin-table th{background:#101b28!important;color:#a9b8ca}
+html.dark body.admin-page-bg .operations-admin-table td{color:#d8e1eb;border-bottom-color:rgba(148,163,184,.12)}
+html.dark body.admin-page-bg .operations-admin-table tbody tr:hover{background:#101b28}
+html.dark body.admin-page-bg .operations-report-tab{background:#0a131e!important;color:#d8e1eb!important;border-color:rgba(148,163,184,.2)!important}
+html.dark body.admin-page-bg .operations-report-tab.active{background:#2563eb!important;color:#fff!important}
+html.dark body.admin-page-bg .data-center-month{background:rgba(37,99,235,.14);color:#93c5fd}
+@media(max-width:700px){body.admin-page-bg main.container{padding:.7rem .7rem 2rem}body.admin-page-bg .operations-shell{padding:.85rem;border-radius:15px!important}}
+</style>
 </head>
 
 <body class="admin-page-bg">
