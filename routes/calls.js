@@ -388,6 +388,18 @@ router.get('/:id', auth, async (req, res) => {
       const { data: admin } = await supabase.from('recovery_users').select('username, email').eq('id', session.admin_user_id).maybeSingle();
       session.admin_name = admin?.username || admin?.email || 'Admin';
     }
+
+    if (['ringing', 'queued'].includes(session.status) && !session.admin_user_id) {
+      const { count, error: queueError } = await supabase
+        .from('recovery_call_sessions')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['ringing', 'queued'])
+        .is('admin_user_id', null)
+        .lte('created_at', session.created_at);
+      if (queueError) throw queueError;
+      session.queue_position = Math.max(1, Number(count || 1));
+    }
+
     res.json({ success: true, session });
   } catch (error) {
     console.error('Get call session error:', error);
