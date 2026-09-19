@@ -167,8 +167,8 @@
       flex:0 0 42px !important;
       border-radius:13px !important;
       background:#ffffff !important;
-      border:2px solid rgba(255,255,255,.95) !important;
-      box-shadow:0 0 0 2px rgba(255,255,255,.28),0 0 16px rgba(255,255,255,.9),0 7px 18px rgba(0,0,0,.22);
+      border:2px solid #ffffff !important;
+      box-shadow:0 0 0 3px #ffffff,0 0 18px rgba(255,255,255,1),0 7px 18px rgba(0,0,0,.16);
     }
 
     .manlung-contact-choice-icon img{
