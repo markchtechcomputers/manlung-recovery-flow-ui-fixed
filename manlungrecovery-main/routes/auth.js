@@ -645,292 +645,36 @@ router.get('/admin/mfa/status', ownerIdentity, async (req, res) => {
 router.post(
   '/client/register',
   [
-    body('email')
-      .trim()
-      .isEmail()
-      .withMessage('A valid email is required')
-      .normalizeEmail(),
-
-    body('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters'),
-
-    body('fullName')
-      .optional()
-      .trim()
-      .isLength({ max: 200 })
-      .escape(),
-
-    body('phone')
-      .optional()
-      .trim()
-      .isLength({ max: 40 })
-      .escape(),
+    body('email').trim().isEmail().withMessage('A valid email is required').normalizeEmail(),
+    body('fullName').optional().trim().isLength({ max: 200 }).escape(),
+    body('phone').optional().trim().isLength({ max: 40 }).escape(),
   ],
   async (req, res) => {
     if (!checkValidation(req, res)) return;
-
     try {
-      const {
-        fullName,
-        email,
-        phone,
-        password,
-      } = req.body;
-
+      const { fullName, email, phone } = req.body;
       const existing = await User.findByEmail(email);
-
-      if (existing) {
-        return res.status(409).json({
-          error:
-            'An account with this email already exists',
-        });
-      }
-
-      // Keep usernames human-readable while guaranteeing uniqueness.
-      // Email remains the login identifier; the username is display-only.
-      const baseUsername = String(fullName || email.split('@')[0])
-        .trim()
-        .replace(/[^a-zA-Z0-9._ -]/g, '')
-        .replace(/\s+/g, ' ')
-        .slice(0, 60) || `client-${crypto.randomBytes(4).toString('hex')}`;
+      if (existing) return res.status(409).json({ error: 'An account with this email already exists. Please sign in instead.', code: 'ACCOUNT_EXISTS' });
+      const baseUsername = String(fullName || email.split('@')[0]).trim().replace(/[^a-zA-Z0-9._ -]/g, '').replace(/\s+/g, ' ').slice(0, 60) || `client-${crypto.randomBytes(4).toString('hex')}`;
       let username = baseUsername;
-      if (await User.findByUsername(username)) {
-        username = `${baseUsername.slice(0, 50)}-${crypto.randomBytes(4).toString('hex')}`;
-      }
-
-      const client = await User.create({
-        username,
-        email,
-        phone,
-        password,
-        role: 'client',
-      });
-
-      // Require email verification before the new client can sign in.
+      if (await User.findByUsername(username)) username = `${baseUsername.slice(0, 50)}-${crypto.randomBytes(4).toString('hex')}`;
+      const temporaryPassword = crypto.randomBytes(48).toString('hex');
+      const client = await User.create({ username, email, phone, password: temporaryPassword, role: 'client' });
       const rawVerificationToken = crypto.randomBytes(32).toString('hex');
-      const verificationTokenHash = hashToken(rawVerificationToken);
-      const verificationExpires = new Date(
-        Date.now() + 60 * 60 * 1000
-      ).toISOString();
-
-      await User.setEmailVerificationToken(
-        client.email,
-        verificationTokenHash,
-        verificationExpires
-      );
-
-      const base =
-        process.env.PUBLIC_APP_URL ||
-        `${req.protocol}://${req.get('host')}`;
-
-      const verificationLink =
-        `${base}/api/auth/client/verify-email?token=${rawVerificationToken}`;
-
-      const safeUsername = String(client.username || 'Client')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-
+      await User.setEmailVerificationToken(client.email, hashToken(rawVerificationToken), new Date(Date.now() + 60 * 60 * 1000).toISOString());
+      const base = process.env.PUBLIC_APP_URL || `${req.protocol}://${req.get('host')}`;
+      const verificationLink = `${base}/api/auth/client/verify-email?token=${rawVerificationToken}`;
       const emailResult = await sendEmail({
         to: client.email,
-        subject: 'Verify your Manlung Recovery email',
-        html: `
-          <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033;line-height:1.6;">
-            <div style="padding:24px;border-radius:16px;background:#0f2747;color:#fff;">
-              <h1 style="margin:0;font-size:24px;">Verify your email</h1>
-              <p style="margin:8px 0 0;color:#dbeafe;">
-                Welcome to Manlung Recovery, ${safeUsername}.
-              </p>
-            </div>
-
-            <div style="padding:24px 8px;">
-              <p>
-                Your client account has been created successfully.
-              </p>
-
-              <p>
-                Before you can sign in, please verify your email address by clicking
-                the button below.
-              </p>
-
-              <p style="margin:24px 0;">
-                <a href="${verificationLink}"
-                   style="display:inline-block;padding:13px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700;">
-                  Verify Email Address
-                </a>
-              </p>
-
-              <p style="color:#64748b;font-size:13px;">
-                This verification link expires in one hour. You must verify your email
-                before signing in to the Client Portal.
-              </p>
-
-              <p style="margin-top:28px;color:#64748b;font-size:13px;">
-                If you did not create this account, you can safely ignore this email.
-              </p>
-            </div>
-          </div>
-        `,
+        subject: 'Verify your Manlung Recovery email and set your password',
+        html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;line-height:1.6"><h1>Finish creating your Manlung Recovery account</h1><p>Your account has been created.</p><ol><li>Verify your email.</li><li>Create your password.</li><li>Return to the login page and sign in.</li></ol><p><a href="${verificationLink}" style="display:inline-block;padding:13px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700">Verify Email &amp; Set Password</a></p><p>This link expires in one hour.</p></div>`,
       });
-
-      if (!emailResult?.success) {
-        console.error(
-          'Client verification email was not sent:',
-          emailResult?.error || 'Unknown email error'
-        );
-      }
-
-      res.status(201).json({
-        success: true,
-        emailVerificationRequired: true,
-        message:
-          'Account created successfully. Please check your email and verify your address before signing in.',
-      });
+      if (!emailResult?.success) console.error('Client verification email was not sent:', emailResult?.error || 'Unknown email error');
+      return res.status(201).json({ success: true, emailVerificationRequired: true, message: 'Account created. Check your email, verify your address, then create your password before signing in.' });
     } catch (error) {
       console.error('Client register error:', error);
-
-      if (error.code === '23505') {
-        return res.status(409).json({
-          error:
-            'An account with this email already exists',
-        });
-      }
-
-      res.status(500).json({
-        error: error.message || 'Server error',
-      });
-    }
-  }
-);
-
-
-// ============================================================
-// CLIENT EMAIL VERIFICATION
-// ============================================================
-
-router.get('/client/verify-email', async (req, res) => {
-  try {
-    const rawToken = String(req.query.token || '').trim();
-    if (!rawToken || rawToken.length < 32) return res.redirect('/login.html?verified=invalid');
-    const tokenHash = hashToken(rawToken);
-    const client = await User.findByValidEmailVerificationToken(tokenHash);
-    if (!client) return res.redirect('/login.html?verified=expired');
-    await User.markEmailVerified(client.id);
-    await User.setResetToken(client.email, tokenHash, new Date(Date.now() + 15 * 60 * 1000).toISOString());
-    return res.redirect('/reset-password.html?token=' + encodeURIComponent(rawToken) + '&setup=1');
-  } catch (error) {
-    console.error('Client email verification error:', error);
-    return res.redirect('/login.html?verified=error');
-  }
-});
-
-
-// ============================================================
-// RESEND CLIENT EMAIL VERIFICATION
-// ============================================================
-
-router.post(
-  '/client/resend-verification',
-  [
-    body('email')
-      .trim()
-      .isEmail()
-      .withMessage('A valid email is required')
-      .normalizeEmail(),
-  ],
-  async (req, res) => {
-    if (!checkValidation(req, res)) return;
-
-    try {
-      const { email } = req.body;
-      const client = await User.findByEmailAndRole(email, 'client');
-
-      // Keep the response generic so this endpoint does not reveal
-      // whether an email address belongs to an account.
-      if (!client) {
-        return res.json({
-          success: true,
-          message:
-            'If an account exists for this email, a verification message has been sent.',
-        });
-      }
-
-      if (client.email_verified_at) {
-        return res.json({
-          success: true,
-          message:
-            'This email address is already verified. You can sign in.',
-        });
-      }
-
-      const rawVerificationToken = crypto
-        .randomBytes(32)
-        .toString('hex');
-
-      const verificationTokenHash =
-        hashToken(rawVerificationToken);
-
-      const verificationExpires =
-        new Date(Date.now() + 60 * 60 * 1000).toISOString();
-
-      await User.setEmailVerificationToken(
-        client.email,
-        verificationTokenHash,
-        verificationExpires
-      );
-
-      const baseUrl =
-        process.env.PUBLIC_APP_URL ||
-        `${req.protocol}://${req.get('host')}`;
-
-      const verificationUrl =
-        `${baseUrl}/api/auth/client/verify-email?token=${encodeURIComponent(rawVerificationToken)}`;
-
-      try {
-        await sendEmail({
-          to: client.email,
-          subject: 'Verify your Manlung Recovery email',
-          html: `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">
-              <h2>Verify your Manlung Recovery email</h2>
-              <p>Hello ${client.username || 'there'},</p>
-              <p>
-                You requested a new email verification link for your
-                Manlung Recovery account.
-              </p>
-              <p>
-                <a href="${verificationUrl}"
-                   style="display:inline-block;padding:12px 20px;background:#0b3d91;color:#fff;text-decoration:none;border-radius:6px">
-                  Verify Email Address
-                </a>
-              </p>
-              <p>This verification link expires in one hour.</p>
-            </div>
-          `,
-        });
-      } catch (emailError) {
-        console.error(
-          'Client verification resend email error:',
-          emailError
-        );
-      }
-
-      return res.json({
-        success: true,
-        message:
-          'If your account is not yet verified, a new verification email has been sent.',
-      });
-    } catch (error) {
-      console.error(
-        'Client resend verification error:',
-        error
-      );
-
-      return res.status(500).json({
-        success: false,
-        error: 'Could not resend the verification email.',
-      });
+      if (error.code === '23505') return res.status(409).json({ error: 'An account with this email already exists.' });
+      return res.status(500).json({ error: error.message || 'Server error' });
     }
   }
 );
