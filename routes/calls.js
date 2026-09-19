@@ -158,6 +158,8 @@ router.post('/start', auth, async (req, res) => {
       channel: session.id,
       status: session.status,
       availability: availability.state,
+      onlineCount: availability.onlineCount,
+      availableCount: availability.availableCount,
       message: availability.state === 'busy'
         ? 'All admins are currently assisting other clients. You are in the waiting queue. The next available admin will receive your call.'
         : 'An admin is available and will receive your call.',
@@ -403,7 +405,8 @@ router.get('/:id', auth, async (req, res) => {
       session.queue_position = Math.max(1, Number(count || 1));
     }
 
-    res.json({ success: true, session });
+    const availability = await AdminPresence.getAvailabilityState();
+    res.json({ success: true, session, onlineCount: availability.onlineCount, availableCount: availability.availableCount });
   } catch (error) {
     console.error('Get call session error:', error);
     res.status(500).json({ error: error.message || 'Server error' });
