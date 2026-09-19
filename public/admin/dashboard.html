@@ -594,7 +594,31 @@ html.dark body.admin-page-bg #voiceLineRingtoneSettings,html.dark body.admin-pag
 body.dark.admin-page-bg #voiceLineRingtoneSettings,body.dark.admin-page-bg #bulkBar{
   background:#0a131e!important;border-color:rgba(148,163,184,.16)!important;
 }
-</style></head>
+<style id="manlung-admin-music-style">
+#adminMusicCard{border-color:#c7d2fe!important;background:linear-gradient(135deg,#fff,#f8faff)!important;}
+.admin-music-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.55rem;margin-top:.75rem;}
+.admin-music-search{min-height:44px;border:1px solid #cbd5e1;border-radius:11px;padding:.55rem .75rem;background:#fff;color:#0f172a;width:100%;}
+.admin-music-search:focus{outline:2px solid rgba(37,99,235,.18);border-color:#2563eb;}
+.admin-music-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;margin-top:.8rem;max-height:390px;overflow:auto;padding-right:2px;}
+.admin-song{display:grid;grid-template-columns:96px minmax(0,1fr);gap:.65rem;padding:.55rem;border:1px solid #e2e8f0;border-radius:13px;background:#fff;min-width:0;}
+.admin-song-thumb{width:96px;height:58px;object-fit:cover;border-radius:8px;background:#e2e8f0;}
+.admin-song-title{font-size:.78rem;font-weight:850;line-height:1.25;color:#0f172a;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.admin-song-meta{font-size:.64rem;color:#64748b;margin-top:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.admin-song-actions{display:flex;gap:.35rem;margin-top:.42rem;flex-wrap:wrap;}
+.admin-song-actions button,.admin-song-actions a{font-size:.65rem!important;padding:.34rem .5rem!important;min-height:32px!important;}
+.admin-music-player{margin-top:.8rem;border:1px solid #dbe4ee;border-radius:14px;background:#0b1220;overflow:hidden;}
+.admin-music-player-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.55rem .7rem;color:#fff;font-size:.72rem;font-weight:800;}
+.admin-music-player iframe{display:block;width:100%;height:315px;border:0;}
+.admin-music-queue{display:flex;gap:.4rem;overflow:auto;padding:.55rem;background:#f8fafc;border-top:1px solid #e2e8f0;}
+.admin-queue-chip{flex:0 0 auto;max-width:220px;padding:.4rem .55rem;border:1px solid #cbd5e1;border-radius:9px;background:#fff;font-size:.64rem;color:#334155;cursor:pointer;}
+.admin-music-status{min-height:1.2em;margin-top:.45rem;font-size:.7rem;color:#64748b;}
+@media(max-width:760px){.admin-music-results{grid-template-columns:1fr;}.admin-music-toolbar{grid-template-columns:1fr;}.admin-music-player iframe{height:230px;}}
+html.dark #adminMusicCard,body.dark #adminMusicCard{background:linear-gradient(135deg,#0d1722,#101d2c)!important;border-color:rgba(96,165,250,.25)!important;}
+html.dark .admin-music-search,body.dark .admin-music-search,html.dark .admin-song,body.dark .admin-song,html.dark .admin-queue-chip,body.dark .admin-queue-chip{background:#101b28;color:#e5e7eb;border-color:rgba(148,163,184,.18);}
+html.dark .admin-song-title,body.dark .admin-song-title{color:#f8fafc;}
+html.dark .admin-song-meta,body.dark .admin-song-meta,html.dark .admin-music-status,body.dark .admin-music-status{color:#94a3b8;}
+html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;border-color:rgba(148,163,184,.16);}
+</style></style></head>
 <body class="admin-page-bg">
     <header class="site-header">
         <div class="container">
@@ -635,7 +659,24 @@ body.dark.admin-page-bg #voiceLineRingtoneSettings,body.dark.admin-page-bg #bulk
 
 
 
-                <div class="card" style="margin-bottom:1rem;">
+        
+        <div class="card" id="adminMusicCard" style="margin-bottom:1rem;">
+            <div class="card-title"><i class="fab fa-youtube"></i> Admin Music Center</div>
+            <p style="color:var(--text-muted);font-size:.78rem;margin:.2rem 0 0;">Search YouTube, play songs/videos, and build a temporary queue while you work.</p>
+            <div class="admin-music-toolbar">
+                <input id="adminMusicSearch" class="admin-music-search" type="search" placeholder="Search songs, artists, albums or videos…" autocomplete="off">
+                <button class="btn btn-primary" type="button" id="adminMusicSearchBtn"><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div id="adminMusicStatus" class="admin-music-status"></div>
+            <div id="adminMusicResults" class="admin-music-results"><div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:1rem;">Search for a song to start listening.</div></div>
+            <div class="admin-music-player" id="adminMusicPlayer" style="display:none;">
+                <div class="admin-music-player-head"><span id="adminMusicNowPlaying">Nothing playing</span><button type="button" class="btn btn-outline-dark" id="adminMusicClearBtn">Close</button></div>
+                <iframe id="adminMusicFrame" title="YouTube music player" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+                <div id="adminMusicQueue" class="admin-music-queue" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:1rem;">
             <div class="card-title"><i class="fas fa-heart"></i> Donation Dashboard</div>
             <div class="stats-grid" style="margin-top:0.8rem;">
                 <div class="stat-card"><div class="number" id="donationTotal">KES 0</div><div class="label">Confirmed donations</div></div>
@@ -1473,6 +1514,138 @@ body.dark.admin-page-bg #voiceLineRingtoneSettings,body.dark.admin-page-bg #bulk
 
         // ---- Call Admin: presence, incoming-call ringing, and the call itself ----
     if (window.ManlungCallRingtone) window.ManlungCallRingtone.useRole('admin');
+
+
+    // ---- Admin Music Center ----
+    const adminMusicState = { queue: [], currentIndex: -1 };
+
+    function escapeMusicHtml(value) {
+        return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
+    }
+
+    function formatMusicViews(value) {
+        const n = Number(value || 0);
+        if (!Number.isFinite(n) || n <= 0) return '';
+        if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0','') + 'M views';
+        if (n >= 1000) return (n / 1000).toFixed(1).replace('.0','') + 'K views';
+        return n.toLocaleString() + ' views';
+    }
+
+    function setMusicStatus(message) {
+        const el = document.getElementById('adminMusicStatus');
+        if (el) el.textContent = message || '';
+    }
+
+    function renderMusicQueue() {
+        const host = document.getElementById('adminMusicQueue');
+        if (!host) return;
+        if (!adminMusicState.queue.length) { host.style.display='none'; host.innerHTML=''; return; }
+        host.style.display='flex';
+        host.innerHTML = adminMusicState.queue.map((song,index) =>
+            '<button type="button" class="admin-queue-chip" data-queue-index="' + index + '" title="' + escapeMusicHtml(song.title) + '">' +
+            (index+1) + '. ' + escapeMusicHtml(song.title) + '</button>'
+        ).join('');
+        host.querySelectorAll('[data-queue-index]').forEach(btn => {
+            btn.addEventListener('click', () => playAdminQueueIndex(Number(btn.dataset.queueIndex)));
+        });
+    }
+
+    function playAdminSong(song) {
+        if (!adminMusicState.queue.some(item => item.id === song.id)) adminMusicState.queue.push(song);
+        adminMusicState.currentIndex = adminMusicState.queue.findIndex(item => item.id === song.id);
+        const player = document.getElementById('adminMusicPlayer');
+        const frame = document.getElementById('adminMusicFrame');
+        const title = document.getElementById('adminMusicNowPlaying');
+        if (!player || !frame) return;
+        player.style.display='block';
+        frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(song.id) + '?autoplay=1&playsinline=1&rel=0';
+        if (title) title.textContent = song.title;
+        renderMusicQueue();
+        player.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+
+    function playAdminQueueIndex(index) {
+        const song = adminMusicState.queue[index];
+        if (song) playAdminSong(song);
+    }
+
+    function addAdminSong(song) {
+        if (!adminMusicState.queue.some(item => item.id === song.id)) {
+            adminMusicState.queue.push(song);
+            setMusicStatus('Added "' + song.title + '" to the queue.');
+            renderMusicQueue();
+        } else {
+            setMusicStatus('That song is already in the queue.');
+        }
+    }
+
+    function renderMusicResults(songs) {
+        const host = document.getElementById('adminMusicResults');
+        if (!host) return;
+        if (!songs.length) {
+            host.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:1rem;">No matching videos found.</div>';
+            return;
+        }
+        host.innerHTML=songs.map(song =>
+            '<article class="admin-song">' +
+              '<img class="admin-song-thumb" src="' + escapeMusicHtml(song.thumbnail) + '" alt="" loading="lazy">' +
+              '<div style="min-width:0;">' +
+                '<div class="admin-song-title">' + escapeMusicHtml(song.title) + '</div>' +
+                '<div class="admin-song-meta">' + escapeMusicHtml(song.author || 'YouTube') + ' · ' + escapeMusicHtml(song.duration || '') + (song.views ? ' · ' + escapeMusicHtml(formatMusicViews(song.views)) : '') + '</div>' +
+                '<div class="admin-song-actions">' +
+                  '<button type="button" class="btn btn-primary" data-music-play="' + escapeMusicHtml(song.id) + '"><i class="fas fa-play"></i> Play</button>' +
+                  '<button type="button" class="btn btn-outline-dark" data-music-add="' + escapeMusicHtml(song.id) + '"><i class="fas fa-plus"></i> Add</button>' +
+                  '<a class="btn btn-outline-dark" href="' + escapeMusicHtml(song.url) + '" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>' +
+                '</div>' +
+              '</div>' +
+            '</article>'
+        ).join('');
+        host.querySelectorAll('[data-music-play]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const song=songs.find(item => item.id === btn.dataset.musicPlay);
+                if (song) playAdminSong(song);
+            });
+        });
+        host.querySelectorAll('[data-music-add]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const song=songs.find(item => item.id === btn.dataset.musicAdd);
+                if (song) addAdminSong(song);
+            });
+        });
+    }
+
+    async function searchAdminMusic() {
+        const input=document.getElementById('adminMusicSearch');
+        const btn=document.getElementById('adminMusicSearchBtn');
+        const query=input?.value.trim() || '';
+        if (query.length < 2) { setMusicStatus('Enter at least 2 characters to search.'); return; }
+        if (btn) { btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Searching…'; }
+        setMusicStatus('Searching YouTube…');
+        try {
+            const res=await fetch('/api/youtube/search?q='+encodeURIComponent(query),{headers:authHeaders(),cache:'no-store'});
+            if (await handleUnauthorized(res)) return;
+            const data=await res.json().catch(()=>({}));
+            if (!res.ok || !data.success) throw new Error(data.error || 'Search failed.');
+            renderMusicResults(Array.isArray(data.songs) ? data.songs : []);
+            setMusicStatus((data.songs?.length || 0) + ' results found.');
+        } catch(error) {
+            console.error('Admin music search error:',error);
+            setMusicStatus(error.message || 'Could not search YouTube.');
+        } finally {
+            if (btn) { btn.disabled=false; btn.innerHTML='<i class="fas fa-search"></i> Search'; }
+        }
+    }
+
+    document.getElementById('adminMusicSearchBtn')?.addEventListener('click',searchAdminMusic);
+    document.getElementById('adminMusicSearch')?.addEventListener('keydown',event => { if (event.key==='Enter') searchAdminMusic(); });
+    document.getElementById('adminMusicClearBtn')?.addEventListener('click',() => {
+        const frame=document.getElementById('adminMusicFrame');
+        const player=document.getElementById('adminMusicPlayer');
+        if (frame) frame.src='about:blank';
+        if (player) player.style.display='none';
+        adminMusicState.currentIndex=-1;
+        setMusicStatus('Player closed.');
+    });
 
     function renderAdminRingtoneSettings() {
         const options = window.ManlungCallRingtone?.options || [];
