@@ -653,7 +653,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             <div>
                 <div class="card-title" style="margin-bottom:0.2rem;"><i class="fas fa-phone-volume"></i> Call Admin — Availability</div>
                 <p style="color:var(--text-muted); font-size:0.85rem; margin:0;" id="voiceLineStatus">Go online to receive Call Admin requests. Calls are queued when all admins are busy; the first available admin can accept the next caller. Each Admin can actively manage up to 10 cases at a time.</p>
-                <div id="voiceLineRingtoneSettings"></div><div id="callQueueBadge" style="display:inline-flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.42rem .7rem;border:1px solid #bfdbfe;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:.72rem;font-weight:800;">Waiting queue: 0</div>
+                <div id="voiceLineRingtoneSettings"></div><div id="adminOnlineBadge" style="display:inline-flex;align-items:center;gap:.45rem;margin-top:.65rem;margin-right:.45rem;padding:.42rem .7rem;border:1px solid #bbf7d0;border-radius:999px;background:#f0fdf4;color:#15803d;font-size:.72rem;font-weight:800;">Admins online: checking…</div><div id="callQueueBadge" style="display:inline-flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.42rem .7rem;border:1px solid #bfdbfe;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:.72rem;font-weight:800;">Waiting queue: 0</div>
             </div>
             <button class="btn btn-success" id="voiceLineBtn" onclick="toggleAdminOnline()"><i class="fas fa-power-off"></i> Go Online</button>
         </div>
@@ -1699,6 +1699,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             btn.classList.remove('btn-danger');
             btn.classList.add('btn-success');
             statusEl.textContent = 'Offline — you will not receive Call Admin requests.';
+            const offlineBadge = document.getElementById('adminOnlineBadge'); if (offlineBadge) offlineBadge.textContent = 'Admins online: checking…';
             return;
         }
 
@@ -1711,7 +1712,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             btn.innerHTML = '<i class="fas fa-phone-slash"></i> Go Offline';
             btn.classList.remove('btn-success');
             btn.classList.add('btn-danger');
-            statusEl.textContent = 'Online — listening for Call Admin requests.';
+            statusEl.textContent = `Online — listening for Call Admin requests. ${Number(data.onlineCount || 1)} admin(s) online.`;
 
             heartbeatTimer = setInterval(async () => {
     try {
@@ -1761,6 +1762,8 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                 data.success && Array.isArray(data.calls)
                     ? data.calls
                     : [];
+            const onlineBadge = document.getElementById('adminOnlineBadge');
+            if (onlineBadge) onlineBadge.textContent = `Admins online: ${Number(data.onlineCount || 0)} · Available: ${Number(data.availableCount || 0)}`;
 
             // If this browser is showing a call that is no longer pending,
             // another admin answered/rejected it. Close the stale popup.
