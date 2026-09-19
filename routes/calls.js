@@ -147,6 +147,7 @@ router.post('/start', auth, async (req, res) => {
       clientName: req.user.username,
       clientEmail: req.user.email,
       caseId: req.body?.caseId || null,
+      status: availability.state === 'busy' ? 'queued' : 'ringing',
     });
 
     res.status(201).json({
@@ -156,7 +157,7 @@ router.post('/start', auth, async (req, res) => {
       status: session.status,
       availability: availability.state,
       message: availability.state === 'busy'
-        ? 'All admins are currently assisting other clients. Kindly hold or call back in a few minutes.'
+        ? 'All admins are currently assisting other clients. You are in the waiting queue. The next available admin will receive your call.'
         : 'An admin is available and will receive your call.',
     });
   } catch (error) {
