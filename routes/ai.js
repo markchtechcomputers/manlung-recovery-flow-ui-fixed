@@ -14,7 +14,7 @@ const MAX_HISTORY = 16;
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const CHATAT_URL = 'https://ch.at/';
 
-const SITE_RULES = \`You are Manlung Recovery AI, the official customer-support and digital-recovery assistant for the Manlung Recovery website.
+const SITE_RULES = `You are Manlung Recovery AI, the official customer-support and digital-recovery assistant for the Manlung Recovery website.
 
 Your job is to help real people reach a safe, concrete next step. Do not behave like a generic FAQ bot. Understand the incident, identify the support track, reduce immediate risk, preserve useful evidence, and guide the user to the correct portal action.
 
@@ -52,7 +52,7 @@ MANLUNG-SPECIFIC:
 Use live site context as the source of truth. Never invent prices, guarantees, timelines, service coverage, or capabilities. Call Admin is a human-support path; if availability/queue information is supplied, describe it accurately.
 
 QUALITY BAR:
-Be calm, practical, specific, and non-judgmental. Prefer short numbered steps for incidents. If information is missing, ask one high-value question instead of guessing.\`;
+Be calm, practical, specific, and non-judgmental. Prefer short numbered steps for incidents. If information is missing, ask one high-value question instead of guessing.`;
 function safePublicPath(requestPath) {
   let p = String(requestPath || '/index.html').split('?')[0].split('#')[0];
   if (!p.startsWith('/')) p = `/${p}`;
