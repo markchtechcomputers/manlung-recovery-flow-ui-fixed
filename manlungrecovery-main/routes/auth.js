@@ -1,10 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const githubAuthRoutes = require('../api/auth-github');
+const googleAuthRoutes = require('../api/auth-google');
+
+
+router.use((_req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const SecurityMonitoring = require('../models/SecurityMonitoring');
 const Case = require('../models/Case');
 const { auth } = require('../middleware/auth');
 const AdminInvitation = require('../models/AdminInvitation');
@@ -16,15 +24,26 @@ const {
   generateRecoveryCodes, hashRecoveryCode, consumeRecoveryCode,
 } = require('../services/mfa');
 
-const signToken = (user) =>
-  jwt.sign(
-    { id: user.id, role: user.role, mfa: ['admin', 'owner'].includes(user.role) ? Boolean(user.mfa_enabled) : undefined },
+const SESSION_MAX_AGE_MS = {
+  admin: 24 * 60 * 60 * 1000,
+  owner: 24 * 60 * 60 * 1000,
+  client: 7 * 24 * 60 * 60 * 1000,
+};
+
+const SESSION_EXPIRES_IN = {
+  admin: '24h',
+  owner: '24h',
+  client: '7d',
+};
+
+const signToken = (user) => {
+  const role = ['admin', 'owner', 'client'].includes(user?.role) ? user.role : 'client';
+  return jwt.sign(
+    { id: user.id, role, sessionVersion: Number(user.session_version || 0), mfa: ['admin', 'owner'].includes(role) ? Boolean(user.mfa_enabled) : undefined },
     process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRE || '7d',
-      algorithm: 'HS256',
-    }
+    { expiresIn: SESSION_EXPIRES_IN[role] || process.env.JWT_EXPIRE || '7d' }
   );
+};
 
 const hashToken = (token) =>
   crypto.createHash('sha256').update(token).digest('hex');
@@ -50,7 +69,7 @@ function setAdminCookie(res, token) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: SESSION_MAX_AGE_MS.admin,
   });
 }
 
@@ -119,8 +138,8 @@ router.post(
       .normalizeEmail(),
 
     body('password')
-      .isLength({ min: 12 })
-      .withMessage('Password must be at least 12 characters'),
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters'),
 
     body('phone')
       .optional()
@@ -371,6 +390,23 @@ router.post(
       }
 
       // ------------------------------------------------------
+      // Owner Security & Monitoring account state
+      // ------------------------------------------------------
+
+      if (admin.security_status && admin.security_status !== 'active') {
+        const messages = {
+          restricted: 'Your account has been restricted. Contact the site owner.',
+          suspended: 'Your account has been suspended. Contact the site owner.',
+          blocked: 'Your account has been blocked. Contact the site owner.',
+        };
+
+        return res.status(403).json({
+          error: messages[admin.security_status] || 'Account access is restricted.',
+          code: `ACCOUNT_${admin.security_status.toUpperCase()}`,
+        });
+      }
+
+      // ------------------------------------------------------
       // Check password
       // ------------------------------------------------------
 
@@ -380,6 +416,16 @@ router.post(
       );
 
       if (!isMatch) {
+        await SecurityMonitoring.recordEvent({
+          eventType: 'LOGIN_FAILED',
+          userId: admin.id,
+          ipAddress: req.ip,
+          userAgent: req.get('user-agent'),
+          details: {
+            role: admin.role,
+          },
+        });
+
         return res.status(401).json({
           error: 'Invalid credentials',
         });
@@ -427,9 +473,64 @@ router.post(
 // ADMIN / OWNER SESSION + MFA
 // ============================================================
 
-router.post('/admin/logout', (req, res) => {
-  clearAdminCookie(res);
-  res.json({ success: true });
+router.post('/client/logout-all', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required.' });
+    await User.bumpSessionVersion(req.user.id);
+
+    await SecurityMonitoring.recordEvent({
+      eventType: 'LOGOUT',
+      userId: req.user.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {
+        role: req.user.role,
+        all_sessions: true,
+      },
+    });
+
+    res.json({ success: true, message: 'All client sessions have been revoked. Sign in again.' });
+  } catch (error) {
+    console.error('Client logout-all error:', error);
+    res.status(500).json({ success: false, error: 'Could not revoke sessions.' });
+  }
+});
+
+router.post('/admin/logout', async (req, res) => {
+  try {
+    const token =
+      req.header('Authorization')?.replace(/^Bearer\s+/i, '') ||
+      getCookie(req, ADMIN_COOKIE);
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const admin = await User.findById(decoded.id);
+
+        if (admin && (admin.role === 'admin' || admin.role === 'owner')) {
+          await SecurityMonitoring.recordEvent({
+            eventType: 'LOGOUT',
+            userId: admin.id,
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent'),
+            details: {
+              role: admin.role,
+              all_sessions: false,
+            },
+          });
+        }
+      } catch (_) {
+        // Logout must still succeed if the session is expired or invalid.
+      }
+    }
+
+    clearAdminCookie(res);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Admin logout monitoring error:', error);
+    clearAdminCookie(res);
+    res.json({ success: true });
+  }
 });
 
 router.post('/admin/mfa/login', [
@@ -454,8 +555,32 @@ router.post('/admin/mfa/login', [
         valid = true;
       }
     }
-    if (!valid) return res.status(401).json({ error: 'Invalid authentication code.' });
+    if (!valid) {
+      await SecurityMonitoring.recordEvent({
+        eventType: 'MFA_FAILED',
+        userId: admin.id,
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+        details: {
+          role: admin.role,
+        },
+      });
+
+      return res.status(401).json({ error: 'Invalid authentication code.' });
+    }
+
     issueAdminSession(res, admin);
+
+    await SecurityMonitoring.recordEvent({
+      eventType: 'MFA_SUCCESS',
+      userId: admin.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: {
+        role: admin.role,
+      },
+    });
+
     return res.json({ success: true, user: { id: admin.id, username: admin.username, email: admin.email, role: admin.role } });
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired MFA session.' });
@@ -527,8 +652,8 @@ router.post(
       .normalizeEmail(),
 
     body('password')
-      .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters'),
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters'),
 
     body('fullName')
       .optional()
@@ -562,83 +687,105 @@ router.post(
         });
       }
 
+      // Keep usernames human-readable while guaranteeing uniqueness.
+      // Email remains the login identifier; the username is display-only.
+      const baseUsername = String(fullName || email.split('@')[0])
+        .trim()
+        .replace(/[^a-zA-Z0-9._ -]/g, '')
+        .replace(/\s+/g, ' ')
+        .slice(0, 60) || `client-${crypto.randomBytes(4).toString('hex')}`;
+      let username = baseUsername;
+      if (await User.findByUsername(username)) {
+        username = `${baseUsername.slice(0, 50)}-${crypto.randomBytes(4).toString('hex')}`;
+      }
+
       const client = await User.create({
-        username: fullName || email.split('@')[0],
+        username,
         email,
         phone,
         password,
         role: 'client',
       });
 
-      // Account-created notification.
-      // Email failure must never prevent a successful registration.
-      sendEmail({
+      // Require email verification before the new client can sign in.
+      const rawVerificationToken = crypto.randomBytes(32).toString('hex');
+      const verificationTokenHash = hashToken(rawVerificationToken);
+      const verificationExpires = new Date(
+        Date.now() + 60 * 60 * 1000
+      ).toISOString();
+
+      await User.setEmailVerificationToken(
+        client.email,
+        verificationTokenHash,
+        verificationExpires
+      );
+
+      const base =
+        process.env.PUBLIC_APP_URL ||
+        `${req.protocol}://${req.get('host')}`;
+
+      const verificationLink =
+        `${base}/api/auth/client/verify-email?token=${rawVerificationToken}`;
+
+      const safeUsername = String(client.username || 'Client')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      const emailResult = await sendEmail({
         to: client.email,
-        subject: 'Welcome to Manlung Recovery — Account Created Successfully',
+        subject: 'Verify your Manlung Recovery email',
         html: `
           <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033;line-height:1.6;">
             <div style="padding:24px;border-radius:16px;background:#0f2747;color:#fff;">
-              <h1 style="margin:0;font-size:24px;">Welcome to Manlung Recovery</h1>
+              <h1 style="margin:0;font-size:24px;">Verify your email</h1>
               <p style="margin:8px 0 0;color:#dbeafe;">
-                Your client account has been created successfully.
+                Welcome to Manlung Recovery, ${safeUsername}.
               </p>
             </div>
 
             <div style="padding:24px 8px;">
-              <p>Hello ${String(client.username || 'Client')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')},</p>
+              <p>
+                Your client account has been created successfully.
+              </p>
 
               <p>
-                Your Manlung Recovery client account was successfully created.
-                You can now sign in to your Client Portal and manage your recovery cases.
+                Before you can sign in, please verify your email address by clicking
+                the button below.
               </p>
 
-              <div style="padding:16px;border:1px solid #dbe3ef;border-radius:12px;background:#f8fafc;">
-                <strong>Account email:</strong>
-                ${String(client.email)
-                  .replace(/&/g, '&amp;')
-                  .replace(/</g, '&lt;')
-                  .replace(/>/g, '&gt;')}
-              </div>
-
-              <p style="margin-top:20px;">
-                From your portal you can submit recovery requests, track your cases,
-                receive Admin updates, and use the free Call Admin service.
-              </p>
-
-              <p style="margin-top:24px;">
-                <a href="${process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'}"
-                   style="display:inline-block;padding:12px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700;">
-                  Open Manlung Recovery
+              <p style="margin:24px 0;">
+                <a href="${verificationLink}"
+                   style="display:inline-block;padding:13px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700;">
+                  Verify Email Address
                 </a>
               </p>
 
+              <p style="color:#64748b;font-size:13px;">
+                This verification link expires in one hour. You must verify your email
+                before signing in to the Client Portal.
+              </p>
+
               <p style="margin-top:28px;color:#64748b;font-size:13px;">
-                If you did not create this account, please contact Manlung Recovery support.
+                If you did not create this account, you can safely ignore this email.
               </p>
             </div>
           </div>
         `,
-      }).catch(error => {
-        console.error(
-          'Client account confirmation email failed:',
-          error?.message || error
-        );
       });
 
-      const token = signToken(client);
+      if (!emailResult?.success) {
+        console.error(
+          'Client verification email was not sent:',
+          emailResult?.error || 'Unknown email error'
+        );
+      }
 
       res.status(201).json({
         success: true,
-        token,
-        user: {
-          id: client.id,
-          email: client.email,
-          username: client.username,
-          role: client.role,
-        },
+        emailVerificationRequired: true,
+        message:
+          'Account created successfully. Please check your email and verify your address before signing in.',
       });
     } catch (error) {
       console.error('Client register error:', error);
@@ -652,6 +799,145 @@ router.post(
 
       res.status(500).json({
         error: error.message || 'Server error',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// CLIENT EMAIL VERIFICATION
+// ============================================================
+
+router.get('/client/verify-email', async (req, res) => {
+  try {
+    const rawToken = String(req.query.token || '').trim();
+
+    if (!rawToken || rawToken.length < 32) {
+      return res.redirect('/login.html?verified=invalid');
+    }
+
+    const tokenHash = hashToken(rawToken);
+    const client = await User.findByValidEmailVerificationToken(tokenHash);
+
+    if (!client) {
+      return res.redirect('/login.html?verified=expired');
+    }
+
+    await User.markEmailVerified(client.id);
+
+    return res.redirect('/login.html?verified=success');
+  } catch (error) {
+    console.error('Client email verification error:', error);
+    return res.redirect('/login.html?verified=error');
+  }
+});
+
+
+// ============================================================
+// RESEND CLIENT EMAIL VERIFICATION
+// ============================================================
+
+router.post(
+  '/client/resend-verification',
+  [
+    body('email')
+      .trim()
+      .isEmail()
+      .withMessage('A valid email is required')
+      .normalizeEmail(),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const { email } = req.body;
+      const client = await User.findByEmailAndRole(email, 'client');
+
+      // Keep the response generic so this endpoint does not reveal
+      // whether an email address belongs to an account.
+      if (!client) {
+        return res.json({
+          success: true,
+          message:
+            'If an account exists for this email, a verification message has been sent.',
+        });
+      }
+
+      if (client.email_verified_at) {
+        return res.json({
+          success: true,
+          message:
+            'This email address is already verified. You can sign in.',
+        });
+      }
+
+      const rawVerificationToken = crypto
+        .randomBytes(32)
+        .toString('hex');
+
+      const verificationTokenHash =
+        hashToken(rawVerificationToken);
+
+      const verificationExpires =
+        new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+      await User.setEmailVerificationToken(
+        client.email,
+        verificationTokenHash,
+        verificationExpires
+      );
+
+      const baseUrl =
+        process.env.PUBLIC_APP_URL ||
+        `${req.protocol}://${req.get('host')}`;
+
+      const verificationUrl =
+        `${baseUrl}/api/auth/client/verify-email?token=${encodeURIComponent(rawVerificationToken)}`;
+
+      try {
+        await sendEmail({
+          to: client.email,
+          subject: 'Verify your Manlung Recovery email',
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">
+              <h2>Verify your Manlung Recovery email</h2>
+              <p>Hello ${client.username || 'there'},</p>
+              <p>
+                You requested a new email verification link for your
+                Manlung Recovery account.
+              </p>
+              <p>
+                <a href="${verificationUrl}"
+                   style="display:inline-block;padding:12px 20px;background:#0b3d91;color:#fff;text-decoration:none;border-radius:6px">
+                  Verify Email Address
+                </a>
+              </p>
+              <p>This verification link expires in one hour.</p>
+            </div>
+          `,
+        });
+      } catch (emailError) {
+        console.error(
+          'Client verification resend email error:',
+          emailError
+        );
+      }
+
+      return res.json({
+        success: true,
+        message:
+          'If your account is not yet verified, a new verification email has been sent.',
+      });
+    } catch (error) {
+      console.error(
+        'Client resend verification error:',
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        error: 'Could not resend the verification email.',
       });
     }
   }
@@ -688,8 +974,35 @@ router.post(
         await User.findByEmailAndRole(email, 'client');
 
       if (!client) {
-        return res.status(401).json({
-          error: 'Invalid credentials',
+        return res.status(404).json({
+          success: false,
+          code: 'ACCOUNT_NOT_FOUND',
+          error: 'No client account exists for this email. Please create an account first.',
+          redirect: '/login.html?tab=register',
+        });
+      }
+
+      // New client accounts must verify their email before signing in.
+      // Existing accounts without a verification timestamp remain compatible.
+      if (client.email_verification_token_hash && !client.email_verified_at) {
+        return res.status(403).json({
+          success: false,
+          code: 'EMAIL_NOT_VERIFIED',
+          error: 'Please verify your email address before signing in.',
+        });
+      }
+
+      // Owner-controlled security state.
+      if (client.security_status && client.security_status !== 'active') {
+        const messages = {
+          restricted: 'Your account has been restricted. Contact the site owner.',
+          suspended: 'Your account has been suspended. Contact the site owner.',
+          blocked: 'Your account has been blocked. Contact the site owner.',
+        };
+
+        return res.status(403).json({
+          error: messages[client.security_status] || 'Account access is restricted.',
+          code: `ACCOUNT_${client.security_status.toUpperCase()}`,
         });
       }
 
@@ -697,6 +1010,16 @@ router.post(
         await User.comparePassword(client, password);
 
       if (!isMatch) {
+        await SecurityMonitoring.recordEvent({
+          eventType: 'LOGIN_FAILED',
+          userId: client.id,
+          ipAddress: req.ip,
+          userAgent: req.get('user-agent'),
+          details: {
+            role: client.role,
+          },
+        });
+
         return res.status(401).json({
           error: 'Invalid credentials',
         });
@@ -854,8 +1177,8 @@ router.post(
       .isLength({ min: 1 })
       .withMessage('Current password is required.'),
     body('newPassword')
-      .isLength({ min: 12 })
-      .withMessage('New password must be at least 12 characters.'),
+      .isLength({ min: 8 })
+      .withMessage('New password must be at least 8 characters.'),
   ],
   async (req, res) => {
     if (!checkValidation(req, res)) return;
@@ -916,192 +1239,6 @@ router.post(
 
 
 // ============================================================
-// CLIENT OAUTH
-// Google / GitHub / other Supabase OAuth providers
-// ============================================================
-
-router.post(
-  '/client/oauth',
-  [
-    body('accessToken')
-      .trim()
-      .notEmpty()
-      .withMessage('OAuth access token is required'),
-  ],
-  async (req, res) => {
-    if (!checkValidation(req, res)) return;
-
-    try {
-      const { supabase } = require('../config/supabase');
-
-      const {
-        data,
-        error,
-      } = await supabase.auth.getUser(
-        req.body.accessToken
-      );
-
-      if (error || !data?.user) {
-        return res.status(401).json({
-          error: 'Social sign-in could not be verified.',
-        });
-      }
-
-      const oauthUser = data.user;
-
-      const email = String(
-        oauthUser.email || ''
-      ).trim().toLowerCase();
-
-      if (!email) {
-        return res.status(400).json({
-          error:
-            'Your social account did not provide an email address.',
-        });
-      }
-
-      let client = await User.findByEmail(email);
-
-      // Existing admin/owner accounts must never be converted
-      // into client accounts through social sign-in.
-      // Send them to the correct portal instead of leaving them
-      // on a generic social-login failure screen.
-      if (client && client.role !== 'client') {
-        return res.status(403).json({
-          error:
-            'This email belongs to an Admin/Owner account. Continue from the Admin Sign In page.',
-          accountRole: client.role,
-          redirect:
-            client.role === 'owner' || client.role === 'admin'
-              ? '/admin/login.html'
-              : '/login.html',
-        });
-      }
-
-      const metadata = oauthUser.user_metadata || {};
-
-      const fullName = String(
-        metadata.full_name ||
-        metadata.name ||
-        metadata.user_name ||
-        metadata.preferred_username ||
-        email.split('@')[0]
-      ).trim().slice(0, 200);
-
-      const phone = String(
-        metadata.phone || ''
-      ).trim().slice(0, 40) || null;
-
-      if (!client) {
-        let username =
-          fullName ||
-          email.split('@')[0];
-
-        const existingUsername =
-          await User.findByUsername(username);
-
-        if (existingUsername) {
-          username =
-            `${username}-${String(oauthUser.id).slice(0, 8)}`
-              .slice(0, 80);
-        }
-
-        const randomPassword =
-          crypto.randomBytes(32).toString('hex');
-
-        client = await User.create({
-          username,
-          email,
-          phone,
-          password: randomPassword,
-          role: 'client',
-        });
-
-        // Social account-created notification.
-        // Only sent when OAuth actually creates a new client account.
-        sendEmail({
-          to: client.email,
-          subject: 'Welcome to Manlung Recovery — Account Created Successfully',
-          html: `
-            <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033;line-height:1.6;">
-              <div style="padding:24px;border-radius:16px;background:#0f2747;color:#fff;">
-                <h1 style="margin:0;font-size:24px;">Welcome to Manlung Recovery</h1>
-                <p style="margin:8px 0 0;color:#dbeafe;">
-                  Your client account has been created successfully.
-                </p>
-              </div>
-
-              <div style="padding:24px 8px;">
-                <p>Hello ${String(client.username || 'Client')
-                  .replace(/&/g, '&amp;')
-                  .replace(/</g, '&lt;')
-                  .replace(/>/g, '&gt;')},</p>
-
-                <p>
-                  Your Manlung Recovery account was created successfully using social sign-in.
-                </p>
-
-                <div style="padding:16px;border:1px solid #dbe3ef;border-radius:12px;background:#f8fafc;">
-                  <strong>Account email:</strong>
-                  ${String(client.email)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')}
-                </div>
-
-                <p style="margin-top:20px;">
-                  You can now use the Client Portal to submit recovery requests,
-                  track cases, receive Admin updates, and use the free Call Admin service.
-                </p>
-
-                <p style="margin-top:24px;">
-                  <a href="${process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'}"
-                     style="display:inline-block;padding:12px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700;">
-                    Open Manlung Recovery
-                  </a>
-                </p>
-              </div>
-            </div>
-          `,
-        }).catch(error => {
-          console.error(
-            'Social client account confirmation email failed:',
-            error?.message || error
-          );
-        });
-      }
-
-      const token = signToken(client);
-
-      return res.json({
-        success: true,
-        token,
-        user: {
-          id: client.id,
-          email: client.email,
-          username: client.username,
-          role: client.role,
-        },
-      });
-
-    } catch (error) {
-      console.error(
-        'Client OAuth error:',
-        error
-      );
-
-      return res.status(500).json({
-        error:
-          error.message ||
-          'Could not complete social sign-in.',
-      });
-    }
-  }
-);
-
-
-
-// ============================================================
 // CLIENT: Delete Own Account
 // ============================================================
 
@@ -1113,6 +1250,46 @@ router.delete(
       if (req.user.role !== 'client') {
         return res.status(403).json({
           error: 'Only client accounts can be deleted here.',
+        });
+      }
+
+      const password = String(req.body?.password || '');
+
+      const client = await User.findById(req.user.id);
+
+      if (!client) {
+        return res.status(404).json({
+          error: 'Your account could not be found.',
+        });
+      }
+
+      const authProvider = String(
+        client.auth_provider || ''
+      ).trim().toLowerCase();
+
+      if (authProvider === 'google' || authProvider === 'github') {
+        return res.status(409).json({
+          error:
+            `This account uses ${authProvider === 'google' ? 'Google' : 'GitHub'} sign-in. Please re-authenticate with ${authProvider === 'google' ? 'Google' : 'GitHub'} before deleting your account.`,
+          code: 'OAUTH_REAUTH_REQUIRED',
+          provider: authProvider,
+        });
+      }
+
+      if (!password) {
+        return res.status(400).json({
+          error: 'Your current password is required to delete your account.',
+          code: 'PASSWORD_REQUIRED',
+        });
+      }
+
+      const passwordValid =
+        await User.verifyPassword(client, password);
+
+      if (!passwordValid) {
+        return res.status(401).json({
+          error: 'The password you entered is incorrect.',
+          code: 'INVALID_DELETE_PASSWORD',
         });
       }
 
@@ -1302,9 +1479,9 @@ router.post(
       .withMessage('Reset token is required'),
 
     body('password')
-      .isLength({ min: 12 })
+      .isLength({ min: 8 })
       .withMessage(
-        'Password must be at least 12 characters'
+        'Password must be at least 8 characters'
       ),
   ],
   async (req, res) => {
@@ -1527,6 +1704,329 @@ router.post(
 );
 
 
+
+// ============================================================
+// CLIENT OAUTH
+// Google / GitHub / other Supabase OAuth providers
+// ============================================================
+
+router.post(
+  '/client/oauth',
+  [
+    body('accessToken')
+      .trim()
+      .notEmpty()
+      .withMessage('OAuth access token is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const { supabase } = require('../config/supabase');
+
+      const {
+        data,
+        error,
+      } = await supabase.auth.getUser(
+        req.body.accessToken
+      );
+
+      if (error || !data?.user) {
+        return res.status(401).json({
+          error: 'Social sign-in could not be verified.',
+        });
+      }
+
+      const oauthUser = data.user;
+
+      const authProvider = String(
+        oauthUser.app_metadata?.provider ||
+        oauthUser.user_metadata?.provider ||
+        ''
+      ).trim().toLowerCase();
+
+      const email = String(
+        oauthUser.email || ''
+      ).trim().toLowerCase();
+
+      if (!email) {
+        return res.status(400).json({
+          error:
+            'Your social account did not provide an email address.',
+        });
+      }
+
+      let client = await User.findByEmail(email);
+
+      if (client && client.role !== 'client') {
+        return res.status(403).json({
+          error:
+            'This email belongs to an Admin/Owner account. Continue from the Admin Sign In page.',
+          accountRole: client.role,
+          redirect:
+            client.role === 'owner' || client.role === 'admin'
+              ? '/admin/login.html'
+              : '/login.html',
+        });
+      }
+
+      if (client && authProvider && client.auth_provider !== authProvider) {
+        const { data: updatedClient, error: providerError } = await supabase
+          .from('recovery_users')
+          .update({ auth_provider: authProvider })
+          .eq('id', client.id)
+          .eq('role', 'client')
+          .select()
+          .maybeSingle();
+
+        if (providerError) throw providerError;
+
+        if (updatedClient) {
+          client = updatedClient;
+        }
+      }
+
+      const metadata = oauthUser.user_metadata || {};
+
+      const fullName = String(
+        metadata.full_name ||
+        metadata.name ||
+        metadata.user_name ||
+        metadata.preferred_username ||
+        email.split('@')[0]
+      ).trim().slice(0, 200);
+
+      const phone = String(
+        metadata.phone || ''
+      ).trim().slice(0, 40) || null;
+
+      if (!client) {
+        let username =
+          fullName ||
+          email.split('@')[0];
+
+        const existingUsername =
+          await User.findByUsername(username);
+
+        if (existingUsername) {
+          username =
+            `${username}-${String(oauthUser.id).slice(0, 8)}`
+              .slice(0, 80);
+        }
+
+        const randomPassword =
+          crypto.randomBytes(32).toString('hex');
+
+        client = await User.create({
+          username,
+          email,
+          phone,
+          password: randomPassword,
+          role: 'client',
+        });
+
+        if (authProvider) {
+          const { error: providerError } = await supabase
+            .from('recovery_users')
+            .update({ auth_provider: authProvider })
+            .eq('id', client.id)
+            .eq('role', 'client');
+
+          if (providerError) throw providerError;
+
+          client.auth_provider = authProvider;
+        }
+
+        sendEmail({
+          to: client.email,
+          subject: 'Welcome to Manlung Recovery — Account Created Successfully',
+        }).catch(() => {});
+      }
+
+      const token = signToken(client);
+
+      return res.json({
+        success: true,
+        token,
+        user: {
+          id: client.id,
+          username: client.username,
+          email: client.email,
+          phone: client.phone,
+          role: client.role,
+          auth_provider: client.auth_provider || null,
+        },
+      });
+    } catch (error) {
+      console.error('Client OAuth error:', error);
+
+      return res.status(500).json({
+        error:
+          error.message ||
+          'Social sign-in failed.',
+      });
+    }
+  }
+);
+
+
+// ============================================================
+// DELETE CLIENT ACCOUNT — OAUTH RE-AUTHENTICATION
+// ============================================================
+
+router.delete(
+  '/client/account/oauth',
+  auth,
+  async (req, res) => {
+    try {
+      if (req.user.role !== 'client') {
+        return res.status(403).json({
+          error: 'Only client accounts can be deleted here.',
+        });
+      }
+
+      const accessToken = String(
+        req.body?.accessToken || ''
+      ).trim();
+
+      if (!accessToken) {
+        return res.status(400).json({
+          error: 'A fresh social sign-in session is required.',
+          code: 'OAUTH_TOKEN_REQUIRED',
+        });
+      }
+
+      const client = await User.findById(req.user.id);
+
+      if (!client) {
+        return res.status(404).json({
+          error: 'Your account could not be found.',
+        });
+      }
+
+      const expectedProvider = String(
+        client.auth_provider || ''
+      ).trim().toLowerCase();
+
+      if (
+        expectedProvider !== 'google' &&
+        expectedProvider !== 'github'
+      ) {
+        return res.status(409).json({
+          error:
+            'This account is not configured for Google or GitHub sign-in.',
+          code: 'OAUTH_PROVIDER_NOT_CONFIGURED',
+        });
+      }
+
+      const { data, error } =
+        await supabase.auth.getUser(accessToken);
+
+      if (error || !data?.user) {
+        return res.status(401).json({
+          error:
+            'Your social sign-in session could not be verified. Please sign in again.',
+          code: 'OAUTH_REAUTH_FAILED',
+        });
+      }
+
+      const oauthUser = data.user;
+
+      const actualProvider = String(
+        oauthUser.app_metadata?.provider ||
+        oauthUser.user_metadata?.provider ||
+        ''
+      ).trim().toLowerCase();
+
+      const oauthEmail = String(
+        oauthUser.email || ''
+      ).trim().toLowerCase();
+
+      const clientEmail = String(
+        client.email || ''
+      ).trim().toLowerCase();
+
+      if (actualProvider !== expectedProvider) {
+        return res.status(403).json({
+          error:
+            'The social account does not match the authentication provider for this Manlung account.',
+          code: 'OAUTH_PROVIDER_MISMATCH',
+        });
+      }
+
+      if (!oauthEmail || oauthEmail !== clientEmail) {
+        return res.status(403).json({
+          error:
+            'The social account does not match the email address on this Manlung account.',
+          code: 'OAUTH_ACCOUNT_MISMATCH',
+        });
+      }
+
+      const cases = await Case.findByClientUserId(req.user.id);
+
+      const paths = [...new Set(
+        cases.flatMap(c =>
+          Array.isArray(c.files)
+            ? c.files.map(f => f?.path).filter(Boolean)
+            : []
+        )
+      )];
+
+      if (paths.length) {
+        const { error: storageError } =
+          await supabase.storage
+            .from(EVIDENCE_BUCKET)
+            .remove(paths);
+
+        if (storageError) {
+          console.error(
+            'OAuth account deletion evidence cleanup failed:',
+            storageError
+          );
+
+          return res.status(500).json({
+            error:
+              'Your account could not be deleted because some case files could not be removed.',
+          });
+        }
+      }
+
+      for (const caseRow of cases) {
+        await Case.removeForClient(
+          caseRow.case_id,
+          req.user.id
+        );
+      }
+
+      const deleted = await User.deleteById(req.user.id);
+
+      if (!deleted) {
+        return res.status(500).json({
+          error: 'Account could not be deleted.',
+        });
+      }
+
+      return res.json({
+        success: true,
+        message:
+          'Your account and your linked cases have been deleted.',
+      });
+    } catch (error) {
+      console.error(
+        'OAuth client account deletion error:',
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          error.message ||
+          'Your account could not be deleted.',
+      });
+    }
+  }
+);
+
+
 // ============================================================
 // VERIFY TOKEN
 // ============================================================
@@ -1542,10 +2042,14 @@ router.get(
         username: req.user.username,
         email: req.user.email,
         role: req.user.role,
+        auth_provider: req.user.auth_provider || null,
       },
     });
   }
 );
 
+
+router.use('/github', githubAuthRoutes);
+router.use('/google', googleAuthRoutes);
 
 module.exports = router;
