@@ -23,9 +23,9 @@
   opacity:1 !important;
   visibility:visible !important;
   display:inline-flex !important;
-  color:#ffffff !important;
-  background:#2563eb !important;
-  border:2px solid #2563eb !important;
+  color:#111827 !important;
+  background:#facc15 !important;
+  border:2px solid #facc15 !important;
   text-shadow:none !important;
   font-weight:900 !important;
   padding:10px 14px !important;
@@ -585,7 +585,7 @@
                       <span>${escapeHtml(a.role_interested)} · ${escapeHtml(a.email)} · ${escapeHtml(a.phone)}</span>
                       <span>${escapeHtml(a.location)}</span>
                       <span class="status-badge">${escapeHtml(a.status)}</span>
-                      <details style="margin-top:.5rem;"><summary>View application</summary><div style="white-space:pre-wrap;margin-top:.5rem;color:var(--text-muted);"><strong>Education:</strong> ${escapeHtml(a.education)}\n\n<strong>Experience:</strong> ${escapeHtml(a.experience)}\n\n<strong>Skills:</strong> ${escapeHtml(a.skills)}\n\n<strong>Application:</strong> ${escapeHtml(a.cover_note)}</div></details><div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem;">${a.cv_path?`<a class="btn btn-primary career-doc-btn" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;background:#2563eb!important;color:#fff!important;border:2px solid #2563eb!important;font-weight:900!important;padding:10px 14px!important;border-radius:8px!important;" href="/api/careers/admin/${a.id}/document/cv" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> View CV</a>`:""}${a.cover_letter_path?`<a class="btn btn-primary career-doc-btn" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;background:#2563eb!important;color:#fff!important;border:2px solid #2563eb!important;font-weight:900!important;padding:10px 14px!important;border-radius:8px!important;" href="/api/careers/admin/${a.id}/document/cover-letter" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> View Application Letter</a>`:""}</div>
+                      <details style="margin-top:.5rem;"><summary>View application</summary><div style="white-space:pre-wrap;margin-top:.5rem;color:var(--text-muted);"><strong>Education:</strong> ${escapeHtml(a.education)}\n\n<strong>Experience:</strong> ${escapeHtml(a.experience)}\n\n<strong>Skills:</strong> ${escapeHtml(a.skills)}\n\n<strong>Application:</strong> ${escapeHtml(a.cover_note)}</div></details><div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem;">${a.cv_path?`<a class="btn btn-primary career-doc-btn" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;background:#facc15!important;color:#111827!important;border:2px solid #facc15!important;font-weight:900!important;padding:10px 14px!important;border-radius:8px!important;" href="/api/careers/admin/${a.id}/document/cv" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> View CV</a>`:""}${a.cover_letter_path?`<a class="btn btn-primary career-doc-btn" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;background:#facc15!important;color:#111827!important;border:2px solid #facc15!important;font-weight:900!important;padding:10px 14px!important;border-radius:8px!important;" href="/api/careers/admin/${a.id}/document/cover-letter" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> View Application Letter</a>`:""}</div>
                     </div>
                     <div style="display:flex;gap:.4rem;flex-wrap:wrap;justify-content:flex-end;">
                       <button class="btn btn-outline career-status-btn" onclick="setCareerStatus('${a.id}','reviewing')">Reviewing</button>
