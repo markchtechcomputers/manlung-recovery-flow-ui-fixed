@@ -27,7 +27,7 @@ body{margin:0;background:var(--music-bg);color:var(--music-text)}
 .results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:.7rem}
 .song{display:grid;grid-template-columns:110px minmax(0,1fr);gap:.7rem;padding:.6rem;border:1px solid var(--music-border);border-radius:14px;background:#fff;min-width:0}.thumb{width:110px;height:66px;object-fit:cover;border-radius:9px;background:#e2e8f0}.song-title{font-size:.78rem;font-weight:900;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.meta{font-size:.63rem;color:var(--music-muted);margin-top:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.actions{display:flex;gap:.35rem;margin-top:.45rem;flex-wrap:wrap}.actions .btn,.actions a{font-size:.65rem;min-height:32px;padding:.35rem .5rem;text-decoration:none}
 .queue{display:flex;gap:.4rem;overflow:auto;margin-top:.75rem;padding:.55rem;background:#f8fafc;border:1px solid var(--music-border);border-radius:11px}.chip{flex:0 0 auto;max-width:240px;padding:.4rem .55rem;border:1px solid #cbd5e1;border-radius:9px;background:#fff;font-size:.64rem;color:#334155;cursor:pointer}
-.persistent-note{margin-top:.8rem;padding:.65rem .75rem;border-radius:11px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:.7rem;font-weight:700}
+.audio-panel{margin-top:1rem;padding:1rem;border:1px solid #c7d2fe;border-radius:15px;background:#f5f7ff}.audio-head{display:flex;align-items:center;justify-content:space-between;gap:.7rem}.audio-title{font-weight:900;font-size:.9rem}.audio-status{margin-top:.35rem;color:var(--music-muted);font-size:.7rem}.audio-actions{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.65rem}.audio-actions .btn{font-size:.68rem}.dark .audio-panel{background:#0c1728;border-color:#263b68}.persistent-note{margin-top:.8rem;padding:.65rem .75rem;border-radius:11px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:.7rem;font-weight:700}
 @media(max-width:700px){.music-header-inner{align-items:flex-start;flex-direction:column}.music-nav{width:100%;display:grid;grid-template-columns:repeat(2,1fr)}.music-nav a{justify-content:center}.results{grid-template-columns:1fr}.song{grid-template-columns:92px minmax(0,1fr)}.thumb{width:92px;height:58px}.toolbar{grid-template-columns:1fr}.toolbar .btn{width:100%}}
 html.dark body{background:#07101a;color:#e5e7eb}.dark .music-card{background:#0d1722;border-color:rgba(148,163,184,.16)}.dark .song{background:#101b28;border-color:rgba(148,163,184,.16)}.dark .search{background:#08111b;color:#e5e7eb;border-color:rgba(148,163,184,.2)}.dark .btn-outline,.dark .chip{background:#101b28;color:#e2e8f0;border-color:rgba(148,163,184,.22)}.dark .queue{background:#0a131e;border-color:rgba(148,163,184,.16)}.dark .persistent-note{background:#0c2038;border-color:#1e4b7a;color:#bfdbfe}
 </style>
@@ -57,6 +57,10 @@ html.dark body{background:#07101a;color:#e5e7eb}.dark .music-card{background:#0d
     <div id="status" class="status"></div>
     <div id="results" class="results"></div>
     <div id="queue" class="queue" style="display:none"></div>
+    <section class="audio-panel" aria-label="Audio player">
+      <div class="audio-head"><div><div class="audio-title"><i class="fas fa-headphones"></i> Audio Player</div><div id="audioStatus" class="audio-status">Select a song, then choose Play Audio.</div></div><i class="fas fa-volume-up" aria-hidden="true"></i></div>
+      <div class="audio-actions"><button id="audioLast" class="btn btn-outline" type="button"><i class="fas fa-step-backward"></i> Previous</button><button id="audioPlay" class="btn btn-primary" type="button"><i class="fas fa-play"></i> Play Audio</button><button id="audioNext" class="btn btn-outline" type="button">Next <i class="fas fa-step-forward"></i></button></div>
+    </section>
     <div class="persistent-note"><i class="fas fa-window-restore"></i> Playback opens in the persistent Admin Music Player so it can keep playing while you move between Admin functions.</div>
   </section>
 </main>
@@ -64,19 +68,26 @@ html.dark body{background:#07101a;color:#e5e7eb}.dark .music-card{background:#0d
 <script src="/js/theme.js"></script>
 <script src="/js/pwa.js" defer></script>
 <script>
-const results=document.getElementById('results'),status=document.getElementById('status'),queueEl=document.getElementById('queue');
-const queue=[];
+const results=document.getElementById('results'),status=document.getElementById('status'),queueEl=document.getElementById('queue'),audioStatus=document.getElementById('audioStatus');
+const queue=[]; let audioIndex=-1;
 function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
 function views(v){const n=Number(v||0);if(!n)return '';if(n>=1e6)return (n/1e6).toFixed(1).replace('.0','')+'M views';if(n>=1e3)return (n/1e3).toFixed(1).replace('.0','')+'K views';return n.toLocaleString()+' views'}
 function renderQueue(){if(!queue.length){queueEl.style.display='none';queueEl.innerHTML='';return}queueEl.style.display='flex';queueEl.innerHTML=queue.map((s,i)=>'<button class="chip" data-q="'+i+'">'+(i+1)+'. '+esc(s.title)+'</button>').join('');queueEl.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>play(queue[Number(b.dataset.q)]))}
 function persistPlay(song){try{localStorage.setItem('manlung-admin-music-now-playing-v1',JSON.stringify({id:String(song.id),title:String(song.title||'Now playing'),updatedAt:Date.now()}))}catch(_){}}
-function play(song){if(!song||!song.id)return;if(!queue.some(x=>x.id===song.id))queue.push(song);renderQueue();persistPlay(song);window.open('/admin/music-player.html','manlungAdminMusicPlayer','popup=yes,width=760,height=520,resizable=yes,scrollbars=no');status.textContent='Playing: '+song.title}
-function add(song){if(!queue.some(x=>x.id===song.id)){queue.push(song);status.textContent='Added "'+song.title+'" to the queue.';renderQueue()}else status.textContent='That song is already in the queue.'}
+function openPlayer(song,mode){if(!song||!song.id)return;if(!queue.some(x=>x.id===song.id))queue.push(song);renderQueue();persistPlay({...song,mode});window.open('/admin/music-player.html','manlungAdminMusicPlayer','popup=yes,width=760,height=520,resizable=yes,scrollbars=no');}
+function play(song){if(!song||!song.id)return;audioIndex=queue.findIndex(x=>x.id===song.id);openPlayer(song,'video');status.textContent='Playing video: '+song.title;audioStatus.textContent='Selected: '+song.title}
+function playAudio(song){if(!song||!song.id)return;audioIndex=queue.findIndex(x=>x.id===song.id);openPlayer(song,'audio');status.textContent='Playing audio: '+song.title;audioStatus.textContent='Audio playing: '+song.title}
+function playQueuedAudio(i){if(queue[i]){audioIndex=i;playAudio(queue[i]);}}
+function add(song){if(!queue.some(x=>x.id===song.id)){queue.push(song);status.textContent='Added "'+song.title+'" to the queue.';renderQueue()}else status.textContent='That song is already in the queue.';audioStatus.textContent='Selected: '+song.title;}
+function previousAudio(){if(!queue.length)return;audioIndex=(audioIndex<=0?queue.length-1:audioIndex-1);playQueuedAudio(audioIndex)}
+function nextAudio(){if(!queue.length)return;audioIndex=(audioIndex+1)%queue.length;playQueuedAudio(audioIndex)}
 function render(songs){if(!songs.length){results.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--music-muted);padding:1rem;">No matching videos found.</div>';return}results.innerHTML=songs.map(s=>'<article class="song"><img class="thumb" src="'+esc(s.thumbnail)+'" alt="" loading="lazy"><div><div class="song-title">'+esc(s.title)+'</div><div class="meta">'+esc(s.author||'YouTube')+' · '+esc(s.duration||'')+(s.views?' · '+esc(views(s.views)):'')+'</div><div class="actions"><button class="btn btn-primary" data-play="'+esc(s.id)+'"><i class="fas fa-play"></i> Play</button><button class="btn btn-outline" data-add="'+esc(s.id)+'"><i class="fas fa-plus"></i> Add</button><a class="btn btn-outline" href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a></div></div></article>').join('');
-results.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>{const s=songs.find(x=>x.id===b.dataset.play);play(s)});
+results.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>{const s=songs.find(x=>x.id===b.dataset.play);play(s);});
+results.querySelectorAll('[data-play]').forEach(b=>{const audio=document.createElement('button');audio.className='btn btn-outline';audio.type='button';audio.innerHTML='<i class="fas fa-headphones"></i> Audio';audio.onclick=()=>{const s=songs.find(x=>x.id===b.dataset.play);if(s)playAudio(s)};b.parentElement.insertBefore(audio,b.nextSibling);});
 results.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const s=songs.find(x=>x.id===b.dataset.add);add(s)});
 }
 async function search(){const q=document.getElementById('search').value.trim();if(q.length<2){status.textContent='Enter at least 2 characters to search.';return}const btn=document.getElementById('searchBtn');btn.disabled=true;status.textContent='Searching YouTube…';try{const r=await fetch('/api/youtube/search?q='+encodeURIComponent(q),{credentials:'include',cache:'no-store'});if(r.status===401||r.status===403){location.href='/admin/login.html';return}const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw new Error(d.error||'Search failed.');render(Array.isArray(d.songs)?d.songs:[]);status.textContent=(d.songs?.length||0)+' results found.'}catch(e){console.error(e);status.textContent=e.message||'Could not search YouTube.'}finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-search"></i> Search'}}
+document.getElementById('audioPlay').onclick=()=>{if(audioIndex>=0&&queue[audioIndex])playAudio(queue[audioIndex]);else if(queue[0]){audioIndex=0;playAudio(queue[0]);}else audioStatus.textContent='Add a song to the temporary queue first.'};document.getElementById('audioLast').onclick=previousAudio;document.getElementById('audioNext').onclick=nextAudio;
 document.getElementById('searchBtn').onclick=search;document.getElementById('search').onkeydown=e=>{if(e.key==='Enter')search()};
 </script>
 </body>
