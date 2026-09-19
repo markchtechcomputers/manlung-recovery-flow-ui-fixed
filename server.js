@@ -24,6 +24,7 @@ const careerRoutes = require('./routes/careers');
 const platformRoutes = require('./routes/platform');
 const operationsRoutes = require('./routes/operations');
 const aiRoutes = require('./routes/ai');
+const youtubeRoutes = require('./routes/youtube');
 const { supabase } = require('./config/supabase');
 const { inputSecurity } = require('./middleware/inputSecurity');
 const { adminAuth, ownerAuth } = require('./middleware/auth');
@@ -61,7 +62,7 @@ app.use(
         imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
         mediaSrc: ["'self'", 'https:', 'blob:'],
         connectSrc: ["'self'", 'https://*.supabase.co', 'https://api.paystack.co', 'wss:', 'https:'],
-        frameSrc: ["'self'", 'https://js.paystack.co'],
+        frameSrc: ["'self'", 'https://js.paystack.co', 'https://www.youtube.com', 'https://www.youtube-nocookie.com'],
         workerSrc: ["'self'", 'blob:'],
         manifestSrc: ["'self'"],
       },
@@ -453,6 +454,7 @@ app.use('/api/careers', careerRoutes);
 app.use('/api/platform', platformRoutes);
 app.use('/api/operations', operationsRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/youtube', youtubeRoutes);
 
 // ============================================================
 // ADMIN PAGES
