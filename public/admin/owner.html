@@ -14,6 +14,38 @@
         .role-admin-suspended { background: var(--danger-bg); color: var(--danger); }
         .search-result-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; border: 1px solid var(--card-border); border-radius: 10px; margin-bottom: 0.5rem; }
     </style>
+<style id="career-owner-visibility-fix">
+#careerApplications .career-document-actions a.career-doc-btn,
+#careerApplications .career-status-actions button.career-status-btn,
+#careerApplications .case-item button.career-status-btn{
+  opacity:1 !important;
+  visibility:visible !important;
+  display:inline-flex !important;
+  color:#ffffff !important;
+  background:#2563eb !important;
+  border:2px solid #2563eb !important;
+  text-shadow:none !important;
+  font-weight:900 !important;
+  padding:10px 14px !important;
+  min-height:40px !important;
+  border-radius:8px !important;
+}
+#careerApplications .career-status-actions button.career-status-btn.status-hire{
+  background:#16a34a !important;
+  border-color:#16a34a !important;
+}
+#careerApplications .career-status-actions button.career-status-btn.status-delete{
+  background:#dc2626 !important;
+  border-color:#dc2626 !important;
+}
+#careerApplications .career-status-actions button.career-status-btn:hover,
+#careerApplications .career-document-actions a.career-doc-btn:hover{
+  opacity:1 !important;
+  visibility:visible !important;
+  color:#fff !important;
+  background:#1d4ed8 !important;
+}
+</style>
 <style id="manlung-header-style">
 .site-header{
   position:sticky;
@@ -555,7 +587,7 @@
                     </div>
                     <div style="display:flex;gap:.4rem;flex-wrap:wrap;justify-content:flex-end;">
                       <button class="btn btn-outline career-status-btn" onclick="setCareerStatus('${a.id}','reviewing')">Reviewing</button>
-                      <button class="btn btn-outline" onclick="setCareerStatus('${a.id}','shortlisted')">Shortlist</button>
+                      <button class="btn btn-outline career-status-btn" onclick="setCareerStatus('${a.id}','shortlisted')">Shortlist</button>
                       <button class="btn btn-success" onclick="setCareerStatus('${a.id}','hired')">Hire</button>
                       <button class="btn btn-danger" onclick="deleteCareerApplication('${a.id}')">Delete</button>
                     </div>
