@@ -1767,7 +1767,19 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 
             // If this browser is showing a call that is no longer pending,
             // another admin answered/rejected it. Close the stale popup.
+            // A busy admin must not be offered another call. Keep the remaining
+        // callers in the shared queue until this active call is actually ended.
+        if (currentActiveCallId) {
             if (currentIncomingCallId) {
+                stopIncomingAlert();
+                currentIncomingCallId = null;
+            }
+            const overlay = document.getElementById('callModalOverlay');
+            if (overlay && overlay.style.display !== 'none') overlay.style.display = 'none';
+            return;
+        }
+
+        if (currentIncomingCallId) {
                 const stillPending = pendingCalls.some(
                     call => String(call.id) === String(currentIncomingCallId)
                 );
@@ -1945,7 +1957,13 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             } catch (_) {}
         }
         cleanupActiveCall();
-        closeCallModal();
+        // Do not call closeCallModal() here. If the next queued caller is
+        // already displayed, closeCallModal() would interpret it as an admin
+        // declining that waiting caller. The polling loop will show the next
+        // caller only after the current active call has been cleared.
+        const overlay = document.getElementById('callModalOverlay');
+        if (overlay) overlay.style.display = 'none';
+        pollIncomingCalls();
     }
     window.endActiveCall = endActiveCall;
 
