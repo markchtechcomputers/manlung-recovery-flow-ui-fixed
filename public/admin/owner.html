@@ -879,6 +879,54 @@ body.dark.admin-page-bg #pageContent select{
 }
 </style>
 
+<style id="owner-force-white-section-backgrounds">
+/* Owner Management — keep every management section white in Light Mode */
+html:not(.dark) body.admin-page-bg #pageContent > .card,
+html:not(.dark) body.admin-page-bg > section.container > .card{
+  background:#ffffff !important;
+  background-image:none !important;
+  color:#111827 !important;
+  border-color:#e2e8f0 !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.06) !important;
+}
+html:not(.dark) body.admin-page-bg #pageContent > .card::before,
+html:not(.dark) body.admin-page-bg > section.container > .card::before{
+  opacity:.45;
+}
+html:not(.dark) body.admin-page-bg #pageContent .case-item,
+html:not(.dark) body.admin-page-bg #pageContent details,
+html:not(.dark) body.admin-page-bg #pageContent #auditLog,
+html:not(.dark) body.admin-page-bg #pageContent #mfaStatus,
+html:not(.dark) body.admin-page-bg #pageContent #mfaSetupBox,
+html:not(.dark) body.admin-page-bg #pageContent #mfaDisableBox{
+  background:#ffffff !important;
+  background-image:none !important;
+  color:#111827 !important;
+  border-color:#e2e8f0 !important;
+}
+html:not(.dark) body.admin-page-bg #pageContent input,
+html:not(.dark) body.admin-page-bg #pageContent select{
+  background:#ffffff !important;
+  color:#111827 !important;
+  border-color:#cbd5e1 !important;
+}
+html:not(.dark) body.admin-page-bg #pageContent .btn-outline{
+  background:#ffffff !important;
+  color:#111827 !important;
+  border-color:#cbd5e1 !important;
+}
+html:not(.dark) body.admin-page-bg #pageContent .card-title,
+html:not(.dark) body.admin-page-bg #pageContent .card-title strong,
+html:not(.dark) body.admin-page-bg #pageContent h2,
+html:not(.dark) body.admin-page-bg #pageContent h3{
+  color:#111827 !important;
+}
+html:not(.dark) body.admin-page-bg #pageContent p,
+html:not(.dark) body.admin-page-bg #pageContent span:not(.role-badge):not(.status-badge){
+  color:#475569;
+}
+/* Dark Mode remains available through the existing theme styles. */
+</style>
 </head>
 <body class="admin-page-bg">
     <header class="site-header">
