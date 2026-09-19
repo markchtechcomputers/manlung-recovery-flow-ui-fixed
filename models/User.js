@@ -4,12 +4,10 @@ const { supabase } = require('../config/supabase');
 const TABLE = 'recovery_users';
 const BCRYPT_ROUNDS = 12;
 const MAX_LOGIN_FAILURES = 3;
-const LOCKOUT_YEARS = 132;
+const LOCKOUT_MINUTES = 30;
 
-function addYears(date, years) {
-  const result = new Date(date);
-  result.setFullYear(result.getFullYear() + years);
-  return result;
+function addMinutes(date, minutes) {
+  return new Date(date.getTime() + minutes * 60 * 1000);
 }
 
 async function findByUsername(username) {
@@ -74,7 +72,7 @@ async function comparePassword(user, candidatePassword) {
     .from(TABLE)
     .update({
       failed_login_attempts: locked ? MAX_LOGIN_FAILURES : failures,
-      login_locked_until: locked ? addYears(new Date(), LOCKOUT_YEARS).toISOString() : null,
+      login_locked_until: locked ? addMinutes(new Date(), LOCKOUT_MINUTES).toISOString() : null,
     })
     .eq('id', user.id);
 
