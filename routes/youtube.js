@@ -46,9 +46,12 @@ router.get('/search', adminAuth, async (req, res) => {
         });
 
         const html = String(page.data || '');
-        const match = html.match(/var ytInitialData = (\{[\s\S]*?\});<\\/script>/);
+        const marker = 'var ytInitialData = ';
+        const start = html.indexOf(marker);
+        const end = start === -1 ? -1 : html.indexOf(';</script>', start + marker.length);
+        const match = start !== -1 && end !== -1 ? html.slice(start + marker.length, end) : null;
         if (match) {
-          const data = JSON.parse(match[1]);
+          const data = JSON.parse(match);
           const renderers = [];
           const walk = (node) => {
             if (!node || typeof node !== 'object') return;
