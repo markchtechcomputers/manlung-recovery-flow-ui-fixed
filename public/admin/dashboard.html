@@ -628,7 +628,7 @@ body.dark.admin-page-bg #voiceLineRingtoneSettings,body.dark.admin-page-bg #bulk
             <div>
                 <div class="card-title" style="margin-bottom:0.2rem;"><i class="fas fa-phone-volume"></i> Call Admin — Availability</div>
                 <p style="color:var(--text-muted); font-size:0.85rem; margin:0;" id="voiceLineStatus">Go online to receive Call Admin requests. Calls are queued when all admins are busy; the first available admin can accept the next caller. Each Admin can actively manage up to 10 cases at a time.</p>
-                <div id="voiceLineRingtoneSettings"></div>
+                <div id="voiceLineRingtoneSettings"></div><div id="callQueueBadge" style="display:inline-flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.42rem .7rem;border:1px solid #bfdbfe;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:.72rem;font-weight:800;">Waiting queue: 0</div>
             </div>
             <button class="btn btn-success" id="voiceLineBtn" onclick="toggleAdminOnline()"><i class="fas fa-power-off"></i> Go Online</button>
         </div>
@@ -1624,6 +1624,12 @@ body.dark.admin-page-bg #voiceLineRingtoneSettings,body.dark.admin-page-bg #bulk
 
                     return;
                 }
+            }
+
+            const queueBadge = document.getElementById('callQueueBadge');
+            if (queueBadge) {
+                queueBadge.textContent = `Waiting queue: ${pendingCalls.length}`;
+                queueBadge.style.display = pendingCalls.length ? 'inline-flex' : 'inline-flex';
             }
 
             if (!currentIncomingCallId && pendingCalls.length > 0) {
