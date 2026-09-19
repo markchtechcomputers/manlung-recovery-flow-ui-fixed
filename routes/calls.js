@@ -11,7 +11,8 @@ const CallSignal = require('../models/CallSignal');
 router.post('/admin/online', adminAuth, async (req, res) => {
   try {
     await AdminPresence.setOnline(req.user.id);
-    res.json({ success: true, online: true });
+    const availability = await AdminPresence.getAvailabilityState();
+    res.json({ success: true, online: true, onlineCount: availability.onlineCount, availableCount: availability.availableCount });
   } catch (error) {
     console.error('Admin online error:', error);
     res.status(500).json({ error: error.message || 'Server error' });
@@ -21,7 +22,8 @@ router.post('/admin/online', adminAuth, async (req, res) => {
 router.post('/admin/offline', adminAuth, async (req, res) => {
   try {
     await AdminPresence.setOffline(req.user.id);
-    res.json({ success: true, online: false });
+    const availability = await AdminPresence.getAvailabilityState();
+    res.json({ success: true, online: false, onlineCount: availability.onlineCount, availableCount: availability.availableCount });
   } catch (error) {
     console.error('Admin offline error:', error);
     res.status(500).json({ error: error.message || 'Server error' });
@@ -182,7 +184,8 @@ router.get('/pending', adminAuth, async (req, res) => {
       .order('created_at', { ascending: true })
       .limit(20);
     if (error) throw error;
-    res.json({ success: true, calls: data });
+    const availability = await AdminPresence.getAvailabilityState();
+    res.json({ success: true, calls: data || [], onlineCount: availability.onlineCount, availableCount: availability.availableCount });
   } catch (error) {
     console.error('Pending calls error:', error);
     res.status(500).json({ error: error.message || 'Server error' });
