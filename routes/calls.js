@@ -184,6 +184,20 @@ router.post('/start', auth, async (req, res) => {
 router.get('/pending', adminAuth, async (req, res) => {
   try {
     await CallSession.cleanupAbandoned();
+
+    // Never offer a second call to an admin who is already handling one.
+    // Other clients remain untouched in the shared queue.
+    const adminBusy = await CallSession.adminHasActiveCall(req.user.id);
+    if (adminBusy) {
+      const availability = await AdminPresence.getAvailabilityState();
+      return res.json({
+        success: true,
+        calls: [],
+        onlineCount: availability.onlineCount,
+        availableCount: availability.availableCount,
+      });
+    }
+
     const { data, error } = await supabase
       .from('recovery_call_sessions')
       .select('id, client_name, client_email, case_id, created_at')
@@ -502,8 +516,18 @@ router.put('/:id/accept', adminAuth, async (req, res) => {
 
 router.put('/:id/reject', adminAuth, async (req, res) => {
   try {
-    const session = await CallSession.setStatus(req.params.id, 'rejected');
-    res.json({ success: true, session });
+    // An explicit decline is allowed only for an unassigned waiting call.
+    // A busy admin or another admin must never be able to cancel a caller's
+    // session accidentally.
+    const session = await CallSession.findById(req.params.id);
+    if (!session) return res.status(404).json({ error: 'Call session not found' });
+    const busy = await CallSession.adminHasActiveCall(req.user.id);
+    if (busy) return res.status(409).json({ error: 'You are already on an active call.' });
+    if (session.admin_user_id || !['ringing', 'queued'].includes(session.status)) {
+      return res.status(409).json({ error: 'This waiting call is no longer available to decline.' });
+    }
+    const updated = await CallSession.setStatus(req.params.id, 'rejected', 'admin_declined');
+    res.json({ success: true, session: updated });
   } catch (error) {
     console.error('Reject call error:', error);
     res.status(500).json({ error: error.message || 'Server error' });
