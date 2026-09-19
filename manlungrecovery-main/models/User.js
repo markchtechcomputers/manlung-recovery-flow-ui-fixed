@@ -2,6 +2,15 @@ const bcrypt = require('bcryptjs');
 const { supabase } = require('../config/supabase');
 
 const TABLE = 'recovery_users';
+const BCRYPT_ROUNDS = 12;
+const MAX_LOGIN_FAILURES = 3;
+const LOCKOUT_YEARS = 132;
+
+function addYears(date, years) {
+  const result = new Date(date);
+  result.setFullYear(result.getFullYear() + years);
+  return result;
+}
 
 async function findByUsername(username) {
   const { data, error } = await supabase.from(TABLE).select('*').eq('username', username).maybeSingle();
@@ -28,18 +37,102 @@ async function findByEmail(email) {
 }
 
 async function create({ username, password, role = 'client', email, phone }) {
-  const hashed = await bcrypt.hash(password, 12);
+  const hashed = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const { data, error } = await supabase
     .from(TABLE)
-    .insert({ username, password: hashed, role, email, phone })
+    .insert({ username, password: hashed, role, email, phone, failed_login_attempts: 0, login_locked_until: null, session_version: 0 })
     .select()
     .single();
   if (error) throw error;
   return data;
 }
 
+async function verifyPassword(user, candidatePassword) {
+  if (!user || !user.password || !candidatePassword) return false;
+  return bcrypt.compare(String(candidatePassword), user.password);
+}
+
 async function comparePassword(user, candidatePassword) {
-  return bcrypt.compare(candidatePassword, user.password);
+  if (!user || !user.password) return false;
+
+  const lockedUntil = user.login_locked_until ? new Date(user.login_locked_until).getTime() : 0;
+  if (lockedUntil && lockedUntil > Date.now()) return false;
+
+  const isMatch = await bcrypt.compare(candidatePassword, user.password);
+
+  if (isMatch) {
+    await supabase
+      .from(TABLE)
+      .update({ failed_login_attempts: 0, login_locked_until: null, last_login_at: new Date().toISOString() })
+      .eq('id', user.id);
+    return true;
+  }
+
+  const failures = Number(user.failed_login_attempts || 0) + 1;
+  const locked = failures >= MAX_LOGIN_FAILURES;
+  await supabase
+    .from(TABLE)
+    .update({
+      failed_login_attempts: locked ? MAX_LOGIN_FAILURES : failures,
+      login_locked_until: locked ? addYears(new Date(), LOCKOUT_YEARS).toISOString() : null,
+    })
+    .eq('id', user.id);
+
+  return false;
+}
+
+async function bumpSessionVersion(userId) {
+  const current = await findById(userId);
+  if (!current) return null;
+  const next = Number(current.session_version || 0) + 1;
+  const { data, error } = await supabase
+    .from(TABLE)
+    .update({ session_version: next })
+    .eq('id', userId)
+    .select('id, session_version')
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+async function setEmailVerificationToken(email, tokenHash, expiresAt) {
+  const { error } = await supabase
+    .from(TABLE)
+    .update({
+      email_verification_token_hash: tokenHash,
+      email_verification_expires: expiresAt,
+    })
+    .eq('email', email);
+
+  if (error) throw error;
+}
+
+async function findByValidEmailVerificationToken(tokenHash) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select('*')
+    .eq('email_verification_token_hash', tokenHash)
+    .gt('email_verification_expires', new Date().toISOString())
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+async function markEmailVerified(id) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .update({
+      email_verified_at: new Date().toISOString(),
+      email_verification_token_hash: null,
+      email_verification_expires: null,
+    })
+    .eq('id', id)
+    .select('*')
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
 }
 
 async function setResetToken(email, tokenHash, expiresAt) {
@@ -62,15 +155,13 @@ async function findByValidResetToken(tokenHash) {
 }
 
 async function resetPassword(id, newPassword) {
-  const hashed = await bcrypt.hash(newPassword, 12);
+  const hashed = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
   const { error } = await supabase
     .from(TABLE)
-    .update({ password: hashed, reset_token_hash: null, reset_token_expires: null })
+    .update({ password: hashed, reset_token_hash: null, reset_token_expires: null, failed_login_attempts: 0, login_locked_until: null, session_version: (await findById(id))?.session_version + 1 || 1 })
     .eq('id', id);
   if (error) throw error;
 }
-
-
 
 async function updateProfile(userId, { username, phone }) {
   const fields = {
@@ -91,7 +182,9 @@ async function updateProfile(userId, { username, phone }) {
 }
 
 async function updatePassword(userId, newPassword) {
-  const hashed = await bcrypt.hash(newPassword, 12);
+  const hashed = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+  const current = await findById(userId);
+  const nextVersion = Number(current?.session_version || 0) + 1;
 
   const { error } = await supabase
     .from(TABLE)
@@ -99,6 +192,9 @@ async function updatePassword(userId, newPassword) {
       password: hashed,
       reset_token_hash: null,
       reset_token_expires: null,
+      failed_login_attempts: 0,
+      login_locked_until: null,
+      session_version: nextVersion,
     })
     .eq('id', userId)
     .eq('role', 'client');
@@ -120,20 +216,17 @@ async function deleteById(userId) {
 }
 
 // ---- Owner / Admin management ----
-
-// Every admin + the owner, for the Admin Management list view.
 async function listAdminsAndOwner() {
   const { data, error } = await supabase
     .from(TABLE)
-    .select('id, username, email, phone, role, admin_status, appointed_at, appointed_by, created_at')
+    .select('id, username, email, phone, role, admin_status, appointed_at, appointed_by, created_at, failed_login_attempts, login_locked_until, last_login_at, mfa_enabled, session_version')
     .in('role', ['owner', 'admin'])
-    .order('role', { ascending: true }) // 'admin' < 'owner' alphabetically -> owner last; fine, frontend sorts if needed
+    .order('role', { ascending: true })
     .order('appointed_at', { ascending: true });
   if (error) throw error;
   return data;
 }
 
-// Registered clients not yet admins — the pool the Owner picks from to promote.
 async function searchPromotableUsers(search) {
   let query = supabase.from(TABLE).select('id, username, email, role, created_at').eq('role', 'client');
   if (search) {
@@ -146,21 +239,8 @@ async function searchPromotableUsers(search) {
   return data;
 }
 
-
-async function convertClientToPendingAdmin(
-  userId,
-  {
-    username,
-    password,
-    phone,
-    appointedBy,
-  }
-) {
-  const hashed = await bcrypt.hash(
-    password,
-    12
-  );
-
+async function convertClientToPendingAdmin(userId, { username, password, phone, appointedBy }) {
+  const hashed = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const fields = {
     username: String(username || '').trim(),
     password: hashed,
@@ -169,6 +249,8 @@ async function convertClientToPendingAdmin(
     admin_status: 'pending',
     appointed_at: new Date().toISOString(),
     appointed_by: appointedBy || null,
+    failed_login_attempts: 0,
+    login_locked_until: null,
   };
 
   const { data, error } = await supabase
@@ -180,7 +262,6 @@ async function convertClientToPendingAdmin(
     .maybeSingle();
 
   if (error) throw error;
-
   return data;
 }
 
@@ -189,7 +270,7 @@ async function promoteToAdmin(userId, appointedByUserId) {
     .from(TABLE)
     .update({ role: 'admin', admin_status: 'active', appointed_at: new Date().toISOString(), appointed_by: appointedByUserId })
     .eq('id', userId)
-    .eq('role', 'client') // can only promote a plain client — can't "promote" an existing admin/owner through this path
+    .eq('role', 'client')
     .select()
     .maybeSingle();
   if (error) throw error;
@@ -201,16 +282,13 @@ async function setAdminStatus(userId, status) {
     .from(TABLE)
     .update({ admin_status: status })
     .eq('id', userId)
-    .eq('role', 'admin') // never touches the owner row, even if somehow called with the owner's id
+    .eq('role', 'admin')
     .select()
     .maybeSingle();
   if (error) throw error;
   return data;
 }
 
-// Removing admin privileges reverts to 'client' — the account, its case
-// history, call history, and everything else stays completely intact.
-// Nothing is deleted here.
 async function removeAdminPrivileges(userId) {
   const { data, error } = await supabase
     .from(TABLE)
@@ -224,12 +302,11 @@ async function removeAdminPrivileges(userId) {
 }
 
 async function createAdminFromInvitation({ username, password, email, phone, invitationId, appointedBy }) {
-  const hashed = await bcrypt.hash(password, 12);
-  const { data, error } = await supabase.from(TABLE).insert({ username, password: hashed, role: 'admin', email, phone, admin_status: 'pending', appointed_at: new Date().toISOString(), appointed_by: appointedBy }).select().single();
+  const hashed = await bcrypt.hash(password, BCRYPT_ROUNDS);
+  const { data, error } = await supabase.from(TABLE).insert({ username, password: hashed, role: 'admin', email, phone, admin_status: 'pending', appointed_at: new Date().toISOString(), appointed_by: appointedBy, failed_login_attempts: 0, login_locked_until: null, session_version: 0 }).select().single();
   if (error) throw error;
   return data;
 }
-
 
 async function setMfaSetup(userId, encryptedSecret) {
   const { data, error } = await supabase
@@ -280,7 +357,8 @@ async function consumeRecoveryCode(userId, remainingHashes) {
 }
 
 module.exports = {
-  findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword,
+  findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword, verifyPassword, bumpSessionVersion,
+  setEmailVerificationToken, findByValidEmailVerificationToken, markEmailVerified,
   setResetToken, findByValidResetToken, resetPassword, updateProfile, updatePassword, deleteById, createAdminFromInvitation,
   listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, convertClientToPendingAdmin, setAdminStatus, removeAdminPrivileges,
   setMfaSetup, enableMfa, disableMfa, consumeRecoveryCode,
