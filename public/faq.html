@@ -1,7 +1,93 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FAQ | Manlung Recovery</title><meta name="description" content="Frequently asked questions about Manlung Recovery cases, evidence, calls, donations, privacy and account safety."><meta name="robots" content="index,follow"><link rel="canonical" href="https://manlungrecovery.manlungshop.co.ke/faq.html"><link rel="manifest" href="/manifest.webmanifest"><style>body{margin:0;font-family:system-ui,sans-serif;background:#07111d;color:#eaf2fb;line-height:1.65}.wrap{max-width:900px;margin:auto;padding:28px 18px}.nav{display:flex;gap:12px;flex-wrap:wrap}.nav a{color:#9bd0ff}.card{background:#0e1d2e;border:1px solid #203750;border-radius:16px;padding:18px;margin:12px 0}summary{font-weight:800;cursor:pointer}</style>    <link rel="stylesheet" href="/css/footer.css">
     <script src="/js/support-fab.js"></script>
-    <link rel="stylesheet" href="/css/unified-ui.css">
-</head><body><main class="wrap"><nav class="nav"><a href="/">Home</a><a href="/services.html">Services</a><a href="/faq.html">FAQ</a><a href="/privacy.html">Trust</a><a href="/login.html">Client portal</a></nav><h1>Frequently asked questions</h1><div class="card"><details open><summary>How do I track my case?</summary><p>Sign in to the client portal. Your case status, timeline, messages and available investigator actions are protected by account authorization.</p></details></div><div class="card"><details><summary>What should I upload?</summary><p>Only relevant evidence. Supported uploads are validated for type and file signature. Do not upload passwords, OTPs, recovery codes, API keys or other secrets.</p></details></div><div class="card"><details><summary>Can I reopen a closed case?</summary><p>Eligible completed cases can be reopened by an authorized investigator or owner. The reopen action is recorded in the case timeline.</p></details></div><div class="card"><details><summary>How are calls handled?</summary><p>Calls use browser WebRTC signaling. Ringing, acceptance, missed calls, reconnection diagnostics and end state can be recorded for authorized participants.</p></details></div><div class="card"><details><summary>How are donations confirmed?</summary><p>Payment confirmation is based on server-side verification/webhook processing. Pending and failed payments are not counted as confirmed donations.</p></details></div><div class="card"><details><summary>Does the AI know my private case?</summary><p>Only authenticated, authorized case context may be retrieved. The assistant should not reveal another user's case information and should never ask for credentials or secrets.</p></details></div><div class="card"><details><summary>What if I suspect account abuse?</summary><p>Stop sharing secrets, sign out of other sessions from your security controls when available, and contact human support through the portal.</p></details></div></main><footer class="manlung-footer" aria-label="Manlung Recovery footer">
+    <link rel="stylesheet" href="/css/unified-ui.css"><style id="manlung-faq-premium-ui">
+:root{
+  --faq-bg:#f5f8fc;--faq-surface:#fff;--faq-text:#0f172a;--faq-muted:#64748b;
+  --faq-border:#e2e8f0;--faq-blue:#2563eb;--faq-blue-soft:#eff6ff;--faq-green:#16a34a;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0!important;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+  background:linear-gradient(180deg,#f8fbff 0,#f5f8fc 46%,#eef3f9 100%)!important;color:var(--faq-text)!important;
+  line-height:1.65!important;
+}
+.faq-page{max-width:1120px;margin:0 auto;padding:22px 20px 48px}
+.faq-topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  padding:10px 0 20px;border-bottom:1px solid rgba(148,163,184,.22)
+}
+.faq-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.faq-nav a{
+  color:#334155!important;text-decoration:none!important;font-size:.82rem;font-weight:800;
+  padding:9px 12px;border-radius:10px;transition:.18s ease
+}
+.faq-nav a:hover,.faq-nav a:focus-visible{background:#fff;color:var(--faq-blue)!important;box-shadow:0 4px 14px rgba(15,23,42,.06)}
+.faq-security-pill{
+  display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid #bbf7d0;
+  border-radius:999px;background:#f0fdf4;color:#166534;font-size:.72rem;font-weight:850
+}
+.faq-security-pill i{font-size:.7rem}
+.faq-hero{padding:54px 0 30px;max-width:820px}
+.faq-kicker{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;
+  background:var(--faq-blue-soft);color:#1d4ed8;font-size:.72rem;font-weight:850;letter-spacing:.04em;text-transform:uppercase
+}
+.faq-hero h1{
+  margin:14px 0 10px;font-size:clamp(2rem,5vw,3.5rem);line-height:1.03;letter-spacing:-.045em;font-weight:900;color:#0b1220
+}
+.faq-hero p{margin:0;color:var(--faq-muted);font-size:1rem;max-width:720px}
+.faq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.faq-card{
+  background:rgba(255,255,255,.94);border:1px solid var(--faq-border);border-radius:18px;
+  box-shadow:0 8px 26px rgba(15,23,42,.055);overflow:hidden;transition:.2s ease
+}
+.faq-card:hover{transform:translateY(-2px);border-color:#bfdbfe;box-shadow:0 14px 32px rgba(15,23,42,.08)}
+.faq-card details{padding:0}
+.faq-card summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:20px 21px;font-size:.96rem;font-weight:850;color:#172033
+}
+.faq-card summary::-webkit-details-marker{display:none}
+.faq-card summary:after{
+  content:"+";display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px;border-radius:9px;
+  background:#f1f5f9;color:#475569;font-size:1.1rem;font-weight:700;transition:.18s ease
+}
+.faq-card details[open] summary:after{content:"−";background:var(--faq-blue-soft);color:var(--faq-blue)}
+.faq-card details[open] summary{color:#0f3f9e}
+.faq-answer{padding:0 21px 21px;color:#5b687c;font-size:.88rem}
+.faq-answer p{margin:0}
+.faq-trust{
+  margin-top:24px;padding:18px 20px;border:1px solid #bfdbfe;border-radius:18px;
+  background:linear-gradient(135deg,#eff6ff,#f8fbff);display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start
+}
+.faq-trust-icon{
+  width:42px;height:42px;border-radius:13px;background:#2563eb;color:#fff;display:grid;place-items:center;
+  box-shadow:0 8px 18px rgba(37,99,235,.2)
+}
+.faq-trust strong{display:block;margin-bottom:3px;font-size:.9rem}
+.faq-trust span{color:#64748b;font-size:.8rem}
+@media(max-width:760px){.faq-page{padding:14px 14px 36px}.faq-grid{grid-template-columns:1fr}.faq-hero{padding:40px 0 24px}.faq-hero h1{font-size:2.25rem}.faq-topbar{align-items:flex-start}.faq-security-pill{margin-top:3px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.faq-card{transition:none}.faq-card:hover{transform:none}.faq-nav a{transition:none}.faq-card summary:after{transition:none}}
+html.dark body,body.dark{background:linear-gradient(180deg,#07111d,#081522 55%,#06101a)!important;color:#e5edf7!important}
+html.dark .faq-topbar,body.dark .faq-topbar{border-bottom-color:rgba(148,163,184,.16)}
+html.dark .faq-nav a,body.dark .faq-nav a{color:#cbd5e1!important}
+html.dark .faq-nav a:hover,html.dark .faq-nav a:focus-visible,body.dark .faq-nav a:hover,body.dark .faq-nav a:focus-visible{background:#0f1d2d;color:#93c5fd!important}
+html.dark .faq-security-pill,body.dark .faq-security-pill{background:#092016;border-color:#14532d;color:#86efac}
+html.dark .faq-hero h1,body.dark .faq-hero h1{color:#f8fafc}
+html.dark .faq-hero p,body.dark .faq-hero p{color:#9fb0c5}
+html.dark .faq-kicker,body.dark .faq-kicker{background:#0d2340;color:#93c5fd}
+html.dark .faq-card,body.dark .faq-card{background:#0d1927;border-color:#20334a;box-shadow:0 10px 28px rgba(0,0,0,.24)}
+html.dark .faq-card:hover,body.dark .faq-card:hover{border-color:#315b88}
+html.dark .faq-card summary,body.dark .faq-card summary{color:#e7eef8}
+html.dark .faq-card details[open] summary,body.dark .faq-card details[open] summary{color:#93c5fd}
+html.dark .faq-card summary:after,body.dark .faq-card summary:after{background:#17263a;color:#a9b8cb}
+html.dark .faq-card details[open] summary:after,body.dark .faq-card details[open] summary:after{background:#102d50;color:#93c5fd}
+html.dark .faq-answer,body.dark .faq-answer{color:#a9b8cb}
+html.dark .faq-trust,body.dark .faq-trust{background:linear-gradient(135deg,#0c2239,#0c1826);border-color:#21486f}
+html.dark .faq-trust span,body.dark .faq-trust span{color:#9fb0c5}
+</style>
+</head><body><main class="faq-page"><div class="faq-topbar"><nav class="faq-nav"><a href="/">Home</a><a href="/services.html">Services</a><a href="/faq.html">FAQ</a><a href="/privacy.html">Trust</a><a href="/login.html">Client portal</a></nav><div class="faq-security-pill"><i>●</i> Security &amp; privacy focused</div></div><header class="faq-hero"><span class="faq-kicker">Manlung Recovery · FAQ</span><h1>Frequently asked questions</h1><p>Clear answers about recovery cases, evidence, calls, payments, privacy and account safety.</p></header><section class="faq-grid" aria-label="Frequently asked questions"><article class="faq-card"><details open><summary>How do I track my case?</summary><p>Sign in to the client portal. Your case status, timeline, messages and available investigator actions are protected by account authorization.</p></details></article><article class="faq-card"><details><summary>What should I upload?</summary><p>Only relevant evidence. Supported uploads are validated for type and file signature. Do not upload passwords, OTPs, recovery codes, API keys or other secrets.</p></details></article><article class="faq-card"><details><summary>Can I reopen a closed case?</summary><p>Eligible completed cases can be reopened by an authorized investigator or owner. The reopen action is recorded in the case timeline.</p></details></article><article class="faq-card"><details><summary>How are calls handled?</summary><p>Calls use browser WebRTC signaling. Ringing, acceptance, missed calls, reconnection diagnostics and end state can be recorded for authorized participants.</p></details></article><article class="faq-card"><details><summary>How are donations confirmed?</summary><p>Payment confirmation is based on server-side verification/webhook processing. Pending and failed payments are not counted as confirmed donations.</p></details></article><article class="faq-card"><details><summary>Does the AI know my private case?</summary><p>Only authenticated, authorized case context may be retrieved. The assistant should not reveal another user's case information and should never ask for credentials or secrets.</p></details></article><article class="faq-card"><details><summary>What if I suspect account abuse?</summary><p>Stop sharing secrets, sign out of other sessions from your security controls when available, and contact human support through the portal.</p></details></article></main><footer class="manlung-footer" aria-label="Manlung Recovery footer">
   <div class="manlung-footer-inner">
     <div class="manlung-footer-grid">
       <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
