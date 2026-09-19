@@ -812,21 +812,13 @@ router.post(
 router.get('/client/verify-email', async (req, res) => {
   try {
     const rawToken = String(req.query.token || '').trim();
-
-    if (!rawToken || rawToken.length < 32) {
-      return res.redirect('/login.html?verified=invalid');
-    }
-
+    if (!rawToken || rawToken.length < 32) return res.redirect('/login.html?verified=invalid');
     const tokenHash = hashToken(rawToken);
     const client = await User.findByValidEmailVerificationToken(tokenHash);
-
-    if (!client) {
-      return res.redirect('/login.html?verified=expired');
-    }
-
+    if (!client) return res.redirect('/login.html?verified=expired');
     await User.markEmailVerified(client.id);
-
-    return res.redirect('/login.html?verified=success');
+    await User.setResetToken(client.email, tokenHash, new Date(Date.now() + 15 * 60 * 1000).toISOString());
+    return res.redirect('/reset-password.html?token=' + encodeURIComponent(rawToken) + '&setup=1');
   } catch (error) {
     console.error('Client email verification error:', error);
     return res.redirect('/login.html?verified=error');
