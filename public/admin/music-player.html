@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#081525">
+  <title>Admin Music Player · Manlung Recovery</title>
+  <style>
+    :root{color-scheme:dark}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:#08111b;color:#f8fafc;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{display:flex;flex-direction:column}
+    .head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.75rem .9rem;background:linear-gradient(135deg,#081525,#10253f);border-bottom:1px solid rgba(148,163,184,.16)}
+    .brand{min-width:0}
+    .brand strong{display:block;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand span{display:block;color:#94a3b8;font-size:.65rem;margin-top:.15rem}
+    button{border:1px solid rgba(148,163,184,.25);border-radius:9px;background:#101b28;color:#e2e8f0;padding:.45rem .65rem;font-weight:800;cursor:pointer}
+    button:hover{background:#172638}
+    .now{padding:.7rem .9rem .5rem;font-size:.76rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .player{padding:0 .7rem .7rem}
+    iframe{display:block;width:100%;height:min(56vw,430px);min-height:220px;border:0;border-radius:12px;background:#000}
+    .hint{padding:.5rem .9rem;color:#94a3b8;font-size:.64rem;line-height:1.4}
+    .offline{display:none;padding:2rem 1rem;text-align:center;color:#94a3b8}
+  </style>
+</head>
+<body>
+  <header class="head">
+    <div class="brand">
+      <strong>♪ Manlung Admin Music</strong>
+      <span>Persistent browser player</span>
+    </div>
+    <button type="button" id="closeBtn">Close</button>
+  </header>
+  <div class="now" id="nowPlaying">Nothing playing</div>
+  <main class="player">
+    <iframe id="frame" title="Admin music player" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+    <div class="offline" id="offline">Choose a song from the Admin Music Center.</div>
+  </main>
+  <div class="hint">Keep this player window/tab open while you move between Admin functions. Playback stays in this browser window instead of being destroyed by page navigation.</div>
+
+  <script>
+    const KEY = 'manlung-admin-music-now-playing-v1';
+    const frame = document.getElementById('frame');
+    const title = document.getElementById('nowPlaying');
+    const offline = document.getElementById('offline');
+
+    function readSong() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function render(song) {
+      if (!song || !song.id) {
+        frame.src = 'about:blank';
+        title.textContent = 'Nothing playing';
+        offline.style.display = 'block';
+        return;
+      }
+      offline.style.display = 'none';
+      title.textContent = song.title || 'Now playing';
+      const url = 'https://www.youtube-nocookie.com/embed/' +
+        encodeURIComponent(song.id) +
+        '?autoplay=1&playsinline=1&rel=0';
+      if (frame.src !== url) frame.src = url;
+    }
+
+    render(readSong());
+
+    window.addEventListener('storage', event => {
+      if (event.key === KEY) render(readSong());
+    });
+
+    if ('BroadcastChannel' in window) {
+      const channel = new BroadcastChannel('manlung-admin-music-v1');
+      channel.addEventListener('message', event => {
+        if (event.data && event.data.type === 'song') render(event.data.song);
+      });
+      window.addEventListener('beforeunload', () => channel.close());
+    }
+
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      try { localStorage.removeItem(KEY); } catch (_) {}
+      window.close();
+    });
+  </script>
+</body>
+</html>
