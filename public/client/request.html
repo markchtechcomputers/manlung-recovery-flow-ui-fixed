@@ -258,8 +258,29 @@
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
     <script src="/js/client-session-guard.js"></script>
+    <style id="submission-modal-style">
+        #submissionModalOverlay{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(2,6,23,.62);backdrop-filter:blur(6px)}
+        #submissionModal{width:min(520px,100%);background:var(--card-bg,#fff);color:var(--text,#0f172a);border:1px solid var(--card-border,#e2e8f0);border-radius:20px;box-shadow:0 24px 70px rgba(2,6,23,.28);padding:28px;text-align:center}
+        #submissionModal .submission-icon{width:54px;height:54px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#ecfdf5;color:#16a34a;font-size:22px}
+        #submissionModal h2{margin:.2rem 0 .45rem;font-size:1.35rem}
+        #submissionModal p{margin:.35rem 0;color:var(--text-muted,#64748b);line-height:1.55}
+        #submissionModal .submission-case{display:inline-flex;align-items:center;gap:8px;margin:12px 0;padding:9px 12px;border-radius:10px;background:var(--info-bg,#eff6ff);color:var(--info-text,#1e40af);font-weight:800;font-size:.9rem}
+        #submissionModal .submission-actions{display:flex;gap:10px;justify-content:center;margin-top:16px}
+        #submissionModal .submission-actions .btn{min-width:130px}
+        @media(max-width:520px){#submissionModal{padding:22px 18px;border-radius:16px}#submissionModal .submission-actions{flex-direction:column}#submissionModal .submission-actions .btn{width:100%}}
+    </style>
 </head>
 <body>
+<div id="submissionModalOverlay" role="dialog" aria-modal="true" aria-labelledby="submissionModalTitle">
+  <div id="submissionModal">
+    <div class="submission-icon"><i class="fas fa-circle-check" aria-hidden="true"></i></div>
+    <h2 id="submissionModalTitle">Request submitted successfully</h2>
+    <p>Your recovery request has been received and is now in our review workflow.</p>
+    <div class="submission-case"><i class="fas fa-folder-open" aria-hidden="true"></i><span>Case ID: <strong id="submittedCaseIdModal">—</strong></span></div>
+    <p>Keep your Case ID safe. You can use it to track your request and receive updates.</p>
+    <div class="submission-actions"><a class="btn btn-primary" href="/client/dashboard.html"><i class="fas fa-gauge"></i> Open Dashboard</a><button type="button" class="btn btn-outline-dark" onclick="closeSubmissionModal()">Continue</button></div>
+  </div>
+</div>
     <header class="site-header">
         <div class="container-narrow">
             <div class="brand">
@@ -678,6 +699,9 @@
                     document.getElementById('formContainer').style.display = 'none';
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('submittedCaseId').textContent = data.case.caseId;
+                    document.getElementById('submittedCaseIdModal').textContent = data.case.caseId;
+                    document.getElementById('submissionModalOverlay').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
                     clearDraft();
                 } else {
                     alert((data && data.error) || `Error submitting request (status ${xhr.status}). Please try again.`);
@@ -693,6 +717,9 @@
             xhr.send(fd);
         }
 
+
+        function closeSubmissionModal(){ const o=document.getElementById('submissionModalOverlay'); if(o)o.style.display='none'; document.body.style.overflow=''; }
+        document.getElementById('submissionModalOverlay').addEventListener('click',e=>{if(e.target.id==='submissionModalOverlay')closeSubmissionModal();});
         async function checkAuth() {
             const token = localStorage.getItem('clientToken');
             if (!token) {
