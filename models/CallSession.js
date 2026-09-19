@@ -6,14 +6,14 @@ const RING_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_RING_TIMEOUT_SECON
 const QUEUE_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_QUEUE_TIMEOUT_SECONDS, 10) || 600;
 const ACTIVE_CALL_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_ACTIVE_TIMEOUT_SECONDS, 10) || 21600; // 6h safety valve
 
-async function create({ clientUserId, clientName, clientEmail, caseId }) {
+async function create({ clientUserId, clientName, clientEmail, caseId, status = 'ringing' }) {
   const now = new Date().toISOString();
   const { data, error } = await supabase.from(TABLE).insert({
     client_user_id: clientUserId,
     client_name: clientName,
     client_email: clientEmail,
     case_id: caseId || null,
-    status: 'ringing',
+    status: ['ringing', 'queued'].includes(status) ? status : 'ringing',
     ringing_started_at: now,
   }).select().single();
   if (error) throw error;
@@ -67,8 +67,8 @@ async function accept(id, adminUserId) {
       admin_user_id: adminUserId,
       accepted_at: new Date().toISOString(),
     })
-    .eq('id', id)
-    .eq('status', 'ringing')
+     .eq('id', id)
+    .in('status', ['ringing', 'queued'])
     .is('admin_user_id', null)
     .select()
     .maybeSingle();
@@ -105,7 +105,7 @@ async function setStatus(id, status, endReason) {
 }
 
 async function expireIfRingingTooLong(session) {
-  if (!session || session.status !== 'ringing') return session;
+  if (!session || !['ringing', 'queued'].includes(session.status)) return session;
   const ringingSince = new Date(session.ringing_started_at || session.created_at).getTime();
   const timeoutSeconds = session.admin_user_id ? RING_TIMEOUT_SECONDS : QUEUE_TIMEOUT_SECONDS;
   if (Date.now() - ringingSince < timeoutSeconds * 1000) return session;
@@ -120,7 +120,7 @@ async function cleanupAbandoned() {
     status: 'missed',
     ended_at: new Date().toISOString(),
     end_reason: 'queue_timeout',
-  }).eq('status', 'ringing').is('admin_user_id', null).lt('ringing_started_at', queueCutoff);
+  }).in('status', ['ringing', 'queued']).is('admin_user_id', null).lt('ringing_started_at', queueCutoff);
   if (queueError) throw queueError;
   const { data: timedOutCallbacks, error: ringError } = await supabase.from(TABLE).update({
     status: 'missed',
