@@ -516,7 +516,18 @@ router.put('/:id/end', auth, async (req, res) => {
     if (session.admin_user_id) {
       await AdminPresence.setBusy(session.admin_user_id, false);
     }
-    res.json({ success: true, session: updated });
+
+    // Freeing an admin must only promote the next waiting caller. Never touch
+    // the rest of the queue when one call ends.
+    const nextWaiting = await CallSession.promoteNextWaiting();
+    const availability = await AdminPresence.getAvailabilityState();
+    res.json({
+      success: true,
+      session: updated,
+      nextWaitingCallId: nextWaiting?.id || null,
+      onlineCount: availability.onlineCount,
+      availableCount: availability.availableCount,
+    });
   } catch (error) {
     console.error('End call error:', error);
     res.status(500).json({ error: error.message || 'Server error' });
