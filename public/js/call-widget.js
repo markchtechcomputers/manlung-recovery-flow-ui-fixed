@@ -235,8 +235,8 @@
       }
 
       #manlungContactMenu{
-        width:min(245px,calc(100vw - 24px)) !important;
-        padding:.55rem !important;
+        width:min(235px,calc(100vw - 20px)) !important;
+        padding:.25rem !important;
         right:-2px !important;
       }
 
@@ -245,21 +245,25 @@
       }
 
        .manlung-contact-choice{
-        height:50px !important;
-        min-height:50px !important;
-        gap:.5rem !important;
-        padding:.25rem .45rem !important;
+        height:58px !important;
+        min-height:58px !important;
+        gap:.65rem !important;
+        padding:.25rem .3rem !important;
       }
       .manlung-contact-choice-icon{
-        width:36px !important;
-        height:36px !important;
-        flex-basis:36px !important;
+        width:42px !important;
+        height:42px !important;
+        flex-basis:42px !important;
       }
       .manlung-contact-choice-icon img{
-        width:28px !important;
-        height:28px !important;
-        max-width:28px !important;
-        max-height:28px !important;
+        width:34px !important;
+        height:34px !important;
+        max-width:34px !important;
+        max-height:34px !important;
+      }
+      .manlung-contact-choice .manlung-contact-choice-label{
+        font-size:.95rem !important;
+        font-weight:900 !important;
       }
     }
     /* Final contact icon cleanup: remove every dark holder/line around the icons. */
