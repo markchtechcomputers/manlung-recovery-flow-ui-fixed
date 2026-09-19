@@ -281,7 +281,11 @@
                     credentials: 'include',
                     body: JSON.stringify({ username, password }),
                 });
-                const data = await response.json();
+                const raw = await response.text();
+                let data = {};
+                try { data = raw ? JSON.parse(raw) : {}; } catch (_) {
+                    data = { error: raw || `Server returned HTTP ${response.status}.` };
+                }
 
                 if (data.success && data.mfaRequired) {
                     pendingMfaTicket = data.mfaTicket;
@@ -302,7 +306,7 @@
 
                 errorEl.textContent = data.error || 'Invalid credentials';
             } catch (error) {
-                errorEl.textContent = 'Connection error. Please try again.';
+                errorEl.textContent = error?.message || 'Unable to reach the login service. Please try again.';
                 console.error('Login error:', error);
             }
         }
