@@ -278,7 +278,7 @@
       box-shadow:none !important;
     }
     #manlungContactMenu .manlung-contact-choice .manlung-contact-choice-label{
-      color:#fff !important;
+      color:#111827 !important;
     }
 
   `;
