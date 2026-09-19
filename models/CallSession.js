@@ -3,7 +3,7 @@ const AdminPresence = require('./AdminPresence');
 
 const TABLE = 'recovery_call_sessions';
 const RING_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_RING_TIMEOUT_SECONDS, 10) || 30;
-const QUEUE_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_QUEUE_TIMEOUT_SECONDS, 10) || 600;
+const QUEUE_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_QUEUE_TIMEOUT_SECONDS, 10) || 3600;
 const ACTIVE_CALL_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_ACTIVE_TIMEOUT_SECONDS, 10) || 21600; // 6h safety valve
 
 async function create({ clientUserId, clientName, clientEmail, caseId, status = 'ringing' }) {
