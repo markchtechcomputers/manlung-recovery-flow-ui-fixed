@@ -483,6 +483,7 @@
                 <a href="/admin/owner.html" id="ownerLink" class="btn btn-outline owner-only" style="display:none !important;"> Admin Management</a>
                 <a class="btn btn-outline" href="/admin/reports.html"> Reports</a>
                 <a class="btn btn-outline" href="/admin/operations.html"> Operations</a>
+                <a class="btn btn-outline" href="/admin/tools.html"> Tools</a>
                 <button class="btn btn-outline" data-theme-toggle="true"></button>
                 <a href="/" class="btn btn-outline"> Home</a>
                 <button class="btn btn-danger" onclick="handleLogout()"> Logout</button>
@@ -680,6 +681,12 @@
         }
 
         applyOwnerVisibility(currentAdmin);
+
+        // Tools case lookup can hand off directly to the existing case modal.
+        const toolsCaseId = new URLSearchParams(window.location.search).get('case');
+        if (toolsCaseId) {
+            window.setTimeout(() => openCase(toolsCaseId), 250);
+        }
 
         /*
          * Re-check the authenticated session after every login.

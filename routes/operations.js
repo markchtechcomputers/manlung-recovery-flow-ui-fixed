@@ -64,26 +64,60 @@ router.get('/queue', adminAuth, async (req, res) => {
     const status = String(req.query.status || 'active');
     const priority = String(req.query.priority || 'all');
     const assignee = req.query.assignee === 'me' ? req.user.id : (req.query.assignee || null);
-    let query = supabase.from('recovery_cases').select('*').order('sla_due_at', { ascending: true, nullsFirst: false }).order('created_at', { ascending: true }).limit(limit);
-    if (status === 'active') query = query.in('status', ACTIVE);
-    else if (status === 'closed') query = query.in('status', TERMINAL);
-    else if (status !== 'all') query = query.eq('status', status);
-    if (priority !== 'all') query = query.eq('priority', priority);
-    if (assignee) query = query.eq('assigned_admin_id', assignee);
-    if (req.user.role !== 'owner') query = query.eq('assigned_admin_id', req.user.id);
-    const { data, error } = await query;
+    // Read the existing case shape first, then apply optional operations fields
+    // in application code. This keeps Operations compatible with installations
+    // that predate the optional SLA/priority migration while still using the
+    // real recovery_cases table.
+    const { data, error } = await supabase
+      .from('recovery_cases')
+      .select('*')
+      .order('created_at', { ascending: true })
+      .limit(Math.min(limit * 3, 300));
     if (error) throw error;
+
+    const scoped = (data || []).filter(c => {
+      const statusMatch =
+        status === 'active' ? ACTIVE.includes(c.status) :
+        status === 'closed' ? TERMINAL.includes(c.status) :
+        status === 'all' ? true :
+        c.status === status;
+      const priorityMatch =
+        priority === 'all' || String(c.priority || 'normal').toLowerCase() === priority;
+      const assigneeMatch =
+        !assignee || c.assigned_admin_id === assignee;
+      const roleMatch =
+        req.user.role === 'owner' || c.assigned_admin_id === req.user.id;
+      return statusMatch && priorityMatch && assigneeMatch && roleMatch;
+    });
+
     const now = Date.now();
-    const cases = (data || []).map(c => ({ ...c, sla_state: !c.sla_due_at ? 'unset' : new Date(c.sla_due_at).getTime() < now ? 'breached' : new Date(c.sla_due_at).getTime() - now < 24*3600*1000 ? 'at_risk' : 'on_track' }));
+    const cases = scoped
+      .sort((a, b) => {
+        const aSla = a.sla_due_at ? new Date(a.sla_due_at).getTime() : Number.POSITIVE_INFINITY;
+        const bSla = b.sla_due_at ? new Date(b.sla_due_at).getTime() : Number.POSITIVE_INFINITY;
+        if (aSla !== bSla) return aSla - bSla;
+        return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+      })
+      .slice(0, limit)
+      .map(c => ({
+        ...c,
+        priority: c.priority || 'normal',
+        sla_state: !c.sla_due_at ? 'unset' : new Date(c.sla_due_at).getTime() < now ? 'breached' : new Date(c.sla_due_at).getTime() - now < 24*3600*1000 ? 'at_risk' : 'on_track'
+      }));
     res.json({ success: true, cases });
   } catch (e) { res.status(500).json({ success:false, error:'Could not load case queue.' }); }
 });
 
 router.get('/workload', adminAuth, async (req, res) => {
   try {
-    const { data: admins, error: ae } = await supabase.from('recovery_users').select('id,username,email,full_name,role,admin_status').in('role',['admin','owner']);
+    const { data: admins, error: ae } = await supabase
+      .from('recovery_users')
+      .select('*')
+      .in('role',['admin','owner']);
     if (ae) throw ae;
-    const { data: cases, error: ce } = await supabase.from('recovery_cases').select('assigned_admin_id,status,priority,sla_due_at');
+    const { data: cases, error: ce } = await supabase
+      .from('recovery_cases')
+      .select('*');
     if (ce) throw ce;
     const rows = (admins || []).map(a => {
       const mine = (cases || []).filter(c => c.assigned_admin_id === a.id);

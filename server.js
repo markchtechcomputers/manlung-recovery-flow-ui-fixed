@@ -26,6 +26,7 @@ const operationsRoutes = require('./routes/operations');
 const aiRoutes = require('./routes/ai');
 const { supabase } = require('./config/supabase');
 const { inputSecurity } = require('./middleware/inputSecurity');
+const { adminAuth, ownerAuth } = require('./middleware/auth');
 const OFFICIAL_WEBSITES = require('./config/official-websites');
 
 const app = express();
@@ -318,6 +319,18 @@ app.use('/api/', inputSecurity);
 // ============================================================
 // STATIC FRONTEND FILES
 // ============================================================
+
+// Internal admin tool documents are protected before the public static handler.
+// API endpoints remain the source of truth for tool-level authorization.
+app.get('/admin/tools.html', adminAuth, (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'tools.html'));
+});
+app.get('/admin/tools/website-scanner.html', adminAuth, (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'tools', 'website-scanner.html'));
+});
+app.get('/admin/tools/security.html', ownerAuth, (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'tools', 'security.html'));
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -856,7 +869,7 @@ function analyzeDomain(hostname) {
   };
 }
 
-app.post('/api/link-scanner/scan', scannerLimiter, async (req, res) => {
+app.post('/api/link-scanner/scan', scannerLimiter, adminAuth, async (req, res) => {
   const startedAt = Date.now();
 
   try {

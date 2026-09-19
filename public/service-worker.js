@@ -1,13 +1,13 @@
-const CACHE_NAME = 'manlung-recovery-static-v20';
+const CACHE_NAME = 'manlung-recovery-static-v21';
 
 // Only public/static pages are cached. Authenticated dashboards, settings,
 // admin pages, API responses, evidence, and other private data stay network-only.
 const STATIC_ASSETS = [
   '/', '/about.html', '/blog.html', '/careers.html', '/contact.html', '/donate.html',
-  '/knowledge.html', '/services.html', '/link-scanner.html', '/terms.html', '/privacy.html', '/login.html',
+  '/knowledge.html', '/services.html', '/terms.html', '/privacy.html', '/login.html',
   '/reset-password.html', '/oauth-callback.html', '/client/request.html', '/client/track.html', '/manifest.webmanifest',
   '/favicon.svg', '/css/style.css', '/css/theme.css', '/js/theme.js', '/js/pwa.js',
-  '/js/link-scanner.js', '/js/call-webrtc.js', '/js/call-widget.js', '/js/contact-fab.js',
+  '/js/call-webrtc.js', '/js/call-widget.js', '/js/contact-fab.js',
   '/js/support-fab.js', '/js/manlung-ai-v2.js', '/js/manlung-ai.js',
   '/icons/icon-192.png', '/icons/icon-512.png'
 ];

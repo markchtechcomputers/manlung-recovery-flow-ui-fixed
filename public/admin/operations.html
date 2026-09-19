@@ -12,7 +12,7 @@ html.dark{--op-bg:#0b0f19;--op-card:#111827;--op-text:#f8fafc;--op-muted:#94a3b8
 </head>
 <body>
 <main class="wrap">
-<header class="top"><div><h1>Operations</h1><p>Live case queue, SLA visibility and investigator workload.</p></div><div class="actions"><a class="btn" href="/admin/dashboard.html">Dashboard</a><a class="btn" href="/admin/reports.html">Reports</a><a class="btn" href="/admin/owner.html">Owner Tools</a><button class="btn primary" id="refresh">Refresh</button></div></header>
+<header class="top"><div><h1>Operations</h1><p>Live case queue, SLA visibility and investigator workload.</p></div><div class="actions"><a class="btn" href="/admin/dashboard.html">Dashboard</a><a class="btn" href="/admin/reports.html">Reports</a><a class="btn" href="/admin/tools.html">Tools</a><a class="btn" href="/admin/owner.html">Owner Tools</a><button class="btn primary" id="refresh">Refresh</button></div></header>
 <div id="status" class="status">Loading operations…</div>
 <section class="grid"><section class="card"><h2>Case Queue</h2><div class="filters"><select id="statusFilter"><option value="active">Active</option><option value="closed">Closed</option><option value="all">All</option></select><select id="priorityFilter"><option value="all">All priorities</option><option value="urgent">Urgent</option><option value="high">High</option><option value="normal">Normal</option><option value="low">Low</option></select><select id="assigneeFilter"><option value="all">All assigned</option><option value="me">My cases</option></select></div><div id="queue" class="queue"></div></section>
 <section class="card"><h2>Team Workload</h2><div id="workload"></div></section></section>
