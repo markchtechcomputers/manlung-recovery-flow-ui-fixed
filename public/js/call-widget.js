@@ -249,6 +249,38 @@
         min-height:72px !important;
       }
     }
+    /* Final contact icon cleanup: remove every dark holder/line around the icons. */
+    #manlungContactMenu .manlung-contact-menu-actions{
+      background:transparent !important;
+      border:0 !important;
+      box-shadow:none !important;
+      outline:0 !important;
+    }
+    #manlungContactMenu .manlung-contact-choice,
+    #manlungContactMenu .manlung-contact-choice:hover,
+    #manlungContactMenu .manlung-contact-choice:focus,
+    #manlungContactMenu .manlung-contact-choice:active{
+      background:transparent !important;
+      border:0 !important;
+      outline:0 !important;
+      box-shadow:none !important;
+    }
+    #manlungContactMenu .manlung-contact-choice-icon,
+    #manlungContactMenu .manlung-contact-call .manlung-contact-choice-icon{
+      background:#fff !important;
+      border:2px solid #fff !important;
+      outline:0 !important;
+      box-shadow:0 0 0 2px #fff,0 0 16px 5px rgba(255,255,255,1),0 0 30px 8px rgba(255,255,255,.72) !important;
+    }
+    #manlungContactMenu .manlung-contact-choice-icon img{
+      border:0 !important;
+      outline:0 !important;
+      box-shadow:none !important;
+    }
+    #manlungContactMenu .manlung-contact-choice .manlung-contact-choice-label{
+      color:#fff !important;
+    }
+
   `;
   document.head.appendChild(style);
 })();
