@@ -251,9 +251,9 @@
         padding:.25rem .3rem !important;
       }
       .manlung-contact-choice-icon{
-        width:42px !important;
-        height:42px !important;
-        flex-basis:42px !important;
+        width:38px !important;
+        height:38px !important;
+        flex-basis:38px !important;
       }
       .manlung-contact-choice-icon img{
         width:34px !important;
