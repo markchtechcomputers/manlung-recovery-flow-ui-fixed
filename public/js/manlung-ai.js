@@ -217,6 +217,140 @@
       html.dark .manlung-ai-voice-state,body.dark .manlung-ai-voice-state{background:#102238;color:#dbeafe;border-color:#29415b}
       html.dark .manlung-ai-quick button,body.dark .manlung-ai-quick button{background:#102238;color:#9bd0ff;border-color:#29415b}
       html.dark .manlung-ai-note,body.dark .manlung-ai-note{color:#9eb1c6}
+      /* Premium Manlung AI chat redesign */
+      #manlungAiWindow{
+        background:#f4f7fb;
+        font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      }
+      .manlung-ai-head{
+        min-height:82px;
+        padding:14px clamp(16px,4vw,48px);
+        background:linear-gradient(135deg,#061525 0%,#0b2946 48%,#0a7188 100%);
+        position:relative;
+        overflow:hidden;
+      }
+      .manlung-ai-head:after{
+        content:"";
+        position:absolute;inset:auto -8% -70px auto;width:340px;height:150px;
+        background:radial-gradient(circle,rgba(34,211,238,.28),transparent 68%);
+        pointer-events:none;
+      }
+      .manlung-ai-avatar{
+        width:50px;height:50px;border-radius:16px;
+        background:linear-gradient(145deg,#22d3ee,#2563eb);
+        box-shadow:0 10px 28px rgba(37,99,235,.32);
+        position:relative;z-index:1;
+      }
+      .manlung-ai-title{font-size:1.08rem;font-weight:850;letter-spacing:-.03em;position:relative;z-index:1}
+      .manlung-ai-status{font-size:.74rem;letter-spacing:.01em;position:relative;z-index:1}
+      .manlung-ai-close{position:relative;z-index:2;border-radius:14px}
+      .manlung-ai-toolbar{
+        min-height:54px;padding:8px clamp(16px,4vw,48px);
+        background:rgba(255,255,255,.94);
+        backdrop-filter:blur(12px);
+        justify-content:flex-start;
+      }
+      .manlung-ai-toolbar button{
+        min-height:38px;border-radius:10px;
+        background:#f8fafc;color:#334155;
+        font-size:.72rem;box-shadow:0 1px 2px rgba(15,23,42,.03);
+      }
+      .manlung-ai-body{
+        padding:34px clamp(14px,7vw,120px) 28px;
+        background:
+          radial-gradient(circle at 50% -5%,rgba(37,99,235,.07),transparent 34%),
+          linear-gradient(180deg,#f8fafc 0%,#f1f5f9 100%);
+      }
+      .manlung-ai-msg{margin-bottom:20px}
+      .manlung-ai-msg>div{max-width:min(720px,82%)}
+      .manlung-ai-bubble{
+        padding:14px 17px;border-radius:17px;
+        font-size:.92rem;line-height:1.62;
+        box-shadow:0 7px 24px rgba(15,23,42,.055);
+      }
+      .manlung-ai-msg.ai .manlung-ai-bubble{
+        border-color:#dce5ef;background:#fff;
+      }
+      .manlung-ai-msg.user .manlung-ai-bubble{
+        background:linear-gradient(135deg,#0e7490,#2563eb);
+        border:0;box-shadow:0 9px 24px rgba(37,99,235,.18);
+      }
+      .manlung-ai-quick{
+        max-width:min(720px,82%);gap:8px;margin:0 0 24px;
+      }
+      .manlung-ai-quick button{
+        padding:9px 13px;border-radius:11px;
+        border-color:#d7e2ed;color:#1e5874;
+        font-size:.74rem;font-weight:800;
+        box-shadow:0 2px 8px rgba(15,23,42,.035);
+        transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+      }
+      .manlung-ai-quick button:hover{
+        transform:translateY(-1px);border-color:#72bcd0;
+        box-shadow:0 6px 16px rgba(15,23,42,.07);
+      }
+      .manlung-ai-foot{
+        padding:11px clamp(12px,4vw,48px) 14px;
+        background:rgba(255,255,255,.97);
+        backdrop-filter:blur(12px);
+      }
+      .manlung-ai-links{
+        max-width:1000px;margin:0 auto 9px;
+        gap:8px;
+      }
+      .manlung-ai-links a{
+        padding:9px 13px;border-radius:10px;
+        background:#f8fafc;border-color:#dbe5ee;color:#155e75;
+        font-size:.72rem;
+        transition:.16s ease;
+      }
+      .manlung-ai-links a:hover{transform:translateY(-1px);background:#effbfe}
+      .manlung-ai-compose{max-width:1000px}
+      .manlung-ai-input{
+        min-height:48px;background:#f8fafc;border-color:#cbd8e6;
+        border-radius:14px;box-shadow:inset 0 1px 2px rgba(15,23,42,.025);
+      }
+      .manlung-ai-mic,.manlung-ai-send{
+        width:48px;height:48px;border-radius:14px;
+      }
+      .manlung-ai-send{
+        background:linear-gradient(135deg,#0e7490,#2563eb);
+        box-shadow:0 8px 20px rgba(37,99,235,.2);
+      }
+      .manlung-ai-note{
+        max-width:900px;line-height:1.35;
+      }
+      html.dark #manlungAiWindow,body.dark #manlungAiWindow{background:#06101b}
+      html.dark .manlung-ai-head,body.dark .manlung-ai-head{background:linear-gradient(135deg,#040b13 0%,#0a2036 48%,#075d70 100%)}
+      html.dark .manlung-ai-toolbar,body.dark .manlung-ai-toolbar{background:rgba(9,20,33,.96)}
+      html.dark .manlung-ai-toolbar button,body.dark .manlung-ai-toolbar button{background:#132337;color:#dbeafe;border-color:#304a64}
+      html.dark .manlung-ai-body,body.dark .manlung-ai-body{
+        background:
+          radial-gradient(circle at 50% -5%,rgba(37,99,235,.13),transparent 34%),
+          linear-gradient(180deg,#0a1827 0%,#06101b 100%);
+      }
+      html.dark .manlung-ai-msg.ai .manlung-ai-bubble,body.dark .manlung-ai-msg.ai .manlung-ai-bubble{
+        background:#0e2033;border-color:#29445d;
+        box-shadow:0 8px 24px rgba(0,0,0,.18);
+      }
+      html.dark .manlung-ai-quick button,body.dark .manlung-ai-quick button{
+        background:#0e2033;color:#9bd0ff;border-color:#29445d;
+      }
+      html.dark .manlung-ai-foot,body.dark .manlung-ai-foot{background:rgba(7,17,29,.97)}
+      html.dark .manlung-ai-links a,body.dark .manlung-ai-links a{background:#0e2033;color:#9bd0ff;border-color:#29445d}
+      html.dark .manlung-ai-input,body.dark .manlung-ai-input{background:#0c1b2c;border-color:#38516b}
+      @media(max-width:650px){
+        .manlung-ai-head{min-height:64px;padding:9px 11px}
+        .manlung-ai-toolbar{min-height:48px;padding:6px 9px}
+        .manlung-ai-body{
+          padding:16px 9px 14px;
+          background:linear-gradient(180deg,#f8fafc 0%,#f1f5f9 100%);
+        }
+        .manlung-ai-msg{margin-bottom:14px}
+        .manlung-ai-msg>div,.manlung-ai-quick{max-width:96%}
+        .manlung-ai-bubble{font-size:.88rem;padding:11px 12px;border-radius:15px}
+        .manlung-ai-foot{padding:8px 9px calc(9px + env(safe-area-inset-bottom))}
+      }
       @keyframes manlungAiRecord{50%{transform:scale(1.06)}}
     `;
     document.head.appendChild(style);
