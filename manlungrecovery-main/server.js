@@ -20,6 +20,7 @@ const subscriptionRoutes = require('./routes/subscription');
 const callRoutes = require('./routes/calls');
 const donationRoutes = require('./routes/donations');
 const ownerRoutes = require('./routes/owner');
+const operationsRoutes = require('./routes/operations');
 const careerRoutes = require('./routes/careers');
 const { supabase } = require('./config/supabase');
 const { inputSecurity } = require('./middleware/inputSecurity');
@@ -433,6 +434,7 @@ app.use('/api/payments/call-admin', subscriptionRoutes);
 app.use('/api/calls', callRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/owner', ownerRoutes);
+app.use('/api/operations', operationsRoutes);
 app.use('/api/careers', careerRoutes);
 
 // ============================================================
