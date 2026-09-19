@@ -133,6 +133,39 @@ async function cleanupAbandoned() {
   }
 }
 
+async function getWaitingQueue() {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select('id, client_name, client_email, case_id, status, created_at, ringing_started_at')
+    .in('status', ['ringing', 'queued'])
+    .is('admin_user_id', null)
+    .order('created_at', { ascending: true })
+    .limit(100);
+  if (error) throw error;
+  return data || [];
+}
+
+async function promoteNextWaiting() {
+  const queue = await getWaitingQueue();
+  const next = queue[0];
+  if (!next) return null;
+  // Keep the caller waiting. Promotion only changes the display state from
+  // queued to ringing; it never changes or closes any other waiting session.
+  if (next.status === 'queued') {
+    const { data, error } = await supabase
+      .from(TABLE)
+      .update({ status: 'ringing', ringing_started_at: new Date().toISOString() })
+      .eq('id', next.id)
+      .eq('status', 'queued')
+      .is('admin_user_id', null)
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    return data || next;
+  }
+  return next;
+}
+
 module.exports = {
   create,
   findById,
@@ -145,4 +178,6 @@ module.exports = {
   RING_TIMEOUT_SECONDS,
   ACTIVE_CALL_TIMEOUT_SECONDS,
   QUEUE_TIMEOUT_SECONDS,
+  getWaitingQueue,
+  promoteNextWaiting,
 };
