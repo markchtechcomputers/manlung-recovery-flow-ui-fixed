@@ -42,3 +42,112 @@ body.dark .brand-copy h1,body.dark .home-nav a{color:#f8fafc!important}.dark .br
   .recovery-journey-card img{aspect-ratio:4/3}
   .home-demo-section{margin-top:34px}
 }
+
+/* =========================================================
+   MANLUNG RECOVERY — EXPERTISE CARDS FINAL VISUAL POLISH
+   Center the original service artwork and keep the card flow clean.
+   ========================================================= */
+.premium-service-card{
+  text-align:center!important;
+  align-items:stretch!important;
+  overflow:hidden!important;
+}
+.premium-service-card .service-card-top{
+  position:relative!important;
+  min-height:68px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.premium-service-card .service-number{
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  font-size:.7rem!important;
+  font-weight:900!important;
+  letter-spacing:.04em!important;
+}
+.premium-service-card .service-icon-wrap{
+  width:64px!important;
+  height:64px!important;
+  flex:0 0 64px!important;
+  margin:0 auto!important;
+  border-radius:18px!important;
+  display:grid!important;
+  place-items:center!important;
+  background:linear-gradient(145deg,#eff6ff,#ffffff)!important;
+  border:1px solid #dbeafe!important;
+  box-shadow:0 10px 24px rgba(37,99,235,.10)!important;
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important;
+}
+.premium-service-card .service-icon-image{
+  width:38px!important;
+  height:38px!important;
+  max-width:38px!important;
+  max-height:38px!important;
+  margin:0!important;
+  object-fit:contain!important;
+}
+.premium-service-card:hover .service-icon-wrap{
+  transform:translateY(-2px) scale(1.04)!important;
+  border-color:#93c5fd!important;
+  box-shadow:0 14px 30px rgba(37,99,235,.16)!important;
+}
+.premium-service-card h3{
+  text-align:center!important;
+  margin:20px 0 10px!important;
+  min-height:2.6em!important;
+}
+.premium-service-card p{
+  text-align:center!important;
+  max-width:34rem!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+.premium-service-card .service-learn{
+  align-self:center!important;
+  text-align:center!important;
+  margin-top:auto!important;
+  padding-top:18px!important;
+}
+@media(max-width:1050px){
+  .premium-service-card .service-icon-wrap{
+    width:62px!important;
+    height:62px!important;
+    flex-basis:62px!important;
+  }
+}
+@media(max-width:780px){
+  .premium-service-card{
+    min-height:0!important;
+    padding:24px 20px!important;
+  }
+  .premium-service-card .service-card-top{
+    min-height:64px!important;
+  }
+  .premium-service-card .service-icon-wrap{
+    width:62px!important;
+    height:62px!important;
+    flex-basis:62px!important;
+  }
+  .premium-service-card .service-icon-image{
+    width:38px!important;
+    height:38px!important;
+    max-width:38px!important;
+    max-height:38px!important;
+  }
+  .premium-service-card h3{
+    min-height:0!important;
+  }
+}
+@media(max-width:420px){
+  .premium-service-card{
+    padding:22px 16px!important;
+  }
+  .premium-service-card .service-icon-wrap{
+    width:60px!important;
+    height:60px!important;
+    flex-basis:60px!important;
+    border-radius:17px!important;
+  }
+}
