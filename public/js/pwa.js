@@ -312,7 +312,6 @@
   document.addEventListener('click', async event => {
     const button = event.target.closest('.manlung-pwa-download');
 
-
     if (!button || !deferredPrompt) {
       return;
     }
@@ -343,4 +342,141 @@
 
     deferredPrompt = null;
   });
+
+  /*
+   * Admin Music Center persistence
+   *
+   * YouTube playback inside the dashboard iframe is destroyed whenever the
+   * dashboard document navigates to another Admin function. To keep music
+   * playing in the same browser, Play opens one named browser window/tab
+   * containing the dedicated player. The named window is reused for later
+   * songs, so navigation in the main Admin window does not interrupt audio.
+   */
+  const MUSIC_KEY = 'manlung-admin-music-now-playing-v1';
+  const MUSIC_CHANNEL_NAME = 'manlung-admin-music-v1';
+  let musicChannel = null;
+  let musicPopup = null;
+
+  function isAdminMusicPage() {
+    return location.pathname.startsWith('/admin/') &&
+      location.pathname !== '/admin/music-player.html';
+  }
+
+  function publishAdminMusic(song) {
+    if (!song || !song.id) return false;
+
+    try {
+      localStorage.setItem(MUSIC_KEY, JSON.stringify({
+        id: String(song.id),
+        title: String(song.title || 'Now playing'),
+        updatedAt: Date.now()
+      }));
+    } catch (_) {}
+
+    try {
+      if (!musicChannel && 'BroadcastChannel' in window) {
+        musicChannel = new BroadcastChannel(MUSIC_CHANNEL_NAME);
+      }
+      musicChannel?.postMessage({ type: 'song', song });
+    } catch (_) {}
+
+    return true;
+  }
+
+  function openAdminMusicPopup(song) {
+    if (!song || !song.id) return false;
+
+    publishAdminMusic(song);
+
+    const url = '/admin/music-player.html';
+    const features = 'popup=yes,width=760,height=520,resizable=yes,scrollbars=no';
+    let popup = musicPopup;
+
+    try {
+      if (!popup || popup.closed) {
+        popup = window.open(url, 'manlungAdminMusicPlayer', features);
+        musicPopup = popup;
+      } else {
+        popup.focus();
+      }
+    } catch (_) {
+      popup = null;
+    }
+
+    if (!popup) {
+      return false;
+    }
+
+    try {
+      popup.focus();
+    } catch (_) {}
+
+    return true;
+  }
+
+  function getMusicButtonSong(button) {
+    const article = button?.closest('.admin-song');
+    if (!article) return null;
+
+    const id = button.getAttribute('data-music-play');
+    const title = article.querySelector('.admin-song-title')?.textContent?.trim() || 'Now playing';
+    return id ? { id, title } : null;
+  }
+
+  function getQueueSongFromDashboard() {
+    const frame = document.getElementById('adminMusicFrame');
+    const title = document.getElementById('adminMusicNowPlaying')?.textContent?.trim();
+    if (!frame || !title || title === 'Nothing playing') return null;
+
+    try {
+      const match = frame.src.match(/embed\/([^?]+)/);
+      if (!match) return null;
+      return {
+        id: decodeURIComponent(match[1]),
+        title
+      };
+    } catch (_) {
+      return null;
+    }
+  }
+
+  if (isAdminMusicPage()) {
+    document.addEventListener('click', event => {
+      const playButton = event.target.closest('[data-music-play]');
+      if (playButton) {
+        const song = getMusicButtonSong(playButton);
+        if (song && openAdminMusicPopup(song)) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+      }
+
+      const queueButton = event.target.closest('.admin-queue-chip');
+      if (queueButton) {
+        /*
+         * The existing dashboard queue handler runs on the target first.
+         * After it selects the song, move that song into the persistent
+         * player and clear the temporary dashboard iframe.
+         */
+        window.setTimeout(() => {
+          const song = getQueueSongFromDashboard();
+          if (!song || !openAdminMusicPopup(song)) return;
+          const frame = document.getElementById('adminMusicFrame');
+          if (frame) frame.src = 'about:blank';
+        }, 0);
+      }
+    }, true);
+
+    /*
+     * If the user already has a persistent player, keep the dashboard's
+     * temporary iframe silent so two copies cannot play at once.
+     */
+    window.addEventListener('pagehide', () => {
+      try {
+        musicChannel?.close();
+      } catch (_) {}
+      musicChannel = null;
+    });
+  }
 })();
