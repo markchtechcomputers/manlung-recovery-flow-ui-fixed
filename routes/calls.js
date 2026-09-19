@@ -105,8 +105,14 @@ router.get('/ice-servers', auth, (req, res) => {
 router.get('/owner/monitor', ownerAuth, async (req, res) => {
   try {
     await CallSession.cleanupAbandoned();
-    const { data, error } = await supabase
-      .from('recovery_call_sessions')
+    // A busy admin must never receive a second incoming call. Other callers
+    // remain untouched in the shared waiting queue.
+    const adminBusy = await CallSession.adminHasActiveCall(req.user.id);
+    if (adminBusy) {
+      const availability = await AdminPresence.getAvailabilityState();
+      return res.json({ success: true, calls: [], onlineCount: availability.onlineCount, availableCount: availability.availableCount });
+    }
+    const { data, error } = await supabase.from('recovery_call_sessions')
       .select('id, client_name, client_email, case_id, status, admin_user_id, created_at, accepted_at, ended_at, end_reason')
       .order('created_at', { ascending: false })
       .limit(50);
