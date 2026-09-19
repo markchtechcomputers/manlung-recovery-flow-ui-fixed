@@ -639,6 +639,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                 <a href="/admin/owner.html" id="ownerLink" class="btn btn-outline owner-only" style="display:none !important;"> Admin Management</a>
                 <a class="btn btn-outline" href="/admin/reports.html"> Reports</a>
                 <a class="btn btn-outline" href="/admin/operations.html"> Operations</a>
+                <a class="btn btn-outline" href="/admin/music.html"><i class="fas fa-music"></i> Music</a>
                 <a class="btn btn-outline" href="/admin/tools.html"> Tools</a>
                 <button class="btn btn-outline" data-theme-toggle="true"></button>
                 <a href="/" class="btn btn-outline"> Home</a>
@@ -660,22 +661,6 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 
 
         
-        <div class="card" id="adminMusicCard" style="margin-bottom:1rem;">
-            <div class="card-title"><i class="fab fa-youtube"></i> Admin Music Center</div>
-            <p style="color:var(--text-muted);font-size:.78rem;margin:.2rem 0 0;">Search YouTube, play songs/videos, and build a temporary queue while you work.</p>
-            <div class="admin-music-toolbar">
-                <input id="adminMusicSearch" class="admin-music-search" type="search" placeholder="Search songs, artists, albums or videos…" autocomplete="off">
-                <button class="btn btn-primary" type="button" id="adminMusicSearchBtn"><i class="fas fa-search"></i> Search</button>
-            </div>
-            <div id="adminMusicStatus" class="admin-music-status"></div>
-            <div id="adminMusicResults" class="admin-music-results"><div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:1rem;">Search for a song to start listening.</div></div>
-            <div class="admin-music-player" id="adminMusicPlayer" style="display:none;">
-                <div class="admin-music-player-head"><span id="adminMusicNowPlaying">Nothing playing</span><button type="button" class="btn btn-outline-dark" id="adminMusicClearBtn">Close</button></div>
-                <iframe id="adminMusicFrame" title="YouTube music player" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
-                <div id="adminMusicQueue" class="admin-music-queue" style="display:none;"></div>
-            </div>
-        </div>
-
         <div class="card" style="margin-bottom:1rem;">
             <div class="card-title"><i class="fas fa-heart"></i> Donation Dashboard</div>
             <div class="stats-grid" style="margin-top:0.8rem;">
