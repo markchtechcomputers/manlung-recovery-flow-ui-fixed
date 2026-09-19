@@ -803,6 +803,82 @@ body.dark #adminsList .case-item .btn-danger{
 
 </style>
 
+<style id="owner-light-sections">
+/* Keep the Owner Management page white in light mode; dark styling remains under html.dark/body.dark. */
+body.admin-page-bg #pageContent > .card,
+body.admin-page-bg > section.container > .card{
+  background:#ffffff !important;
+  color:#111827 !important;
+  border-color:#e2e8f0 !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.06) !important;
+}
+body.admin-page-bg #pageContent > .card::before,
+body.admin-page-bg > section.container > .card::before{
+  opacity:.35;
+}
+body.admin-page-bg #pageContent > .card .card-title,
+body.admin-page-bg > section.container > .card h2{
+  color:#111827 !important;
+}
+body.admin-page-bg #pageContent > .card p,
+body.admin-page-bg > section.container > .card p{
+  color:#64748b !important;
+}
+body.admin-page-bg #pageContent input,
+body.admin-page-bg #pageContent select,
+body.admin-page-bg #pageContent > .card:nth-child(2)>div[style*="display:flex"],
+body.admin-page-bg #careerApplications details,
+body.admin-page-bg #pageContent > .card:nth-child(6) #auditLog,
+body.admin-page-bg #mfaStatus,
+body.admin-page-bg #mfaSetupBox,
+body.admin-page-bg #mfaDisableBox{
+  background:#f8fafc !important;
+  color:#111827 !important;
+  border-color:#e2e8f0 !important;
+}
+body.admin-page-bg #pageContent input::placeholder{color:#94a3b8;}
+body.admin-page-bg #pageContent .btn-outline{
+  background:#fff !important;
+  color:#334155 !important;
+  border-color:#cbd5e1 !important;
+}
+html.dark body.admin-page-bg #pageContent > .card,
+html.dark body.admin-page-bg > section.container > .card,
+body.dark.admin-page-bg #pageContent > .card,
+body.dark.admin-page-bg > section.container > .card{
+  background:linear-gradient(145deg,rgba(13,20,28,.98),rgba(9,15,21,.98)) !important;
+  color:#f8fafc !important;
+  border-color:rgba(148,163,184,.16) !important;
+  box-shadow:0 14px 40px rgba(0,0,0,.22) !important;
+}
+html.dark body.admin-page-bg #pageContent > .card .card-title,
+html.dark body.admin-page-bg > section.container > .card h2,
+body.dark.admin-page-bg #pageContent > .card .card-title,
+body.dark.admin-page-bg > section.container > .card h2{
+  color:#f8fafc !important;
+}
+html.dark body.admin-page-bg #pageContent > .card p,
+html.dark body.admin-page-bg > section.container > .card p,
+body.dark.admin-page-bg #pageContent > .card p,
+body.dark.admin-page-bg > section.container > .card p{
+  color:#94a3b8 !important;
+}
+html.dark body.admin-page-bg #pageContent input,
+html.dark body.admin-page-bg #pageContent select,
+html.dark body.admin-page-bg #pageContent > .card:nth-child(2)>div[style*="display:flex"],
+html.dark body.admin-page-bg #careerApplications details,
+html.dark body.admin-page-bg #pageContent > .card:nth-child(6) #auditLog,
+html.dark body.admin-page-bg #mfaStatus,
+html.dark body.admin-page-bg #mfaSetupBox,
+html.dark body.admin-page-bg #mfaDisableBox,
+body.dark.admin-page-bg #pageContent input,
+body.dark.admin-page-bg #pageContent select{
+  background:#080d13 !important;
+  color:#f8fafc !important;
+  border-color:rgba(148,163,184,.16) !important;
+}
+</style>
+
 </head>
 <body class="admin-page-bg">
     <header class="site-header">
