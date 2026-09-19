@@ -102,8 +102,11 @@
 
     #manlungContactMenu{
       padding:1rem !important;
-      background:linear-gradient(180deg,rgba(17,37,72,.99),rgba(7,20,40,.99)) !important;
-      border-color:rgba(96,165,250,.22) !important;
+      background:#ffffff !important;
+      border:1px solid #e5e7eb !important;
+      border-radius:22px !important;
+      box-shadow:0 24px 55px rgba(0,0,0,.18),0 0 30px rgba(255,255,255,.95) !important;
+      color:#111827 !important;
     }
 
     .manlung-contact-menu-header{
@@ -116,7 +119,7 @@
     }
 
     .manlung-contact-menu-header span{
-      color:#b7c7df !important;
+      color:#475569 !important;
     }
 
     #manlungContactClose{
@@ -147,12 +150,12 @@
       margin:0 !important;
       border:1px solid rgba(255,255,255,.09) !important;
       border-radius:15px !important;
-      background:linear-gradient(145deg,#172b4c,#10213a) !important;
-      box-shadow:0 8px 20px rgba(0,0,0,.18) !important;
+      background:linear-gradient(145deg,#111827,#1f2937) !important;
+      box-shadow:0 8px 22px rgba(15,23,42,.22),0 0 18px rgba(255,255,255,.18) !important;
     }
 
     .manlung-contact-choice:hover{
-      background:linear-gradient(145deg,#203b66,#163057) !important;
+      background:linear-gradient(145deg,#1f2937,#334155) !important;
       transform:translateY(-2px) scale(1.015) !important;
       border-color:rgba(96,165,250,.35) !important;
       box-shadow:0 12px 24px rgba(0,0,0,.24) !important;
@@ -163,8 +166,9 @@
       height:42px !important;
       flex:0 0 42px !important;
       border-radius:13px !important;
-      background:rgba(255,255,255,.06) !important;
-      box-shadow:0 5px 14px rgba(0,0,0,.18);
+      background:#ffffff !important;
+      border:2px solid rgba(255,255,255,.95) !important;
+      box-shadow:0 0 0 2px rgba(255,255,255,.28),0 0 16px rgba(255,255,255,.9),0 7px 18px rgba(0,0,0,.22);
     }
 
     .manlung-contact-choice-icon img{
@@ -181,16 +185,17 @@
       opacity:1 !important;
       background:none !important;
       padding:0 !important;
-      color:#eef5ff !important;
-      font-size:.7rem !important;
+      color:#ffffff !important;
+      text-shadow:0 1px 8px rgba(255,255,255,.18);
+      font-size:.82rem !important;
       font-weight:800 !important;
       pointer-events:none !important;
     }
 
     .manlung-contact-call{
-      background:linear-gradient(145deg,#0e6b46,#164f3a) !important;
-      border-color:rgba(74,222,128,.35) !important;
-      box-shadow:0 9px 24px rgba(18,138,85,.24) !important;
+      background:linear-gradient(145deg,#0f172a,#14532d) !important;
+      border-color:rgba(255,255,255,.22) !important;
+      box-shadow:0 9px 24px rgba(15,23,42,.24),0 0 20px rgba(255,255,255,.18) !important;
     }
 
     .manlung-contact-call:hover{
@@ -199,8 +204,9 @@
     }
 
     .manlung-contact-call .manlung-contact-choice-icon{
-      background:rgba(74,222,128,.16) !important;
-      box-shadow:0 0 0 4px rgba(74,222,128,.08),0 6px 16px rgba(0,0,0,.18);
+      background:#ffffff !important;
+      border:2px solid #ffffff !important;
+      box-shadow:0 0 0 4px rgba(255,255,255,.18),0 0 20px rgba(255,255,255,.95),0 6px 16px rgba(0,0,0,.2);
       animation:manlungPhonePulse 1.9s ease-in-out infinite;
     }
 
