@@ -35,6 +35,15 @@ const app = express();
 // client-aware rate limits using the forwarded address.
 app.set('trust proxy', 1);
 
+// Security response hardening applied to every request.
+app.use((req, res, next) => {
+  res.setHeader('X-DNS-Prefetch-Control', 'off');
+  res.setHeader('X-Download-Options', 'noopen');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  res.setHeader('Origin-Agent-Cluster', '?1');
+  next();
+});
+
 // Security middleware
 app.use(
   helmet({
@@ -211,6 +220,40 @@ app.use('/api/notifications', notificationLimiter);
 // owner/admin login and incorrectly present the account as locked.
 // User.comparePassword records failures and applies the 132-year
 // persistent account lock after the third failed password attempt.
+
+// ============================================================
+ // AUTH LOGIN / MFA BRUTE-FORCE PROTECTION
+ // ============================================================
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many sign-in attempts. Please wait before trying again.'
+    });
+  },
+});
+
+const mfaLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many MFA attempts. Please wait before trying again.'
+    });
+  },
+});
+
+app.use('/api/auth/admin/login', loginLimiter);
+app.use('/api/auth/client/login', loginLimiter);
+app.use('/api/auth/admin/mfa/login', mfaLimiter);
 
 // ============================================================
 // AUTH ACTION RATE LIMITER
