@@ -282,6 +282,9 @@ app.use('/api/calls/start', callStartLimiter);
 
 // Public career submissions are rate-limited separately so a bot cannot
 // exhaust the general API budget or flood the recruitment table.
+// IMPORTANT: only POST /api/careers is submission traffic. Admin GET/PUT/DELETE
+// requests must not share this limiter, otherwise an owner with more than 10
+// applications is incorrectly shown "Too many applications".
 const careerSubmissionLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -295,7 +298,7 @@ const careerSubmissionLimiter = rateLimit({
   },
 });
 
-app.use('/api/careers', careerSubmissionLimiter);
+app.post('/api/careers', careerSubmissionLimiter);
 
 // ============================================================
 // BODY PARSERS
