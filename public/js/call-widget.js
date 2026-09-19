@@ -278,7 +278,27 @@
       box-shadow:none !important;
     }
     #manlungContactMenu .manlung-contact-choice .manlung-contact-choice-label{
-      color:#111827 !important;
+      display:block !important;
+      position:static !important;
+      transform:none !important;
+      visibility:visible !important;
+      opacity:1 !important;
+      color:#000000 !important;
+      background:transparent !important;
+      text-shadow:none !important;
+      font-size:1rem !important;
+      line-height:1.2 !important;
+      font-weight:900 !important;
+      white-space:nowrap !important;
+      pointer-events:none !important;
+      z-index:10 !important;
+    }
+    #manlungContactMenu .manlung-contact-choice{
+      color:#000000 !important;
+      overflow:visible !important;
+    }
+    #manlungContactMenu .manlung-contact-menu-actions{
+      overflow:visible !important;
     }
 
   `;
