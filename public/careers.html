@@ -242,7 +242,13 @@
     <link rel="stylesheet" href="/css/footer.css">
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
-</head><body><header class="site-header"><div class="container"><div class="brand">
+<style id="application-modal-style">
+.application-modal-overlay{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(2,6,23,.62);backdrop-filter:blur(6px)}
+.application-modal{width:min(500px,100%);background:var(--card-bg,#fff);color:var(--text,#0f172a);border:1px solid var(--card-border,#e2e8f0);border-radius:20px;box-shadow:0 24px 70px rgba(2,6,23,.28);padding:28px;text-align:center}
+.application-modal-icon{width:54px;height:54px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#ecfdf5;color:#16a34a;font-size:22px}
+.application-modal h2{margin:.2rem 0 .45rem;font-size:1.35rem}.application-modal p{margin:.35rem 0;color:var(--text-muted,#64748b);line-height:1.55}.application-modal .modal-actions{display:flex;gap:10px;justify-content:center;margin-top:16px}.application-modal .modal-actions .btn{min-width:130px}
+@media(max-width:520px){.application-modal{padding:22px 18px;border-radius:16px}.application-modal .modal-actions{flex-direction:column}.application-modal .modal-actions .btn{width:100%}}
+</style></head><body><header class="site-header"><div class="container"><div class="brand">
 <a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home"><img
   class="manlung-site-logo"
   src="/icons/icon-512.png"
@@ -270,12 +276,16 @@ document.getElementById('careerForm').addEventListener('submit', async e => {
     const r = await fetch('/api/careers', { method: 'POST', body: data });
     const d = await r.json();
     if (!r.ok || !d.success) throw new Error(d.error || 'Could not submit application.');
-    status.innerHTML = '<div class="career-note" style="margin-top:.7rem;background:#ecfdf5;color:#166534;">Application submitted successfully. Thank you — the Owner can now review your application.</div>';
+    status.innerHTML = '';
+    document.getElementById('applicationSuccessModal').style.display='flex';
+    document.body.style.overflow='hidden';
     form.reset();
   } catch (err) {
     status.textContent = err.message || 'Could not submit application.';
   }
 });
+function closeApplicationModal(){document.getElementById('applicationSuccessModal').style.display='none';document.body.style.overflow='';}
+document.getElementById('applicationSuccessModal').addEventListener('click',e=>{if(e.target.id==='applicationSuccessModal')closeApplicationModal();});
 </script><script src="/js/pwa.js" defer></script>
 <footer class="manlung-footer" aria-label="Manlung Recovery footer">
   <div class="manlung-footer-inner">
@@ -296,4 +306,5 @@ document.getElementById('careerForm').addEventListener('submit', async e => {
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
-</body></html>
+<div id="applicationSuccessModal" class="application-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="applicationSuccessTitle">
+<div class="application-modal"><div class="application-modal-icon"><i class="fas fa-circle-check"></i></div><h2 id="applicationSuccessTitle">Application submitted</h2><p>Your application has been received successfully.</p><p>The Owner can now review your application. Please keep your submitted contact details available in case we need to reach you.</p><div class="modal-actions"><button type="button" class="btn btn-primary" onclick="closeApplicationModal()">Done</button><a href="/" class="btn btn-outline-dark">Back Home</a></div></div></div></body></html>
