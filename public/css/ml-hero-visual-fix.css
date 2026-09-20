@@ -941,3 +941,41 @@ body.dark .ml-balanced-hero .ml-hero-video-shade {
         grid-template-columns: 1fr !important;
     }
 }
+
+
+<style>
+/* HERO BALANCE POLISH */
+.ml-balanced-hero .ml-hero-copy {
+    max-width: 720px !important;
+    padding-top: clamp(72px, 9vh, 104px) !important;
+    padding-bottom: clamp(60px, 8vh, 90px) !important;
+}
+.ml-balanced-hero .ml-hero-badge { margin-bottom: 18px !important; }
+.ml-balanced-hero .ml-hero-copy h1 {
+    font-size: clamp(2.6rem, 4.6vw, 4.25rem) !important;
+    line-height: 1.03 !important;
+    margin-bottom: 20px !important;
+}
+.ml-balanced-hero .ml-hero-description {
+    max-width: 650px !important;
+    font-size: clamp(15px, 1.25vw, 17px) !important;
+    line-height: 1.65 !important;
+    margin-bottom: 26px !important;
+}
+.ml-hero-actions { margin-bottom: 24px !important; }
+.ml-hero-security-row { gap: 10px 22px !important; }
+@media (min-width: 769px) {
+    .ml-balanced-hero .ml-hero-copy {
+        width: min(720px, 62vw) !important;
+    }
+}
+@media (max-width: 768px) {
+    .ml-balanced-hero .ml-hero-copy {
+        padding-top: 78px !important;
+        padding-bottom: 42px !important;
+    }
+    .ml-balanced-hero .ml-hero-copy h1 {
+        font-size: clamp(2.15rem, 9.5vw, 3.1rem) !important;
+    }
+}
+</style>
