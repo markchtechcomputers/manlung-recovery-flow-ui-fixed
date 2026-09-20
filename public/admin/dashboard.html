@@ -776,17 +776,122 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
     </div>
 
     <!-- Incoming / active call panel -->
-    <div id="callModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(10,18,40,0.6); align-items:center; justify-content:center; z-index:99999;" onclick="if(event.target===this && !currentActiveCallId) closeCallModal()">
-        <div style="position:relative; background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; max-width:380px; width:90%; padding:2rem; text-align:center;">
-            <button type="button" id="callModalCloseBtn" aria-label="Close call window" title="Close" onclick="closeCallModal()" style="position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;border-radius:50%;background:var(--page-bg);color:var(--text);cursor:pointer;font-size:1rem;"><i class="fas fa-times"></i></button>
+    <div id="callModalOverlay" class="manlung-admin-call-overlay" style="display:none;" onclick="if(event.target===this && !currentActiveCallId) closeCallModal()">
+        <div id="callModalPanel" class="manlung-admin-call-panel">
+            <div class="manlung-admin-call-toolbar">
+                <strong><i class="fas fa-phone-volume"></i> Active Call</strong>
+                <div class="manlung-admin-call-window-actions">
+                    <button type="button" id="callModalMinBtn" aria-label="Minimize call" title="Minimize call" onclick="toggleCallPanelMinimize()"><i class="fas fa-minus"></i></button>
+                    <button type="button" id="callModalMaxBtn" aria-label="Maximize call" title="Maximize call" onclick="toggleCallPanelMaximize()" style="display:none;"><i class="fas fa-expand"></i></button>
+                    <button type="button" id="callModalCloseBtn" aria-label="Close call window" title="Close" onclick="closeCallModal()"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
             <div id="callModalBody"></div>
         </div>
     </div>
 
+<style id="manlung-active-call-panel-style">
+.manlung-admin-call-overlay{
+  position:fixed!important;
+  inset:0!important;
+  background:rgba(10,18,40,.6)!important;
+  align-items:center!important;
+  justify-content:center!important;
+  z-index:99999!important;
+}
+.manlung-admin-call-panel{
+  position:relative!important;
+  background:var(--card-bg)!important;
+  border:1px solid var(--card-border)!important;
+  border-radius:20px!important;
+  max-width:380px!important;
+  width:min(380px,90vw)!important;
+  padding:0 2rem 2rem!important;
+  text-align:center!important;
+  box-shadow:0 24px 70px rgba(0,0,0,.3)!important;
+  transition:all .2s ease!important;
+}
+.manlung-admin-call-toolbar{
+  min-height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.7rem;
+  border-bottom:1px solid var(--card-border);
+  margin:0 -2rem 1.25rem;
+  padding:.45rem .65rem .45rem 1rem;
+  text-align:left;
+}
+.manlung-admin-call-toolbar strong{font-size:.78rem;color:var(--text);}
+.manlung-admin-call-toolbar strong i{color:var(--success);margin-right:.3rem;}
+.manlung-admin-call-window-actions{display:flex;gap:.25rem;}
+.manlung-admin-call-window-actions button{
+  width:32px;height:32px;border:0;border-radius:9px;
+  background:var(--page-bg);color:var(--text);cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.manlung-admin-call-window-actions button:hover{filter:brightness(.96);}
+.manlung-admin-call-window-actions #callModalCloseBtn{display:none!important;}
+.manlung-admin-call-panel.is-minimized{
+  position:fixed!important;
+  right:18px!important;
+  bottom:18px!important;
+  left:auto!important;
+  top:auto!important;
+  width:min(310px,calc(100vw - 28px))!important;
+  max-width:none!important;
+  padding:0 1rem 1rem!important;
+  border-radius:16px!important;
+}
+.manlung-admin-call-panel.is-minimized .manlung-admin-call-toolbar{
+  margin:0 -1rem .7rem;
+  min-height:48px;
+}
+.manlung-admin-call-panel.is-minimized #callModalBody{
+  max-height:170px;
+  overflow:auto;
+}
+@media(max-width:600px){
+  .manlung-admin-call-panel{
+    width:calc(100vw - 24px)!important;
+    padding:0 1rem 1.2rem!important;
+  }
+  .manlung-admin-call-toolbar{margin:0 -1rem 1rem;}
+  .manlung-admin-call-panel.is-minimized{
+    right:10px!important;
+    bottom:10px!important;
+    width:calc(100vw - 20px)!important;
+  }
+}
+</style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/js/call-webrtc.js"></script>
     <script>
-        
+        let callPanelMinimized = false;
+
+        function setCallPanelMinimized(minimized) {
+            callPanelMinimized = !!minimized;
+            const panel = document.getElementById('callModalPanel');
+            const minBtn = document.getElementById('callModalMinBtn');
+            const maxBtn = document.getElementById('callModalMaxBtn');
+            if (!panel) return;
+            panel.classList.toggle('is-minimized', callPanelMinimized);
+            if (minBtn) minBtn.style.display = callPanelMinimized ? 'none' : 'inline-flex';
+            if (maxBtn) maxBtn.style.display = callPanelMinimized ? 'inline-flex' : 'none';
+        }
+
+        function toggleCallPanelMinimize() {
+            if (!currentActiveCallId) return;
+            setCallPanelMinimized(true);
+        }
+        window.toggleCallPanelMinimize = toggleCallPanelMinimize;
+
+        function toggleCallPanelMaximize() {
+            if (!currentActiveCallId) return;
+            setCallPanelMinimized(false);
+        }
+        window.toggleCallPanelMaximize = toggleCallPanelMaximize;
+
         let currentAdmin = (() => {
             try {
                 const raw =
@@ -1765,19 +1870,10 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             const onlineBadge = document.getElementById('adminOnlineBadge');
             if (onlineBadge) onlineBadge.textContent = `Admins online: ${Number(data.onlineCount || 0)} · Available: ${Number(data.availableCount || 0)}`;
 
-            // If this browser is showing a call that is no longer pending,
-            // another admin answered/rejected it. Close the stale popup.
-            // A busy admin must not be offered another call. Keep the remaining
-        // callers in the shared queue until this active call is actually ended.
-        if (currentActiveCallId) {
-            if (currentIncomingCallId) {
-                stopIncomingAlert();
-                currentIncomingCallId = null;
-            }
-            const overlay = document.getElementById('callModalOverlay');
-            if (overlay && overlay.style.display !== 'none') overlay.style.display = 'none';
-            return;
-        }
+                // Never hide the active call panel from the polling loop.
+            // This request may have started before the admin accepted the call;
+            // its response must not close an already-connected call.
+            if (currentActiveCallId) return;
 
         if (currentIncomingCallId) {
                 const stillPending = pendingCalls.some(
@@ -1905,11 +2001,13 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
         const body = document.getElementById('callModalBody');
         const overlay = document.getElementById('callModalOverlay');
         const closeBtn = document.getElementById('callModalCloseBtn');
-        if (overlay && state === 'connected') overlay.style.zIndex = '99999';
-        if (closeBtn) {
-            closeBtn.style.display = currentActiveCallId ? 'none' : 'block';
+        if (overlay && (state === 'connected' || currentActiveCallId)) {
+            overlay.style.display = 'flex';
+            overlay.style.zIndex = '99999';
         }
+        if (closeBtn) closeBtn.style.display = 'none';
         if (state === 'connected') {
+            setCallPanelMinimized(false);
             body.innerHTML = `
                 <p style="font-weight:700;color:var(--success);">Connected to Client</p>
                 <p style="color:var(--text-muted);margin-bottom:0.3rem;">${session.client_name || 'Client'}${session.case_id ? ' — ' + session.case_id : ''}</p>
@@ -1978,6 +2076,8 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
         try { currentCallPeer?.cleanup(); } catch (_) {}
         currentCallPeer = null;
         currentActiveCallId = null;
+        callPanelMinimized = false;
+        setCallPanelMinimized(false);
     }
 
     async function closeCallModal() {
