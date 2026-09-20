@@ -42,16 +42,23 @@
 
     z-index: 2 !important;
 
-    width: min(680px, 53vw) !important;
+    width: 50% !important;
+    height: min(520px, 72%) !important;
 
-    right: -25px !important;
-    top: 46% !important;
+    right: 0 !important;
+    top: 50% !important;
 
     transform: translateY(-50%) !important;
 
     pointer-events: none !important;
 
-    display: block !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    overflow: hidden !important;
+
+    border-radius: 26px 0 0 26px !important;
 }
 
 .ml-balanced-hero .ml-hero-device-visual img,
@@ -78,7 +85,9 @@
 }
 
 .ml-balanced-hero .ml-hero-device-video {
-    aspect-ratio: 16 / 10 !important;
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
     background: #eaf2ff !important;
     box-shadow:
         0 24px 60px rgba(15,23,42,.12),
@@ -450,9 +459,12 @@
 
         transform: none !important;
 
-        width: 92% !important;
+        width: 100% !important;
+        height: auto !important;
 
-        margin: -12px auto 0 !important;
+        margin: 0 auto !important;
+
+        border-radius: 0 !important;
 
         z-index: 3 !important;
     }
@@ -476,7 +488,7 @@
     }
 
     .ml-balanced-hero .ml-hero-device-video {
-        aspect-ratio: 16 / 11 !important;
+        aspect-ratio: 16 / 10 !important;
         min-height: 230px !important;
         max-height: 360px !important;
         background: #eaf2ff !important;
