@@ -446,7 +446,7 @@ router.get('/:id', auth, async (req, res) => {
     }
 
     const availability = await AdminPresence.getAvailabilityState();
-    res.json({ success: true, session, onlineCount: availability.onlineCount, availableCount: availability.availableCount });
+    res.json({ success: true, session, participant_user_id: req.user.id, onlineCount: availability.onlineCount, availableCount: availability.availableCount });
   } catch (error) {
     console.error('Get call session error:', error);
     res.status(500).json({ error: error.message || 'Server error' });
