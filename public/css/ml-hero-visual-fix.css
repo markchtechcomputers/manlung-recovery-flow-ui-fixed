@@ -883,3 +883,31 @@ body.dark .ml-balanced-hero .ml-hero-device-visual img {
     visibility: hidden !important;
     pointer-events: none !important;
 }
+
+
+/* HERO RESPONSIVE FINAL PASS */
+.ml-balanced-hero .ml-hero-copy{max-width:760px!important;box-sizing:border-box!important;}
+@media (min-width:1201px){
+ .ml-balanced-hero .ml-hero-copy{width:min(760px,58vw)!important;padding-left:clamp(44px,6vw,96px)!important;padding-right:34px!important;}
+ .ml-balanced-hero .ml-hero-copy h1{max-width:680px!important;}
+ .ml-balanced-hero .ml-hero-description{max-width:610px!important;}
+}
+@media (min-width:769px) and (max-width:1200px){
+ .ml-balanced-hero{min-height:640px!important;}
+ .ml-balanced-hero .ml-hero-copy{width:min(690px,66vw)!important;padding:76px 28px 76px 42px!important;}
+ .ml-balanced-hero .ml-hero-copy h1{font-size:clamp(2.45rem,4.8vw,3.7rem)!important;}
+ .ml-balanced-hero .ml-hero-description{max-width:570px!important;font-size:16px!important;line-height:1.6!important;}
+}
+@media (max-width:768px){
+ .ml-balanced-hero{min-height:760px!important;}
+ .ml-balanced-hero .ml-hero-copy{width:100%!important;max-width:100%!important;padding:78px 20px 52px!important;}
+ .ml-balanced-hero .ml-hero-copy h1{max-width:620px!important;font-size:clamp(2.1rem,9vw,3rem)!important;line-height:1.05!important;}
+ .ml-balanced-hero .ml-hero-description{max-width:590px!important;font-size:15.5px!important;line-height:1.6!important;}
+ .ml-balanced-hero .ml-hero-actions,.ml-balanced-hero .ml-hero-security-row{max-width:430px!important;}
+}
+@media (max-width:480px){
+ .ml-balanced-hero{min-height:820px!important;}
+ .ml-balanced-hero .ml-hero-copy{padding:72px 16px 44px!important;}
+ .ml-balanced-hero .ml-hero-copy h1{font-size:clamp(2rem,10vw,2.7rem)!important;}
+ .ml-balanced-hero .ml-hero-description{font-size:15px!important;}
+}
