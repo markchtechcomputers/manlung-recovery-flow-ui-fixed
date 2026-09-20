@@ -121,9 +121,12 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize:
-      parseInt(process.env.MAX_FILE_SIZE) ||
-      25 * 1024 * 1024,
-    files: 20,
+      Math.min(parseInt(process.env.MAX_FILE_SIZE, 10) || 10 * 1024 * 1024, 10 * 1024 * 1024),
+    files: 10,
+    fields: 40,
+    parts: 55,
+    fieldSize: 64 * 1024,
+    fieldNameSize: 200,
   },
 });
 
@@ -139,6 +142,23 @@ const SIGNED_URL_TTL = 15 * 60;
 // ============================================================
 // File Signature Validation
 // ============================================================
+
+function rejectSuspiciousBinary(file) {
+  const buffer = file?.buffer;
+  if (!Buffer.isBuffer(buffer) || buffer.length < 4) throw new Error('The uploaded file is invalid or empty.');
+  const head = buffer.subarray(0, Math.min(buffer.length, 4096)).toString('latin1');
+  const signatures = [
+    [buffer[0] === 0x4d && buffer[1] === 0x5a, 'Windows executable'],
+    [buffer[0] === 0x7f && buffer[1] === 0x45 && buffer[2] === 0x4c && buffer[3] === 0x46, 'ELF executable'],
+    [buffer[0] === 0x23 && buffer[1] === 0x21, 'script'],
+    [buffer[0] === 0x50 && buffer[1] === 0x4b && buffer[2] === 0x03 && buffer[3] === 0x04, 'archive/polyglot'],
+  ];
+  const hit = signatures.find(([matched]) => matched);
+  if (hit) throw new Error('Executable or archive content is not allowed in evidence uploads.');
+  if (/<\\s*(script|html|iframe|object|embed)\\b/i.test(head) || /\\bon(?:error|load|click)\\s*=/i.test(head)) {
+    throw new Error('Executable HTML/script content is not allowed in evidence uploads.');
+  }
+}
 
 function validateEvidenceSignature(file) {
   const buffer = file?.buffer;
@@ -276,6 +296,7 @@ async function uploadToStorage(
   }
 
   validateEvidenceSignature(file);
+  rejectSuspiciousBinary(file);
 
   const originalName =
     String(file.originalname || 'file')
@@ -293,6 +314,11 @@ async function uploadToStorage(
           .toLowerCase()
           .replace(/[^a-z0-9]/g, '')
       : '';
+
+  const expectedExtension = mimetype === 'image/jpeg' ? 'jpg' : mimetype === 'image/png' ? 'png' : 'pdf';
+  if (extension !== expectedExtension && !(mimetype === 'image/jpeg' && extension === 'jpeg')) {
+    throw new Error('The file extension does not match its content type.');
+  }
 
   const crypto = require('crypto');
 
