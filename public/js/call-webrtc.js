@@ -112,7 +112,11 @@
       const data = await res.json();
       const session = data?.session;
       if (!session) return null;
-      return isInitiator ? (session.client_user_id || null) : (session.admin_user_id || null);
+      // isInitiator is a WebRTC role, not a user identity. The initiator
+      // is the local admin for admin-initiated calls, while the receiver is
+      // the local client. Always return the ID of the browser making this
+      // request so pollSignals() does not discard the remote answer/offer.
+      return isInitiator ? (session.admin_user_id || null) : (session.client_user_id || null);
     } catch (_) {
       return null;
     }
