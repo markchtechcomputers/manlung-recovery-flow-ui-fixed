@@ -5,6 +5,7 @@ const AdminPresence = require('../models/AdminPresence');
 const CallSession = require('../models/CallSession');
 const { supabase } = require('../config/supabase');
 const CallSignal = require('../models/CallSignal');
+const Notification = require('../models/Notification');
 
 // ---- Admin presence ----
 
@@ -287,6 +288,25 @@ router.post('/admin/callback', adminAuth, async (req, res) => {
     if (error) throw error;
 
     session.admin_name = req.user.username || req.user.email || 'Admin';
+
+    // Create a durable client notification as well as the live call session.
+    // The dashboard can therefore show the incoming call even if the client
+    // misses the floating call widget for a moment or reloads the page.
+    try {
+      await Notification.create({
+        userId: clientUserId,
+        caseId,
+        type: 'call_admin_callback',
+        title: 'Incoming call from your Manlung Admin',
+        message: caseId
+          ? `${session.admin_name} is calling you about case ${caseId}. Open your Client Dashboard, review the call details, then choose Accept to start the secure browser audio call or Decline if you cannot talk right now.`
+          : `${session.admin_name} is calling you from Manlung Recovery. Open your Client Dashboard, review the call details, then choose Accept to start the secure browser audio call or Decline if you cannot talk right now.`,
+      });
+    } catch (notificationError) {
+      // A notification write must never prevent the actual call from ringing.
+      console.warn('Admin callback notification could not be created:', notificationError?.message || notificationError);
+    }
+
     res.status(201).json({ success: true, sessionId: session.id, channel: session.id, status: session.status, adminName: session.admin_name, session });
   } catch (error) {
     console.error('Admin callback start error:', error);
