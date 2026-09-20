@@ -725,7 +725,23 @@
   }
 </style>
 
-</head>
+<style id="manlung-client-dashboard-premium">
+.manlung-dashboard-main{max-width:1180px;padding-top:.5rem;padding-bottom:2rem}
+.manlung-dashboard-hero{position:relative;overflow:hidden;min-height:230px;padding:clamp(1.35rem,4vw,2.4rem);margin:1.2rem 0 1rem;border:1px solid rgba(96,165,250,.28);border-radius:26px;background:radial-gradient(circle at 90% 10%,rgba(56,189,248,.18),transparent 30%),linear-gradient(135deg,#081a39 0%,#12346d 55%,#1550a2 100%);box-shadow:0 24px 60px rgba(15,23,42,.16);display:flex;align-items:center;justify-content:space-between;gap:2rem}
+.manlung-dashboard-hero:after{content:"";position:absolute;width:260px;height:260px;right:-110px;bottom:-145px;border-radius:50%;border:1px solid rgba(255,255,255,.12);box-shadow:0 0 0 22px rgba(255,255,255,.025),0 0 0 44px rgba(255,255,255,.018)}
+.dashboard-hero-copy{position:relative;z-index:1;max-width:720px}.dashboard-kicker,.dashboard-section-kicker{display:inline-flex;align-items:center;gap:.38rem;color:#60a5fa;text-transform:uppercase;letter-spacing:.1em;font-size:.64rem;font-weight:900}.dashboard-kicker{color:#bfdbfe;padding:.35rem .65rem;border:1px solid rgba(191,219,254,.2);border-radius:999px;background:rgba(255,255,255,.06)}
+.manlung-dashboard-hero h2{margin:.75rem 0 .35rem;color:#fff;font-size:clamp(1.65rem,4vw,2.35rem);letter-spacing:-.035em}.manlung-dashboard-hero p{margin:0;color:#c9dcf5;line-height:1.65;max-width:670px}.dashboard-hero-trust{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}.dashboard-hero-trust span{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .58rem;border-radius:999px;background:rgba(255,255,255,.065);color:#dbeafe;font-size:.68rem;font-weight:750;border:1px solid rgba(255,255,255,.08)}
+.dashboard-hero-action{position:relative;z-index:2;display:flex;flex-direction:column;align-items:stretch;min-width:205px}.dashboard-primary-action{min-height:52px;border-radius:14px;gap:.55rem;box-shadow:0 14px 28px rgba(2,6,23,.22)}.dashboard-action-arrow{margin-left:auto}.dashboard-hero-action small{margin-top:.55rem;color:#b9cbe3;text-align:center;font-size:.66rem}
+.dashboard-overview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;margin-bottom:1rem}.dashboard-overview-card{position:relative;display:flex;align-items:center;gap:.8rem;min-width:0;padding:1rem 1.05rem;border:1px solid #e2e8f0;border-radius:17px;background:var(--card-bg,#fff);box-shadow:0 10px 28px rgba(15,23,42,.055);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.dashboard-overview-card:hover{transform:translateY(-2px);box-shadow:0 15px 34px rgba(15,23,42,.09);border-color:#cbd5e1}.overview-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:13px;background:#eff6ff;color:#2563eb}.overview-copy{min-width:0;display:grid}.overview-copy span{font-size:.68rem;font-weight:800;color:var(--text-muted)}.overview-copy strong{font-size:1.15rem;line-height:1.25;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.overview-copy small{font-size:.62rem;color:var(--text-muted);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.overview-corner{margin-left:auto;align-self:flex-start;color:#94a3b8;font-size:.65rem}.overview-donations .overview-icon{background:#ecfdf5;color:#059669}.overview-notices .overview-icon{background:#f5f3ff;color:#7c3aed}
+.dashboard-support-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1rem;margin-bottom:1rem;padding:1.05rem 1.15rem;border:1px solid #dbeafe;border-radius:18px;background:linear-gradient(135deg,#f8fbff,#fff);box-shadow:0 10px 28px rgba(15,23,42,.05)}.dashboard-support-art{width:56px;height:56px;display:grid;place-items:center;border-radius:15px;background:#fff;border:1px solid #e2e8f0;overflow:hidden}.dashboard-support-art img{width:42px;height:42px;object-fit:contain}.dashboard-support-copy h2{margin:.12rem 0 .18rem;font-size:1.02rem;color:var(--text)}.dashboard-support-copy p{margin:0;color:var(--text-muted);font-size:.74rem;line-height:1.5}.dashboard-donation-number{display:flex;align-items:baseline;gap:.55rem;margin-top:.45rem}.dashboard-donation-number strong{font-size:1rem;color:#059669}.dashboard-donation-number span{font-size:.64rem;color:var(--text-muted)}
+.manlung-dashboard-card{border-radius:20px!important;border:1px solid #e2e8f0!important;box-shadow:0 12px 32px rgba(15,23,42,.055)!important;padding:1.15rem!important;background:var(--card-bg,#fff)}
+.dashboard-section-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}.dashboard-section-head.compact{margin-bottom:.8rem}.dashboard-section-title{display:flex;align-items:center;gap:.7rem;min-width:0}.dashboard-section-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:12px;background:#eff6ff;color:#2563eb}.dashboard-section-icon.danger{background:#fff1f2;color:#dc2626}.dashboard-section-icon.notice{background:#f5f3ff;color:#7c3aed}.dashboard-section-title h2{margin:.12rem 0 0;font-size:1.05rem;color:var(--text);letter-spacing:-.02em}.dashboard-section-title p{margin:.18rem 0 0;color:var(--text-muted);font-size:.68rem}.dashboard-inline-count{font-size:.68rem;font-weight:700;color:var(--text-muted);margin-left:.2rem}.dashboard-mini-link{display:inline-flex;align-items:center;gap:.35rem;padding:.42rem .65rem;border:1px solid #dbeafe;border-radius:9px;background:#f8fbff;color:#2563eb;text-decoration:none;font-size:.67rem;font-weight:800;white-space:nowrap;cursor:pointer}.dashboard-mini-link:hover{background:#eff6ff;border-color:#bfdbfe}.case-grid{margin-top:.2rem}.dashboard-lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.privacy-panel{padding:.9rem;border:1px solid rgba(220,38,38,.12);border-radius:14px;background:linear-gradient(135deg,rgba(254,242,242,.65),rgba(255,255,255,.8))}.privacy-status{display:flex;align-items:center;gap:.55rem;margin-bottom:.65rem;color:#b91c1c}.privacy-status>i{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#fee2e2}.privacy-status span{display:grid}.privacy-status strong{font-size:.76rem;color:#7f1d1d}.privacy-status small{font-size:.62rem;color:var(--text-muted);margin-top:.08rem}.danger-kicker{color:#dc2626}.danger-copy{max-width:none;font-size:.72rem;line-height:1.55;margin:0 0 .75rem}.case-delete-btn{min-height:38px!important}
+.manlung-notifications-card{margin:0!important}.manlung-notification-head{display:none}.manlung-notification-list{max-height:285px;overflow:auto;padding-right:.15rem}.manlung-notification-item{padding:.7rem;border:1px solid rgba(148,163,184,.16);border-radius:12px;background:rgba(248,250,252,.72);transition:background .18s ease,border-color .18s ease}.manlung-notification-item.unread{border-color:rgba(96,165,250,.3);background:rgba(239,246,255,.7)}.manlung-notification-item+.manlung-notification-item{margin-top:.5rem}.manlung-notification-item h4{font-size:.78rem}.manlung-notification-item p{font-size:.7rem}.manlung-notification-meta{font-size:.6rem}.manlung-notification-badge{min-width:21px;height:21px;margin-left:.25rem;font-size:.62rem}.manlung-empty{padding:1.2rem;font-size:.72rem}
+@media(max-width:800px){.manlung-dashboard-hero{align-items:flex-start;flex-direction:column}.dashboard-hero-action{width:100%;max-width:330px}.dashboard-overview-grid{grid-template-columns:1fr}.dashboard-lower-grid{grid-template-columns:1fr}.dashboard-support-card{grid-template-columns:auto 1fr}.dashboard-support-action{grid-column:1/-1;margin-left:72px}}
+@media(max-width:560px){.manlung-dashboard-main{padding-top:0}.manlung-dashboard-hero{border-radius:20px;margin-top:.8rem;padding:1.15rem}.manlung-dashboard-hero h2{font-size:1.5rem}.dashboard-hero-trust{gap:.3rem}.dashboard-hero-trust span{font-size:.6rem}.dashboard-overview-card{padding:.85rem}.dashboard-support-card{grid-template-columns:auto 1fr;gap:.7rem;padding:.9rem}.dashboard-support-copy h2{font-size:.9rem}.dashboard-support-copy p{font-size:.67rem}.dashboard-donation-number{flex-direction:column;gap:.05rem}.dashboard-support-action{grid-column:1/-1;margin-left:0}.dashboard-support-action .btn{width:100%}.manlung-dashboard-card{padding:.9rem!important;border-radius:17px!important}.dashboard-section-head{align-items:flex-start}.dashboard-section-title p{display:none}.dashboard-mini-link{font-size:.62rem}.dashboard-section-icon{width:38px;height:38px;flex-basis:38px}}
+@media(prefers-reduced-motion:reduce){.dashboard-overview-card{transition:none}.manlung-dashboard-hero,.dashboard-overview-card{animation:none}}
+</style>\n</head>
 <body>
   <header class="site-header">
     <div class="container">
@@ -756,65 +772,102 @@
     </div>
   </header>
 
-  <main class="container">
-    <section class="dashboard-hero">
-      <div>
+  <main class="container manlung-dashboard-main">
+    <section class="dashboard-hero manlung-dashboard-hero">
+      <div class="dashboard-hero-copy">
+        <span class="dashboard-kicker"><i class="fas fa-shield-halved"></i> Private Client Portal</span>
         <h2>Welcome back</h2>
-        <p>Every case stays tied to your account. Follow updates and speak directly with an available Admin.</p>
+        <p>Every case stays tied to your account. Follow progress, review updates and speak directly with an available Admin.</p>
+        <div class="dashboard-hero-trust">
+          <span><i class="fas fa-lock"></i> Secure account</span>
+          <span><i class="fas fa-clock"></i> Live updates</span>
+          <span><i class="fas fa-headset"></i> Admin support</span>
+        </div>
       </div>
-      <div class="dashboard-actions">
-        <a class="btn btn-primary" href="/client/request.html"><i class="fas fa-file-circle-plus"></i> Submit Case</a>
+      <div class="dashboard-hero-action">
+        <a class="btn btn-primary dashboard-primary-action" href="/client/request.html">
+          <i class="fas fa-file-circle-plus"></i>
+          <span>Submit a Case</span>
+          <i class="fas fa-arrow-right dashboard-action-arrow"></i>
+        </a>
+        <small>Start a new recovery request securely.</small>
       </div>
     </section>
 
-    <section class="card" style="margin-bottom:1rem;">
-      <div class="card-title"><img src="/images/donation.png" alt="Donation" style="width:2.3rem;height:2.3rem;object-fit:contain;display:inline-block;vertical-align:middle;margin-right:.45rem;"> Community Support</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
-        <div>
-          <strong id="publicDonationTotal">KES 0</strong>
-          <div style="font-size:.82rem;color:var(--text-muted);margin-top:.2rem;"><span id="publicDonationCount">0</span> confirmed donations</div>
-        </div>
+    <section class="dashboard-overview-grid" aria-label="Portal overview">
+      <article class="dashboard-overview-card overview-cases">
+        <div class="overview-icon"><i class="fas fa-folder-open"></i></div>
+        <div class="overview-copy"><span>My Cases</span><strong id="dashboardCaseMetric">0</strong><small>Recovery cases linked to you</small></div>
+        <i class="fas fa-arrow-up-right-from-square overview-corner" aria-hidden="true"></i>
+      </article>
+      <article class="dashboard-overview-card overview-donations">
+        <div class="overview-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <div class="overview-copy"><span>Community Support</span><strong id="dashboardDonationMetric">KES 0</strong><small><span id="dashboardDonationCountMetric">0</span> confirmed donations</small></div>
+        <i class="fas fa-heart overview-corner" aria-hidden="true"></i>
+      </article>
+      <article class="dashboard-overview-card overview-notices">
+        <div class="overview-icon"><i class="fas fa-bell"></i></div>
+        <div class="overview-copy"><span>Notifications</span><strong id="dashboardNoticeMetric">0</strong><small>Unread account updates</small></div>
+        <i class="fas fa-chevron-right overview-corner" aria-hidden="true"></i>
+      </article>
+    </section>
+
+    <section class="dashboard-support-card">
+      <div class="dashboard-support-art">
+        <img src="/images/donation.png" alt="Community support">
+      </div>
+      <div class="dashboard-support-copy">
+        <span class="dashboard-section-kicker">Community support</span>
+        <h2>Help keep digital recovery resources accessible.</h2>
+        <p>Your support helps maintain recovery resources and digital safety information for the wider community.</p>
+        <div class="dashboard-donation-number"><strong id="publicDonationTotal">KES 0</strong><span><b id="publicDonationCount">0</b> confirmed donations</span></div>
+      </div>
+      <div class="dashboard-support-action">
         <a class="btn btn-primary" href="/donate.html"><i class="fas fa-heart"></i> Donate</a>
       </div>
     </section>
 
-    <section class="card" style="margin-bottom:1rem;">
-      <div class="card-title"><i class="fas fa-list-check"></i> My Cases <span id="caseCount" style="font-size:.78rem;color:var(--text-muted);font-weight:500;"></span></div>
+    <section class="card manlung-dashboard-card manlung-cases-card" id="myCasesSection">
+      <div class="dashboard-section-head">
+        <div class="dashboard-section-title">
+          <div class="dashboard-section-icon"><i class="fas fa-list-check"></i></div>
+          <div><span class="dashboard-section-kicker">Your recovery activity</span><h2>My Cases <span id="caseCount" class="dashboard-inline-count"></span></h2><p>Review every recovery request connected to your account.</p></div>
+        </div>
+        <a class="dashboard-mini-link" href="/client/request.html"><i class="fas fa-plus"></i> New case</a>
+      </div>
       <div id="casesState" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading your cases…</div>
       <div id="casesGrid" class="case-grid"></div>
     </section>
 
-    <section id="accountDangerZone" class="card danger-zone" style="margin-top:1rem;">
-      <div class="card-title">
-        <i class="fas fa-user-shield"></i> Account &amp; Privacy
-      </div>
-      <p class="danger-copy">
-        You control your account. Deleting it permanently removes your account,
-        your linked recovery cases, and the evidence files attached to those cases.
-      </p>
-      <button
-        type="button"
-        class="btn btn-danger"
-        onclick="deleteMyAccount()"
-      >
-        <i class="fas fa-user-xmark"></i> Delete My Account
-      </button>
+    <section class="dashboard-lower-grid">
+      <section class="card manlung-dashboard-card danger-zone" id="accountDangerZone">
+        <div class="dashboard-section-head compact">
+          <div class="dashboard-section-title">
+            <div class="dashboard-section-icon danger"><i class="fas fa-user-shield"></i></div>
+            <div><span class="dashboard-section-kicker danger-kicker">Account control</span><h2>Account &amp; Privacy</h2></div>
+          </div>
+        </div>
+        <div class="privacy-panel">
+          <div class="privacy-status"><i class="fas fa-lock"></i><span><strong>Your account is yours</strong><small>Manage your data and access securely.</small></span></div>
+          <p class="danger-copy">Deleting your account permanently removes your account, linked recovery cases, and evidence files attached to those cases.</p>
+          <button type="button" class="btn btn-danger case-delete-btn" onclick="deleteMyAccount()"><i class="fas fa-user-xmark"></i> Delete My Account</button>
+        </div>
+      </section>
+
+      <section class="card manlung-dashboard-card manlung-notifications-card" id="manlungNotifications">
+        <div class="dashboard-section-head compact">
+          <div class="dashboard-section-title">
+            <div class="dashboard-section-icon notice"><i class="fas fa-bell"></i></div>
+            <div><span class="dashboard-section-kicker">Stay informed</span><h2>Notifications <span class="manlung-notification-badge" id="manlungNotificationCount">0</span></h2></div>
+          </div>
+          <button type="button" class="dashboard-mini-link dashboard-mark-all" onclick="markAllManlungNotificationsRead()">Mark all read</button>
+        </div>
+        <div class="manlung-notification-list" id="manlungNotificationList">
+          <div class="manlung-empty">Loading notifications…</div>
+        </div>
+      </section>
     </section>
-
-
-<section class="card manlung-notifications-card" id="manlungNotifications">
-  <div class="manlung-notification-head">
-    <div class="manlung-notification-title">
-      <i class="fas fa-bell"></i>
-      <strong>Notifications</strong>
-      <span class="manlung-notification-badge" id="manlungNotificationCount">0</span>
-    </div>
-    <button type="button" class="btn" onclick="markAllManlungNotificationsRead()">Mark all read</button>
-  </div>
-  <div class="manlung-notification-list" id="manlungNotificationList">
-    <div class="manlung-empty">Loading notifications…</div>
-  </div>
-</section>
+  </main>
 
 <!-- Account deletion confirmation modal -->
 <div
@@ -1928,7 +1981,35 @@
 })();
 </script>
 
-<script src="/js/pwa.js" defer></script>
+<script id="manlung-dashboard-metrics">
+(function(){
+  function syncMetric(id,value){const el=document.getElementById(id);if(el)el.textContent=value}
+  const oldLoadCases=window.loadCases;
+  const oldLoadDonationSummary=window.loadDonationSummary;
+  const casesGrid=document.getElementById('casesGrid');
+  const donation=document.getElementById('publicDonationTotal');
+  const count=document.getElementById('publicDonationCount');
+  const caseObserver=new MutationObserver(function(){
+    const cards=casesGrid?.querySelectorAll('.case-card')||[];
+    const n=cards.length;
+    syncMetric('dashboardCaseMetric',n);
+  });
+  if(casesGrid)caseObserver.observe(casesGrid,{childList:true,subtree:true});
+  if(donation){
+    const observer=new MutationObserver(function(){syncMetric('dashboardDonationMetric',donation.textContent||'KES 0')});
+    observer.observe(donation,{childList:true,characterData:true,subtree:true});
+  }
+  if(count){
+    const observer=new MutationObserver(function(){syncMetric('dashboardDonationCountMetric',count.textContent||'0')});
+    observer.observe(count,{childList:true,characterData:true,subtree:true});
+  }
+  const notice=document.getElementById('manlungNotificationCount');
+  if(notice){
+    const observer=new MutationObserver(function(){syncMetric('dashboardNoticeMetric',notice.textContent||'0')});
+    observer.observe(notice,{childList:true,characterData:true,subtree:true});
+  }
+})();
+</script>\n<script src="/js/pwa.js" defer></script>
 <footer class="manlung-footer" aria-label="Manlung Recovery footer">
   <div class="manlung-footer-inner">
     <div class="manlung-footer-grid">
