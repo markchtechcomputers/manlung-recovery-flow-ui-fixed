@@ -206,6 +206,58 @@
 </style>
 
 
+<style id="manlung-track-premium-style">
+.track-entry-card{
+  margin:1.25rem 0;
+  padding:clamp(1.35rem,3vw,2rem);
+  border:1px solid #dbeafe;
+  border-radius:22px;
+  background:linear-gradient(135deg,#ffffff,#f7fbff);
+  box-shadow:0 18px 50px rgba(15,23,42,.08);
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:1rem 1.15rem;
+  align-items:center;
+}
+.track-entry-icon{
+  width:58px;height:58px;border-radius:17px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#2563eb,#1d4ed8);color:#fff;
+  box-shadow:0 12px 26px rgba(37,99,235,.2);font-size:1.2rem;
+}
+.track-entry-copy{min-width:0}
+.track-eyebrow{display:block;text-transform:uppercase;letter-spacing:.1em;font-size:.66rem;font-weight:900;color:#2563eb;margin-bottom:.25rem}
+.track-entry-copy h2{margin:0;color:#0f172a;font-size:clamp(1.25rem,3vw,1.7rem)}
+.track-entry-copy p{margin:.45rem 0 0;color:#64748b;line-height:1.55}
+.track-entry-form{grid-column:1/-1;padding-top:.25rem}
+.track-entry-form label{display:block;font-size:.74rem;font-weight:800;color:#334155;margin-bottom:.4rem}
+.track-entry-controls{display:flex;gap:.6rem}
+.track-entry-controls input{flex:1;min-height:48px;border:1px solid #cbd5e1;border-radius:12px;padding:.7rem .8rem;background:#fff;color:#0f172a}
+.track-entry-controls input:focus{outline:2px solid rgba(37,99,235,.16);border-color:#2563eb}
+.track-entry-controls .btn{min-height:48px}
+.track-entry-form small{display:block;margin-top:.4rem;color:#64748b;font-size:.68rem}
+.track-help-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:0 0 1rem}
+.track-help-grid article{display:grid;grid-template-columns:auto 1fr;column-gap:.65rem;padding:1rem;border:1px solid #e2e8f0;border-radius:15px;background:#fff}
+.track-help-grid i{grid-row:span 2;color:#2563eb;font-size:1rem;margin-top:.15rem}
+.track-help-grid strong{font-size:.78rem;color:#0f172a}
+.track-help-grid span{font-size:.7rem;color:#64748b;line-height:1.45;margin-top:.15rem}
+@media(max-width:650px){
+ .track-entry-card{grid-template-columns:auto 1fr;border-radius:18px}
+ .track-entry-controls{flex-direction:column}
+ .track-entry-controls .btn{width:100%}
+ .track-help-grid{grid-template-columns:1fr}
+}
+</style>
+<script>
+function openCaseFromForm(event){
+  event.preventDefault();
+  const input=document.getElementById('trackCaseInput');
+  const value=(input?.value||'').trim();
+  if(!value) return false;
+  window.location.href='/client/track.html?case='+encodeURIComponent(value);
+  return false;
+}
+</script>
+
 <style id="manlung-message-style">
 .manlung-message-card{margin-top:1rem}
 .manlung-message-list{display:grid;gap:.6rem;max-height:420px;overflow:auto;padding:.2rem;scrollbar-width:thin;scrollbar-color:rgba(100,116,139,.55) transparent}.manlung-message-list::-webkit-scrollbar{width:7px;height:7px}.manlung-message-list::-webkit-scrollbar-track{background:transparent}.manlung-message-list::-webkit-scrollbar-thumb{background:rgba(100,116,139,.42);border-radius:999px}.manlung-message-list::-webkit-scrollbar-thumb:hover{background:rgba(36,81,214,.68)}
@@ -339,7 +391,30 @@
             if (!token) { window.location.href = '/login.html'; return; }
 
             if (!caseId) {
-                content.innerHTML = '<div class="card"><p class="error-text">No case ID provided.</p></div>';
+                document.getElementById('caseIdHeading').textContent = 'Track an existing case';
+                content.innerHTML = `
+                    <section class="track-entry-card">
+                        <div class="track-entry-icon"><i class="fas fa-route"></i></div>
+                        <div class="track-entry-copy">
+                            <span class="track-eyebrow">Secure case tracking</span>
+                            <h2>Where is your case now?</h2>
+                            <p>Enter your private case reference to view available progress, updates, messages and next steps.</p>
+                        </div>
+                        <form class="track-entry-form" onsubmit="return openCaseFromForm(event)">
+                            <label for="trackCaseInput">Case reference</label>
+                            <div class="track-entry-controls">
+                                <input id="trackCaseInput" type="text" autocomplete="off" placeholder="e.g. MRC-2026-0012" required>
+                                <button class="btn btn-primary" type="submit"><i class="fas fa-arrow-right"></i> View Case</button>
+                            </div>
+                            <small>Use the case ID provided after submitting your recovery request.</small>
+                        </form>
+                    </section>
+                    <section class="track-help-grid">
+                        <article><i class="fas fa-shield-halved"></i><strong>Private</strong><span>Case details are shown only after client authentication.</span></article>
+                        <article><i class="fas fa-list-check"></i><strong>Structured</strong><span>Follow status, timeline, files and meaningful updates in one place.</span></article>
+                        <article><i class="fas fa-headset"></i><strong>Need help?</strong><span>Open your Client Portal or use available support options.</span></article>
+                    </section>
+                `;
                 return;
             }
 
