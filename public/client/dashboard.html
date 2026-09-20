@@ -755,6 +755,29 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 @media(max-width:800px){.dashboard-overview-grid{grid-template-columns:1fr 1fr}.dashboard-lower-grid{grid-template-columns:1fr}.dashboard-overview-card:last-child{grid-column:1/-1}}
 @media(max-width:600px){.container.manlung-dashboard-main{padding:.65rem .65rem 1.1rem!important}.dashboard-hero.manlung-dashboard-hero{padding:1.1rem!important;border-radius:18px!important}.dashboard-hero h2{font-size:1.38rem!important}.dashboard-hero p{font-size:.76rem!important}.dashboard-hero-action{width:100%}.dashboard-primary-action{width:100%;justify-content:center}.dashboard-overview-grid{grid-template-columns:1fr;gap:.5rem}.dashboard-overview-card,.dashboard-overview-card:last-child{grid-column:auto;min-height:72px;padding:.75rem}.dashboard-support-card{grid-template-columns:50px 1fr;gap:.65rem;padding:.75rem}.dashboard-support-art{width:50px;height:50px}.dashboard-support-action{grid-column:1/-1}.dashboard-support-action .btn{width:100%;justify-content:center}.dashboard-section-head{padding:.8rem}.dashboard-section-title p{display:none}.case-grid{padding:0 .8rem .8rem!important}.manlung-notification-list{padding:0 .8rem .8rem}}
 </style>
+<style id="manlung-incoming-call-dashboard-style">
+.manlung-incoming-call-card{display:none;position:relative;margin:0 0 1rem;padding:1.05rem 1.15rem;border:1px solid #86efac;border-radius:20px;background:linear-gradient(135deg,#f0fdf4,#ffffff 62%,#eff6ff);box-shadow:0 16px 40px rgba(16,185,129,.12);overflow:hidden}
+.manlung-incoming-call-card.is-visible{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:1rem;animation:manlungIncomingCallIn .35s ease-out}
+.manlung-incoming-call-card:before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:linear-gradient(180deg,#16a34a,#2563eb)}
+.manlung-incoming-call-avatar{width:58px;height:58px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#0f2f63;border:3px solid #bbf7d0;box-shadow:0 0 0 5px rgba(34,197,94,.08);animation:manlungIncomingPulse 1.6s ease-in-out infinite}
+.manlung-incoming-call-avatar img{width:100%;height:100%;object-fit:cover}
+.manlung-incoming-call-copy .kicker{font-size:.66rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#15803d}
+.manlung-incoming-call-copy h3{margin:.18rem 0 .22rem;font-size:1.08rem;color:#0f172a}
+.manlung-incoming-call-copy p{margin:0;color:#475569;font-size:.72rem;line-height:1.5}
+.manlung-incoming-call-meta{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.55rem}
+.manlung-incoming-call-meta span{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .5rem;border-radius:999px;background:#fff;border:1px solid #dcfce7;color:#166534;font-size:.62rem;font-weight:800}
+.manlung-incoming-call-actions{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end}
+.manlung-incoming-call-actions button{min-height:42px;border:0;border-radius:11px;padding:.62rem .8rem;font-weight:900;cursor:pointer}
+.manlung-incoming-call-actions .accept{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;box-shadow:0 8px 20px rgba(22,163,74,.2)}
+.manlung-incoming-call-actions .decline{background:#fff1f2;color:#b91c1c;border:1px solid #fecdd3}
+.manlung-incoming-call-actions button:disabled{opacity:.55;cursor:wait}
+.manlung-incoming-call-state{display:none;margin-top:.55rem;font-size:.68rem;font-weight:800;color:#2563eb}
+.manlung-incoming-call-card.is-connecting .manlung-incoming-call-state{display:block}
+@keyframes manlungIncomingCallIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes manlungIncomingPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@media(max-width:760px){.manlung-incoming-call-card.is-visible{grid-template-columns:auto 1fr}.manlung-incoming-call-actions{grid-column:1/-1;justify-content:stretch}.manlung-incoming-call-actions button{flex:1}}
+@media(prefers-reduced-motion:reduce){.manlung-incoming-call-card.is-visible,.manlung-incoming-call-avatar{animation:none}}
+</style>
 </head>
 <body>
   <header class="site-header">
@@ -808,7 +831,27 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       </div>
     </section>
 
-    <section class="dashboard-overview-grid" aria-label="Portal overview">
+    <section id="manlungIncomingAdminCall" class="manlung-incoming-call-card" aria-live="assertive" aria-label="Incoming Admin call">
+  <div class="manlung-incoming-call-avatar">
+    <img src="https://i.postimg.cc/FHBztf67/Chat-GPT-Image-Aug-31-2026-11-17-24-AM.png" alt="Manlung Admin">
+  </div>
+  <div class="manlung-incoming-call-copy">
+    <span class="kicker"><i class="fas fa-phone-volume"></i> Incoming secure call</span>
+    <h3 id="manlungIncomingCallTitle">Your Admin is calling</h3>
+    <p id="manlungIncomingCallDescription">An Admin has started a secure browser call with you. Review the details below before answering.</p>
+    <div class="manlung-incoming-call-meta">
+      <span id="manlungIncomingCallAdmin"><i class="fas fa-user-shield"></i> Admin</span>
+      <span id="manlungIncomingCallCase"><i class="fas fa-folder-open"></i> Support callback</span>
+      <span><i class="fas fa-lock"></i> Secure audio</span>
+    </div>
+    <div id="manlungIncomingCallState" class="manlung-incoming-call-state">Preparing your secure call…</div>
+  </div>
+  <div class="manlung-incoming-call-actions">
+    <button type="button" class="decline" id="manlungIncomingCallDecline"><i class="fas fa-phone-slash"></i> Decline</button>
+    <button type="button" class="accept" id="manlungIncomingCallAccept"><i class="fas fa-phone"></i> Accept call</button>
+  </div>
+</section>
+\n    <section class="dashboard-overview-grid" aria-label="Portal overview">
       <article class="dashboard-overview-card overview-cases">
         <div class="overview-icon"><i class="fas fa-folder-open"></i></div>
         <div class="overview-copy"><span>My Cases</span><strong id="dashboardCaseMetric">0</strong><small>Recovery cases linked to you</small></div>
@@ -1833,6 +1876,87 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
   window.hideNotificationToast =
     hideNotificationToast;
 
+  let manlungIncomingCall = null;
+  let manlungIncomingCallPoll = null;
+
+  function renderIncomingAdminCall(call){
+    const card=document.getElementById('manlungIncomingAdminCall');
+    if(!card) return;
+    if(!call){
+      manlungIncomingCall=null;
+      card.classList.remove('is-visible','is-connecting');
+      card.setAttribute('aria-hidden','true');
+      return;
+    }
+    manlungIncomingCall={...call};
+    const adminName=escapeHtml(call.admin_name||'Manlung Admin');
+    const caseText=call.case_id ? `Case ${escapeHtml(call.case_id)}` : 'Support callback';
+    document.getElementById('manlungIncomingCallTitle').textContent=`Incoming call from ${call.admin_name||'Manlung Admin'}`;
+    document.getElementById('manlungIncomingCallDescription').textContent=call.case_id
+      ? `${call.admin_name||'Manlung Admin'} is calling about case ${call.case_id}. You can accept to start the secure browser audio call, or decline if you are unavailable.`
+      : `${call.admin_name||'Manlung Admin'} is calling you from Manlung Recovery. You can accept to start the secure browser audio call, or decline if you are unavailable.`;
+    document.getElementById('manlungIncomingCallAdmin').innerHTML='<i class="fas fa-user-shield"></i> '+adminName;
+    document.getElementById('manlungIncomingCallCase').innerHTML='<i class="fas fa-folder-open"></i> '+caseText;
+    card.classList.add('is-visible');
+    card.setAttribute('aria-hidden','false');
+  }
+
+  function setIncomingCallConnecting(connecting){
+    const card=document.getElementById('manlungIncomingAdminCall');
+    if(!card) return;
+    card.classList.toggle('is-connecting',!!connecting);
+    const accept=document.getElementById('manlungIncomingCallAccept');
+    const decline=document.getElementById('manlungIncomingCallDecline');
+    if(accept) accept.disabled=!!connecting;
+    if(decline) decline.disabled=!!connecting;
+  }
+
+  async function pollIncomingAdminCall(){
+    const headers=manlungHeaders();
+    if(!headers) return;
+    try{
+      const res=await fetch('/api/calls/client/callbacks',{headers,cache:'no-store'});
+      if(!res.ok) return;
+      const data=await res.json().catch(()=>({}));
+      const call=Array.isArray(data.calls)&&data.calls.length?data.calls[0]:null;
+      if(call && !manlungIncomingCall){
+        renderIncomingAdminCall(call);
+      }else if(call && manlungIncomingCall && String(call.id)!==String(manlungIncomingCall.id)){
+        renderIncomingAdminCall(call);
+      }else if(!call && manlungIncomingCall){
+        renderIncomingAdminCall(null);
+      }
+    }catch(_){}
+  }
+
+  function setupIncomingAdminCallDashboard(){
+    const accept=document.getElementById('manlungIncomingCallAccept');
+    const decline=document.getElementById('manlungIncomingCallDecline');
+    accept?.addEventListener('click',()=>{
+      if(!manlungIncomingCall)return;
+      setIncomingCallConnecting(true);
+      window.dispatchEvent(new CustomEvent('manlung:dashboard-accept-admin-call',{detail:{id:manlungIncomingCall.id}}));
+    });
+    decline?.addEventListener('click',()=>{
+      if(!manlungIncomingCall)return;
+      setIncomingCallConnecting(true);
+      window.dispatchEvent(new CustomEvent('manlung:dashboard-decline-admin-call',{detail:{id:manlungIncomingCall.id}}));
+    });
+    window.addEventListener('manlung:incoming-admin-call',event=>{
+      renderIncomingAdminCall(event.detail||null);
+    });
+    window.addEventListener('manlung:admin-call-accepting',()=>{
+      setIncomingCallConnecting(true);
+    });
+    window.addEventListener('manlung:admin-call-cleared',()=>{
+      renderIncomingAdminCall(null);
+      loadManlungNotifications();
+    });
+    pollIncomingAdminCall();
+    clearInterval(manlungIncomingCallPoll);
+    manlungIncomingCallPoll=setInterval(pollIncomingAdminCall,2000);
+  }
+
   async function loadManlungNotifications(){
     const list = document.getElementById('manlungNotificationList');
     const badge = document.getElementById('manlungNotificationCount');
@@ -1893,6 +2017,8 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       });
 
       notificationReady = true;
+      const noticeMetric=document.getElementById("dashboardNoticeMetric");
+      if(noticeMetric) noticeMetric.textContent=String(unread);
 
       if(!notifications.length){
         list.innerHTML = '<div class="manlung-empty">No notifications yet.</div>';
@@ -1968,6 +2094,8 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
   window.loadManlungNotifications = loadManlungNotifications;
   window.markManlungNotificationRead = markManlungNotificationRead;
   window.markAllManlungNotificationsRead = markAllManlungNotificationsRead;
+
+  document.addEventListener("DOMContentLoaded", setupIncomingAdminCallDashboard);
 
   document.addEventListener(
     'pointerdown',
