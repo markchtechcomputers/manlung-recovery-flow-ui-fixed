@@ -112,11 +112,23 @@
       const data = await res.json();
       const session = data?.session;
       if (!session) return null;
-      // The signaling cursor must identify the actual user represented by
-      // this browser session. The initiator is the ADMIN for an admin callback,
-      // while the non-initiator is the CLIENT. Reversing these IDs makes each
-      // browser discard the other side's SDP/ICE as if it were its own signal.
-      return isInitiator ? (session.admin_user_id || null) : (session.client_user_id || null);
+      // The signaling identity must be the authenticated participant, not
+      // simply the initiator/non-initiator role. A client is the initiator for
+      // Client -> Admin calls, while an admin is the initiator for Admin ->
+      // Client callbacks. Using the role alone reverses Client -> Admin and
+      // causes one browser to discard the other side's SDP/ICE as its own.
+      const tokenUserId = currentUserIdFromHeaders(headers);
+      if (tokenUserId && (
+        tokenUserId === session.client_user_id ||
+        tokenUserId === session.admin_user_id
+      )) {
+        return tokenUserId;
+      }
+
+      // Safe fallback for sessions where the JWT cannot be decoded locally.
+      return isInitiator
+        ? (session.client_user_id || null)
+        : (session.admin_user_id || null);
     } catch (_) {
       return null;
     }
