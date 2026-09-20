@@ -776,9 +776,9 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
     </div>
 
     <!-- Incoming / active call panel -->
-    <div id="callModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(10,18,40,0.6); align-items:center; justify-content:center; z-index:300;" onclick="if(event.target===this) closeCallModal()">
+    <div id="callModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(10,18,40,0.6); align-items:center; justify-content:center; z-index:99999;" onclick="if(event.target===this && !currentActiveCallId) closeCallModal()">
         <div style="position:relative; background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; max-width:380px; width:90%; padding:2rem; text-align:center;">
-            <button type="button" aria-label="Close call window" title="Close" onclick="closeCallModal()" style="position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;border-radius:50%;background:var(--page-bg);color:var(--text);cursor:pointer;font-size:1rem;"><i class="fas fa-times"></i></button>
+            <button type="button" id="callModalCloseBtn" aria-label="Close call window" title="Close" onclick="closeCallModal()" style="position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;border-radius:50%;background:var(--page-bg);color:var(--text);cursor:pointer;font-size:1rem;"><i class="fas fa-times"></i></button>
             <div id="callModalBody"></div>
         </div>
     </div>
@@ -1903,6 +1903,12 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 
     function renderActiveCallUI(state, session, detail) {
         const body = document.getElementById('callModalBody');
+        const overlay = document.getElementById('callModalOverlay');
+        const closeBtn = document.getElementById('callModalCloseBtn');
+        if (overlay && state === 'connected') overlay.style.zIndex = '99999';
+        if (closeBtn) {
+            closeBtn.style.display = currentActiveCallId ? 'none' : 'block';
+        }
         if (state === 'connected') {
             body.innerHTML = `
                 <p style="font-weight:700;color:var(--success);">Connected to Client</p>
@@ -1975,6 +1981,9 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
     }
 
     async function closeCallModal() {
+        /* A connected call must stay on screen until End Call is explicitly pressed
+           by either participant. The close X/backdrop cannot terminate an active call. */
+        if (currentActiveCallId) return;
         stopIncomingAlert();
         if (currentIncomingCallId && !currentActiveCallId) {
             const callId = currentIncomingCallId;
