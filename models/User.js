@@ -156,6 +156,7 @@ async function findByValidResetToken(tokenHash) {
 }
 
 async function resetPassword(id, newPassword) {
+  if (Buffer.byteLength(String(newPassword || ''), 'utf8') > MAX_PASSWORD_BYTES) throw new Error('Password is too long. Use at most 72 UTF-8 bytes.');
   const hashed = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
   const { error } = await supabase
     .from(TABLE)
@@ -183,6 +184,7 @@ async function updateProfile(userId, { username, phone }) {
 }
 
 async function updatePassword(userId, newPassword) {
+  if (Buffer.byteLength(String(newPassword || ''), 'utf8') > MAX_PASSWORD_BYTES) throw new Error('Password is too long. Use at most 72 UTF-8 bytes.');
   const hashed = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
   const current = await findById(userId);
   const nextVersion = Number(current?.session_version || 0) + 1;
