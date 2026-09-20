@@ -285,7 +285,7 @@
         if(status==='accepted'&&!currentPeer){
           clearInterval(pollTimer);pollTimer=null;
           renderCallUI('requesting-mic');
-          currentPeer=new window.ManlungCallWebRTC.CallPeer({sessionId:currentSessionId,isInitiator:true,headers,onStateChange:(state,detail)=>renderCallUI(state,detail),onDuration:d=>updateDuration(d)});
+          currentPeer=new window.ManlungCallWebRTC.CallPeer({sessionId:currentSessionId,isInitiator:false,headers,onStateChange:(state,detail)=>renderCallUI(state,detail),onDuration:d=>updateDuration(d)});
           try{await currentPeer.start();}
           catch(e){
             console.error('Client WebRTC start error:',e);
