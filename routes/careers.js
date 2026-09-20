@@ -12,7 +12,7 @@ const SIGNED_URL_TTL = 15 * 60;
 
 const careerUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: CAREER_MAX_FILE_SIZE, files: 2 },
+  limits: { fileSize: CAREER_MAX_FILE_SIZE, files: 2, fields: 12, parts: 16, fieldSize: 64 * 1024 },
 });
 
 function valid(req, res) {
@@ -27,7 +27,14 @@ function valid(req, res) {
 function validateCareerPdf(file, label) {
   if (!file) throw new Error(`${label} PDF is required.`);
   if (file.mimetype !== 'application/pdf') throw new Error(`${label} must be a PDF file.`);
+  const name = String(file.originalname || '').toLowerCase();
+  if (!name.endsWith('.pdf')) throw new Error(`${label} must use the .pdf extension.`);
+  if (file.size > CAREER_MAX_FILE_SIZE) throw new Error(`${label} exceeds the 10 MB upload limit.`);
   if (file.buffer.toString('ascii', 0, 5) !== '%PDF-') throw new Error(`${label} is not a valid PDF file.`);
+  const head = file.buffer.subarray(0, Math.min(file.buffer.length, 4096)).toString('latin1');
+  if (/^(MZ|\\x7fELF|#!)/.test(head) || /<\\s*(script|html|iframe|object|embed)\\b/i.test(head) || /\\bon(?:error|load|click)\\s*=/i.test(head)) {
+    throw new Error(`${label} contains executable content and was rejected.`);
+  }
 }
 
 function safeOriginalName(name, fallback) {
