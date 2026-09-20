@@ -1878,13 +1878,15 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 
   let manlungIncomingCall = null;
   let manlungIncomingCallPoll = null;
+  let manlungActiveAdminCallId = null;
 
   function renderIncomingAdminCall(call){
     const card=document.getElementById('manlungIncomingAdminCall');
     if(!card) return;
     if(!call){
+      if(manlungActiveAdminCallId) return;
       manlungIncomingCall=null;
-      card.classList.remove('is-visible','is-connecting');
+      card.classList.remove('is-visible','is-connecting','is-active');
       card.setAttribute('aria-hidden','true');
       return;
     }
@@ -1898,7 +1900,38 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
     document.getElementById('manlungIncomingCallAdmin').innerHTML='<i class="fas fa-user-shield"></i> '+adminName;
     document.getElementById('manlungIncomingCallCase').innerHTML='<i class="fas fa-folder-open"></i> '+caseText;
     card.classList.add('is-visible');
+    card.classList.remove('is-active');
     card.setAttribute('aria-hidden','false');
+  }
+
+  function renderActiveAdminCall(state, call){
+    const card=document.getElementById('manlungIncomingAdminCall');
+    if(!card) return;
+    const adminName=escapeHtml(call?.admin_name||'Manlung Admin');
+    const caseText=call?.case_id ? 'Case '+escapeHtml(call.case_id) : 'Support callback';
+    manlungActiveAdminCallId=call?.id || manlungActiveAdminCallId;
+    card.classList.add('is-visible','is-active');
+    card.classList.remove('is-connecting');
+    card.setAttribute('aria-hidden','false');
+    const title=document.getElementById('manlungIncomingCallTitle');
+    const desc=document.getElementById('manlungIncomingCallDescription');
+    const admin=document.getElementById('manlungIncomingCallAdmin');
+    const caseEl=document.getElementById('manlungIncomingCallCase');
+    const stateEl=document.getElementById('manlungIncomingCallState');
+    const actions=card.querySelector('.manlung-incoming-call-actions');
+    if(title) title.textContent=state==='connected' ? 'Secure call connected' : 'Connecting to your Admin…';
+    if(desc) desc.textContent=state==='connected' ? 'You are now connected to your Admin. Keep this page open while the secure audio call is active.' : 'Your Admin has accepted the connection. Establishing secure browser audio…';
+    if(admin) admin.innerHTML='<i class="fas fa-user-shield"></i> '+adminName;
+    if(caseEl) caseEl.innerHTML='<i class="fas fa-folder-open"></i> '+caseText;
+    if(stateEl){stateEl.style.display='block';stateEl.textContent=state==='connected' ? '🟢 Live audio connection' : '🔄 Establishing secure audio connection…';}
+    if(actions){
+      actions.innerHTML=state==='connected'
+        ? '<button type="button" class="decline" id="manlungActiveCallEnd"><i class="fas fa-phone-slash"></i> End call</button>'
+        : '<button type="button" class="accept" disabled><i class="fas fa-spinner fa-spin"></i> Connecting…</button>';
+    }
+    document.getElementById('manlungActiveCallEnd')?.addEventListener('click',()=>{
+      window.dispatchEvent(new CustomEvent('manlung:dashboard-end-admin-call',{detail:{id:manlungActiveAdminCallId}}));
+    });
   }
 
   function setIncomingCallConnecting(connecting){
@@ -1948,9 +1981,18 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
     window.addEventListener('manlung:admin-call-accepting',()=>{
       setIncomingCallConnecting(true);
     });
-    window.addEventListener('manlung:admin-call-cleared',()=>{
-      renderIncomingAdminCall(null);
+    window.addEventListener('manlung:admin-call-cleared',event=>{
+      const action=event?.detail?.action;
+      if(action==='accepted') renderActiveAdminCall('connecting',manlungIncomingCall||{id:event?.detail?.id});
+      else { manlungActiveAdminCallId=null; renderIncomingAdminCall(null); }
       loadManlungNotifications();
+    });
+    window.addEventListener('manlung:admin-call-state',event=>{
+      const detail=event?.detail||{};
+      if(detail.id && manlungActiveAdminCallId && String(detail.id)!==String(manlungActiveAdminCallId)) return;
+      if(['requesting-mic','connecting','reconnecting'].includes(detail.state)) renderActiveAdminCall('connecting',manlungIncomingCall||detail);
+      else if(detail.state==='connected') renderActiveAdminCall('connected',manlungIncomingCall||detail);
+      else if(['connection-failed','ended-by-remote','ended'].includes(detail.state)){ manlungActiveAdminCallId=null; renderIncomingAdminCall(null); }
     });
     pollIncomingAdminCall();
     clearInterval(manlungIncomingCallPoll);
