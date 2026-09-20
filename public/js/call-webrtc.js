@@ -282,9 +282,12 @@
       await this.pollSignals();
 
       if (this.isInitiator) {
+        // The client is already in the answered state when this peer starts.
+        // Never restart the incoming ringtone here; doing so made the phone
+        // keep ringing even after the admin had accepted the call.
         await this.sendOffer();
-        this.setState('ringing');
-        startRingtone();
+        this.setState('connecting');
+        stopRingtone();
       } else {
         this.setState('connecting');
       }
