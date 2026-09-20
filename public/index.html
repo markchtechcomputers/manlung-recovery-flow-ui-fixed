@@ -1595,7 +1595,7 @@ img[src*="gctxrf7M"] {
 <!-- MANLUNG HERO VIDEO BACKGROUND -->
 <div class="ml-hero-device-visual" aria-hidden="true">
     <video class="ml-hero-device-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-        <source src="https://files.catbox.moe/uj2its.mp4" type="video/mp4">
+        <source src="/media/hero-recovery.mp4" type="video/mp4">
     </video>
     <div class="ml-hero-video-shade"></div>
 </div>
@@ -2580,17 +2580,22 @@ body.dark .manlung-case-tracker-visual{
 <!-- MANLUNG HERO VIDEO PLAYBACK GUARD -->
 <script>
 (function () {
+    function getHeroVideo() {
+        return document.querySelector('.ml-balanced-hero .ml-hero-device-video');
+    }
+
     function keepHeroVideoPlaying() {
-        var video = document.querySelector('.ml-balanced-hero .ml-hero-device-video');
-        if (!video) return;
+        var video = getHeroVideo();
+        if (!video || document.hidden) return;
 
         video.muted = true;
         video.defaultMuted = true;
+        video.playsInline = true;
         video.setAttribute('muted', '');
         video.setAttribute('playsinline', '');
         video.setAttribute('webkit-playsinline', '');
 
-        if (video.paused) {
+        if (video.paused && !video.ended) {
             var playPromise = video.play();
             if (playPromise && typeof playPromise.catch === 'function') {
                 playPromise.catch(function () {});
@@ -2599,15 +2604,30 @@ body.dark .manlung-case-tracker-visual{
     }
 
     document.addEventListener('DOMContentLoaded', keepHeroVideoPlaying);
-
     document.addEventListener('visibilitychange', function () {
         if (!document.hidden) keepHeroVideoPlaying();
     });
-
     window.addEventListener('pageshow', keepHeroVideoPlaying);
     window.addEventListener('focus', keepHeroVideoPlaying);
 
-    setInterval(keepHeroVideoPlaying, 3000);
+    var video = getHeroVideo();
+    if (video) {
+        video.addEventListener('loadedmetadata', keepHeroVideoPlaying);
+        video.addEventListener('canplay', keepHeroVideoPlaying);
+        video.addEventListener('stalled', function () {
+            if (!document.hidden) keepHeroVideoPlaying();
+        });
+        video.addEventListener('waiting', function () {
+            if (!document.hidden) keepHeroVideoPlaying();
+        });
+        video.addEventListener('ended', function () {
+            video.currentTime = 0;
+            keepHeroVideoPlaying();
+        });
+        video.addEventListener('error', function () {
+            // Leave the poster/fallback state intact rather than hammering play().
+        });
+    }
 })();
 </script>
 <!-- /MANLUNG HERO VIDEO PLAYBACK GUARD -->
