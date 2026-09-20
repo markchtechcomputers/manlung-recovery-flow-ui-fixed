@@ -1566,7 +1566,7 @@
 
             currentCallPeer = new window.ManlungCallWebRTC.CallPeer({
                 sessionId: callId,
-                isInitiator: false,
+                isInitiator: true,
                 headers: authHeaders(),
                 onStateChange: (state, detail) => renderActiveCallUI(state, data.session, detail),
                 onDuration: (d) => {
