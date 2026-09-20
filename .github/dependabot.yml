@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    versioning-strategy: increase
+    groups:
+      security-dependencies:
+        patterns:
+          - "helmet"
+          - "express-rate-limit"
+          - "express-validator"
+          - "multer"
+          - "bcryptjs"
