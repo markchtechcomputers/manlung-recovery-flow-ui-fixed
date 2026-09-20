@@ -876,7 +876,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 }
 </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="/js/call-webrtc.js"></script>
+<script src="/js/call-webrtc.js?v=webrtc-20260920"></script>
     <script>
         let callPanelMinimized = false;
 
@@ -1027,7 +1027,9 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
         let selectedIds = new Set();
 
         function authHeaders() {
-            return {};
+            const match = document.cookie.match(/(?:^|;\\s*)(?:__Host-mlc_csrf|mlc_csrf)=([^;]+)/);
+            const token = match ? decodeURIComponent(match[1]) : '';
+            return token ? { 'X-CSRF-Token': token } : {};
         }
 
         async function handleUnauthorized(res) {
