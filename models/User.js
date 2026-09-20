@@ -3,6 +3,7 @@ const { supabase } = require('../config/supabase');
 
 const TABLE = 'recovery_users';
 const BCRYPT_ROUNDS = 12;
+const MAX_PASSWORD_BYTES = 72;
 const MAX_LOGIN_FAILURES = 3;
 const LOCKOUT_MINUTES = 30;
 
@@ -35,6 +36,7 @@ async function findByEmail(email) {
 }
 
 async function create({ username, password, role = 'client', email, phone }) {
+  if (Buffer.byteLength(String(password || ''), 'utf8') > MAX_PASSWORD_BYTES) throw new Error('Password is too long. Use at most 72 UTF-8 bytes.');
   const hashed = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const { data, error } = await supabase
     .from(TABLE)
@@ -56,6 +58,7 @@ async function comparePassword(user, candidatePassword) {
   const lockedUntil = user.login_locked_until ? new Date(user.login_locked_until).getTime() : 0;
   if (lockedUntil && lockedUntil > Date.now()) return false;
 
+  if (Buffer.byteLength(String(candidatePassword || ''), 'utf8') > MAX_PASSWORD_BYTES) return false;
   const isMatch = await bcrypt.compare(candidatePassword, user.password);
 
   if (isMatch) {
@@ -228,7 +231,8 @@ async function listAdminsAndOwner() {
 async function searchPromotableUsers(search) {
   let query = supabase.from(TABLE).select('id, username, email, role, created_at').eq('role', 'client');
   if (search) {
-    const like = `%${search}%`;
+    const safeSearch = String(search).slice(0, 80).replace(/[\\%,().]/g, (ch) => `\\${ch}`);
+    const like = `%${safeSearch}%`;
     query = query.or(`username.ilike.${like},email.ilike.${like}`);
   }
   query = query.order('created_at', { ascending: false }).limit(20);
