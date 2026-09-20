@@ -20,10 +20,12 @@
     "express-validator": "^7.0.1",
     "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.0",
-    "multer": "^2.0.1",
-    "yt-search": "^2.13.1"
+    "multer": "^2.4.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
+  },
+  "overrides": {
+    "qs": "^6.16.0"
   }
 }
