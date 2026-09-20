@@ -2579,5 +2579,39 @@ body.dark .manlung-case-tracker-visual{
 </div>
 
 <script src="/js/onboarding.js" defer></script>
+<!-- MANLUNG HERO VIDEO PLAYBACK GUARD -->
+<script>
+(function () {
+    function keepHeroVideoPlaying() {
+        var video = document.querySelector('.ml-balanced-hero .ml-hero-device-video');
+        if (!video) return;
+
+        video.muted = true;
+        video.defaultMuted = true;
+        video.setAttribute('muted', '');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+
+        if (video.paused) {
+            var playPromise = video.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(function () {});
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', keepHeroVideoPlaying);
+
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) keepHeroVideoPlaying();
+    });
+
+    window.addEventListener('pageshow', keepHeroVideoPlaying);
+    window.addEventListener('focus', keepHeroVideoPlaying);
+
+    setInterval(keepHeroVideoPlaying, 3000);
+})();
+</script>
+<!-- /MANLUNG HERO VIDEO PLAYBACK GUARD -->
 </body>
 </html>
