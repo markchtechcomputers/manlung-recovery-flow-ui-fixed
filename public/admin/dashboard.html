@@ -2033,6 +2033,14 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             `;
         } else if (state === 'connecting' || state === 'requesting-mic') {
             body.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> ${state === 'requesting-mic' ? 'Requesting microphone access…' : 'Connecting securely…'}</p>`;
+        } else if (state === 'reconnecting') {
+            body.innerHTML = `
+                <p style="font-weight:800;color:#ca8a04;"><i class="fas fa-rotate fa-spin"></i> Reconnecting to Client…</p>
+                <p style="color:var(--text-muted);margin-bottom:.7rem;">The network connection changed. We are trying to restore the same call.</p>
+                <div style="display:flex;gap:10px;justify-content:center;">
+                    <button class="btn btn-danger" onclick="endActiveCall()"><i class="fas fa-phone-slash"></i> End Call</button>
+                </div>
+            `;
         } else if (state === 'ended-by-remote' || state === 'ended') {
             body.innerHTML = `<p>Client ended the call.</p><button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
             cleanupActiveCall();
