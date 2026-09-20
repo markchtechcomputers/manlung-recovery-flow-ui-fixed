@@ -871,3 +871,15 @@ body.dark .ml-balanced-hero .ml-hero-device-visual img {
 .ml-balanced-hero .ml-hero-device-visual img {
     display: none !important;
 }
+
+
+/* FINAL HERO CLEANUP: no floating service labels/cards over hero copy */
+.ml-balanced-hero .floating-mini-card,
+.ml-balanced-hero [class*="mini-"],
+.ml-balanced-hero .device-recovery-card,
+.ml-balanced-hero .device-recovery-label,
+.ml-balanced-hero .service-card {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
