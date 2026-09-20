@@ -140,6 +140,8 @@
       this.remoteDescriptionSet = false;
       this.pendingIce = [];
       this.remoteAudio = null;
+      this.audioPlayTimer = null;
+      this.iceRestartTimer = null;
       this.signalCursor = 0;
       this.signalTimer = null;
       this.sessionStatusTimer = null;
@@ -188,6 +190,8 @@
           this.remoteAudio.autoplay = true;
           this.remoteAudio.playsInline = true;
           this.remoteAudio.controls = false;
+          this.remoteAudio.muted = false;
+          this.remoteAudio.volume = 1;
           this.remoteAudio.dataset.callAudio = this.sessionId;
           this.remoteAudio.style.position = 'fixed';
           this.remoteAudio.style.width = '1px';
@@ -197,10 +201,24 @@
           document.body.appendChild(this.remoteAudio);
         }
         this.remoteAudio.srcObject = stream;
-        const playRemote = () => this.remoteAudio?.play().catch((error) => {
-          console.warn('[Manlung WebRTC] remote audio autoplay was blocked:', error);
-        });
+        const playRemote = () => {
+          if (!this.remoteAudio) return;
+          this.remoteAudio.muted = false;
+          this.remoteAudio.volume = 1;
+          this.remoteAudio.play().catch((error) => {
+            console.warn('[Manlung WebRTC] remote audio autoplay was blocked:', error);
+          });
+        };
         playRemote();
+        clearInterval(this.audioPlayTimer);
+        this.audioPlayTimer = setInterval(() => {
+          if (!this.remoteAudio) return;
+          if (this.remoteAudio.paused) playRemote();
+          if (this.connectedAt) {
+            clearInterval(this.audioPlayTimer);
+            this.audioPlayTimer = null;
+          }
+        }, 1000);
       };
 
       this.pc.onicecandidate = event => {
@@ -222,6 +240,9 @@
         const state = this.pc?.connectionState;
         if (state === 'connected' && !this.connectedAt) {
           if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
+          clearInterval(this.audioPlayTimer);
+          this.audioPlayTimer = null;
+          this.remoteAudio?.play().catch(() => {});
           this.connectionTimeout = null;
           stopRingtone();
           this.connectedAt = Date.now();
@@ -257,7 +278,7 @@
         if (!this.ended && !this.connectedAt) {
           this.setState('connection-failed', 'Connection timed out. This usually means the network needs a working TURN relay.');
         }
-      }, 20000);
+      }, 35000);
     }
 
     async sendSignal(event, payload) {
@@ -425,10 +446,14 @@
       if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
       if (this.signalTimer) clearInterval(this.signalTimer);
       if (this.sessionStatusTimer) clearInterval(this.sessionStatusTimer);
+      if (this.audioPlayTimer) clearInterval(this.audioPlayTimer);
+      if (this.iceRestartTimer) clearTimeout(this.iceRestartTimer);
       this.durationTimer = null;
       this.connectionTimeout = null;
       this.signalTimer = null;
       this.sessionStatusTimer = null;
+      this.audioPlayTimer = null;
+      this.iceRestartTimer = null;
       this.localStream?.getTracks().forEach(track => { try { track.stop(); } catch (_) {} });
       this.localStream = null;
       try { this.pc?.close(); } catch (_) {}
