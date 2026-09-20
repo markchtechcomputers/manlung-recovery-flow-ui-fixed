@@ -144,7 +144,7 @@ app.use(cors({
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000,
+  max: 600,
   standardHeaders: true,
   legacyHeaders: false,
 
@@ -219,8 +219,8 @@ app.use('/api/notifications', notificationLimiter);
 // Login lockout is enforced per account in recovery_users.
 // Do not use a short in-memory IP limiter here: it can block a valid
 // owner/admin login and incorrectly present the account as locked.
-// User.comparePassword records failures and applies the 132-year
-// persistent account lock after the third failed password attempt.
+// User.comparePassword records failures and applies a temporary 30-minute
+// account lock after the third failed password attempt.
 
 // ============================================================
  // AUTH LOGIN / MFA BRUTE-FORCE PROTECTION
@@ -349,15 +349,15 @@ app.post('/api/careers', careerSubmissionLimiter);
 // ============================================================
 
 app.use(express.json({
-  limit: '10mb',
+  limit: '2mb',
   verify: (req, _res, buf) => {
     req.rawBody = buf;
   },
 }));
 
 app.use(express.urlencoded({
-  extended: true,
-  limit: '10mb',
+  extended: false,
+  limit: '1mb',
 }));
 
 // Validate API input before it reaches route handlers.
