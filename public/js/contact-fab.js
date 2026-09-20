@@ -50,14 +50,14 @@
     addLoadingIndicator();
 
     // Load the original WebRTC stack first; do not replace it.
-    await load('/js/call-webrtc.js?v=restore-20260908', 'manlungCallWebRTC');
-    await load('/js/call-widget.js?v=restore-20260908', 'manlungCallWidget');
+    await load('/js/call-webrtc.js?v=webrtc-20260920', 'manlungCallWebRTC');
+    await load('/js/call-widget.js?v=webrtc-20260920', 'manlungCallWidget');
 
     // Restore the contact menu around the Call Admin control.
-    await load('/js/support-fab.js?v=restore-20260908', 'manlung-support-fab');
+    await load('/js/support-fab.js?v=webrtc-20260920', 'manlung-support-fab');
 
     // Also ensure the original functional AI implementation is loaded.
-    await load('/js/manlung-ai.js?v=restore-20260908', 'manlung-functional-ai');
+    await load('/js/manlung-ai.js?v=webrtc-20260920', 'manlung-functional-ai');
 
     // Give dynamically-created controls a moment to render, then remove the loading mark.
     setTimeout(finishLoadingIndicator, 700);
