@@ -159,3 +159,19 @@ test('Admin dashboard supplies the CSRF token for cookie-authenticated mutations
   assert.match(source, /__Host-mlc_csrf|mlc_csrf/);
 });
 
+
+
+test('WebRTC end performs durable authenticated session cleanup', () => {
+  const source = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public', 'js', 'call-webrtc.js'), 'utf8');
+  assert.match(source, /\/api\/calls.*encodeURIComponent\(this\.sessionId\).*\/end/);
+  assert.match(source, /reason:\s*'peer_hangup'/);
+  assert.match(source, /keepalive:\s*true/);
+});
+
+test('active-call guard repairs an admin call after presence is lost', () => {
+  const source = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'models', 'CallSession.js'), 'utf8');
+  assert.match(source, /recovery_admin_presence/);
+  assert.match(source, /AdminPresence\.STALE_MS/);
+  assert.match(source, /admin_presence_lost_cleanup/);
+  assert.match(source, /status:\s*'ended'/);
+});
