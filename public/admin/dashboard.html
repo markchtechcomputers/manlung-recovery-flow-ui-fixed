@@ -831,7 +831,18 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
   display:inline-flex;align-items:center;justify-content:center;
 }
 .manlung-admin-call-window-actions button:hover{filter:brightness(.96);}
-.manlung-admin-call-window-actions #callModalCloseBtn{display:none!important;}
+.manlung-admin-call-window-actions #callModalCloseBtn{
+  display:inline-flex!important;
+  background:#fee2e2!important;
+  color:#b91c1c!important;
+  border:1px solid #fecaca!important;
+  font-size:14px!important;
+  font-weight:900!important;
+}
+.manlung-admin-call-window-actions #callModalCloseBtn:hover{
+  background:#fecaca!important;
+  color:#991b1b!important;
+}
 .manlung-admin-call-panel.is-minimized{
   position:fixed!important;
   right:18px!important;
@@ -2005,7 +2016,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             overlay.style.display = 'flex';
             overlay.style.zIndex = '99999';
         }
-        if (closeBtn) closeBtn.style.display = 'none';
+        if (closeBtn) closeBtn.style.display = 'inline-flex';
         if (state === 'connected') {
             setCallPanelMinimized(false);
             body.innerHTML = `
@@ -2081,9 +2092,12 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
     }
 
     async function closeCallModal() {
-        /* A connected call must stay on screen until End Call is explicitly pressed
-           by either participant. The close X/backdrop cannot terminate an active call. */
-        if (currentActiveCallId) return;
+        /* X never ends a connected call. It minimizes the active call window;
+           only the explicit End Call button terminates the connected call. */
+        if (currentActiveCallId) {
+            setCallPanelMinimized(true);
+            return;
+        }
         stopIncomingAlert();
         if (currentIncomingCallId && !currentActiveCallId) {
             const callId = currentIncomingCallId;
