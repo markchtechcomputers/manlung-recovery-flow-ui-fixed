@@ -65,6 +65,7 @@ app.use(
         frameSrc: ["'self'", 'https://js.paystack.co', 'https://www.youtube.com', 'https://www.youtube-nocookie.com'],
         workerSrc: ["'self'", 'blob:'],
         manifestSrc: ["'self'"],
+        upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
       },
     },
 
