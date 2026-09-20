@@ -54,7 +54,7 @@ test('input security rejects excessively deep JSON', () => {
   for (let i = 0; i < 25; i += 1) value = { nested: value };
 
   const result = runInput(value);
-  assert.equal(result.statusCode, 200);
+  assert.equal(result.statusCode, 400);
 });
 
 test('scanner uses certificate verification for HTTPS requests', () => {
@@ -97,7 +97,7 @@ test('server security headers, CORS and general API throttling are configured', 
   assert.match(server, /hsts:\s*\{/);
   assert.match(server, /app\.disable\(['"]x-powered-by['"]\)/);
   assert.match(server, /effectiveAllowedOrigins/);
-  assert.match(server, /max:\s*1000/);
+  assert.match(server, /max:\s*600/);
 });
 
 test('login lockout is capped at three failures', () => {
@@ -154,4 +154,30 @@ test('donation total exposes a configurable target and percentage', () => {
   const donations = fs.readFileSync(path.join(__dirname, '..', 'routes', 'donations.js'), 'utf8');
   assert.match(donations, /DONATION_TARGET_KES/);
   assert.match(donations, /percentage/);
+});
+
+
+test('upload validation rejects executable signatures and mismatched extensions', () => {
+  const cases = fs.readFileSync(path.join(__dirname, '..', 'routes', 'cases.js'), 'utf8');
+  assert.match(cases, /rejectSuspiciousBinary/);
+  assert.match(cases, /Windows executable/);
+  assert.match(cases, /ELF executable/);
+  assert.match(cases, /file extension does not match/i);
+  assert.match(cases, /fileSize:/);
+  assert.match(cases, /parts:/);
+});
+
+test('password handling is bounded for bcrypt and uses adaptive hashing', () => {
+  const user = fs.readFileSync(path.join(__dirname, '..', 'models', 'User.js'), 'utf8');
+  assert.match(user, /bcrypt\.hash/);
+  assert.match(user, /BCRYPT_ROUNDS\s*=\s*12/);
+  assert.match(user, /MAX_PASSWORD_BYTES\s*=\s*72/);
+});
+
+test('dependency automation is enabled', () => {
+  const dependabot = fs.readFileSync(path.join(__dirname, '..', '.github', 'dependabot.yml'), 'utf8');
+  const audit = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'npm-security-audit.yml'), 'utf8');
+  assert.match(dependabot, /package-ecosystem:\s*npm/);
+  assert.match(dependabot, /interval:\s*weekly/);
+  assert.match(audit, /npm audit --audit-level=high/);
 });
