@@ -117,16 +117,21 @@ function inspectString(value, keyPath) {
   return null;
 }
 
-function inspectValue(value, keyPath = '') {
+function inspectValue(value, keyPath = '', depth = 0, state = { keys: 0 }) {
+  if (depth > 8) return 'Request nesting is too deep.';
   if (typeof value === 'string') return inspectString(value, keyPath);
   if (Array.isArray(value)) {
-    for (let i = 0; i < value.length; i += 1) { const error = inspectValue(value[i], `${keyPath}[${i}]`); if (error) return error; }
+    if (value.length > 200) return 'Request contains too many array items.';
+    for (let i = 0; i < value.length; i += 1) { const error = inspectValue(value[i], `${keyPath}[${i}]`, depth + 1, state); if (error) return error; }
     return null;
   }
   if (isPlainObject(value)) {
-    for (const [key, child] of Object.entries(value)) {
+    const entries = Object.entries(value);
+    state.keys += entries.length;
+    if (state.keys > 500) return 'Request contains too many fields.';
+    for (const [key, child] of entries) {
       if (DANGEROUS_KEYS.has(key)) return 'Invalid object property name.';
-      const error = inspectValue(child, keyPath ? `${keyPath}.${key}` : key);
+      const error = inspectValue(child, keyPath ? `${keyPath}.${key}` : key, depth + 1, state);
       if (error) return error;
     }
   }
@@ -135,6 +140,10 @@ function inspectValue(value, keyPath = '') {
 
 function inputSecurity(req, res, next) {
   try {
+    const contentLength = Number(req.headers['content-length'] || 0);
+    if (Number.isFinite(contentLength) && contentLength > 12 * 1024 * 1024) {
+      return res.status(413).json({ success: false, error: 'Request body is too large.' });
+    }
     ensureCsrfCookie(req, res);
     if (!enforceCsrf(req, res)) return;
     for (const [sourceName, value] of [['body', req.body], ['query', req.query], ['params', req.params]]) {
