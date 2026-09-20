@@ -409,12 +409,18 @@
 
     async end() {
       if (this.ended) return;
-      try {
-        if (!this.endSent) {
-          this.endSent = true;
-          await this.sendSignal('end', {});
-        }
-      } catch (_) {}
+      /* Never let signaling/network latency trap the End Call button.
+         The local media must stop immediately; the durable API status update
+         is handled by the caller after this cleanup. */
+      if (!this.endSent) {
+        this.endSent = true;
+        try {
+          await Promise.race([
+            this.sendSignal('end', {}),
+            new Promise(resolve => setTimeout(resolve, 1500)),
+          ]);
+        } catch (_) {}
+      }
       this.cleanup();
     }
 
