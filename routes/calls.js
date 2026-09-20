@@ -70,33 +70,93 @@ router.get('/availability', auth, async (req, res) => {
 // (symmetric NAT, some corporate/mobile networks) where a direct peer
 // connection can't be established. Kept behind auth since TURN credentials
 // are more sensitive than the public Supabase anon key.
-router.get('/ice-servers', auth, (req, res) => {
-  const iceServers = [
-    { urls: 'stun:stun.l.google.com:19302' },
-  ];
+router.get('/ice-servers', auth, async (req, res) => {
+  try {
+    const iceServers = [
+      { urls: 'stun:stun.cloudflare.com:3478' },
+    ];
 
-  // TURN_URL may contain one URL or a comma-separated list. Supporting the
-  // full Metered UDP/TCP/TLS set is important on mobile/corporate networks
-  // where UDP TURN can be blocked.
-  const turnUrls = String(process.env.TURN_URL || '')
-    .split(',')
-    .map((url) => url.trim())
-    .filter(Boolean);
+    // Preferred production path: Cloudflare Realtime TURN. The long-lived
+    // TURN API token/key stay server-side; only short-lived ICE credentials
+    // are returned to the browser.
+    const turnKeyId = String(process.env.CLOUDFLARE_TURN_KEY_ID || '').trim();
+    const turnApiToken = String(process.env.CLOUDFLARE_TURN_API_TOKEN || '').trim();
 
-  const turnConfigured = turnUrls.length > 0 && !!process.env.TURN_USERNAME && !!process.env.TURN_CREDENTIAL;
+    if (turnKeyId && turnApiToken) {
+      const response = await fetch(
+        `https://rtc.live.cloudflare.com/v1/turn/keys/${encodeURIComponent(turnKeyId)}/credentials/generate-ice-servers`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${turnApiToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ttl: 86400 }),
+        }
+      );
 
-  if (turnConfigured) {
-    iceServers.push({
-      urls: turnUrls,
-      username: process.env.TURN_USERNAME,
-      credential: process.env.TURN_CREDENTIAL,
-    });
-  } else {
-    // Production should set private TURN credentials. Until then, use the
-    // OpenRelay public test relay as a connectivity fallback so mobile/NAT
-    // calls do not hang indefinitely when direct STUN negotiation fails.
-    // These credentials are intentionally public and must not be treated as
-    // an application secret.
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !Array.isArray(payload.iceServers)) {
+        console.error('Cloudflare TURN credential generation failed:', response.status, payload);
+        return res.status(503).json({
+          success: false,
+          error: 'TURN relay credentials could not be generated.',
+          turnConfigured: false,
+        });
+      }
+
+      // Browser clients should not wait on unsupported/undesired alternate
+      // endpoints. Keep the normal UDP/TCP/TLS Cloudflare endpoints.
+      for (const server of payload.iceServers) {
+        if (!server || !server.urls) continue;
+        const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
+        const filteredUrls = urls.filter((url) => !/:53(?:\\?|$)/.test(String(url)));
+        if (!filteredUrls.length) continue;
+        iceServers.push({
+          urls: filteredUrls,
+          ...(server.username ? { username: server.username } : {}),
+          ...(server.credential ? { credential: server.credential } : {}),
+        });
+      }
+
+      return res.json({
+        success: true,
+        iceServers,
+        turnConfigured: true,
+        turnProvider: 'cloudflare',
+        turnFallback: false,
+      });
+    }
+
+    // Backwards-compatible private TURN configuration.
+    const turnUrls = String(process.env.TURN_URL || '')
+      .split(',')
+      .map((url) => url.trim())
+      .filter(Boolean);
+
+    const turnConfigured =
+      turnUrls.length > 0 &&
+      !!process.env.TURN_USERNAME &&
+      !!process.env.TURN_CREDENTIAL;
+
+    if (turnConfigured) {
+      iceServers.push({
+        urls: turnUrls,
+        username: process.env.TURN_USERNAME,
+        credential: process.env.TURN_CREDENTIAL,
+      });
+
+      return res.json({
+        success: true,
+        iceServers,
+        turnConfigured: true,
+        turnProvider: 'custom',
+        turnFallback: false,
+      });
+    }
+
+    // Public TURN is only a last-resort development fallback. It is not a
+    // reliable production relay and must not be presented as one.
     iceServers.push({
       urls: [
         'turn:openrelay.metered.ca:80',
@@ -107,14 +167,22 @@ router.get('/ice-servers', auth, (req, res) => {
       username: 'openrelayproject',
       credential: 'openrelayproject',
     });
-  }
 
-  res.json({
-    success: true,
-    iceServers,
-    turnConfigured,
-    turnFallback: !turnConfigured,
-  });
+    res.json({
+      success: true,
+      iceServers,
+      turnConfigured: false,
+      turnProvider: 'public-fallback',
+      turnFallback: true,
+    });
+  } catch (error) {
+    console.error('ICE server configuration error:', error);
+    res.status(503).json({
+      success: false,
+      error: 'Unable to prepare WebRTC relay configuration.',
+      turnConfigured: false,
+    });
+  }
 });
 
 // Owner-only monitoring. The Owner can observe call metadata/status but is not
