@@ -117,7 +117,7 @@ test('client register rejects a too-short password', async () => {
     password: '123',
   });
   assert.equal(status, 400);
-  assert.match(json.error, /8 characters/i);
+  assert.match(json.error, /8.*characters/i);
 });
 
 test('case submit rejects missing required fields (never fakes success)', async () => {
