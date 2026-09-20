@@ -148,6 +148,10 @@
       this.endSent = false;
       this.remoteEndSeen = false;
       this.connectionTimeout = null;
+      this.reconnectAttempts = 0;
+      this.reconnectTimer = null;
+      this.reconnectInFlight = false;
+      this.maxReconnectAttempts = 4;
     }
 
     setState(state, extra) {
@@ -211,10 +215,10 @@
 
       this.pc.oniceconnectionstatechange = () => {
         const state = this.pc?.iceConnectionState;
-        if (state === 'failed') {
-          this.setState('connection-failed', 'ICE negotiation failed. Check that the Vercel TURN_URL, TURN_USERNAME and TURN_CREDENTIAL variables are configured for production.');
+        if (state === 'failed' && this.connectedAt) {
+          this.requestReconnect('ICE connection failed');
         } else if (state === 'disconnected' && this.connectedAt) {
-          this.setState('reconnecting');
+          this.requestReconnect('ICE connection disconnected');
         }
       };
 
@@ -222,6 +226,7 @@
         const state = this.pc?.connectionState;
         if (state === 'connected' && !this.connectedAt) {
           if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
+      if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
           this.connectionTimeout = null;
           stopRingtone();
           this.connectedAt = Date.now();
@@ -232,9 +237,13 @@
             }
           }, 1000);
         } else if (state === 'failed') {
-          this.setState('connection-failed', 'WebRTC could not establish an audio path. TURN is required for some mobile, VPN and restricted networks.');
+          if (this.connectedAt) {
+            this.requestReconnect('WebRTC connection failed');
+          } else {
+            this.setState('connection-failed', 'WebRTC could not establish an audio path. TURN is required for some mobile, VPN and restricted networks.');
+          }
         } else if (state === 'disconnected' && this.connectedAt) {
-          this.setState('reconnecting');
+          this.requestReconnect('WebRTC connection disconnected');
         }
       };
 
@@ -258,6 +267,39 @@
           this.setState('connection-failed', 'Connection timed out. This usually means the network needs a working TURN relay.');
         }
       }, 20000);
+    }
+
+    async requestReconnect(reason) {
+      if (this.ended || !this.connectedAt || this.reconnectInFlight) return;
+      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        this.setState('connection-failed', reason + '. Automatic reconnection attempts were exhausted.');
+        return;
+      }
+      clearTimeout(this.reconnectTimer);
+      const attempt = ++this.reconnectAttempts;
+      this.reconnectTimer = setTimeout(async () => {
+        if (this.ended || !this.pc || this.reconnectInFlight) return;
+        this.reconnectInFlight = true;
+        this.setState('reconnecting', `Reconnecting… attempt ${attempt}/${this.maxReconnectAttempts}`);
+        try {
+          if (this.isInitiator) {
+            const offer = await this.pc.createOffer({ iceRestart: true });
+            await this.pc.setLocalDescription(offer);
+            await this.sendSignal('offer', {
+              sdp: { type: this.pc.localDescription?.type || 'offer', sdp: this.pc.localDescription?.sdp || '' },
+              reconnect: true,
+              attempt
+            });
+          }
+        } catch (error) {
+          console.warn('[Manlung WebRTC] reconnect attempt failed:', error);
+        } finally {
+          this.reconnectInFlight = false;
+          if (!this.ended && this.pc?.connectionState !== 'connected' && this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.requestReconnect('Retrying connection');
+          }
+        }
+      }, Math.min(1000 * Math.pow(2, attempt - 1), 8000));
     }
 
     async sendSignal(event, payload) {
@@ -302,11 +344,14 @@
           await this.pc.setRemoteDescription(offerDescription);
           this.remoteDescriptionSet = true;
           await this.flushPendingIce();
-          if (!this.answerSent) {
+          const reconnectOffer = signal.payload?.reconnect === true;
+          if (!this.answerSent || reconnectOffer) {
             const answer = await this.pc.createAnswer();
             await this.pc.setLocalDescription(answer);
             await this.sendSignal('answer', {
               sdp: { type: this.pc.localDescription?.type || 'answer', sdp: this.pc.localDescription?.sdp || '' },
+              reconnect: reconnectOffer,
+              attempt: signal.payload?.attempt || 0
             });
             this.answerSent = true;
           }
