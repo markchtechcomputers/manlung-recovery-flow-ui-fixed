@@ -1,0 +1,70 @@
+name: Optimize hero video
+
+on:
+  push:
+    branches:
+      - owner-security-monitoring
+    paths:
+      - "public/index.html"
+      - ".github/workflows/optimize-hero-video.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Download source video
+        env:
+          HERO_SOURCE: https://files.catbox.moe/uj2its.mp4
+        run: |
+          mkdir -p public/media
+          curl --fail --location --retry 4 --retry-delay 2 --connect-timeout 20 --max-time 300 \
+            "$HERO_SOURCE" \
+            --output /tmp/uj2its-source.mp4
+          test -s /tmp/uj2its-source.mp4
+          ffprobe -v error -show_entries format=duration,size \
+            -of default=noprint_wrappers=1 /tmp/uj2its-source.mp4
+
+      - name: Encode web-optimized hero
+        run: |
+          ffmpeg -hide_banner -loglevel error -y \
+            -i /tmp/uj2its-source.mp4 \
+            -vf "scale=1920:-2:force_original_aspect_ratio=decrease,fps=30" \
+            -an \
+            -c:v libx264 \
+            -preset medium \
+            -crf 26 \
+            -pix_fmt yuv420p \
+            -movflags +faststart \
+            -maxrate 5M \
+            -bufsize 10M \
+            public/media/hero-recovery.mp4
+          test -s public/media/hero-recovery.mp4
+          ffprobe -v error -show_entries format=duration,size \
+            -show_entries stream=codec_name,width,height,pix_fmt,r_frame_rate,bit_rate \
+            -of default=noprint_wrappers=1 public/media/hero-recovery.mp4
+
+      - name: Commit optimized video
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/media/hero-recovery.mp4
+          if git diff --cached --quiet; then
+            echo "Optimized hero video is already up to date."
+            exit 0
+          fi
+          git commit -m "Add web-optimized hero video"
+          git push
