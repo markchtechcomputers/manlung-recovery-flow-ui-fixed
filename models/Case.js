@@ -102,7 +102,8 @@ async function search({
   let query = supabase.from(TABLE).select('*', { count: 'exact' });
 
   if (search) {
-    const like = `%${search}%`;
+    const safeSearch = String(search).slice(0, 100).replace(/[\\%,().]/g, (ch) => `\\${ch}`);
+    const like = `%${safeSearch}%`;
 
     query = query.or(
       [
