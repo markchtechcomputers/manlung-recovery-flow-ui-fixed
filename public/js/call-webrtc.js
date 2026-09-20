@@ -194,11 +194,17 @@
         this.videoEnabled = this.localStream.getVideoTracks().length > 0;
       } catch (mediaError) {
         console.warn('[Manlung WebRTC] camera unavailable; using audio-only fallback:', mediaError?.name || mediaError);
-        this.localStream = await navigator.mediaDevices.getUserMedia({
-          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-          video: false,
-        });
-        this.videoEnabled = false;
+        try {
+          this.localStream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+            video: false,
+          });
+          this.videoEnabled = false;
+        } catch (audioError) {
+          await this.terminateSession('media_permission_denied').catch(() => {});
+          this.setState('permission-denied', 'Microphone/camera permission was not granted.');
+          throw audioError;
+        }
       }
 
       // Resolve the signaling identity from the server-side call session.
@@ -277,7 +283,8 @@
           if (this.connectedAt) {
             this.requestReconnect('WebRTC connection failed');
           } else {
-            this.setState('connection-failed', 'WebRTC could not establish an audio path. TURN is required for some mobile, VPN and restricted networks.');
+            this.setState('connection-failed', 'WebRTC could not establish an audio/video path. TURN is required for some mobile, VPN and restricted networks.');
+            this.terminateSession('connection_failed').catch(() => {});
           }
         } else if (state === 'disconnected' && this.connectedAt) {
           this.requestReconnect('WebRTC connection disconnected');
@@ -302,6 +309,7 @@
       this.connectionTimeout = setTimeout(() => {
         if (!this.ended && !this.connectedAt) {
           this.setState('connection-failed', 'Connection timed out. This usually means the network needs a working TURN relay.');
+          this.terminateSession('connection_timeout').catch(() => {});
         }
       }, 20000);
     }
@@ -310,6 +318,7 @@
       if (this.ended || !this.connectedAt || this.reconnectInFlight) return;
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
         this.setState('connection-failed', reason + '. Automatic reconnection attempts were exhausted.');
+        this.terminateSession('reconnect_failed').catch(() => {});
         return;
       }
       clearTimeout(this.reconnectTimer);
@@ -519,6 +528,21 @@
           ]);
         } catch (_) {}
       }
+      this.cleanup();
+    }
+
+    async terminateSession(reason) {
+      if (this.ended) return;
+      try {
+        await Promise.race([
+          fetch(`/api/calls/${encodeURIComponent(this.sessionId)}/end`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...this.headers },
+            body: JSON.stringify({ reason })
+          }),
+          new Promise(resolve => setTimeout(resolve, 1500))
+        ]);
+      } catch (_) {}
       this.cleanup();
     }
 
