@@ -83,18 +83,37 @@ router.get('/ice-servers', auth, (req, res) => {
     .map((url) => url.trim())
     .filter(Boolean);
 
-  if (turnUrls.length && process.env.TURN_USERNAME && process.env.TURN_CREDENTIAL) {
+  const turnConfigured = turnUrls.length > 0 && !!process.env.TURN_USERNAME && !!process.env.TURN_CREDENTIAL;
+
+  if (turnConfigured) {
     iceServers.push({
       urls: turnUrls,
       username: process.env.TURN_USERNAME,
       credential: process.env.TURN_CREDENTIAL,
+    });
+  } else {
+    // Production should set private TURN credentials. Until then, use the
+    // OpenRelay public test relay as a connectivity fallback so mobile/NAT
+    // calls do not hang indefinitely when direct STUN negotiation fails.
+    // These credentials are intentionally public and must not be treated as
+    // an application secret.
+    iceServers.push({
+      urls: [
+        'turn:openrelay.metered.ca:80',
+        'turn:openrelay.metered.ca:443',
+        'turn:openrelay.metered.ca:443?transport=tcp',
+        'turns:openrelay.metered.ca:443?transport=tcp',
+      ],
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     });
   }
 
   res.json({
     success: true,
     iceServers,
-    turnConfigured: turnUrls.length > 0 && !!process.env.TURN_USERNAME && !!process.env.TURN_CREDENTIAL,
+    turnConfigured,
+    turnFallback: !turnConfigured,
   });
 });
 
