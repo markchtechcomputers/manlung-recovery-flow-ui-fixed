@@ -762,3 +762,182 @@ body.dark .ml-balanced-hero .ml-hero-video-shade {
         transition: none !important;
     }
 }
+
+
+/* ==========================================================
+   HERO VIDEO BACKGROUND — FULL BLEED / COPY ON TOP
+   ========================================================== */
+
+.ml-balanced-hero {
+    min-height: 680px !important;
+    padding: 0 !important;
+    background: #07111f !important;
+    overflow: hidden !important;
+}
+
+.ml-balanced-hero .ml-hero-device-visual {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    z-index: 1 !important;
+    display: block !important;
+}
+
+.ml-balanced-hero .ml-hero-device-video {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    aspect-ratio: auto !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: 0 !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.ml-balanced-hero .ml-hero-video-shade {
+    position: absolute !important;
+    inset: 0 !important;
+    border-radius: 0 !important;
+    z-index: 2 !important;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(3,10,20,.92) 0%,
+            rgba(3,10,20,.82) 28%,
+            rgba(3,10,20,.58) 50%,
+            rgba(3,10,20,.28) 72%,
+            rgba(3,10,20,.18) 100%
+        ) !important;
+}
+
+.ml-balanced-hero::after {
+    content: none !important;
+}
+
+.ml-balanced-hero .ml-hero-copy {
+    position: relative !important;
+    z-index: 10 !important;
+    width: min(760px, 62%) !important;
+    margin: 0 !important;
+    padding: 90px clamp(24px, 7vw, 110px) !important;
+    text-align: left !important;
+    color: #fff !important;
+}
+
+.ml-balanced-hero .ml-hero-copy h1 {
+    color: #fff !important;
+    text-shadow: 0 3px 24px rgba(0,0,0,.38) !important;
+}
+
+.ml-balanced-hero .ml-hero-copy h1 span {
+    color: #7dd3fc !important;
+}
+
+.ml-balanced-hero .ml-hero-description {
+    color: rgba(255,255,255,.9) !important;
+    text-shadow: 0 2px 14px rgba(0,0,0,.35) !important;
+}
+
+.ml-balanced-hero .ml-hero-badge {
+    color: #dbeafe !important;
+    background: rgba(8,25,45,.62) !important;
+    border-color: rgba(147,197,253,.35) !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,.18) !important;
+    backdrop-filter: blur(12px) !important;
+}
+
+.ml-balanced-hero .ml-hero-secondary {
+    color: #fff !important;
+    background: rgba(15,23,42,.58) !important;
+    border-color: rgba(255,255,255,.28) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.ml-balanced-hero .ml-hero-security-row {
+    color: rgba(255,255,255,.86) !important;
+}
+
+.ml-balanced-hero .ml-security-item i {
+    color: #7dd3fc !important;
+}
+
+@media (max-width: 768px) {
+    .ml-balanced-hero {
+        min-height: 760px !important;
+        display: block !important;
+        padding: 0 !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-visual {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        order: initial !important;
+        z-index: 1 !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-video {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
+        border-radius: 0 !important;
+        object-fit: cover !important;
+    }
+
+    .ml-balanced-hero .ml-hero-video-shade {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(3,10,20,.34) 0%,
+                rgba(3,10,20,.54) 34%,
+                rgba(3,10,20,.84) 72%,
+                rgba(3,10,20,.94) 100%
+            ) !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy {
+        position: relative !important;
+        width: auto !important;
+        margin: 0 !important;
+        padding: 95px 20px 55px !important;
+        z-index: 10 !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy h1 {
+        color: #fff !important;
+    }
+
+    .ml-balanced-hero .ml-hero-description {
+        color: rgba(255,255,255,.92) !important;
+    }
+
+    .ml-hero-security-row {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .ml-balanced-hero {
+        min-height: 820px !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy {
+        padding: 82px 16px 45px !important;
+    }
+
+    .ml-hero-security-row {
+        grid-template-columns: 1fr !important;
+    }
+}
