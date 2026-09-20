@@ -13,7 +13,7 @@ async function create({ sessionId, senderUserId, event, payload }) {
   return data;
 }
 
-async function listAfter(sessionId, afterId, participantIds, excludeSenderUserId) {
+async function listAfter(sessionId, afterId, participantIds) {
   let query = supabase
     .from(TABLE)
     .select('id, session_id, sender_user_id, event, payload, created_at')
@@ -23,7 +23,6 @@ async function listAfter(sessionId, afterId, participantIds, excludeSenderUserId
 
   if (Number.isFinite(Number(afterId)) && Number(afterId) > 0) query = query.gt('id', Number(afterId));
   if (participantIds?.length) query = query.in('sender_user_id', participantIds);
-  if (excludeSenderUserId) query = query.neq('sender_user_id', excludeSenderUserId);
 
   const { data, error } = await query;
   if (error) throw error;
