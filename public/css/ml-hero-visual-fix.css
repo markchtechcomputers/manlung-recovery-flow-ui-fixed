@@ -911,3 +911,32 @@ body.dark .ml-balanced-hero .ml-hero-device-visual img {
  .ml-balanced-hero .ml-hero-copy h1{font-size:clamp(2rem,10vw,2.7rem)!important;}
  .ml-balanced-hero .ml-hero-description{font-size:15px!important;}
 }
+
+
+/* MOBILE HERO: keep Device Recovery as the final security item, below the three core items. */
+@media (max-width: 768px) {
+  .ml-balanced-hero .ml-hero-security-row {
+    grid-template-columns: 1fr 1fr !important;
+    align-items: stretch !important;
+  }
+  .ml-balanced-hero .ml-device-recovery-item {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+@media (max-width: 480px) {
+  .ml-balanced-hero .ml-hero-security-row {
+    grid-template-columns: 1fr !important;
+  }
+  .ml-balanced-hero .ml-device-recovery-item {
+    grid-column: auto !important;
+  }
+}
+
+/* Faster perceived hero start: keep the video visible immediately and avoid expensive effects. */
+.ml-balanced-hero .ml-hero-device-video {
+  background: #07111f !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+}
