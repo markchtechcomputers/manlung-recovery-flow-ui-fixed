@@ -450,7 +450,7 @@ router.get('/:id/signals', auth, async (req, res) => {
     if (!isParticipant) return res.status(403).json({ error: 'Not part of this call' });
 
     const participantIds = [session.client_user_id, session.admin_user_id].filter(Boolean);
-    const signals = await CallSignal.listAfter(req.params.id, req.query.after, participantIds);
+    const signals = await CallSignal.listAfter(req.params.id, req.query.after, participantIds, req.user.id);
     res.json({ success: true, signals });
   } catch (error) {
     console.error('Call signal read error:', error);
