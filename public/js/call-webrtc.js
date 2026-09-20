@@ -112,7 +112,11 @@
       const data = await res.json();
       const session = data?.session;
       if (!session) return null;
-      return isInitiator ? (session.client_user_id || null) : (session.admin_user_id || null);
+      // The signaling cursor must identify the actual user represented by
+      // this browser session. The initiator is the ADMIN for an admin callback,
+      // while the non-initiator is the CLIENT. Reversing these IDs makes each
+      // browser discard the other side's SDP/ICE as if it were its own signal.
+      return isInitiator ? (session.admin_user_id || null) : (session.client_user_id || null);
     } catch (_) {
       return null;
     }
