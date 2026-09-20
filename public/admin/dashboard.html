@@ -2110,10 +2110,10 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
     }
 
     async function closeCallModal() {
-        /* X never ends a connected call. It minimizes the active call window;
-           only the explicit End Call button terminates the connected call. */
+        /* Closing the call window must release the server-side call session.
+           This prevents an active accepted row from blocking the next client. */
         if (currentActiveCallId) {
-            setCallPanelMinimized(true);
+            await endActiveCall();
             return;
         }
         stopIncomingAlert();
