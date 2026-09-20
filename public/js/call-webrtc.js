@@ -516,18 +516,31 @@
 
     async end() {
       if (this.ended) return;
-      /* Never let signaling/network latency trap the End Call button.
-         The local media must stop immediately; the durable API status update
-         is handled by the caller after this cleanup. */
+      /* End must be durable even if signaling is delayed or the caller forgets
+         to make a second API request. Send both the lightweight peer signal
+         and the authenticated session-end request, then clean up locally. */
       if (!this.endSent) {
         this.endSent = true;
         try {
           await Promise.race([
             this.sendSignal('end', {}),
-            new Promise(resolve => setTimeout(resolve, 1500)),
+            new Promise(resolve => setTimeout(resolve, 1000)),
           ]);
         } catch (_) {}
       }
+
+      try {
+        await Promise.race([
+          fetch(`/api/calls/${encodeURIComponent(this.sessionId)}/end`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...this.headers },
+            body: JSON.stringify({ reason: 'peer_hangup' }),
+            keepalive: true,
+          }),
+          new Promise(resolve => setTimeout(resolve, 2000)),
+        ]);
+      } catch (_) {}
+
       this.cleanup();
     }
 
