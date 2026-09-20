@@ -1,5 +1,4 @@
 const express = require('express');
-const ytSearch = require('yt-search');
 const axios = require('axios');
 const { adminAuth } = require('../middleware/auth');
 
@@ -25,15 +24,10 @@ router.get('/search', adminAuth, async (req, res) => {
 
   try {
     let videos = [];
-    try {
-      const result = await ytSearch(query);
-      videos = Array.isArray(result?.videos) ? result.videos : [];
-    } catch (searchError) {
-      console.error('yt-search failed:', searchError?.message || searchError);
-    }
 
-    // Fallback: YouTube's public search page is useful when yt-search is
-    // temporarily blocked or its upstream response changes.
+    // Search YouTube's public results page directly. This avoids the
+    // unmaintained yt-search dependency chain and its vulnerable minimatch
+    // transitive dependency.
     if (!videos.length) {
       try {
         const page = await axios.get('https://www.youtube.com/results', {
