@@ -112,6 +112,7 @@
       const data = await res.json();
       const session = data?.session;
       if (!session) return null;
+      if (data?.participant_user_id) return String(data.participant_user_id);
       // The signaling identity must be the authenticated participant, not
       // simply the initiator/non-initiator role. A client is the initiator for
       // Client -> Admin calls, while an admin is the initiator for Admin ->
@@ -156,6 +157,10 @@
       this.remoteDescriptionSet = false;
       this.pendingIce = [];
       this.remoteAudio = null;
+      this.remoteVideoElement = null;
+      this.remoteStream = null;
+      this.localVideoElement = null;
+      this.videoEnabled = false;
       this.signalCursor = 0;
       this.signalTimer = null;
       this.sessionStatusTimer = null;
@@ -181,10 +186,26 @@
       }
 
       this.setState('requesting-mic');
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-        video: false,
-      });
+      try {
+        this.localStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+          video: { width: { ideal: 1280, max: 1920 }, height: { ideal: 720, max: 1080 }, frameRate: { ideal: 24, max: 30 }, facingMode: 'user' },
+        });
+        this.videoEnabled = this.localStream.getVideoTracks().length > 0;
+      } catch (mediaError) {
+        console.warn('[Manlung WebRTC] camera unavailable; using audio-only fallback:', mediaError?.name || mediaError);
+        try {
+          this.localStream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+            video: false,
+          });
+          this.videoEnabled = false;
+        } catch (audioError) {
+          await this.terminateSession('media_permission_denied').catch(() => {});
+          this.setState('permission-denied', 'Microphone/camera permission was not granted.');
+          throw audioError;
+        }
+      }
 
       // Resolve the signaling identity from the server-side call session.
       // This is more reliable than decoding a JWT in the browser, especially
@@ -203,6 +224,12 @@
       this.pc.ontrack = event => {
         const stream = event.streams?.[0];
         if (!stream) return;
+        this.remoteStream = stream;
+        if (this.remoteVideoElement) {
+          this.remoteVideoElement.srcObject = stream;
+          this.remoteVideoElement.style.display = stream.getVideoTracks().length ? '' : 'none';
+          this.remoteVideoElement.play().catch(() => {});
+        }
         if (!this.remoteAudio) {
           this.remoteAudio = document.createElement('audio');
           this.remoteAudio.autoplay = true;
@@ -256,7 +283,8 @@
           if (this.connectedAt) {
             this.requestReconnect('WebRTC connection failed');
           } else {
-            this.setState('connection-failed', 'WebRTC could not establish an audio path. TURN is required for some mobile, VPN and restricted networks.');
+            this.setState('connection-failed', 'WebRTC could not establish an audio/video path. TURN is required for some mobile, VPN and restricted networks.');
+            this.terminateSession('connection_failed').catch(() => {});
           }
         } else if (state === 'disconnected' && this.connectedAt) {
           this.requestReconnect('WebRTC connection disconnected');
@@ -281,6 +309,7 @@
       this.connectionTimeout = setTimeout(() => {
         if (!this.ended && !this.connectedAt) {
           this.setState('connection-failed', 'Connection timed out. This usually means the network needs a working TURN relay.');
+          this.terminateSession('connection_timeout').catch(() => {});
         }
       }, 20000);
     }
@@ -289,6 +318,7 @@
       if (this.ended || !this.connectedAt || this.reconnectInFlight) return;
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
         this.setState('connection-failed', reason + '. Automatic reconnection attempts were exhausted.');
+        this.terminateSession('reconnect_failed').catch(() => {});
         return;
       }
       clearTimeout(this.reconnectTimer);
@@ -399,7 +429,7 @@
     async sendOffer() {
       if (!this.isInitiator || this.offerSent || !this.pc || this.ended) return;
       this.offerSent = true;
-      const offer = await this.pc.createOffer({ offerToReceiveAudio: true });
+      const offer = await this.pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
       await this.pc.setLocalDescription(offer);
       await this.sendSignal('offer', { sdp: this.pc.localDescription });
     }
@@ -409,6 +439,22 @@
       const candidates = this.pendingIce.splice(0);
       for (const candidate of candidates) {
         try { await this.pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch (_) {}
+      }
+    }
+
+    attachMediaElements({ local, remote } = {}) {
+      this.localVideoElement = local || this.localVideoElement;
+      this.remoteVideoElement = remote || this.remoteVideoElement;
+      if (this.localVideoElement && this.localStream) {
+        this.localVideoElement.srcObject = this.localStream;
+        this.localVideoElement.muted = true;
+        this.localVideoElement.style.display = this.videoEnabled ? '' : 'none';
+        this.localVideoElement.play().catch(() => {});
+      }
+      if (this.remoteVideoElement && this.remoteStream) {
+        this.remoteVideoElement.srcObject = this.remoteStream;
+        this.remoteVideoElement.style.display = this.remoteStream.getVideoTracks().length ? '' : 'none';
+        this.remoteVideoElement.play().catch(() => {});
       }
     }
 
@@ -470,18 +516,46 @@
 
     async end() {
       if (this.ended) return;
-      /* Never let signaling/network latency trap the End Call button.
-         The local media must stop immediately; the durable API status update
-         is handled by the caller after this cleanup. */
+      /* End must be durable even if signaling is delayed or the caller forgets
+         to make a second API request. Send both the lightweight peer signal
+         and the authenticated session-end request, then clean up locally. */
       if (!this.endSent) {
         this.endSent = true;
         try {
           await Promise.race([
             this.sendSignal('end', {}),
-            new Promise(resolve => setTimeout(resolve, 1500)),
+            new Promise(resolve => setTimeout(resolve, 1000)),
           ]);
         } catch (_) {}
       }
+
+      try {
+        await Promise.race([
+          fetch(`/api/calls/${encodeURIComponent(this.sessionId)}/end`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...this.headers },
+            body: JSON.stringify({ reason: 'peer_hangup' }),
+            keepalive: true,
+          }),
+          new Promise(resolve => setTimeout(resolve, 2000)),
+        ]);
+      } catch (_) {}
+
+      this.cleanup();
+    }
+
+    async terminateSession(reason) {
+      if (this.ended) return;
+      try {
+        await Promise.race([
+          fetch(`/api/calls/${encodeURIComponent(this.sessionId)}/end`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...this.headers },
+            body: JSON.stringify({ reason })
+          }),
+          new Promise(resolve => setTimeout(resolve, 1500))
+        ]);
+      } catch (_) {}
       this.cleanup();
     }
 

@@ -136,3 +136,42 @@ test('ice-servers endpoint requires auth (TURN credentials must not be public)',
   const { status } = await req('GET', '/api/calls/ice-servers');
   assert.equal(status, 401);
 });
+
+test('call session API returns the authenticated participant identity for WebRTC signaling', () => {
+  const routes = require('fs').readFileSync(require('node:path').join(__dirname, '..', 'routes', 'calls.js'), 'utf8');
+  assert.match(routes, /participant_user_id:\s*req\.user\.id/);
+});
+
+test('WebRTC client does not infer signaling identity from initiator role when server identity is available', () => {
+  const fs = require('fs');
+  const path = require('node:path');
+  const source = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'call-webrtc.js'), 'utf8');
+  assert.match(source, /participant_user_id/);
+  assert.match(source, /offerToReceiveVideo/);
+  assert.match(source, /videoEnabled/);
+});
+
+test('Admin dashboard supplies the CSRF token for cookie-authenticated mutations', () => {
+  const fs = require('fs');
+  const path = require('node:path');
+  const source = fs.readFileSync(path.join(__dirname, '..', 'public', 'admin', 'dashboard.html'), 'utf8');
+  assert.match(source, /X-CSRF-Token/);
+  assert.match(source, /__Host-mlc_csrf|mlc_csrf/);
+});
+
+
+
+test('WebRTC end performs durable authenticated session cleanup', () => {
+  const source = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public', 'js', 'call-webrtc.js'), 'utf8');
+  assert.match(source, /\/api\/calls.*encodeURIComponent\(this\.sessionId\).*\/end/);
+  assert.match(source, /reason:\s*'peer_hangup'/);
+  assert.match(source, /keepalive:\s*true/);
+});
+
+test('active-call guard repairs an admin call after presence is lost', () => {
+  const source = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'models', 'CallSession.js'), 'utf8');
+  assert.match(source, /recovery_admin_presence/);
+  assert.match(source, /AdminPresence\.STALE_MS/);
+  assert.match(source, /admin_presence_lost_cleanup/);
+  assert.match(source, /status:\s*'ended'/);
+});

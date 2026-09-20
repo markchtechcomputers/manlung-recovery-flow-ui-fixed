@@ -876,7 +876,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 }
 </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="/js/call-webrtc.js"></script>
+<script src="/js/call-webrtc.js?v=webrtc-20260920-2"></script>
     <script>
         let callPanelMinimized = false;
 
@@ -1027,7 +1027,9 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
         let selectedIds = new Set();
 
         function authHeaders() {
-            return {};
+            const match = document.cookie.match(/(?:^|;\s*)(?:__Host-mlc_csrf|mlc_csrf)=([^;]+)/);
+            const token = match ? decodeURIComponent(match[1]) : '';
+            return token ? { 'X-CSRF-Token': token } : {};
         }
 
         async function handleUnauthorized(res) {
@@ -2023,6 +2025,8 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                 <p style="font-weight:700;color:var(--success);">Connected to Client</p>
                 <p style="color:var(--text-muted);margin-bottom:0.3rem;">${session.client_name || 'Client'}${session.case_id ? ' — ' + session.case_id : ''}</p>
                 <p id="adminCallDuration" style="font-size:1.6rem;margin:0.6rem 0;">00:00</p>
+                <video id="adminRemoteVideo" autoplay playsinline style="width:100%;max-height:230px;border-radius:14px;background:#08111f;display:none;object-fit:cover;margin:.5rem 0;"></video>
+                <video id="adminLocalVideo" autoplay muted playsinline style="width:100px;height:74px;border-radius:10px;background:#08111f;display:none;object-fit:cover;margin:-86px 8px 10px auto;position:relative;z-index:2;"></video>
                 <div style="display:flex;gap:10px;justify-content:center;margin-bottom:8px;">
                     <button class="btn btn-outline-dark" id="adminSpeakerBtn" onclick="enableAdminAudio()"><i class="fas fa-volume-high"></i> Enable Audio</button>
                 </div>
@@ -2031,6 +2035,12 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                     <button class="btn btn-danger" onclick="endActiveCall()"><i class="fas fa-phone-slash"></i> End Call</button>
                 </div>
             `;
+            if (currentCallPeer) {
+                currentCallPeer.attachMediaElements({
+                    local: document.getElementById('adminLocalVideo'),
+                    remote: document.getElementById('adminRemoteVideo')
+                });
+            }
         } else if (state === 'connecting' || state === 'requesting-mic') {
             body.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> ${state === 'requesting-mic' ? 'Requesting microphone access…' : 'Connecting securely…'}</p>`;
         } else if (state === 'reconnecting') {
@@ -2100,10 +2110,10 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
     }
 
     async function closeCallModal() {
-        /* X never ends a connected call. It minimizes the active call window;
-           only the explicit End Call button terminates the connected call. */
+        /* Closing the call window must release the server-side call session.
+           This prevents an active accepted row from blocking the next client. */
         if (currentActiveCallId) {
-            setCallPanelMinimized(true);
+            await endActiveCall();
             return;
         }
         stopIncomingAlert();

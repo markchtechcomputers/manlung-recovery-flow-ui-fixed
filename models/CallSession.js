@@ -28,35 +28,62 @@ async function findById(id) {
 
 async function adminHasActiveCall(adminUserId) {
   const cutoff = new Date(Date.now() - ACTIVE_CALL_TIMEOUT_SECONDS * 1000).toISOString();
-  const { data, error } = await supabase
-    .from(TABLE)
-    .select('id, accepted_at, ended_at')
-    .eq('admin_user_id', adminUserId)
-    .eq('status', 'accepted')
-    .is('ended_at', null)
-    .order('accepted_at', { ascending: false })
-    .limit(10);
+  const presenceCutoff = new Date(Date.now() - AdminPresence.STALE_MS).toISOString();
+
+  const [{ data, error }, { data: presence, error: presenceError }] = await Promise.all([
+    supabase
+      .from(TABLE)
+      .select('id, accepted_at, ended_at')
+      .eq('admin_user_id', adminUserId)
+      .eq('status', 'accepted')
+      .is('ended_at', null)
+      .order('accepted_at', { ascending: false })
+      .limit(10),
+    supabase
+      .from('recovery_admin_presence')
+      .select('admin_user_id, is_online, last_seen')
+      .eq('admin_user_id', adminUserId)
+      .maybeSingle(),
+  ]);
   if (error) throw error;
+  if (presenceError) throw presenceError;
 
-  const active = (data || []).filter((row) => {
-    if (!row.accepted_at) return true;
-    return row.accepted_at >= cutoff;
-  });
+  const now = new Date().toISOString();
+  const staleByAge = (data || []).filter((row) =>
+    row.accepted_at && row.accepted_at < cutoff
+  );
 
-  const stale = (data || []).filter((row) => {
-    if (!row.accepted_at) return false;
-    return row.accepted_at < cutoff;
-  });
+  // If the admin browser has disappeared and its heartbeat is stale/offline,
+  // an accepted call left behind by a closed/crashed tab is no longer a real
+  // active call. Release it automatically instead of blocking all callbacks.
+  const presenceIsStale =
+    !presence ||
+    !presence.is_online ||
+    !presence.last_seen ||
+    presence.last_seen < presenceCutoff;
 
-  if (stale.length) {
-    await supabase.from(TABLE).update({
-      status: 'ended',
-      ended_at: new Date().toISOString(),
-      end_reason: 'stale_active_call_cleanup',
-    }).in('id', stale.map((x) => x.id)).eq('status', 'accepted');
+  const orphaned = presenceIsStale
+    ? (data || []).filter((row) => !staleByAge.includes(row))
+    : [];
+
+  const staleIds = [...staleByAge, ...orphaned].map((row) => row.id);
+  if (staleIds.length) {
+    const { error: cleanupError } = await supabase
+      .from(TABLE)
+      .update({
+        status: 'ended',
+        ended_at: now,
+        end_reason: staleByAge.length ? 'stale_active_call_cleanup' : 'admin_presence_lost_cleanup',
+      })
+      .in('id', staleIds)
+      .eq('status', 'accepted')
+      .is('ended_at', null);
+    if (cleanupError) throw cleanupError;
+
+    await AdminPresence.setBusy(adminUserId, false);
   }
 
-  return active.length > 0;
+  return (data || []).some((row) => !staleIds.includes(row.id));
 }
 
 async function accept(id, adminUserId) {
