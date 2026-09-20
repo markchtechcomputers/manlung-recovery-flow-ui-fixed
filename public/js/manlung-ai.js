@@ -122,28 +122,55 @@
   let voiceEnabled = true;
   let selectedVoice = null;
 
+  let voiceUnlocked = false;
+
   function initVoice() {
     try { voiceEnabled = localStorage.getItem(VOICE_STORAGE_KEY) !== 'off'; } catch (_) { voiceEnabled = true; }
     if (!('speechSynthesis' in window)) return;
     const pick = () => {
       const voices = window.speechSynthesis.getVoices();
-      selectedVoice = voices.find(v => /^en(-KE|-GB|-US)?$/i.test(v.lang)) ||
-        voices.find(v => /^en/i.test(v.lang)) || voices[0] || null;
+      selectedVoice =
+        voices.find(v => /^en-KE$/i.test(v.lang)) ||
+        voices.find(v => /^en-GB$/i.test(v.lang)) ||
+        voices.find(v => /^en-US$/i.test(v.lang)) ||
+        voices.find(v => /^en/i.test(v.lang)) ||
+        voices[0] || null;
     };
     pick();
     window.speechSynthesis.addEventListener?.('voiceschanged', pick);
+  }
+
+  function unlockVoice() {
+    if (!voiceEnabled || !('speechSynthesis' in window) || voiceUnlocked) return;
+    try {
+      window.speechSynthesis.resume();
+      const unlock = new SpeechSynthesisUtterance('');
+      unlock.volume = 0;
+      unlock.lang = selectedVoice?.lang || 'en-KE';
+      if (selectedVoice) unlock.voice = selectedVoice;
+      window.speechSynthesis.speak(unlock);
+      voiceUnlocked = true;
+      setTimeout(() => window.speechSynthesis.cancel(), 50);
+    } catch (_) {}
   }
 
   function speak(text) {
     if (!voiceEnabled || !('speechSynthesis' in window) || !text) return;
     try {
       window.speechSynthesis.cancel();
-      const clean = String(text).replace(/<[^>]*>/g, ' ').replace(/[•]/g, '. ').replace(/\\s+/g, ' ').trim();
+      window.speechSynthesis.resume();
+      const clean = String(text)
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/[•]/g, '. ')
+        .replace(/\s+/g, ' ')
+        .trim();
       const utterance = new SpeechSynthesisUtterance(clean);
       utterance.lang = selectedVoice?.lang || 'en-KE';
       if (selectedVoice) utterance.voice = selectedVoice;
       utterance.rate = 0.98;
       utterance.pitch = 1;
+      utterance.volume = 1;
+      utterance.onend = () => { voiceUnlocked = true; };
       window.speechSynthesis.speak(utterance);
     } catch (_) {}
   }
@@ -243,10 +270,10 @@
       if(!soundEnabled()) return;
       try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=620;g.gain.setValueAtTime(.0001,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.035,audioCtx.currentTime+.01);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+.07);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.08);}catch(_){}
     };
-    button.addEventListener('click',()=>{if(button.dataset.dragged==='true'){button.dataset.dragged='false';return;} clickSound();toggle();});
+    button.addEventListener('click',()=>{if(button.dataset.dragged==='true'){button.dataset.dragged='false';return;} clickSound();unlockVoice();toggle();});
     document.querySelector('.manlung-ai-close').addEventListener('click',()=>{clickSound();toggle(false);});
-    document.getElementById('manlungAiVoice').addEventListener('click',()=>{clickSound();toggleVoice();});
-    document.getElementById('manlungAiForm').addEventListener('submit',e=>{e.preventDefault();const input=document.getElementById('manlungAiInput');const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';clickSound();respond(text);});
+    document.getElementById('manlungAiVoice').addEventListener('click',()=>{clickSound();unlockVoice();toggleVoice();});
+    document.getElementById('manlungAiForm').addEventListener('submit',e=>{e.preventDefault();const input=document.getElementById('manlungAiInput');const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';clickSound();unlockVoice();respond(text);});
     const input=document.getElementById('manlungAiInput');
     input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,92)+'px';});
     input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('manlungAiForm').requestSubmit();}});
