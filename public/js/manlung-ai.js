@@ -94,7 +94,7 @@
         </div>
         <div class="manlung-ai-body" id="manlungAiMessages"></div>
         <div class="manlung-ai-foot">
-          <div class="manlung-ai-links"><a href="${REQUEST}">New Request</a><a href="${TRACK}">Track Case</a><a href="${WHATSAPP}" target="_blank" rel="noopener">Human Support</a></div>
+          <div class="manlung-ai-links"><a href="${REQUEST}">New Request</a><a href="${TRACK}">Track Case</a><a href="${WHATSAPP}" target="_blank" rel="noopener">Human Support</a><button type="button" id="manlungAiVoice" aria-pressed="true" style="border:0;background:transparent;color:#86efac;font-size:.62rem;cursor:pointer;padding:4px 6px">🔊 Voice on</button></div>
           <form class="manlung-ai-compose" id="manlungAiForm"><textarea class="manlung-ai-input" id="manlungAiInput" rows="1" placeholder="Ask Manlung Recovery AI…" aria-label="Message"></textarea><button class="manlung-ai-send" type="submit" aria-label="Send message">➤</button></form>
           <div class="manlung-ai-note">AI support gives guidance — sensitive cases can be handed to human support.</div>
         </div>
@@ -113,9 +113,48 @@
     bindEvents();
     addMessage(KNOWLEDGE.greeting, 'ai');
     addQuickReplies();
+    initVoice();
   }
 
   function now() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+
+  const VOICE_STORAGE_KEY = 'manlung-ai-voice';
+  let voiceEnabled = true;
+  let selectedVoice = null;
+
+  function initVoice() {
+    try { voiceEnabled = localStorage.getItem(VOICE_STORAGE_KEY) !== 'off'; } catch (_) { voiceEnabled = true; }
+    if (!('speechSynthesis' in window)) return;
+    const pick = () => {
+      const voices = window.speechSynthesis.getVoices();
+      selectedVoice = voices.find(v => /^en(-KE|-GB|-US)?$/i.test(v.lang)) ||
+        voices.find(v => /^en/i.test(v.lang)) || voices[0] || null;
+    };
+    pick();
+    window.speechSynthesis.addEventListener?.('voiceschanged', pick);
+  }
+
+  function speak(text) {
+    if (!voiceEnabled || !('speechSynthesis' in window) || !text) return;
+    try {
+      window.speechSynthesis.cancel();
+      const clean = String(text).replace(/<[^>]*>/g, ' ').replace(/[•]/g, '. ').replace(/\\s+/g, ' ').trim();
+      const utterance = new SpeechSynthesisUtterance(clean);
+      utterance.lang = selectedVoice?.lang || 'en-KE';
+      if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.rate = 0.98;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    } catch (_) {}
+  }
+
+  function toggleVoice() {
+    voiceEnabled = !voiceEnabled;
+    try { localStorage.setItem(VOICE_STORAGE_KEY, voiceEnabled ? 'on' : 'off'); } catch (_) {}
+    if (!voiceEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+    const btn = document.getElementById('manlungAiVoice');
+    if (btn) { btn.textContent = voiceEnabled ? '🔊 Voice on' : '🔇 Voice off'; btn.setAttribute('aria-pressed', String(voiceEnabled)); }
+  }
 
   function addMessage(text, who) {
     const body = document.getElementById('manlungAiMessages');
@@ -184,7 +223,7 @@
     try { reply = await backendReply(displayText); } catch (_) {}
     if (!reply) reply = KNOWLEDGE[key] || KNOWLEDGE.unknown;
     const delay = Math.min(950, Math.max(350, reply.length * 4));
-    setTimeout(()=>{removeTyping();addMessage(reply,'ai');}, delay);
+    setTimeout(()=>{removeTyping();addMessage(reply,'ai');speak(reply);}, delay);
   }
 
   function toggle(open) {
@@ -206,6 +245,7 @@
     };
     button.addEventListener('click',()=>{if(button.dataset.dragged==='true'){button.dataset.dragged='false';return;} clickSound();toggle();});
     document.querySelector('.manlung-ai-close').addEventListener('click',()=>{clickSound();toggle(false);});
+    document.getElementById('manlungAiVoice').addEventListener('click',()=>{clickSound();toggleVoice();});
     document.getElementById('manlungAiForm').addEventListener('submit',e=>{e.preventDefault();const input=document.getElementById('manlungAiInput');const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';clickSound();respond(text);});
     const input=document.getElementById('manlungAiInput');
     input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,92)+'px';});
