@@ -25,7 +25,7 @@ jobs:
           server = Path('server.js').read_text()
           required_user = [
               'MAX_LOGIN_FAILURES = 3',
-              'LOCKOUT_YEARS = 132',
+              'LOCKOUT_MINUTES = 30',
               'login_locked_until',
               'failed_login_attempts',
           ]
@@ -34,5 +34,5 @@ jobs:
                   raise SystemExit(f'Missing required lockout marker: {marker}')
           if 'const loginLimiter = rateLimit' in server and '/api/auth/admin/login' in server:
               raise SystemExit('Conflicting short-window login limiter detected in server.js')
-          print('Per-account persistent 3-attempt / 132-year lockout policy verified.')
+          print('Per-account persistent 3-attempt / 30-minute lockout policy verified.')
           PY
