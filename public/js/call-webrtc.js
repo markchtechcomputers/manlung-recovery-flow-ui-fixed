@@ -227,12 +227,29 @@
         }
       };
 
-      this.pc.oniceconnectionstatechange = () => {
+      this.pc.oniceconnectionstatechange = async () => {
         const state = this.pc?.iceConnectionState;
-        if (state === 'failed') {
-          this.setState('connection-failed', 'ICE negotiation failed. Check that the Vercel TURN_URL, TURN_USERNAME and TURN_CREDENTIAL variables are configured for production.');
-        } else if (state === 'disconnected' && this.connectedAt) {
+        if (state === 'checking') {
+          this.setState('connecting');
+        } else if (state === 'connected' || state === 'completed') {
+          if (this.iceRestartTimer) {
+            clearTimeout(this.iceRestartTimer);
+            this.iceRestartTimer = null;
+          }
+        } else if (state === 'disconnected') {
           this.setState('reconnecting');
+          // Give transient mobile/Wi-Fi changes a chance to recover before
+          // declaring the call dead.
+          clearTimeout(this.iceRestartTimer);
+          this.iceRestartTimer = setTimeout(() => this.restartIce().catch(() => {}), 2500);
+        } else if (state === 'failed') {
+          this.setState('reconnecting', 'Trying a fresh ICE route…');
+          clearTimeout(this.iceRestartTimer);
+          this.iceRestartTimer = setTimeout(() => this.restartIce().catch(() => {
+            if (!this.ended && !this.connectedAt) {
+              this.setState('connection-failed', 'Secure audio could not establish a network path. Configure a production TURN relay (TURN_URL, TURN_USERNAME and TURN_CREDENTIAL).');
+            }
+          }), 300);
         }
       };
 
@@ -353,6 +370,23 @@
       } catch (error) {
         console.error('[Manlung WebRTC] signal handling error:', error);
         this.setState('connection-failed', error.message);
+      }
+    }
+
+    async restartIce() {
+      if (this.ended || !this.pc || !this.isInitiator) return;
+      if (!['failed', 'disconnected'].includes(this.pc.iceConnectionState)) return;
+
+      try {
+        const offer = await this.pc.createOffer({ iceRestart: true, offerToReceiveAudio: true });
+        await this.pc.setLocalDescription(offer);
+        await this.sendSignal('offer', { sdp: this.pc.localDescription });
+        this.setState('connecting');
+      } catch (error) {
+        console.warn('[Manlung WebRTC] ICE restart failed:', error);
+        if (!this.connectedAt) {
+          this.setState('connection-failed', 'Secure audio could not establish a network path. Configure a production TURN relay.');
+        }
       }
     }
 
