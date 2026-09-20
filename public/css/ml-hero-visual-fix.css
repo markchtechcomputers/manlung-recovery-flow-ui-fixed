@@ -54,7 +54,8 @@
     display: block !important;
 }
 
-.ml-balanced-hero .ml-hero-device-visual img {
+.ml-balanced-hero .ml-hero-device-visual img,
+.ml-balanced-hero .ml-hero-device-video {
 
     display: block !important;
 
@@ -65,11 +66,37 @@
 
     opacity: .98 !important;
 
-    mix-blend-mode: multiply !important;
+    object-fit: cover !important;
+    object-position: center !important;
+
+    border-radius: 24px !important;
 
     filter:
         drop-shadow(
             0 28px 48px rgba(15,23,42,.15)
+        ) !important;
+}
+
+.ml-balanced-hero .ml-hero-device-video {
+    aspect-ratio: 16 / 10 !important;
+    background: #eaf2ff !important;
+    box-shadow:
+        0 24px 60px rgba(15,23,42,.12),
+        0 0 0 1px rgba(37,99,235,.08) !important;
+    transform: translateZ(0) scale(1.005) !important;
+}
+
+.ml-balanced-hero .ml-hero-video-shade {
+    position: absolute !important;
+    inset: 0 !important;
+    border-radius: 24px !important;
+    pointer-events: none !important;
+    z-index: 2 !important;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0) 55%,
+            rgba(255,255,255,.10) 100%
         ) !important;
 }
 
@@ -430,17 +457,42 @@
         z-index: 3 !important;
     }
 
-    .ml-balanced-hero .ml-hero-device-visual img {
+    .ml-balanced-hero .ml-hero-device-visual img,
+    .ml-balanced-hero .ml-hero-device-video {
 
         width: 100% !important;
 
         height: auto !important;
 
-        mix-blend-mode: multiply !important;
+        object-fit: cover !important;
+        object-position: center !important;
+
+        border-radius: 18px !important;
 
         filter:
             drop-shadow(
                 0 16px 32px rgba(15,23,42,.10)
+            ) !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-video {
+        aspect-ratio: 16 / 11 !important;
+        min-height: 230px !important;
+        max-height: 360px !important;
+        background: #eaf2ff !important;
+        box-shadow:
+            0 18px 42px rgba(15,23,42,.10),
+            0 0 0 1px rgba(37,99,235,.07) !important;
+        transform: translateZ(0) !important;
+    }
+
+    .ml-balanced-hero .ml-hero-video-shade {
+        border-radius: 18px !important;
+        background:
+            linear-gradient(
+                180deg,
+                rgba(255,255,255,0) 60%,
+                rgba(255,255,255,.14) 100%
             ) !important;
     }
 
@@ -641,13 +693,31 @@ body.dark .ml-balanced-hero::after {
 }
 
 html.dark .ml-balanced-hero .ml-hero-device-visual img,
-body.dark .ml-balanced-hero .ml-hero-device-visual img {
-
-    mix-blend-mode: screen !important;
+body.dark .ml-balanced-hero .ml-hero-device-visual img,
+html.dark .ml-balanced-hero .ml-hero-device-video,
+body.dark .ml-balanced-hero .ml-hero-device-video {
 
     filter:
         drop-shadow(0 25px 45px rgba(0,0,0,.45))
         brightness(.88) !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-device-video,
+body.dark .ml-balanced-hero .ml-hero-device-video {
+    background: #0f172a !important;
+    box-shadow:
+        0 24px 60px rgba(0,0,0,.34),
+        0 0 0 1px rgba(96,165,250,.12) !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-video-shade,
+body.dark .ml-balanced-hero .ml-hero-video-shade {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(11,15,25,0) 55%,
+            rgba(11,15,25,.14) 100%
+        ) !important;
 }
 
 @media (max-width: 768px) {
