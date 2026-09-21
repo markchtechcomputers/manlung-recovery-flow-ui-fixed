@@ -759,7 +759,7 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
     };
 
     const files = Array.isArray(existing.files) ? [...existing.files, fileMeta] : [fileMeta];
-    await Case.update(request.case_id, { files, status: existing.status === 'Pending Review' ? 'Evidence Collected' : existing.status, last_updated: now });
+    await Case.update(request.case_id, { files, last_updated: now });
 
     return res.json({ success:true, message:'Selfie uploaded successfully.', evidence:{caseId:request.case_id, requestId:request.id, filename} });
   } catch (error) {
