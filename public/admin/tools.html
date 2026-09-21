@@ -56,6 +56,9 @@ body{margin:0;background:var(--tool-bg);color:var(--tool-text);font-family:Inter
 .notice{font-size:.78rem;color:var(--tool-muted);line-height:1.5}
 @media(max-width:900px){.tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.site-header>.container{padding:8px 14px}.manlung-brand-copy span{display:none}}
 @media(max-width:650px){.site-header>.container{min-height:60px;padding:7px 10px;gap:8px}.admin-portal-logo{width:38px;height:38px}.manlung-brand-copy h1{font-size:.9rem}.header-actions{gap:5px}.header-actions .btn{width:40px;min-width:40px;min-height:40px;padding:0;font-size:0;display:grid;place-items:center}.header-actions .btn i{font-size:.9rem}.tools-shell{padding:16px 12px 35px}.tools-hero{align-items:flex-start;flex-direction:column;padding:22px 18px}.hero-actions{width:100%}.hero-actions a{flex:1;text-align:center}.workspace,.tool-grid{grid-template-columns:1fr}.lookup{flex-direction:column}.lookup button{width:100%}.live-grid{grid-template-columns:repeat(2,1fr)}.tool-card{min-height:250px}.tool-image-card .tool-icon{width:100%;height:auto}.result{align-items:flex-start;flex-direction:column}.result a{width:100%;text-align:center}}
+
+.link-analysis-card{cursor:pointer;text-align:left;font:inherit;color:inherit}.link-analysis-card.is-active{border-color:var(--tool-accent);box-shadow:0 0 0 3px rgba(96,165,250,.12),0 14px 34px rgba(0,0,0,.12);transform:translateY(-2px)}.link-analysis-card.is-active .tool-status{color:var(--tool-accent)}
+.link-analysis-workspace{display:none;margin:-10px 0 28px;padding:18px;border:1px solid var(--tool-line);border-radius:16px;background:var(--tool-card);box-shadow:0 8px 28px rgba(0,0,0,.06)}.link-analysis-workspace.is-open{display:block}.selfie-generator{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(250px,.6fr);gap:18px}.selfie-panel{border:1px solid var(--tool-line);border-radius:14px;padding:18px}.selfie-panel h3{margin:0 0 6px}.selfie-panel p{margin:0;color:var(--tool-muted);font-size:.8rem;line-height:1.5}.selfie-input{width:100%;min-height:46px;margin-top:14px;padding:10px 12px;border:1px solid var(--tool-line);border-radius:10px;background:transparent;color:var(--tool-text)}.selfie-actions{display:flex;gap:8px;margin-top:10px}.selfie-output{margin-top:14px;padding:12px;border:1px solid var(--tool-line);border-radius:10px;overflow-wrap:anywhere;font-size:.78rem}.selfie-output a{color:var(--tool-accent)}.selfie-status{margin-top:8px;color:var(--tool-muted);font-size:.72rem}.selfie-copy{margin-top:9px}.selfie-notice{padding:12px;border-radius:10px;background:rgba(245,158,11,.06);color:var(--tool-muted);font-size:.72rem;line-height:1.5}.selfie-notice strong{color:var(--tool-text)}@media(max-width:750px){.selfie-generator{grid-template-columns:1fr}.selfie-actions{flex-direction:column}.selfie-actions button{width:100%}}
 </style>
 </head>
 <body>
@@ -92,6 +95,29 @@ body{margin:0;background:var(--tool-bg);color:var(--tool-text);font-family:Inter
     </div>
   </section>
 
+  <section id="linkAnalysisWorkspace" class="link-analysis-workspace" aria-hidden="true">
+    <div class="selfie-generator">
+      <div class="selfie-panel">
+        <h3>Selfie Request Generator</h3>
+        <p>Create an authorized HTTPS selfie request link tied to an existing case.</p>
+        <label for="selfieReference" style="display:block;margin-top:14px;font-size:.75rem;font-weight:800">Reference / Name / Code</label>
+        <input id="selfieReference" class="selfie-input" maxlength="120" autocomplete="off" placeholder="e.g. MTC-2026-001">
+        <div class="selfie-actions">
+          <button type="button" class="btn btn-primary" id="generateSelfieBtn">Generate Selfie Link</button>
+          <button type="button" class="btn btn-outline" id="clearSelfieBtn">Clear</button>
+        </div>
+        <div class="selfie-output" id="selfieOutput">Your secure selfie link will appear here.</div>
+        <button type="button" class="btn btn-outline selfie-copy" id="copySelfieBtn" disabled>Copy Link</button>
+        <div class="selfie-status" id="selfieGeneratorStatus">Waiting</div>
+      </div>
+      <div class="selfie-panel">
+        <h3>How it works</h3>
+        <p>Admin generates a short-lived request. The recipient opens the HTTPS link, explicitly grants camera permission, sees a 3 → 2 → 1 countdown, and one selfie is captured and uploaded to the linked case.</p>
+        <div class="selfie-notice" style="margin-top:14px"><strong>Authorized use only.</strong><br>Camera access is never started secretly. The recipient must explicitly allow the browser camera permission.</div>
+        <div class="selfie-notice" style="margin-top:10px">Evidence is stored in the existing private <strong>recovery-evidence</strong> storage and appears in the existing Evidence Review/case workspace.</div>
+      </div>
+    </div>
+  </section>
   <div id="toolsMount">
     <section class="tool-section"><div class="section-head"><div><h2>Case Investigation</h2><p>Work with real case records, lifecycle, history, assignment and analysis.</p></div></div><div class="tool-grid">
       <a class="tool-card" href="/admin/dashboard.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-folder-open"></i></span><span class="tool-status">Live</span></div><h3>Case Lookup &amp; Search</h3><p>Search and open existing cases using the current admin case workspace.</p><span class="tool-action">Open case workspace <i class="fas fa-arrow-right"></i></span></a>
@@ -120,7 +146,7 @@ body{margin:0;background:var(--tool-bg);color:var(--tool-text);font-family:Inter
     <section class="tool-section"><div class="section-head"><div><h2>Security Investigation</h2><p>Defensive investigation tools for authenticated administrators.</p></div></div><div class="tool-grid">
       <a class="tool-card tool-image-card" href="/admin/tools/website-scanner.html"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/0yPvCntM/Chat-GPT-Image-Sep-21-2026-10-47-58-AM.png" alt="Website Safety Scanner toolbox"></span><span class="tool-status">Admin</span></div><h3>Website Safety Scanner</h3><p>Use the existing server-side scanner for DNS, TLS, redirects, headers and verified-domain signals.</p><span class="tool-action">Scan a website <i class="fas fa-arrow-right"></i></span></a>
       <a class="tool-card owner-link" id="securityEventsCard" href="/admin/tools/security.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-shield-halved"></i></span><span class="tool-status owner">Owner</span></div><h3>Security Events</h3><p>Review authentication, account and administrative security events with severity filtering.</p><span class="tool-action">Review events <i class="fas fa-arrow-right"></i></span></a>
-      <a class="tool-card tool-image-card" href="/admin/tools/website-scanner.html"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/bvZB02jF/Chat-GPT-Image-Sep-21-2026-10-54-52-AM.png" alt="Link Analysis toolbox"></span><span class="tool-status">Admin</span></div><h3>Link Analysis</h3><p>Trace and analyze website links for case investigations using the authenticated server-side scanner and its verified technical signals.</p><span class="tool-action">Analyze a link <i class="fas fa-arrow-right"></i></span></a>
+      <button type="button" class="tool-card tool-image-card link-analysis-card" id="linkAnalysisCard" aria-expanded="false" aria-controls="linkAnalysisWorkspace"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/bvZB02jF/Chat-GPT-Image-Sep-21-2026-10-54-52-AM.png" alt="Link Analysis toolbox"></span><span class="tool-status" id="linkAnalysisStatus">Admin</span></div><h3>Link Analysis</h3><p>Activate the Link Analysis workspace to generate an authorized selfie request link for a case.</p><span class="tool-action" id="linkAnalysisAction">Open Link Analysis <i class="fas fa-arrow-right"></i></span></button>
     </div></section>
 
     <section class="tool-section"><div class="section-head"><div><h2>Research &amp; Investigation</h2><p>Keep research tied to authorized case records instead of creating a parallel data store.</p></div></div><div class="tool-grid">
@@ -140,6 +166,50 @@ body{margin:0;background:var(--tool-bg);color:var(--tool-text);font-family:Inter
 </main>
 <script>
 const $=id=>document.getElementById(id);
+const linkAnalysisCard=document.getElementById('linkAnalysisCard');
+const linkAnalysisWorkspace=document.getElementById('linkAnalysisWorkspace');
+const selfieReference=document.getElementById('selfieReference');
+const selfieOutput=document.getElementById('selfieOutput');
+const selfieStatus=document.getElementById('selfieGeneratorStatus');
+const copySelfieBtn=document.getElementById('copySelfieBtn');
+let generatedSelfieUrl='';
+function setLinkAnalysisActive(active){
+  if(!linkAnalysisCard||!linkAnalysisWorkspace)return;
+  linkAnalysisCard.classList.toggle('is-active',active);
+  linkAnalysisCard.setAttribute('aria-expanded',String(active));
+  linkAnalysisWorkspace.classList.toggle('is-open',active);
+  linkAnalysisWorkspace.setAttribute('aria-hidden',String(!active));
+  document.getElementById('linkAnalysisStatus').textContent=active?'Active':'Admin';
+  document.getElementById('linkAnalysisAction').innerHTML=active?'Link Analysis Active <i class="fas fa-check"></i>':'Open Link Analysis <i class="fas fa-arrow-right"></i>';
+}
+async function generateSelfieLink(){
+  const reference=(selfieReference.value||'').trim()||'guest';
+  selfieStatus.textContent='Generating Link…';
+  generatedSelfieUrl='';
+  copySelfieBtn.disabled=true;
+  selfieOutput.textContent='Generating secure request…';
+  try{
+    const r=await fetch('/api/cases/admin/selfie-requests',{method:'POST',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({reference})});
+    const d=await r.json();
+    if(!r.ok||!d.success)throw new Error(d.error||'Could not generate link.');
+    generatedSelfieUrl='https://manlungrecovery.manlungshop.co.ke/selfie.html?id='+encodeURIComponent(d.request.token);
+    const a=document.createElement('a');a.href=generatedSelfieUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent=generatedSelfieUrl;
+    selfieOutput.textContent='';selfieOutput.appendChild(a);copySelfieBtn.disabled=false;selfieStatus.textContent='Link Generated';
+    try{await navigator.clipboard.writeText(generatedSelfieUrl);selfieStatus.textContent='Link Generated · Copied'}catch(_){}
+  }catch(e){selfieOutput.textContent=e.message||'Action failed';selfieStatus.textContent='Action Failed'}
+}
+async function copySelfieLink(){
+  if(!generatedSelfieUrl)return;
+  try{await navigator.clipboard.writeText(generatedSelfieUrl);selfieStatus.textContent='Copied'}catch(e){const t=document.createElement('textarea');t.value=generatedSelfieUrl;t.style.position='fixed';t.style.left='-9999px';document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();selfieStatus.textContent='Copied'}
+}
+function clearSelfieGenerator(){selfieReference.value='';selfieOutput.textContent='Your secure selfie link will appear here.';generatedSelfieUrl='';copySelfieBtn.disabled=true;selfieStatus.textContent='Waiting'}
+if(linkAnalysisCard){linkAnalysisCard.addEventListener('click',()=>setLinkAnalysisActive(!linkAnalysisCard.classList.contains('is-active')));linkAnalysisCard.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setLinkAnalysisActive(!linkAnalysisCard.classList.contains('is-active'))}})}
+document.getElementById('generateSelfieBtn')?.addEventListener('click',generateSelfieLink);
+document.getElementById('clearSelfieBtn')?.addEventListener('click',clearSelfieGenerator);
+copySelfieBtn?.addEventListener('click',copySelfieLink);
+selfieReference?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateSelfieLink()}});
+
+
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(url,options={}){const r=await fetch(url,{credentials:'include',headers:{Accept:'application/json',...(options.headers||{})},...options});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||`Request failed (${r.status})`);return d}
 function logoutFromTools(e){e.preventDefault();fetch('/api/auth/admin/logout',{method:'POST',credentials:'include'}).finally(()=>location.href='/admin/login.html');}
