@@ -406,3 +406,86 @@ body.dark .site-header .header-actions .btn i { color: #fff !important; }
   html body .site-header .header-actions .btn { font-size: .69rem !important; height: 32px !important; min-height: 32px !important; }
   html body .site-header .header-actions button[data-theme-toggle="true"] { height: 32px !important; min-height: 32px !important; font-size: .69rem !important; }
 }
+
+
+/* =========================================================
+   ADMIN THEME OVERRIDES — use the real theme variables.
+   Do not force black text on dark mode.
+   ========================================================= */
+html body .site-header,
+html body .site-header::before,
+html body .site-header::after{
+  background:var(--page-bg)!important;
+  color:var(--text)!important;
+  border-bottom:1px solid var(--card-border)!important;
+  box-shadow:0 2px 12px rgba(15,23,42,.08)!important;
+}
+html body .site-header .container{
+  min-height:64px!important;
+  padding:8px 20px!important;
+  max-width:1280px!important;
+  gap:16px!important;
+}
+html body .site-header .brand h1,
+html body .site-header .brand span,
+html body .site-header .header-actions a,
+html body .site-header .header-actions button,
+html body .site-header .header-actions .btn,
+html body .site-header .header-actions i{
+  color:var(--text)!important;
+  -webkit-text-fill-color:var(--text)!important;
+}
+html body .site-header .brand span{color:var(--text-muted)!important}
+html body .site-header .header-actions{gap:7px!important}
+html body .site-header .header-actions a,
+html body .site-header .header-actions button,
+html body .site-header .header-actions .btn{
+  min-height:36px!important;height:auto!important;
+  padding:7px 10px!important;
+  border:1px solid var(--card-border)!important;
+  border-radius:9px!important;
+  background:var(--card-bg)!important;
+  font-size:.75rem!important;
+  line-height:1.2!important;
+}
+html body .site-header .header-actions .btn-primary{
+  background:var(--accent)!important;
+  border-color:var(--accent)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+html body .site-header .header-actions .btn-danger{
+  background:var(--danger)!important;
+  border-color:var(--danger)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+html.dark body .site-header,
+html.dark body .site-header::before,
+html.dark body .site-header::after{
+  background:var(--page-bg)!important;
+  color:var(--text)!important;
+}
+html.dark body .site-header .header-actions a,
+html.dark body .site-header .header-actions button,
+html.dark body .site-header .header-actions .btn{
+  background:var(--card-bg)!important;
+  color:var(--text)!important;
+  -webkit-text-fill-color:var(--text)!important;
+  border-color:var(--card-border)!important;
+}
+html.dark body .site-header .header-actions i{color:var(--text)!important;-webkit-text-fill-color:var(--text)!important}
+html.dark body .site-header .header-actions .btn-primary{background:var(--accent)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+html.dark body .site-header .header-actions .btn-danger{background:var(--danger)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+html.dark body .site-header .brand h1{color:var(--text)!important;-webkit-text-fill-color:var(--text)!important}
+html.dark body .site-header .brand span{color:var(--text-muted)!important;-webkit-text-fill-color:var(--text-muted)!important}
+@media(max-width:700px){
+ html body .site-header .container{padding:7px 12px!important;min-height:58px!important}
+ html body .site-header .brand h1{font-size:.95rem!important}
+ html body .site-header .brand span{font-size:.6rem!important}
+ html body .site-header .header-actions{gap:5px!important;overflow-x:auto!important;flex-wrap:nowrap!important;scrollbar-width:none!important}
+ html body .site-header .header-actions::-webkit-scrollbar{display:none}
+ html body .site-header .header-actions a,
+ html body .site-header .header-actions button,
+ html body .site-header .header-actions .btn{flex:0 0 auto!important;font-size:.7rem!important;min-height:34px!important;padding:6px 8px!important}
+}
