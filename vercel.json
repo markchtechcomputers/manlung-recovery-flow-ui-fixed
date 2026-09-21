@@ -112,6 +112,10 @@
       "dest": "/api/index.js"
     },
     {
+      "src": "/admin",
+      "dest": "/public/admin/login.html"
+    },
+    {
       "src": "/admin/(.*)",
       "dest": "/public/admin/$1"
     },
