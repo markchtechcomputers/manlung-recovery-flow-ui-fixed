@@ -634,7 +634,17 @@ router.post('/admin/selfie-requests', adminAuth, async (req, res) => {
     if (reference !== 'guest') {
       caseData = await Case.findByCaseId(reference);
       if (!caseData) {
-        return res.status(404).json({ success:false, error:'Case reference not found. Enter an existing case ID.' });
+        const matches = await Case.searchAll({ search: reference });
+        const normalized = reference.toLowerCase();
+        caseData = (matches || []).find((item) =>
+          String(item?.case_id || '').trim().toLowerCase() === normalized
+        ) || null;
+      }
+      if (!caseData) {
+        return res.status(404).json({
+          success:false,
+          error:'Case ID not found. Enter the exact Case ID shown in the admin Case Lookup & Search.'
+        });
       }
     }
 
@@ -741,6 +751,37 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
     const existing = await Case.findByCaseId(request.case_id);
     if (!existing) throw new Error('The linked case no longer exists.');
 
+    let captureMetadata = {};
+    try {
+      const rawMetadata = String(req.body?.metadata || '').trim();
+      if (rawMetadata) {
+        const parsed = JSON.parse(rawMetadata);
+        const latitude = Number(parsed?.location?.latitude);
+        const longitude = Number(parsed?.location?.longitude);
+        const accuracy = Number(parsed?.location?.accuracy);
+        if (Number.isFinite(latitude) && latitude >= -90 && latitude <= 90 &&
+            Number.isFinite(longitude) && longitude >= -180 && longitude <= 180) {
+          captureMetadata.location = {
+            latitude: Number(latitude.toFixed(6)),
+            longitude: Number(longitude.toFixed(6)),
+            accuracyMeters: Number.isFinite(accuracy) && accuracy >= 0 ? Number(accuracy.toFixed(1)) : null,
+            source: 'browser-geolocation',
+          };
+        }
+        if (parsed?.clientCapturedAt) {
+          const clientDate = new Date(parsed.clientCapturedAt);
+          if (!Number.isNaN(clientDate.getTime())) {
+            captureMetadata.clientCapturedAt = clientDate.toISOString();
+          }
+        }
+        if (typeof parsed?.timezone === 'string') {
+          captureMetadata.timezone = parsed.timezone.slice(0, 80);
+        }
+      }
+    } catch (_) {
+      // Metadata is optional; the server timestamp below remains authoritative.
+    }
+
     const fileMeta = {
       path: uploadedPath,
       filename,
@@ -755,6 +796,7 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
       requestReference: request.reference,
       description: `Selfie captured through authorized Manlung Recovery Link Analysis request for case ${request.case_id}.`,
       capturedAt: now,
+      captureMetadata,
       status: 'pending review'
     };
 
