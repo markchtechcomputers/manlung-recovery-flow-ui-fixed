@@ -29,20 +29,20 @@ html.dark{--bg:#0a1020;--card:#111827;--line:#26364f;--text:#f8fafc;--muted:#94a
 <div class="header-actions"><a class="btn btn-outline" href="/admin/tools.html"><i class="fas fa-toolbox"></i> Tools</a><a class="btn btn-outline" href="/admin/dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a><button class="btn btn-outline" data-theme-toggle="true" aria-label="Toggle theme"></button></div>
 </div></header>
 <main class="page">
-<section class="hero"><div class="eyebrow">Security Investigation</div><h1>Link Analysis</h1><p>Generate an authorized, short-lived selfie request link tied to an existing Manlung Recovery case. The recipient must explicitly grant camera permission before one visible selfie is captured.</p></section>
+<section class="hero"><div class="eyebrow">Security Investigation</div><h1>Link Analysis</h1><p>Generate an authorized, short-lived video verification link tied to an existing Manlung Recovery case. The recipient completes one automatic camera verification capture.</p></section>
 <section class="card">
-<h2>Selfie Request Generator</h2><p>Enter an existing case ID. The generated HTTPS link can be shared with the authorized recipient for camera verification.</p>
-<div class="form"><label for="selfieReference">Case ID</label><input id="selfieReference" maxlength="120" autocomplete="off" placeholder="e.g. MRC-2026-001"></div>
-<div class="actions"><button type="button" class="btn btn-primary" id="generateSelfieBtn">Generate Selfie Link</button><button type="button" class="btn btn-outline" id="clearSelfieBtn">Clear</button></div>
-<div class="output" id="selfieOutput">Your secure selfie link will appear here.</div>
-<button type="button" class="btn btn-outline" id="copySelfieBtn" disabled style="margin-top:9px">Copy Link</button>
-<div class="status" id="selfieGeneratorStatus">Waiting</div>
+<h2>Video Verification Link Generator</h2><p>Enter an existing case ID. The generated HTTPS link can be shared with the authorized recipient for automatic video verification.</p>
+<div class="form"><label for="videoReference">Case ID</label><input id="videoReference" maxlength="120" autocomplete="off" placeholder="e.g. MRC-2026-001"></div>
+<div class="actions"><button type="button" class="btn btn-primary" id="generateVideoBtn">Generate Video Link</button><button type="button" class="btn btn-outline" id="clearVideoBtn">Clear</button></div>
+<div class="output" id="videoOutput">Your secure video verification link will appear here.</div>
+<button type="button" class="btn btn-outline" id="copyVideoBtn" disabled style="margin-top:9px">Copy Link</button>
+<div class="status" id="videoGeneratorStatus">Waiting</div>
 <div class="info"><strong>How it works:</strong> the request is short-lived and single-use. The recipient opens the HTTPS link, explicitly allows the browser camera, sees a 3 → 2 → 1 countdown, and one selfie is uploaded to the linked case evidence.</div>
 </section>
 </main>
 <script>
 const reference=document.getElementById('selfieReference'),output=document.getElementById('selfieOutput'),status=document.getElementById('selfieGeneratorStatus'),copyBtn=document.getElementById('copySelfieBtn');let generatedUrl='';
-async function generateSelfieLink(){
+async function generateVideoLink(){
  const value=(reference.value||'').trim();
  if(!value){status.textContent='Enter an existing case ID';reference.focus();return}
  generatedUrl='';copyBtn.disabled=true;output.textContent='Generating secure request…';status.textContent='Generating Link…';
@@ -56,7 +56,7 @@ async function generateSelfieLink(){
 }
 async function copyLink(){if(!generatedUrl)return;try{await navigator.clipboard.writeText(generatedUrl);status.textContent='Copied'}catch(e){status.textContent='Copy failed — use the link above'}}
 function clearLink(){reference.value='';output.textContent='Your secure selfie link will appear here.';generatedUrl='';copyBtn.disabled=true;status.textContent='Waiting'}
-document.getElementById('generateSelfieBtn').onclick=generateSelfieLink;document.getElementById('clearSelfieBtn').onclick=clearLink;copyBtn.onclick=copyLink;reference.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateSelfieLink()}});
+document.getElementById('generateVideoBtn').onclick=generateVideoLink;document.getElementById('clearVideoBtn').onclick=clearLink;copyBtn.onclick=copyLink;reference.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateSelfieLink()}});
 (async()=>{try{const r=await fetch('/api/auth/verify',{credentials:'include'}),d=await r.json();if(!d.success||!['admin','owner'].includes(String(d.user?.role||'').toLowerCase()))location.replace('/admin/login.html')}catch(e){location.replace('/admin/login.html')}})();
 </script>
 </body>
