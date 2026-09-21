@@ -694,6 +694,26 @@ router.get('/selfie-request/:token', async (req, res) => {
     return res.status(500).json({ success:false, error:'Could not load selfie request.' });
   }
 });
+router.get('/selfie-request/:token/status', async (req, res) => {
+  try {
+    const token = String(req.params.token || '');
+    if (!/^[A-Za-z0-9_-]{32,120}$/.test(token)) return res.status(400).json({ success:false, error:'Invalid request.' });
+    const { data: request, error: requestError } = await supabase.from('recovery_selfie_requests').select('id,case_id,status,expires_at').eq('request_token_hash', hashSelfieToken(token)).maybeSingle();
+    if (requestError) throw requestError;
+    if (!request) return res.status(404).json({ success:false, error:'Selfie request not found.' });
+    let count = 0;
+    if (request.case_id) {
+      const caseData = await Case.findByCaseId(request.case_id);
+      const files = Array.isArray(caseData?.files) ? caseData.files : [];
+      count = files.filter((file) => file?.requestId === request.id && file?.evidenceType === 'video-verification').length;
+    }
+    return res.json({ success:true, status:request.status, count, complete:count === 4 });
+  } catch (error) {
+    console.error('Selfie request status error:', error);
+    return res.status(500).json({ success:false, error:'Could not check verification status.' });
+  }
+});
+
 
 const selfieUpload = multer({
   storage: multer.memoryStorage(),

