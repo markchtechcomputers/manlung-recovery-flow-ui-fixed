@@ -142,8 +142,23 @@ async function captureFour(){
 
     metadata={
       clientCapturedAt:new Date().toISOString(),
-      timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||""
+      timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"",
+      captureMethod:"browser-camera"
     };
+    if(navigator.geolocation){
+      await new Promise(resolve=>navigator.geolocation.getCurrentPosition(
+        position=>{
+          metadata.location={
+            latitude:position.coords.latitude,
+            longitude:position.coords.longitude,
+            accuracy:position.coords.accuracy
+          };
+          resolve();
+        },
+        ()=>resolve(),
+        {enableHighAccuracy:true,maximumAge:0,timeout:2500}
+      ));
+    }
     for(let i=0;i<4;i++){
       blobs.push(await frameBlob());
       if(i<3)await pause(120);
