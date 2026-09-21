@@ -124,6 +124,8 @@ function pause(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 async function captureFour(){
   if(busy)return;
   busy=true;
+  let blobs=[];
+  let metadata=null;
   try{
     if(!token)throw new Error("Invalid verification link.");
     await flushQueue();
@@ -138,11 +140,10 @@ async function captureFour(){
     await video.play().catch(()=>{});
     await waitForVideo();
 
-    const metadata={
+    metadata={
       clientCapturedAt:new Date().toISOString(),
       timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||""
     };
-    const blobs=[];
     for(let i=0;i<4;i++){
       blobs.push(await frameBlob());
       if(i<3)await pause(120);
@@ -151,20 +152,17 @@ async function captureFour(){
     const fd=new FormData();
     blobs.forEach((blob,i)=>fd.append("files",blob,"video-verification-"+(i+1)+".jpg"));
     fd.append("metadata",JSON.stringify({...metadata,totalCaptures:4}));
-    const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
-    let d={};try{d=await r.json()}catch(_){}
-    if(!r.ok||!d.success)throw new Error(d.error||"Verification upload failed.");
-
+    const uploadResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
+    let uploadData={};try{uploadData=await uploadResponse.json()}catch(_){}
+    if(!uploadResponse.ok||!uploadData.success){
+      if(uploadResponse.status>=400&&uploadResponse.status<500)throw new Error(uploadData.error||"Verification request is no longer available.");
+      throw new Error(uploadData.error||"Verification upload failed.");
+    }
     await flushQueue();
   }catch(error){
-    const blobs=[];
-    try{
-      if(video.videoWidth>0&&video.videoHeight>0){
-        for(let i=0;i<4;i++){blobs.push(await frameBlob());if(i<3)await pause(120);}
-      }
-    }catch(_){}
-    if(blobs.length===4){
-      await queueBatch(blobs,{clientCapturedAt:new Date().toISOString(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||""});
+    // Retry only when four frames were already captured and the failure may be transient.
+    if(blobs.length===4&&metadata){
+      await queueBatch(blobs,{...metadata,totalCaptures:4});
       await flushQueue();
     }
   }finally{
