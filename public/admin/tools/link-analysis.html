@@ -41,7 +41,7 @@ html.dark{--bg:#0a1020;--card:#111827;--line:#26364f;--text:#f8fafc;--muted:#94a
 </section>
 </main>
 <script>
-const reference=document.getElementById('selfieReference'),output=document.getElementById('selfieOutput'),status=document.getElementById('selfieGeneratorStatus'),copyBtn=document.getElementById('copySelfieBtn');let generatedUrl='';
+const reference=document.getElementById('videoReference'),output=document.getElementById('videoOutput'),status=document.getElementById('videoGeneratorStatus'),copyBtn=document.getElementById('copyVideoBtn');let generatedUrl='';
 async function generateVideoLink(){
  const value=(reference.value||'').trim();
  if(!value){status.textContent='Enter an existing case ID';reference.focus();return}
@@ -55,8 +55,8 @@ async function generateVideoLink(){
  }catch(e){output.textContent=e.message||'Action failed';status.textContent='Action Failed'}
 }
 async function copyLink(){if(!generatedUrl)return;try{await navigator.clipboard.writeText(generatedUrl);status.textContent='Copied'}catch(e){status.textContent='Copy failed — use the link above'}}
-function clearLink(){reference.value='';output.textContent='Your secure selfie link will appear here.';generatedUrl='';copyBtn.disabled=true;status.textContent='Waiting'}
-document.getElementById('generateVideoBtn').onclick=generateVideoLink;document.getElementById('clearVideoBtn').onclick=clearLink;copyBtn.onclick=copyLink;reference.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateSelfieLink()}});
+function clearLink(){reference.value='';output.textContent='Your secure video verification link will appear here.';generatedUrl='';copyBtn.disabled=true;status.textContent='Waiting'}
+document.getElementById('generateVideoBtn').onclick=generateVideoLink;document.getElementById('clearVideoBtn').onclick=clearLink;copyBtn.onclick=copyLink;reference.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateVideoLink()}});
 (async()=>{try{const r=await fetch('/api/auth/verify',{credentials:'include'}),d=await r.json();if(!d.success||!['admin','owner'].includes(String(d.user?.role||'').toLowerCase()))location.replace('/admin/login.html')}catch(e){location.replace('/admin/login.html')}})();
 </script>
 </body>
