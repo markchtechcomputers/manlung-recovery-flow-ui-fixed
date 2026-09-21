@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const router = express.Router();
 const multer = require('multer');
 const { body, validationResult } = require('express-validator');
@@ -610,6 +611,168 @@ function mapBodyToCaseFields(body) {
   return fields;
 }
 
+
+// ============================================================
+// Link Analysis: Selfie request generator
+// ============================================================
+
+function hashSelfieToken(token) {
+  return crypto.createHash('sha256').update(String(token)).digest('hex');
+}
+
+function safeReference(value) {
+  return String(value || '').trim().slice(0, 120);
+}
+
+router.post('/admin/selfie-requests', adminAuth, async (req, res) => {
+  try {
+    const reference = safeReference(req.body?.reference) || 'guest';
+    const token = crypto.randomBytes(32).toString('base64url');
+    const tokenHash = hashSelfieToken(token);
+
+    let caseData = null;
+    if (reference !== 'guest') {
+      caseData = await Case.findByCaseId(reference);
+      if (!caseData) {
+        return res.status(404).json({ success:false, error:'Case reference not found. Enter an existing case ID.' });
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('recovery_selfie_requests')
+      .insert({
+        request_token_hash: tokenHash,
+        case_id: caseData ? caseData.case_id : null,
+        reference,
+        created_by: req.user.id
+      })
+      .select('id,reference,status,expires_at,created_at')
+      .single();
+
+    if (error) throw error;
+
+    return res.status(201).json({ success:true, request:{...data, token} });
+  } catch (error) {
+    console.error('Selfie request generation error:', error);
+    return res.status(500).json({ success:false, error:'Could not generate selfie request.' });
+  }
+});
+
+router.get('/selfie-request/:token', async (req, res) => {
+  try {
+    const token = String(req.params.token || '');
+    if (!/^[A-Za-z0-9_-]{32,120}$/.test(token)) {
+      return res.status(400).json({ success:false, error:'Invalid request.' });
+    }
+
+    const { data, error } = await supabase
+      .from('recovery_selfie_requests')
+      .select('id,reference,status,expires_at,created_at')
+      .eq('request_token_hash', hashSelfieToken(token))
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return res.status(404).json({ success:false, error:'Selfie request not found.' });
+
+    if (data.status !== 'active' || new Date(data.expires_at).getTime() <= Date.now()) {
+      return res.status(410).json({ success:false, error:'This selfie request has expired or is no longer active.' });
+    }
+
+    return res.json({ success:true, request:data });
+  } catch (error) {
+    console.error('Selfie request lookup error:', error);
+    return res.status(500).json({ success:false, error:'Could not load selfie request.' });
+  }
+});
+
+const selfieUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 1, parts: 4 }
+});
+
+router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async (req, res) => {
+  let claimed = null;
+  let uploadedPath = null;
+  try {
+    const token = String(req.params.token || '');
+    if (!req.file) return res.status(400).json({ success:false, error:'Selfie image is required.' });
+    if (!['image/jpeg','image/png'].includes(String(req.file.mimetype || '').toLowerCase())) {
+      return res.status(400).json({ success:false, error:'Only JPEG or PNG selfies are accepted.' });
+    }
+    validateEvidenceSignature(req.file);
+    rejectSuspiciousBinary(req.file);
+
+    const tokenHash = hashSelfieToken(token);
+    const { data: request, error: requestError } = await supabase
+      .from('recovery_selfie_requests')
+      .select('*')
+      .eq('request_token_hash', tokenHash)
+      .eq('status', 'active')
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (requestError) throw requestError;
+    if (!request) return res.status(410).json({ success:false, error:'This selfie request is expired or already used.' });
+    if (!request.case_id) return res.status(400).json({ success:false, error:'This request is not linked to a case.' });
+
+    const now = new Date().toISOString();
+    const { data: lock, error: lockError } = await supabase
+      .from('recovery_selfie_requests')
+      .update({ status:'used', used_at:now, captured_at:now })
+      .eq('id', request.id)
+      .eq('status', 'active')
+      .select('id')
+      .maybeSingle();
+
+    if (lockError) throw lockError;
+    if (!lock) return res.status(409).json({ success:false, error:'This selfie request was already used.' });
+    claimed = request;
+
+    const extension = String(req.file.mimetype).toLowerCase() === 'image/png' ? 'png' : 'jpg';
+    const filename = `selfie-${now.replace(/[:.]/g,'-')}-${crypto.randomBytes(4).toString('hex')}.${extension}`;
+    uploadedPath = `selfies/${encodeURIComponent(request.reference).replace(/%/g,'_')}/${filename}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(EVIDENCE_BUCKET)
+      .upload(uploadedPath, req.file.buffer, { contentType:req.file.mimetype, upsert:false });
+
+    if (uploadError) throw uploadError;
+
+    const existing = await Case.findByCaseId(request.case_id);
+    if (!existing) throw new Error('The linked case no longer exists.');
+
+    const fileMeta = {
+      path: uploadedPath,
+      filename,
+      originalName: filename,
+      size: req.file.size,
+      mimetype: req.file.mimetype,
+      uploadedBy: 'link-analysis-selfie',
+      uploadedAt: now,
+      evidenceType: 'selfie',
+      source: 'Link Analysis Selfie Request',
+      requestId: request.id,
+      requestReference: request.reference,
+      description: `Selfie captured through authorized Manlung Recovery Link Analysis request for case ${request.case_id}.`,
+      capturedAt: now,
+      status: 'pending review'
+    };
+
+    const files = Array.isArray(existing.files) ? [...existing.files, fileMeta] : [fileMeta];
+    await Case.update(request.case_id, { files, status: existing.status === 'Pending Review' ? 'Evidence Collected' : existing.status, last_updated: now });
+
+    return res.json({ success:true, message:'Selfie uploaded successfully.', evidence:{caseId:request.case_id, requestId:request.id, filename} });
+  } catch (error) {
+    console.error('Selfie upload error:', error);
+    if (uploadedPath) {
+      await supabase.storage.from(EVIDENCE_BUCKET).remove([uploadedPath]).catch(()=>{});
+    }
+    if (claimed?.id) {
+      await supabase.from('recovery_selfie_requests').update({status:'active',used_at:null,captured_at:null}).eq('id',claimed.id).eq('status','used').catch(()=>{});
+    }
+    return res.status(500).json({ success:false, error:'Selfie upload failed. Please try again.' });
+  }
+});
 
 // ============================================================
 // Client: Submit New Case
