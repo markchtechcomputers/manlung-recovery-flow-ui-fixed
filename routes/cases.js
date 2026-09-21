@@ -1985,6 +1985,31 @@ router.post(
 
 
 // ============================================================
+// Owner: Delete One Case Evidence File
+// ============================================================
+
+router.delete('/admin/case/:caseId/file', ownerAuth, async (req, res) => {
+  try {
+    const caseId = req.params.caseId;
+    const requestedPath = String(req.body?.path || '').trim();
+    if (!requestedPath) return res.status(400).json({ error: 'Evidence file path is required.' });
+    const existing = await Case.findByCaseId(caseId);
+    if (!existing) return res.status(404).json({ error: 'Case not found.' });
+    const files = Array.isArray(existing.files) ? existing.files : [];
+    const target = files.find((file) => file?.path === requestedPath);
+    if (!target) return res.status(404).json({ error: 'Evidence file not found.' });
+    const { error } = await supabase.storage.from(EVIDENCE_BUCKET).remove([requestedPath]);
+    if (error) throw error;
+    await Case.update(caseId, { files: files.filter((file) => file?.path !== requestedPath) });
+    res.json({ success: true, message: 'Case evidence file deleted by Owner.' });
+  } catch (error) {
+    console.error('Delete case evidence file error:', error);
+    res.status(500).json({ error: 'Could not delete the case evidence file.' });
+  }
+});
+
+
+// ============================================================
 // Admin/Owner: Delete Case
 // ============================================================
 
