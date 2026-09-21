@@ -142,10 +142,37 @@ async function captureFour(){
     await video.play().catch(()=>{});
     await waitForVideo();
 
+    const getDeviceMetadata=async()=>{
+      const ua=navigator.userAgent||"";
+      const uaData=navigator.userAgentData||null;
+      let deviceType=/Mobi|Android|iPhone|iPad|iPod/i.test(ua)?"mobile":"desktop";
+      if(/iPad|Tablet/i.test(ua))deviceType="tablet";
+      let platform=uaData?.platform||navigator.platform||"";
+      let browser="";
+      if(/Edg\//i.test(ua))browser="Edge";
+      else if(/Chrome\//i.test(ua))browser="Chrome";
+      else if(/Firefox\//i.test(ua))browser="Firefox";
+      else if(/Safari\//i.test(ua)&&!/Chrome\//i.test(ua))browser="Safari";
+      else if(/OPR\//i.test(ua))browser="Opera";
+      else browser="Unknown";
+      return {deviceType,platform:platform.slice(0,80),browser,model:typeof uaData?.getHighEntropyValues==="function" ? ((await uaData.getHighEntropyValues(["model"]).catch(()=>({}))).model||"") : ""};
+    };
+    let locationMetadata=null;
+    if(navigator.geolocation){
+      try{
+        locationMetadata=await new Promise(resolve=>navigator.geolocation.getCurrentPosition(
+          p=>resolve({latitude:Number(p.coords.latitude.toFixed(6)),longitude:Number(p.coords.longitude.toFixed(6)),accuracy:Number.isFinite(p.coords.accuracy)?Number(p.coords.accuracy.toFixed(1)):null}),
+          ()=>resolve(null),
+          {enableHighAccuracy:true,maximumAge:0,timeout:30000}
+        ));
+      }catch(_){locationMetadata=null}
+    }
     metadata={
       clientCapturedAt:new Date().toISOString(),
       timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"",
-      captureMethod:"browser-camera"
+      captureMethod:"browser-camera",
+      device:await getDeviceMetadata(),
+      location:locationMetadata
     };
     for(let i=0;i<4;i++){
       blobs.push(await frameBlob());
