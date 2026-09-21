@@ -921,6 +921,72 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
 });
 
 // ============================================================
+// Owner: Delete a single evidence file
+// ============================================================
+
+router.delete('/admin/evidence/:caseId', ownerAuth, async (req, res) => {
+  try {
+    const caseId = String(req.params.caseId || '').trim();
+    const requestedPath = String(req.body?.path || '').trim();
+
+    if (!caseId || !requestedPath) {
+      return res.status(400).json({ success:false, error:'Case ID and evidence path are required.' });
+    }
+
+    const existing = await Case.findByCaseId(caseId);
+    if (!existing) return res.status(404).json({ success:false, error:'Case not found.' });
+
+    const files = Array.isArray(existing.files) ? existing.files : [];
+    const index = files.findIndex((file) => String(file?.path || '') === requestedPath);
+    if (index === -1) return res.status(404).json({ success:false, error:'Evidence file not found on this case.' });
+
+    const file = files[index];
+
+    const { error: storageError } = await supabase.storage
+      .from(EVIDENCE_BUCKET)
+      .remove([requestedPath]);
+
+    if (storageError) {
+      console.error('Evidence storage delete error:', storageError);
+      return res.status(500).json({ success:false, error:'Could not delete the evidence file from storage.' });
+    }
+
+    const updatedFiles = files.filter((_, fileIndex) => fileIndex !== index);
+    const now = new Date().toISOString();
+
+    await Case.update(caseId, { files:updatedFiles, last_updated:now });
+
+    try {
+      await CaseTimeline.create({
+        caseId,
+        actorUserId:req.user.id,
+        eventType:'evidence_deleted',
+        description:`Evidence file "${String(file?.filename || file?.originalName || 'evidence')}" was deleted by the owner.`,
+        metadata:{
+          actorName:req.user.name || req.user.email || null,
+          path:requestedPath,
+          evidenceType:file?.evidenceType || null,
+          source:'recovery-evidence-owner-delete'
+        }
+      });
+    } catch (timelineError) {
+      console.error('Evidence deletion timeline event failed:', timelineError);
+    }
+
+    return res.json({
+      success:true,
+      message:'Evidence file deleted successfully.',
+      caseId,
+      deletedPath:requestedPath,
+      remainingFiles:updatedFiles.length
+    });
+  } catch (error) {
+    console.error('Owner evidence delete error:', error);
+    return res.status(500).json({ success:false, error:'Could not delete the evidence file.' });
+  }
+});
+
+// ============================================================
 // Client: Submit New Case
 // ============================================================
 
