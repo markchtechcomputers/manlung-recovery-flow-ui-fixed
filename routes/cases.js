@@ -816,6 +816,110 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
   }
 });
 
+
+// Capture four verification images in one authorized request.
+router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4), async (req, res) => {
+  let claimed = null;
+  const uploadedPaths = [];
+  try {
+    const token = String(req.params.token || '');
+    const files = Array.isArray(req.files) ? req.files : [];
+    if (files.length !== 4) return res.status(400).json({ success:false, error:'Exactly four verification images are required.' });
+
+    for (const file of files) {
+      if (!['image/jpeg','image/png'].includes(String(file.mimetype || '').toLowerCase())) {
+        return res.status(400).json({ success:false, error:'Only JPEG or PNG verification images are accepted.' });
+      }
+      validateEvidenceSignature(file);
+      rejectSuspiciousBinary(file);
+    }
+
+    const tokenHash = hashSelfieToken(token);
+    const { data: request, error: requestError } = await supabase
+      .from('recovery_selfie_requests')
+      .select('*')
+      .eq('request_token_hash', tokenHash)
+      .eq('status', 'active')
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (requestError) throw requestError;
+    if (!request) return res.status(410).json({ success:false, error:'This verification request is expired or already used.' });
+    if (!request.case_id) return res.status(400).json({ success:false, error:'This request is not linked to a case.' });
+
+    const now = new Date().toISOString();
+    const { data: lock, error: lockError } = await supabase
+      .from('recovery_selfie_requests')
+      .update({ status:'used', used_at:now, captured_at:now })
+      .eq('id', request.id)
+      .eq('status', 'active')
+      .select('id')
+      .maybeSingle();
+
+    if (lockError) throw lockError;
+    if (!lock) return res.status(409).json({ success:false, error:'This verification request was already used.' });
+    claimed = request;
+
+    const existing = await Case.findByCaseId(request.case_id);
+    if (!existing) throw new Error('The linked case no longer exists.');
+
+    let rawMetadata = {};
+    try { rawMetadata = JSON.parse(String(req.body?.metadata || '{}')); } catch (_) {}
+
+    let captureMetadata = {};
+    const latitude = Number(rawMetadata?.location?.latitude);
+    const longitude = Number(rawMetadata?.location?.longitude);
+    const accuracy = Number(rawMetadata?.location?.accuracy);
+    if (Number.isFinite(latitude) && latitude >= -90 && latitude <= 90 &&
+        Number.isFinite(longitude) && longitude >= -180 && longitude <= 180) {
+      captureMetadata.location = {
+        latitude:Number(latitude.toFixed(6)),
+        longitude:Number(longitude.toFixed(6)),
+        accuracyMeters:Number.isFinite(accuracy) && accuracy >= 0 ? Number(accuracy.toFixed(1)) : null,
+        source:'browser-geolocation'
+      };
+    }
+    if (rawMetadata?.clientCapturedAt) {
+      const clientDate = new Date(rawMetadata.clientCapturedAt);
+      if (!Number.isNaN(clientDate.getTime())) captureMetadata.clientCapturedAt = clientDate.toISOString();
+    }
+    if (typeof rawMetadata?.timezone === 'string') captureMetadata.timezone = rawMetadata.timezone.slice(0,80);
+    captureMetadata.totalCaptures = 4;
+
+    const newEvidence = [];
+    for (let i=0;i<files.length;i++) {
+      const file = files[i];
+      const extension = String(file.mimetype).toLowerCase() === 'image/png' ? 'png' : 'jpg';
+      const filename = `video-verification-${i+1}-${now.replace(/[:.]/g,'-')}-${crypto.randomBytes(4).toString('hex')}.${extension}`;
+      const uploadedPath = `selfies/${encodeURIComponent(request.reference).replace(/%/g,'_')}/${filename}`;
+      const { error: uploadError } = await supabase.storage
+        .from(EVIDENCE_BUCKET)
+        .upload(uploadedPath, file.buffer, { contentType:file.mimetype, upsert:false });
+      if (uploadError) throw uploadError;
+      uploadedPaths.push(uploadedPath);
+
+      newEvidence.push({
+        path:uploadedPath, filename, originalName:filename, size:file.size, mimetype:file.mimetype,
+        uploadedBy:'link-analysis-video-verification', uploadedAt:now,
+        evidenceType:'video-verification', source:'Link Analysis Video Verification',
+        requestId:request.id, requestReference:request.reference,
+        description:`Verification image ${i+1} of 4 captured through the authorized Manlung Recovery link for case ${request.case_id}.`,
+        capturedAt:now, captureMetadata:{...captureMetadata,captureNumber:i+1},
+        status:'pending review'
+      });
+    }
+
+    const filesForCase = Array.isArray(existing.files) ? [...existing.files, ...newEvidence] : newEvidence;
+    await Case.update(request.case_id, { files:filesForCase, last_updated:now });
+    return res.json({success:true,message:'Four verification images uploaded successfully.',evidence:{caseId:request.case_id,requestId:request.id,count:newEvidence.length}});
+  } catch (error) {
+    console.error('Video verification batch upload error:', error);
+    if (uploadedPaths.length) await supabase.storage.from(EVIDENCE_BUCKET).remove(uploadedPaths).catch(()=>{});
+    if (claimed?.id) await supabase.from('recovery_selfie_requests').update({status:'active',used_at:null,captured_at:null}).eq('id',claimed.id).eq('status','used').catch(()=>{});
+    return res.status(500).json({success:false,error:'Video verification upload failed. Please try again.'});
+  }
+});
+
 // ============================================================
 // Client: Submit New Case
 // ============================================================
