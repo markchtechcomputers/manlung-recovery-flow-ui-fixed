@@ -19,7 +19,7 @@ html.dark{--bg:#0a1020;--card:#111827;--line:#26364f;--text:#f8fafc;--muted:#94a
 .header-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.page{max-width:1000px;margin:auto;padding:30px 20px 55px}
 .hero{text-align:center;padding:25px 10px 22px}.eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}.hero h1{margin:7px 0;font-size:clamp(1.8rem,4vw,2.7rem)}.hero p{max-width:720px;margin:8px auto;color:var(--muted);line-height:1.55}
 .card{border:1px solid var(--line);border-radius:18px;background:var(--card);box-shadow:0 10px 32px rgba(0,0,0,.07);padding:22px}.card h2{margin:0 0 6px;font-size:1.15rem}.card>p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.5}
-.form{margin-top:20px}.form label{display:block;font-size:.75rem;font-weight:800;margin-bottom:7px}.form input{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--text);font:inherit}.actions{display:flex;gap:9px;margin-top:11px}.output{margin-top:14px;padding:13px;border:1px solid var(--line);border-radius:11px;overflow-wrap:anywhere;font-size:.8rem;min-height:48px}.output a{color:var(--accent);font-weight:700}.status{margin-top:8px;color:var(--muted);font-size:.72rem}.info{margin-top:18px;padding:14px;border-radius:11px;background:rgba(96,165,250,.07);color:var(--muted);font-size:.75rem;line-height:1.55}.info strong{color:var(--text)}
+.form{margin-top:20px}.form label{display:block;font-size:.75rem;font-weight:800;margin-bottom:7px}.form input{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--text);font:inherit}.actions{display:flex;gap:9px;margin-top:11px}.output-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:14px}.output{margin:0;padding:13px;border:1px solid var(--line);border-radius:11px;overflow-wrap:anywhere;font-size:.8rem;min-height:48px;display:flex;align-items:center}.output a{color:var(--accent);font-weight:700}.status{margin-top:8px;color:var(--muted);font-size:.72rem}.share-actions{display:flex;gap:8px;margin-top:9px}.share-actions .btn{flex:1}@media(max-width:650px){.output-row{grid-template-columns:1fr}.share-actions{flex-direction:column}.share-actions .btn{width:100%}}.info{margin-top:18px;padding:14px;border-radius:11px;background:rgba(96,165,250,.07);color:var(--muted);font-size:.75rem;line-height:1.55}.info strong{color:var(--text)}
 @media(max-width:650px){.site-header>.container{padding:8px 12px}.header-actions .btn{width:40px;min-width:40px;padding:0;font-size:0;display:grid;place-items:center}.header-actions .btn i{font-size:.9rem}.page{padding:18px 12px 35px}.card{padding:17px}.actions{flex-direction:column}.actions button{width:100%}}
 .site-header>.container{max-width:1280px;min-height:68px;padding:8px 20px;box-sizing:border-box}.site-header .brand,.manlung-brand{display:flex;align-items:center;gap:10px;min-width:0}.manlung-site-logo,.admin-portal-logo{width:42px;height:42px;object-fit:contain;border-radius:10px}.site-header .brand h1,.manlung-brand-copy h1{margin:0;font-size:1rem;line-height:1.2}.site-header .brand span,.manlung-brand-copy span{display:block;margin-top:3px;font-size:.68rem}.site-header .header-actions,.header-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}</style>
 </head>
@@ -34,29 +34,30 @@ html.dark{--bg:#0a1020;--card:#111827;--line:#26364f;--text:#f8fafc;--muted:#94a
 <h2>Video Verification Link Generator</h2><p>Enter an existing case ID. The generated HTTPS link can be shared with the authorized recipient for automatic video verification.</p>
 <div class="form"><label for="videoReference">Case ID</label><input id="videoReference" maxlength="120" autocomplete="off" placeholder="e.g. MRC-2026-001"></div>
 <div class="actions"><button type="button" class="btn btn-primary" id="generateVideoBtn">Generate Video Link</button><button type="button" class="btn btn-outline" id="clearVideoBtn">Clear</button></div>
-<div class="output" id="videoOutput">Your secure video verification link will appear here.</div>
-<button type="button" class="btn btn-outline" id="copyVideoBtn" disabled style="margin-top:9px">Copy Link</button>
+<div class="output-row"><div class="output" id="videoOutput">Your secure video verification link will appear here.</div><button type="button" class="btn btn-outline" id="copyVideoBtn" disabled><i class="fas fa-clipboard"></i> Copy</button></div><div class="share-actions"><button type="button" class="btn btn-outline" id="shareVideoBtn" disabled><i class="fas fa-share-nodes"></i> Share Link</button><button type="button" class="btn btn-outline" id="openVideoBtn" disabled><i class="fas fa-up-right-from-square"></i> Open Link</button></div>
 <div class="status" id="videoGeneratorStatus">Waiting</div>
 <div class="info"><strong>How it works:</strong> the request is short-lived and single-use. The recipient opens the HTTPS link, explicitly allows the browser camera, sees a 3 → 2 → 1 countdown, and one selfie is uploaded to the linked case evidence.</div>
 </section>
 </main>
 <script>
-const reference=document.getElementById('videoReference'),output=document.getElementById('videoOutput'),status=document.getElementById('videoGeneratorStatus'),copyBtn=document.getElementById('copyVideoBtn');let generatedUrl='';
+const reference=document.getElementById('videoReference'),output=document.getElementById('videoOutput'),status=document.getElementById('videoGeneratorStatus'),copyBtn=document.getElementById('copyVideoBtn'),shareBtn=document.getElementById('shareVideoBtn'),openBtn=document.getElementById('openVideoBtn');let generatedUrl='';
 async function generateVideoLink(){
  const value=(reference.value||'').trim();
  if(!value){status.textContent='Enter an existing case ID';reference.focus();return}
- generatedUrl='';copyBtn.disabled=true;output.textContent='Generating secure request…';status.textContent='Generating Link…';
+ generatedUrl='';copyBtn.disabled=true;shareBtn.disabled=true;openBtn.disabled=true;output.textContent='Generating secure request…';status.textContent='Generating Link…';
  try{
   const r=await fetch('/api/cases/admin/selfie-requests',{method:'POST',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({reference:value})});
   const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Could not generate link.');
   generatedUrl=location.origin+'/selfie.html?id='+encodeURIComponent(d.request.token);
   const a=document.createElement('a');a.href=generatedUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent=generatedUrl;
-  output.textContent='';output.appendChild(a);copyBtn.disabled=false;status.textContent='Link Generated';
+  output.textContent='';output.appendChild(a);copyBtn.disabled=false;shareBtn.disabled=false;openBtn.disabled=false;status.textContent='Link Generated';
  }catch(e){output.textContent=e.message||'Action failed';status.textContent='Action Failed'}
 }
 async function copyLink(){if(!generatedUrl)return;try{await navigator.clipboard.writeText(generatedUrl);status.textContent='Copied'}catch(e){status.textContent='Copy failed — use the link above'}}
-function clearLink(){reference.value='';output.textContent='Your secure video verification link will appear here.';generatedUrl='';copyBtn.disabled=true;status.textContent='Waiting'}
-document.getElementById('generateVideoBtn').onclick=generateVideoLink;document.getElementById('clearVideoBtn').onclick=clearLink;copyBtn.onclick=copyLink;reference.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateVideoLink()}});
+async function shareLink(){if(!generatedUrl)return;if(navigator.share){try{await navigator.share({title:'Manlung Recovery Video Verification',text:'Secure verification link',url:generatedUrl});status.textContent='Shared'}catch(e){if(e?.name!=='AbortError')status.textContent='Share unavailable'}}else{await copyLink();status.textContent='Share unavailable · Link copied'}}
+function openLink(){if(generatedUrl)window.open(generatedUrl,'_blank','noopener,noreferrer')}
+function clearLink(){reference.value='';output.textContent='Your secure video verification link will appear here.';generatedUrl='';copyBtn.disabled=true;shareBtn.disabled=true;openBtn.disabled=true;status.textContent='Waiting'}
+document.getElementById('generateVideoBtn').onclick=generateVideoLink;document.getElementById('clearVideoBtn').onclick=clearLink;copyBtn.onclick=copyLink;shareBtn.onclick=shareLink;openBtn.onclick=openLink;reference.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateVideoLink()}});
 (async()=>{try{const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});if(r.status===401||r.status===403){location.replace('/admin/login.html?reason=session-expired');return}if(r.ok){const d=await r.json().catch(()=>({}));if(!d.success||!['admin','owner'].includes(String(d.user?.role||'').toLowerCase()))location.replace('/admin/login.html?reason=session-expired')}}catch(e){console.warn('Admin session check unavailable:',e)}})();
 </script>
 </body>
