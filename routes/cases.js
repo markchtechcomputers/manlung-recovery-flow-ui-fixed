@@ -884,6 +884,15 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
       if (!Number.isNaN(clientDate.getTime())) captureMetadata.clientCapturedAt = clientDate.toISOString();
     }
     if (typeof rawMetadata?.timezone === 'string') captureMetadata.timezone = rawMetadata.timezone.slice(0,80);
+    if (rawMetadata?.device && typeof rawMetadata.device === 'object') {
+      const device = rawMetadata.device;
+      captureMetadata.device = {
+        deviceType: typeof device.deviceType === 'string' ? device.deviceType.slice(0,40) : 'unknown',
+        platform: typeof device.platform === 'string' ? device.platform.slice(0,80) : '',
+        browser: typeof device.browser === 'string' ? device.browser.slice(0,40) : '',
+        model: typeof device.model === 'string' ? device.model.slice(0,80) : '',
+      };
+    }
     captureMetadata.totalCaptures = 4;
 
     const newEvidence = [];
