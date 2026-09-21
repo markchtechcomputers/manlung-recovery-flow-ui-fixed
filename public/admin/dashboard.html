@@ -1304,11 +1304,12 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 
         function renderCaseModal(c) {
             const filesHtml = (c.files && c.files.length)
-                ? c.files.map(f => `
-                    <div class="file-item">
-                        <a href="${f.url}" target="_blank" rel="noopener"><i class="fas fa-file"></i> ${f.originalName || f.filename}</a>
-                        <span class="status">${f.uploadedBy || ''}</span>
-                    </div>`).join('')
+                ? c.files.map(f => {
+                    const canDelete = currentAdmin && currentAdmin.role === 'owner' && f.path;
+                    const safePath = String(f.path || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                    const deleteButton = canDelete ? '<button class="btn btn-danger" style="margin-left:auto;padding:.25rem .55rem;font-size:.72rem;" onclick="deleteCaseEvidence(\\'' + String(c.caseId).replace(/'/g, "\\'") + '\\', \\' ' + safePath + '\\')"><i class="fas fa-trash"></i> Delete</button>' : '';
+                    return '<div class="file-item"><a href="' + (f.url || '#') + '" target="_blank" rel="noopener"><i class="fas fa-file"></i> ' + (f.originalName || f.filename || 'Evidence file') + '</a><span class="status">' + (f.uploadedBy || '') + '</span>' + deleteButton + '</div>';
+                  }).join('')
                 : '<p style="color:var(--text-muted); font-size:0.9rem;">No files yet.</p>';
 
             document.getElementById('modalBody').innerHTML = `
@@ -1509,6 +1510,19 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             }
         }
         window.deleteClientMessage = deleteClientMessage;
+        async function deleteCaseEvidence(caseId, path) {
+            if (!currentAdmin || currentAdmin.role !== 'owner') { alert('Only the Owner can delete case images.'); return; }
+            if (!confirm('Delete this case evidence permanently?')) return;
+            try {
+                const res = await fetch('/api/cases/admin/case/' + encodeURIComponent(caseId) + '/file', { method:'DELETE', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify({path}) });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) { alert(data.error || 'Could not delete the case evidence.'); return; }
+                openCase(caseId);
+            } catch (e) { console.error(e); alert('Network error deleting case evidence.'); }
+        }
+        window.deleteCaseEvidence = deleteCaseEvidence;
+
 
         function uploadAdminFile(caseId, input) {
             const file = input.files[0];
