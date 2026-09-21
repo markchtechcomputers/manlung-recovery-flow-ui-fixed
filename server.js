@@ -133,7 +133,7 @@ const effectiveAllowedOrigins = allowedOrigins.length
 app.use(cors({
   origin: (origin, callback) => {
     // Non-browser requests do not send Origin and remain supported.
-    if (!origin || effectiveAllowedOrigins.includes(origin)) {
+    if (origin == null || effectiveAllowedOrigins.includes(origin) || (process.env.NODE_ENV === 'production' && origin.startsWith('https://manlungrecovery-') && origin.endsWith('.vercel.app'))) {
       return callback(null, true);
     }
 
