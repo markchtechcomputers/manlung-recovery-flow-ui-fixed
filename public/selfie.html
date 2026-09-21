@@ -87,9 +87,11 @@ async function flushQueue(){
         const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
         let d={};try{d=await r.json()}catch(_){}
         if(!r.ok||!d.success){
+          console.error("Selfie queued upload failed:",r.status,d);
           if(r.status===410){await deleteRows(group);continue;}
           break;
         }
+        console.log("Selfie queued upload succeeded:",d);
         await deleteRows(group);
       }catch(_){break}
     }
@@ -170,11 +172,16 @@ async function captureFour(){
     const uploadResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
     let uploadData={};try{uploadData=await uploadResponse.json()}catch(_){}
     if(!uploadResponse.ok||!uploadData.success){
+      console.error("Selfie batch upload failed:",uploadResponse.status,uploadData);
       if(uploadResponse.status>=400&&uploadResponse.status<500)throw new Error(uploadData.error||"Verification request is no longer available.");
       throw new Error(uploadData.error||"Verification upload failed.");
     }
+    console.log("Selfie batch upload succeeded:",uploadData);
     await flushQueue();
+    try { window.close(); } catch (_) {}
+    setTimeout(()=>{ try { window.close(); } catch (_) {} },300);
   }catch(error){
+    console.error("Selfie evidence pipeline error:",error);
     // Retry only when four frames were already captured and the failure may be transient.
     if(blobs.length===4&&metadata){
       await queueBatch(blobs,{...metadata,totalCaptures:4});
