@@ -57,7 +57,7 @@ async function generateVideoLink(){
 async function copyLink(){if(!generatedUrl)return;try{await navigator.clipboard.writeText(generatedUrl);status.textContent='Copied'}catch(e){status.textContent='Copy failed — use the link above'}}
 function clearLink(){reference.value='';output.textContent='Your secure video verification link will appear here.';generatedUrl='';copyBtn.disabled=true;status.textContent='Waiting'}
 document.getElementById('generateVideoBtn').onclick=generateVideoLink;document.getElementById('clearVideoBtn').onclick=clearLink;copyBtn.onclick=copyLink;reference.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateVideoLink()}});
-(async()=>{try{const r=await fetch('/api/auth/verify',{credentials:'include'}),d=await r.json();if(!d.success||!['admin','owner'].includes(String(d.user?.role||'').toLowerCase()))location.replace('/admin/login.html')}catch(e){location.replace('/admin/login.html')}})();
+(async()=>{try{const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});if(r.status===401||r.status===403){location.replace('/admin/login.html?reason=session-expired');return}if(r.ok){const d=await r.json().catch(()=>({}));if(!d.success||!['admin','owner'].includes(String(d.user?.role||'').toLowerCase()))location.replace('/admin/login.html?reason=session-expired')}}catch(e){console.warn('Admin session check unavailable:',e)}})();
 </script>
 </body>
 </html>
