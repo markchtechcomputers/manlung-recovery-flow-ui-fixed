@@ -1309,7 +1309,11 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                     const caseArg = JSON.stringify(String(c.caseId || ''));
                     const pathArg = JSON.stringify(String(f.path || ''));
                     const deleteButton = canDelete ? '<button class="btn btn-danger" style="margin-left:auto;padding:.25rem .55rem;font-size:.72rem;" onclick=\'deleteCaseEvidence(' + caseArg + ',' + pathArg + ')\'><i class="fas fa-trash"></i> Delete</button>' : '';
-                    return '<div class="file-item"><a href="' + (f.url || '#') + '" target="_blank" rel="noopener"><i class="fas fa-file"></i> ' + (f.originalName || f.filename || 'Evidence file') + '</a><span class="status">' + (f.uploadedBy || '') + '</span>' + deleteButton + '</div>';
+                    const isSelfie = String(f.evidenceType || '').toLowerCase() === 'selfie' || String(f.source || '').toLowerCase().includes('link analysis selfie');
+                    const isImage = String(f.mimetype || '').toLowerCase().startsWith('image/');
+                    const preview = isImage && f.url ? '<div style="margin-top:.65rem;"><img src="' + f.url + '" alt="Selfie evidence preview" style="display:block;max-width:100%;width:min(420px,100%);max-height:420px;object-fit:contain;border-radius:12px;border:1px solid var(--card-border);background:var(--page-bg);"></div>' : '';
+                    const details = (isSelfie ? '<div style="margin-top:.45rem;color:var(--text-muted);font-size:.76rem;">Selfie Evidence · Request: ' + (f.requestReference || c.caseId || '') + ' · Captured: ' + (f.capturedAt || f.uploadedAt || '') + '<br>' + (f.description || 'Captured through Link Analysis Selfie Request.') + '</div>' : '');
+                    return '<div class="file-item" style="display:block;"><div style="display:flex;align-items:center;gap:.7rem;"><a href="' + (f.url || '#') + '" target="_blank" rel="noopener"><i class="fas fa-' + (isSelfie ? 'camera' : 'file') + '"></i> ' + (f.originalName || f.filename || 'Evidence file') + '</a><span class="status">' + (f.uploadedBy || '') + '</span>' + deleteButton + '</div>' + preview + details + '</div>';
                   }).join('')
                 : '<p style="color:var(--text-muted); font-size:0.9rem;">No files yet.</p>';
 
