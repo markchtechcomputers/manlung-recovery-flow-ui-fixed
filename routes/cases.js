@@ -697,7 +697,7 @@ router.get('/selfie-request/:token', async (req, res) => {
 
 const selfieUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024, files: 1, parts: 4 }
+  limits: { fileSize: 5 * 1024 * 1024, files: 4, parts: 8 }
 });
 
 router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async (req, res) => {
