@@ -6,10 +6,12 @@
     if(checking||location.pathname==='/admin/login.html')return; checking=true;
     try{
       const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});
-      if(!r.ok){
+      if(r.status===401||r.status===403){
         try{localStorage.removeItem('adminUser');sessionStorage.removeItem('adminUser')}catch(_){}
         location.replace(login);
-      } else {
+        return;
+      }
+      if(r.ok){
         const d=await r.json().catch(()=>({}));
         if(!d.success||!['admin','owner'].includes(d.user?.role)){
           try{localStorage.removeItem('adminUser');sessionStorage.removeItem('adminUser')}catch(_){}

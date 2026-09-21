@@ -114,6 +114,8 @@ const defaultAllowedOrigins = [
 
 if (process.env.NODE_ENV !== 'production') {
   defaultAllowedOrigins.push(
+    'http://localhost:5000',
+    'http://127.0.0.1:5000',
     'http://localhost:3000',
     'http://127.0.0.1:3000'
   );
@@ -131,7 +133,7 @@ const effectiveAllowedOrigins = allowedOrigins.length
 app.use(cors({
   origin: (origin, callback) => {
     // Non-browser requests do not send Origin and remain supported.
-    if (!origin || effectiveAllowedOrigins.includes(origin)) {
+    if (origin == null || effectiveAllowedOrigins.includes(origin) || (process.env.NODE_ENV === 'production' && origin.startsWith('https://manlungrecovery-') && origin.endsWith('.vercel.app'))) {
       return callback(null, true);
     }
 

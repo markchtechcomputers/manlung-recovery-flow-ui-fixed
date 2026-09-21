@@ -217,6 +217,24 @@
       html.dark .manlung-ai-voice-state,body.dark .manlung-ai-voice-state{background:#102238;color:#dbeafe;border-color:#29415b}
       html.dark .manlung-ai-quick button,body.dark .manlung-ai-quick button{background:#102238;color:#9bd0ff;border-color:#29415b}
       html.dark .manlung-ai-note,body.dark .manlung-ai-note{color:#9eb1c6}
+      .site-header .header-actions .manlung-ai-tab{
+        background:linear-gradient(135deg,#06b6d4,#2563eb)!important;
+        border:1px solid #22d3ee!important;
+        color:#fff!important;
+        cursor:pointer!important;
+        box-shadow:0 6px 16px rgba(37,99,235,.18)!important;
+      }
+      .site-header .header-actions .manlung-ai-tab:hover{
+        background:linear-gradient(135deg,#0891b2,#1d4ed8)!important;
+        color:#fff!important;
+      }
+      html.dark .site-header .header-actions .manlung-ai-tab,
+      body.dark .site-header .header-actions .manlung-ai-tab{
+        background:linear-gradient(135deg,#0891b2,#1d4ed8)!important;
+        border-color:#67e8f9!important;
+        color:#fff!important;
+        box-shadow:0 6px 18px rgba(34,211,238,.2)!important;
+      }
       /* Premium Manlung AI chat redesign */
       #manlungAiWindow{
         background:#f4f7fb;
@@ -389,32 +407,85 @@
     if(b) b.textContent=voiceEnabled()?'🔊 Voice on':'🔇 Voice off';
     window.__MANLUNG_AI_VOICE_ON=voiceEnabled();
   }
+  function ensureSpeechVoice(){
+    if(!('speechSynthesis'in window))return null;
+    const preferred=speechSynthesis.getVoices()||[];
+    return preferred.find(v=>/^en-KE$/i.test(v.lang))
+      ||preferred.find(v=>/^sw-KE$/i.test(v.lang))
+      ||preferred.find(v=>/^en/i.test(v.lang))
+      ||preferred.find(v=>/^sw/i.test(v.lang))
+      ||preferred[0]
+      ||null;
+  }
+  if('speechSynthesis'in window&&speechSynthesis.onvoiceschanged!==undefined){
+    speechSynthesis.onvoiceschanged=()=>ensureSpeechVoice();
+  }
   function speak(text){
     if(!voiceEnabled()||!('speechSynthesis'in window))return;
-    const u=new SpeechSynthesisUtterance(String(text));
-    u.lang=speechLanguage(text);u.rate=.98;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
+    const value=String(text||'').trim();if(!value)return;
+    try{
+      const u=new SpeechSynthesisUtterance(value);
+      u.lang=speechLanguage(value);u.rate=.98;
+      const voice=ensureSpeechVoice();if(voice)u.voice=voice;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+      setVoiceState?.('waiting','AI is speaking…');
+      u.onend=()=>{if(voiceSession&&voiceAutoResume)waitUntilSpeechIsFinished();};
+      u.onerror=()=>{if(voiceSession&&voiceAutoResume)waitUntilSpeechIsFinished();};
+    }catch(e){console.warn('Manlung AI speech output error',e);}
   }
   function createLiveSpeaker(){
     if(!('speechSynthesis'in window))return {push(){},finish(){}};
-    let pending='';
+    let pending='',speaking=false;
+    const queue=[];
+    const pump=()=>{
+      if(speaking||!queue.length||!window.__MANLUNG_AI_VOICE_ON)return;
+      const text=queue.shift();if(!text)return pump();
+      speaking=true;
+      try{
+        const u=new SpeechSynthesisUtterance(text);
+        u.lang=speechLanguage(text);u.rate=.98;
+        const voice=ensureSpeechVoice();if(voice)u.voice=voice;
+        u.onend=()=>{speaking=false;pump();};
+        u.onerror=()=>{speaking=false;pump();};
+        window.speechSynthesis.speak(u);
+      }catch(_){speaking=false;pump();}
+    };
+    const speakChunk=chunk=>{
+      const text=String(chunk||'').trim();
+      if(!text||!window.__MANLUNG_AI_VOICE_ON)return;
+      queue.push(text);pump();
+    };
+    const flushReady=()=>{
+      if(!pending.trim()||!window.__MANLUNG_AI_VOICE_ON)return;
+      // Start speaking while SSE is still arriving. Prefer a sentence, but
+      // flush a reasonably sized clause if the model has not finished one.
+      const sentence=pending.match(/^([\\s\\S]*?[.!?…](?:\\s+|$))/);
+      if(sentence){
+        pending=pending.slice(sentence[1].length);
+        speakChunk(sentence[1]);
+        flushReady();
+        return;
+      }
+      if(pending.length>=90){
+        const clause=pending.match(/^([\\s\\S]{70,140}?[,:;](?:\\s+|$))/);
+        if(clause){
+          pending=pending.slice(clause[1].length);
+          speakChunk(clause[1]);
+        }
+      }
+    };
     return {
       push(part){
         if(!window.__MANLUNG_AI_VOICE_ON)return;
         pending+=String(part||'');
-        const m=pending.match(/^([\\s\\S]*?[.!?…](?:\\s+|$))/);
-        if(m){pending=pending.slice(m[1].length);const u=new SpeechSynthesisUtterance(m[1].trim());u.lang=speechLanguage(m[1]);u.rate=.98;
-           u.onstart=()=>{voiceSpeechCooldownUntil=Date.now()+1200;clearVoiceRestartTimer();};
-           u.onend=()=>{voiceSpeechCooldownUntil=Date.now()+1200;};
-           window.speechSynthesis.speak(u);}
+        flushReady();
       },
       finish(){
-        if(!window.__MANLUNG_AI_VOICE_ON||!pending.trim())return;
-        const u=new SpeechSynthesisUtterance(pending.trim());u.lang=speechLanguage(pending);u.rate=.98;
-         u.onstart=()=>{voiceSpeechCooldownUntil=Date.now()+1200;clearVoiceRestartTimer();};
-         u.onend=()=>{voiceSpeechCooldownUntil=Date.now()+1200;};
-         window.speechSynthesis.speak(u);pending='';
+        if(!window.__MANLUNG_AI_VOICE_ON)return;
+        flushReady();
+        if(pending.trim())speakChunk(pending);
+        pending='';
       }
     };
   }
@@ -633,7 +704,13 @@
        if('speechSynthesis'in window&&window.speechSynthesis.speaking){waitUntilSpeechIsFinished();return false;}
        if(Date.now()<voiceSpeechCooldownUntil){waitUntilSpeechIsFinished();return false;}
        clearVoiceRestartTimer();
-      recognition=new SR();recognition.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';recognition.continuous=false;recognition.interimResults=true;recognition.maxAlternatives=1;voiceFinal='';
+      recognition=new SR();
+      recognition.lang=currentLanguage()==='sw'?'sw-KE':'en-KE';
+      recognition.continuous=false;
+      recognition.interimResults=true;
+      recognition.maxAlternatives=1;
+      voiceFinal='';
+      recognition.onstart=()=>setListening(true);
       setListening(true);
       recognition.onresult=e=>{
         voiceFinal=Array.from(e.results).map(x=>x[0].transcript).join(' ').trim();
@@ -661,12 +738,16 @@
           setVoiceState('','');
         }
       };
-      recognition.onerror=()=>{
+      recognition.onerror=e=>{
+        console.warn('Manlung AI voice input error',e?.error||e);
         recognition=null;
         setListening(false);
         resetComposer();
-        setVoiceState('','');
-        if(voiceSession&&voiceAutoResume){waitUntilSpeechIsFinished();}
+        if(voiceSession&&voiceAutoResume){
+          setVoiceState('waiting','Voice input paused — tap the mic to speak again');
+          clearVoiceRestartTimer();
+          voiceRestartTimer=setTimeout(()=>{voiceRestartTimer=null;if(voiceSession&&voiceAutoResume&&!recognition)startListening();},1200);
+        }else setVoiceState('','');
       };
       try{recognition.start();return true;}catch(_){recognition=null;setListening(false);return false;}
     }

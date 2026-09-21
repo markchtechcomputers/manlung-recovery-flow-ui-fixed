@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const router = express.Router();
 const multer = require('multer');
 const { body, validationResult } = require('express-validator');
@@ -610,6 +611,409 @@ function mapBodyToCaseFields(body) {
   return fields;
 }
 
+
+// ============================================================
+// Link Analysis: Selfie request generator
+// ============================================================
+
+function hashSelfieToken(token) {
+  return crypto.createHash('sha256').update(String(token)).digest('hex');
+}
+
+function safeReference(value) {
+  return String(value || '').trim().slice(0, 120);
+}
+
+router.post('/admin/selfie-requests', adminAuth, async (req, res) => {
+  try {
+    const reference = safeReference(req.body?.reference) || 'guest';
+    const token = crypto.randomBytes(32).toString('base64url');
+    const tokenHash = hashSelfieToken(token);
+
+    let caseData = null;
+    if (reference !== 'guest') {
+      caseData = await Case.findByCaseId(reference);
+      if (!caseData) {
+        const matches = await Case.searchAll({ search: reference });
+        const normalized = reference.toLowerCase();
+        caseData = (matches || []).find((item) =>
+          String(item?.case_id || '').trim().toLowerCase() === normalized
+        ) || null;
+      }
+      if (!caseData) {
+        return res.status(404).json({
+          success:false,
+          error:'Case ID not found. Enter the exact Case ID shown in the admin Case Lookup & Search.'
+        });
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('recovery_selfie_requests')
+      .insert({
+        request_token_hash: tokenHash,
+        case_id: caseData ? caseData.case_id : null,
+        reference,
+        created_by: req.user.id
+      })
+      .select('id,reference,status,expires_at,created_at')
+      .single();
+
+    if (error) throw error;
+
+    return res.status(201).json({ success:true, request:{...data, token} });
+  } catch (error) {
+    console.error('Selfie request generation error:', error);
+    return res.status(500).json({ success:false, error:'Could not generate selfie request.' });
+  }
+});
+
+router.get('/selfie-request/:token', async (req, res) => {
+  try {
+    const token = String(req.params.token || '');
+    if (!/^[A-Za-z0-9_-]{32,120}$/.test(token)) {
+      return res.status(400).json({ success:false, error:'Invalid request.' });
+    }
+
+    const { data, error } = await supabase
+      .from('recovery_selfie_requests')
+      .select('id,reference,status,expires_at,created_at')
+      .eq('request_token_hash', hashSelfieToken(token))
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return res.status(404).json({ success:false, error:'Selfie request not found.' });
+
+    if (data.status !== 'active' || new Date(data.expires_at).getTime() <= Date.now()) {
+      return res.status(410).json({ success:false, error:'This selfie request has expired or is no longer active.' });
+    }
+
+    return res.json({ success:true, request:data });
+  } catch (error) {
+    console.error('Selfie request lookup error:', error);
+    return res.status(500).json({ success:false, error:'Could not load selfie request.' });
+  }
+});
+router.get('/selfie-request/:token/status', async (req, res) => {
+  try {
+    const token = String(req.params.token || '');
+    if (!/^[A-Za-z0-9_-]{32,120}$/.test(token)) return res.status(400).json({ success:false, error:'Invalid request.' });
+    const { data: request, error: requestError } = await supabase.from('recovery_selfie_requests').select('id,case_id,status,expires_at').eq('request_token_hash', hashSelfieToken(token)).maybeSingle();
+    if (requestError) throw requestError;
+    if (!request) return res.status(404).json({ success:false, error:'Selfie request not found.' });
+    let count = 0;
+    if (request.case_id) {
+      const caseData = await Case.findByCaseId(request.case_id);
+      const files = Array.isArray(caseData?.files) ? caseData.files : [];
+      count = files.filter((file) => file?.requestId === request.id && file?.evidenceType === 'video-verification').length;
+    }
+    return res.json({ success:true, status:request.status, count, complete:count === 4 });
+  } catch (error) {
+    console.error('Selfie request status error:', error);
+    return res.status(500).json({ success:false, error:'Could not check verification status.' });
+  }
+});
+
+
+const selfieUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 4, parts: 8 }
+});
+
+router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async (req, res) => {
+  let claimed = null;
+  let uploadedPath = null;
+  try {
+    const token = String(req.params.token || '');
+    if (!req.file) return res.status(400).json({ success:false, error:'Selfie image is required.' });
+    if (!['image/jpeg','image/png'].includes(String(req.file.mimetype || '').toLowerCase())) {
+      return res.status(400).json({ success:false, error:'Only JPEG or PNG selfies are accepted.' });
+    }
+    validateEvidenceSignature(req.file);
+    rejectSuspiciousBinary(req.file);
+
+    const tokenHash = hashSelfieToken(token);
+    const { data: request, error: requestError } = await supabase
+      .from('recovery_selfie_requests')
+      .select('*')
+      .eq('request_token_hash', tokenHash)
+      .eq('status', 'active')
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (requestError) throw requestError;
+    if (!request) return res.status(410).json({ success:false, error:'This selfie request is expired or already used.' });
+    if (!request.case_id) return res.status(400).json({ success:false, error:'This request is not linked to a case.' });
+
+    const now = new Date().toISOString();
+    const { data: lock, error: lockError } = await supabase
+      .from('recovery_selfie_requests')
+      .update({ status:'used', used_at:now, captured_at:now })
+      .eq('id', request.id)
+      .eq('status', 'active')
+      .select('id')
+      .maybeSingle();
+
+    if (lockError) throw lockError;
+    if (!lock) return res.status(409).json({ success:false, error:'This selfie request was already used.' });
+    claimed = request;
+
+    const extension = String(req.file.mimetype).toLowerCase() === 'image/png' ? 'png' : 'jpg';
+    const filename = `selfie-${now.replace(/[:.]/g,'-')}-${crypto.randomBytes(4).toString('hex')}.${extension}`;
+    uploadedPath = `selfies/${encodeURIComponent(request.reference).replace(/%/g,'_')}/${filename}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(EVIDENCE_BUCKET)
+      .upload(uploadedPath, req.file.buffer, { contentType:req.file.mimetype, upsert:false });
+
+    if (uploadError) throw uploadError;
+
+    const existing = await Case.findByCaseId(request.case_id);
+    if (!existing) throw new Error('The linked case no longer exists.');
+
+    let captureMetadata = {};
+    try {
+      const rawMetadata = String(req.body?.metadata || '').trim();
+      if (rawMetadata) {
+        const parsed = JSON.parse(rawMetadata);
+        const latitude = Number(parsed?.location?.latitude);
+        const longitude = Number(parsed?.location?.longitude);
+        const accuracy = Number(parsed?.location?.accuracy);
+        if (Number.isFinite(latitude) && latitude >= -90 && latitude <= 90 &&
+            Number.isFinite(longitude) && longitude >= -180 && longitude <= 180) {
+          captureMetadata.location = {
+            latitude: Number(latitude.toFixed(6)),
+            longitude: Number(longitude.toFixed(6)),
+            accuracyMeters: Number.isFinite(accuracy) && accuracy >= 0 ? Number(accuracy.toFixed(1)) : null,
+            source: 'browser-geolocation',
+          };
+        }
+        if (parsed?.clientCapturedAt) {
+          const clientDate = new Date(parsed.clientCapturedAt);
+          if (!Number.isNaN(clientDate.getTime())) {
+            captureMetadata.clientCapturedAt = clientDate.toISOString();
+          }
+        }
+        if (typeof parsed?.timezone === 'string') {
+          captureMetadata.timezone = parsed.timezone.slice(0, 80);
+        }
+      }
+    } catch (_) {
+      // Metadata is optional; the server timestamp below remains authoritative.
+    }
+
+    const fileMeta = {
+      path: uploadedPath,
+      filename,
+      originalName: filename,
+      size: req.file.size,
+      mimetype: req.file.mimetype,
+      uploadedBy: 'link-analysis-selfie',
+      uploadedAt: now,
+      evidenceType: 'selfie',
+      source: 'Link Analysis Selfie Request',
+      requestId: request.id,
+      requestReference: request.reference,
+      description: `Selfie captured through authorized Manlung Recovery Link Analysis request for case ${request.case_id}.`,
+      capturedAt: now,
+      captureMetadata,
+      status: 'pending review'
+    };
+
+    const files = Array.isArray(existing.files) ? [...existing.files, fileMeta] : [fileMeta];
+    await Case.update(request.case_id, { files, last_updated: now });
+
+    return res.json({ success:true, message:'Selfie uploaded successfully.', evidence:{caseId:request.case_id, requestId:request.id, filename} });
+  } catch (error) {
+    console.error('Selfie upload error:', error);
+    if (uploadedPath) {
+      await supabase.storage.from(EVIDENCE_BUCKET).remove([uploadedPath]).catch(()=>{});
+    }
+    if (claimed?.id) {
+      await supabase.from('recovery_selfie_requests').update({status:'active',used_at:null,captured_at:null}).eq('id',claimed.id).eq('status','used').catch(()=>{});
+    }
+    return res.status(500).json({ success:false, error:'Selfie upload failed. Please try again.' });
+  }
+});
+
+
+// Capture four verification images in one authorized request.
+router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4), async (req, res) => {
+  let claimed = null;
+  const uploadedPaths = [];
+  try {
+    const token = String(req.params.token || '');
+    const files = Array.isArray(req.files) ? req.files : [];
+    if (files.length !== 4) return res.status(400).json({ success:false, error:'Exactly four verification images are required.' });
+
+    for (const file of files) {
+      if (!['image/jpeg','image/png'].includes(String(file.mimetype || '').toLowerCase())) {
+        return res.status(400).json({ success:false, error:'Only JPEG or PNG verification images are accepted.' });
+      }
+      validateEvidenceSignature(file);
+      rejectSuspiciousBinary(file);
+    }
+
+    const tokenHash = hashSelfieToken(token);
+    const { data: request, error: requestError } = await supabase
+      .from('recovery_selfie_requests')
+      .select('*')
+      .eq('request_token_hash', tokenHash)
+      .eq('status', 'active')
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (requestError) throw requestError;
+    if (!request) return res.status(410).json({ success:false, error:'This verification request is expired or already used.' });
+    if (!request.case_id) return res.status(400).json({ success:false, error:'This request is not linked to a case.' });
+
+    const now = new Date().toISOString();
+    const { data: lock, error: lockError } = await supabase
+      .from('recovery_selfie_requests')
+      .update({ status:'used', used_at:now, captured_at:now })
+      .eq('id', request.id)
+      .eq('status', 'active')
+      .select('id')
+      .maybeSingle();
+
+    if (lockError) throw lockError;
+    if (!lock) return res.status(409).json({ success:false, error:'This verification request was already used.' });
+    claimed = request;
+
+    const existing = await Case.findByCaseId(request.case_id);
+    if (!existing) throw new Error('The linked case no longer exists.');
+
+    let rawMetadata = {};
+    try { rawMetadata = JSON.parse(String(req.body?.metadata || '{}')); } catch (_) {}
+
+    let captureMetadata = {};
+    const latitude = Number(rawMetadata?.location?.latitude);
+    const longitude = Number(rawMetadata?.location?.longitude);
+    const accuracy = Number(rawMetadata?.location?.accuracy);
+    if (Number.isFinite(latitude) && latitude >= -90 && latitude <= 90 &&
+        Number.isFinite(longitude) && longitude >= -180 && longitude <= 180) {
+      captureMetadata.location = {
+        latitude:Number(latitude.toFixed(6)),
+        longitude:Number(longitude.toFixed(6)),
+        accuracyMeters:Number.isFinite(accuracy) && accuracy >= 0 ? Number(accuracy.toFixed(1)) : null,
+        source:'browser-geolocation'
+      };
+    }
+    if (rawMetadata?.clientCapturedAt) {
+      const clientDate = new Date(rawMetadata.clientCapturedAt);
+      if (!Number.isNaN(clientDate.getTime())) captureMetadata.clientCapturedAt = clientDate.toISOString();
+    }
+    if (typeof rawMetadata?.timezone === 'string') captureMetadata.timezone = rawMetadata.timezone.slice(0,80);
+    if (rawMetadata?.device && typeof rawMetadata.device === 'object') {
+      const device = rawMetadata.device;
+      captureMetadata.device = {
+        deviceType: typeof device.deviceType === 'string' ? device.deviceType.slice(0,40) : 'unknown',
+        platform: typeof device.platform === 'string' ? device.platform.slice(0,80) : '',
+        browser: typeof device.browser === 'string' ? device.browser.slice(0,40) : '',
+        model: typeof device.model === 'string' ? device.model.slice(0,80) : '',
+      };
+    }
+    captureMetadata.totalCaptures = 4;
+
+    const newEvidence = [];
+    for (let i=0;i<files.length;i++) {
+      const file = files[i];
+      const extension = String(file.mimetype).toLowerCase() === 'image/png' ? 'png' : 'jpg';
+      const filename = `video-verification-${i+1}-${now.replace(/[:.]/g,'-')}-${crypto.randomBytes(4).toString('hex')}.${extension}`;
+      const uploadedPath = `selfies/${encodeURIComponent(request.reference).replace(/%/g,'_')}/${filename}`;
+      const { error: uploadError } = await supabase.storage
+        .from(EVIDENCE_BUCKET)
+        .upload(uploadedPath, file.buffer, { contentType:file.mimetype, upsert:false });
+      if (uploadError) throw uploadError;
+      uploadedPaths.push(uploadedPath);
+
+      newEvidence.push({
+        path:uploadedPath, filename, originalName:filename, size:file.size, mimetype:file.mimetype,
+        uploadedBy:'link-analysis-video-verification', uploadedAt:now,
+        evidenceType:'video-verification', source:'Link Analysis Video Verification',
+        requestId:request.id, requestReference:request.reference,
+        description:`Verification image ${i+1} of 4 captured through the authorized Manlung Recovery link for case ${request.case_id}.`,
+        capturedAt:now, captureMetadata:{...captureMetadata,captureNumber:i+1},
+        status:'pending review'
+      });
+    }
+
+    const filesForCase = Array.isArray(existing.files) ? [...existing.files, ...newEvidence] : newEvidence;
+    await Case.update(request.case_id, { files:filesForCase, last_updated:now });
+    return res.json({success:true,message:'Four verification images uploaded successfully.',evidence:{caseId:request.case_id,requestId:request.id,count:newEvidence.length}});
+  } catch (error) {
+    console.error('Video verification batch upload error:', error);
+    if (uploadedPaths.length) await supabase.storage.from(EVIDENCE_BUCKET).remove(uploadedPaths).catch(()=>{});
+    if (claimed?.id) await supabase.from('recovery_selfie_requests').update({status:'active',used_at:null,captured_at:null}).eq('id',claimed.id).eq('status','used').catch(()=>{});
+    return res.status(500).json({success:false,error:'Video verification upload failed. Please try again.'});
+  }
+});
+
+// ============================================================
+// Owner: Delete a single evidence file
+// ============================================================
+
+router.delete('/admin/evidence/:caseId', ownerAuth, async (req, res) => {
+  try {
+    const caseId = String(req.params.caseId || '').trim();
+    const requestedPath = String(req.body?.path || '').trim();
+
+    if (!caseId || !requestedPath) {
+      return res.status(400).json({ success:false, error:'Case ID and evidence path are required.' });
+    }
+
+    const existing = await Case.findByCaseId(caseId);
+    if (!existing) return res.status(404).json({ success:false, error:'Case not found.' });
+
+    const files = Array.isArray(existing.files) ? existing.files : [];
+    const index = files.findIndex((file) => String(file?.path || '') === requestedPath);
+    if (index === -1) return res.status(404).json({ success:false, error:'Evidence file not found on this case.' });
+
+    const file = files[index];
+
+    const { error: storageError } = await supabase.storage
+      .from(EVIDENCE_BUCKET)
+      .remove([requestedPath]);
+
+    if (storageError) {
+      console.error('Evidence storage delete error:', storageError);
+      return res.status(500).json({ success:false, error:'Could not delete the evidence file from storage.' });
+    }
+
+    const updatedFiles = files.filter((_, fileIndex) => fileIndex !== index);
+    const now = new Date().toISOString();
+
+    await Case.update(caseId, { files:updatedFiles, last_updated:now });
+
+    try {
+      await CaseTimeline.create({
+        caseId,
+        actorUserId:req.user.id,
+        eventType:'evidence_deleted',
+        description:`Evidence file "${String(file?.filename || file?.originalName || 'evidence')}" was deleted by the owner.`,
+        metadata:{
+          actorName:req.user.name || req.user.email || null,
+          path:requestedPath,
+          evidenceType:file?.evidenceType || null,
+          source:'recovery-evidence-owner-delete'
+        }
+      });
+    } catch (timelineError) {
+      console.error('Evidence deletion timeline event failed:', timelineError);
+    }
+
+    return res.json({
+      success:true,
+      message:'Evidence file deleted successfully.',
+      caseId,
+      deletedPath:requestedPath,
+      remainingFiles:updatedFiles.length
+    });
+  } catch (error) {
+    console.error('Owner evidence delete error:', error);
+    return res.status(500).json({ success:false, error:'Could not delete the evidence file.' });
+  }
+});
 
 // ============================================================
 // Client: Submit New Case
@@ -1982,6 +2386,31 @@ router.post(
     }
   }
 );
+
+
+// ============================================================
+// Owner: Delete One Case Evidence File
+// ============================================================
+
+router.delete('/admin/case/:caseId/file', ownerAuth, async (req, res) => {
+  try {
+    const caseId = req.params.caseId;
+    const requestedPath = String(req.body?.path || '').trim();
+    if (!requestedPath) return res.status(400).json({ error: 'Evidence file path is required.' });
+    const existing = await Case.findByCaseId(caseId);
+    if (!existing) return res.status(404).json({ error: 'Case not found.' });
+    const files = Array.isArray(existing.files) ? existing.files : [];
+    const target = files.find((file) => file?.path === requestedPath);
+    if (!target) return res.status(404).json({ error: 'Evidence file not found.' });
+    const { error } = await supabase.storage.from(EVIDENCE_BUCKET).remove([requestedPath]);
+    if (error) throw error;
+    await Case.update(caseId, { files: files.filter((file) => file?.path !== requestedPath) });
+    res.json({ success: true, message: 'Case evidence file deleted by Owner.' });
+  } catch (error) {
+    console.error('Delete case evidence file error:', error);
+    res.status(500).json({ error: 'Could not delete the case evidence file.' });
+  }
+});
 
 
 // ============================================================

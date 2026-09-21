@@ -546,3 +546,146 @@ body.dark-mode header .header-actions button.btn-danger i {
     }
 }
 
+
+
+/* =========================================================
+   ADMIN UI FINAL NORMALIZATION
+   One readable scale + reliable light/dark contrast.
+   ========================================================= */
+:root{
+  --admin-page:#f6f8fc;
+  --admin-surface:#ffffff;
+  --admin-border:#dbe3ef;
+  --admin-text:#0f172a;
+  --admin-muted:#64748b;
+}
+html.dark{
+  --admin-page:#0a1020;
+  --admin-surface:#111827;
+  --admin-border:#26364f;
+  --admin-text:#f8fafc;
+  --admin-muted:#94a3b8;
+}
+html body{
+  color:var(--admin-text);
+  background:var(--admin-page);
+}
+html body .site-header{
+  background:var(--admin-surface)!important;
+  color:var(--admin-text)!important;
+  border-bottom:1px solid var(--admin-border)!important;
+  box-shadow:0 2px 12px rgba(15,23,42,.08)!important;
+}
+html.dark body .site-header{box-shadow:0 2px 14px rgba(0,0,0,.28)!important}
+html body .site-header>.container{
+  width:100%;
+  max-width:1280px;
+  min-height:64px;
+  padding:8px 20px;
+  gap:16px;
+}
+html body .site-header .brand,
+html body .site-header .manlung-brand{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+html body .site-header .brand h1,
+html body .site-header .manlung-brand-copy h1{
+  margin:0!important;
+  color:var(--admin-text)!important;
+  font-size:1rem!important;
+  line-height:1.2!important;
+  font-weight:800!important;
+  white-space:nowrap;
+}
+html body .site-header .brand span,
+html body .site-header .manlung-brand-copy span{
+  display:block;
+  margin-top:2px!important;
+  color:var(--admin-muted)!important;
+  font-size:.68rem!important;
+  line-height:1.25!important;
+  font-weight:600!important;
+  white-space:nowrap;
+}
+html body .site-header .manlung-site-logo,
+html body .site-header .admin-portal-logo{
+  width:42px!important;height:42px!important;max-width:42px!important;max-height:42px!important;
+  object-fit:contain!important;flex:0 0 42px;
+}
+html body .site-header .header-actions{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;
+  gap:7px!important;flex-wrap:wrap!important;
+}
+html body .site-header .header-actions .btn,
+html body .site-header .header-actions a,
+html body .site-header .header-actions button{
+  min-height:36px!important;
+  padding:7px 10px!important;
+  border-radius:9px!important;
+  font-size:.75rem!important;
+  line-height:1.1!important;
+  white-space:nowrap!important;
+}
+html body .site-header .header-actions .btn-outline{
+  color:var(--admin-text)!important;
+  -webkit-text-fill-color:var(--admin-text)!important;
+  background:var(--admin-surface)!important;
+  border:1px solid var(--admin-border)!important;
+}
+html body .site-header .header-actions .btn-outline i{
+  color:var(--admin-text)!important;
+  -webkit-text-fill-color:var(--admin-text)!important;
+}
+html.dark body .site-header .header-actions .btn-outline{
+  color:var(--admin-text)!important;
+  -webkit-text-fill-color:var(--admin-text)!important;
+  background:#17233d!important;
+  border-color:#34496f!important;
+}
+html.dark body .site-header .header-actions .btn-outline i{color:var(--admin-text)!important;-webkit-text-fill-color:var(--admin-text)!important}
+html body .site-header .header-actions .btn-primary{color:#fff!important;-webkit-text-fill-color:#fff!important}
+html body .site-header .header-actions .btn-danger,
+html body .site-header .header-actions .btn-danger *{
+  color:#fff!important;-webkit-text-fill-color:#fff!important;
+}
+html body main h1{font-size:clamp(1.45rem,3vw,2.2rem);line-height:1.18}
+html body main h2{font-size:clamp(1.15rem,2vw,1.55rem);line-height:1.25}
+html body main h3{font-size:clamp(.98rem,1.5vw,1.15rem);line-height:1.3}
+html body main p,
+html body main label,
+html body main input,
+html body main select,
+html body main textarea,
+html body main button,
+html body main a{line-height:1.4}
+html body .card,
+html body .panel,
+html body .modal-card{
+  color:var(--admin-text);
+}
+html body .card p,
+html body .panel p,
+html body .notice,
+html body .status,
+html body .muted{color:var(--admin-muted)}
+html.dark body input,
+html.dark body select,
+html.dark body textarea{
+  background:#0f1a2b!important;
+  color:#f8fafc!important;
+  border-color:#34496f!important;
+}
+html.dark body input::placeholder,
+html.dark body textarea::placeholder{color:#8293ad!important}
+@media(max-width:700px){
+  html body .site-header>.container{min-height:58px;padding:7px 12px;gap:8px}
+  html body .site-header .brand span,
+  html body .site-header .manlung-brand-copy span{white-space:normal;font-size:.6rem!important}
+  html body .site-header .header-actions{gap:5px!important}
+  html body .site-header .header-actions .btn,
+  html body .site-header .header-actions a,
+  html body .site-header .header-actions button{min-height:34px!important;padding:6px 8px!important;font-size:.7rem!important}
+}
