@@ -1644,6 +1644,173 @@ router.get(
 
 
 
+
+router.post('/admin/device-recovery/cases', adminAuth, async (req, res) => {
+  try {
+    const platform = String(req.body?.platform || '').trim().toLowerCase();
+    const platformNames = {
+      android: 'Android',
+      iphone: 'iPhone / iPad',
+      windows: 'Windows',
+      mac: 'Mac',
+    };
+    if (!platformNames[platform]) {
+      return res.status(400).json({ success:false, error:'Select a supported device platform.' });
+    }
+
+    const clientName = String(req.body?.clientName || '').trim().slice(0, 200);
+    const phone = String(req.body?.phone || '').trim().slice(0, 40);
+    const email = String(req.body?.email || '').trim().toLowerCase().slice(0, 254);
+    const manufacturer = String(req.body?.manufacturer || '').trim().slice(0, 120);
+    const model = String(req.body?.model || '').trim().slice(0, 120);
+    const deviceName = String(req.body?.deviceName || '').trim().slice(0, 120);
+    const serial = String(req.body?.serial || '').trim().slice(0, 120);
+    const imei = String(req.body?.imei || '').trim().slice(0, 40);
+    const notes = String(req.body?.notes || '').trim().slice(0, 5000);
+
+    if (!clientName || !phone || !email || !manufacturer || !model) {
+      return res.status(400).json({
+        success:false,
+        error:'Client name, phone, email, manufacturer and model are required.',
+      });
+    }
+
+    const caseTypeMap = {
+      android: 'Lost Android Device Recovery',
+      iphone: 'Lost iPhone / iPad Recovery',
+      windows: 'Lost Windows Device Recovery',
+      mac: 'Lost Mac Recovery',
+    };
+
+    const officialService = {
+      android: 'Google Find Hub',
+      iphone: 'Apple Find My',
+      windows: 'Microsoft Find My Device',
+      mac: 'Apple Find My',
+    }[platform];
+
+    const description = [
+      'Authorized lost-device recovery case.',
+      `Platform: ${platformNames[platform]}.`,
+      `Manufacturer: ${manufacturer}.`,
+      `Model: ${model}.`,
+      deviceName ? `Device name: ${deviceName}.` : '',
+      serial ? 'Serial number supplied and stored securely.' : '',
+      imei ? 'IMEI supplied and stored securely.' : '',
+      notes ? `Claimant notes: ${notes}` : '',
+    ].filter(Boolean).join(' ');
+
+    const now = new Date().toISOString();
+    const caseFields = {
+      client_name: clientName,
+      phone,
+      email,
+      case_type: caseTypeMap[platform],
+      priority: String(req.body?.priority || 'Normal').match(/^(Normal|Urgent|Emergency)$/)?.[1] || 'Normal',
+      status: 'Pending Review',
+      incident_desc: description,
+      device_type: platformNames[platform],
+      device_brand: manufacturer,
+      device_model: model,
+      serial: serial || null,
+      imei1: imei || null,
+      recovery_platform: platform,
+      device_recovery_source: officialService,
+      last_updated: now,
+      assigned_admin_id: req.user.id,
+      assigned_at: now,
+      started_at: now,
+    };
+
+    const created = await Case.create(caseFields);
+
+    try {
+      await CaseTimeline.create({
+        caseId: created.case_id,
+        actorUserId: req.user.id,
+        eventType: 'device_recovery_case_created',
+        description: `Lost-device recovery case created and assigned to ${req.user.username || req.user.email || 'Admin'}.`,
+        metadata: {
+          actorName: req.user.username || req.user.email || 'Admin',
+          actorRole: req.user.role,
+          platform: platformNames[platform],
+          officialService,
+          source: 'device-recovery-admin',
+        },
+      });
+    } catch (timelineError) {
+      console.error('Device recovery creation timeline failed:', timelineError);
+    }
+
+    return res.status(201).json({
+      success:true,
+      case: serializeCase(created, { includeInternal:true }),
+      assignedAdmin: {
+        id: req.user.id,
+        name: req.user.username || req.user.email || 'Admin',
+        role: req.user.role,
+      },
+      officialService,
+    });
+  } catch (error) {
+    console.error('Admin device recovery case creation error:', error);
+    return res.status(500).json({ success:false, error:'Could not create the recovery case.' });
+  }
+});
+
+router.post('/admin/device-recovery/case/:caseId/verify-ownership', adminAuth, async (req, res) => {
+  try {
+    const checks = req.body?.checks || {};
+    const required = ['identity','purchase','device','authorization'];
+    if (!required.every((key) => checks[key] === true)) {
+      return res.status(400).json({ success:false, error:'All four ownership checks are required.' });
+    }
+
+    const existing = await Case.findByCaseId(req.params.caseId);
+    if (!existing) return res.status(404).json({ success:false, error:'Case not found.' });
+
+    if (req.user.role === 'admin' && existing.assigned_admin_id !== req.user.id) {
+      return res.status(403).json({ success:false, error:'Claim this case before verifying ownership.' });
+    }
+
+    const now = new Date().toISOString();
+    const updated = await Case.update(req.params.caseId, {
+      ownership_verified_at: now,
+      ownership_verified_by: req.user.id,
+      status: existing.status === 'Pending Review' ? 'Accepted' : existing.status,
+      last_updated: now,
+    });
+
+    await CaseTimeline.create({
+      caseId: req.params.caseId,
+      actorUserId: req.user.id,
+      eventType: 'ownership_verified',
+      description: `Ownership verification completed by ${req.user.username || req.user.email || 'Admin'}.`,
+      metadata: {
+        actorName: req.user.username || req.user.email || 'Admin',
+        actorRole: req.user.role,
+        checks: { identity:true, purchase:true, device:true, authorization:true },
+        source: 'device-recovery-admin',
+      },
+    });
+
+    return res.json({
+      success:true,
+      case: serializeCase(updated, { includeInternal:true }),
+      verifiedBy: {
+        id: req.user.id,
+        name: req.user.username || req.user.email || 'Admin',
+        role: req.user.role,
+      },
+      verifiedAt: now,
+    });
+  } catch (error) {
+    console.error('Device ownership verification error:', error);
+    return res.status(500).json({ success:false, error:'Could not record ownership verification.' });
+  }
+});
+
+
 /*
  * Lost Device Recovery: live case feed.
  * This endpoint reads the existing recovery_cases records and resolves the
