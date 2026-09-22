@@ -1643,6 +1643,121 @@ router.get(
 );
 
 
+
+/*
+ * Lost Device Recovery: live case feed.
+ * This endpoint reads the existing recovery_cases records and resolves the
+ * assigned actor from recovery_users. It never invents device status/location.
+ */
+router.get('/admin/device-recovery/cases', adminAuth, async (req, res) => {
+  try {
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 100, 1), 200);
+
+    const { data: rows, error: caseError } = await supabase
+      .from('recovery_cases')
+      .select('*')
+      .or('case_type.ilike.%Lost%,device_type.not.is.null')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (caseError) throw caseError;
+
+    const adminIds = [
+      ...new Set(
+        (rows || [])
+          .flatMap((row) => [row.assigned_admin_id, row.completed_by])
+          .filter(Boolean)
+          .map(String)
+      ),
+    ];
+
+    let adminMap = new Map();
+    if (adminIds.length) {
+      const { data: admins, error: adminError } = await supabase
+        .from('recovery_users')
+        .select('id,username,email,role,admin_status')
+        .in('id', adminIds);
+
+      if (adminError) throw adminError;
+
+      adminMap = new Map(
+        (admins || []).map((admin) => [
+          String(admin.id),
+          {
+            id: admin.id,
+            name: admin.username || admin.email || 'Admin',
+            role: admin.role,
+            status: admin.admin_status || null,
+          },
+        ])
+      );
+    }
+
+    const cases = (rows || []).map((row) => {
+      const assigned = row.assigned_admin_id
+        ? adminMap.get(String(row.assigned_admin_id)) || null
+        : null;
+      const completed = row.completed_by
+        ? adminMap.get(String(row.completed_by)) || null
+        : null;
+
+      return {
+        caseId: row.case_id,
+        clientName: row.client_name,
+        caseType: row.case_type,
+        status: row.status,
+        priority: row.priority,
+        deviceType: row.device_type,
+        deviceBrand: row.device_brand,
+        deviceModel: row.device_model,
+        serial: row.serial ? String(row.serial).slice(0, 3) + '••••••' : null,
+        assignedAdmin: assigned,
+        completedBy: completed,
+        investigator: row.investigator || null,
+        createdAt: row.created_at,
+        updatedAt: row.last_updated || row.created_at,
+        assignedAt: row.assigned_at || null,
+        startedAt: row.started_at || null,
+        completedAt: row.completed_at || null,
+        timeline: row.timeline || '',
+      };
+    });
+
+    const byAdmin = {};
+    for (const item of cases) {
+      const key = item.assignedAdmin?.id || 'unassigned';
+      if (!byAdmin[key]) {
+        byAdmin[key] = {
+          admin: item.assignedAdmin,
+          total: 0,
+          active: 0,
+          completed: 0,
+        };
+      }
+      byAdmin[key].total += 1;
+      if (Case.FINISHED_STATUSES.includes(item.status)) {
+        byAdmin[key].completed += 1;
+      } else {
+        byAdmin[key].active += 1;
+      }
+    }
+
+    return res.json({
+      success: true,
+      serverTime: new Date().toISOString(),
+      cases,
+      byAdmin: Object.values(byAdmin),
+    });
+  } catch (error) {
+    console.error('Lost Device Recovery live feed error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Could not load the live recovery case feed.',
+    });
+  }
+});
+
+
 // ============================================================
 // Admin: Export Cases CSV
 // ============================================================
