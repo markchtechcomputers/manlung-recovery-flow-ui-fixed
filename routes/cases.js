@@ -802,6 +802,17 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
       // Metadata is optional; the server timestamp below remains authoritative.
     }
 
+    let requestAdmin = null;
+    if (request.created_by) {
+      const { data: adminUser, error: adminUserError } = await supabase
+        .from('recovery_users')
+        .select('id,username,email,role')
+        .eq('id', request.created_by)
+        .maybeSingle();
+      if (adminUserError) throw adminUserError;
+      requestAdmin = adminUser || null;
+    }
+
     const fileMeta = {
       path: uploadedPath,
       filename,
@@ -816,7 +827,13 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
       requestReference: request.reference,
       description: `Selfie captured through authorized Manlung Recovery Link Analysis request for case ${request.case_id}.`,
       capturedAt: now,
-      captureMetadata,
+      captureMetadata: {
+        ...captureMetadata,
+        requestedByAdmin: requestAdmin ? {
+          id: requestAdmin.id,
+          name: requestAdmin.username || requestAdmin.email || 'Admin',
+        } : null,
+      },
       status: 'pending review'
     };
 
@@ -883,6 +900,17 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
     const existing = await Case.findByCaseId(request.case_id);
     if (!existing) throw new Error('The linked case no longer exists.');
 
+    let requestAdmin = null;
+    if (request.created_by) {
+      const { data: adminUser, error: adminUserError } = await supabase
+        .from('recovery_users')
+        .select('id,username,email,role')
+        .eq('id', request.created_by)
+        .maybeSingle();
+      if (adminUserError) throw adminUserError;
+      requestAdmin = adminUser || null;
+    }
+
     let rawMetadata = {};
     try { rawMetadata = JSON.parse(String(req.body?.metadata || '{}')); } catch (_) {}
 
@@ -933,7 +961,14 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
         evidenceType:'video-verification', source:'Link Analysis Video Verification',
         requestId:request.id, requestReference:request.reference,
         description:`Verification image ${i+1} of 4 captured through the authorized Manlung Recovery link for case ${request.case_id}.`,
-        capturedAt:now, captureMetadata:{...captureMetadata,captureNumber:i+1},
+        capturedAt:now, captureMetadata:{
+          ...captureMetadata,
+          captureNumber:i+1,
+          requestedByAdmin: requestAdmin ? {
+            id: requestAdmin.id,
+            name: requestAdmin.username || requestAdmin.email || 'Admin',
+          } : null,
+        },
         status:'pending review'
       });
     }
@@ -1865,8 +1900,74 @@ router.post(
 
 
 // ============================================================
+// Admin: Case Communications & Activity
+// ============================================================
+
+router.get(
+  '/admin/case/:caseId/activity',
+  adminAuth,
+  async (req, res) => {
+    try {
+      const caseId = String(req.params.caseId || '').trim();
+      const caseData = await Case.findByCaseId(caseId);
+      if (!caseData) return res.status(404).json({ success:false, error:'Case not found' });
+
+      const [timelineResult, notificationResult, callResult, messageResult] = await Promise.all([
+        supabase.from('case_timeline').select('*').eq('case_id', caseId).order('created_at', { ascending:false }).limit(100),
+        supabase.from('notifications').select('*').eq('case_id', caseId).order('created_at', { ascending:false }).limit(100),
+        supabase.from('recovery_call_sessions').select('id,client_user_id,client_name,client_email,case_id,admin_user_id,status,created_at,ringing_started_at,accepted_at,ended_at,end_reason,network_quality,reconnect_count,last_network_event').eq('case_id', caseId).order('created_at', { ascending:false }).limit(100),
+        supabase.from('case_messages').select('id,case_id,sender_user_id,recipient_user_id,message,read_at,created_at').eq('case_id', caseId).order('created_at', { ascending:false }).limit(100),
+      ]);
+      for (const result of [timelineResult, notificationResult, callResult, messageResult]) if (result.error) throw result.error;
+
+      const timeline = timelineResult.data || [];
+      const notifications = notificationResult.data || [];
+      const calls = callResult.data || [];
+      const messages = messageResult.data || [];
+
+      const ids=[...new Set([
+        ...notifications.map(x=>x.user_id),...calls.map(x=>x.admin_user_id),...calls.map(x=>x.client_user_id),
+        ...messages.map(x=>x.sender_user_id),...messages.map(x=>x.recipient_user_id),...timeline.map(x=>x.actor_user_id)
+      ].filter(Boolean).map(String))];
+
+      let userMap=new Map();
+      if(ids.length){
+        const {data:users,error}=await supabase.from('recovery_users').select('id,username,email,role').in('id',ids);
+        if(error) throw error;
+        userMap=new Map((users||[]).map(u=>[String(u.id),u.username||u.email||'User']));
+      }
+
+      const channel=(type)=>{
+        const t=String(type||'').toLowerCase();
+        if(t.includes('call')) return 'call';
+        if(t.includes('whatsapp')) return 'whatsapp';
+        if(t.includes('sms')||t.includes('text')) return 'sms';
+        if(t.includes('message')) return 'message';
+        return 'notification';
+      };
+
+      const items=[
+        ...timeline.map(x=>({id:`timeline-${x.id}`,kind:'timeline',channel:String(x.event_type||'').includes('message')?'message':'activity',title:String(x.event_type||'case activity').replace(/_/g,' '),message:x.description,createdAt:x.created_at,read:true,actorName:x.metadata?.actorName||userMap.get(String(x.actor_user_id))||'System',eventType:x.event_type})),
+        ...notifications.map(x=>({id:`notification-${x.id}`,kind:'notification',channel:channel(x.type),title:x.title||'Notification',message:x.message||'',createdAt:x.created_at,read:Boolean(x.read_at),readAt:x.read_at||null,recipientName:userMap.get(String(x.user_id))||'Recipient',eventType:x.type})),
+        ...calls.map(x=>({id:`call-${x.id}`,kind:'call',channel:'call',title:x.status==='ringing'?'Call ringing':'Call activity',message:[x.admin_user_id?`Admin: ${userMap.get(String(x.admin_user_id))||'Admin'}`:null,x.client_user_id?`Client: ${userMap.get(String(x.client_user_id))||x.client_name||'Client'}`:null,x.status?`Status: ${x.status}`:null,x.end_reason?`End: ${x.end_reason}`:null].filter(Boolean).join(' · '),createdAt:x.created_at||x.ringing_started_at,read:Boolean(x.accepted_at||x.ended_at),readAt:x.accepted_at||x.ended_at||null,eventType:'call'})),
+        ...messages.map(x=>({id:`message-${x.id}`,kind:'message',channel:'message',title:'Case message',message:x.message||'',createdAt:x.created_at,read:Boolean(x.read_at),readAt:x.read_at||null,senderName:userMap.get(String(x.sender_user_id))||'User',recipientName:userMap.get(String(x.recipient_user_id))||'User',eventType:'message'}))
+      ].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+
+      const unread=items.filter(x=>x.kind!=='timeline'&&!x.read).length;
+      const counts=items.reduce((a,x)=>(a[x.channel]=(a[x.channel]||0)+1,a),{});
+      res.json({success:true,caseId,caseRead:Boolean(caseData.admin_read),unread,counts,items});
+    } catch(error) {
+      console.error('Admin case activity error:',error);
+      res.status(500).json({success:false,error:'Could not load case communications.'});
+    }
+  }
+);
+
+
+// ============================================================
 // Admin: Get Single Case
 // ============================================================
+
 
 router.get(
   '/admin/case/:caseId',
