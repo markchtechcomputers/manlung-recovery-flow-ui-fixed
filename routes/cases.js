@@ -474,22 +474,93 @@ async function withSignedFileUrls(caseRow) {
     return caseRow;
   }
 
+  const requestIds = [
+    ...new Set(
+      caseRow.files
+        .map((file) => file?.requestId)
+        .filter(Boolean)
+        .map(String)
+    ),
+  ];
+
+  const requestAdminMap = new Map();
+  if (requestIds.length) {
+    const { data: requests, error: requestError } = await supabase
+      .from('recovery_selfie_requests')
+      .select('id,created_by')
+      .in('id', requestIds);
+
+    if (requestError) throw requestError;
+
+    const adminIds = [
+      ...new Set(
+        (requests || [])
+          .map((request) => request.created_by)
+          .filter(Boolean)
+          .map(String)
+      ),
+    ];
+
+    let adminMap = new Map();
+    if (adminIds.length) {
+      const { data: admins, error: adminError } = await supabase
+        .from('recovery_users')
+        .select('id,username,email,role')
+        .in('id', adminIds);
+
+      if (adminError) throw adminError;
+
+      adminMap = new Map(
+        (admins || []).map((admin) => [
+          String(admin.id),
+          {
+            id: admin.id,
+            name: admin.username || admin.email || 'Admin',
+          },
+        ])
+      );
+    }
+
+    for (const request of requests || []) {
+      const admin = request.created_by
+        ? adminMap.get(String(request.created_by))
+        : null;
+      if (admin) requestAdminMap.set(String(request.id), admin);
+    }
+  }
+
   const files = await Promise.all(
     caseRow.files.map(async (f) => {
-      if (!f.path) {
-        return f;
+      let enriched = f;
+
+      if (
+        f?.requestId &&
+        !f?.captureMetadata?.requestedByAdmin &&
+        requestAdminMap.has(String(f.requestId))
+      ) {
+        enriched = {
+          ...f,
+          captureMetadata: {
+            ...(f.captureMetadata || {}),
+            requestedByAdmin: requestAdminMap.get(String(f.requestId)),
+          },
+        };
+      }
+
+      if (!enriched.path) {
+        return enriched;
       }
 
       const { data, error } =
         await supabase.storage
           .from(EVIDENCE_BUCKET)
           .createSignedUrl(
-            f.path,
+            enriched.path,
             SIGNED_URL_TTL
           );
 
       return {
-        ...f,
+        ...enriched,
         url: error ? null : data.signedUrl,
       };
     })
@@ -500,7 +571,6 @@ async function withSignedFileUrls(caseRow) {
     files,
   };
 }
-
 
 // ============================================================
 // Field Configuration
