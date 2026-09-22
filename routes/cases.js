@@ -2589,6 +2589,15 @@ router.get(
       const stats =
         await Case.stats();
 
+      const recentSince = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { count: recentActivity, error: recentError } = await supabase
+        .from('recovery_cases')
+        .select('id', { count: 'exact', head: true })
+        .gte('last_updated', recentSince);
+
+      if (recentError) throw recentError;
+      stats.recent = recentActivity || 0;
+
       res.json({
         success: true,
         stats,
