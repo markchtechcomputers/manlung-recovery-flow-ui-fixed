@@ -1909,8 +1909,18 @@ router.get('/admin/device-recovery/cases', adminAuth, async (req, res) => {
     });
 
     const byAdmin = {};
+    const allActorIds = new Set(
+      [...adminIds].map(String)
+    );
+    if (adminMap.size) {
+      for (const [id, admin] of adminMap.entries()) {
+        allActorIds.add(String(id));
+        byAdmin[String(id)] = { admin, total: 0, active: 0, completed: 0 };
+      }
+    }
+
     for (const item of cases) {
-      const key = item.assignedAdmin?.id || 'unassigned';
+      const key = item.assignedAdmin?.id ? String(item.assignedAdmin.id) : 'unassigned';
       if (!byAdmin[key]) {
         byAdmin[key] = {
           admin: item.assignedAdmin,
@@ -1920,11 +1930,8 @@ router.get('/admin/device-recovery/cases', adminAuth, async (req, res) => {
         };
       }
       byAdmin[key].total += 1;
-      if (Case.FINISHED_STATUSES.includes(item.status)) {
-        byAdmin[key].completed += 1;
-      } else {
-        byAdmin[key].active += 1;
-      }
+      if (Case.FINISHED_STATUSES.includes(item.status)) byAdmin[key].completed += 1;
+      else byAdmin[key].active += 1;
     }
 
     return res.json({
