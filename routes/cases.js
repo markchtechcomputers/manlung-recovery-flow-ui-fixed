@@ -1839,12 +1839,19 @@ router.get('/admin/device-recovery/cases', adminAuth, async (req, res) => {
     ];
 
     let adminMap = new Map();
-    if (adminIds.length) {
-      const { data: admins, error: adminError } = await supabase
+    {
+      let adminQuery = supabase
         .from('recovery_users')
         .select('id,username,email,role,admin_status')
-        .in('id', adminIds);
+        .in('role', ['admin','owner']);
 
+      if (adminIds.length) {
+        adminQuery = adminQuery.or(
+          'role.eq.admin,role.eq.owner'
+        );
+      }
+
+      const { data: admins, error: adminError } = await adminQuery;
       if (adminError) throw adminError;
 
       adminMap = new Map(
