@@ -2019,7 +2019,7 @@ router.get(
       const items=[
         ...timeline.map(x=>({id:`timeline-${x.id}`,kind:'timeline',channel:String(x.event_type||'').includes('message')?'message':'activity',title:String(x.event_type||'case activity').replace(/_/g,' '),message:x.description,createdAt:x.created_at,read:true,actorName:x.metadata?.actorName||userMap.get(String(x.actor_user_id))||'System',eventType:x.event_type})),
         ...notifications.map(x=>({id:`notification-${x.id}`,kind:'notification',channel:channel(x.type),title:x.title||'Notification',message:x.message||'',createdAt:x.created_at,read:Boolean(x.read_at),readAt:x.read_at||null,recipientName:userMap.get(String(x.user_id))||'Recipient',eventType:x.type})),
-        ...calls.map(x=>({id:`call-${x.id}`,kind:'call',channel:'call',title:x.status==='ringing'?'Call ringing':'Call activity',message:[x.admin_user_id?`Admin: ${userMap.get(String(x.admin_user_id))||'Admin'}`:null,x.client_user_id?`Client: ${userMap.get(String(x.client_user_id))||x.client_name||'Client'}`:null,x.status?`Status: ${x.status}`:null,x.end_reason?`End: ${x.end_reason}`:null].filter(Boolean).join(' · '),createdAt:x.created_at||x.ringing_started_at,read:Boolean(x.accepted_at||x.ended_at),readAt:x.accepted_at||x.ended_at||null,eventType:'call'})),
+        ...calls.map(x=>({id:`call-${x.id}`,kind:'call',channel:'call',title:x.status==='ringing'?'Call ringing':'Call activity',message:[x.admin_user_id?`Admin: ${userMap.get(String(x.admin_user_id))||'Admin'}`:null,x.client_user_id?`Client: ${userMap.get(String(x.client_user_id))||x.client_name||'Client'}`:null,x.status?`Status: ${x.status}`:null,x.end_reason?`End: ${x.end_reason}`:null].filter(Boolean).join(' · '),createdAt:x.created_at||x.ringing_started_at,read:Boolean(caseData.admin_read),readAt:caseData.admin_read?(caseData.last_updated||null):null,eventType:'call'})),
         ...messages.map(x=>({id:`message-${x.id}`,kind:'message',channel:'message',title:'Case message',message:x.message||'',createdAt:x.created_at,read:Boolean(x.read_at),readAt:x.read_at||null,senderName:userMap.get(String(x.sender_user_id))||'User',recipientName:userMap.get(String(x.recipient_user_id))||'User',eventType:'message'}))
       ].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
 
@@ -2033,6 +2033,46 @@ router.get(
   }
 );
 
+
+// ============================================================
+// Admin: Mark Case Communications Read
+// ============================================================
+
+router.post('/admin/case/:caseId/activity/read', adminAuth, async (req, res) => {
+  try {
+    const caseId = String(req.params.caseId || '').trim();
+    const caseData = await Case.findByCaseId(caseId);
+    if (!caseData) return res.status(404).json({ success:false, error:'Case not found' });
+    const now = new Date().toISOString();
+    const all = req.body?.all === true;
+    const kind = String(req.body?.kind || '').trim().toLowerCase();
+    const itemId = String(req.body?.id || '').trim();
+    if (all) {
+      const n = await supabase.from('notifications').update({ read_at:now }).eq('case_id',caseId).eq('user_id',req.user.id).is('read_at',null);
+      if (n.error) throw n.error;
+      const m = await supabase.from('case_messages').update({ read_at:now }).eq('case_id',caseId).eq('recipient_user_id',req.user.id).is('read_at',null);
+      if (m.error) throw m.error;
+      await Case.update(caseId,{admin_read:true,last_updated:now});
+      return res.json({success:true,markedAt:now});
+    }
+    const id = itemId.replace(/^notification-|^message-|^call-/,'');
+    if (kind === 'notification') {
+      const n = await supabase.from('notifications').update({read_at:now}).eq('id',id).eq('case_id',caseId).eq('user_id',req.user.id).is('read_at',null);
+      if (n.error) throw n.error;
+    } else if (kind === 'message') {
+      const m = await supabase.from('case_messages').update({read_at:now}).eq('id',id).eq('case_id',caseId).eq('recipient_user_id',req.user.id).is('read_at',null);
+      if (m.error) throw m.error;
+    } else if (kind === 'call') {
+      await Case.update(caseId,{admin_read:true,last_updated:now});
+    } else {
+      return res.status(400).json({success:false,error:'Unsupported activity item.'});
+    }
+    return res.json({success:true,markedAt:now});
+  } catch (error) {
+    console.error('Admin mark case activity read error:',error);
+    return res.status(500).json({success:false,error:'Could not mark activity as read.'});
+  }
+});
 
 // ============================================================
 // Admin: Get Single Case
