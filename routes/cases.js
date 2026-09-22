@@ -1860,6 +1860,20 @@ router.get('/admin/device-recovery/cases', adminAuth, async (req, res) => {
       );
     }
 
+    const caseIds = (rows || []).map((row) => row.case_id).filter(Boolean);
+    let locationMap = new Map();
+    if (caseIds.length) {
+      const { data: locations, error: locationError } = await supabase
+        .from('recovery_device_locations')
+        .select('id,case_id,latitude,longitude,accuracy_meters,source,reported_at,recorded_by')
+        .in('case_id', caseIds)
+        .order('reported_at', { ascending: false });
+      if (locationError) throw locationError;
+      for (const location of locations || []) {
+        if (!locationMap.has(location.case_id)) locationMap.set(location.case_id, location);
+      }
+    }
+
     const cases = (rows || []).map((row) => {
       const assigned = row.assigned_admin_id
         ? adminMap.get(String(row.assigned_admin_id)) || null
@@ -1887,6 +1901,9 @@ router.get('/admin/device-recovery/cases', adminAuth, async (req, res) => {
         startedAt: row.started_at || null,
         completedAt: row.completed_at || null,
         timeline: row.timeline || '',
+        ownershipVerifiedAt: row.ownership_verified_at || null,
+        ownershipVerifiedBy: row.ownership_verified_by ? (adminMap.get(String(row.ownership_verified_by)) || null) : null,
+        latestLocation: locationMap.get(row.case_id) || null,
       };
     });
 
