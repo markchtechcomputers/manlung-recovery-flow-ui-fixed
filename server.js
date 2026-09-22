@@ -381,6 +381,9 @@ app.get('/admin/tools/website-scanner.html', adminAuth, (_req, res) => {
 app.get('/admin/tools/security.html', ownerAuth, (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'tools', 'security.html'));
 });
+app.get('/admin/tools/device-recovery.html', adminAuth, (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'tools', 'device-recovery.html'));
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
