@@ -1888,6 +1888,7 @@ router.get('/admin/device-recovery/cases', adminAuth, async (req, res) => {
         caseType: row.case_type,
         status: row.status,
         priority: row.priority,
+        recoveryPlatform: row.recovery_platform || null,
         deviceType: row.device_type,
         deviceBrand: row.device_brand,
         deviceModel: row.device_model,
