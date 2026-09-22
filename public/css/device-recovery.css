@@ -10,3 +10,28 @@ html.dark{--dr-bg:#0a1020;--dr-card:#111827;--dr-line:#26364f;--dr-text:#f8fafc;
 .dr-location-state-box{margin-top:12px;padding:12px;border:1px solid var(--dr-line);border-radius:11px;background:rgba(36,81,214,.045)}
 .dr-location-state-box strong{display:block;font-size:.78rem}.dr-location-state-box span{display:block;margin-top:4px;color:var(--dr-muted);font-size:.7rem;line-height:1.45}
 .dr-verify-help{margin-top:8px;padding:10px;border-radius:10px;background:rgba(245,158,11,.08);color:var(--dr-muted);font-size:.7rem;line-height:1.45}
+
+/* Google Find Hub My Devices */
+.dr-my-devices{margin-top:18px}
+.dr-my-devices .dr-title h2 i{color:var(--dr-blue);margin-right:6px}
+.dr-device-notice{display:flex;gap:9px;align-items:flex-start;padding:11px 12px;margin-bottom:12px;border:1px solid var(--dr-line);border-radius:11px;background:rgba(36,81,214,.045);color:var(--dr-muted);font-size:.72rem;line-height:1.5}
+.dr-device-notice i{color:var(--dr-blue);margin-top:2px}
+.dr-device-notice strong{color:var(--dr-text)}
+.dr-device-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.dr-device-card{appearance:none;width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:12px;border:1px solid var(--dr-line);border-radius:14px;background:var(--dr-card);color:var(--dr-text);cursor:pointer;transition:.18s ease}
+.dr-device-card:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(0,0,0,.06)}
+.dr-device-card.active{border-color:var(--dr-blue);box-shadow:0 0 0 3px rgba(36,81,214,.1)}
+.dr-device-card img{width:64px;height:64px;object-fit:contain;border-radius:12px;background:var(--dr-bg);border:1px solid var(--dr-line);flex:0 0 64px}
+.dr-device-info{min-width:0;display:grid;gap:3px;flex:1}
+.dr-device-info strong{font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dr-device-info small{color:var(--dr-muted);font-size:.66rem}
+.dr-device-state{display:inline-flex;align-items:center;gap:5px;width:max-content;max-width:100%;padding:4px 7px;border-radius:999px;font-style:normal;font-size:.62rem;font-weight:800}
+.dr-device-state.neutral{background:rgba(100,116,139,.1);color:var(--dr-muted)}
+.dr-device-state.contacting{background:rgba(245,158,11,.12);color:#a16207}
+.dr-device-state.unreachable{background:rgba(220,38,38,.1);color:#b91c1c}
+.dr-device-chevron{color:var(--dr-muted);font-size:.75rem}
+.dr-device-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;padding-top:11px;border-top:1px solid var(--dr-line);font-size:.7rem}
+.dr-device-foot span{color:var(--dr-muted)}
+.dr-device-foot a{color:var(--dr-blue);font-weight:800;text-decoration:none}
+@media(max-width:900px){.dr-device-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.dr-device-card img{width:54px;height:54px;flex-basis:54px}.dr-device-foot{align-items:flex-start;flex-direction:column}}
