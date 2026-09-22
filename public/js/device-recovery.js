@@ -1,27 +1,300 @@
 (function(){
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const official={android:{name:'Google Find Hub',url:'https://www.google.com/android/find/'},iphone:{name:'Apple Find My',url:'https://www.icloud.com/find'},windows:{name:'Microsoft Find My Device',url:'https://account.microsoft.com/devices'},mac:{name:'Apple Find My',url:'https://www.icloud.com/find'}};
-const state={platform:'android',status:'REGISTERED',caseId:null,actor:null};
+const official={
+  android:{name:'Google Find Hub',url:'https://www.google.com/android/find/'},
+  iphone:{name:'Apple Find My',url:'https://www.icloud.com/find'},
+  windows:{name:'Microsoft Find My Device',url:'https://account.microsoft.com/devices'},
+  mac:{name:'Apple Find My',url:'https://www.icloud.com/find'}
+};
+const state={platform:'android',status:'NO CASE SELECTED',caseId:null,actor:null,cases:[],selected:null};
 const $=id=>document.getElementById(id);
-function setPlatform(p){state.platform=p;document.querySelectorAll('.dr-platform').forEach(x=>x.classList.toggle('active',x.dataset.platform===p));const o=official[p];if($('officialService'))$('officialService').textContent=o.name;if($('officialLink')){$('officialLink').href=o.url;$('officialLink').textContent='Continue with '+o.name}if($('locationServiceLink')){$('locationServiceLink').href=o.url;$('locationServiceLink').innerHTML='<i class="fas fa-location-crosshairs"></i> Open '+o.name}if($('locationSource'))$('locationSource').textContent='Not available';if($('locationState'))$('locationState').textContent='Awaiting official service';}
-function mask(v){v=String(v||'').trim();return v.length<7?(v?'••••':'Not provided'):v.slice(0,3)+'••••••••'+v.slice(-3)}
-function addEvent(title,detail,source='SYSTEM GENERATED'){const box=$('timeline');if(!box)return;const el=document.createElement('div');el.className='dr-event';const actor=state.actor?state.actor.name+' ('+state.actor.role+')':'Authenticated session';el.innerHTML='<span class="dr-dot"></span><div><strong>'+esc(title)+'</strong><small>'+esc(new Date().toLocaleString())+' · '+esc(actor)+' · '+esc(source)+(detail?' · '+esc(detail):'')+'</small></div>';box.prepend(el);}
-function applyPlatformState(card){if(!card)return;const status=card.dataset.status||'Status not reported';const name=card.dataset.name||'Selected device';if($('traceDeviceName'))$('traceDeviceName').textContent=name;if($('tracePlatformState'))$('tracePlatformState').textContent=status;if($('traceLocationState'))$('traceLocationState').textContent='Not reported';if($('connectionStatus'))$('connectionStatus').textContent=status;if($('connectionDetail'))$('connectionDetail').textContent='Google Find Hub is the source of this device state. Manlung Recovery does not create or infer a location from connectivity.';if($('connectionIcon'))$('connectionIcon').innerHTML=status.toLowerCase().includes('contacting')?'<i class="fas fa-spinner fa-spin"></i>':status.toLowerCase().includes("can’t")||status.toLowerCase().includes("can't")?'<i class="fas fa-link-slash"></i>':'<i class="fas fa-circle-check"></i>';}
-async function loadActor(){try{const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success||!d.user){if($('currentActor'))$('currentActor').textContent='Authentication required';return null}state.actor={id:d.user.id,name:d.user.username||d.user.email||'Authenticated user',role:String(d.user.role||'').toUpperCase()};if($('currentActor'))$('currentActor').textContent=state.actor.name+' · '+state.actor.role;if($('connectionActor'))$('connectionActor').textContent=state.actor.name+' · '+state.actor.role;return state.actor}catch(_){if($('currentActor'))$('currentActor').textContent='Session unavailable';return null}}
+const finished=['Recovery Successful','Recovered by Police','Recovered by Owner','Closed','Rejected'];
 
-function renderCase(){const id=state.caseId||'MR-REC-'+Math.floor(100000+Math.random()*899999);state.caseId=id;['caseId','caseId2','reportCaseId'].forEach(k=>{if($(k))$(k).textContent=id});if($('caseStatus'))$('caseStatus').textContent=state.status.replaceAll('_',' ');}
-function canVerify(){return ['proofIdentity','proofPurchase','proofDevice','proofAuthorization'].every(id=>$(id)?.checked);}
-document.querySelectorAll('.dr-platform').forEach(x=>x.addEventListener('click',()=>setPlatform(x.dataset.platform)));document.querySelectorAll('.dr-device-card').forEach(card=>card.addEventListener('click',()=>{document.querySelectorAll('.dr-device-card').forEach(x=>x.classList.remove('active'));card.classList.add('active');state.platform=card.dataset.platform||'android';state.status=card.dataset.state||'REGISTERED';state.caseId=null;const name=card.dataset.name||'Selected device';if($('locationTitle'))$('locationTitle').textContent='Location not yet available';if($('locationSource'))$('locationSource').textContent='Google Find Hub — awaiting location';if($('locationFreshness'))$('locationFreshness').textContent='Not reported';if($('locationState'))$('locationState').textContent=card.dataset.status||'Status not reported';if($('locationHelp'))$('locationHelp').textContent='Google Find Hub status: '+(card.dataset.status||'Status not reported')+'. This is not a GPS result. Open Google Find Hub to see whether Google reports a current or last-known location.';setPlatform(state.platform);applyPlatformState(card);if($('identityModel'))$('identityModel').textContent=name;if($('identityPlatform'))$('identityPlatform').textContent='Android';if($('registeredOwner'))$('registeredOwner').textContent='Select or create an authorized recovery case';if($('caseStatus'))$('caseStatus').textContent=state.status.replaceAll('_',' ');addEvent('Device selected',name,'GOOGLE FIND HUB STATUS');}));
+function mask(v){
+  v=String(v||'').trim();
+  return v.length<7?(v?'••••':'Not provided'):v.slice(0,3)+'••••••••'+v.slice(-3);
+}
+function formatDate(v){
+  if(!v)return '—';
+  const d=new Date(v);
+  return Number.isNaN(d.getTime())?'—':d.toLocaleString();
+}
+function escapeAttr(v){return esc(v).replace(/"/g,'&quot;');}
+function serviceFor(platform){return official[platform]||official.android;}
 
-$('deviceForm')?.addEventListener('submit',e=>{e.preventDefault();state.status='AWAITING VERIFICATION';renderCase();const fd=new FormData(e.currentTarget);if($('identityModel'))$('identityModel').textContent=fd.get('model')||'—';if($('identityPlatform'))$('identityPlatform').textContent=fd.get('platform')||state.platform;if($('identitySerial'))$('identitySerial').textContent=mask(fd.get('serial'));if($('registeredOwner'))$('registeredOwner').textContent='Authenticated owner · verification pending';$('casePanel')?.classList.remove('dr-hidden');addEvent('Recovery case created','Device registration submitted');addEvent('Ownership verification required','An authorized Owner or Admin must review the evidence before marking verified');});
-$('verifyBtn')?.addEventListener('click',async()=>{if(!state.caseId){alert('Create the recovery case first.');return}if(!canVerify()){alert('Complete all four ownership checks before recording verification.');return}try{const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));const role=String(d.user?.role||'').toLowerCase();if(!r.ok||!d.success||!['admin','owner'].includes(role)){alert('Your session is not authorized to verify this recovery case. Sign in with an authorized Admin or Owner account.');return}const actor=role==='owner'?'Owner':'Authorized Admin';state.status='OWNERSHIP VERIFIED';renderCase();if($('registeredOwner'))$('registeredOwner').textContent='Verified · '+actor;if($('verifiedBy'))$('verifiedBy').value=actor.toUpperCase();if($('verificationResult'))$('verificationResult').textContent='✓ Review completed by '+actor;if($('verificationHelp'))$('verificationHelp').textContent='Ownership verification recorded for this active case session. Platform security remains with Google, Apple or Microsoft.';addEvent('Device ownership verified','Ownership evidence reviewed and authorized',actor.toUpperCase())}catch(e){alert('Verification could not be checked against the authenticated session. Please refresh and try again.')}});
-$('connectOfficialBtn')?.addEventListener('click',()=>{addEvent('Official device connection opened',official[state.platform].name,'PLATFORM HANDOFF');});
-$('refreshPlatformState')?.addEventListener('click',()=>{const card=document.querySelector('.dr-device-card.active');if(card){applyPlatformState(card);addEvent('Platform status refreshed',card.dataset.status||'Not reported','GOOGLE FIND HUB STATUS')}else{alert('Select a device first.')}});
-$('officialLink')?.addEventListener('click',()=>{addEvent('Official recovery service opened',official[state.platform].name,'PLATFORM HANDOFF');if($('locationState'))$('locationState').textContent='Official service opened';});
-$('locationServiceLink')?.addEventListener('click',()=>{addEvent('Official location service opened',official[state.platform].name,'PLATFORM HANDOFF');if($('locationState'))$('locationState').textContent='Check official service';});
-$('locationUnavailableBtn')?.addEventListener('click',()=>{if($('locationTitle'))$('locationTitle').textContent='No verified location available';if($('locationSource'))$('locationSource').textContent='Official platform — unavailable';if($('locationFreshness'))$('locationFreshness').textContent='No verified coordinates';if($('locationState'))$('locationState').textContent='Unavailable';addEvent('Official location unavailable','No platform-reported coordinates available at this time','PLATFORM STATUS');});
-$('lostBtn')?.addEventListener('click',()=>{state.status='RECOVERY IN PROGRESS';renderCase();addEvent('Device marked for recovery','Official recovery handoff required')});
-$('recoveredBtn')?.addEventListener('click',()=>{state.status='DEVICE RECOVERED';renderCase();addEvent('Device recovered','User/admin supplied status')});
-$('eraseBtn')?.addEventListener('click',()=>{if(confirm('Remote erase can permanently delete device data. Manlung Recovery will not automatically erase the device. Continue to the official service?')){addEvent('Remote erase guidance acknowledged','No erase command was executed by Manlung Recovery');window.open(official[state.platform].url,'_blank','noopener,noreferrer')}});
-setPlatform('android');renderCase();applyPlatformState(document.querySelector('.dr-device-card.active'));(async()=>{await loadActor();try{const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));const role=String(d.user?.role||'').toLowerCase();if(['admin','owner'].includes(role)&&$('verifiedBy'))$('verifiedBy').value=role.toUpperCase()==='OWNER'?'OWNER':'AUTHORIZED ADMIN';if($('verificationHelp')&&!['admin','owner'].includes(role))$('verificationHelp').textContent='An authenticated Admin or Owner session is required to record ownership verification.'}catch(_){}})();
+function setPlatform(p){
+  state.platform=p;
+  document.querySelectorAll('.dr-platform').forEach(x=>x.classList.toggle('active',x.dataset.platform===p));
+  const o=serviceFor(p);
+  if($('officialService'))$('officialService').textContent=o.name;
+  if($('officialLink')){$('officialLink').href=o.url;$('officialLink').textContent='Continue with '+o.name;}
+  if($('locationServiceLink')){$('locationServiceLink').href=o.url;$('locationServiceLink').innerHTML='<i class="fas fa-location-crosshairs"></i> Open '+o.name;}
+}
+
+async function loadActor(){
+  try{
+    const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.success||!d.user)throw new Error('Authentication required');
+    state.actor={id:d.user.id,name:d.user.username||d.user.email||'Authenticated user',role:String(d.user.role||'').toUpperCase()};
+    if($('currentActor'))$('currentActor').textContent=state.actor.name+' · '+state.actor.role;
+    if($('connectionActor'))$('connectionActor').textContent=state.actor.name+' · '+state.actor.role;
+    return state.actor;
+  }catch(e){
+    if($('currentActor'))$('currentActor').textContent='Authentication required';
+    if($('connectionActor'))$('connectionActor').textContent='Authentication required';
+    return null;
+  }
+}
+
+function addEvent(title,detail='',source='RECOVERY WORKSPACE'){
+  const box=$('timeline');
+  if(!box)return;
+  const el=document.createElement('div');
+  el.className='dr-event';
+  const actor=state.actor?state.actor.name+' ('+state.actor.role+')':'Authenticated session';
+  el.innerHTML='<span class="dr-dot"></span><div><strong>'+esc(title)+'</strong><small>'+esc(new Date().toLocaleString())+' · '+esc(actor)+' · '+esc(source)+(detail?' · '+esc(detail):'')+'</small></div>';
+  box.prepend(el);
+}
+
+function selectCase(c){
+  state.selected=c;
+  state.caseId=c.caseId;
+  state.status=c.status||'Pending Review';
+  state.platform=(
+    c.recoveryPlatform ||
+    ({'Android':'android','iPhone / iPad':'iphone','Windows':'windows','Mac':'mac'}[c.deviceType]) ||
+    'android'
+  ).toLowerCase();
+
+  setPlatform(state.platform);
+
+  document.querySelectorAll('.dr-device-card').forEach(x=>x.classList.toggle('active',x.dataset.caseId===c.caseId));
+
+  ['caseId','caseId2','reportCaseId'].forEach(k=>{if($(k))$(k).textContent=c.caseId||'—';});
+  if($('caseStatus'))$('caseStatus').textContent=String(c.status||'').replaceAll('_',' ');
+  if($('traceDeviceName'))$('traceDeviceName').textContent=[c.deviceBrand,c.deviceModel].filter(Boolean).join(' ')||'Registered device';
+  if($('tracePlatformState'))$('tracePlatformState').textContent=c.status||'Not reported';
+  if($('connectionStatus'))$('connectionStatus').textContent=c.status||'Case status';
+  if($('connectionDetail'))$('connectionDetail').textContent=(c.assignedAdmin?.name?('Handled by '+c.assignedAdmin.name+'. '):'Unassigned. ')+serviceFor(state.platform).name+' remains the official device service.';
+  if($('connectionIcon'))$('connectionIcon').innerHTML='<i class="fas fa-database"></i>';
+
+  if($('identityModel'))$('identityModel').textContent=c.deviceModel||'—';
+  if($('identityPlatform'))$('identityPlatform').textContent=c.deviceType||'—';
+  if($('identitySerial'))$('identitySerial').textContent=mask(c.serial);
+  if($('registeredOwner'))$('registeredOwner').textContent=c.ownershipVerifiedAt?'Verified · '+(c.ownershipVerifiedBy?.name||'Authorized reviewer'):'Verification pending';
+  if($('officialService'))$('officialService').textContent=serviceFor(state.platform).name;
+
+  const loc=c.latestLocation;
+  if(loc){
+    if($('locationTitle'))$('locationTitle').textContent='Verified location recorded';
+    if($('locationSource'))$('locationSource').textContent=loc.source||'Authorized source';
+    if($('locationFreshness'))$('locationFreshness').textContent=formatDate(loc.reported_at);
+    if($('locationState'))$('locationState').textContent='Verified';
+    if($('locationHelp'))$('locationHelp').textContent='This location was recorded from an authorized source. It is not inferred from IMEI, phone number, IP or MAC address.';
+    const metrics=document.querySelectorAll('.dr-metric strong');
+    if(metrics[0])metrics[0].textContent=Number(loc.latitude).toFixed(6)+', '+Number(loc.longitude).toFixed(6);
+    if(metrics[1])metrics[1].textContent=formatDate(loc.reported_at);
+    if(metrics[2])metrics[2].textContent=loc.accuracy_meters?('± '+loc.accuracy_meters+' m'):'—';
+    if(metrics[3])metrics[3].textContent='Authorized source';
+  }else{
+    if($('locationTitle'))$('locationTitle').textContent='No verified location available';
+    if($('locationSource'))$('locationSource').textContent='Official platform — not reported';
+    if($('locationFreshness'))$('locationFreshness').textContent='Unknown';
+    if($('locationState'))$('locationState').textContent='Unavailable';
+    if($('locationHelp'))$('locationHelp').textContent=serviceFor(state.platform).name+' has not supplied a location to Manlung Recovery for this case. Open the official service to check the claimant’s device.';
+    const metrics=document.querySelectorAll('.dr-metric strong');
+    if(metrics[0])metrics[0].textContent='Unavailable';
+    if(metrics[1])metrics[1].textContent='—';
+    if(metrics[2])metrics[2].textContent='—';
+    if(metrics[3])metrics[3].textContent='Unknown';
+  }
+
+  $('casePanel')?.classList.remove('dr-hidden');
+  if($('reportCaseId'))$('reportCaseId').textContent=c.caseId||'—';
+}
+
+function renderDevices(cases){
+  const box=$('recoveryDeviceGrid');
+  if(!box)return;
+  if(!cases.length){
+    box.innerHTML='<div class="dr-empty-state"><i class="fas fa-mobile-screen-button"></i><strong>No lost-device cases found</strong><span>Create a real recovery case below. Demo devices have been removed.</span></div>';
+    return;
+  }
+  box.innerHTML=cases.map(c=>{
+    const platform=({android:'Android',iphone:'iPhone / iPad',windows:'Windows',mac:'Mac'})[c.recoveryPlatform]||c.deviceType||'Device';
+    const status=c.status||'Unknown';
+    const admin=c.assignedAdmin?.name||'Unassigned';
+    return '<button type="button" class="dr-device-card '+(state.caseId===c.caseId?'active':'')+'" data-case-id="'+escapeAttr(c.caseId)+'">'+
+      '<div class="dr-device-avatar"><i class="fas fa-mobile-screen-button"></i></div>'+
+      '<span class="dr-device-info"><strong>'+esc([c.deviceBrand,c.deviceModel].filter(Boolean).join(' ')||'Unnamed device')+'</strong>'+
+      '<small>'+esc(platform)+' · '+esc(c.caseId)+'</small>'+
+      '<em class="dr-device-state neutral"><i class="fas fa-circle"></i> '+esc(status)+'</em>'+
+      '<small>Admin: '+esc(admin)+'</small></span>'+
+      '<i class="fas fa-chevron-right dr-device-chevron"></i></button>';
+  }).join('');
+  box.querySelectorAll('.dr-device-card').forEach(card=>{
+    card.addEventListener('click',()=>{
+      const c=state.cases.find(x=>x.caseId===card.dataset.caseId);
+      if(c){selectCase(c);addEvent('Recovery case selected',c.caseId,'LIVE CASE FEED');}
+    });
+  });
+}
+
+function renderAdminReport(payload){
+  const cases=payload.cases||[];
+  const groups=payload.byAdmin||[];
+  const active=cases.filter(c=>!finished.includes(c.status)).length;
+  const completed=cases.length-active;
+  const assigned=new Set(cases.filter(c=>c.assignedAdmin?.id).map(c=>c.assignedAdmin.id)).size;
+  const summary=$('adminReportSummary');
+  if(summary)summary.innerHTML=[
+    [cases.length,'Total device cases'],
+    [active,'Active cases'],
+    [completed,'Completed'],
+    [assigned,'Assigned admins']
+  ].map(x=>'<div><strong>'+esc(x[0])+'</strong><span>'+esc(x[1])+'</span></div>').join('');
+
+  const board=$('adminBoard');
+  if(board){
+    board.innerHTML=groups.length?groups.map(g=>{
+      const name=g.admin?.name||'Unassigned';
+      const role=g.admin?.role||'—';
+      return '<div class="dr-admin-card"><div class="dr-admin-avatar"><i class="fas fa-user-shield"></i></div><div><strong>'+esc(name)+'</strong><small>'+esc(role.toUpperCase())+'</small></div><div class="dr-admin-count"><strong>'+esc(g.active)+'</strong><span>active</span></div><div class="dr-admin-count"><strong>'+esc(g.completed)+'</strong><span>completed</span></div></div>';
+    }).join(''):'<div class="dr-empty-state"><i class="fas fa-users"></i><strong>No assigned admin workload yet</strong><span>New cases will appear here with the authenticated handler name.</span></div>';
+  }
+
+  const tbody=$('adminCaseRows');
+  if(tbody){
+    tbody.innerHTML=cases.length?cases.map(c=>{
+      const admin=c.assignedAdmin?.name||'Unassigned';
+      const device=[c.deviceBrand,c.deviceModel].filter(Boolean).join(' ')||c.deviceType||'—';
+      const action=c.assignedAdmin?.id?'<button class="btn btn-outline dr-case-open" data-case-id="'+escapeAttr(c.caseId)+'">Open</button>':'<button class="btn btn-primary dr-case-claim" data-case-id="'+escapeAttr(c.caseId)+'">Claim</button>';
+      return '<tr><td><strong>'+esc(c.caseId)+'</strong><small>'+esc(c.caseType||'Device recovery')+'</small></td><td>'+esc(device)+'</td><td>'+esc(c.clientName||'—')+'</td><td><strong>'+esc(admin)+'</strong><small>'+esc(c.assignedAdmin?.role||'Unassigned')+'</small></td><td><span class="dr-table-status">'+esc(c.status||'—')+'</span></td><td>'+esc(formatDate(c.updatedAt))+'</td><td>'+action+'</td></tr>';
+    }).join(''):'<tr><td colspan="7" class="dr-table-empty">No real lost-device cases are currently recorded.</td></tr>';
+
+    tbody.querySelectorAll('.dr-case-open').forEach(b=>b.addEventListener('click',()=>{
+      const c=state.cases.find(x=>x.caseId===b.dataset.caseId);if(c)selectCase(c);
+    }));
+    tbody.querySelectorAll('.dr-case-claim').forEach(b=>b.addEventListener('click',()=>claimCase(b.dataset.caseId)));
+  }
+
+  if($('reportUpdatedAt'))$('reportUpdatedAt').textContent='Server data refreshed '+formatDate(payload.serverTime);
+}
+
+async function loadRecoveryFeed({silent=false}={}){
+  try{
+    const r=await fetch('/api/cases/admin/device-recovery/cases?limit=200',{credentials:'include',cache:'no-store'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.success)throw new Error(d.error||'Recovery feed unavailable');
+    state.cases=d.cases||[];
+    renderDevices(state.cases);
+    renderAdminReport(d);
+    if($('deviceFeedState'))$('deviceFeedState').textContent='LIVE · '+state.cases.length+' cases';
+    if($('reportFeedState'))$('reportFeedState').textContent='LIVE · '+formatDate(d.serverTime);
+    if(state.caseId){
+      const refreshed=state.cases.find(c=>c.caseId===state.caseId);
+      if(refreshed)selectCase(refreshed);
+    }else if(state.cases[0]){
+      selectCase(state.cases[0]);
+    }
+  }catch(e){
+    if(!silent){
+      if($('deviceFeedState'))$('deviceFeedState').textContent='Feed unavailable';
+      if($('reportFeedState'))$('reportFeedState').textContent='Offline';
+    }
+  }
+}
+
+async function createRecoveryCase(e){
+  e.preventDefault();
+  const fd=new FormData(e.currentTarget);
+  const payload={
+    platform:state.platform,
+    clientName:fd.get('client_name'),
+    phone:fd.get('phone'),
+    email:fd.get('email'),
+    manufacturer:fd.get('manufacturer'),
+    model:fd.get('model'),
+    deviceName:fd.get('device_name'),
+    serial:fd.get('serial'),
+    imei:fd.get('imei'),
+    notes:fd.get('notes'),
+    priority:fd.get('priority')||'Normal'
+  };
+  try{
+    const r=await fetch('/api/cases/admin/device-recovery/cases',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.success)throw new Error(d.error||'Could not create case');
+    state.caseId=d.case.caseId;
+    state.status=d.case.status;
+    addEvent('Recovery case created',d.case.caseId,'ADMIN CASE CREATION');
+    e.currentTarget.reset();
+    setPlatform(payload.platform);
+    await loadRecoveryFeed({silent:true});
+    alert('Recovery case '+d.case.caseId+' created and assigned to '+(d.assignedAdmin?.name||'the authenticated admin')+'.');
+  }catch(err){alert(err.message||'Could not create the recovery case.');}
+}
+
+async function verifyOwnership(){
+  if(!state.caseId){alert('Select or create a recovery case first.');return;}
+  const checks={
+    identity:Boolean($('proofIdentity')?.checked),
+    purchase:Boolean($('proofPurchase')?.checked),
+    device:Boolean($('proofDevice')?.checked),
+    authorization:Boolean($('proofAuthorization')?.checked)
+  };
+  if(!Object.values(checks).every(Boolean)){alert('Complete all four ownership checks before recording verification.');return;}
+  try{
+    const r=await fetch('/api/cases/admin/device-recovery/case/'+encodeURIComponent(state.caseId)+'/verify-ownership',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({checks})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.success)throw new Error(d.error||'Verification failed');
+    if($('registeredOwner'))$('registeredOwner').textContent='Verified · '+(d.verifiedBy?.name||'Authorized reviewer');
+    if($('verificationResult'))$('verificationResult').textContent='✓ Verified by '+(d.verifiedBy?.name||'authorized reviewer');
+    addEvent('Ownership verified',state.caseId,'SERVER AUDIT');
+    await loadRecoveryFeed({silent:true});
+  }catch(err){alert(err.message||'Could not record ownership verification.');}
+}
+
+async function claimCase(caseId){
+  try{
+    const r=await fetch('/api/cases/admin/case/'+encodeURIComponent(caseId)+'/claim',{method:'POST',credentials:'include',headers:{Accept:'application/json'}});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.success)throw new Error(d.error||'Could not claim case');
+    addEvent('Case claimed',caseId,'SERVER CASE ASSIGNMENT');
+    await loadRecoveryFeed({silent:true});
+  }catch(err){alert(err.message||'Could not claim case.');}
+}
+
+function setupActions(){
+  document.querySelectorAll('.dr-platform').forEach(x=>x.addEventListener('click',()=>setPlatform(x.dataset.platform)));
+  $('deviceForm')?.addEventListener('submit',createRecoveryCase);
+  $('verifyBtn')?.addEventListener('click',verifyOwnership);
+  $('refreshRecoveryFeed')?.addEventListener('click',()=>loadRecoveryFeed());
+  $('connectOfficialBtn')?.addEventListener('click',()=>addEvent('Official recovery service opened',serviceFor(state.platform).name,'PLATFORM HANDOFF'));
+  $('officialLink')?.addEventListener('click',()=>addEvent('Official recovery service opened',serviceFor(state.platform).name,'PLATFORM HANDOFF'));
+  $('locationServiceLink')?.addEventListener('click',()=>addEvent('Official location service opened',serviceFor(state.platform).name,'PLATFORM HANDOFF'));
+  $('locationUnavailableBtn')?.addEventListener('click',()=>{if($('locationTitle'))$('locationTitle').textContent='No verified location available';addEvent('Location unavailable recorded','No official or authorized coordinates were available','PLATFORM STATUS');});
+  $('lostBtn')?.addEventListener('click',async()=>{
+    if(!state.caseId)return alert('Select a case first.');
+    alert('Recovery-in-progress changes are recorded through the case workflow. Use the existing Case Management controls for status changes.');
+  });
+  $('recoveredBtn')?.addEventListener('click',async()=>{
+    if(!state.caseId)return alert('Select a case first.');
+    alert('Use the case completion workflow to mark the device recovered so the assigned admin and audit trail are preserved.');
+  });
+  $('eraseBtn')?.addEventListener('click',()=>{
+    if(confirm('Manlung Recovery will not erase a device itself. Continue to the official service?')){
+      addEvent('Official erase guidance opened','No erase command was executed by Manlung Recovery','PLATFORM HANDOFF');
+      window.open(serviceFor(state.platform).url,'_blank','noopener,noreferrer');
+    }
+  });
+}
+
+(async()=>{
+  setupActions();
+  await loadActor();
+  await loadRecoveryFeed();
+  setInterval(()=>loadRecoveryFeed({silent:true}),10000);
+})();
 })();
