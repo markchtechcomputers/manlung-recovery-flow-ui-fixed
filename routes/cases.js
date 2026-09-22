@@ -1009,6 +1009,7 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
         platform: typeof device.platform === 'string' ? device.platform.slice(0,80) : '',
         browser: typeof device.browser === 'string' ? device.browser.slice(0,40) : '',
         model: typeof device.model === 'string' ? device.model.slice(0,80) : '',
+        imei: typeof device.imei === 'string' ? device.imei.slice(0,40) : '',
       };
     }
     captureMetadata.totalCaptures = 4;
@@ -2093,16 +2094,6 @@ router.get(
         return res.status(404).json({
           error: 'Case not found',
         });
-      }
-
-      if (!caseData.admin_read) {
-        caseData =
-          await Case.update(
-            req.params.caseId,
-            {
-              admin_read: true,
-            }
-          );
       }
 
       res.json({
