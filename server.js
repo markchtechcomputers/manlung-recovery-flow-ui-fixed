@@ -25,6 +25,7 @@ const platformRoutes = require('./routes/platform');
 const operationsRoutes = require('./routes/operations');
 const aiRoutes = require('./routes/ai');
 const youtubeRoutes = require('./routes/youtube');
+const locationRoutes = require('./routes/location');
 const { supabase } = require('./config/supabase');
 const { inputSecurity } = require('./middleware/inputSecurity');
 const { adminAuth, ownerAuth } = require('./middleware/auth');
@@ -56,8 +57,8 @@ app.use(
         objectSrc: ["'none'"],
         frameAncestors: ["'none'"],
         formAction: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://js.paystack.co'],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com'],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://js.paystack.co', 'https://unpkg.com'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://unpkg.com'],
         fontSrc: ["'self'", 'https://cdnjs.cloudflare.com', 'data:'],
         imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
         mediaSrc: ["'self'", 'https:', 'blob:'],
@@ -100,7 +101,7 @@ app.use(
 app.use((req, res, next) => {
   res.setHeader(
     'Permissions-Policy',
-    'camera=(self), microphone=(self), geolocation=(), payment=()'
+    'camera=(self), microphone=(self), geolocation=(self), payment=()'
   );
   next();
 });
@@ -458,6 +459,7 @@ app.use('/api/platform', platformRoutes);
 app.use('/api/operations', operationsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/youtube', youtubeRoutes);
+app.use('/api/location', locationRoutes);
 
 // ============================================================
 // ADMIN PAGES
