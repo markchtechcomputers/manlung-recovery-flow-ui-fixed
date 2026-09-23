@@ -1957,6 +1957,40 @@ router.get('/admin/device-recovery/cases', adminAuth, async (req, res) => {
 });
 
 
+
+// Lost Device Recovery: verified map points from official platform records and authorized picture capture metadata.
+router.get('/admin/device-recovery/case/:caseId/map', adminAuth, async (req, res) => {
+  try {
+    const caseId = String(req.params.caseId || '').trim();
+    if (!caseId) return res.status(400).json({ success:false, error:'Case ID is required.' });
+    const { data: row, error } = await supabase.from('recovery_cases').select('*').eq('case_id', caseId).maybeSingle();
+    if (error) throw error;
+    if (!row) return res.status(404).json({ success:false, error:'Recovery case not found.' });
+    if (req.user.role === 'admin' && String(row.assigned_admin_id || '') !== String(req.user.id)) {
+      return res.status(403).json({ success:false, error:'Claim this case before viewing its recovery map.' });
+    }
+    const points=[];
+    const { data: locations, error: locationError } = await supabase.from('recovery_device_locations')
+      .select('id,latitude,longitude,accuracy_meters,source,reported_at,recorded_by')
+      .eq('case_id', caseId).order('reported_at',{ascending:true});
+    if (locationError) throw locationError;
+    for (const l of locations || []) points.push({id:'platform-'+l.id,type:'platform',label:'Official platform location',latitude:Number(l.latitude),longitude:Number(l.longitude),accuracyMeters:l.accuracy_meters,timestamp:l.reported_at,source:l.source||'Authorized platform'});
+    const files=Array.isArray(row.files)?row.files:[];
+    files.forEach((file,index)=>{
+      const l=file?.captureMetadata?.location;
+      const lat=Number(l?.latitude),lng=Number(l?.longitude);
+      if (Number.isFinite(lat)&&lat>=-90&&lat<=90&&Number.isFinite(lng)&&lng>=-180&&lng<=180) {
+        points.push({id:'picture-'+index,type:'picture',label:file?.description||file?.originalName||'Picture capture location',latitude:lat,longitude:lng,accuracyMeters:l?.accuracyMeters ?? null,timestamp:file?.captureMetadata?.clientCapturedAt||file?.capturedAt||file?.uploadedAt||null,source:l?.source||'Authorized picture capture metadata'});
+      }
+    });
+    points.sort((a,b)=>new Date(a.timestamp||0)-new Date(b.timestamp||0));
+    return res.json({success:true,caseId,points});
+  } catch (error) {
+    console.error('Device recovery map error:', error);
+    return res.status(500).json({success:false,error:'Could not load verified recovery map data.'});
+  }
+});
+
 // ============================================================
 // Admin: Export Cases CSV
 // ============================================================
