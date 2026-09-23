@@ -2497,7 +2497,7 @@ function buildUpdateFields(
       existing.public_notes
   ) {
     fields.public_notes =
-      updates.publicNotes;
+      updates.publicNotes === null ? '' : updates.publicNotes;
 
     changes.publicNotes = true;
   }
