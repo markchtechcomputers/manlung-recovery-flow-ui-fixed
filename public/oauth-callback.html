@@ -99,7 +99,9 @@
                     persistSession: true,
                     autoRefreshToken: true,
                     detectSessionInUrl: true,
-                    flowType: 'pkce'
+                    flowType: 'pkce',
+                    storage: window.localStorage,
+                    storageKey: 'manlung-github-auth'
                 }
             });
 
@@ -113,23 +115,32 @@
                 throw new Error(hashError);
             }
 
+            let session = null;
+
             if (code) {
-                const { error } = await client.auth.exchangeCodeForSession(code);
-                clearOAuthUrl();
+                const { data: exchanged, error } = await client.auth.exchangeCodeForSession(code);
                 if (error) throw error;
-            } else {
-                const { data: restored, error: restoreError } = await client.auth.getSession();
-                if (restoreError) throw restoreError;
-                if (!restored?.session?.access_token) {
-                    throw new Error('No GitHub sign-in session was found. Please try again.');
-                }
-                clearOAuthUrl();
+                session = exchanged?.session || null;
             }
 
-            const { data: sessionData, error: sessionError } = await client.auth.getSession();
-            if (sessionError) throw sessionError;
-            const session = sessionData?.session;
-            if (!session?.access_token) throw new Error('No GitHub sign-in session was found. Please try again.');
+            if (!session?.access_token) {
+                const { data: restored, error: restoreError } = await client.auth.getSession();
+                if (restoreError) throw restoreError;
+                session = restored?.session || null;
+            }
+
+            if (!session?.access_token) {
+                await new Promise(resolve => setTimeout(resolve, 350));
+                const { data: retryData, error: retryError } = await client.auth.getSession();
+                if (retryError) throw retryError;
+                session = retryData?.session || null;
+            }
+
+            if (!session?.access_token) {
+                throw new Error('GitHub authentication completed, but the session could not be restored. Please try GitHub again.');
+            }
+
+            clearOAuthUrl();
 
             const appSession = await fetchJson('/api/auth/client/oauth', {
                 method: 'POST',
