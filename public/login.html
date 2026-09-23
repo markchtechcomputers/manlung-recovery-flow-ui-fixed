@@ -460,9 +460,8 @@ async function startSocialSignup(provider){
           persistSession:true,
           autoRefreshToken:true,
           detectSessionInUrl:true,
-          flowType:'pkce',
-          storage:window.localStorage,
-          storageKey:'manlung-github-auth'
+          flowType:'implicit',
+          storage:window.localStorage
         }
       }
     );
