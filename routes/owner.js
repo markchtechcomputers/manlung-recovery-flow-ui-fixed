@@ -373,7 +373,7 @@ router.delete('/cases/:caseId/public-notes', async (req, res) => {
     if (!existing.public_notes) return res.json({ success: true, message: 'No client message to delete.' });
 
     const updated = await Case.update(req.params.caseId, {
-      public_notes: null,
+      public_notes: '',
       last_updated: new Date().toLocaleString(),
     });
 
