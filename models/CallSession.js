@@ -6,13 +6,15 @@ const RING_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_RING_TIMEOUT_SECON
 const QUEUE_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_QUEUE_TIMEOUT_SECONDS, 10) || 3600;
 const ACTIVE_CALL_TIMEOUT_SECONDS = Number.parseInt(process.env.CALL_ACTIVE_TIMEOUT_SECONDS, 10) || 21600; // 6h safety valve
 
-async function create({ clientUserId, clientName, clientEmail, caseId, status = 'ringing' }) {
+async function create({ clientUserId, clientName, clientEmail, caseId, status = 'ringing', callMode = 'audio' }) {
+  const normalizedCallMode = callMode === 'video' ? 'video' : 'audio';
   const now = new Date().toISOString();
   const { data, error } = await supabase.from(TABLE).insert({
     client_user_id: clientUserId,
     client_name: clientName,
     client_email: clientEmail,
     case_id: caseId || null,
+    call_mode: normalizedCallMode,
     status: ['ringing', 'queued'].includes(status) ? status : 'ringing',
     ringing_started_at: now,
   }).select().single();
