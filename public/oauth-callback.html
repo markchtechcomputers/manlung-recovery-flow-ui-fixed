@@ -99,14 +99,12 @@
                     persistSession: true,
                     autoRefreshToken: true,
                     detectSessionInUrl: true,
-                    flowType: 'pkce',
-                    storage: window.localStorage,
-                    storageKey: 'manlung-github-auth'
+                    flowType: 'implicit',
+                    storage: window.localStorage
                 }
             });
 
             const url = new URL(window.location.href);
-            const code = url.searchParams.get('code');
             const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
             const hashError = hashParams.get('error_description') || hashParams.get('error');
 
@@ -116,21 +114,12 @@
             }
 
             let session = null;
-
-            if (code) {
-                const { data: exchanged, error } = await client.auth.exchangeCodeForSession(code);
-                if (error) throw error;
-                session = exchanged?.session || null;
-            }
+            const { data: restored, error: restoreError } = await client.auth.getSession();
+            if (restoreError) throw restoreError;
+            session = restored?.session || null;
 
             if (!session?.access_token) {
-                const { data: restored, error: restoreError } = await client.auth.getSession();
-                if (restoreError) throw restoreError;
-                session = restored?.session || null;
-            }
-
-            if (!session?.access_token) {
-                await new Promise(resolve => setTimeout(resolve, 350));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 const { data: retryData, error: retryError } = await client.auth.getSession();
                 if (retryError) throw retryError;
                 session = retryData?.session || null;
