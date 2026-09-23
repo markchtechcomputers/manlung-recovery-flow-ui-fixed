@@ -2059,12 +2059,20 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 
             currentActiveCallId = callId;
             currentIncomingCallId = null;
+            let incomingVideoEnabled = false;
+            if (data.session?.case_id) {
+                try {
+                    const videoRes = await fetch('/api/calls/video/status/' + encodeURIComponent(data.session.case_id), { headers: authHeaders(), cache: 'no-store' });
+                    const videoData = await videoRes.json().catch(() => ({}));
+                    incomingVideoEnabled = videoRes.ok && videoData.success && videoData.enabled === true;
+                } catch (_) {}
+            }
 
             currentCallPeer = new window.ManlungCallWebRTC.CallPeer({
                 sessionId: callId,
                 isInitiator: false,
                 headers: authHeaders(),
-                videoEnabled: true,
+                videoEnabled: incomingVideoEnabled,
                 onStateChange: (state, detail) => renderActiveCallUI(state, data.session, detail),
                 onDuration: (d) => {
                     const el = document.getElementById('adminCallDuration');
