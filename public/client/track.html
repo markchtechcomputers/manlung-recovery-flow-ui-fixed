@@ -739,5 +739,25 @@ async function sendClientCaseMessage() {
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
+<script id="manlung-live-location-link">
+(function(){
+  const caseId=new URLSearchParams(location.search).get('case');
+  if(!caseId)return;
+  function add(){
+    const content=document.getElementById('content');
+    if(!content||document.getElementById('manlungLiveLocationCard'))return;
+    const card=document.createElement('section');
+    card.id='manlungLiveLocationCard';
+    card.className='card';
+    card.style.cssText='margin-top:1rem;border:1px solid rgba(37,99,235,.2);background:linear-gradient(135deg,rgba(37,99,235,.06),rgba(14,165,233,.03));';
+    card.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:.8rem"><img src="https://i.postimg.cc/3w6BvBsT/icon-512.png" alt="Manlung Recovery" width="48" height="48" style="border-radius:12px;object-fit:cover"><div><strong style="display:block">Live device location</strong><span style="color:var(--text-muted);font-size:.78rem">Share your own device location for this case.</span></div></div><a class="btn btn-primary" href="/client/live-location.html?case='+encodeURIComponent(caseId)+'"><i class="fas fa-location-crosshairs"></i> Open Live Tracker</a></div><p style="margin:.7rem 0 0;color:var(--text-muted);font-size:.72rem">Sharing starts only after you press Start and grant browser location permission.</p>';
+    const first=content.querySelector('.card');
+    if(first)first.parentNode.insertBefore(card,first.nextSibling);else content.prepend(card);
+  }
+  const target=document.getElementById('content')||document.body;
+  new MutationObserver(add).observe(target,{childList:true,subtree:true});
+  add();
+})();
+</script>
 </body>
 </html>
