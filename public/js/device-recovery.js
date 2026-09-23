@@ -9,6 +9,7 @@ const official={
 const state={platform:'android',status:'NO CASE SELECTED',caseId:null,actor:null,cases:[],selected:null};
 const $=id=>document.getElementById(id);
 const finished=['Recovery Successful','Recovered by Police','Recovered by Owner','Closed','Rejected'];
+let recoveryMap=null,recoveryMapLayer=null,recoveryMapFitTimer=null;
 
 function mask(v){
   v=String(v||'').trim();
@@ -112,6 +113,44 @@ function selectCase(c){
 
   $('casePanel')?.classList.remove('dr-hidden');
   if($('reportCaseId'))$('reportCaseId').textContent=c.caseId||'—';
+  loadRecoveryMap(c.caseId);
+}
+
+function initRecoveryMap(){
+  if(!window.L||!$('recoveryMap')||recoveryMap)return;
+  recoveryMap=L.map('recoveryMap',{zoomControl:true,attributionControl:true}).setView([0,0],2);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(recoveryMap);
+  recoveryMapLayer=L.layerGroup().addTo(recoveryMap);
+}
+function showMapState(message,icon='fa-map-location-dot'){
+  const box=$('recoveryMapState');if(box)box.innerHTML='<i class="fas '+icon+'"></i><span>'+esc(message)+'</span>';
+}
+async function loadRecoveryMap(caseId){
+  if(!caseId)return;
+  initRecoveryMap();
+  if(!recoveryMap){showMapState('Map library is unavailable. Verified coordinates remain available in the case record.','fa-triangle-exclamation');return;}
+  if(recoveryMapLayer)recoveryMapLayer.clearLayers();
+  showMapState('Loading verified picture and platform locations…','fa-spinner fa-spin');
+  try{
+    const r=await fetch('/api/cases/admin/device-recovery/case/'+encodeURIComponent(caseId)+'/map',{credentials:'include',cache:'no-store'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.success)throw new Error(d.error||'Map data unavailable');
+    const points=Array.isArray(d.points)?d.points:[];
+    if(!points.length){showMapState('No verified location has been supplied for this case. Pictures without authorized location metadata are not mapped.','fa-location-slash');return;}
+    const bounds=[];
+    points.forEach((p,index)=>{
+      const lat=Number(p.latitude),lng=Number(p.longitude);if(!Number.isFinite(lat)||!Number.isFinite(lng))return;
+      bounds.push([lat,lng]);
+      const icon=L.divIcon({className:'dr-map-marker '+(p.type==='picture'?'picture':'platform'),html:'<span>'+(p.type==='picture'?'📷':'●')+'</span>',iconSize:[34,34],iconAnchor:[17,17]});
+      const marker=L.marker([lat,lng],{icon}).addTo(recoveryMapLayer);
+      marker.bindPopup('<strong>'+esc(p.label||'Verified location')+'</strong><br>'+esc(Number(lat).toFixed(6)+', '+Number(lng).toFixed(6))+'<br><small>'+esc(p.source||'Authorized source')+' · '+esc(formatDate(p.timestamp))+(p.accuracyMeters!=null?' · ±'+esc(p.accuracyMeters)+' m':'')+'</small>');
+    });
+    if(bounds.length>1)L.polyline(bounds,{weight:4,dashArray:'8 8'}).addTo(recoveryMapLayer);
+    if(bounds.length)recoveryMap.fitBounds(bounds,{padding:[30,30],maxZoom:17});
+    const pictureCount=points.filter(p=>p.type==='picture').length;
+    const platformCount=points.filter(p=>p.type==='platform').length;
+    showMapState((pictureCount?'📷 '+pictureCount+' picture capture point'+(pictureCount===1?'':'s'):'No picture GPS')+' · '+(platformCount?'📍 '+platformCount+' platform point'+(platformCount===1?'':'s'):'No platform point')+' · trace follows verified timestamps','fa-route');
+  }catch(e){showMapState(e.message||'Could not load verified map data.','fa-triangle-exclamation');}
 }
 
 function renderDevices(cases){
