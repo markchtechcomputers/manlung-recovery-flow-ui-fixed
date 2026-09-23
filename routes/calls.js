@@ -255,6 +255,15 @@ router.post('/start', auth, async (req, res) => {
       return res.status(403).json({ error: 'Only clients can initiate a Call Admin session.' });
     }
 
+    const requestedVideo = req.body?.video === true;
+    const caseId = req.body?.caseId ? String(req.body.caseId).trim() : null;
+    if (requestedVideo) {
+      if (!caseId) return res.status(400).json({ error: 'A case is required for video calling.' });
+      const caseRow = await getVideoCase(caseId);
+      if (!caseRow || caseRow.client_user_id !== req.user.id) return res.status(404).json({ error: 'Case not found.' });
+      if (!(await getVideoEnabled(caseId))) return res.status(403).json({ error: 'Video calling is currently disabled for this case.' });
+    }
+
     const availability = await AdminPresence.getAvailabilityState();
     if (availability.state === 'offline') {
       return res.status(409).json({
@@ -267,7 +276,7 @@ router.post('/start', auth, async (req, res) => {
       clientUserId: req.user.id,
       clientName: req.user.username,
       clientEmail: req.user.email,
-      caseId: req.body?.caseId || null,
+      caseId,
       status: availability.state === 'busy' ? 'queued' : 'ringing',
     });
 
@@ -358,6 +367,9 @@ router.post('/admin/callback', adminAuth, async (req, res) => {
       .maybeSingle();
     if (pendingCallback.error) throw pendingCallback.error;
     if (pendingCallback.data) return res.status(409).json({ error: 'You already have a callback waiting for an answer.' });
+
+    if (!caseId) return res.status(400).json({ error: 'A case is required for Admin video calling.' });
+    if (!(await getVideoEnabled(caseId))) return res.status(403).json({ error: 'Video calling is currently disabled for this case.' });
 
     if (caseId) {
       const { data: caseRow, error: caseError } = await supabase
