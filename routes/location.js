@@ -1,6 +1,7 @@
 const express=require('express');
 const {supabase}=require('../config/supabase');
 const {auth}=require('../middleware/auth');
+const CaseTimeline=require('../models/CaseTimeline');
 const router=express.Router();
 const DEVICE_ID_RE=/^[A-Za-z0-9_-]{8,100}$/;
 const clean=(v,f,m)=>{const s=String(v??'').trim();return s?s.slice(0,m):f};
@@ -106,10 +107,10 @@ async function investigatorCase(caseId, userId, role) {
 
 async function recordLocationAccess(caseId, user, action, metadata = {}) {
   try {
-    await supabase.from('case_timeline').insert({
-      case_id: caseId,
-      actor_user_id: user.id,
-      event_type: 'location_' + action,
+    await CaseTimeline.create({
+      caseId,
+      actorUserId: user.id,
+      eventType: 'location_' + action,
       description: 'Investigator accessed consented device location ' + action + '.',
       metadata: { role: user.role, ...metadata },
     });
