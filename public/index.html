@@ -1490,6 +1490,7 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
  .manlung-home-tracker .tracker-actions{flex-direction:column}
  .manlung-home-tracker .tracker-actions button{width:100%}
 }
+<style id="manlung-service-transition">.service-transition-rail{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin:0 0 1rem;padding:.75rem .8rem;border:1px solid rgba(37,99,235,.14);border-radius:16px;background:linear-gradient(90deg,rgba(239,246,255,.95),rgba(248,250,252,.95));box-shadow:0 8px 24px rgba(15,23,42,.04)}.service-transition-rail span{display:inline-flex;align-items:center;gap:.4rem;color:#334155;font-size:.67rem;font-weight:800;white-space:nowrap}.service-transition-rail b{display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:#2563eb;color:#fff;font-size:.62rem}.service-transition-rail i{height:1px;flex:1;min-width:18px;background:linear-gradient(90deg,#93c5fd,transparent);position:relative;overflow:hidden}.service-transition-rail i:after{content:"";position:absolute;left:-25%;top:-1px;width:25%;height:3px;background:#22d3ee;animation:serviceRailFlow 2.4s linear infinite}.service-transition-rail i:nth-of-type(2):after{animation-delay:.6s}.service-transition-rail i:nth-of-type(3):after{animation-delay:1.2s}@keyframes serviceRailFlow{from{left:-25%}to{left:110%}}@media(max-width:800px){.service-transition-rail{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}.service-transition-rail i{display:none}.service-transition-rail span{white-space:normal}}@media(max-width:520px){.service-transition-rail{grid-template-columns:1fr}.service-transition-rail span{font-size:.65rem}}</style>
 </style>
 </head>
 <body>
@@ -1680,7 +1681,13 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
                     <h2 id="services-title">How We Can Help</h2>
                     <p>Structured digital recovery, investigation, and cybersecurity support for individuals and organizations.</p>
                 </div>
-                <div class="features premium-service-grid">
+                <div class="service-transition-rail" aria-label="Recovery service transition">
+  <span><b>01</b> Device Recovery</span><i></i>
+  <span><b>02</b> Identity &amp; Account Recovery</span><i></i>
+  <span><b>03</b> Scam &amp; Fraud Investigation</span><i></i>
+  <span><b>04</b> Security Assessment &amp; Audit</span>
+</div>
+<div class="features premium-service-grid">
                     <article class="feature-card premium-service-card" data-service="device">
                         <div class="service-card-top"><span class="service-number">01</span><span class="service-icon-wrap"><img src="/images/device-recovery.png" alt="" class="service-icon-image"></span></div>
                         <h3>Device Recovery</h3>
