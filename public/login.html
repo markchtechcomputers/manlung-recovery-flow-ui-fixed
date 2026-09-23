@@ -454,7 +454,17 @@ async function startSocialSignup(provider){
 
     const supabase=window.supabase.createClient(
       cfg.supabaseUrl,
-      cfg.supabaseAnonKey
+      cfg.supabaseAnonKey,
+      {
+        auth:{
+          persistSession:true,
+          autoRefreshToken:true,
+          detectSessionInUrl:true,
+          flowType:'pkce',
+          storage:window.localStorage,
+          storageKey:'manlung-github-auth'
+        }
+      }
     );
 
     const {error}=await supabase.auth.signInWithOAuth({
