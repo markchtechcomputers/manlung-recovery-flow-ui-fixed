@@ -192,6 +192,7 @@ router.get('/video/client-cases', auth, async (req, res) => {
     if (error) throw error;
     const caseIds = (cases || []).map(row => row.case_id).filter(Boolean);
     if (!caseIds.length) return res.json({ success: true, cases: [] });
+
     const { data: events, error: eventError } = await supabase
       .from('case_timeline')
       .select('case_id, event_type, created_at')
@@ -200,12 +201,20 @@ router.get('/video/client-cases', auth, async (req, res) => {
       .order('created_at', { ascending: false })
       .limit(500);
     if (eventError) throw eventError;
+
     const latest = new Map();
     for (const event of events || []) if (!latest.has(event.case_id)) latest.set(event.case_id, event);
+
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, cases: caseIds.filter(id => latest.get(id)?.event_type === 'video_call_enabled') });
+    res.json({
+      success: true,
+      cases: caseIds.map(caseId => ({
+        caseId,
+        videoEnabled: latest.get(caseId)?.event_type === 'video_call_enabled'
+      }))
+    });
   } catch (error) {
-    console.error('Client video cases error:', error);
+    console.error('Client call cases error:', error);
     res.status(500).json({ success: false, error: error.message || 'Server error' });
   }
 });
