@@ -383,6 +383,9 @@ app.get('/admin/tools/website-scanner.html', adminAuth, (_req, res) => {
 app.get('/admin/tools/security.html', ownerAuth, (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'tools', 'security.html'));
 });
+app.get('/admin/tools/device-recovery.html', adminAuth, (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'tools', 'device-recovery.html'));
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -1179,7 +1182,25 @@ app.use((req, res, next) => {
 // ============================================================
 
 app.use((err, req, res, next) => {
-  console.error(err.stack || err);
+  console.error('Unhandled request error:', err.stack || err);
+
+  if (req.path === '/api/cases/submit') {
+    const isMulterError = err && (err.name === 'MulterError' || String(err.code || '').startsWith('LIMIT_'));
+    if (isMulterError) {
+      const messages = {
+        LIMIT_FILE_SIZE: 'An uploaded file exceeds the 10MB limit.',
+        LIMIT_FILE_COUNT: 'Too many files were uploaded. Maximum 10 files are allowed.',
+        LIMIT_PART_COUNT: 'The submission contains too many multipart fields.',
+        LIMIT_FIELD_COUNT: 'Too many form fields were submitted.',
+        LIMIT_FIELD_SIZE: 'A form field is too large.',
+        LIMIT_UNEXPECTED_FILE: 'An unsupported or unexpected upload field was received.'
+      };
+      return res.status(400).json({
+        success: false,
+        error: messages[err.code] || 'The uploaded files could not be processed.'
+      });
+    }
+  }
 
   if (!req.path.startsWith('/api/') && req.method === 'GET' && req.accepts && req.accepts('html')) {
     return res.status(500).sendFile(path.join(__dirname, 'public', '500.html'));

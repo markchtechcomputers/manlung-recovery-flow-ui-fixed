@@ -449,7 +449,7 @@
                     <div class="card-title"><i class="fas fa-paperclip"></i> Additional Files <span style="font-weight:400;font-size:0.85rem;color:var(--text-muted);">(max 100MB each)</span></div>
                     <div class="upload-zone" onclick="document.getElementById('fileUpload').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Click to upload PDF, Word, Images, Video, ZIP</p>
+                        <p>Click to upload PDF, JPG/JPEG or PNG (max 10MB each)</p>
                         <input type="file" id="fileUpload" multiple style="display:none" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png">
                     </div>
                     <div id="fileList" class="file-list"></div>
@@ -502,8 +502,12 @@
         document.getElementById('fileUpload').addEventListener('change', function (e) {
             const files = Array.from(e.target.files);
             files.forEach(file => {
-                if (file.size > 100 * 1024 * 1024) {
-                    alert(`File ${file.name} exceeds 100MB limit.`);
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`File ${file.name} exceeds the 10MB limit.`);
+                    return;
+                }
+                if (!['application/pdf','image/jpeg','image/png'].includes(String(file.type || '').toLowerCase())) {
+                    alert(`File ${file.name} is not supported. Use PDF, JPG/JPEG or PNG.`);
                     return;
                 }
                 pendingFiles.push(file);

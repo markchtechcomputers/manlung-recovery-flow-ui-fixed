@@ -668,6 +668,18 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 
 
         
+        <div class="card" style="margin-bottom:1rem; border:1px solid #bfdbfe;">
+            <div class="card-title"><i class="fas fa-video"></i> Case Video Call Control</div>
+            <p style="color:var(--text-muted);margin:.35rem 0 .8rem;">Video calls are <strong>OFF by default</strong>. Enable them only for the specific case that needs a secure browser video connection.</p>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;">
+                <input id="videoControlCaseId" type="text" placeholder="Case ID (e.g. MRC-...)" style="flex:1;min-width:220px;padding:.65rem;border:1px solid var(--card-border);border-radius:10px;background:var(--card-bg);color:inherit;">
+                <button class="btn btn-outline-dark" type="button" onclick="checkCaseVideoAccess()">Check</button>
+                <button class="btn btn-success" type="button" onclick="setCaseVideoAccess(true)">Enable Video</button>
+                <button class="btn btn-danger" type="button" onclick="setCaseVideoAccess(false)">Turn Off</button>
+            </div>
+            <div id="videoControlStatus" style="margin-top:.65rem;color:var(--text-muted);">No case selected.</div>
+        </div>
+
         <div class="card" style="margin-bottom:1rem;">
             <div class="card-title"><i class="fas fa-heart"></i> Donation Dashboard</div>
             <div class="stats-grid" style="margin-top:0.8rem;">
@@ -883,7 +895,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 }
 </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="/js/call-webrtc.js?v=webrtc-20260920-2"></script>
+<script src="/js/call-webrtc.js?v=video-20260923"></script>
     <script>
         let callPanelMinimized = false;
 
@@ -1418,6 +1430,36 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             `;
         }
 
+        async function checkCaseVideoAccess() {
+            const caseId = document.getElementById('videoControlCaseId')?.value.trim();
+            const status = document.getElementById('videoControlStatus');
+            if (!caseId) { if (status) status.textContent = 'Enter a case ID first.'; return; }
+            try {
+                const res = await fetch('/api/calls/video/status/' + encodeURIComponent(caseId), { headers: authHeaders(), cache: 'no-store' });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) throw new Error(data.error || 'Could not check video access.');
+                status.textContent = data.enabled ? '🟢 Video calling is ENABLED for ' + caseId : '⚪ Video calling is OFF for ' + caseId;
+            } catch (e) { if (status) status.textContent = e.message || 'Could not check video access.'; }
+        }
+        window.checkCaseVideoAccess = checkCaseVideoAccess;
+
+        async function setCaseVideoAccess(enabled) {
+            const caseId = document.getElementById('videoControlCaseId')?.value.trim();
+            const status = document.getElementById('videoControlStatus');
+            if (!caseId) { if (status) status.textContent = 'Enter a case ID first.'; return; }
+            try {
+                const res = await fetch('/api/calls/video/' + encodeURIComponent(caseId) + (enabled ? '/enable' : '/disable'), {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: '{}'
+                });
+                if (await handleUnauthorized(res)) return;
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) throw new Error(data.error || 'Could not update video access.');
+                status.textContent = enabled ? '🟢 Video calling ENABLED for ' + caseId : '⚪ Video calling turned OFF for ' + caseId;
+            } catch (e) { if (status) status.textContent = e.message || 'Could not update video access.'; }
+        }
+        window.setCaseVideoAccess = setCaseVideoAccess;
+
         async function callClientFromCase(clientUserId, caseId) {
             if (currentActiveCallId || currentIncomingCallId) {
                 alert('Finish the current call before starting another call.');
@@ -1443,6 +1485,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                     sessionId: data.sessionId,
                     isInitiator: true,
                     headers: authHeaders(),
+                    videoEnabled: true,
                     onStateChange: (state, detail) => renderActiveCallUI(state, data.session, detail),
                     onDuration: (d) => {
                         const el = document.getElementById('adminCallDuration');
@@ -2016,11 +2059,20 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 
             currentActiveCallId = callId;
             currentIncomingCallId = null;
+            let incomingVideoEnabled = false;
+            if (data.session?.case_id) {
+                try {
+                    const videoRes = await fetch('/api/calls/video/status/' + encodeURIComponent(data.session.case_id), { headers: authHeaders(), cache: 'no-store' });
+                    const videoData = await videoRes.json().catch(() => ({}));
+                    incomingVideoEnabled = videoRes.ok && videoData.success && videoData.enabled === true;
+                } catch (_) {}
+            }
 
             currentCallPeer = new window.ManlungCallWebRTC.CallPeer({
                 sessionId: callId,
                 isInitiator: false,
                 headers: authHeaders(),
+                videoEnabled: incomingVideoEnabled,
                 onStateChange: (state, detail) => renderActiveCallUI(state, data.session, detail),
                 onDuration: (d) => {
                     const el = document.getElementById('adminCallDuration');

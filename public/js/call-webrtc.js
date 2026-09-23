@@ -136,7 +136,7 @@
   }
 
   class CallPeer {
-    constructor({ sessionId, isInitiator, headers, onStateChange, onDuration }) {
+    constructor({ sessionId, isInitiator, headers, onStateChange, onDuration, videoEnabled = false }) {
       this.sessionId = sessionId;
       this.isInitiator = !!isInitiator;
       this.headers = headers || {};
@@ -160,7 +160,7 @@
       this.remoteVideoElement = null;
       this.remoteStream = null;
       this.localVideoElement = null;
-      this.videoEnabled = false;
+      this.videoEnabled = !!videoEnabled;
       this.signalCursor = 0;
       this.signalTimer = null;
       this.sessionStatusTimer = null;
@@ -189,11 +189,11 @@
       try {
         this.localStream = await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-          video: { width: { ideal: 1280, max: 1920 }, height: { ideal: 720, max: 1080 }, frameRate: { ideal: 24, max: 30 }, facingMode: 'user' },
+          video: this.videoEnabled ? { width: { ideal: 1280, max: 1920 }, height: { ideal: 720, max: 1080 }, frameRate: { ideal: 24, max: 30 }, facingMode: 'user' } : false,
         });
-        this.videoEnabled = this.localStream.getVideoTracks().length > 0;
+        this.videoEnabled = this.videoEnabled && this.localStream.getVideoTracks().length > 0;
       } catch (mediaError) {
-        console.warn('[Manlung WebRTC] camera unavailable; using audio-only fallback:', mediaError?.name || mediaError);
+        console.warn('[Manlung WebRTC] requested media unavailable; using audio-only fallback:', mediaError?.name || mediaError);
         try {
           this.localStream = await navigator.mediaDevices.getUserMedia({
             audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },

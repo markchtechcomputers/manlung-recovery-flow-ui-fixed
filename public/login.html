@@ -227,7 +227,9 @@ async function handleLogin(event) {
     if(data.success){
       localStorage.setItem('clientToken',data.token);
       localStorage.setItem('clientUser',JSON.stringify(data.user));
-      window.location.href='/client/dashboard.html';
+      const submitBtn=document.querySelector('#loginForm button[type="submit"]');
+      if(submitBtn){submitBtn.disabled=true;submitBtn.innerHTML='<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Opening your portal…';}
+      window.location.replace('/client/dashboard.html?session=1');
       return;
     }
 
