@@ -1045,8 +1045,6 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
   </div>
 </div>
 
-</main>
-
   <script src="/js/call-webrtc.js"></script>
   <script src="/js/call-widget.js"></script>
   <script>
@@ -1627,10 +1625,18 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         }
       }catch(error){ console.error('Donation summary error',error); }
     }
-    loadCases();
-    loadDonationSummary();
-    setInterval(loadCases, 15000);
-    setInterval(loadDonationSummary, 10000);
+    (async function bootClientDashboard(){
+      const authenticated = await guardClientPortal();
+      if (!authenticated) return;
+
+      await Promise.allSettled([
+        loadCases(),
+        loadDonationSummary()
+      ]);
+
+      setInterval(loadCases, 30000);
+      setInterval(loadDonationSummary, 30000);
+    })();
   </script>
 
 <script id="manlung-notifications-script">
