@@ -124,8 +124,8 @@ const upload = multer({
     fileSize:
       Math.min(parseInt(process.env.MAX_FILE_SIZE, 10) || 10 * 1024 * 1024, 10 * 1024 * 1024),
     files: 10,
-    fields: 40,
-    parts: 55,
+    fields: 80,
+    parts: 100,
     fieldSize: 64 * 1024,
     fieldNameSize: 200,
   },
