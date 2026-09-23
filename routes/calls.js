@@ -255,7 +255,8 @@ router.post('/start', auth, async (req, res) => {
       return res.status(403).json({ error: 'Only clients can initiate a Call Admin session.' });
     }
 
-    const requestedVideo = req.body?.video === true;
+    const callMode = req.body?.callMode === 'video' ? 'video' : 'audio';
+    const requestedVideo = callMode === 'video';
     const caseId = req.body?.caseId ? String(req.body.caseId).trim() : null;
     if (requestedVideo) {
       if (!caseId) return res.status(400).json({ error: 'A case is required for video calling.' });
@@ -277,6 +278,7 @@ router.post('/start', auth, async (req, res) => {
       clientName: req.user.username,
       clientEmail: req.user.email,
       caseId,
+      callMode,
       status: availability.state === 'busy' ? 'queued' : 'ringing',
     });
 
@@ -285,6 +287,7 @@ router.post('/start', auth, async (req, res) => {
       sessionId: session.id,
       channel: session.id,
       status: session.status,
+      callMode,
       availability: availability.state,
       onlineCount: availability.onlineCount,
       availableCount: availability.availableCount,
@@ -322,7 +325,7 @@ router.get('/pending', adminAuth, async (req, res) => {
 
     const { data, error } = await supabase
       .from('recovery_call_sessions')
-      .select('id, client_name, client_email, case_id, created_at')
+      .select('id, client_name, client_email, case_id, call_mode, created_at')
       .in('status', ['ringing', 'queued'])
       .is('admin_user_id', null)
       .order('created_at', { ascending: true })
@@ -342,6 +345,7 @@ router.get('/pending', adminAuth, async (req, res) => {
 router.post('/admin/callback', adminAuth, async (req, res) => {
   try {
     const clientUserId = String(req.body?.clientUserId || '').trim();
+    const callMode = req.body?.callMode === 'video' ? 'video' : 'audio';
     const caseId = req.body?.caseId ? String(req.body.caseId).trim() : null;
     if (!clientUserId) return res.status(400).json({ error: 'Client user ID is required.' });
 
@@ -368,8 +372,10 @@ router.post('/admin/callback', adminAuth, async (req, res) => {
     if (pendingCallback.error) throw pendingCallback.error;
     if (pendingCallback.data) return res.status(409).json({ error: 'You already have a callback waiting for an answer.' });
 
-    if (!caseId) return res.status(400).json({ error: 'A case is required for Admin video calling.' });
-    if (!(await getVideoEnabled(caseId))) return res.status(403).json({ error: 'Video calling is currently disabled for this case.' });
+    if (callMode === 'video') {
+      if (!caseId) return res.status(400).json({ error: 'A case is required for Admin video calling.' });
+      if (!(await getVideoEnabled(caseId))) return res.status(403).json({ error: 'Video calling is currently disabled for this case.' });
+    }
 
     if (caseId) {
       const { data: caseRow, error: caseError } = await supabase
@@ -403,6 +409,7 @@ router.post('/admin/callback', adminAuth, async (req, res) => {
         client_name: client.username || client.email,
         client_email: client.email,
         case_id: caseId,
+        call_mode: callMode,
         admin_user_id: req.user.id,
         status: 'ringing',
         ringing_started_at: now,
@@ -431,7 +438,7 @@ router.post('/admin/callback', adminAuth, async (req, res) => {
       console.warn('Admin callback notification could not be created:', notificationError?.message || notificationError);
     }
 
-    res.status(201).json({ success: true, sessionId: session.id, channel: session.id, status: session.status, adminName: session.admin_name, session });
+    res.status(201).json({ success: true, sessionId: session.id, channel: session.id, status: session.status, callMode, adminName: session.admin_name, session });
   } catch (error) {
     console.error('Admin callback start error:', error);
     res.status(500).json({ error: error.message || 'Could not start callback.' });
@@ -444,7 +451,7 @@ router.get('/client/callbacks', auth, async (req, res) => {
     if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required' });
     const { data, error } = await supabase
       .from('recovery_call_sessions')
-      .select('id, client_name, client_email, case_id, status, admin_user_id, created_at, ringing_started_at')
+      .select('id, client_name, client_email, case_id, call_mode, status, admin_user_id, created_at, ringing_started_at')
       .eq('client_user_id', req.user.id)
       .eq('status', 'ringing')
       .not('admin_user_id', 'is', null)
