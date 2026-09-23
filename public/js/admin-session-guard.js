@@ -6,7 +6,7 @@
     if(checking||location.pathname==='/admin/login.html')return; checking=true;
     try{
       const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});
-      if(r.status===401||r.status===403){
+      if(r.status===401){
         try{localStorage.removeItem('adminUser');sessionStorage.removeItem('adminUser')}catch(_){}
         location.replace(login);
         return;
