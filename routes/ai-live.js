@@ -143,6 +143,49 @@ router.post('/chat',optionalAuth,async(req,res)=>{
     req.on('close',()=>{try{upstream.data.destroy();}catch(_){}});
   }catch(e){
     console.error('Manlung Riple AI error:',e.response?.status||e.message);
+
+    if(!res.headersSent && process.env.OPENAI_API_KEY){
+      try{
+        const fallback=await axios.post(
+          'https://api.openai.com/v1/responses',
+          {
+            model:process.env.OPENAI_MODEL||'gpt-4o-mini',
+            input:messages,
+            max_output_tokens:1200
+          },
+          {
+            headers:{
+              authorization:'Bearer '+process.env.OPENAI_API_KEY,
+              'content-type':'application/json'
+            },
+            timeout:45000,
+            validateStatus:()=>true
+          }
+        );
+        const answer=extractText(
+          fallback.data?.output_text
+          ||fallback.data?.output?.map(item=>item?.content?.map(part=>part?.text||'').join('')).join('')
+          ||fallback.data
+        );
+        if(fallback.status>=200&&fallback.status<300&&answer){
+          res.status(200).set({
+            'Content-Type':'text/event-stream; charset=utf-8',
+            'X-Manlung-AI':'live-conversation-fallback',
+            'Cache-Control':'no-cache, no-transform',
+            'Connection':'keep-alive',
+            'X-Accel-Buffering':'no'
+          });
+          if(res.flushHeaders)res.flushHeaders();
+          emit(res,answer);
+          res.write('data: [DONE]\\n\\n');
+          return res.end();
+        }
+        console.error('Manlung OpenAI fallback error:',fallback.status,fallback.data?.error?.message||'empty response');
+      }catch(fallbackError){
+        console.error('Manlung OpenAI fallback failed:',fallbackError.message);
+      }
+    }
+
     if(!res.headersSent)res.status(502).json({success:false,error:'Live AI service is temporarily unavailable.'});
     else res.end();
   }
