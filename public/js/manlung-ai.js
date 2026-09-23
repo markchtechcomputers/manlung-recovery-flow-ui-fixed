@@ -63,7 +63,8 @@
       .manlung-ai-bubble{padding:13px 16px;border-radius:18px;line-height:1.55;font-size:.94rem;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 2px 10px rgba(15,23,42,.06)}\n      .manlung-ai-typing{display:inline-flex;gap:5px;align-items:center;min-width:52px}.manlung-ai-typing span{width:6px;height:6px;border-radius:50%;background:#7b8da5;animation:manlungAiPulse 1.1s infinite ease-in-out}.manlung-ai-typing span:nth-child(2){animation-delay:.15s}.manlung-ai-typing span:nth-child(3){animation-delay:.3s}@keyframes manlungAiPulse{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
       .manlung-ai-msg.ai .manlung-ai-bubble{background:#fff;color:#243447;border:1px solid #e3e9f1;border-top-left-radius:6px}
       .manlung-ai-msg.user .manlung-ai-bubble{background:linear-gradient(135deg,#126f91,#2563eb);color:#fff;border:1px solid #126f91;border-top-right-radius:6px}
-      .manlung-ai-time{font-size:.68rem;font-weight:700;color:#8a97a8;margin:6px 4px 0}
+      .manlung-ai-replay{display:inline-flex;align-items:center;justify-content:center;margin:5px 4px 0;padding:5px 9px;border:1px solid #d7e3ed;border-radius:999px;background:#fff;color:#17617b;font-size:.67rem;font-weight:800;cursor:pointer}.manlung-ai-replay:hover{background:#edfafd;border-color:#7cc5d8}html.dark .manlung-ai-replay,body.dark .manlung-ai-replay{background:#102238;color:#9bd0ff;border-color:#29415b}
+.manlung-ai-time{font-size:.68rem;font-weight:700;color:#8a97a8;margin:6px 4px 0}
       .manlung-ai-msg.user .manlung-ai-time{color:#6d7c90}
       .manlung-ai-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
       .manlung-ai-links a{display:inline-flex;align-items:center;padding:8px 12px;border:1px solid #d7e3ed;border-radius:10px;background:#fff;color:#17617b;text-decoration:none;font-size:.74rem;font-weight:800}
@@ -399,12 +400,23 @@
     return s>e?'sw':e>s?'en':currentLanguage();
   }
   function speechLanguage(text){return detectLanguage(text)==='sw'?'sw-KE':'en-KE';}
+  function voiceSupported(){return 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;}
   function voiceEnabled(){
-    return localStorage.getItem('manlung-ai-voice') !== 'off';
+    return voiceSupported() && localStorage.getItem('manlung-ai-voice') !== 'off';
   }
   function syncVoiceButton(){
     const b=document.getElementById('manlungAiVoice');
-    if(b) b.textContent=voiceEnabled()?'🔊 Voice on':'🔇 Voice off';
+    if(!b)return;
+    if(!voiceSupported()){
+      b.textContent='🔇 Voice unavailable';
+      b.disabled=true;
+      b.title='This browser does not provide speech output.';
+      window.__MANLUNG_AI_VOICE_ON=false;
+      return;
+    }
+    b.disabled=false;
+    b.textContent=voiceEnabled()?'🔊 Voice on':'🔇 Voice off';
+    b.title=voiceEnabled()?'AI replies will be spoken aloud.':'Turn on spoken AI replies.';
     window.__MANLUNG_AI_VOICE_ON=voiceEnabled();
   }
   function ensureSpeechVoice(){
@@ -431,7 +443,7 @@
       window.speechSynthesis.speak(u);
       setVoiceState?.('waiting','AI is speaking…');
       u.onend=()=>{if(voiceSession&&voiceAutoResume)waitUntilSpeechIsFinished();};
-      u.onerror=()=>{if(voiceSession&&voiceAutoResume)waitUntilSpeechIsFinished();};
+      u.onerror=()=>{setVoiceState('','');if(voiceSession&&voiceAutoResume)waitUntilSpeechIsFinished();};
     }catch(e){console.warn('Manlung AI speech output error',e);}
   }
   function createLiveSpeaker(){
@@ -502,7 +514,11 @@
     if (!body) return;
     const row = document.createElement('div');
     row.className = `manlung-ai-msg ${who}`;
-    const wrap=document.createElement('div');const bubble=document.createElement('div');bubble.className='manlung-ai-bubble';bubble.textContent=text;wrap.appendChild(bubble);const meta=document.createElement('div');meta.className='manlung-ai-time';meta.textContent=who==='ai'?'Manlung AI':'You';wrap.appendChild(meta);row.appendChild(wrap);body.appendChild(row);
+    const wrap=document.createElement('div');const bubble=document.createElement('div');bubble.className='manlung-ai-bubble';bubble.textContent=text;wrap.appendChild(bubble);const meta=document.createElement('div');meta.className='manlung-ai-time';meta.textContent=who==='ai'?'Manlung AI':'You';wrap.appendChild(meta);
+    if(who==='ai'){
+      const replay=document.createElement('button');replay.type='button';replay.className='manlung-ai-replay';replay.textContent='🔊 Listen';replay.title='Play this AI reply aloud';
+      replay.addEventListener('click',()=>speak(text));wrap.appendChild(replay);
+    }row.appendChild(wrap);body.appendChild(row);
     body.scrollTop = body.scrollHeight;
   }
 
@@ -657,10 +673,17 @@
     document.getElementById('manlungAiInput')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('manlungAiForm')?.requestSubmit();}});
     document.getElementById('manlungAiLang')?.addEventListener('click',()=>{const next=currentLanguage()==='sw'?'en':'sw';localStorage.setItem('manlung-ai-language',next);const b=document.getElementById('manlungAiLang');if(b)b.textContent=next==='sw'?'🌐 Auto: Kiswahili':'🌐 Auto: English';});
     document.getElementById('manlungAiVoice')?.addEventListener('click',()=>{
+       if(!voiceSupported())return;
        const next=!voiceEnabled();
        localStorage.setItem('manlung-ai-voice',next?'on':'off');
        window.__MANLUNG_AI_VOICE_ON=next;
        syncVoiceButton();
+       if(next){
+         const unlock=new SpeechSynthesisUtterance('Voice enabled.');
+         unlock.lang='en-KE';unlock.rate=.98;
+         const v=ensureSpeechVoice();if(v)unlock.voice=v;
+         try{window.speechSynthesis.cancel();window.speechSynthesis.speak(unlock);}catch(_){}
+       }
        if(!next&&'speechSynthesis'in window)window.speechSynthesis.cancel();
      });
      syncVoiceButton();
