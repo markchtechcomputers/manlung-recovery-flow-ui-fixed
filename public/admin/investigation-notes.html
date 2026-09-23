@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Investigation Notes · Manlung Recovery</title>
+<script src="/js/theme.js"></script><link rel="stylesheet" href="/css/admin.css">
+<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"><script src="/js/admin-session-guard.js"></script>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--line:#dbe3ef;--text:#142033;--muted:#64748b;--accent:#2563eb}
+html.dark{--bg:#08111f;--card:#101c2d;--line:#2b405b;--text:#eef6ff;--muted:#9db0c5;--accent:#60a5fa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 18px}
+.bar{max-width:1400px;margin:auto;display:flex;align-items:center;gap:12px}.bar h1{font-size:1rem;margin:0}.bar span{font-size:.7rem;color:var(--muted)}.bar .actions{margin-left:auto;display:flex;gap:7px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:9px;padding:9px 12px;font-weight:800;cursor:pointer}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.danger{color:#b91c1c}
+.shell{max-width:1400px;margin:auto;padding:18px}.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(15,23,42,.05)}.sidebar{padding:14px}.sidebar h2{font-size:.85rem;margin:2px 0 10px}.docs{display:grid;gap:6px}.doc{padding:10px;border:1px solid transparent;border-radius:10px;cursor:pointer}.doc:hover,.doc.active{border-color:var(--line);background:rgba(37,99,235,.06)}.doc strong{display:block;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.doc small{color:var(--muted);font-size:.65rem}
+.editor-wrap{padding:16px}.toolbar{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:12px;border-bottom:1px solid var(--line)}.toolbar button{min-width:36px}.meta{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:8px;margin:12px 0}.title,.case{width:100%;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:9px;padding:11px;font:inherit}.editor{min-height:560px;padding:18px;border:1px solid var(--line);border-radius:10px;background:var(--card);outline:none;line-height:1.65;font-family:Georgia,serif;font-size:16px}.editor:focus{box-shadow:0 0 0 3px rgba(37,99,235,.1)}.status{font-size:.72rem;color:var(--muted);margin-top:8px}.share{margin-top:14px;padding:14px;border:1px dashed var(--line);border-radius:10px;display:grid;grid-template-columns:140px minmax(0,1fr) 150px auto;gap:8px;align-items:center}.share input,.share select{min-height:40px;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:8px;padding:8px}.hint{font-size:.7rem;color:var(--muted);line-height:1.5;margin-top:8px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.sidebar{max-height:260px;overflow:auto}.meta{grid-template-columns:1fr}.editor{min-height:420px}.share{grid-template-columns:1fr}.bar .actions .label{display:none}}
+</style></head>
+<body>
+<header><div class="bar"><div><h1><i class="fas fa-file-pen"></i> Investigation Notes</h1><span>Private admin documents · explicit sharing only</span></div><div class="actions"><a class="btn" href="/admin/tools.html">Tools</a><button class="btn" id="newBtn">New</button><button class="btn primary" id="saveBtn">Save</button><button class="btn" id="pdfBtn">PDF</button><button class="btn danger" id="deleteBtn">Delete</button></div></div></header>
+<main class="shell"><div class="layout">
+<section class="panel sidebar"><h2>My documents</h2><div class="docs" id="docs"><div class="hint">Loading…</div></div><div class="hint">Documents are private to the signed-in admin unless you explicitly share one. Shared recipients receive read-only access.</div></section>
+<section class="panel editor-wrap">
+<div class="meta"><input class="title" id="title" placeholder="Investigation document title"><input class="case" id="caseId" placeholder="Case ID (optional)"></div>
+<div class="toolbar" id="toolbar">
+<button class="btn" data-cmd="bold"><b>B</b></button><button class="btn" data-cmd="italic"><i>I</i></button><button class="btn" data-cmd="underline"><u>U</u></button><button class="btn" data-cmd="insertUnorderedList">• List</button><button class="btn" data-cmd="insertOrderedList">1. List</button><button class="btn" data-cmd="formatBlock" data-value="h2">H2</button><button class="btn" data-cmd="formatBlock" data-value="p">P</button>
+</div>
+<div id="editor" class="editor" contenteditable="true" spellcheck="true" aria-label="Investigation document editor"></div>
+<div class="status" id="status">New document</div>
+<div class="share">
+<select id="recipientType"><option value="admin">Admin</option><option value="client">Client</option></select>
+<input id="recipient" placeholder="Admin user ID or client email">
+<input id="shareCase" placeholder="Case ID for client email lookup">
+<button class="btn" id="shareBtn">Share PDF</button>
+</div>
+<div class="hint">For an admin, enter the recipient admin's user ID. For a client, enter an email; optionally provide the case ID to use the case's stored client email. Email delivery requires the server's configured Resend settings. The PDF is generated server-side.</div>
+</section></div></main>
+<script>
+const $=id=>document.getElementById(id);let docs=[],current=null,readOnly=false;
+async function api(url,opt={}){const r=await fetch(url,{credentials:'include',...opt,headers:{Accept:'application/json','Content-Type':'application/json',...(opt.headers||{})}});let d={};try{d=await r.json()}catch(_){}if(!r.ok)throw new Error(d.error||'Request failed');return d}
+function esc(v){return String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function renderDocs(){ $('docs').innerHTML=docs.length?docs.map(d=>'<div class="doc '+(current&&current.id===d.id?'active':'')+'" data-id="'+d.id+'"><strong>'+esc(d.title)+'</strong><small>'+(d.shared?'Shared with you · ':'')+new Date(d.updated_at).toLocaleString()+'</small></div>').join(''):'<div class="hint">No documents yet.</div>';document.querySelectorAll('.doc').forEach(x=>x.onclick=()=>openDoc(x.dataset.id))}
+async function load(){try{const d=await api('/api/admin/documents');docs=d.documents||[];renderDocs();const q=new URLSearchParams(location.search).get('doc');if(q)await openDoc(q);else if(docs[0])await openDoc(docs[0].id)}catch(e){$('status').textContent=e.message}}
+async function openDoc(id){try{const d=await api('/api/admin/documents/'+encodeURIComponent(id));current=d.document;readOnly=!!d.readOnly;$('title').value=current.title||'';$('caseId').value=current.case_id||'';$('editor').innerHTML=plainToHtml(current.content||'');$('title').disabled=readOnly;$('caseId').disabled=readOnly;$('editor').contentEditable=String(!readOnly);$('saveBtn').disabled=readOnly;$('deleteBtn').disabled=readOnly;$('shareBtn').disabled=readOnly;$('pdfBtn').disabled=false;$('status').textContent=readOnly?'Shared document · read only':'Loaded · '+new Date(current.updated_at).toLocaleString();renderDocs()}catch(e){$('status').textContent=e.message}}
+function plainToHtml(v){return esc(v).replace(/\n/g,'<br>')}
+async function save(){if(readOnly)return;try{const body={title:$('title').value,caseId:$('caseId').value,content:$('editor').innerText};const d=current?await api('/api/admin/documents/'+current.id,{method:'PUT',body:JSON.stringify(body)}):await api('/api/admin/documents',{method:'POST',body:JSON.stringify(body)});current=d.document;await load();await openDoc(current.id);$('status').textContent='Saved '+new Date().toLocaleTimeString()}catch(e){$('status').textContent=e.message}}
+async function newDoc(){current=null;readOnly=false;$('title').value='';$('caseId').value='';$('editor').innerHTML='';$('title').disabled=false;$('caseId').disabled=false;$('editor').contentEditable='true';$('saveBtn').disabled=false;$('deleteBtn').disabled=false;$('shareBtn').disabled=true;$('pdfBtn').disabled=true;$('status').textContent='New document';renderDocs()}
+async function del(){if(!current||readOnly)return;if(!confirm('Delete this investigation document?'))return;try{await api('/api/admin/documents/'+current.id,{method:'DELETE'});await newDoc();await load()}catch(e){$('status').textContent=e.message}}
+function pdf(){if(current)window.location.href='/api/admin/documents/'+current.id+'/pdf'}
+async function share(){if(!current||readOnly)return;try{const type=$('recipientType').value;const recipient=$('recipient').value.trim();const caseId=$('shareCase').value.trim()||$('caseId').value.trim();const body=type==='admin'?{recipientType:type,recipientUserId:recipient}:{recipientType:type,recipientEmail:recipient,caseId};const d=await api('/api/admin/documents/'+current.id+'/share',{method:'POST',body:JSON.stringify(body)});$('status').textContent=d.emailSent?'PDF sent successfully.':(d.deliveryConfigured?'Share created; email delivery failed.':'Share created. Configure RESEND_API_KEY + MANLUNG_FROM_EMAIL for email delivery.')}catch(e){$('status').textContent=e.message}}
+document.querySelectorAll('[data-cmd]').forEach(b=>b.onclick=()=>{document.execCommand(b.dataset.cmd,false,b.dataset.value||null);$('editor').focus()});
+$('newBtn').onclick=newDoc;$('saveBtn').onclick=save;$('deleteBtn').onclick=del;$('pdfBtn').onclick=pdf;$('shareBtn').onclick=share;load();
+</script></body></html>
