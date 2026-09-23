@@ -133,6 +133,118 @@ router.get('/owner/monitor', ownerAuth, async (req, res) => {
   }
 });
 
+
+
+// ---- Case-scoped video-call controls ----
+// Video is OFF by default. The latest case-timeline video event is the source
+// of truth, so enabling/disabling is also auditable without changing the
+// existing recovery_cases schema.
+const CaseTimeline = require('../models/CaseTimeline');
+
+async function getVideoCase(caseId) {
+  const { data, error } = await supabase
+    .from('recovery_cases')
+    .select('case_id, client_user_id, assigned_admin_id')
+    .eq('case_id', caseId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+async function getVideoEnabled(caseId) {
+  const { data, error } = await supabase
+    .from('case_timeline')
+    .select('event_type, created_at, metadata')
+    .eq('case_id', caseId)
+    .in('event_type', ['video_call_enabled', 'video_call_disabled'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.event_type === 'video_call_enabled';
+}
+
+router.get('/video/status/:caseId', auth, async (req, res) => {
+  try {
+    const caseId = String(req.params.caseId || '').trim();
+    const row = await getVideoCase(caseId);
+    if (!row) return res.status(404).json({ success: false, error: 'Case not found.' });
+    const allowed = req.user.role === 'owner' ||
+      (req.user.role === 'admin' && row.assigned_admin_id === req.user.id) ||
+      (req.user.role === 'client' && row.client_user_id === req.user.id);
+    if (!allowed) return res.status(403).json({ success: false, error: 'You are not authorized to access this case video setting.' });
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, caseId, enabled: await getVideoEnabled(caseId) });
+  } catch (error) {
+    console.error('Video status error:', error);
+    res.status(500).json({ success: false, error: error.message || 'Server error' });
+  }
+});
+
+router.get('/video/client-cases', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ success: false, error: 'Client access required.' });
+    const { data: cases, error } = await supabase
+      .from('recovery_cases')
+      .select('case_id')
+      .eq('client_user_id', req.user.id)
+      .limit(100);
+    if (error) throw error;
+    const caseIds = (cases || []).map(row => row.case_id).filter(Boolean);
+    if (!caseIds.length) return res.json({ success: true, cases: [] });
+    const { data: events, error: eventError } = await supabase
+      .from('case_timeline')
+      .select('case_id, event_type, created_at')
+      .in('case_id', caseIds)
+      .in('event_type', ['video_call_enabled', 'video_call_disabled'])
+      .order('created_at', { ascending: false })
+      .limit(500);
+    if (eventError) throw eventError;
+    const latest = new Map();
+    for (const event of events || []) if (!latest.has(event.case_id)) latest.set(event.case_id, event);
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, cases: caseIds.filter(id => latest.get(id)?.event_type === 'video_call_enabled') });
+  } catch (error) {
+    console.error('Client video cases error:', error);
+    res.status(500).json({ success: false, error: error.message || 'Server error' });
+  }
+});
+
+async function setVideoState(req, res, enabled) {
+  try {
+    const caseId = String(req.params.caseId || '').trim();
+    const row = await getVideoCase(caseId);
+    if (!row) return res.status(404).json({ success: false, error: 'Case not found.' });
+    const allowed = req.user.role === 'owner' || (req.user.role === 'admin' && row.assigned_admin_id === req.user.id);
+    if (!allowed) return res.status(403).json({ success: false, error: 'Only the assigned Admin or Owner can change video-call access.' });
+    const eventType = enabled ? 'video_call_enabled' : 'video_call_disabled';
+    const description = enabled ? 'Case video calling enabled by authorized staff.' : 'Case video calling disabled by authorized staff.';
+    const event = await CaseTimeline.create({
+      caseId,
+      actorUserId: req.user.id,
+      eventType,
+      description,
+      metadata: { enabled, source: 'case_video_control' },
+    });
+    if (row.client_user_id) {
+      await Notification.create({
+        userId: row.client_user_id,
+        caseId,
+        type: enabled ? 'video_call_enabled' : 'video_call_disabled',
+        title: enabled ? 'Video call enabled for your case' : 'Video call disabled for your case',
+        message: enabled ? 'An authorized Admin has enabled secure browser video calling for this case. You can start a video call from your Client Dashboard.' : 'Video calling has been turned off for this case.',
+      });
+    }
+    res.json({ success: true, caseId, enabled, eventId: event.id });
+  } catch (error) {
+    console.error('Video state update error:', error);
+    res.status(500).json({ success: false, error: error.message || 'Server error' });
+  }
+}
+
+router.post('/video/:caseId/enable', adminAuth, (req, res) => setVideoState(req, res, true));
+router.post('/video/:caseId/disable', adminAuth, (req, res) => setVideoState(req, res, false));
+
 // ---- Call sessions ----
 
 // Client starts a call. Server enforces BOTH the entitlement (trial/subscription)
