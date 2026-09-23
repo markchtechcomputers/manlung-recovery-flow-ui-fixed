@@ -1464,19 +1464,34 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
         }
         window.setCaseVideoAccess = setCaseVideoAccess;
 
-        async function callClientFromCase(clientUserId, caseId) {
+        async function callClientFromCase(clientUserId, caseId, callMode) {
             if (currentActiveCallId || currentIncomingCallId) {
                 alert('Finish the current call before starting another call.');
                 return;
             }
+
             const body = document.getElementById('callModalBody');
             document.getElementById('callModalOverlay').style.display = 'flex';
-            body.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Calling client…</p>';
+
+            if (!callMode) {
+                body.innerHTML = `
+                    <p style="font-weight:800;">Choose how to call this client</p>
+                    <p style="color:var(--text-muted);">Audio works independently. Video is optional and only available when enabled for this case.</p>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:1rem;flex-wrap:wrap;">
+                        <button class="btn btn-success" onclick="callClientFromCase('${String(clientUserId).replace(/'/g,"\\'")}','${String(caseId || '').replace(/'/g,"\\'")}','audio')"><i class="fas fa-phone"></i> Audio Call</button>
+                        <button class="btn btn-primary" onclick="callClientFromCase('${String(clientUserId).replace(/'/g,"\\'")}','${String(caseId || '').replace(/'/g,"\\'")}','video')"><i class="fas fa-video"></i> Video Call</button>
+                    </div>
+                    <button class="btn btn-outline-dark" style="margin-top:.8rem;" onclick="closeCallModal()">Cancel</button>
+                `;
+                return;
+            }
+
+            body.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Calling client by ' + (callMode === 'video' ? 'video' : 'audio') + '…</p>';
             try {
                 const res = await fetch('/api/calls/admin/callback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', ...authHeaders() },
-                    body: JSON.stringify({ clientUserId, caseId }),
+                    body: JSON.stringify({ clientUserId, caseId, callMode }),
                 });
                 if (await handleUnauthorized(res)) return;
                 const data = await res.json();
@@ -1484,19 +1499,21 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                     body.innerHTML = `<p style="color:var(--danger);">${data.error || 'Could not start callback.'}</p><button class="btn btn-outline-dark" onclick="closeCallModal()">Close</button>`;
                     return;
                 }
+
                 currentActiveCallId = data.sessionId;
                 currentCallPeer = new window.ManlungCallWebRTC.CallPeer({
                     sessionId: data.sessionId,
                     isInitiator: true,
                     headers: authHeaders(),
-                    videoEnabled: true,
+                    videoEnabled: data.callMode === 'video',
                     onStateChange: (state, detail) => renderActiveCallUI(state, data.session, detail),
                     onDuration: (d) => {
                         const el = document.getElementById('adminCallDuration');
                         if (el) el.textContent = d;
                     },
                 });
-                body.innerHTML = '<p><i class="fas fa-phone-volume"></i> Calling client… waiting for them to answer.</p><button class="btn btn-danger" style="margin-top:.8rem;" onclick="endActiveCall()">Cancel</button>';
+
+                body.innerHTML = '<p><i class="fas fa-phone-volume"></i> Calling client by ' + (data.callMode === 'video' ? 'video' : 'audio') + '… waiting for them to answer.</p><button class="btn btn-danger" style="margin-top:.8rem;" onclick="endActiveCall()">Cancel</button>';
                 await currentCallPeer.start();
             } catch (e) {
                 console.error(e);
@@ -2005,7 +2022,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             </div>
             <p style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Incoming Help Call</p>
             <p style="color:var(--text-muted);margin-bottom:0.2rem;">Client: <strong style="color:var(--text);">${call.client_name || 'Client'}</strong></p>
-            ${call.case_id ? `<p style="color:var(--text-muted);margin-bottom:1rem;">Case: <strong style="color:var(--text);">${call.case_id}</strong></p>` : '<p style="color:var(--text-muted);margin-bottom:1rem;">General support call</p>'}
+            ${call.case_id ? `<p style="color:var(--text-muted);margin-bottom:.35rem;">Case: <strong style="color:var(--text);">${call.case_id}</strong></p>` : '<p style="color:var(--text-muted);margin-bottom:.35rem;">General support call</p>'}<p style="color:var(--text-muted);margin-bottom:1rem;"><i class="fas ${call.call_mode === 'video' ? 'fa-video' : 'fa-phone'}"></i> ${call.call_mode === 'video' ? 'Video call' : 'Audio call'}</p>
             <div style="display:flex;gap:10px;justify-content:center;">
                 <button class="btn btn-danger" onclick="rejectIncomingCall()"><i class="fas fa-phone-slash"></i> Decline</button>
                 <button class="btn btn-success" onclick="acceptIncomingCall()"><i class="fas fa-phone"></i> Accept</button>
@@ -2076,7 +2093,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                 sessionId: callId,
                 isInitiator: false,
                 headers: authHeaders(),
-                videoEnabled: incomingVideoEnabled,
+                videoEnabled: data.session?.call_mode === 'video',
                 onStateChange: (state, detail) => renderActiveCallUI(state, data.session, detail),
                 onDuration: (d) => {
                     const el = document.getElementById('adminCallDuration');
