@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live Device Location · Manlung Recovery</title>
+<meta name="description" content="Consent-based live location sharing for your own recovery case.">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/theme.css">
+<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+.live{max-width:1180px;margin:auto;padding:1rem .8rem 3rem}.hero{display:grid;grid-template-columns:1fr .75fr;gap:1rem;margin:1rem 0}.card{background:var(--card-bg,#fff);border:1px solid var(--card-border,#dbeafe);border-radius:20px;padding:1.2rem;box-shadow:0 16px 40px rgba(15,23,42,.08)}.hero img{width:100%;height:100%;min-height:230px;object-fit:cover;border-radius:16px}.kicker{color:#2563eb;font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.title{margin:.35rem 0;font-size:clamp(1.5rem,4vw,2.2rem)}.copy{color:var(--text-muted,#64748b);line-height:1.6}.grid{display:grid;grid-template-columns:350px 1fr;gap:1rem}.controls{display:grid;gap:.75rem}.controls label{font-size:.75rem;font-weight:800}.controls input{width:100%;padding:.72rem;border:1px solid #cbd5e1;border-radius:10px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}.stat{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid #e2e8f0;font-size:.78rem}.stat span:last-child{text-align:right;color:var(--text-muted)}#map{height:520px;border-radius:15px;overflow:hidden}.status{display:inline-flex;padding:.35rem .6rem;border-radius:999px;background:#f1f5f9;color:#475569;font-size:.7rem;font-weight:800}.status.on{background:#dcfce7;color:#166534}.status.err{background:#fee2e2;color:#991b1b}.note{margin-top:.7rem;padding:.7rem;border-radius:10px;background:#eff6ff;color:#1e3a8a;font-size:.72rem;line-height:1.5}@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}#map{height:420px}}@media(max-width:520px){.actions{grid-template-columns:1fr}#map{height:360px}}
+</style>
+</head>
+<body>
+<header class="site-header">
+<div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem .8rem">
+<a href="/client/dashboard.html" style="display:flex;align-items:center;gap:.65rem;text-decoration:none;color:inherit">
+<img src="https://i.postimg.cc/3w6BvBsT/icon-512.png" alt="Manlung Recovery" width="42" height="42" style="border-radius:11px;object-fit:cover">
+<span><strong>Manlung Recovery</strong><small style="display:block;opacity:.7">Live Device Location</small></span>
+</a>
+<a class="btn btn-outline" href="/client/dashboard.html">Dashboard</a>
+</div>
+</header>
+<main class="live">
+<section class="hero">
+<div class="card">
+<span class="kicker"><i class="fas fa-location-crosshairs"></i> Consent-based tracking</span>
+<h1 class="title">Share your device location</h1>
+<p class="copy">Location is sent only after you press Start and grant browser permission. Stop sharing whenever you choose.</p>
+<div class="note"><strong>Browser limit:</strong> a phone browser can pause location updates when the page is backgrounded or the screen is locked.</div>
+</div>
+<div class="card"><img src="https://i.postimg.cc/3w6BvBsT/icon-512.png" alt="Manlung Recovery"></div>
+</section>
+<section class="grid">
+<div class="card">
+<div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;margin-bottom:.8rem"><strong>Location sharing</strong><span id="status" class="status">Stopped</span></div>
+<div class="controls">
+<div><label for="caseId">Case reference</label><input id="caseId" placeholder="MRC-2026-0012" autocomplete="off"></div>
+<div><label for="label">Device name</label><input id="label" value="My device" maxlength="80"></div>
+<div class="actions"><button id="start" class="btn btn-primary"><i class="fas fa-location-arrow"></i> Start sharing</button><button id="stop" class="btn btn-outline" disabled><i class="fas fa-stop"></i> Stop</button></div>
+<div>
+<div class="stat"><strong>GPS</strong><span id="gps">Waiting</span></div>
+<div class="stat"><strong>Accuracy</strong><span id="accuracy">—</span></div>
+<div class="stat"><strong>Speed</strong><span id="speed">—</span></div>
+<div class="stat"><strong>Battery</strong><span id="battery">—</span></div>
+<div class="stat"><strong>Last sent</strong><span id="sent">—</span></div>
+<div class="stat"><strong>Updates</strong><span id="updates">0</span></div>
+</div>
+</div>
+</div>
+<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem"><strong>Live map</strong><button id="follow" class="btn btn-outline">Follow</button></div><div id="map"></div></div>
+</section>
+</main>
+<script src="/js/theme.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/live-location.js"></script>
+</body>
+</html>
