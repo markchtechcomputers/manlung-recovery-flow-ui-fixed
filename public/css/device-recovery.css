@@ -107,3 +107,12 @@ html.dark{--dr-bg:#0a1020;--dr-card:#111827;--dr-line:#26364f;--dr-text:#f8fafc;
 .dr-report-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;color:var(--tool-muted,#64748b);font-size:.68rem}
 @media(max-width:760px){.dr-report-summary{grid-template-columns:1fr 1fr}.dr-admin-card{grid-template-columns:42px 1fr 48px 48px}.dr-report-foot{align-items:flex-start;flex-direction:column}}
 @media(max-width:560px){.dr-report-summary{grid-template-columns:1fr 1fr}.dr-admin-board{grid-template-columns:1fr}.dr-device-avatar{width:52px;height:52px}}
+
+/* VERIFIED RECOVERY MAP */
+.dr-map-shell{position:relative;display:block;overflow:hidden;padding:0;min-height:390px;background:var(--dr-bg)}
+.recovery-map{width:100%;height:390px;border-radius:14px;z-index:1}
+.dr-map-overlay{position:absolute;z-index:500;left:14px;bottom:14px;max-width:min(520px,calc(100% - 28px));display:flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid var(--dr-line);border-radius:10px;background:rgba(255,255,255,.92);color:var(--dr-text);box-shadow:0 8px 24px rgba(15,23,42,.12);font-size:.68rem;line-height:1.35}
+html.dark .dr-map-overlay{background:rgba(15,23,42,.92)}
+.dr-map-overlay i{color:var(--dr-blue)}
+.dr-map-marker{background:transparent!important;border:0!important}.dr-map-marker span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--dr-card);border:2px solid var(--dr-blue);box-shadow:0 4px 16px rgba(36,81,214,.28);font-size:14px}.dr-map-marker.picture span{border-color:#7c3aed}.dr-map-marker.platform span{border-color:#15803d;font-size:18px}
+@media(max-width:650px){.recovery-map{height:300px}.dr-map-shell{min-height:300px}}
