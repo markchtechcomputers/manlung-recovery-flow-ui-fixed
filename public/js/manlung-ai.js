@@ -771,6 +771,9 @@
     });
   }
 
-  function boot(){injectStyles();createUI();injectHeaderTab();}
+  function boot(){
+    document.querySelectorAll('.manlung-ai-loading,#manlungAiButton.manlung-ai-loading').forEach(el=>el.classList.remove('manlung-ai-loading'));
+    injectStyles();createUI();injectHeaderTab();
+  }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 })();
