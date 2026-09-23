@@ -1052,10 +1052,14 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
         }
 
         async function handleUnauthorized(res) {
-            if (res.status === 401 || res.status === 403) {
+            // Only a missing/expired authentication session should log the
+            // admin out. A 403 is an authorization/permission response and
+            // must never destroy an otherwise valid admin session.
+            if (res.status === 401) {
                 localStorage.removeItem('adminUser');
+                sessionStorage.removeItem('adminUser');
                 fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
-                window.location.href = '/admin/login.html';
+                window.location.href = '/admin/login.html?reason=session-expired';
                 return true;
             }
             return false;
