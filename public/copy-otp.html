@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="description" content="Copy your Manlung Recovery verification code.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/png" href="/icons/icon-512.png">
+  <title>Copy Verification Code · Manlung Recovery</title>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+      padding:24px;background:linear-gradient(135deg,#020617,#0f172a 55%,#111827);
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#fff
+    }
+    .card{
+      width:min(100%,460px);text-align:center;background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:34px 24px;
+      box-shadow:0 24px 70px rgba(0,0,0,.35);backdrop-filter:blur(16px)
+    }
+    .logo{
+      width:72px;height:72px;border-radius:18px;object-fit:cover;margin-bottom:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25)
+    }
+    h1{margin:0 0 8px;font-size:26px}
+    p{margin:0;color:#cbd5e1;line-height:1.55}
+    .code{
+      margin:26px 0 14px;padding:18px 14px;border-radius:16px;background:#fff;color:#0f172a;
+      font-size:36px;line-height:1;font-weight:800;letter-spacing:.16em;word-break:break-all;
+      user-select:all
+    }
+    button{
+      width:100%;border:0;border-radius:14px;padding:15px 18px;font-size:16px;font-weight:800;
+      cursor:pointer;background:#fff;color:#0f172a;transition:transform .15s ease,opacity .15s ease
+    }
+    button:hover{transform:translateY(-1px)}
+    button:disabled{cursor:default;opacity:.75;transform:none}
+    .status{min-height:24px;margin-top:14px;font-size:14px;color:#cbd5e1}
+    .back{
+      display:inline-block;margin-top:18px;color:#cbd5e1;text-decoration:none;font-size:14px
+    }
+    .back:hover{text-decoration:underline}
+    .error{color:#fecaca}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <img class="logo" src="/icons/icon-512.png" alt="Manlung Recovery">
+    <h1>Verification Code</h1>
+    <p>Your Manlung Recovery verification code is ready.</p>
+
+    <div id="code" class="code" aria-label="Verification code">••••••••</div>
+
+    <button id="copyButton" type="button" disabled>📋 Copy verification code</button>
+    <div id="status" class="status" aria-live="polite"></div>
+
+    <a class="back" href="/login.html">Return to Manlung Recovery</a>
+  </main>
+
+  <script>
+    (function () {
+      const codeEl = document.getElementById('code');
+      const copyButton = document.getElementById('copyButton');
+      const statusEl = document.getElementById('status');
+
+      // The OTP is carried in the URL fragment, so it is not sent to the server
+      // in the HTTP request and is not included in normal server access logs.
+      const code = decodeURIComponent(window.location.hash.slice(1)).trim();
+
+      if (!/^\d{8}$/.test(code)) {
+        codeEl.textContent = 'Invalid code';
+        codeEl.classList.add('error');
+        statusEl.textContent = 'Please return to your email and use the latest verification message.';
+        return;
+      }
+
+      codeEl.textContent = code;
+      copyButton.disabled = false;
+
+      async function copyCode() {
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(code);
+          } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = code;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+          }
+
+          copyButton.textContent = '✓ Code copied';
+          statusEl.textContent = 'The verification code is now on your clipboard.';
+        } catch (error) {
+          statusEl.textContent = 'Copy was blocked by your browser. Tap and hold the code to copy it.';
+        }
+      }
+
+      copyButton.addEventListener('click', copyCode);
+      codeEl.addEventListener('click', copyCode);
+    })();
+  </script>
+</body>
+</html>
