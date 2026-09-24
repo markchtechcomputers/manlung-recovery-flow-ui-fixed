@@ -47,6 +47,17 @@ const signToken = (user) => {
 const hashToken = (token) =>
   crypto.createHash('sha256').update(token).digest('hex');
 
+function normalizePhone(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const compact = raw.replace(/[\s().-]/g, '');
+  if (compact.startsWith('+')) return compact;
+  if (compact.startsWith('00')) return `+${compact.slice(2)}`;
+  if (compact.startsWith('254')) return `+${compact}`;
+  if (compact.startsWith('0')) return `+254${compact.slice(1)}`;
+  return `+${compact}`;
+}
+
 
 const ADMIN_COOKIE = 'manlung_admin_session';
 const MFA_TICKET_EXPIRE = '5m';
@@ -698,93 +709,37 @@ router.post(
         username = `${baseUsername.slice(0, 50)}-${crypto.randomBytes(4).toString('hex')}`;
       }
 
+      const normalizedPhone = normalizePhone(phone);
+
+      if (!normalizedPhone || !/^\+[1-9]\d{7,14}$/.test(normalizedPhone)) {
+        return res.status(400).json({
+          error: 'Enter a valid phone number, for example +254 7XX XXX XXX.',
+          code: 'INVALID_PHONE',
+        });
+      }
+
       const client = await User.create({
         username,
         email,
-        phone,
+        phone: normalizedPhone,
         password,
         role: 'client',
       });
 
-      // Require email verification before the new client can sign in.
-      const rawVerificationToken = crypto.randomBytes(32).toString('hex');
-      const verificationTokenHash = hashToken(rawVerificationToken);
-      const verificationExpires = new Date(
-        Date.now() + 60 * 60 * 1000
-      ).toISOString();
+      await supabase
+        .from('recovery_users')
+        .update({ phone_verification_required: true })
+        .eq('id', client.id)
+        .eq('role', 'client');
 
-      await User.setEmailVerificationToken(
-        client.email,
-        verificationTokenHash,
-        verificationExpires
-      );
-
-      const base =
-        process.env.PUBLIC_APP_URL ||
-        `${req.protocol}://${req.get('host')}`;
-
-      const verificationLink =
-        `${base}/api/auth/client/verify-email?token=${rawVerificationToken}`;
-
-      const safeUsername = String(client.username || 'Client')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-
-      const emailResult = await sendEmail({
-        to: client.email,
-        subject: 'Verify your Manlung Recovery email',
-        html: `
-          <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033;line-height:1.6;">
-            <div style="padding:24px;border-radius:16px;background:#0f2747;color:#fff;">
-              <h1 style="margin:0;font-size:24px;">Verify your email</h1>
-              <p style="margin:8px 0 0;color:#dbeafe;">
-                Welcome to Manlung Recovery, ${safeUsername}.
-              </p>
-            </div>
-
-            <div style="padding:24px 8px;">
-              <p>
-                Your client account has been created successfully.
-              </p>
-
-              <p>
-                Before you can sign in, please verify your email address by clicking
-                the button below.
-              </p>
-
-              <p style="margin:24px 0;">
-                <a href="${verificationLink}"
-                   style="display:inline-block;padding:13px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:10px;font-weight:700;">
-                  Verify Email Address
-                </a>
-              </p>
-
-              <p style="color:#64748b;font-size:13px;">
-                This verification link expires in one hour. You must verify your email
-                before signing in to the Client Portal.
-              </p>
-
-              <p style="margin-top:28px;color:#64748b;font-size:13px;">
-                If you did not create this account, you can safely ignore this email.
-              </p>
-            </div>
-          </div>
-        `,
-      });
-
-      if (!emailResult?.success) {
-        console.error(
-          'Client verification email was not sent:',
-          emailResult?.error || 'Unknown email error'
-        );
-      }
-
+      // Phone verification is handled by Supabase Auth SMS OTP.
+      // The OTP is requested by the browser after this account is created.
       res.status(201).json({
         success: true,
-        emailVerificationRequired: true,
+        phoneVerificationRequired: true,
+        phone: normalizedPhone,
         message:
-          'Account created successfully. Please check your email and verify your address before signing in.',
+          'Account created successfully. We sent a verification code to your phone.',
       });
     } catch (error) {
       console.error('Client register error:', error);
@@ -944,6 +899,108 @@ router.post(
 
 
 // ============================================================
+// CLIENT PHONE OTP
+// Supabase Auth sends and verifies the SMS OTP. The app then
+// marks the matching recovery_users record as phone-verified.
+// ============================================================
+
+router.post(
+  '/client/phone-otp/verify',
+  [
+    body('accessToken')
+      .trim()
+      .notEmpty()
+      .withMessage('Supabase verification session is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+
+    try {
+      const accessToken = String(req.body.accessToken || '').trim();
+      const { data, error } = await supabase.auth.getUser(accessToken);
+
+      if (error || !data?.user?.phone) {
+        return res.status(401).json({
+          success: false,
+          error: 'The phone verification session is invalid or expired.',
+          code: 'PHONE_OTP_INVALID',
+        });
+      }
+
+      const verifiedPhone = normalizePhone(data.user.phone);
+      const client = await User.findByEmailAndRole(
+        String(data.user.email || '').trim().toLowerCase(),
+        'client'
+      );
+
+      let matchedClient = client;
+
+      if (!matchedClient) {
+        const { data: phoneClient, error: phoneError } = await supabase
+          .from('recovery_users')
+          .select('*')
+          .eq('phone', verifiedPhone)
+          .eq('role', 'client')
+          .maybeSingle();
+
+        if (phoneError) throw phoneError;
+        matchedClient = phoneClient;
+      }
+
+      if (!matchedClient || normalizePhone(matchedClient.phone) !== verifiedPhone) {
+        return res.status(403).json({
+          success: false,
+          error: 'The verified phone number does not match this Manlung Recovery account.',
+          code: 'PHONE_ACCOUNT_MISMATCH',
+        });
+      }
+
+      const verified = await User.markPhoneVerified(matchedClient.id);
+      const token = signToken(verified || matchedClient);
+
+      return res.json({
+        success: true,
+        token,
+        user: {
+          id: matchedClient.id,
+          email: matchedClient.email,
+          username: matchedClient.username,
+          phone: matchedClient.phone,
+          role: matchedClient.role,
+        },
+        message: 'Phone number verified successfully.',
+      });
+    } catch (error) {
+      console.error('Client phone OTP verification error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Could not complete phone verification.',
+      });
+    }
+  }
+);
+
+router.post(
+  '/client/phone-otp/resend',
+  [
+    body('phone')
+      .trim()
+      .notEmpty()
+      .withMessage('Phone number is required'),
+  ],
+  async (req, res) => {
+    if (!checkValidation(req, res)) return;
+    // OTP delivery is intentionally performed by the Supabase client.
+    // This endpoint only confirms the route is available; the browser
+    // calls supabase.auth.signInWithOtp() to trigger the SMS.
+    return res.json({
+      success: true,
+      message: 'Request a new code from the verification screen.',
+    });
+  }
+);
+
+// ============================================================
 // CLIENT LOGIN
 // ============================================================
 
@@ -981,13 +1038,11 @@ router.post(
         });
       }
 
-      // New client accounts must verify their email before signing in.
-      // Existing accounts without a verification timestamp remain compatible.
-      if (client.email_verification_token_hash && !client.email_verified_at) {
+      if (client.phone_verification_required && !client.phone_verified_at) {
         return res.status(403).json({
           success: false,
-          code: 'EMAIL_NOT_VERIFIED',
-          error: 'Please verify your email address before signing in.',
+          code: 'PHONE_NOT_VERIFIED',
+          error: 'Please verify your phone number with the SMS code before signing in.',
         });
       }
 
@@ -1034,6 +1089,7 @@ router.post(
           email: client.email,
           username: client.username,
           role: client.role,
+          phone: client.phone || '',
         },
       });
     } catch (error) {
