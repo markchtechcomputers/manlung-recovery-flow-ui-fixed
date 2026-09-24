@@ -112,7 +112,7 @@
       <div id="registerPanel" hidden>
         <div class="manlung-auth-heading"><h2>Create your account</h2><p>Create a secure client account before submitting a recovery request.</p></div>
         <div class="manlung-social-grid"><div id="googleRegisterBtn" class="manlung-google-btn" aria-label="Continue with Google"></div><button type="button" id="githubRegisterBtn" class="manlung-social-btn" aria-label="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i> Continue with GitHub</button></div>
-        <div class="manlung-auth-divider">or create with email + phone verification</div>
+        <div class="manlung-auth-divider">or create with email verification</div>
         <form id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group"><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="200" placeholder="Your full name" required></div>
           <div class="form-group"><label for="regEmail">Email address</label><input type="email" id="regEmail" autocomplete="email" maxlength="254" placeholder="you@example.com" required></div>
@@ -137,16 +137,16 @@
         </form>
       </div>
 
-      <div id="phoneOtpPanel" hidden>
+      <div id="emailOtpPanel" hidden>
         <div class="manlung-auth-heading">
-          <h2>Verify your phone</h2>
-          <p id="phoneOtpDescription">We sent a 6-digit verification code to your phone.</p>
+          <h2>Verify your email</h2>
+          <p id="emailOtpDescription">We sent a 6-digit verification code to your email address.</p>
         </div>
-        <form id="phoneOtpForm" onsubmit="handlePhoneOtp(event)">
+        <form id="emailOtpForm" onsubmit="handleEmailOtp(event)">
           <div class="form-group">
-            <label for="phoneOtpCode">SMS verification code</label>
+            <label for="emailOtpCode">Email verification code</label>
             <input
-              id="phoneOtpCode"
+              id="emailOtpCode"
               inputmode="numeric"
               autocomplete="one-time-code"
               maxlength="6"
@@ -157,15 +157,15 @@
             >
           </div>
           <button type="submit" class="btn btn-primary manlung-auth-primary">
-            <i class="fas fa-shield-halved" aria-hidden="true"></i> Verify Phone
+            <i class="fas fa-shield-halved" aria-hidden="true"></i> Verify Email
           </button>
-          <button type="button" id="resendPhoneOtpBtn" class="btn" style="width:100%;margin-top:10px;" onclick="sendPhoneOtp(true)">
+          <button type="button" id="resendEmailOtpBtn" class="btn" style="width:100%;margin-top:10px;" onclick="sendEmailOtp(true)">
             <i class="fas fa-rotate-right" aria-hidden="true"></i> Resend code
           </button>
           <button type="button" class="btn" style="width:100%;margin-top:10px;" onclick="showTab('register')">
             Back to registration
           </button>
-          <div id="phoneOtpError" class="manlung-auth-message error-text" role="alert"></div>
+          <div id="emailOtpError" class="manlung-auth-message error-text" role="alert"></div>
         </form>
       </div>
 
@@ -190,7 +190,7 @@ function showTab(tab) {
   document.getElementById('loginPanel').hidden = tab !== 'login';
   document.getElementById('registerPanel').hidden = tab !== 'register';
   document.getElementById('forgotForm').hidden = true;
-  document.getElementById('phoneOtpPanel').hidden = true;
+  document.getElementById('emailOtpPanel').hidden = true;
   document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
   document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
   document.getElementById('tabLogin').setAttribute('aria-selected', String(tab === 'login'));
@@ -298,10 +298,10 @@ async function handleLogin(event) {
       return;
     }
 
-    if(data.code==='PHONE_NOT_VERIFIED'){
+    if(data.code==='EMAIL_NOT_VERIFIED'){
       showMessage(
         errorEl,
-        'Please verify your phone number with the SMS code before signing in.'
+        'Please verify your email address with the 6-digit code before signing in.'
       );
       return;
     }
@@ -364,7 +364,7 @@ async function resendVerificationEmail(){
   }
 }
 
-let manlungOtpPhone = '';
+let manlungOtpEmail = '';
 let manlungOtpSupabase = null;
 
 async function getManlungSupabaseClient() {
@@ -389,36 +389,25 @@ async function getManlungSupabaseClient() {
   return manlungOtpSupabase;
 }
 
-function normalizeManlungPhone(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return '';
-  const compact = raw.replace(/[\s().-]/g, '');
-  if (compact.startsWith('+')) return compact;
-  if (compact.startsWith('00')) return '+' + compact.slice(2);
-  if (compact.startsWith('254')) return '+' + compact;
-  if (compact.startsWith('0')) return '+254' + compact.slice(1);
-  return '+' + compact;
-}
-
-function showPhoneOtpPanel(phone) {
-  manlungOtpPhone = normalizeManlungPhone(phone);
+function showEmailOtpPanel(email) {
+  manlungOtpEmail = String(email || '').trim().toLowerCase();
   document.getElementById('loginPanel').hidden = true;
   document.getElementById('registerPanel').hidden = true;
   document.getElementById('forgotForm').hidden = true;
-  document.getElementById('phoneOtpPanel').hidden = false;
+  document.getElementById('emailOtpPanel').hidden = false;
   document.getElementById('tabLogin').classList.remove('active');
   document.getElementById('tabRegister').classList.remove('active');
-  document.getElementById('phoneOtpDescription').textContent =
+  document.getElementById('emailOtpDescription').textContent =
     'We sent a 6-digit Manlung Recovery verification code to ' +
-    manlungOtpPhone.replace(/(\\+?\\d{3})\\d+(\\d{3})$/, '$1•••$2') + '.';
-  document.getElementById('phoneOtpCode').focus();
+    manlungOtpEmail.replace(/^(.{2}).*(@.*)$/, '$1••••$2') + '.';
+  document.getElementById('emailOtpCode').focus();
 }
 
-async function sendPhoneOtp(isResend=false) {
-  const errorEl = document.getElementById('phoneOtpError');
-  const btn = document.getElementById('resendPhoneOtpBtn');
-  if (!manlungOtpPhone) {
-    showMessage(errorEl, 'Your phone number is missing. Please return to registration.');
+async function sendEmailOtp(isResend=false) {
+  const errorEl = document.getElementById('emailOtpError');
+  const btn = document.getElementById('resendEmailOtpBtn');
+  if (!manlungOtpEmail) {
+    showMessage(errorEl, 'Your email address is missing. Please return to registration.');
     return;
   }
   if (btn) {
@@ -428,7 +417,7 @@ async function sendPhoneOtp(isResend=false) {
   try {
     const supabase = await getManlungSupabaseClient();
     const { error } = await supabase.auth.signInWithOtp({
-      phone: manlungOtpPhone,
+      email: manlungOtpEmail,
       options: {
         shouldCreateUser: true
       }
@@ -436,60 +425,82 @@ async function sendPhoneOtp(isResend=false) {
     if (error) throw error;
     showMessage(
       errorEl,
-      isResend ? 'A new Manlung Recovery verification code has been sent.' : 'Verification code sent. Check your SMS.',
+      isResend
+        ? 'A new Manlung Recovery verification code has been sent to your email.'
+        : 'Verification code sent. Check your email inbox.',
       'success'
     );
   } catch (err) {
-    console.error('Phone OTP send error:', err);
-    showMessage(errorEl, err.message || 'Could not send the SMS verification code.');
+    console.error('Email OTP send error:', err);
+    showMessage(errorEl, err.message || 'Could not send the email verification code.');
   } finally {
     if (btn) {
       setTimeout(() => {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-rotate-right" aria-hidden="true"></i> Resend code';
-      }, 30000);
+      }, 60000);
     }
   }
 }
 
-async function handlePhoneOtp(event) {
+async function handleEmailOtp(event) {
   event.preventDefault();
-  const code = document.getElementById('phoneOtpCode').value.replace(/\D/g, '').slice(0, 6);
-  const errorEl = document.getElementById('phoneOtpError');
+  const code = document.getElementById('emailOtpCode').value.trim();
+  const errorEl = document.getElementById('emailOtpError');
+  const submitBtn = document.querySelector('#emailOtpForm button[type="submit"]');
+
   showMessage(errorEl, '');
+
   if (!/^\d{6}$/.test(code)) {
-    showMessage(errorEl, 'Enter the 6-digit code sent to your phone.');
+    showMessage(errorEl, 'Enter the 6-digit verification code from your email.');
     return;
+  }
+
+  if (!manlungOtpEmail) {
+    showMessage(errorEl, 'Your email address is missing. Please return to registration.');
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Verifying...';
   }
 
   try {
     const supabase = await getManlungSupabaseClient();
     const { data, error } = await supabase.auth.verifyOtp({
-      phone: manlungOtpPhone,
+      email: manlungOtpEmail,
       token: code,
-      type: 'sms'
+      type: 'email'
     });
-    if (error || !data?.session?.access_token) {
-      throw error || new Error('The verification code is invalid or expired.');
+
+    if (error) throw error;
+    if (!data?.session?.access_token) {
+      throw new Error('Email verification succeeded but no Supabase session was returned.');
     }
 
-    const res = await fetch('/api/auth/client/phone-otp/verify', {
+    const res = await fetch('/api/auth/client/email-otp/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ accessToken: data.session.access_token })
     });
+
     const result = await res.json();
     if (!res.ok || !result.success) {
-      throw new Error(result.error || 'Phone verification could not be completed.');
+      throw new Error(result.error || 'Could not complete email verification.');
     }
 
     localStorage.setItem('clientToken', result.token);
     localStorage.setItem('clientUser', JSON.stringify(result.user));
-    showMessage(errorEl, result.message || 'Phone verified successfully.', 'success');
-    setTimeout(() => window.location.replace('/client/dashboard.html?session=1'), 500);
+    window.location.replace('/client/dashboard.html?session=1');
   } catch (err) {
-    console.error('Phone OTP verification error:', err);
-    showMessage(errorEl, err.message || 'Could not verify the phone number.');
+    console.error('Email OTP verification error:', err);
+    showMessage(errorEl, err.message || 'Could not verify the email code.');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-shield-halved" aria-hidden="true"></i> Verify Email';
+    }
   }
 }
 
@@ -517,9 +528,9 @@ async function handleRegister(event) {
     const data=await res.json();
 
     if(data.success){
-      if(data.phoneVerificationRequired){
-        showPhoneOtpPanel(data.phone || phone);
-        await sendPhoneOtp(false);
+      if(data.emailVerificationRequired){
+        showEmailOtpPanel(data.email || email);
+        await sendEmailOtp(false);
         return;
       }
 
