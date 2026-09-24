@@ -432,8 +432,20 @@
   if('speechSynthesis'in window&&speechSynthesis.onvoiceschanged!==undefined){
     speechSynthesis.onvoiceschanged=()=>ensureSpeechVoice();
   }
+  let speechOutputUnlocked=false;
+  function unlockSpeechOutput(){
+    if(speechOutputUnlocked||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
+    try{
+      const u=new SpeechSynthesisUtterance('');
+      u.volume=0;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+      speechOutputUnlocked=true;
+    }catch(_){}
+  }
   function speak(text){
     if(!voiceEnabled()||!('speechSynthesis'in window))return;
+    unlockSpeechOutput();
     const value=String(text||'').trim();if(!value)return;
     try{
       const u=new SpeechSynthesisUtterance(value);
@@ -448,6 +460,7 @@
   }
   function createLiveSpeaker(){
     if(!('speechSynthesis'in window))return {push(){},finish(){}};
+    unlockSpeechOutput();
     let pending='',speaking=false;
     const queue=[];
     const pump=()=>{
@@ -668,6 +681,10 @@
   window.openManlungAI=function(open){toggle(open)};function toggle(open){const win=document.getElementById('manlungAiWindow');const next=typeof open==='boolean'?open:!win.classList.contains('open');win.classList.toggle('open',next);win.setAttribute('aria-hidden',String(!next));document.body.style.overflow=next?'hidden':'';if(next)setTimeout(()=>document.getElementById('manlungAiInput')?.focus(),80);}
 
   function bindEvents(){
+    // Browsers block speech started after an async network response unless the
+    // speech engine has first been unlocked by a user gesture.
+    document.getElementById('manlungAiWindow')?.addEventListener('pointerdown',unlockSpeechOutput,{passive:true});
+    document.getElementById('manlungAiWindow')?.addEventListener('keydown',unlockSpeechOutput,{passive:true});
     document.querySelector('.manlung-ai-close')?.addEventListener('click',()=>{stopListening();if('speechSynthesis'in window)window.speechSynthesis.cancel();toggle(false);});
     document.getElementById('manlungAiForm')?.addEventListener('submit',e=>{e.preventDefault();const i=document.getElementById('manlungAiInput'),v=i.value.trim();if(v){resetComposer();respond(v);}});
     document.getElementById('manlungAiInput')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('manlungAiForm')?.requestSubmit();}});
