@@ -310,6 +310,15 @@ function setupActions(){
   $('deviceForm')?.addEventListener('submit',createRecoveryCase);
   $('verifyBtn')?.addEventListener('click',verifyOwnership);
   $('refreshRecoveryFeed')?.addEventListener('click',()=>loadRecoveryFeed());
+  $('openRecoveryMap')?.addEventListener('click',async()=>{
+    const shell=document.querySelector('.dr-map-shell');
+    if(!shell)return;
+    try{
+      if(shell.requestFullscreen) await shell.requestFullscreen();
+      else shell.classList.toggle('dr-map-expanded');
+    }catch(_){shell.classList.toggle('dr-map-expanded');}
+    setTimeout(()=>recoveryMap?.invalidateSize(true),250);
+  });
   $('connectOfficialBtn')?.addEventListener('click',()=>addEvent('Official recovery service opened',serviceFor(state.platform).name,'PLATFORM HANDOFF'));
   $('officialLink')?.addEventListener('click',()=>addEvent('Official recovery service opened',serviceFor(state.platform).name,'PLATFORM HANDOFF'));
   $('locationServiceLink')?.addEventListener('click',()=>addEvent('Official location service opened',serviceFor(state.platform).name,'PLATFORM HANDOFF'));
