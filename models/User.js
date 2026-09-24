@@ -120,6 +120,21 @@ async function findByValidEmailVerificationToken(tokenHash) {
   return data;
 }
 
+async function markPhoneVerified(id) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .update({
+      phone_verified_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .eq('role', 'client')
+    .select('*')
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 async function markEmailVerified(id) {
   const { data, error } = await supabase
     .from(TABLE)
@@ -362,7 +377,7 @@ async function consumeRecoveryCode(userId, remainingHashes) {
 
 module.exports = {
   findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword, verifyPassword, bumpSessionVersion,
-  setEmailVerificationToken, findByValidEmailVerificationToken, markEmailVerified,
+  setEmailVerificationToken, findByValidEmailVerificationToken, markEmailVerified, markPhoneVerified,
   setResetToken, findByValidResetToken, resetPassword, updateProfile, updatePassword, deleteById, createAdminFromInvitation,
   listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, convertClientToPendingAdmin, setAdminStatus, removeAdminPrivileges,
   setMfaSetup, enableMfa, disableMfa, consumeRecoveryCode,
