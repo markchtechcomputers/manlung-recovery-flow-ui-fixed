@@ -119,3 +119,5 @@ html.dark .dr-map-overlay{background:rgba(15,23,42,.92)}
 
 .dr-map-shell{position:relative}.dr-map-open{position:absolute;right:14px;top:14px;z-index:700;padding:.5rem .8rem;font-size:.72rem;box-shadow:0 6px 18px rgba(15,23,42,.18)}
 @media(max-width:650px){.dr-map-open{right:10px;top:10px;padding:.45rem .65rem;font-size:.66rem}}
+
+.dr-map-shell:fullscreen{width:100vw;height:100vh;background:#fff;padding:0}.dr-map-shell:fullscreen .recovery-map{height:100vh;border-radius:0}.dr-map-shell.dr-map-expanded{position:fixed;inset:0;z-index:9999;background:#fff;padding:0}.dr-map-shell.dr-map-expanded .recovery-map{height:100vh;border-radius:0}
