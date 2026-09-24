@@ -2491,5 +2491,54 @@ async function sendAdminCaseMessage(caseId) {
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
-</body>
+
+<style id="admin-live-notifications-style">
+#adminLiveNotificationToast{position:fixed;top:88px;right:18px;z-index:2147483000;width:min(420px,calc(100vw - 30px));display:none;background:#071a33;color:#fff;border:1px solid rgba(96,165,250,.35);border-radius:16px;box-shadow:0 18px 50px rgba(2,6,23,.35);padding:14px 16px}
+#adminLiveNotificationToast.show{display:block;animation:adminNoticeIn .22s ease}
+#adminLiveNotificationToast .admin-notice-row{display:flex;gap:12px;align-items:flex-start}
+#adminLiveNotificationToast .admin-notice-icon{width:42px;height:42px;flex:0 0 42px;border-radius:12px;background:#2563eb;display:grid;place-items:center}
+#adminLiveNotificationToast h4{margin:0 0 3px;font-size:.92rem;color:#fff}
+#adminLiveNotificationToast p{margin:0;color:#cbd5e1;font-size:.78rem;line-height:1.45}
+#adminLiveNotificationToast button{margin-left:auto;border:0;background:transparent;color:#94a3b8;cursor:pointer;font-size:1.1rem}
+@keyframes adminNoticeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+<div id="adminLiveNotificationToast" role="status" aria-live="polite"><div class="admin-notice-row"><div class="admin-notice-icon"><i class="fas fa-bell"></i></div><div style="min-width:0;flex:1"><h4 id="adminLiveNotificationTitle">New request</h4><p id="adminLiveNotificationMessage"></p></div><button type="button" id="adminLiveNotificationClose" aria-label="Close"><i class="fas fa-times"></i></button></div></div>
+<script id="admin-live-notifications">
+(function(){
+  const seen=new Set(); let ready=false, timer=null, audioCtx=null;
+  function sound(){
+    try{
+      const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+      audioCtx=audioCtx||new C(); if(audioCtx.state==='suspended')audioCtx.resume();
+      const now=audioCtx.currentTime;
+      [0,.14,.28].forEach((offset,i)=>{
+        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.type='sine';o.frequency.value=[880,1175,880][i];g.gain.setValueAtTime(.0001,now+offset);
+        g.gain.exponentialRampToValueAtTime(.08,now+offset+.02);g.gain.exponentialRampToValueAtTime(.0001,now+offset+.11);
+        o.connect(g);g.connect(audioCtx.destination);o.start(now+offset);o.stop(now+offset+.12);
+      });
+    }catch(_){}
+  }
+  function show(n){
+    const t=document.getElementById('adminLiveNotificationToast');if(!t)return;
+    document.getElementById('adminLiveNotificationTitle').textContent=n.title||'New notification';
+    document.getElementById('adminLiveNotificationMessage').textContent=n.message||'';
+    t.classList.add('show');sound();clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('show'),8000);
+  }
+  async function poll(){
+    try{
+      const headers=typeof authHeaders==='function'?authHeaders():{};
+      const r=await fetch('/api/notifications',{headers,cache:'no-store'});
+      if(!r.ok)return;
+      const d=await r.json();const items=Array.isArray(d.notifications)?d.notifications:[];
+      const fresh=items.filter(n=>n&&!n.read_at&&n.id&&!seen.has(String(n.id))).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+      if(ready&&fresh.length){show(fresh[0]);if(typeof loadCases==='function')loadCases(1);if(typeof loadStats==='function')loadStats();}
+      items.forEach(n=>n?.id&&seen.add(String(n.id)));ready=true;
+    }catch(_){}
+  }
+  document.getElementById('adminLiveNotificationClose')?.addEventListener('click',()=>document.getElementById('adminLiveNotificationToast')?.classList.remove('show'));
+  document.addEventListener('pointerdown',()=>{try{const C=window.AudioContext||window.webkitAudioContext;if(C){audioCtx=audioCtx||new C();if(audioCtx.state==='suspended')audioCtx.resume();}}catch(_){}},{once:true,passive:true});
+  document.addEventListener('DOMContentLoaded',()=>{poll();setInterval(poll,8000);});
+})();
+</script></body>
 </html>
