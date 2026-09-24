@@ -7,6 +7,7 @@ const { body, validationResult } = require('express-validator');
 const Case = require('../models/Case');
 const Notification = require('../models/Notification');
 const CaseTimeline = require('../models/CaseTimeline');
+const User = require('../models/User');
 const {
   auth,
   optionalAuth,
@@ -1201,6 +1202,22 @@ router.post(
 
       const newCase =
         await Case.create(caseFields);
+
+      // Notify every active Owner/Admin immediately when a new client request arrives.
+      try {
+        const recipients = await User.listAdminsAndOwner();
+        await Promise.all((recipients || [])
+          .filter(user => user?.id && user.admin_status !== 'suspended')
+          .map(user => Notification.create({
+            userId: user.id,
+            caseId: newCase.case_id,
+            type: 'new_case_request',
+            title: 'New recovery request',
+            message: 'New ' + (newCase.case_type || 'recovery') + ' request ' + newCase.case_id + ' from ' + (newCase.client_name || 'a client') + ' is waiting for review.',
+          })));
+      } catch (notificationError) {
+        console.error('New case admin notification failed:', notificationError);
+      }
 
       const message = `
 📌 <b>New Recovery Request</b>
