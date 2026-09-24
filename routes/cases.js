@@ -1992,6 +1992,23 @@ router.get('/admin/device-recovery/case/:caseId/map', adminAuth, async (req, res
       .eq('case_id', caseId).order('reported_at',{ascending:true});
     if (locationError) throw locationError;
     for (const l of locations || []) points.push({id:'platform-'+l.id,type:'platform',label:'Official platform location',latitude:Number(l.latitude),longitude:Number(l.longitude),accuracyMeters:l.accuracy_meters,timestamp:l.reported_at,source:l.source||'Authorized platform'});
+
+    // Client-initiated, consented device location points are also valid investigation
+    // evidence and are displayed on the same real-world map with their timestamps.
+    const { data: liveLocations, error: liveLocationError } = await supabase.from('recovery_location_points')
+      .select('id,latitude,longitude,accuracy_m,device_timestamp,received_at,device_label')
+      .eq('case_id', caseId).order('device_timestamp',{ascending:true}).limit(2000);
+    if (liveLocationError) throw liveLocationError;
+    for (const l of liveLocations || []) points.push({
+      id:'live-'+l.id,
+      type:'platform',
+      label:'Consented device location · '+(l.device_label || 'Device'),
+      latitude:Number(l.latitude),
+      longitude:Number(l.longitude),
+      accuracyMeters:l.accuracy_m,
+      timestamp:l.device_timestamp || l.received_at,
+      source:'Client-initiated consented location'
+    });
     const files=Array.isArray(row.files)?row.files:[];
     files.forEach((file,index)=>{
       const l=file?.captureMetadata?.location;
