@@ -116,3 +116,6 @@ html.dark .dr-map-overlay{background:rgba(15,23,42,.92)}
 .dr-map-overlay i{color:var(--dr-blue)}
 .dr-map-marker{background:transparent!important;border:0!important}.dr-map-marker span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--dr-card);border:2px solid var(--dr-blue);box-shadow:0 4px 16px rgba(36,81,214,.28);font-size:14px}.dr-map-marker.picture span{border-color:#7c3aed}.dr-map-marker.platform span{border-color:#15803d;font-size:18px}
 @media(max-width:650px){.recovery-map{height:300px}.dr-map-shell{min-height:300px}}
+
+.dr-map-shell{position:relative}.dr-map-open{position:absolute;right:14px;top:14px;z-index:700;padding:.5rem .8rem;font-size:.72rem;box-shadow:0 6px 18px rgba(15,23,42,.18)}
+@media(max-width:650px){.dr-map-open{right:10px;top:10px;padding:.45rem .65rem;font-size:.66rem}}
