@@ -690,11 +690,104 @@ router.post(
 
       const existing = await User.findByEmail(email);
 
+      // Allow an unverified client to resume registration instead of
+      // incorrectly blocking them with "account already exists".
+      // Supabase Auth is kept in sync so the browser can request an OTP
+      // with shouldCreateUser:false.
       if (existing) {
-        return res.status(409).json({
-          error:
-            'An account with this email already exists',
-        });
+        if (existing.role !== 'client') {
+          return res.status(409).json({
+            error: 'An account with this email already exists',
+            code: 'ACCOUNT_EXISTS',
+          });
+        }
+
+        if (existing.email_verified_at) {
+          return res.status(409).json({
+            error: 'An account with this email already exists. Please sign in.',
+            code: 'ACCOUNT_EXISTS_VERIFIED',
+          });
+        }
+
+        let authUser = null;
+        try {
+          const { data: authList, error: authListError } =
+            await supabase.auth.admin.listUsers({
+              page: 1,
+              perPage: 1000,
+            });
+
+          if (authListError) throw authListError;
+
+          authUser = (authList?.users || []).find(
+            (user) =>
+              String(user.email || '').trim().toLowerCase() ===
+              String(email).trim().toLowerCase()
+          );
+
+          if (authUser) {
+            const { data: updatedAuth, error: updateAuthError } =
+              await supabase.auth.admin.updateUserById(authUser.id, {
+                password,
+                email_confirm: false,
+                user_metadata: {
+                  ...(authUser.user_metadata || {}),
+                  full_name: fullName || existing.username,
+                  phone: normalizePhone(phone) || existing.phone || null,
+                  app_user_id: existing.id,
+                },
+              });
+
+            if (updateAuthError) throw updateAuthError;
+            authUser = updatedAuth?.user || authUser;
+          } else {
+            const { data: authData, error: authError } =
+              await supabase.auth.admin.createUser({
+                email,
+                password,
+                email_confirm: false,
+                user_metadata: {
+                  full_name: fullName || existing.username,
+                  phone: normalizePhone(phone) || existing.phone || null,
+                  app_user_id: existing.id,
+                },
+              });
+
+            if (authError || !authData?.user?.id) {
+              throw authError || new Error('Could not create the Supabase authentication account.');
+            }
+
+            authUser = authData.user;
+          }
+
+          const { error: verificationFlagError } = await supabase
+            .from('recovery_users')
+            .update({
+              email_otp_required: true,
+              phone_verification_required: false,
+            })
+            .eq('id', existing.id)
+            .eq('role', 'client');
+
+          if (verificationFlagError) throw verificationFlagError;
+
+          return res.status(200).json({
+            success: true,
+            existingAccount: true,
+            emailVerificationRequired: true,
+            email,
+            message:
+              'This account is not verified yet. We will send a new 6-digit verification code to your email.',
+          });
+        } catch (resumeError) {
+          console.error('Client registration resume error:', resumeError);
+
+          return res.status(500).json({
+            error:
+              resumeError.message ||
+              'Could not resume email verification for this account.',
+          });
+        }
       }
 
       // Keep usernames human-readable while guaranteeing uniqueness.
