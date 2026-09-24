@@ -728,18 +728,21 @@ router.post(
 
       await supabase
         .from('recovery_users')
-        .update({ phone_verification_required: true })
+        .update({
+          email_otp_required: true,
+          phone_verification_required: false,
+        })
         .eq('id', client.id)
         .eq('role', 'client');
 
-      // Phone verification is handled by Supabase Auth SMS OTP.
+      // Email verification is handled by Supabase Auth Email OTP.
       // The OTP is requested by the browser after this account is created.
       res.status(201).json({
         success: true,
-        phoneVerificationRequired: true,
-        phone: normalizedPhone,
+        emailVerificationRequired: true,
+        email,
         message:
-          'Account created successfully. We sent a verification code to your phone.',
+          'Account created successfully. We sent a 6-digit verification code to your email.',
       });
     } catch (error) {
       console.error('Client register error:', error);
@@ -899,13 +902,13 @@ router.post(
 
 
 // ============================================================
-// CLIENT PHONE OTP
-// Supabase Auth sends and verifies the SMS OTP. The app then
-// marks the matching recovery_users record as phone-verified.
+// CLIENT EMAIL OTP
+// Supabase Auth sends and verifies the email OTP. The app then
+// marks the matching recovery_users record as email-verified.
 // ============================================================
 
 router.post(
-  '/client/phone-otp/verify',
+  '/client/email-otp/verify',
   [
     body('accessToken')
       .trim()
@@ -919,83 +922,73 @@ router.post(
       const accessToken = String(req.body.accessToken || '').trim();
       const { data, error } = await supabase.auth.getUser(accessToken);
 
-      if (error || !data?.user?.phone) {
+      if (error || !data?.user?.email) {
         return res.status(401).json({
           success: false,
-          error: 'The phone verification session is invalid or expired.',
-          code: 'PHONE_OTP_INVALID',
+          error: 'The email verification session is invalid or expired.',
+          code: 'EMAIL_OTP_INVALID',
         });
       }
 
-      const verifiedPhone = normalizePhone(data.user.phone);
-      const client = await User.findByEmailAndRole(
-        String(data.user.email || '').trim().toLowerCase(),
-        'client'
-      );
+      const verifiedEmail = String(data.user.email).trim().toLowerCase();
+      const client = await User.findByEmailAndRole(verifiedEmail, 'client');
 
-      let matchedClient = client;
-
-      if (!matchedClient) {
-        const { data: phoneClient, error: phoneError } = await supabase
-          .from('recovery_users')
-          .select('*')
-          .eq('phone', verifiedPhone)
-          .eq('role', 'client')
-          .maybeSingle();
-
-        if (phoneError) throw phoneError;
-        matchedClient = phoneClient;
-      }
-
-      if (!matchedClient || normalizePhone(matchedClient.phone) !== verifiedPhone) {
+      if (!client) {
         return res.status(403).json({
           success: false,
-          error: 'The verified phone number does not match this Manlung Recovery account.',
-          code: 'PHONE_ACCOUNT_MISMATCH',
+          error: 'The verified email does not match a Manlung Recovery client account.',
+          code: 'EMAIL_ACCOUNT_MISMATCH',
         });
       }
 
-      const verified = await User.markPhoneVerified(matchedClient.id);
-      const token = signToken(verified || matchedClient);
+      const verified = await User.markEmailVerified(client.id);
+
+      await supabase
+        .from('recovery_users')
+        .update({ email_otp_required: false })
+        .eq('id', client.id)
+        .eq('role', 'client');
+
+      const token = signToken(verified || client);
 
       return res.json({
         success: true,
         token,
         user: {
-          id: matchedClient.id,
-          email: matchedClient.email,
-          username: matchedClient.username,
-          phone: matchedClient.phone,
-          role: matchedClient.role,
+          id: client.id,
+          email: client.email,
+          username: client.username,
+          phone: client.phone,
+          role: client.role,
         },
-        message: 'Phone number verified successfully.',
+        message: 'Email verified successfully.',
       });
     } catch (error) {
-      console.error('Client phone OTP verification error:', error);
+      console.error('Client email OTP verification error:', error);
       return res.status(500).json({
         success: false,
-        error: 'Could not complete phone verification.',
+        error: 'Could not complete email verification.',
       });
     }
   }
 );
 
 router.post(
-  '/client/phone-otp/resend',
+  '/client/email-otp/resend',
   [
-    body('phone')
+    body('email')
       .trim()
-      .notEmpty()
-      .withMessage('Phone number is required'),
+      .isEmail()
+      .withMessage('A valid email is required')
+      .normalizeEmail(),
   ],
   async (req, res) => {
     if (!checkValidation(req, res)) return;
     // OTP delivery is intentionally performed by the Supabase client.
-    // This endpoint only confirms the route is available; the browser
-    // calls supabase.auth.signInWithOtp() to trigger the SMS.
+    // The browser calls supabase.auth.signInWithOtp() to trigger email delivery.
     return res.json({
       success: true,
-      message: 'Request a new code from the verification screen.',
+      message: 'Request a new code from the email verification screen.',
     });
   }
 );
@@ -1038,11 +1031,11 @@ router.post(
         });
       }
 
-      if (client.phone_verification_required && !client.phone_verified_at) {
+      if (client.email_otp_required && !client.email_verified_at) {
         return res.status(403).json({
           success: false,
-          code: 'PHONE_NOT_VERIFIED',
-          error: 'Please verify your phone number with the SMS code before signing in.',
+          code: 'EMAIL_NOT_VERIFIED',
+          error: 'Please verify your email address with the 6-digit code before signing in.',
         });
       }
 
