@@ -454,7 +454,7 @@ async function handleEmailOtp(event) {
   showMessage(errorEl, '');
 
   if (!/^\d{6}$/.test(code)) {
-    showMessage(errorEl, 'Enter the 6-digit verification code from your email.');
+    showMessage(errorEl, 'Enter the 8-digit verification code from your email.');
     return;
   }
 
