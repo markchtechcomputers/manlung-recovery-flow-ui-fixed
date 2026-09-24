@@ -718,6 +718,9 @@ router.post(
         });
       }
 
+      // Create the application account first, then create the matching
+      // Supabase Auth identity. The Auth identity must exist before the
+      // browser requests an email OTP with shouldCreateUser:false.
       const client = await User.create({
         username,
         email,
@@ -726,17 +729,59 @@ router.post(
         role: 'client',
       });
 
-      await supabase
-        .from('recovery_users')
-        .update({
-          email_otp_required: true,
-          phone_verification_required: false,
-        })
-        .eq('id', client.id)
-        .eq('role', 'client');
+      let authUserId = null;
+
+      try {
+        const { data: authData, error: authError } =
+          await supabase.auth.admin.createUser({
+            email,
+            password,
+            email_confirm: false,
+            user_metadata: {
+              full_name: fullName || username,
+              phone: normalizedPhone,
+              app_user_id: client.id,
+            },
+          });
+
+        if (authError || !authData?.user?.id) {
+          throw authError || new Error('Could not create the Supabase authentication account.');
+        }
+
+        authUserId = authData.user.id;
+
+        const { error: verificationFlagError } = await supabase
+          .from('recovery_users')
+          .update({
+            email_otp_required: true,
+            phone_verification_required: false,
+          })
+          .eq('id', client.id)
+          .eq('role', 'client');
+
+        if (verificationFlagError) {
+          throw verificationFlagError;
+        }
+      } catch (authSetupError) {
+        if (authUserId) {
+          try {
+            await supabase.auth.admin.deleteUser(authUserId);
+          } catch (cleanupError) {
+            console.error('Supabase Auth cleanup after registration failure:', cleanupError);
+          }
+        }
+
+        try {
+          await User.deleteById(client.id);
+        } catch (cleanupError) {
+          console.error('Local client cleanup after registration failure:', cleanupError);
+        }
+
+        throw authSetupError;
+      }
 
       // Email verification is handled by Supabase Auth Email OTP.
-      // The OTP is requested by the browser after this account is created.
+      // The browser requests the code for this already-created Auth user.
       res.status(201).json({
         success: true,
         emailVerificationRequired: true,
