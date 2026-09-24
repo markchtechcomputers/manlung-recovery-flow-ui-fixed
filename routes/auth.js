@@ -729,7 +729,7 @@ router.post(
             const { data: updatedAuth, error: updateAuthError } =
               await supabase.auth.admin.updateUserById(authUser.id, {
                 password,
-                email_confirm: false,
+                email_confirm: true,
                 user_metadata: {
                   ...(authUser.user_metadata || {}),
                   full_name: fullName || existing.username,
@@ -745,7 +745,7 @@ router.post(
               await supabase.auth.admin.createUser({
                 email,
                 password,
-                email_confirm: false,
+                email_confirm: true,
                 user_metadata: {
                   full_name: fullName || existing.username,
                   phone: normalizePhone(phone) || existing.phone || null,
@@ -777,7 +777,7 @@ router.post(
             emailVerificationRequired: true,
             email,
             message:
-              'This account is not verified yet. We will send a new 6-digit verification code to your email.',
+              'This account is not verified yet. We will send a new 8-digit verification code to your email.',
           });
         } catch (resumeError) {
           console.error('Client registration resume error:', resumeError);
@@ -829,7 +829,7 @@ router.post(
           await supabase.auth.admin.createUser({
             email,
             password,
-            email_confirm: false,
+            email_confirm: true,
             user_metadata: {
               full_name: fullName || username,
               phone: normalizedPhone,
