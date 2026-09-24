@@ -419,7 +419,9 @@ async function sendEmailOtp(isResend=false) {
     const { error } = await supabase.auth.signInWithOtp({
       email: manlungOtpEmail,
       options: {
-        shouldCreateUser: true
+        // The server already created the matching Supabase Auth user.
+        // This OTP request must never create a second Auth identity.
+        shouldCreateUser: false
       }
     });
     if (error) throw error;
