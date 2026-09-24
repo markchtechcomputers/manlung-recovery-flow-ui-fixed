@@ -54,6 +54,11 @@
 @media (max-width:640px){.manlung-auth-form{padding:18px}.manlung-auth-page .manlung-auth-form form,.manlung-auth-page .manlung-auth-heading{padding:14px}}
 
 .manlung-auth-tabs,.manlung-auth-tabs button,.manlung-social-grid,.manlung-social-btn,.manlung-google-btn{position:relative;z-index:10000;pointer-events:auto!important}.manlung-social-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;width:100%!important;align-items:stretch!important}.manlung-social-btn,.manlung-google-btn{box-sizing:border-box!important;width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;max-width:100%!important}.manlung-social-btn{display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;white-space:nowrap!important;overflow:hidden!important}.manlung-google-btn{display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;min-height:48px!important}.manlung-google-btn iframe{display:block!important;max-width:100%!important}.manlung-auth-tabs{display:flex!important}.manlung-auth-tabs button{cursor:pointer!important;flex:1!important}@media(max-width:640px){.manlung-social-grid{grid-template-columns:1fr!important}}
+</style><style>
+.manlung-password-field{position:relative;display:flex;align-items:center}
+.manlung-password-field input{padding-right:3rem!important}
+.manlung-password-toggle{position:absolute;right:7px;width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:#64748b;cursor:pointer}
+.manlung-password-toggle:hover{background:rgba(37,99,235,.08);color:#2563eb}
 </style></head>
 <body class="manlung-auth-page">
 <header class="site-header">
@@ -112,7 +117,21 @@
           <div class="form-group"><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="200" placeholder="Your full name" required></div>
           <div class="form-group"><label for="regEmail">Email address</label><input type="email" id="regEmail" autocomplete="email" maxlength="254" placeholder="you@example.com" required></div>
           <div class="form-group"><label for="regPhone">Phone number</label><input id="regPhone" type="tel" autocomplete="tel" maxlength="40" placeholder="+254 7XX XXX XXX" required></div>
-          <div class="form-group"><div class="manlung-auth-message success-text" style="margin-top:.25rem;">Your password is created after you verify your email. We will send you a secure setup link.</div></div>
+          <div class="form-group">
+            <label for="regPassword">Create password</label>
+            <div class="manlung-password-field">
+              <input id="regPassword" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="At least 8 characters" required>
+              <button type="button" class="manlung-password-toggle" data-password-target="regPassword" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button>
+            </div>
+            <small style="display:block;margin-top:5px;color:var(--text-muted);">Use at least 8 characters. Never reuse a password from another service.</small>
+          </div>
+          <div class="form-group">
+            <label for="regPasswordConfirm">Confirm password</label>
+            <div class="manlung-password-field">
+              <input id="regPasswordConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="Re-enter your password" required>
+              <button type="button" class="manlung-password-toggle" data-password-target="regPasswordConfirm" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button>
+            </div>
+          </div>
           <button type="submit" class="btn btn-primary manlung-auth-primary"><i class="fas fa-user-plus" aria-hidden="true"></i> Create Account</button>
           <div id="registerError" class="manlung-auth-message error-text" role="alert"></div>
         </form>
@@ -214,6 +233,14 @@ async function handleLogin(event) {
   const password=document.getElementById('loginPassword').value;
   const errorEl=document.getElementById('loginError');
   showMessage(errorEl,'');
+  if(password.length < 8 || password.length > 72){
+    showMessage(errorEl,'Password must be between 8 and 72 characters.');
+    return;
+  }
+  if(password !== passwordConfirm){
+    showMessage(errorEl,'Passwords do not match.');
+    return;
+  }
 
   try {
     const res=await fetch('/api/auth/client/login',{
@@ -319,7 +346,9 @@ async function handleRegister(event) {
   const fullName=document.getElementById('regName').value;
   const email=document.getElementById('regEmail').value;
   const phone=document.getElementById('regPhone').value;
-    const errorEl=document.getElementById('registerError');
+  const password=document.getElementById('regPassword').value;
+  const passwordConfirm=document.getElementById('regPasswordConfirm').value;
+  const errorEl=document.getElementById('registerError');
 
   showMessage(errorEl,'');
 
@@ -327,7 +356,7 @@ async function handleRegister(event) {
     const res=await fetch('/api/auth/client/register',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({fullName,email,phone})
+      body:JSON.stringify({fullName,email,phone,password})
     });
 
     const data=await res.json();
@@ -356,6 +385,17 @@ async function handleRegister(event) {
     );
   }
 }
+document.querySelectorAll('.manlung-password-toggle').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const input=document.getElementById(btn.dataset.passwordTarget);
+    if(!input)return;
+    const show=input.type==='password';
+    input.type=show?'text':'password';
+    btn.setAttribute('aria-label',show?'Hide password':'Show password');
+    btn.title=show?'Hide password':'Show password';
+    btn.innerHTML=show?'<i class="fas fa-eye-slash"></i>':'<i class="fas fa-eye"></i>';
+  });
+});
 document.addEventListener('DOMContentLoaded',()=>{
   handleEmailVerificationResult();
 });
