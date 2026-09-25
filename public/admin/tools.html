@@ -7,7 +7,8 @@
 <title>Admin Tools · Manlung Recovery</title>
 <script src="/js/theme.js"></script>
 <link rel="stylesheet" href="/css/admin.css">
-<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">\n<link rel="stylesheet" href="/css/footer.css">
+<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="/css/footer.css">
 <script src="/js/admin-session-guard.js"></script>
 <style>
 :root{--tool-bg:#f6f8fc;--tool-card:#fff;--tool-line:#dbe3ef;--tool-text:#0f172a;--tool-muted:#64748b;--tool-accent:#2451d6;--tool-accent-2:#123a78}
@@ -224,7 +225,8 @@ const selfieStatus=document.getElementById('selfieGeneratorStatus');
 const copySelfieBtn=document.getElementById('copySelfieBtn');
 const shareSelfieBtn=document.getElementById('shareSelfieBtn');
 let generatedSelfieUrl='';
-function activateLinkAnalysisFromCard(e){if(e){e.preventDefault();e.stopPropagation()}setLinkAnalysisActive(true);linkAnalysisWorkspace?.scrollIntoView({behavior:'smooth',block:'start'});}\nfunction setLinkAnalysisActive(active){
+function activateLinkAnalysisFromCard(e){if(e){e.preventDefault();e.stopPropagation()}setLinkAnalysisActive(true);linkAnalysisWorkspace?.scrollIntoView({behavior:'smooth',block:'start'});}
+function setLinkAnalysisActive(active){
   if(!linkAnalysisCard||!linkAnalysisWorkspace)return;
   linkAnalysisCard.classList.toggle('is-active',active);
   linkAnalysisCard.setAttribute('aria-expanded',String(active));
