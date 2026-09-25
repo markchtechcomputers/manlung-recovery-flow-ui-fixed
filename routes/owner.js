@@ -11,6 +11,7 @@ const CallSession = require('../models/CallSession');
 const AdminPresence = require('../models/AdminPresence');
 const SecurityMonitoring = require('../models/SecurityMonitoring');
 const { sendEmail } = require('../services/email');
+const { supabase } = require('../config/supabase');
 
 function checkValidation(req, res) {
   const errors = validationResult(req);
@@ -263,6 +264,87 @@ router.get('/security/cases/:caseId/intelligence', async (req,res) => {
     if(!data.case) return res.status(404).json({error:'Case not found.'});
     res.json({success:true,...data});
   } catch(error){ console.error('Case intelligence error:',error); res.status(500).json({error:'Could not load case intelligence.'}); }
+});
+
+// Owner-managed complimentary call access. The client must already exist.
+router.get('/call-access', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('recovery_call_entitlements')
+      .select('user_id,free_access_until,free_access_granted_at,free_access_granted_by')
+      .not('free_access_until', 'is', null)
+      .order('free_access_until', { ascending: false });
+    if (error) throw error;
+    res.json({ success: true, access: data || [] });
+  } catch (error) {
+    console.error('Owner call access list error:', error);
+    res.status(500).json({ error: 'Could not load free call access.' });
+  }
+});
+
+router.put('/call-access', [
+  body('email').trim().isEmail().normalizeEmail(),
+  body('days').isInt({ min: 1, max: 3650 }),
+], async (req, res) => {
+  if (!checkValidation(req, res)) return;
+  try {
+    const email = String(req.body.email).trim().toLowerCase();
+    const days = Number(req.body.days);
+    const { data: client, error: userError } = await supabase
+      .from('recovery_users')
+      .select('id,email,username,role')
+      .eq('email', email)
+      .maybeSingle();
+    if (userError) throw userError;
+    if (!client) return res.status(404).json({ error: 'No registered account exists with that email.' });
+    if (client.role !== 'client') return res.status(400).json({ error: 'Free call access is only for client accounts.' });
+
+    const until = new Date(Date.now() + days * 86400000).toISOString();
+    const { data: entitlement, error: upsertError } = await supabase
+      .from('recovery_call_entitlements')
+      .upsert({
+        user_id: client.id,
+        free_access_until: until,
+        free_access_granted_by: req.user.id,
+        free_access_granted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' })
+      .select()
+      .single();
+    if (upsertError) throw upsertError;
+
+    await AdminAuditLog.record({
+      actor: req.user,
+      target: client,
+      action: 'granted_free_call_access',
+      details: { email, days, freeAccessUntil: until },
+    });
+    res.json({ success: true, entitlement });
+  } catch (error) {
+    console.error('Grant free call access error:', error);
+    res.status(500).json({ error: 'Could not grant free call access.' });
+  }
+});
+
+router.delete('/call-access/:userId', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('recovery_call_entitlements')
+      .update({ free_access_until: null, free_access_granted_by: null, free_access_granted_at: null, updated_at: new Date().toISOString() })
+      .eq('user_id', req.params.userId)
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    await AdminAuditLog.record({
+      actor: req.user,
+      target: { id: req.params.userId },
+      action: 'revoked_free_call_access',
+    });
+    res.json({ success: true, entitlement: data });
+  } catch (error) {
+    console.error('Revoke free call access error:', error);
+    res.status(500).json({ error: 'Could not revoke free call access.' });
+  }
 });
 
 // Proper Admin invitation flow. The Owner creates the account invitation; the Admin creates their own credentials.
