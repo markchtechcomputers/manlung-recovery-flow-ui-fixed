@@ -385,6 +385,10 @@
   }
 </style>
 
+
+<style id="call-subscription-settings-style">
+.call-subscription-card{grid-column:1/-1;position:relative;overflow:hidden}.call-subscription-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.call-subscription-status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;margin:1rem 0}.call-subscription-stat{padding:.75rem;border:1px solid rgba(37,99,235,.14);border-radius:12px;background:rgba(37,99,235,.045)}.call-subscription-stat span{display:block;color:var(--text-muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800}.call-subscription-stat strong{display:block;margin-top:.25rem;font-size:.86rem}.call-subscription-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;margin-top:1rem}.call-plan{position:relative;padding:1rem;border:2px solid rgba(148,163,184,.25);border-radius:15px;background:var(--card-bg,#fff);cursor:pointer;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}.call-plan:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(15,23,42,.08)}.call-plan.selected{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.10)}.call-plan input{position:absolute;opacity:0;pointer-events:none}.call-plan-label{display:flex;justify-content:space-between;gap:.5rem;font-weight:900}.call-plan-price{font-size:1.45rem;font-weight:900;margin:.55rem 0 .15rem}.call-plan-normal{text-decoration:line-through;color:var(--text-muted);font-size:.78rem}.call-plan-discount{display:inline-block;margin:.25rem 0;padding:.2rem .45rem;border-radius:999px;background:rgba(22,163,74,.10);color:#15803d;font-size:.7rem;font-weight:900}.call-plan-billing{color:var(--text-muted);font-size:.78rem}.call-plan button{width:100%;margin-top:.8rem}.call-payment-row{display:flex;gap:.65rem;align-items:end;margin-top:1rem}.call-payment-row .form-group{flex:1;margin:0}.call-payment-message{min-height:1.2rem;margin-top:.65rem;font-size:.8rem}.call-payment-message.success{color:#15803d}.call-payment-message.error{color:#b91c1c}.call-payment-message.info{color:#2563eb}.call-subscription-expired{padding:.75rem;border-radius:12px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);color:#991b1b;font-size:.82rem;margin-top:.8rem}@media(max-width:800px){.call-subscription-status,.call-subscription-plans{grid-template-columns:1fr 1fr}}@media(max-width:560px){.call-subscription-head,.call-payment-row{display:block}.call-payment-row .form-group{margin-bottom:.65rem}.call-subscription-status,.call-subscription-plans{grid-template-columns:1fr}}
+</style>
 </head>
 
 <body>
@@ -416,6 +420,30 @@
 </header>
 
 <main class="container">
+<section class="card settings-card call-subscription-card" id="callSubscriptionSettings">
+  <div class="call-subscription-head">
+    <div><h2><i class="fas fa-phone-volume"></i> Payment / Call Settings</h2><p>Manage the paid Call Admin access linked to your client account. Payment verification is handled securely by the server.</p></div>
+    <span id="callSubscriptionBadge" class="status-badge">Checking…</span>
+  </div>
+  <div class="call-subscription-status">
+    <div class="call-subscription-stat"><span>Plan</span><strong id="callPlanValue">—</strong></div>
+    <div class="call-subscription-stat"><span>Payment Status</span><strong id="callPaymentValue">—</strong></div>
+    <div class="call-subscription-stat"><span>Subscription Start</span><strong id="callStartValue">—</strong></div>
+    <div class="call-subscription-stat"><span>Subscription Expiry</span><strong id="callExpiryValue">—</strong></div>
+  </div>
+  <div class="call-subscription-stat" style="margin-top:.65rem"><span>Days Remaining</span><strong id="callDaysValue">0</strong></div>
+  <div id="callSubscriptionExpired" class="call-subscription-expired" hidden>Your subscription has expired. Please choose a plan to continue.</div>
+  <div class="call-payment-row">
+    <div class="form-group"><label for="callPaymentEmail">Payment Email</label><input id="callPaymentEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
+  </div>
+  <div class="call-subscription-plans" id="callSubscriptionPlans">
+    <label class="call-plan selected"><input type="radio" name="callPlan" value="monthly" checked><div class="call-plan-label"><span>MONTHLY</span><i class="fas fa-check-circle"></i></div><div class="call-plan-price">KES 300</div><div class="call-plan-billing">per month</div><button type="button" class="btn btn-primary call-subscribe-button" data-plan="monthly">SUBSCRIBE</button></label>
+    <label class="call-plan"><input type="radio" name="callPlan" value="six_months"><div class="call-plan-label"><span>6 MONTHS</span><i class="fas fa-calendar-check"></i></div><div class="call-plan-price">KES 1,800</div><div class="call-plan-billing">for 6 months</div><button type="button" class="btn btn-primary call-subscribe-button" data-plan="six_months">SUBSCRIBE</button></label>
+    <label class="call-plan"><input type="radio" name="callPlan" value="yearly"><div class="call-plan-label"><span>1 YEAR</span><i class="fas fa-calendar-star"></i></div><div class="call-plan-price"><span class="call-plan-normal">KES 3,600</span> KES 3,240</div><span class="call-plan-discount">10% OFF</span><div class="call-plan-billing">for 1 year</div><button type="button" class="btn btn-primary call-subscribe-button" data-plan="yearly">SUBSCRIBE</button></label>
+  </div>
+  <div id="callPaymentMessage" class="call-payment-message" role="status" aria-live="polite"></div>
+</section>
+
   <div class="settings-grid">
 
     <section class="card settings-card">
@@ -1192,5 +1220,20 @@ loadProfile();
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
+
+<script id="call-subscription-settings-script">
+(function(){
+  const $=id=>document.getElementById(id);
+  const planNames={monthly:'MONTHLY',six_months:'6 MONTHS',yearly:'1 YEAR'};
+  function fmt(v){return v?new Date(v).toLocaleDateString(undefined,{day:'2-digit',month:'long',year:'numeric'}):'—'}
+  function message(text,type=''){const el=$('callPaymentMessage');if(!el)return;el.textContent=text;el.className='call-payment-message '+type}
+  function selectPlan(code){document.querySelectorAll('.call-plan').forEach(card=>card.classList.toggle('selected',card.querySelector('input')?.value===code));const input=document.querySelector('input[name="callPlan"][value="'+code+'"]');if(input)input.checked=true}
+  function renderStatus(data){const active=!!data.access;$('callSubscriptionBadge').textContent=active?'ACTIVE':'EXPIRED';$('callSubscriptionBadge').className='status-badge '+(active?'status-completed':'status-rejected');$('callPlanValue').textContent=planNames[data.plan]||data.plan||'—';$('callPaymentValue').textContent=String(data.paymentStatus||'—').toUpperCase();$('callStartValue').textContent=fmt(data.subscriptionStartDate);$('callExpiryValue').textContent=fmt(data.subscriptionExpiryDate);$('callDaysValue').textContent=String(data.daysRemaining??0);$('callSubscriptionExpired').hidden=active;}
+  async function loadStatus(){try{const r=await fetch('/api/subscription/status',{headers:authHeaders(),cache:'no-store'});const d=await r.json().catch(()=>({}));if(r.status===401){logout();return}if(!r.ok||!d.success)throw new Error(d.error||'Could not load subscription status.');renderStatus(d);const u=JSON.parse(localStorage.getItem('clientUser')||'null');if(u?.email&&!$('callPaymentEmail').value)$('callPaymentEmail').value=u.email}catch(e){message(e.message||'Could not load subscription status.','error')}}
+  async function subscribe(plan){const email=$('callPaymentEmail').value.trim().toLowerCase();if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){message('Enter a valid payment email before continuing.','error');$('callPaymentEmail').focus();return}selectPlan(plan);document.querySelectorAll('.call-subscribe-button').forEach(b=>b.disabled=true);message('Securely preparing your Paystack checkout…','info');try{const r=await fetch('/api/subscription/initialize',{method:'POST',headers:authHeaders(),body:JSON.stringify({plan,email})});const d=await r.json().catch(()=>({}));if(r.status===401){logout();return}if(!r.ok||!d.success)throw new Error(d.error||'Could not start payment.');if(!d.authorizationUrl)throw new Error('Paystack did not provide a checkout URL.');sessionStorage.setItem('manlungPendingPaymentReference',d.reference);window.location.assign(d.authorizationUrl)}catch(e){message(e.message||'Could not start payment.','error');document.querySelectorAll('.call-subscribe-button').forEach(b=>b.disabled=false)}}
+  async function verifyCallback(){const reference=new URLSearchParams(location.search).get('reference');if(!reference)return;message('Verifying your Paystack payment securely…','info');try{const r=await fetch('/api/subscription/verify',{method:'POST',headers:authHeaders(),body:JSON.stringify({reference})});const d=await r.json().catch(()=>({}));if(r.ok&&d.success){sessionStorage.removeItem('manlungPendingPaymentReference');history.replaceState({},document.title,location.pathname);renderStatus(d);message('Payment verified successfully. Call Admin access is now active.','success')}else if(r.status===202){message(d.message||'Payment is still processing. Refresh this page in a moment.','info')}else{message(d.error||'Payment could not be verified.','error')}}catch(e){message('Payment verification could not be completed yet. Please try again shortly.','error')}}
+  document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.call-plan').forEach(card=>card.addEventListener('click',e=>{if(e.target.closest('button'))return;selectPlan(card.querySelector('input')?.value)}));document.querySelectorAll('.call-subscribe-button').forEach(btn=>btn.addEventListener('click',()=>subscribe(btn.dataset.plan)));loadStatus();verifyCallback()});
+})();
+</script>
 </body>
 </html>
