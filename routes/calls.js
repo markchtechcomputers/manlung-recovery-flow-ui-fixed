@@ -364,19 +364,49 @@ router.get('/pending', adminAuth, async (req, res) => {
 // Admin starts a callback to a client. The existing WebRTC/signaling stack is reused.
 router.post('/admin/callback', adminAuth, async (req, res) => {
   try {
-    const clientUserId = String(req.body?.clientUserId || '').trim();
+    let clientUserId = String(req.body?.clientUserId || '').trim();
     const callMode = req.body?.callMode === 'video' ? 'video' : 'audio';
     const caseId = req.body?.caseId ? String(req.body.caseId).trim() : null;
-    if (!clientUserId) return res.status(400).json({ error: 'Client user ID is required.' });
 
-    let clientQuery = supabase
+    // Case-scoped callbacks are authoritative. Derive the client from the
+    // case instead of trusting a browser-supplied client ID.
+    if (caseId) {
+      const { data: caseRow, error: caseError } = await supabase
+        .from('recovery_cases')
+        .select('case_id, client_user_id, assigned_admin_id')
+        .eq('case_id', caseId)
+        .maybeSingle();
+
+      if (caseError) throw caseError;
+      if (!caseRow || !caseRow.client_user_id) {
+        return res.status(404).json({ error: 'Client/case not found.' });
+      }
+
+      const allowedCaseAccess =
+        req.user.role === 'owner' ||
+        (req.user.role === 'admin' && caseRow.assigned_admin_id === req.user.id);
+
+      if (!allowedCaseAccess) {
+        return res.status(403).json({ error: 'You are not authorized to call this client.' });
+      }
+
+      clientUserId = String(caseRow.client_user_id);
+    }
+
+    if (!clientUserId) {
+      return res.status(400).json({ error: 'A client or case is required.' });
+    }
+
+    const { data: client, error: clientError } = await supabase
       .from('recovery_users')
       .select('id, username, email, role')
       .eq('id', clientUserId)
       .maybeSingle();
-    const { data: client, error: clientError } = await clientQuery;
+
     if (clientError) throw clientError;
-    if (!client || client.role !== 'client') return res.status(404).json({ error: 'Client not found.' });
+    if (!client || client.role !== 'client') {
+      return res.status(404).json({ error: 'Client not found.' });
+    }
 
     const busy = await CallSession.adminHasActiveCall(req.user.id);
     if (busy) return res.status(409).json({ error: 'You already have an active call. End it before calling a client.' });
@@ -395,18 +425,6 @@ router.post('/admin/callback', adminAuth, async (req, res) => {
     if (callMode === 'video') {
       if (!caseId) return res.status(400).json({ error: 'A case is required for Admin video calling.' });
       if (!(await getVideoEnabled(caseId))) return res.status(403).json({ error: 'Video calling is currently disabled for this case.' });
-    }
-
-    if (caseId) {
-      const { data: caseRow, error: caseError } = await supabase
-        .from('recovery_cases')
-        .select('case_id, client_user_id')
-        .eq('case_id', caseId)
-        .maybeSingle();
-      if (caseError) throw caseError;
-      if (!caseRow || caseRow.client_user_id !== clientUserId) {
-        return res.status(404).json({ error: 'Client/case not found.' });
-      }
     }
 
     const existing = await supabase
