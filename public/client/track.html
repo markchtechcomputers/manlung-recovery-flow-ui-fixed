@@ -421,7 +421,7 @@ function openCaseFromForm(event){
             document.getElementById('caseIdHeading').textContent = caseId;
 
             try {
-                const res = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`, { credentials: 'include', cache: 'no-store' });
                 const data = await res.json();
 
                 if (!data.success) {
@@ -683,8 +683,8 @@ async function sendClientCaseMessage() {
             `/api/messages/case/${encodeURIComponent(currentCaseIdForMessages)}`,
             {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ message })
