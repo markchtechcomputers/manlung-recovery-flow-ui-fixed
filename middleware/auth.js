@@ -88,7 +88,7 @@ const auth = async (req, res, next) => {
 };
 
 const optionalAuth = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '');
+  const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, CLIENT_COOKIE) || getCookie(req, ADMIN_COOKIE);
   if (!token) return next();
   try {
     if (isTokenRevoked(token)) return res.status(401).json({ error: 'Session revoked.', code: 'SESSION_REVOKED' });
