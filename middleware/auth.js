@@ -4,6 +4,7 @@ const AdminPermission = require('../models/AdminPermission');
 const { isTokenRevoked } = require('./sessionRevocation');
 
 const ADMIN_COOKIE = 'manlung_admin_session';
+const CLIENT_COOKIE = 'manlung_client_session';
 const SESSION_MAX_AGE = {
   owner: 24 * 60 * 60,
   admin: 24 * 60 * 60,
@@ -30,7 +31,7 @@ function isDurablyRevoked(decoded, user) {
 }
 
 async function verifyRequestToken(req) {
-  const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, ADMIN_COOKIE);
+  const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, ADMIN_COOKIE) || getCookie(req, CLIENT_COOKIE);
   if (!token) return { token: null, decoded: null, user: null };
   if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
