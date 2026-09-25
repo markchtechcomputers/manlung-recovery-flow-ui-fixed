@@ -38,6 +38,21 @@ const app = express();
 // client-aware rate limits using the forwarded address.
 app.set('trust proxy', 1);
 
+// Enforce HTTPS at the application edge in production. Vercel terminates TLS
+// and forwards the original protocol in X-Forwarded-Proto.
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && req.get('x-forwarded-proto') !== 'https') {
+    let canonicalOrigin = String(process.env.PUBLIC_APP_URL || '').trim().replace(/\/$/, '');
+    try {
+      canonicalOrigin = new URL(canonicalOrigin).origin;
+    } catch (_) {
+      return res.status(500).json({ success: false, error: 'Production URL is not configured.' });
+    }
+    return res.redirect(308, `${canonicalOrigin}${req.originalUrl}`);
+  }
+  return next();
+});
+
 // Security response hardening applied to every request.
 app.use((req, res, next) => {
   res.setHeader('X-DNS-Prefetch-Control', 'off');
@@ -135,12 +150,13 @@ const effectiveAllowedOrigins = allowedOrigins.length
 app.use(cors({
   origin: (origin, callback) => {
     // Non-browser requests do not send Origin and remain supported.
-    if (origin == null || effectiveAllowedOrigins.includes(origin) || (process.env.NODE_ENV === 'production' && origin.startsWith('https://manlungrecovery-') && origin.endsWith('.vercel.app'))) {
+    if (origin == null || effectiveAllowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
     return callback(new Error('Origin not allowed'));
   },
+  credentials: true,
 }));
 
 // ============================================================
@@ -306,8 +322,16 @@ const paymentLimiter = rateLimit({
 
 app.use('/api/subscription/initialize', paymentLimiter);
 app.use('/api/subscription/verify', paymentLimiter);
+const paystackWebhookLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => res.status(429).send('Too many webhook requests.'),
+});
 app.use('/api/donations/initialize', paymentLimiter);
 app.use('/api/donations/verify', paymentLimiter);
+app.use('/api/subscription/webhook', paystackWebhookLimiter);
 
 // ============================================================
 // CALL START RATE LIMITER

@@ -2049,10 +2049,9 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
 
         async function trackCase() {
             const caseId = document.getElementById('trackInput').value.trim();
-            const token = localStorage.getItem('clientToken');
             const result = document.getElementById('trackResult');
 
-            if (!token) {
+            if (false) {
                 result.style.display = 'block';
                 result.innerHTML = '<span class="error-text">Please sign in to track your case. Case IDs are private to their owner.</span>';
                 return;

@@ -137,11 +137,10 @@
                 body: JSON.stringify({ accessToken: session.access_token })
             });
 
-            if (!appSession.success || !appSession.token || !appSession.user) {
+            if (!appSession.success || !appSession.user) {
                 throw new Error('Could not complete GitHub sign-in.');
             }
 
-            localStorage.setItem('clientToken', appSession.token);
             localStorage.setItem('clientUser', JSON.stringify(appSession.user));
             await client.auth.signOut();
             clearOAuthUrl();

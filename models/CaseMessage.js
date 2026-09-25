@@ -16,7 +16,7 @@ async function create({
       recipient_user_id: recipientUserId,
       message,
     })
-    .select()
+       .select('id,case_id,sender_user_id,recipient_user_id,message,read_at,created_at')
     .single();
 
   if (error) throw error;
@@ -26,7 +26,7 @@ async function create({
 async function listForCase(caseId) {
   const { data, error } = await supabase
     .from(TABLE)
-    .select('*')
+    .select('id,case_id,sender_user_id,recipient_user_id,message,read_at,created_at')
     .eq('case_id', caseId)
     .order('created_at', { ascending: true });
 
@@ -42,7 +42,7 @@ async function markRead(id, userId) {
     })
     .eq('id', id)
     .eq('recipient_user_id', userId)
-    .select()
+    .select('id,case_id,sender_user_id,recipient_user_id,message,read_at,created_at')
     .maybeSingle();
 
   if (error) throw error;

@@ -634,20 +634,10 @@
 </main>
 
 <script>
-function authHeaders(){
-  const token = localStorage.getItem('clientToken') || '';
-  return token
-    ? {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    : {
-        'Content-Type': 'application/json'
-      };
-}
+function authHeaders(){ return { 'Content-Type': 'application/json' }; }
 
 function logout(){
-  localStorage.removeItem('clientToken');
+  fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).catch(()=>{});
   localStorage.removeItem('clientUser');
   window.location.href='/login.html';
 }
@@ -1065,7 +1055,6 @@ async function confirmDeleteMyAccount() {
       throw deleteError;
     }
 
-    localStorage.removeItem('clientToken');
     localStorage.removeItem('clientUser');
 
     window.location.href = '/login.html';
@@ -1230,9 +1219,9 @@ loadProfile();
   function selectPlan(code){document.querySelectorAll('.call-plan').forEach(card=>card.classList.toggle('selected',card.querySelector('input')?.value===code));const input=document.querySelector('input[name="callPlan"][value="'+code+'"]');if(input)input.checked=true}
   function renderStatus(data){const active=!!data.access;$('callSubscriptionBadge').textContent=active?'ACTIVE':'EXPIRED';$('callSubscriptionBadge').className='status-badge '+(active?'status-completed':'status-rejected');$('callPlanValue').textContent=planNames[data.plan]||data.plan||'—';$('callPaymentValue').textContent=String(data.paymentStatus||'—').toUpperCase();$('callStartValue').textContent=fmt(data.subscriptionStartDate);$('callExpiryValue').textContent=fmt(data.subscriptionExpiryDate);$('callDaysValue').textContent=String(data.daysRemaining??0);$('callSubscriptionExpired').hidden=active;}
   function getAccountEmail(){try{const u=JSON.parse(localStorage.getItem('clientUser')||'null');return String(u?.email||'').trim().toLowerCase()}catch(_){return ''}}
-  async function loadStatus(){try{const u=getAccountEmail();if(u&&!$('callPaymentEmail').value)$('callPaymentEmail').value=u;const r=await fetch('/api/subscription/status',{headers:authHeaders(),cache:'no-store'});const d=await r.json().catch(()=>({}));if(r.status===401){logout();return}if(!r.ok||!d.success)throw new Error(d.error||'Could not load subscription status.');renderStatus(d);if(u&&!$('callPaymentEmail').value)$('callPaymentEmail').value=u}catch(e){message(e.message||'Could not load subscription status.','error')}}
-  async function subscribe(plan){let email=$('callPaymentEmail').value.trim().toLowerCase();if(!email)email=getAccountEmail();if(email&&!$('callPaymentEmail').value)$('callPaymentEmail').value=email;if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){message('Your account email could not be loaded. Please enter a valid payment email.','error');$('callPaymentEmail').focus();return}selectPlan(plan);document.querySelectorAll('.call-subscribe-button').forEach(b=>b.disabled=true);message('Securely preparing your Paystack checkout…','info');try{const r=await fetch('/api/subscription/initialize',{method:'POST',headers:authHeaders(),body:JSON.stringify({plan,email})});const d=await r.json().catch(()=>({}));if(r.status===401){logout();return}if(!r.ok||!d.success)throw new Error(d.error||'Could not start payment.');if(!d.authorizationUrl)throw new Error('Paystack did not provide a checkout URL.');sessionStorage.setItem('manlungPendingPaymentReference',d.reference);message('Opening secure Paystack checkout…','success');window.location.assign(d.authorizationUrl)}catch(e){message(e.message||'Could not start payment.','error');document.querySelectorAll('.call-subscribe-button').forEach(b=>b.disabled=false)}}
-  async function verifyCallback(){const reference=new URLSearchParams(location.search).get('reference');if(!reference)return;message('Verifying your Paystack payment securely…','info');try{const r=await fetch('/api/subscription/verify',{method:'POST',headers:authHeaders(),body:JSON.stringify({reference})});const d=await r.json().catch(()=>({}));if(r.ok&&d.success){sessionStorage.removeItem('manlungPendingPaymentReference');history.replaceState({},document.title,location.pathname);renderStatus(d);message('Payment verified successfully. Call Admin access is now active.','success')}else if(r.status===202){message(d.message||'Payment is still processing. Refresh this page in a moment.','info')}else{message(d.error||'Payment could not be verified.','error')}}catch(e){message('Payment verification could not be completed yet. Please try again shortly.','error')}}
+  async function loadStatus(){try{const u=getAccountEmail();if(u&&!$('callPaymentEmail').value)$('callPaymentEmail').value=u;const r=await fetch('/api/subscription/status',{headers:authHeaders(),credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(r.status===401){logout();return}if(!r.ok||!d.success)throw new Error(d.error||'Could not load subscription status.');renderStatus(d);if(u&&!$('callPaymentEmail').value)$('callPaymentEmail').value=u}catch(e){message(e.message||'Could not load subscription status.','error')}}
+  async function subscribe(plan){let email=$('callPaymentEmail').value.trim().toLowerCase();if(!email)email=getAccountEmail();if(email&&!$('callPaymentEmail').value)$('callPaymentEmail').value=email;if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){message('Your account email could not be loaded. Please enter a valid payment email.','error');$('callPaymentEmail').focus();return}selectPlan(plan);document.querySelectorAll('.call-subscribe-button').forEach(b=>b.disabled=true);message('Securely preparing your Paystack checkout…','info');try{const r=await fetch('/api/subscription/initialize',{method:'POST',headers:authHeaders(),credentials:'include',body:JSON.stringify({plan,email})});const d=await r.json().catch(()=>({}));if(r.status===401){logout();return}if(!r.ok||!d.success)throw new Error(d.error||'Could not start payment.');if(!d.authorizationUrl)throw new Error('Paystack did not provide a checkout URL.');sessionStorage.setItem('manlungPendingPaymentReference',d.reference);message('Opening secure Paystack checkout…','success');window.location.assign(d.authorizationUrl)}catch(e){message(e.message||'Could not start payment.','error');document.querySelectorAll('.call-subscribe-button').forEach(b=>b.disabled=false)}}
+  async function verifyCallback(){const reference=new URLSearchParams(location.search).get('reference');if(!reference)return;message('Verifying your Paystack payment securely…','info');try{const r=await fetch('/api/subscription/verify',{method:'POST',headers:authHeaders(),credentials:'include',body:JSON.stringify({reference})});const d=await r.json().catch(()=>({}));if(r.ok&&d.success){sessionStorage.removeItem('manlungPendingPaymentReference');history.replaceState({},document.title,location.pathname);renderStatus(d);message('Payment verified successfully. Call Admin access is now active.','success')}else if(r.status===202){message(d.message||'Payment is still processing. Refresh this page in a moment.','info')}else{message(d.error||'Payment could not be verified.','error')}}catch(e){message('Payment verification could not be completed yet. Please try again shortly.','error')}}
   document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.call-plan').forEach(card=>card.addEventListener('click',e=>{if(e.target.closest('button'))return;selectPlan(card.querySelector('input')?.value)}));document.querySelectorAll('.call-subscribe-button').forEach(btn=>btn.addEventListener('click',()=>subscribe(btn.dataset.plan)));loadStatus();verifyCallback()});
 })();
 </script>

@@ -6,6 +6,15 @@ const BCRYPT_ROUNDS = 12;
 const MAX_PASSWORD_BYTES = 72;
 const MAX_LOGIN_FAILURES = 3;
 const LOCKOUT_MINUTES = 30;
+const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,72}$/;
+
+function assertStrongPassword(password) {
+  const value = String(password || '');
+  if (Buffer.byteLength(value, 'utf8') > MAX_PASSWORD_BYTES || !PASSWORD_POLICY.test(value)) {
+    throw new Error('Password must be 12-72 characters and include uppercase, lowercase, number, and special character.');
+  }
+}
+
 
 function addMinutes(date, minutes) {
   return new Date(date.getTime() + minutes * 60 * 1000);
@@ -36,7 +45,7 @@ async function findByEmail(email) {
 }
 
 async function create({ username, password, role = 'client', email, phone }) {
-  if (Buffer.byteLength(String(password || ''), 'utf8') > MAX_PASSWORD_BYTES) throw new Error('Password is too long. Use at most 72 UTF-8 bytes.');
+  assertStrongPassword(password);
   const hashed = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const { data, error } = await supabase
     .from(TABLE)
@@ -171,7 +180,7 @@ async function findByValidResetToken(tokenHash) {
 }
 
 async function resetPassword(id, newPassword) {
-  if (Buffer.byteLength(String(newPassword || ''), 'utf8') > MAX_PASSWORD_BYTES) throw new Error('Password is too long. Use at most 72 UTF-8 bytes.');
+  assertStrongPassword(newPassword);
   const hashed = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
   const { error } = await supabase
     .from(TABLE)

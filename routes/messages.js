@@ -123,7 +123,15 @@ router.get('/case/:caseId', auth, async (req, res) => {
 
     res.json({
       success: true,
-      messages,
+      messages: messages.map((item) => ({
+        id: item.id,
+        case_id: item.case_id,
+        sender_user_id: item.sender_user_id,
+        recipient_user_id: item.recipient_user_id,
+        message: item.message,
+        read_at: item.read_at,
+        created_at: item.created_at,
+      })),
     });
   } catch (error) {
     console.error('Case message list error:', error);
@@ -203,16 +211,22 @@ router.post(
 
       res.json({
         success: true,
-        message: created,
+        message: {
+          id: created.id,
+          case_id: created.case_id,
+          sender_user_id: created.sender_user_id,
+          recipient_user_id: created.recipient_user_id,
+          message: created.message,
+          read_at: created.read_at,
+          created_at: created.created_at,
+        },
       });
     } catch (error) {
       console.error('Case message send error:', error);
 
       res.status(500).json({
         success: false,
-        error:
-          error.message ||
-          'Could not send case message.',
+        error: 'Could not send case message.',
       });
     }
   }

@@ -280,7 +280,6 @@ async function handleLogin(event) {
     const data=await res.json();
 
     if(data.success){
-      localStorage.setItem('clientToken',data.token);
       localStorage.setItem('clientUser',JSON.stringify(data.user));
       const submitBtn=document.querySelector('#loginForm button[type="submit"]');
       if(submitBtn){submitBtn.disabled=true;submitBtn.innerHTML='<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Opening your portal…';}
@@ -492,7 +491,6 @@ async function handleEmailOtp(event) {
       throw new Error(result.error || 'Could not complete email verification.');
     }
 
-    localStorage.setItem('clientToken', result.token);
     localStorage.setItem('clientUser', JSON.stringify(result.user));
     window.location.replace('/client/dashboard.html?session=1');
   } catch (err) {
@@ -611,7 +609,6 @@ async function setupOfficialGoogleButtons(){
           let data;
           try{data=JSON.parse(text);}catch(_){throw new Error('Google sign-in API returned an invalid response.');}
           if(!res.ok||!data.success)throw new Error(data.error||'Google authentication failed. Please try again.');
-          localStorage.setItem('clientToken',data.token);
           localStorage.setItem('clientUser',JSON.stringify(data.user));
           window.location.replace('/client/dashboard.html');
         }catch(err){
@@ -642,7 +639,6 @@ async function setupOfficialGoogleButtons(){
         width:buttonWidth,
         click_listener:()=>{
           window.__manlungGoogleErrorTarget=errorTarget;
-          localStorage.removeItem('clientToken');
           localStorage.removeItem('clientUser');
         }
       });
@@ -655,7 +651,6 @@ async function setupOfficialGoogleButtons(){
 async function startSocialSignup(provider){
   if(provider!=='github')return;
 
-  localStorage.removeItem('clientToken');
   localStorage.removeItem('clientUser');
 
   try{
@@ -728,7 +723,6 @@ async function handleSocialCallback(){
     const result=await res.json();
 
     if(result.success){
-      localStorage.setItem('clientToken',result.token);
       localStorage.setItem('clientUser',JSON.stringify(result.user));
 
       window.history.replaceState(

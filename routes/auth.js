@@ -60,6 +60,7 @@ function normalizePhone(value) {
 
 
 const ADMIN_COOKIE = 'manlung_admin_session';
+const CLIENT_COOKIE = 'manlung_client_session';
 const MFA_TICKET_EXPIRE = '5m';
 
 // Owner identity is required for MFA management, but unlike ownerAuth it
@@ -73,10 +74,29 @@ const ownerIdentity = async (req, res, next) => {
   });
 };
 
+function setClientCookie(res, token) {
+  res.cookie(CLIENT_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: SESSION_MAX_AGE_MS.client,
+  });
+}
+
+function clearClientCookie(res) {
+  res.clearCookie(CLIENT_COOKIE, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+  });
+}
+
 function setAdminCookie(res, token) {
   res.cookie(ADMIN_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' && process.env.PUBLIC_APP_URL?.startsWith('https://'),
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
     maxAge: SESSION_MAX_AGE_MS.admin,
@@ -86,7 +106,7 @@ function setAdminCookie(res, token) {
 function clearAdminCookie(res) {
   res.clearCookie(ADMIN_COOKIE, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' && process.env.PUBLIC_APP_URL?.startsWith('https://'),
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
   });
@@ -148,7 +168,10 @@ router.post(
       .normalizeEmail(),
 
     body('password')
-      .isLength({ min: 8, max: 72 })
+      .isLength({ min: 12, max: 72 })
+      .withMessage('Password must be between 12 and 72 characters')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+      .withMessage('Password must include uppercase, lowercase, number, and special character')
       .withMessage('Password must be between 8 and 72 characters'),
 
     body('phone')
@@ -471,7 +494,7 @@ router.post(
       console.error('Admin login error:', error);
 
       return res.status(500).json({
-        error: error.message || 'Server error',
+        error: 'Something went wrong. Please try again.'
       });
     }
   }
@@ -503,6 +526,26 @@ router.post('/client/logout-all', auth, async (req, res) => {
   } catch (error) {
     console.error('Client logout-all error:', error);
     res.status(500).json({ success: false, error: 'Could not revoke sessions.' });
+  }
+});
+
+router.post('/client/logout', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required.' });
+    await User.bumpSessionVersion(req.user.id);
+    clearClientCookie(res);
+    await SecurityMonitoring.recordEvent({
+      eventType: 'LOGOUT',
+      userId: req.user.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: { role: req.user.role, all_sessions: true },
+    });
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Client logout error:', error);
+    clearClientCookie(res);
+    return res.status(200).json({ success: true });
   }
 });
 
@@ -662,7 +705,10 @@ router.post(
       .normalizeEmail(),
 
     body('password')
-      .isLength({ min: 8, max: 72 })
+      .isLength({ min: 12, max: 72 })
+      .withMessage('Password must be between 12 and 72 characters')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+      .withMessage('Password must include uppercase, lowercase, number, and special character')
       .withMessage('Password must be between 8 and 72 characters'),
 
     body('fullName')
@@ -893,7 +939,7 @@ router.post(
       }
 
       res.status(500).json({
-        error: error.message || 'Server error',
+        error: 'Something went wrong. Please try again.',
       });
     }
   }
@@ -1088,10 +1134,10 @@ router.post(
         .eq('role', 'client');
 
       const token = signToken(verified || client);
+      setClientCookie(res, token);
 
       return res.json({
         success: true,
-        token,
         user: {
           id: client.id,
           email: client.email,
@@ -1161,11 +1207,9 @@ router.post(
         await User.findByEmailAndRole(email, 'client');
 
       if (!client) {
-        return res.status(404).json({
+        return res.status(401).json({
           success: false,
-          code: 'ACCOUNT_NOT_FOUND',
-          error: 'No client account exists for this email. Please create an account first.',
-          redirect: '/login.html?tab=register',
+          error: 'Invalid credentials',
         });
       }
 
@@ -1211,10 +1255,10 @@ router.post(
       }
 
       const token = signToken(client);
+      setClientCookie(res, token);
 
       res.json({
         success: true,
-        token,
         user: {
           id: client.id,
           email: client.email,
@@ -1819,8 +1863,7 @@ router.post(
       );
 
       res.status(500).json({
-        error:
-          error.message || 'Server error',
+        error: 'Something went wrong. Please try again.',
       });
     }
   }
@@ -1839,7 +1882,10 @@ router.post(
       .withMessage('Reset token is required'),
 
     body('password')
-      .isLength({ min: 8, max: 72 })
+      .isLength({ min: 12, max: 72 })
+      .withMessage('Password must be between 12 and 72 characters')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+      .withMessage('Password must include uppercase, lowercase, number, and special character')
       .withMessage(
         'Password must be between 8 and 72 characters'
       ),
@@ -1882,8 +1928,7 @@ router.post(
       );
 
       res.status(500).json({
-        error:
-          error.message || 'Server error',
+        error: 'Something went wrong. Please try again.',
       });
     }
   }
@@ -2030,10 +2075,10 @@ router.post(
       }
 
       const token = signToken(client);
+      setClientCookie(res, token);
 
       return res.json({
         success: true,
-        token,
         user: {
           id: client.id,
           username: client.username,

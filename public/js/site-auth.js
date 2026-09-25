@@ -2,18 +2,13 @@
 (() => {
   'use strict';
 
-  const TOKEN_KEY = 'clientToken';
-  const USER_KEY = 'clientUser';
+    const USER_KEY = 'clientUser';
   const CLIENT_SESSION_MS = 7 * 24 * 60 * 60 * 1000;
   const SESSION_STARTED_KEY = 'clientSessionStartedAt';
   let clientAuthenticated = false;
 
-  function getToken() {
-    try { return localStorage.getItem(TOKEN_KEY); } catch (_) { return null; }
-  }
-  function clearClientSession() {
+    function clearClientSession() {
     try {
-      localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
       localStorage.removeItem('requestFormDraft');
       localStorage.removeItem(SESSION_STARTED_KEY);
@@ -29,12 +24,11 @@
   }
 
   async function verifyClient() {
-    const token = getToken();
-    if (!token || !ensureClientSessionAge()) return false;
+    if (!ensureClientSessionAge()) return false;
     try {
       const response = await fetch('/api/auth/verify', {
         method: 'GET',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
         cache: 'no-store',
       });
       if (!response.ok) throw new Error('session invalid');
@@ -52,8 +46,6 @@
 
   function ensureClientSessionAge() {
     try {
-      const token = getToken();
-      if (!token) return false;
       let started = Number(localStorage.getItem(SESSION_STARTED_KEY) || 0);
       if (!started || !Number.isFinite(started)) {
         started = Date.now();
@@ -71,9 +63,9 @@
 
   async function logout() {
     clearClientSession();
-    // The client API uses stateless bearer JWTs. Removing the browser token
-    // ends this browser session without touching admin/owner sessions.
-    window.location.replace('/login.html?loggedOut=1');
+    fetch('/api/auth/client/logout', { method: 'POST', credentials: 'include' }).finally(() => {
+      window.location.replace('/login.html?loggedOut=1');
+    });
   }
 
   function createAccountSection() {

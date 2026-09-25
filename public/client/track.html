@@ -387,8 +387,8 @@ function openCaseFromForm(event){
             const params = new URLSearchParams(window.location.search);
             const caseId = params.get('case');
             const content = document.getElementById('content');
-            const token = localStorage.getItem('clientToken');
-            if (!token) { window.location.href = '/login.html'; return; }
+            const token = null;
+            if (false) { window.location.href = '/login.html'; return; }
 
             if (!caseId) {
                 document.getElementById('caseIdHeading').textContent = 'Track an existing case';
@@ -489,15 +489,11 @@ function openCaseFromForm(event){
 <script id="manlung-timeline-script">
 (function(){
   function token(){
-    return localStorage.getItem('clientToken') || '';
+    return '';
   }
 
-  function headers(){
-    const t = token();
-    return t
-      ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' }
-      : { 'Content-Type': 'application/json' };
-  }
+  function headers(){ return { 'Content-Type': 'application/json' }; }
+
 
   function escapeHtml(value){
     return String(value ?? '')
@@ -606,17 +602,13 @@ function clientMessageDate(value) {
 async function loadClientCaseMessages(caseId) {
     currentCaseIdForMessages = caseId;
     const list = document.getElementById('caseMessagesList');
-    const token = localStorage.getItem('clientToken');
-
-    if (!list || !token) return;
+    if (!list) return;
 
     try {
         const res = await fetch(
             `/api/messages/case/${encodeURIComponent(caseId)}`,
             {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+                credentials:'include',
                 cache: 'no-store'
             }
         );
@@ -675,9 +667,7 @@ async function loadClientCaseMessages(caseId) {
 async function sendClientCaseMessage() {
     const input = document.getElementById('caseMessageInput');
     const status = document.getElementById('caseMessageStatus');
-    const token = localStorage.getItem('clientToken');
-
-    if (!input || !currentCaseIdForMessages || !token) return;
+    if (!input || !currentCaseIdForMessages) return;
 
     const message = input.value.trim();
 
