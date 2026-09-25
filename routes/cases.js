@@ -1014,6 +1014,13 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
       };
     }
     captureMetadata.totalCaptures = 4;
+    captureMetadata.caseDevice = {
+      imei1: typeof existing?.imei1 === 'string' ? existing.imei1.slice(0, 40) : '',
+      imei2: typeof existing?.imei2 === 'string' ? existing.imei2.slice(0, 40) : '',
+      deviceType: typeof existing?.device_type === 'string' ? existing.device_type.slice(0, 40) : '',
+      brand: typeof existing?.device_brand === 'string' ? existing.device_brand.slice(0, 80) : '',
+      model: typeof existing?.device_model === 'string' ? existing.device_model.slice(0, 80) : '',
+    };
 
     const newEvidence = [];
     for (let i=0;i<files.length;i++) {
