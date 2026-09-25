@@ -76,7 +76,7 @@ const ownerIdentity = async (req, res, next) => {
 function setAdminCookie(res, token) {
   res.cookie(ADMIN_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' && process.env.PUBLIC_APP_URL?.startsWith('https://'),
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
     maxAge: SESSION_MAX_AGE_MS.admin,
