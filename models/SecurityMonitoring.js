@@ -341,6 +341,77 @@ async function getUserDetail(userId) {
   return { user, events, sessions: sessionsResult.data || [] };
 }
 
+
+async function getAnalytics() {
+  const [events, users] = await Promise.all([
+    listEvents({ limit: 500 }),
+    listUsers({ limit: 500 }),
+  ]);
+  const since = Date.now() - 7 * 86400000;
+  const daily = {};
+  const typeCounts = {};
+  for (const e of events) {
+    const d = new Date(e.created_at);
+    if (Number.isNaN(d.getTime())) continue;
+    const key = d.toISOString().slice(0, 10);
+    if (d.getTime() >= since) daily[key] = (daily[key] || 0) + 1;
+    typeCounts[e.event_type] = (typeCounts[e.event_type] || 0) + 1;
+  }
+  const loginEvents = events.filter(e => ['login_success','login_failed','suspicious_login'].includes(e.event_type));
+  const failed = loginEvents.filter(e => e.event_type === 'login_failed').length;
+  const successful = loginEvents.filter(e => e.event_type === 'login_success').length;
+  return {
+    users: { total: users.length, clients: users.filter(u=>u.role==='client').length, admins: users.filter(u=>u.role==='admin').length, restricted: users.filter(u=>u.security_status && u.security_status!=='active').length },
+    login: { successful, failed, suspicious: loginEvents.filter(e=>e.event_type==='suspicious_login').length, failure_rate: successful + failed ? Math.round((failed/(successful+failed))*1000)/10 : 0 },
+    daily: Object.entries(daily).sort(([a],[b])=>a.localeCompare(b)).map(([date,count])=>({date,count})),
+    event_types: Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([event_type,count])=>({event_type,count})),
+  };
+}
+
+async function getCaseOperations() {
+  const { data, error } = await supabase
+    .from('recovery_cases')
+    .select('id,case_id,client_name,case_type,priority,status,assigned_admin_id,assigned_at,started_at,completed_at,sla_due_at,last_status_changed_at,created_at,last_updated,client_user_id')
+    .order('created_at', { ascending: false })
+    .limit(250);
+  if (error) throw error;
+  const cases = data || [];
+  const now = Date.now();
+  return {
+    totals: {
+      total: cases.length,
+      pending: cases.filter(c=>/pending/i.test(c.status||'')).length,
+      active: cases.filter(c=>/progress|active|investigat/i.test(c.status||'')).length,
+      completed: cases.filter(c=>/completed|closed/i.test(c.status||'')).length,
+      overdue: cases.filter(c=>c.sla_due_at && new Date(c.sla_due_at).getTime() < now && !/completed|closed/i.test(c.status||'')).length,
+    },
+    cases,
+  };
+}
+
+async function getAuditCenter(limit = 250) {
+  const { data, error } = await supabase
+    .from('recovery_admin_audit_log')
+    .select('id,actor_user_id,actor_username,target_user_id,target_username,action,details,created_at')
+    .order('created_at', { ascending: false })
+    .limit(Math.min(Number(limit)||250,500));
+  if (error) throw error;
+  return data || [];
+}
+
+async function getCaseIntelligence(caseId) {
+  const [timeline, docs] = await Promise.all([
+    supabase.from('case_timeline').select('id,case_id,actor_user_id,event_type,description,metadata,created_at').eq('case_id', caseId).order('created_at',{ascending:false}).limit(250),
+    supabase.from('admin_documents').select('id,case_id,title,owner_user_id,created_at,updated_at,deleted_at').eq('case_id', caseId).order('created_at',{ascending:false}).limit(100),
+  ]);
+  if (timeline.error) throw timeline.error;
+  if (docs.error) throw docs.error;
+  const { data: row, error: caseError } = await supabase.from('recovery_cases').select('case_id,client_name,case_type,priority,status,files,created_at,last_updated').eq('case_id',caseId).maybeSingle();
+  if (caseError) throw caseError;
+  const evidence = Array.isArray(row?.files) ? row.files.map((f,i)=>({ index:i, filename:f?.filename||f?.originalName||'Evidence file', path:f?.path||null, mimetype:f?.mimetype||null, size:f?.size||null, uploadedAt:f?.uploadedAt||null, uploadedBy:f?.uploadedBy||null, requestId:f?.requestId||null })) : [];
+  return { case: row, timeline: timeline.data||[], documents: docs.data||[], evidence };
+}
+
 module.exports = {
   listUsers,
   getUser,
@@ -348,4 +419,8 @@ module.exports = {
   revokeSessions,
   recordEvent,
   listEvents,
+  getAnalytics,
+  getCaseOperations,
+  getAuditCenter,
+  getCaseIntelligence,
 };
