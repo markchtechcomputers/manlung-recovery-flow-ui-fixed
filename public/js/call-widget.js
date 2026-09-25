@@ -1,6 +1,6 @@
 /* Client "Call Admin" widget — floating contact control + existing WebRTC panel.
-   Call Admin is free. The existing authenticated WebRTC/session flow is kept;
-   the contact menu is integrated here so only one floating control exists. */
+   Paid Call Admin access is enforced by the server; this widget only reflects
+   the server-side subscription state and starts authenticated call sessions. */
 
 (function injectCallWidgetStyles() {
   if (document.getElementById('manlung-call-ui-styles')) return;
@@ -381,17 +381,29 @@
   function panelContent(){return document.getElementById('callWidgetContent')||document.getElementById('callWidgetPanel');}
   function ringtoneSettingsHtml(role='client'){const options=window.ManlungCallRingtone?.options||[];const current=window.ManlungCallRingtone?.get(role)||options[0]?.id||'';return `<div style="margin-top:.85rem;padding-top:.75rem;border-top:1px solid #29385a;"><label for="callRingtoneSelect" style="display:block;font-weight:700;margin-bottom:.35rem;">Call ringtone</label><div style="display:flex;gap:7px;align-items:center;"><select id="callRingtoneSelect" style="flex:1;background:#17284d;color:#fff;border:1px solid #3b4d70;border-radius:9px;padding:.48rem;">${options.map(option=>`<option value="${option.id}" ${option.id===current?'selected':''}>${option.name}</option>`).join('')}</select><button id="testRingtoneBtn" type="button" style="background:#29385a;color:#fff;border:0;border-radius:9px;padding:.48rem .65rem;cursor:pointer;" title="Test ringtone">Test</button></div><small style="display:block;color:#96abc4;margin-top:.3rem;">Choose the sound used when an Admin calls you.</small></div>`;}
   function bindRingtoneSettings(role='client'){const select=document.getElementById('callRingtoneSelect'),test=document.getElementById('testRingtoneBtn');if(!select||!window.ManlungCallRingtone)return;select.addEventListener('change',()=>window.ManlungCallRingtone.set(select.value,role));test?.addEventListener('click',async()=>{window.ManlungCallRingtone.set(select.value,role);await window.ManlungCallRingtone.preview(role);});}
-  async function renderFreeCallPanel(){
+  async function renderPaidCallPanel(){
     const panel=panelContent(),headers=authHeaders();
     if(!headers){return;}
-    panel.innerHTML=panelHtml('<p style="font-weight:800;margin:0 0 .25rem;"><i class="fas fa-phone"></i> Secure Calls</p><p style="color:#96abc4;margin:0 0 .8rem;">Choose Audio or Video. Audio remains available even when video is disabled.</p><p id="videoCaseList">Checking your cases…</p>');
+    panel.innerHTML=panelHtml('<p style="font-weight:800;margin:0 0 .25rem;"><i class="fas fa-phone-volume"></i> Call Settings</p><p style="color:#96abc4;">Checking your subscription…</p>');
     try{
-      const res=await fetch('/api/calls/video/client-cases',{headers,cache:'no-store'});
-      const data=await res.json().catch(()=>({}));
-      if(!res.ok||!data.success)throw new Error(data.error||'Could not load call access.');
+      const subRes=await fetch('/api/subscription/status',{headers,cache:'no-store'});
+      const sub=await subRes.json().catch(()=>({}));
+      if(subRes.status===401){showSignInRequired();return;}
+      if(!subRes.ok||!sub.success)throw new Error(sub.error||'Could not load subscription status.');
+      const planNames={monthly:'MONTHLY',six_months:'6 MONTHS',yearly:'1 YEAR'};
+      if(!sub.access){
+        panel.innerHTML=panelHtml('<p style="font-weight:800;margin:0 0 .3rem;"><i class="fas fa-lock"></i> Call Admin requires an active subscription</p><p style="color:#96abc4;margin:0 0 .8rem;">Your subscription has expired. Please choose a plan to continue.</p><a href="/client/settings.html#callSubscriptionSettings" style="display:block;text-align:center;background:#2451d6;color:#fff;padding:.7rem;border-radius:10px;text-decoration:none;font-weight:800;"><i class="fas fa-credit-card"></i> RENEW SUBSCRIPTION</a>'+ringtoneSettingsHtml('client'));
+        bindRingtoneSettings('client');
+        return;
+      }
+      const plan=planNames[sub.plan]||sub.plan||'ACTIVE PLAN';
+      const summary='<div style="padding:.65rem;border:1px solid rgba(74,222,128,.18);background:rgba(74,222,128,.06);border-radius:12px;margin-bottom:.7rem;"><div style="font-weight:900;color:#4ade80;">'+plan+'</div><div style="color:#96abc4;font-size:.78rem;margin-top:.2rem;">Active · '+String(sub.daysRemaining??0)+' day(s) remaining</div></div>';
+      const casesRes=await fetch('/api/calls/video/client-cases',{headers,cache:'no-store'});
+      const data=await casesRes.json().catch(()=>({}));
+      if(!casesRes.ok||!data.success)throw new Error(data.error||'Could not load call access.');
       const cases=Array.isArray(data.cases)?data.cases:[];
       if(!cases.length){
-        panel.innerHTML=panelHtml('<p style="font-weight:800;margin:0 0 .25rem;"><i class="fas fa-phone"></i> Audio Call</p><p style="color:#96abc4;">No case is available for video, but you can still contact an available Admin by audio.</p><button type="button" data-audio-call style="width:100%;background:#1f6e4a;color:#fff;border:none;padding:.7rem;border-radius:10px;font-weight:700;cursor:pointer;margin:.3rem 0;"><i class="fas fa-phone"></i> Call Admin — Audio</button>'+ringtoneSettingsHtml('client'));
+        panel.innerHTML=panelHtml(summary+'<p style="font-weight:800;margin:0 0 .25rem;"><i class="fas fa-phone"></i> Audio Call</p><p style="color:#96abc4;">No case is available for video, but you can still contact an available Admin by audio.</p><button type="button" data-audio-call style="width:100%;background:#1f6e4a;color:#fff;border:none;padding:.7rem;border-radius:10px;font-weight:700;cursor:pointer;margin:.3rem 0;"><i class="fas fa-phone"></i> Call Admin — Audio</button><a href="/client/settings.html#callSubscriptionSettings" style="display:block;text-align:center;color:#9fc4ff;font-size:.75rem;margin-top:.55rem;">Manage subscription</a>'+ringtoneSettingsHtml('client'));
         panel.querySelector('[data-audio-call]')?.addEventListener('click',()=>beginCall(authHeaders(),null,'audio'));
         bindRingtoneSettings('client');
         return;
@@ -402,15 +414,15 @@
         const video=!!item.videoEnabled;
         return '<div style="margin:.45rem 0;padding:.55rem;border:1px solid rgba(255,255,255,.08);border-radius:12px;"><div style="font-weight:800;margin-bottom:.45rem;">Case '+safe+'</div><div style="display:flex;gap:7px;"><button type="button" data-audio-case="'+safe+'" style="flex:1;background:#1f6e4a;color:#fff;border:none;padding:.6rem;border-radius:9px;font-weight:700;cursor:pointer;"><i class="fas fa-phone"></i> Audio</button><button type="button" data-video-case="'+safe+'" '+(video?'':'disabled')+' style="flex:1;background:'+(video?'#2451d6':'#475569')+';color:#fff;border:none;padding:.6rem;border-radius:9px;font-weight:700;cursor:'+(video?'pointer':'not-allowed')+';opacity:'+(video?'1':'.55')+';"><i class="fas fa-video"></i> '+(video?'Video':'Video Off')+'</button></div></div>';
       }).join('');
-      panel.innerHTML=panelHtml('<p style="font-weight:800;margin:0 0 .25rem;"><i class="fas fa-phone"></i> Choose Call Method</p><p style="color:#96abc4;margin:0 0 .65rem;">Audio always works independently. Video is optional per case.</p>'+html+ringtoneSettingsHtml('client'));
+      panel.innerHTML=panelHtml(summary+'<p style="font-weight:800;margin:0 0 .25rem;"><i class="fas fa-phone"></i> Choose Call Method</p><p style="color:#96abc4;margin:0 0 .65rem;">Audio and authorized case video calling are available while your subscription is active.</p>'+html+'<a href="/client/settings.html#callSubscriptionSettings" style="display:block;text-align:center;color:#9fc4ff;font-size:.75rem;margin-top:.55rem;">Manage subscription</a>'+ringtoneSettingsHtml('client'));
       panel.querySelectorAll('[data-audio-case]').forEach(btn=>btn.addEventListener('click',()=>beginCall(authHeaders(),btn.dataset.audioCase,'audio')));
       panel.querySelectorAll('[data-video-case]:not([disabled])').forEach(btn=>btn.addEventListener('click',()=>beginCall(authHeaders(),btn.dataset.videoCase,'video')));
       bindRingtoneSettings('client');
     }catch(e){
-      panel.innerHTML=panelHtml('<p style="color:#f87171;">'+String(e.message||'Could not load call access.')+'</p>');
+      panel.innerHTML=panelHtml('<p style="color:#f87171;">'+String(e.message||'Could not load call access.')+'</p><a href="/client/settings.html#callSubscriptionSettings" style="display:block;text-align:center;color:#9fc4ff;font-size:.75rem;margin-top:.6rem;">Open Payment / Call Settings</a>');
     }
   }
-  async function refreshEntitlementPanel(){const panel=panelContent(),headers=authHeaders();if(!headers){panel.innerHTML=panelHtml(`<p style="margin-bottom:.8rem;">Sign in to your client account to use secure video calls.</p><a href="/login.html" style="display:block;text-align:center;background:#2451d6;color:#fff;padding:.5rem;border-radius:10px;text-decoration:none;">Sign In</a>`);return;}if(!(await verifyClientSession(headers))){showSignInRequired();return;}await renderFreeCallPanel();}
+  async function refreshEntitlementPanel(){const panel=panelContent(),headers=authHeaders();if(!headers){panel.innerHTML=panelHtml(`<p style="margin-bottom:.8rem;">Sign in to your client account to use secure calls.</p><a href="/login.html" style="display:block;text-align:center;background:#2451d6;color:#fff;padding:.5rem;border-radius:10px;text-decoration:none;">Sign In</a>`);return;}if(!(await verifyClientSession(headers))){showSignInRequired();return;}await renderPaidCallPanel();}
   let ringVibrateTimer=null;
   function startClientAlert(){if(window.ManlungCallRingtone)window.ManlungCallRingtone.start();if(navigator.vibrate){try{navigator.vibrate([500,250,500,250,900]);clearInterval(ringVibrateTimer);ringVibrateTimer=setInterval(()=>{try{navigator.vibrate([500,250,500,250,900]);}catch(_){}},2600);}catch(_){}}}
   function stopClientAlert(){if(window.ManlungCallRingtone)window.ManlungCallRingtone.stop();if(ringVibrateTimer)clearInterval(ringVibrateTimer);ringVibrateTimer=null;try{navigator.vibrate?.(0);}catch(_){} }
