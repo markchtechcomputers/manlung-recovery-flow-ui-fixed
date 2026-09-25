@@ -137,7 +137,7 @@
                 body: JSON.stringify({ accessToken: session.access_token })
             });
 
-            if (!appSession.success || !appSession.token || !appSession.user) {
+            if (!appSession.success || !appSession.user) {
                 throw new Error('Could not complete GitHub sign-in.');
             }
 
