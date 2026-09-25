@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v24';
+const CACHE_NAME = 'manlung-recovery-static-v25';
 
 // Only public/static pages are cached. Authenticated dashboards, settings,
 // admin pages, API responses, evidence, and other private data stay network-only.
