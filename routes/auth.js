@@ -148,7 +148,10 @@ router.post(
       .normalizeEmail(),
 
     body('password')
-      .isLength({ min: 8, max: 72 })
+      .isLength({ min: 12, max: 72 })
+      .withMessage('Password must be between 12 and 72 characters')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+      .withMessage('Password must include uppercase, lowercase, number, and special character')
       .withMessage('Password must be between 8 and 72 characters'),
 
     body('phone')
@@ -471,7 +474,7 @@ router.post(
       console.error('Admin login error:', error);
 
       return res.status(500).json({
-        error: error.message || 'Server error',
+        error: 'Something went wrong. Please try again.'
       });
     }
   }
@@ -662,7 +665,10 @@ router.post(
       .normalizeEmail(),
 
     body('password')
-      .isLength({ min: 8, max: 72 })
+      .isLength({ min: 12, max: 72 })
+      .withMessage('Password must be between 12 and 72 characters')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+      .withMessage('Password must include uppercase, lowercase, number, and special character')
       .withMessage('Password must be between 8 and 72 characters'),
 
     body('fullName')
@@ -893,7 +899,7 @@ router.post(
       }
 
       res.status(500).json({
-        error: error.message || 'Server error',
+        error: 'Something went wrong. Please try again.',
       });
     }
   }
@@ -1819,8 +1825,7 @@ router.post(
       );
 
       res.status(500).json({
-        error:
-          error.message || 'Server error',
+        error: 'Something went wrong. Please try again.',
       });
     }
   }
@@ -1839,7 +1844,10 @@ router.post(
       .withMessage('Reset token is required'),
 
     body('password')
-      .isLength({ min: 8, max: 72 })
+      .isLength({ min: 12, max: 72 })
+      .withMessage('Password must be between 12 and 72 characters')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+      .withMessage('Password must include uppercase, lowercase, number, and special character')
       .withMessage(
         'Password must be between 8 and 72 characters'
       ),
@@ -1882,8 +1890,7 @@ router.post(
       );
 
       res.status(500).json({
-        error:
-          error.message || 'Server error',
+        error: 'Something went wrong. Please try again.',
       });
     }
   }
