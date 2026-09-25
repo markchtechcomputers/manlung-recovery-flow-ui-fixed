@@ -38,6 +38,17 @@ const app = express();
 // client-aware rate limits using the forwarded address.
 app.set('trust proxy', 1);
 
+// Enforce HTTPS at the application edge in production. Vercel terminates TLS
+// and forwards the original protocol in X-Forwarded-Proto.
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && req.get('x-forwarded-proto') !== 'https') {
+    const host = req.get('host');
+    if (!host) return res.status(400).json({ success: false, error: 'Invalid host.' });
+    return res.redirect(308, `https://${host}${req.originalUrl}`);
+  }
+  return next();
+});
+
 // Security response hardening applied to every request.
 app.use((req, res, next) => {
   res.setHeader('X-DNS-Prefetch-Control', 'off');
