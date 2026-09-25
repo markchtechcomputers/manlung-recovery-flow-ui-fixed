@@ -49,7 +49,7 @@ app.post('/',async(req,res)=>{
   const email=String(p.email||'').trim().toLowerCase();if(!email)return res.status(400).json({success:false,error:'Google did not provide an email address.'});
   let user=await User.findByEmail(email);
   if(user&&user.role!=='client')return res.status(409).json({success:false,error:'This email belongs to a staff account. Use staff login.'});
-  if(!user)user=await User.create({username:(email.split('@')[0].replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,55)||'client')+'-'+crypto.randomBytes(3).toString('hex'),password:crypto.randomBytes(32).toString('hex'),role:'client',email,phone:null});
+  if(!user)user=await User.create({username:(email.split('@')[0].replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,55)||'client')+'-'+crypto.randomBytes(3).toString('hex'),password:crypto.randomBytes(32).toString('base64url') + 'A!1',role:'client',email,phone:null});
   const sessionToken=token(user);
   setClientCookie(res,sessionToken);
   res.json({success:true,user:{id:user.id,email:user.email,username:user.username,role:user.role}});
