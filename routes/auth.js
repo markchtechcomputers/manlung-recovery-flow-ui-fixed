@@ -106,7 +106,7 @@ function setAdminCookie(res, token) {
 function clearAdminCookie(res) {
   res.clearCookie(ADMIN_COOKIE, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' && process.env.PUBLIC_APP_URL?.startsWith('https://'),
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
   });
@@ -1134,10 +1134,10 @@ router.post(
         .eq('role', 'client');
 
       const token = signToken(verified || client);
+      setClientCookie(res, token);
 
       return res.json({
         success: true,
-        token,
         user: {
           id: client.id,
           email: client.email,
