@@ -239,6 +239,32 @@ router.get('/security/events', async (req, res) => {
 });
 
 
+
+router.get('/security/analytics', async (req,res) => {
+  try { res.json({ success:true, analytics:await SecurityMonitoring.getAnalytics() }); }
+  catch(error){ console.error('Security analytics error:',error); res.status(500).json({error:'Could not load security analytics.'}); }
+});
+
+router.get('/security/case-operations', async (req,res) => {
+  try { res.json({ success:true, operations:await SecurityMonitoring.getCaseOperations() }); }
+  catch(error){ console.error('Case operations error:',error); res.status(500).json({error:'Could not load case operations.'}); }
+});
+
+router.get('/security/audit-center', async (req,res) => {
+  try { res.json({ success:true, log:await SecurityMonitoring.getAuditCenter(req.query.limit) }); }
+  catch(error){ console.error('Audit center error:',error); res.status(500).json({error:'Could not load audit center.'}); }
+});
+
+router.get('/security/cases/:caseId/intelligence', async (req,res) => {
+  try {
+    const caseId=String(req.params.caseId||'').trim();
+    if(!caseId) return res.status(400).json({error:'Case ID is required.'});
+    const data=await SecurityMonitoring.getCaseIntelligence(caseId);
+    if(!data.case) return res.status(404).json({error:'Case not found.'});
+    res.json({success:true,...data});
+  } catch(error){ console.error('Case intelligence error:',error); res.status(500).json({error:'Could not load case intelligence.'}); }
+});
+
 // Proper Admin invitation flow. The Owner creates the account invitation; the Admin creates their own credentials.
 router.post('/invitations', [body('email').trim().isEmail().normalizeEmail()], async (req, res) => {
   if (!checkValidation(req, res)) return;
