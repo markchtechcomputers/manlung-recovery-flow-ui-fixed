@@ -82,7 +82,7 @@
                         <img id="mfaQrCode" alt="Authenticator setup QR code" style="display:block;width:100%;height:auto;">
                     </div>
                     <p style="font-size:.72rem;color:#a9c0ec;word-break:break-all;">Can't scan? Secret: <strong id="mfaSecret"></strong></p>
-                    <form id="mfaEnrollForm" onsubmit="enableMfa(event)">
+                    <form id="mfaEnrollForm">
                         <div class="form-group">
                             <label><i class="fas fa-key"></i> Enter the 6-digit code</label>
                             <input type="text" id="mfaEnrollCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="123456" required>
@@ -94,7 +94,7 @@
                 </div>
             </section>
 
-            <form id="adminMfaForm" onsubmit="verifyMfaLogin(event)" style="display:none;margin-top:1rem;">
+            <form id="adminMfaForm" style="display:none;margin-top:1rem;">
                 <div class="form-group">
                     <label><i class="fas fa-shield-halved"></i> Authenticator code</label>
                     <input type="text" id="adminMfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" required>
@@ -103,7 +103,7 @@
                 <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
                     <i class="fas fa-check"></i> Verify &amp; Sign In
                 </button>
-                <button type="button" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:.5rem;" onclick="cancelMfaLogin()">Back</button>
+                <button type="button" id="cancelMfaLoginBtn" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:.5rem;">Back</button>
                 <div id="mfaLoginError" class="error-text"></div>
             </form>
 
@@ -136,8 +136,8 @@
 
   <button
     type="button"
+    id="requestAdminResetBtn"
     class="btn btn-primary"
-    onclick="requestAdminReset()"
   >
     Send Reset Link
   </button>
@@ -159,8 +159,11 @@
         let pendingMfaTicket = null;
         let mfaEnrollmentUser = null;
 
-        document.getElementById('adminLoginForm')
-            ?.addEventListener('submit', handleAdminLogin);
+        document.getElementById('adminLoginForm')?.addEventListener('submit', handleAdminLogin);
+        document.getElementById('mfaEnrollForm')?.addEventListener('submit', enableMfa);
+        document.getElementById('adminMfaForm')?.addEventListener('submit', verifyMfaLogin);
+        document.getElementById('cancelMfaLoginBtn')?.addEventListener('click', cancelMfaLogin);
+        document.getElementById('requestAdminResetBtn')?.addEventListener('click', requestAdminReset);
 
         function showMfaEnrollment(user) {
             mfaEnrollmentUser = user;
@@ -246,7 +249,8 @@
                 }
                 const recovery = document.getElementById('mfaRecoveryCodes');
                 recovery.style.display = 'block';
-                recovery.innerHTML = '<strong>Save these recovery codes now.</strong><br><small>Each code can be used once.</small><pre style="white-space:pre-wrap;background:#0b1730;padding:.75rem;border-radius:8px;margin-top:.5rem;">' + data.recoveryCodes.join('\\n') + '</pre><button type="button" class="btn btn-primary" style="width:100%;justify-content:center;" onclick="finishMfaEnrollment()">Continue to Dashboard</button>';
+                recovery.innerHTML = '<strong>Save these recovery codes now.</strong><br><small>Each code can be used once.</small><pre style="white-space:pre-wrap;background:#0b1730;padding:.75rem;border-radius:8px;margin-top:.5rem;">' + data.recoveryCodes.join('\\n') + '</pre><button type="button" id="finishMfaEnrollmentBtn" class="btn btn-primary" style="width:100%;justify-content:center;">Continue to Dashboard</button>';
+                document.getElementById('finishMfaEnrollmentBtn')?.addEventListener('click', finishMfaEnrollment);
                 status.textContent = 'MFA enabled successfully.';
             } catch (error) {
                 console.error('MFA enable error:', error);
