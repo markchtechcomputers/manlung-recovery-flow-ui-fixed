@@ -262,7 +262,7 @@ async function handleForgot(event) {
 async function handleLogin(event) {
   event.preventDefault();
 
-  const email=document.getElementById('loginEmail').value;
+  const email=document.getElementById('loginEmail').value.trim();
   const password=document.getElementById('loginPassword').value;
   const errorEl=document.getElementById('loginError');
   showMessage(errorEl,'');
@@ -270,14 +270,38 @@ async function handleLogin(event) {
     showMessage(errorEl,'Password must be between 8 and 72 characters.');
     return;
   }
+
+  // The active client session is stored in an HttpOnly cookie.
+  // Remove legacy browser tokens so an older account cannot leak a
+  // malformed/stale Bearer token into the next account session.
+  localStorage.removeItem('clientToken');
+  localStorage.removeItem('clientUser');
+
   try {
     const res=await fetch('/api/auth/client/login',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      cache:'no-store',
       body:JSON.stringify({email,password})
     });
 
-    const data=await res.json();
+    const raw=await res.text();
+    let data={};
+    try {
+      data=raw ? JSON.parse(raw) : {};
+    } catch(parseError) {
+      console.error('Client login returned non-JSON response:', {
+        status: res.status,
+        contentType: res.headers.get('content-type'),
+        body: raw.slice(0, 300)
+      });
+      throw new Error(
+        res.ok
+          ? 'The server returned an invalid response. Please refresh and try again.'
+          : `Server error (${res.status}). Please try again.`
+      );
+    }
 
     if(data.success){
       localStorage.setItem('clientUser',JSON.stringify(data.user));
