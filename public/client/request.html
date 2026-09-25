@@ -269,8 +269,39 @@
         #submissionModal .submission-actions .btn{min-width:130px}
         @media(max-width:520px){#submissionModal{padding:22px 18px;border-radius:16px}#submissionModal .submission-actions{flex-direction:column}#submissionModal .submission-actions .btn{width:100%}}
     </style>
+
+<style id="client-request-upgrade">
+.request-flow-card{border:1px solid var(--card-border);border-radius:18px;background:var(--card-bg);padding:1rem 1.1rem;margin-bottom:1rem;box-shadow:0 8px 26px rgba(15,23,42,.06)}
+.request-flow-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.request-flow-head h2{margin:.1rem 0 .25rem;font-size:1.08rem}
+.request-flow-sub{margin:0;color:var(--text-muted);font-size:.82rem;line-height:1.5}
+.request-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:.7rem;margin:1rem 0 .8rem}
+.request-search{position:relative}.request-search i{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.request-search input{width:100%;padding:.72rem .8rem .72rem 2.25rem;border:1px solid var(--card-border);border-radius:11px;background:var(--page-bg);color:var(--text)}
+.request-filters{display:flex;gap:.4rem;flex-wrap:wrap}
+.request-filter{border:1px solid var(--card-border);background:transparent;color:var(--text);border-radius:999px;padding:.48rem .72rem;font-size:.72rem;font-weight:800;cursor:pointer}
+.request-filter.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.request-cards{display:grid;gap:.7rem}.request-card{border:1px solid var(--card-border);border-radius:14px;padding:.85rem;background:var(--page-bg)}
+.request-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.7rem}.request-card-id{font-weight:900;font-size:.88rem}.request-card-type{font-size:.74rem;color:var(--text-muted);margin-top:.15rem}
+.request-status{display:inline-flex;align-items:center;gap:.32rem;border-radius:999px;padding:.34rem .55rem;font-size:.68rem;font-weight:900;white-space:nowrap}
+.request-status.pending{background:#fff7ed;color:#c2410c}.request-status.progress{background:#eff6ff;color:#1d4ed8}.request-status.done{background:#ecfdf5;color:#15803d}.request-status.failed{background:#fef2f2;color:#b91c1c}
+.request-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-top:.7rem}.request-meta div{padding:.55rem .6rem;border:1px solid var(--card-border);border-radius:10px}.request-meta small{display:block;color:var(--text-muted);font-size:.65rem}.request-meta strong{display:block;font-size:.74rem;margin-top:.15rem}
+.request-files{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.65rem}.request-file-chip{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--card-border);border-radius:9px;padding:.38rem .5rem;font-size:.68rem;background:var(--card-bg);max-width:100%}.request-file-chip a{color:inherit;text-decoration:none}.request-file-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
+.request-actions{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.7rem}.request-actions a,.request-actions button{display:inline-flex;align-items:center;gap:.35rem}
+.request-empty{padding:1rem;text-align:center;border:1px dashed var(--card-border);border-radius:14px;color:var(--text-muted);font-size:.8rem}
+.upload-policy{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin:.75rem 0}.upload-policy-item{padding:.65rem;border:1px solid var(--card-border);border-radius:11px;background:var(--page-bg);font-size:.7rem}.upload-policy-item i{margin-right:.3rem}
+.upload-zone-enhanced{border:2px dashed var(--card-border);border-radius:16px;padding:1.25rem;text-align:center;background:var(--page-bg);cursor:pointer;transition:.18s ease}.upload-zone-enhanced:hover,.upload-zone-enhanced.dragover{border-color:var(--accent);background:var(--info-bg)}
+.upload-zone-enhanced .upload-icon{width:48px;height:48px;margin:0 auto .55rem;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--info-bg);color:var(--accent);font-size:1.2rem}.upload-zone-enhanced h3{margin:.1rem 0 .25rem;font-size:.95rem}.upload-zone-enhanced p{margin:0;color:var(--text-muted);font-size:.72rem;line-height:1.5}
+.upload-queue{display:grid;gap:.45rem;margin-top:.75rem}.upload-item{border:1px solid var(--card-border);border-radius:12px;padding:.65rem;background:var(--page-bg)}.upload-item-head{display:flex;align-items:center;gap:.55rem}.upload-item-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--info-bg);color:var(--accent);flex:0 0 30px}.upload-item-main{min-width:0;flex:1}.upload-item-name{font-size:.75rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.upload-item-size{font-size:.65rem;color:var(--text-muted)}.upload-item-actions{display:flex;gap:.3rem}.upload-item-actions button{border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:.3rem}.upload-progress{height:6px;border-radius:999px;background:var(--card-border);overflow:hidden;margin-top:.55rem}.upload-progress>span{display:block;height:100%;width:0;background:var(--accent);transition:width .2s ease}.upload-state{font-size:.66rem;color:var(--text-muted);margin-top:.35rem}
+.flow-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem;margin:.8rem 0}.flow-step{padding:.55rem .35rem;border:1px solid var(--card-border);border-radius:10px;text-align:center;font-size:.63rem;color:var(--text-muted);font-weight:800}.flow-step i{display:block;margin-bottom:.25rem}.flow-step.active{border-color:var(--accent);color:var(--accent);background:var(--info-bg)}.flow-step.done{color:#15803d;background:#ecfdf5}
+.security-upload-note{display:flex;gap:.55rem;align-items:flex-start;padding:.7rem .8rem;border-radius:11px;background:var(--info-bg);color:var(--info-text);font-size:.72rem;line-height:1.45;margin-top:.75rem}
+.submit-progress-panel{display:none;margin:.7rem 0;padding:.8rem;border:1px solid var(--card-border);border-radius:12px;background:var(--page-bg)}.submit-progress-panel.show{display:block}.submit-progress-row{display:flex;justify-content:space-between;gap:.5rem;font-size:.72rem;font-weight:800}.submit-progress-track{height:7px;border-radius:999px;background:var(--card-border);overflow:hidden;margin-top:.5rem}.submit-progress-fill{height:100%;width:0;background:var(--accent);transition:width .25s ease}
+.toast-stack{position:fixed;right:18px;bottom:18px;z-index:11000;display:grid;gap:.5rem;max-width:min(380px,calc(100vw - 36px))}.client-toast{display:flex;gap:.55rem;align-items:flex-start;padding:.75rem .85rem;border-radius:12px;background:var(--card-bg);border:1px solid var(--card-border);box-shadow:0 15px 40px rgba(2,6,23,.18);font-size:.74rem}.client-toast.success i{color:#16a34a}.client-toast.error i{color:#dc2626}
+@media(max-width:700px){.request-toolbar{grid-template-columns:1fr}.request-meta{grid-template-columns:1fr 1fr}.upload-policy{grid-template-columns:1fr}.flow-steps{grid-template-columns:1fr 1fr}.flow-step:last-child{grid-column:1/-1}.request-card-top{flex-direction:column}.request-status{align-self:flex-start}}
+@media(max-width:430px){.container-narrow{padding:.9rem}.request-meta{grid-template-columns:1fr}.request-flow-card{padding:.85rem}.upload-zone-enhanced{padding:1rem}.request-actions a,.request-actions button{width:100%;justify-content:center}}
+</style>
 </head>
-<body>
+<body><div id="clientRequestToastStack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
 <div id="submissionModalOverlay" role="dialog" aria-modal="true" aria-labelledby="submissionModalTitle">
   <div id="submissionModal">
     <div class="submission-icon"><i class="fas fa-circle-check" aria-hidden="true"></i></div>
@@ -307,6 +338,29 @@
     </div>
 
     <div class="container-narrow">
+        
+<section class="request-flow-card" id="clientRequestsPanel" aria-labelledby="clientRequestsTitle">
+  <div class="request-flow-head">
+    <div>
+      <h2 id="clientRequestsTitle"><i class="fas fa-layer-group"></i> My Requests &amp; Evidence</h2>
+      <p class="request-flow-sub">Search your submitted requests, check progress, and open available evidence files.</p>
+    </div>
+    <button type="button" class="btn btn-outline-dark" id="refreshRequestsBtn"><i class="fas fa-rotate"></i> Refresh</button>
+  </div>
+  <div class="request-toolbar">
+    <label class="request-search" aria-label="Search requests and uploaded files">
+      <i class="fas fa-magnifying-glass"></i>
+      <input id="requestSearch" type="search" placeholder="Search case ID, request type, status or file name…" autocomplete="off">
+    </label>
+    <div class="request-filters" id="requestFilters" role="group" aria-label="Request status filters">
+      <button type="button" class="request-filter active" data-filter="all">All</button>
+      <button type="button" class="request-filter" data-filter="pending">Pending</button>
+      <button type="button" class="request-filter" data-filter="progress">In progress</button>
+      <button type="button" class="request-filter" data-filter="done">Completed</button>
+    </div>
+  </div>
+  <div id="requestCards" class="request-cards" aria-live="polite"><div class="request-empty"><i class="fas fa-spinner fa-spin"></i> Loading your requests…</div></div>
+</section>
         <div id="formContainer">
             <div id="draftBanner" class="draft-banner" style="display:none;">
                 <span><i class="fas fa-clock-rotate-left"></i> We restored your unsaved draft from earlier.</span>
@@ -446,13 +500,20 @@
                 </div>
 
                 <div class="card">
-                    <div class="card-title"><i class="fas fa-paperclip"></i> Additional Files <span style="font-weight:400;font-size:0.85rem;color:var(--text-muted);">(max 100MB each)</span></div>
-                    <div class="upload-zone" onclick="document.getElementById('fileUpload').click()">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Click to upload PDF, JPG/JPEG or PNG (max 10MB each)</p>
-                        <input type="file" id="fileUpload" multiple style="display:none" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png">
+                    <div class="card-title"><i class="fas fa-paperclip"></i> Add Evidence / Upload Files <span style="font-weight:400;font-size:.8rem;color:var(--text-muted);">Secure evidence intake</span></div>
+                    <div class="upload-policy" aria-label="Upload requirements">
+                      <div class="upload-policy-item"><i class="fas fa-file-circle-check"></i><strong>Formats</strong><br>PDF, JPG/JPEG, PNG</div>
+                      <div class="upload-policy-item"><i class="fas fa-weight-hanging"></i><strong>Size</strong><br>Up to 10 MB per file</div>
+                      <div class="upload-policy-item"><i class="fas fa-layer-group"></i><strong>Batch</strong><br>Up to 10 files</div>
                     </div>
-                    <div id="fileList" class="file-list"></div>
+                    <div class="upload-zone-enhanced" id="fileUploadZone" role="button" tabindex="0" aria-label="Choose evidence files">
+                      <div class="upload-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                      <h3>Drop evidence here or choose files</h3>
+                      <p>Use only files you are authorized to provide. Do not upload passwords, OTPs, recovery codes or private keys.</p>
+                      <input type="file" id="fileUpload" multiple hidden accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="security-upload-note"><i class="fas fa-shield-halved"></i><span>Evidence is handled as sensitive case material. Upload only what is relevant to this request and keep your account credentials out of files and descriptions.</span></div>
+                    <div id="fileList" class="upload-queue" aria-live="polite"></div>
                 </div>
 
                 <div class="card">
@@ -470,6 +531,17 @@
                     <div class="checkbox-group"><input type="checkbox" id="term2" required><label>I understand that submitting false information may result in my request being rejected.</label></div>
                 </div>
 
+                <div class="submit-progress-panel" id="submitProgressPanel" aria-live="polite">
+  <div class="submit-progress-row"><span id="submitProgressState"><i class="fas fa-cloud-arrow-up"></i> Uploading</span><span id="submitProgressPct">0%</span></div>
+  <div class="submit-progress-track"><div class="submit-progress-fill" id="submitProgressFill"></div></div>
+  <div class="flow-steps" id="requestFlowSteps">
+    <div class="flow-step active" data-step="upload"><i class="fas fa-cloud-arrow-up"></i>Upload</div>
+    <div class="flow-step" data-step="processing"><i class="fas fa-gears"></i>Processing</div>
+    <div class="flow-step" data-step="review"><i class="fas fa-magnifying-glass"></i>Review</div>
+    <div class="flow-step" data-step="completed"><i class="fas fa-circle-check"></i>Completed</div>
+    <div class="flow-step" data-step="failed"><i class="fas fa-circle-xmark"></i>Failed</div>
+  </div>
+</div>
                 <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
                     <button type="submit" id="submitBtn" class="btn btn-success" style="padding:0.8rem 2.5rem; font-size:1rem;">
                         <i class="fas fa-paper-plane"></i> Submit Request
@@ -499,38 +571,43 @@
     <script>
         let pendingFiles = []; // File objects staged for upload (from the general upload zone)
 
-        document.getElementById('fileUpload').addEventListener('change', function (e) {
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
-                if (file.size > 10 * 1024 * 1024) {
-                    alert(`File ${file.name} exceeds the 10MB limit.`);
-                    return;
-                }
-                if (!['application/pdf','image/jpeg','image/png'].includes(String(file.type || '').toLowerCase())) {
-                    alert(`File ${file.name} is not supported. Use PDF, JPG/JPEG or PNG.`);
-                    return;
-                }
-                pendingFiles.push(file);
-            });
-            renderFileList();
-        });
-
-        function renderFileList() {
-            const container = document.getElementById('fileList');
-            if (pendingFiles.length === 0) { container.innerHTML = ''; return; }
-            let html = '';
-            pendingFiles.forEach((file, index) => {
-                const isImage = file.type && file.type.startsWith('image/');
-                const thumb = isImage ? `<img class="file-thumb" src="${URL.createObjectURL(file)}" alt="">` : '<i class="fas fa-file" style="margin-right:8px;"></i>';
-                html += `
-                    <div class="file-item">
-                        <span style="display:flex; align-items:center;">${thumb} ${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>
-                        <span class="remove" onclick="removeFile(${index})"><i class="fas fa-times"></i></span>
-                    </div>`;
-            });
-            container.innerHTML = html;
+        const allowedUploadTypes=['application/pdf','image/jpeg','image/png']; const maxUploadBytes=10*1024*1024;
+        function addUploadFiles(files){
+          const incoming=Array.from(files||[]);
+          if(pendingFiles.length+incoming.length>10){ toast('Maximum 10 evidence files can be submitted at once.','error'); return; }
+          incoming.forEach(file=>{
+            if(file.size>maxUploadBytes){ toast(file.name+' exceeds the 10 MB per-file limit.','error'); return; }
+            if(!allowedUploadTypes.includes(String(file.type||'').toLowerCase())){ toast(file.name+' is not supported. Use PDF, JPG/JPEG or PNG.','error'); return; }
+            if(pendingFiles.some(f=>f.name===file.name&&f.size===file.size)){ return; }
+            pendingFiles.push(file);
+          });
+          renderFileList();
+          if(incoming.length) toast('Evidence added to the secure upload queue.','success');
         }
-        function removeFile(index) { pendingFiles.splice(index, 1); renderFileList(); }
+        const fileUploadInput=document.getElementById('fileUpload'), fileUploadZone=document.getElementById('fileUploadZone');
+        if(fileUploadInput&&fileUploadZone){
+          fileUploadInput.addEventListener('change',e=>{ addUploadFiles(e.target.files); e.target.value=''; });
+          fileUploadZone.addEventListener('click',()=>fileUploadInput.click());
+          fileUploadZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileUploadInput.click();}});
+          ['dragenter','dragover'].forEach(ev=>fileUploadZone.addEventListener(ev,e=>{e.preventDefault();fileUploadZone.classList.add('dragover');}));
+          ['dragleave','drop'].forEach(ev=>fileUploadZone.addEventListener(ev,e=>{e.preventDefault();fileUploadZone.classList.remove('dragover');}));
+          fileUploadZone.addEventListener('drop',e=>addUploadFiles(e.dataTransfer.files));
+        }
+
+        function fileIcon(file){ const t=String(file?.type||'').toLowerCase(); if(t==='application/pdf') return 'fa-file-pdf'; if(t.startsWith('image/')) return 'fa-file-image'; return 'fa-file'; }
+        function formatBytes(bytes){ if(bytes<1024) return bytes+' B'; if(bytes<1024*1024) return (bytes/1024).toFixed(1)+' KB'; return (bytes/1024/1024).toFixed(2)+' MB'; }
+        function toast(message,type='success'){ const stack=document.getElementById('clientRequestToastStack'); if(!stack)return; const el=document.createElement('div'); el.className='client-toast '+type; el.innerHTML='<i class="fas '+(type==='success'?'fa-circle-check':'fa-circle-exclamation')+'"></i><span>'+escapeHtml(message)+'</span>'; stack.appendChild(el); setTimeout(()=>el.remove(),4200); }
+        function renderFileList(){
+            const container=document.getElementById('fileList'); if(!container)return;
+            container.innerHTML='';
+            pendingFiles.forEach((file,index)=>{
+              const row=document.createElement('div'); row.className='upload-item';
+              row.innerHTML='<div class="upload-item-head"><div class="upload-item-icon"><i class="fas '+fileIcon(file)+'"></i></div><div class="upload-item-main"><div class="upload-item-name" title="'+escapeHtml(file.name)+'">'+escapeHtml(file.name)+'</div><div class="upload-item-size">'+formatBytes(file.size)+' · Ready</div></div><div class="upload-item-actions"><button type="button" aria-label="Remove '+escapeHtml(file.name)+'"><i class="fas fa-trash-can"></i></button></div></div><div class="upload-progress"><span style="width:100%"></span></div><div class="upload-state"><i class="fas fa-circle-check"></i> Ready to upload</div>';
+              row.querySelector('button').onclick=()=>removeFile(index);
+              container.appendChild(row);
+            });
+        }
+        function removeFile(index){ pendingFiles.splice(index,1); renderFileList(); }
 
         function applyTheme() {
             const savedTheme =
@@ -686,12 +763,11 @@
             xhr.open('POST', '/api/cases/submit');
             xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
-            xhr.upload.onprogress = (e) => {
-                if (e.lengthComputable) {
-                    const pct = Math.round((e.loaded / e.total) * 100);
-                    statusEl.textContent = allFiles.length ? `Uploading (${pct}%)…` : 'Submitting request…';
-                }
-            };
+            const progressPanel=document.getElementById('submitProgressPanel'), progressFill=document.getElementById('submitProgressFill'), progressPct=document.getElementById('submitProgressPct'), progressState=document.getElementById('submitProgressState');
+            const setFlowStep=(step,pct,label)=>{ if(progressPanel)progressPanel.classList.add('show'); if(progressFill)progressFill.style.width=pct+'%'; if(progressPct)progressPct.textContent=pct+'%'; if(progressState)progressState.innerHTML='<i class="fas '+(step==='failed'?'fa-circle-xmark':step==='completed'?'fa-circle-check':step==='processing'?'fa-gears':'fa-cloud-arrow-up')+'"></i> '+label; document.querySelectorAll('#requestFlowSteps .flow-step').forEach(el=>{const s=el.dataset.step;el.classList.toggle('active',s===step);el.classList.toggle('done',['upload','processing','review','completed'].indexOf(s)<['upload','processing','review','completed'].indexOf(step));});};
+            setFlowStep('upload',0,allFiles.length?'Uploading evidence…':'Submitting request…');
+            xhr.upload.onprogress = (e) => { if(e.lengthComputable){const pct=Math.round((e.loaded/e.total)*100);statusEl.textContent=allFiles.length?`Uploading (${pct}%)…`:'Submitting request…';setFlowStep('upload',Math.max(5,pct),'Uploading evidence…');} };
+            xhr.onreadystatechange=()=>{ if(xhr.readyState===2){ setFlowStep('processing',92,'Processing secure submission…'); } };
 
             xhr.onload = () => {
                 statusEl.textContent = '';
@@ -700,6 +776,9 @@
                 try { data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
 
                 if (xhr.status >= 200 && xhr.status < 300 && data && data.success) {
+                    setFlowStep('completed',100,'Request completed successfully.');
+                    if(typeof toast==='function') toast('Request submitted successfully. Your case is now in review.','success');
+                    if(window.refreshClientRequests) window.refreshClientRequests();
                     document.getElementById('formContainer').style.display = 'none';
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('submittedCaseId').textContent = data.case.caseId;
@@ -708,6 +787,8 @@
                     document.body.style.overflow = 'hidden';
                     clearDraft();
                 } else {
+                    setFlowStep('failed',100,'Upload or submission failed.');
+                    if(typeof toast==='function') toast((data&&data.error)||`Submission failed (status ${xhr.status}). Please try again.`,'error');
                     alert((data && data.error) || `Error submitting request (status ${xhr.status}). Please try again.`);
                 }
             };
@@ -715,6 +796,8 @@
             xhr.onerror = () => {
                 statusEl.textContent = '';
                 submitBtn.disabled = false;
+                setFlowStep('failed',100,'Could not reach the server.');
+                if(typeof toast==='function') toast('Could not reach the server. Please check your connection and try again.','error');
                 alert('Could not reach the server. Is it running, and is the URL correct?');
             };
 
@@ -754,6 +837,43 @@
 
         checkAuth();
     </script>
+  <script id="client-request-enhancement">
+(function(){
+  const state={cases:[],filter:'all',query:''};
+  const token=()=>localStorage.getItem('clientToken');
+  const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  function authHeaders(){const t=token();return t?{Authorization:'Bearer '+t}:{};}
+  function statusGroup(status){const s=String(status||'').toLowerCase();if(/success|completed|recovered|closed/.test(s))return 'done';if(/investig|awaiting|evidence|progress|active|review/.test(s))return 'progress';if(/reject|fail|cancel/.test(s))return 'failed';return 'pending';}
+  function statusIcon(group){return group==='done'?'fa-circle-check':group==='progress'?'fa-spinner':'fa-clock';}
+  function formatDate(v){const d=new Date(v||'');return Number.isNaN(d.getTime())?'—':d.toLocaleString([], {dateStyle:'medium',timeStyle:'short'});}
+  function fileIconForName(name){const s=String(name||'').toLowerCase();return s.endsWith('.pdf')?'fa-file-pdf':/^.*\.(jpg|jpeg|png)$/.test(s)?'fa-file-image':'fa-file';}
+  function renderRequests(){
+    const box=document.getElementById('requestCards');if(!box)return;
+    const q=state.query.trim().toLowerCase();
+    const list=state.cases.filter(c=>{
+      const group=statusGroup(c.status); if(state.filter!=='all'&&group!==state.filter)return false;
+      const files=Array.isArray(c.files)?c.files:[];
+      const hay=[c.caseId,c.caseType,c.status,c.priority,...files.map(f=>f.filename||f.originalName||'')].join(' ').toLowerCase();
+      return !q||hay.includes(q);
+    });
+    if(!list.length){box.innerHTML='<div class="request-empty"><i class="fas fa-folder-open"></i><div style="margin-top:.35rem">'+(state.cases.length?'No requests match your search/filter.':'No recovery requests yet.')+'</div><div style="margin-top:.25rem">Start a new request below and your progress will appear here.</div></div>';return;}
+    box.innerHTML=list.map(c=>{
+      const group=statusGroup(c.status), files=Array.isArray(c.files)?c.files:[];
+      const fileHtml=files.length?files.map(f=>{const name=f.filename||f.originalName||'Evidence file';const link=f.url?'<a href="'+esc(f.url)+'" target="_blank" rel="noopener noreferrer" title="Open '+esc(name)+'"><i class="fas '+fileIconForName(name)+'"></i> <span>'+esc(name)+'</span> <i class="fas fa-up-right-from-square"></i></a>':'<i class="fas '+fileIconForName(name)+'"></i> <span>'+esc(name)+'</span>';return '<div class="request-file-chip">'+link+'</div>';}).join(''):'<span class="request-file-chip"><i class="fas fa-paperclip"></i> No files uploaded</span>';
+      return '<article class="request-card"><div class="request-card-top"><div><div class="request-card-id"><i class="fas fa-folder-open"></i> '+esc(c.caseId||'Case')+'</div><div class="request-card-type">'+esc(c.caseType||'Recovery Request')+'</div></div><span class="request-status '+group+'"><i class="fas '+statusIcon(group)+(group==='progress'?' fa-spin':'')+'"></i> '+esc(c.status||'Pending Review')+'</span></div><div class="request-meta"><div><small>Status</small><strong>'+esc(c.status||'Pending Review')+'</strong></div><div><small>Submitted</small><strong>'+formatDate(c.createdAt||c.lastUpdated)+'</strong></div><div><small>Uploaded items</small><strong>'+files.length+' file'+(files.length===1?'':'s')+'</strong></div></div><div class="request-files">'+fileHtml+'</div><div class="request-actions"><a class="btn btn-outline-dark" href="/client/dashboard.html"><i class="fas fa-eye"></i> View case</a></div></article>';
+    }).join('');
+  }
+  async function loadClientRequests(){
+    const box=document.getElementById('requestCards');if(!box)return;
+    if(!token()){box.innerHTML='<div class="request-empty"><i class="fas fa-lock"></i><div style="margin-top:.35rem">Sign in to view your requests and evidence.</div></div>';return;}
+    try{const r=await fetch('/api/cases/client/me',{headers:authHeaders(),cache:'no-store'});const d=await r.json().catch(()=>({}));if(r.status===401){localStorage.removeItem('clientToken');location.href='/login.html';return;}if(!r.ok||!d.success)throw new Error(d.error||'Could not load your requests.');state.cases=d.cases||[];renderRequests();}catch(e){box.innerHTML='<div class="request-empty" style="color:#b91c1c"><i class="fas fa-circle-exclamation"></i><div style="margin-top:.35rem">'+esc(e.message)+'</div></div>';}}
+  document.getElementById('requestSearch')?.addEventListener('input',e=>{state.query=e.target.value;renderRequests();});
+  document.querySelectorAll('#requestFilters .request-filter').forEach(btn=>btn.addEventListener('click',()=>{state.filter=btn.dataset.filter||'all';document.querySelectorAll('#requestFilters .request-filter').forEach(b=>b.classList.toggle('active',b===btn));renderRequests();}));
+  document.getElementById('refreshRequestsBtn')?.addEventListener('click',()=>loadClientRequests());
+  window.refreshClientRequests=loadClientRequests;
+  loadClientRequests(); setInterval(loadClientRequests,45000);
+})();
+</script>
   <script src="/js/call-widget.js"></script>
 <script src="/js/pwa.js" defer></script>
 <footer class="manlung-footer" aria-label="Manlung Recovery footer">
