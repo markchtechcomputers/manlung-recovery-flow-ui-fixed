@@ -56,6 +56,22 @@ router.use(ownerAuth);
 // Every endpoint below is protected by router-level ownerAuth.
 // ============================================================
 
+router.get('/security/overview', async (req, res) => {
+  try { res.json({ success: true, overview: await SecurityMonitoring.getOverview() }); }
+  catch (error) { console.error('Security overview error:', error); res.status(500).json({ error: 'Could not load security overview.' }); }
+});
+
+router.get('/security/users/:userId/detail', async (req, res) => {
+  try {
+    const detail = await SecurityMonitoring.getUserDetail(req.params.userId);
+    if (!detail) return res.status(404).json({ error: 'User not found.' });
+    res.json({ success: true, ...detail });
+  } catch (error) {
+    console.error('Security user detail error:', error);
+    res.status(500).json({ error: 'Could not load user security detail.' });
+  }
+});
+
 router.get('/security/users', async (req, res) => {
   try {
     const users = await SecurityMonitoring.listUsers({
