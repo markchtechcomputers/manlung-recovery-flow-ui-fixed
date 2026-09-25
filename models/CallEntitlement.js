@@ -51,7 +51,6 @@ function evaluate(entitlement, nowMs = Date.now()) {
     trial: false,
     trialAvailable: false,
     trialUsed: Boolean(entitlement?.trial_started_at),
-    free: false,
   };
 }
 
