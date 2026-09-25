@@ -456,6 +456,15 @@
   });
   window.addEventListener('manlung:dashboard-accept-admin-call',event=>{const id=event?.detail?.id;if(id&&String(id)===String(currentCallbackId)){acceptAdminCallback(id,{});}});window.addEventListener('manlung:dashboard-decline-admin-call',event=>{const id=event?.detail?.id;if(id&&String(id)===String(currentCallbackId)){rejectAdminCallback(id,{});}});
   function loadScript(src){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});}
-  async function init(){if(window.__MANLUNG_CALL_WIDGET_INIT__)return;window.__MANLUNG_CALL_WIDGET_INIT__=true;buildWidget();startCallbackPolling();try{await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js');}catch(e){console.warn('Supabase Realtime SDK failed to load');}}
+  async function init(){
+    if(window.__MANLUNG_CALL_WIDGET_INIT__)return;
+    const path=window.location.pathname;
+    if(path==='/admin/login.html'||path==='/admin/register.html'||path==='/login.html')return;
+    window.__MANLUNG_CALL_WIDGET_INIT__=true;
+    buildWidget();
+    startCallbackPolling();
+    try{await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js');}
+    catch(e){console.warn('Supabase Realtime SDK failed to load');}
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
