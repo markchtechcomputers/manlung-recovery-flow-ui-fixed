@@ -6,6 +6,7 @@ const CallSession = require('../models/CallSession');
 const { supabase } = require('../config/supabase');
 const CallSignal = require('../models/CallSignal');
 const Notification = require('../models/Notification');
+const CallEntitlement = require('../models/CallEntitlement');
 
 // ---- Admin presence ----
 
@@ -262,6 +263,16 @@ router.post('/start', auth, async (req, res) => {
   try {
     if (req.user.role !== 'client') {
       return res.status(403).json({ error: 'Only clients can initiate a Call Admin session.' });
+    }
+
+    const entitlement = await CallEntitlement.get(req.user.id);
+    const evaluatedEntitlement = CallEntitlement.evaluate(entitlement);
+    if (!evaluatedEntitlement.access) {
+      return res.status(402).json({
+        error: 'Your subscription has expired. Please choose a plan to continue.',
+        code: 'CALL_SUBSCRIPTION_REQUIRED',
+        subscription: evaluatedEntitlement,
+      });
     }
 
     const callMode = req.body?.callMode === 'video' ? 'video' : 'audio';
