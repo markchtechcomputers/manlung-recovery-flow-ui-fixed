@@ -57,6 +57,8 @@ const auth = async (req, res, next) => {
     if (isSessionExpired(decoded, user)) {
       if (user.role === 'admin' || user.role === 'owner') {
         res.clearCookie(ADMIN_COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/' });
+      } else if (user.role === 'client') {
+        res.clearCookie(CLIENT_COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
       }
       return res.status(401).json({ error: 'Session expired. Please sign in again.', code: 'SESSION_EXPIRED' });
     }
