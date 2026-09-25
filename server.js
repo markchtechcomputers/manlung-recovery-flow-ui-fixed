@@ -321,8 +321,16 @@ const paymentLimiter = rateLimit({
 
 app.use('/api/subscription/initialize', paymentLimiter);
 app.use('/api/subscription/verify', paymentLimiter);
+const paystackWebhookLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => res.status(429).send('Too many webhook requests.'),
+});
 app.use('/api/donations/initialize', paymentLimiter);
 app.use('/api/donations/verify', paymentLimiter);
+app.use('/api/subscription/webhook', paystackWebhookLimiter);
 
 // ============================================================
 // CALL START RATE LIMITER
