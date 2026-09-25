@@ -609,7 +609,7 @@
       if(!value||value==='[DONE]')continue;
       try{
         const o=JSON.parse(value);
-        const part=o?.choices?.[0]?.delta?.content||o?.choices?.[0]?.message?.content||o?.delta?.content||o?.content||o?.text||o?.response||'';
+        const part=o?.choices?.[0]?.delta?.content||o?.choices?.[0]?.message?.content||o?.delta?.content||o?.content||o?.text||o?.response||o?.answer||o?.message||'';
         if(part)out+=part;
       }catch(_){}
     }
