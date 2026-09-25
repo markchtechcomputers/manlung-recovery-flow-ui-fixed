@@ -480,7 +480,8 @@ router.post(
         });
       }
 
-      issueAdminSession(res, admin);
+      const session = await User.bumpSessionVersion(admin.id);
+      issueAdminSession(res, { ...admin, session_version: session?.session_version });
 
       console.log(`Admin/Owner login successful: ${admin.username} (${admin.role})`);
 
@@ -622,7 +623,8 @@ router.post('/admin/mfa/login', [
       return res.status(401).json({ error: 'Invalid authentication code.' });
     }
 
-    issueAdminSession(res, admin);
+    const session = await User.bumpSessionVersion(admin.id);
+    issueAdminSession(res, { ...admin, session_version: session?.session_version });
 
     await SecurityMonitoring.recordEvent({
       eventType: 'MFA_SUCCESS',
@@ -1262,7 +1264,11 @@ router.post(
         });
       }
 
-      const token = signToken(client);
+      // Each successful login creates a new account session version.
+      // Any older browser session carrying the previous version is rejected
+      // by the auth middleware on its next request.
+      const session = await User.bumpSessionVersion(client.id);
+      const token = signToken({ ...client, session_version: session?.session_version });
       setClientCookie(res, token);
 
       res.json({
@@ -2082,7 +2088,9 @@ router.post(
         }).catch(() => {});
       }
 
-      const token = signToken(client);
+      // Social login follows the same single-browser session rule as password login.
+      const session = await User.bumpSessionVersion(client.id);
+      const token = signToken({ ...client, session_version: session?.session_version });
       setClientCookie(res, token);
 
       return res.json({
