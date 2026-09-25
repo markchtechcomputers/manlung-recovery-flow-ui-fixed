@@ -93,10 +93,11 @@ function entitlementResponse(entitlement, latestPayment = null) {
   const evaluated = CallEntitlement.evaluate(entitlement);
   return {
     ...evaluated,
-    paymentStatus: latestPayment?.payment_status || (evaluated.access ? 'paid' : 'expired'),
-    plan: evaluated.subscriptionPlan || latestPayment?.plan || null,
-    subscriptionStartDate: evaluated.subscriptionStartAt || latestPayment?.subscription_start || null,
-    subscriptionExpiryDate: evaluated.subscriptionExpiresAt || latestPayment?.subscription_expiry || null,
+    paymentStatus: evaluated.free ? 'free' : (latestPayment?.payment_status || (evaluated.access ? 'paid' : 'expired')),
+    accessType: evaluated.free ? 'complimentary' : (evaluated.subscription ? 'paid_subscription' : 'none'),
+    plan: evaluated.free ? 'complimentary' : (evaluated.subscriptionPlan || latestPayment?.plan || null),
+    subscriptionStartDate: evaluated.free ? (entitlement?.free_access_granted_at || null) : (evaluated.subscriptionStartAt || latestPayment?.subscription_start || null),
+    subscriptionExpiryDate: evaluated.free ? (entitlement?.free_access_until || null) : (evaluated.subscriptionExpiresAt || latestPayment?.subscription_expiry || null),
     daysRemaining: evaluated.daysRemaining,
   };
 }
