@@ -32,6 +32,7 @@ const DANGEROUS_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
 const PROMPT_LIKE_KEYS = new Set(['prompt', 'systemPrompt', 'instructions', 'aiPrompt', 'assistantPrompt', 'automationPrompt']);
 const CSRF_COOKIE = process.env.NODE_ENV === 'production' ? '__Host-mlc_csrf' : 'mlc_csrf';
 const ADMIN_COOKIE = 'manlung_admin_session';
+const CLIENT_COOKIE = 'manlung_client_session';
 
 function securityLog(event, req, extra = {}) {
   const safe = {
@@ -81,8 +82,20 @@ function enforceCsrf(req, res) {
   // exchange is exempted narrowly without weakening CSRF protection elsewhere.
   const requestPath = String(req.originalUrl || req.path || '').split('?')[0];
   if (req.method === 'POST' && requestPath === '/api/auth/client/oauth') return true;
-  if (!req.headers.cookie?.includes(`${ADMIN_COOKIE}=`)) return true;
-  if (req.headers.authorization) return true;
+  const hasSessionCookie = req.headers.cookie?.includes(`${ADMIN_COOKIE}=`) || req.headers.cookie?.includes(`${CLIENT_COOKIE}=`);
+  if (!hasSessionCookie || req.headers.authorization) return true;
+  const origin = String(req.headers.origin || '').trim();
+  if (origin) {
+    const allowed = new Set([
+      String(process.env.PUBLIC_APP_URL || '').replace(/\/$/, ''),
+      ...(process.env.NODE_ENV === 'production' ? [] : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:5000', 'http://127.0.0.1:3000']),
+    ]);
+    if (!allowed.has(origin)) {
+      securityLog('csrf_origin_blocked', req);
+      return res.status(403).json({ success: false, error: 'Cross-site request blocked.', code: 'CSRF_ORIGIN_INVALID' });
+    }
+    return true;
+  }
   const cookieToken = parseCookie(req, CSRF_COOKIE);
   const headerToken = req.headers['x-csrf-token'];
   if (!safeEqual(cookieToken, headerToken)) {
