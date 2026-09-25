@@ -1940,7 +1940,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
     const headers=manlungHeaders();
     if(!headers) return;
     try{
-      const res=await fetch('/api/calls/client/callbacks',{headers,cache:'no-store'});
+      const res=await fetch('/api/calls/client/callbacks',{credentials:'include',cache:'no-store'});
       if(!res.ok) return;
       const data=await res.json().catch(()=>({}));
       const call=Array.isArray(data.calls)&&data.calls.length?data.calls[0]:null;
