@@ -1239,17 +1239,25 @@ router.post(
         await User.comparePassword(client, password);
 
       if (!isMatch) {
-        await SecurityMonitoring.recordEvent({
-          eventType: 'LOGIN_FAILED',
-          userId: client.id,
-          ipAddress: req.ip,
-          userAgent: req.get('user-agent'),
-          details: {
-            role: client.role,
-          },
-        });
+        // A failed login must never become a 500 just because security-event
+        // logging is unavailable or its schema is temporarily out of sync.
+        // Authentication failure remains a normal 401 response.
+        try {
+          await SecurityMonitoring.recordEvent({
+            eventType: 'LOGIN_FAILED',
+            userId: client.id,
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent'),
+            details: {
+              role: client.role,
+            },
+          });
+        } catch (securityLogError) {
+          console.error('Client failed-login security logging error:', securityLogError);
+        }
 
         return res.status(401).json({
+          success: false,
           error: 'Invalid credentials',
         });
       }
