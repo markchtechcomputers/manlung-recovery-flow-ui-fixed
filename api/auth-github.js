@@ -34,7 +34,7 @@ function callbackPage(res,token){
 
 app.get('/start',(req,res)=>{
   if(!CLIENT_ID||!CLIENT_SECRET)return res.redirect('/login.html?oauth=github-error');
-  const state=crypto.randomBytes(32).toString('hex');
+  const state=crypto.randomBytes(32).toString('base64url') + 'A!1';
   setStateCookie(res,state);
   const url=new URL('https://github.com/login/oauth/authorize');
   url.searchParams.set('client_id',CLIENT_ID);
@@ -69,7 +69,7 @@ app.get('/callback',async(req,res)=>{
     if(!client){
       let username=String(userRes.data.login||email.split('@')[0]).replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,70)||'client';
       if(await User.findByUsername(username))username=(username+'-'+String(userRes.data.id)).slice(0,80);
-      client=await User.create({username,email,phone:null,password:crypto.randomBytes(32).toString('hex'),role:'client'});
+      client=await User.create({username,email,phone:null,password:crypto.randomBytes(32).toString('base64url') + 'A!1',role:'client'});
     }
     callbackPage(res,signToken(client));
   }catch(e){
