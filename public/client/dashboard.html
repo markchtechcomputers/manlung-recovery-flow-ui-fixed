@@ -1049,20 +1049,17 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
   <script src="/js/call-webrtc.js?v=video-20260923"></script>
   <script src="/js/call-widget.js?v=video-20260923"></script>
   <script>
-    const token = localStorage.getItem('clientToken');
+    const token = null;
 
     async function guardClientPortal() {
       // No client session: return to client sign-in.
-      if (!token) {
-        window.location.replace('/login.html');
-        return false;
-      }
+      
 
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
         const res = await fetch('/api/auth/verify', {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
           cache: 'no-store',
           signal: controller.signal
         });
@@ -1071,7 +1068,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || !data.success) {
-          localStorage.removeItem('clientToken');
+          fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).catch(()=>{});
           localStorage.removeItem('clientUser');
           window.location.href = '/login.html';
           return false;
@@ -1117,11 +1114,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       }
     }
 
-    function authHeaders(){
-      return {
-        Authorization: `Bearer ${token}`
-      };
-    }
+    function authHeaders(){ return { 'Content-Type': 'application/json' }; }
     function escapeHtml(value){
       return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     }
@@ -1649,16 +1642,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
   let notificationToastTimer = null;
   let notificationAudioContext = null;
 
-  function manlungToken(){
-    return localStorage.getItem('clientToken') || '';
-  }
-
-  function manlungHeaders(){
-    const token = manlungToken();
-    return token
-      ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
-      : { 'Content-Type': 'application/json' };
-  }
+  function manlungHeaders(){ return { 'Content-Type': 'application/json' }; }
 
   function formatManlungDate(value){
     if(!value) return '';
