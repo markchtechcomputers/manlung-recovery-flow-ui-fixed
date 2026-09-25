@@ -13,19 +13,19 @@ function cleanText(value, max = 100000) {
 function sanitizeDocumentHtml(value, max = 100000) {
   let html = cleanText(value, max);
   html = html.replace(/<\/?(script|style|iframe|object|embed|form|input|button|textarea|select|svg|math)[^>]*>/gi, '');
-  html = html.replace(/<!--([\\s\\S]*?)-->/g, '');
-  html = html.replace(/\s+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\\s>]+)/gi, '');
-  html = html.replace(/\s+(href|src)\s*=\s*(?:"[^"]*"|'[^']*'|[^\\s>]+)/gi, '');
-  html = html.replace(/\s+style\s*=\s*(?:"[^"]*"|'[^']*'|[^\\s>]+)/gi, '');
+  html = html.replace(/<!--([\s\S]*?)-->/g, '');
+  html = html.replace(/\s+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+  html = html.replace(/\s+(href|src)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+  html = html.replace(/\s+style\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '');
   const allowed = new Set(['p','br','div','h1','h2','h3','strong','b','em','i','u','s','ul','ol','li','blockquote','font']);
-  html = html.replace(/<\\/?([a-z0-9]+)([^>]*)>/gi, (full, tag, attrs) => {
+  html = html.replace(/<\/?([a-z0-9]+)([^>]*)>/gi, (full, tag, attrs) => {
     const name = String(tag).toLowerCase();
     if (!allowed.has(name)) return '';
     if (full.startsWith('</')) return '</' + name + '>';
     if (name === 'br') return '<br>';
     if (name === 'font') {
-      const face = String(attrs).match(/\\bface\\s*=\\s*["']([^"']{1,80})["']/i);
-      const size = String(attrs).match(/\\bsize\\s*=\\s*["']([1-7])["']/i);
+      const face = String(attrs).match(/\bface\s*=\s*["']([^"']{1,80})["']/i);
+      const size = String(attrs).match(/\bsize\s*=\s*["']([1-7])["']/i);
       return '<font' + (face ? ' face="' + face[1].replace(/["<>]/g,'') + '"' : '') + (size ? ' size="' + size[1] + '"' : '') + '>';
     }
     return '<' + name + '>';
@@ -34,14 +34,14 @@ function sanitizeDocumentHtml(value, max = 100000) {
 }
 function htmlToText(value) {
   return String(value || '')
-    .replace(/<br\\s*\\/?>(?=.)/gi, '\\n')
-    .replace(/<\\/(p|div|h1|h2|h3|li|blockquote)>/gi, '\\n')
+    .replace(/<br\s*\/?>(?=.)/gi, '\n')
+    .replace(/<\/(p|div|h1|h2|h3|li|blockquote)>/gi, '\n')
     .replace(/<li>/gi, '• ')
     .replace(/<[^>]+>/g, '')
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
     .replace(/&quot;/gi, '"').replace(/&#39;/gi, "'")
-    .replace(/\\n{3,}/g, '\\n\\n')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 function isOwner(doc, user) {
