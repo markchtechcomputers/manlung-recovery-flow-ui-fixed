@@ -117,8 +117,10 @@ function setMfaTicketCookie(res, token) {
   res.cookie(MFA_TICKET_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/api/auth/admin/mfa',
+    // Keep the temporary MFA ticket available across the login endpoint
+    // and the verification endpoint. The ticket is still HttpOnly and short-lived.
+    sameSite: 'lax',
+    path: '/',
     maxAge: 10 * 60 * 1000,
   });
 }
@@ -127,8 +129,8 @@ function clearMfaTicketCookie(res) {
   res.clearCookie(MFA_TICKET_COOKIE, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/api/auth/admin/mfa',
+    sameSite: 'lax',
+    path: '/',
   });
 }
 
