@@ -1,10 +1,11 @@
 # Manlung Tech City — Cyber Recovery Portal
 
-## Current Call Admin policy (August 25, 2026)
+## Current Call Admin policy (September 25, 2026)
 
-Call Admin voice calling is **free**. No phone-call subscription or Paystack payment is required to place a client-to-admin call. The existing authenticated call/session tables, WebRTC signaling, Admin presence, incoming-call flow, and callback flow remain in place; the database schema and existing files are not migrated or deleted. Clients and Admins can each choose from five local call ringtones.
+Call Admin voice calling requires an active paid subscription. The available plans are KES 300 monthly, KES 1,800 for 6 months, and KES 3,240 for 1 year after the 10% discount. Payment is initialized and verified server-side through Paystack; the browser never receives the Paystack secret key. Existing authenticated call/session tables, WebRTC signaling, Admin presence, incoming-call flow, and callback flow remain in place.
 
-Older subscription/trial notes later in this README describe previous builds and should not be treated as the current product behavior.
+When Paystack recurring plan codes are configured on the server, Paystack manages the recurring billing schedule. If they are not configured, the application uses a verified one-time Paystack checkout and grants only the selected subscription period; it does not fake recurring billing.
+
 
 ## Latest update: global launch trial window (Aug 12–25, 2026)
 
