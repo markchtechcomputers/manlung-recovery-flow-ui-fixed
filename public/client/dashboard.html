@@ -1085,7 +1085,6 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         }
 
         if (!data.user || data.user.role !== 'client') {
-          localStorage.removeItem('clientToken');
           localStorage.removeItem('clientUser');
           window.location.href = '/login.html';
           return false;
@@ -1107,7 +1106,6 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 
         // Do not expose a client-only page when the session cannot
         // be verified.
-        localStorage.removeItem('clientToken');
         localStorage.removeItem('clientUser');
         window.location.replace('/login.html');
         return false;
@@ -1160,9 +1158,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       applyTheme();
     })();
     function logout(){
-      localStorage.removeItem('clientToken');
-      localStorage.removeItem('clientUser');
-      window.location.href='/login.html';
+      fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).finally(()=>window.location.href='/login.html');
     }
     function renderCases(cases){
       const state=document.getElementById('casesState');
@@ -1490,7 +1486,6 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
           throw deleteError;
         }
 
-        localStorage.removeItem('clientToken');
         localStorage.removeItem('clientUser');
 
         window.location.href='/login.html';
