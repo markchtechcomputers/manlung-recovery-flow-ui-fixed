@@ -1,5 +1,5 @@
 (() => {
-  const DISMISS_KEY = 'manlung-pwa-banner-dismissed';
+  const DISMISS_KEY = 'manlung-pwa-banner-dismissed-v2';
   // The install prompt is intentionally a homepage-only experience and a dismissal is permanent.
   const DISMISS_DAYS = 0;
   const IS_HOME = window.location.pathname === '/' || window.location.pathname === '/index.html';
