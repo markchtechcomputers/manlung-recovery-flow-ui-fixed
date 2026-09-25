@@ -1385,6 +1385,47 @@ async function disableMfa() {
 
 loadMfaStatus().catch(() => {});
 </script>
+<section class="card" style="margin-top:1rem;">
+  <div class="card-title"><i class="fas fa-phone-volume"></i> Complimentary Call Access</div>
+  <p style="color:var(--text-muted);font-size:.85rem;">Give a registered client temporary free access to browser calls without changing their Paystack subscription.</p>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 160px auto;gap:.6rem;align-items:end;">
+    <label>Email<input id="freeCallEmail" type="email" placeholder="client@example.com"></label>
+    <label>Days<input id="freeCallDays" type="number" min="1" max="3650" value="30"></label>
+    <button class="btn btn-primary" type="button" onclick="grantFreeCallAccess()">Grant Access</button>
+  </div>
+  <div id="freeCallMessage" style="margin-top:.6rem;font-size:.82rem;"></div>
+  <div id="freeCallList" style="margin-top:.8rem;"></div>
+</section>
+<script>
+async function grantFreeCallAccess(){
+  const email=document.getElementById('freeCallEmail').value.trim();
+  const days=Number(document.getElementById('freeCallDays').value);
+  const box=document.getElementById('freeCallMessage');
+  if(!email||!Number.isInteger(days)||days<1){box.textContent='Enter a valid client email and number of days.';return}
+  const res=await fetch('/api/owner/call-access',{method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,days})});
+  const data=await res.json().catch(()=>({}));
+  box.textContent=res.ok?'Free call access granted until '+new Date(data.entitlement.free_access_until).toLocaleString():(data.error||'Could not grant access.');
+  if(res.ok) loadFreeCallAccess();
+}
+async function revokeFreeCallAccess(id){
+  if(!confirm('Revoke complimentary call access for this account?'))return;
+  const res=await fetch('/api/owner/call-access/'+encodeURIComponent(id),{method:'DELETE',credentials:'include'});
+  const data=await res.json().catch(()=>({}));
+  document.getElementById('freeCallMessage').textContent=res.ok?'Free call access revoked.':(data.error||'Could not revoke access.');
+  loadFreeCallAccess();
+}
+async function loadFreeCallAccess(){
+  const box=document.getElementById('freeCallList');
+  try{
+    const res=await fetch('/api/owner/call-access',{credentials:'include',cache:'no-store'});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Could not load access');
+    if(!data.access?.length){box.innerHTML='<div style="color:var(--text-muted);font-size:.8rem;">No complimentary access accounts.</div>';return}
+    box.innerHTML=data.access.map(x=>'<div style="display:flex;justify-content:space-between;gap:.6rem;align-items:center;padding:.55rem 0;border-top:1px solid var(--card-border);font-size:.8rem;"><span><strong>'+x.user_id+'</strong><br><small>Until '+new Date(x.free_access_until).toLocaleString()+'</small></span><button class="btn btn-danger" type="button" onclick="revokeFreeCallAccess(\''+x.user_id+'\')">Revoke</button></div>').join('');
+  }catch(e){box.textContent=e.message}
+}
+loadFreeCallAccess();
+</script>
 <script src="/js/pwa.js" defer></script>
 <footer class="manlung-footer" aria-label="Manlung Recovery footer">
   <div class="manlung-footer-inner">
