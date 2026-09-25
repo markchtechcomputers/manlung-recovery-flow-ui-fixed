@@ -10,6 +10,7 @@ const CLIENT_SECRET=process.env.GITHUB_CLIENT_SECRET||'';
 const APP_URL=(process.env.PUBLIC_APP_URL||'https://manlungrecovery.manlungshop.co.ke').replace(/\/$/,'');
 const REDIRECT_URI=process.env.GITHUB_REDIRECT_URI||APP_URL+'/api/auth/github/callback';
 const STATE_COOKIE='manlung_github_oauth_state';
+const CLIENT_COOKIE='manlung_client_session';
 
 function signToken(user){
   return jwt.sign({id:user.id,role:user.role,sessionVersion:Number(user.session_version||0)},process.env.JWT_SECRET,{expiresIn:'7d'});
@@ -26,8 +27,9 @@ function clearStateCookie(res){
   res.setHeader('Set-Cookie',STATE_COOKIE+'=; Max-Age=0; Path=/api/auth/github; HttpOnly; Secure; SameSite=Lax');
 }
 function callbackPage(res,token){
-  const safe=JSON.stringify(String(token)).replace(/</g,'\\u003c');
-  res.status(200).set('Content-Type','text/html; charset=utf-8').send('<!doctype html><html><head><meta charset="utf-8"><title>Signing in…</title></head><body><p>Signing you in to Manlung Recovery…</p><script>try{localStorage.setItem("clientToken",'+safe+');window.location.replace("/client/dashboard.html")}catch(e){window.location.replace("/login.html?oauth=github-error")}</script></body></html>');
+  const maxAge=7*24*60*60;
+  res.setHeader('Set-Cookie',CLIENT_COOKIE+'='+encodeURIComponent(String(token))+'; Max-Age='+maxAge+'; Path=/; HttpOnly; Secure; SameSite=Lax');
+  res.redirect('/client/dashboard.html');
 }
 
 app.get('/start',(req,res)=>{
