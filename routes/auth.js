@@ -2229,6 +2229,11 @@ router.get(
         email: req.user.email,
         role: req.user.role,
         auth_provider: req.user.auth_provider || null,
+        email_verified_at: req.user.email_verified_at || null,
+        email_otp_required: Boolean(req.user.email_otp_required),
+        mfa_enabled: Boolean(req.user.mfa_enabled),
+        last_login_at: req.user.last_login_at || null,
+        security_status: req.user.security_status || 'active',
       },
     });
   }
