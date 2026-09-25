@@ -739,7 +739,7 @@
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/api/cases/submit');
-            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            xhr.withCredentials = true;
 
             const progressPanel=document.getElementById('submitProgressPanel'), progressFill=document.getElementById('submitProgressFill'), progressPct=document.getElementById('submitProgressPct'), progressState=document.getElementById('submitProgressState');
             const setFlowStep=(step,pct,label)=>{ if(progressPanel)progressPanel.classList.add('show'); if(progressFill)progressFill.style.width=pct+'%'; if(progressPct)progressPct.textContent=pct+'%'; if(progressState)progressState.innerHTML='<i class="fas '+(step==='failed'?'fa-circle-xmark':step==='completed'?'fa-circle-check':step==='processing'?'fa-gears':'fa-cloud-arrow-up')+'"></i> '+label; document.querySelectorAll('#requestFlowSteps .flow-step').forEach(el=>{const s=el.dataset.step;el.classList.toggle('active',s===step);el.classList.toggle('done',['upload','processing','review','completed'].indexOf(s)<['upload','processing','review','completed'].indexOf(step));});};
