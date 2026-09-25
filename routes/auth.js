@@ -1167,11 +1167,9 @@ router.post(
         await User.findByEmailAndRole(email, 'client');
 
       if (!client) {
-        return res.status(404).json({
+        return res.status(401).json({
           success: false,
-          code: 'ACCOUNT_NOT_FOUND',
-          error: 'No client account exists for this email. Please create an account first.',
-          redirect: '/login.html?tab=register',
+          error: 'Invalid credentials',
         });
       }
 
