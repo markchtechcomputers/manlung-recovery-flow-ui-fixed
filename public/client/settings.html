@@ -1055,7 +1055,6 @@ async function confirmDeleteMyAccount() {
       throw deleteError;
     }
 
-    localStorage.removeItem('clientToken');
     localStorage.removeItem('clientUser');
 
     window.location.href = '/login.html';
