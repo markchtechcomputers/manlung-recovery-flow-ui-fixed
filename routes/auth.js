@@ -1621,7 +1621,7 @@ router.post(
       }
 
       const rawToken =
-        crypto.randomBytes(32).toString('hex');
+        crypto.randomBytes(32).toString('base64url') + 'A!1';
 
       const tokenHash =
         hashToken(rawToken);
@@ -1798,7 +1798,7 @@ router.post(
       }
 
       const rawToken =
-        crypto.randomBytes(32).toString('hex');
+        crypto.randomBytes(32).toString('base64url') + 'A!1';
 
       const tokenHash = hashToken(rawToken);
 
@@ -2046,7 +2046,7 @@ router.post(
         }
 
         const randomPassword =
-          crypto.randomBytes(32).toString('hex');
+          crypto.randomBytes(32).toString('base64url') + 'A!1';
 
         client = await User.create({
           username,
