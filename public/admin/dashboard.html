@@ -1367,7 +1367,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                 <div class="form-group"><label>Internal Notes <span style="font-weight:400; color:var(--text-muted);">(admin only — never shown to the client)</span></label><textarea id="editInternalNotes" style="border-color:var(--warning-bg);">${c.internalNotes || ''}</textarea></div>
 
                 <button class="btn btn-primary" onclick="saveCase('${c.caseId}')"><i class="fas fa-save"></i> Save Changes</button>
-                ${c.clientUserId ? `<button class="btn btn-success" style="margin-left:.5rem;" onclick="callClientFromCase('${c.clientUserId}','${c.caseId}')"><i class="fas fa-phone"></i> Call Client</button>` : ''}
+                <button class="btn btn-success" style="margin-left:.5rem;" onclick="callClientFromCase('${String(c.clientUserId || '').replace(/'/g,"\\'")}','${String(c.caseId || '').replace(/'/g,"\\'")}')"><i class="fas fa-phone"></i> Call Client</button>
                 ${currentAdmin.role === 'owner' && c.publicNotes ? `<button class="btn btn-danger" style="margin-left:.5rem;" onclick="deleteClientMessage('${c.caseId}')"><i class="fas fa-trash"></i> Delete Client Message</button>` : ''}
                 <span id="saveStatus" style="margin-left:0.8rem; color:var(--text-muted); font-size:0.85rem;"></span>
 
