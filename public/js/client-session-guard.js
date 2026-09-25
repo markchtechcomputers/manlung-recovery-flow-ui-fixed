@@ -13,5 +13,6 @@
     clear();location.replace(login);return false;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>check(),{once:true});else check();
-  setInterval(check,5*60*1000);
+  // Detect a newer login on another browser quickly and redirect the old session.
+  setInterval(check,15*1000);
 })();
