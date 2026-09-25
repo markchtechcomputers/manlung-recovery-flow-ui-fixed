@@ -156,6 +156,7 @@ app.use(cors({
 
     return callback(new Error('Origin not allowed'));
   },
+  credentials: true,
 }));
 
 // ============================================================
