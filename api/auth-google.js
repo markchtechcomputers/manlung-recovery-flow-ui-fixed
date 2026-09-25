@@ -12,6 +12,7 @@ app.use((req,_res,next)=>{
  next();
 });
 function token(user){return jwt.sign({id:user.id,role:user.role,sessionVersion:Number(user.session_version||0)},process.env.JWT_SECRET,{expiresIn:'7d'});}
+function setClientCookie(res, value){res.cookie('manlung_client_session',value,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:7*24*60*60*1000});}
 app.get('/',(_req,res)=>res.json({success:true,clientId:GOOGLE_CLIENT_ID}));
 app.post('/',async(req,res)=>{
  try{
@@ -49,7 +50,9 @@ app.post('/',async(req,res)=>{
   let user=await User.findByEmail(email);
   if(user&&user.role!=='client')return res.status(409).json({success:false,error:'This email belongs to a staff account. Use staff login.'});
   if(!user)user=await User.create({username:(email.split('@')[0].replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,55)||'client')+'-'+crypto.randomBytes(3).toString('hex'),password:crypto.randomBytes(32).toString('hex'),role:'client',email,phone:null});
-  res.json({success:true,token:token(user),user:{id:user.id,email:user.email,username:user.username,role:user.role}});
+  const sessionToken=token(user);
+  setClientCookie(res,sessionToken);
+  res.json({success:true,user:{id:user.id,email:user.email,username:user.username,role:user.role}});
  }catch(e){console.error('Google Cloud auth error:',e.response?.data||e.message);res.status(502).json({success:false,error:'Google authentication service is temporarily unavailable.'});}
 });
 module.exports=app;
