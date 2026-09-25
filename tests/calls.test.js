@@ -18,30 +18,39 @@ const jwt = require('jsonwebtoken');
 const CallEntitlement = require('../models/CallEntitlement');
 const app = require('../server.js');
 
-// ---- Unit tests: Call Admin is permanently free ----
-test('entitlement: no row always grants free Call Admin access', () => {
+// ---- Unit tests: paid Call Admin entitlement ----
+test('entitlement: no subscription does not grant Call Admin access', () => {
   const result = CallEntitlement.evaluate(null, Date.now());
-  assert.equal(result.access, true);
-  assert.equal(result.status, 'free');
-  assert.equal(result.free, true);
+  assert.equal(result.access, false);
+  assert.equal(result.status, 'expired');
+  assert.equal(result.free, false);
   assert.equal(result.subscription, false);
 });
 
-test('entitlement: expired subscription data does not remove free access', () => {
+test('entitlement: expired subscription does not grant Call Admin access', () => {
   const past = new Date(Date.now() - 86400000).toISOString();
-  const result = CallEntitlement.evaluate({ subscription_expires_at: past });
-  assert.equal(result.access, true);
-  assert.equal(result.status, 'free');
-  assert.equal(result.free, true);
-  assert.equal(result.subscription, false);
+  const result = CallEntitlement.evaluate({ subscription_status: 'active', subscription_expires_at: past });
+  assert.equal(result.access, false);
+  assert.equal(result.status, 'expired');
+  assert.equal(result.daysRemaining, 0);
 });
 
-test('entitlement: existing active subscription data is preserved but no longer required', () => {
+test('entitlement: active paid subscription grants Call Admin access', () => {
   const future = new Date(Date.now() + 86400000).toISOString();
-  const result = CallEntitlement.evaluate({ subscription_expires_at: future });
+  const result = CallEntitlement.evaluate({ subscription_status: 'active', subscription_plan: 'yearly', subscription_start_at: new Date().toISOString(), subscription_expires_at: future });
   assert.equal(result.access, true);
-  assert.equal(result.status, 'free');
-  assert.equal(result.subscription, true);
+  assert.equal(result.status, 'active');
+  assert.equal(result.subscriptionPlan, 'yearly');
+  assert.ok(result.daysRemaining >= 1);
+});
+
+test('subscription plans use the requested KES prices', () => {
+  const plans = require('../config/call-subscription').CALL_SUBSCRIPTION_PLANS;
+  assert.equal(plans.monthly.amountKes, 300);
+  assert.equal(plans.six_months.amountKes, 1800);
+  assert.equal(plans.yearly.normalAmountKes, 3600);
+  assert.equal(plans.yearly.discountPercent, 10);
+  assert.equal(plans.yearly.amountKes, 3240);
 });
 
 // ---- Integration tests: real HTTP requests through the actual app ----
