@@ -6,7 +6,7 @@ const BCRYPT_ROUNDS = 12;
 const MAX_PASSWORD_BYTES = 72;
 const MAX_LOGIN_FAILURES = 3;
 const LOCKOUT_MINUTES = 30;
-const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{12,72}$/;
+const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,72}$/;
 
 function assertStrongPassword(password) {
   const value = String(password || '');
