@@ -1,9 +1,8 @@
 (() => {
   const DISMISS_KEY = 'manlung-pwa-banner-dismissed';
-  // The install prompt is intentionally a homepage-only experience.
+  // The install prompt is intentionally a homepage-only experience and a dismissal is permanent.
   const DISMISS_DAYS = 0;
-
-  if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') return;
+  const IS_HOME = window.location.pathname === '/' || window.location.pathname === '/index.html';
 
   function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches ||
@@ -287,6 +286,8 @@
 
     event.preventDefault();
     deferredPrompt = event;
+
+    if (!IS_HOME) return;
 
     if (isStandalone()) {
       console.log('[Manlung PWA] App is already installed');
