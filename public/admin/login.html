@@ -288,7 +288,10 @@
                 }
 
                 if (data.success && data.mfaRequired) {
-                    pendingMfaTicket = data.mfaTicket;
+                    // The MFA ticket is stored in a secure HttpOnly cookie by the server.
+                    // Do not keep or resend the ticket from JavaScript; this prevents stale
+                    // tickets from surviving a previous login/deployment.
+                    pendingMfaTicket = true;
                     sessionStorage.setItem('adminUser', JSON.stringify(data.user));
                     showMfaStep();
                     return;
@@ -318,7 +321,7 @@
             errorEl.textContent = '';
 
             if (!pendingMfaTicket) {
-                errorEl.textContent = 'Your MFA session expired. Please start again.';
+                errorEl.textContent = 'Your MFA session expired. Please sign in again.';
                 return;
             }
 
@@ -332,7 +335,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
-                    body: JSON.stringify({ mfaTicket: pendingMfaTicket, code }),
+                    // The server reads the short-lived MFA ticket from its HttpOnly cookie.
+                    body: JSON.stringify({ code }),
                 });
                 const data = await response.json();
 
