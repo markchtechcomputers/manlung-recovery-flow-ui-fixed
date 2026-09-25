@@ -2075,10 +2075,10 @@ router.post(
       }
 
       const token = signToken(client);
+      setClientCookie(res, token);
 
       return res.json({
         success: true,
-        token,
         user: {
           id: client.id,
           username: client.username,
