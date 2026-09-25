@@ -188,3 +188,16 @@
 .manlung-footer-bottom{width:min(100% - 24px,1180px);margin:auto;padding:.75rem 0 1rem;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;gap:1rem;align-items:center;color:#8fa4b8;font-size:.76rem}.manlung-footer-bottom a{color:#b9c8d8}
 @media(max-width:850px){.manlung-footer-inner{grid-template-columns:1fr 1fr}.manlung-footer-brand{grid-column:1/-1}}
 @media(max-width:560px){.manlung-footer-inner{grid-template-columns:1fr;padding-top:1.45rem}.manlung-footer-brand{grid-column:auto}.manlung-footer-social a{width:40px;height:40px}.manlung-footer-bottom{flex-direction:column;align-items:flex-start}}
+
+
+/* Final footer placement: social links grouped above the legal bar; legal links stay together. */
+.manlung-footer-contact-row{display:flex;flex-direction:column;align-items:stretch;gap:1rem}
+.manlung-footer-contact{justify-content:flex-start}
+.manlung-footer-social{width:100%;justify-content:flex-start;gap:.65rem;padding-top:.15rem}
+.manlung-footer-social::before{content:"Follow Manlung Recovery";margin-right:.35rem;color:#8ea2bb;font-size:.62rem;letter-spacing:.08em}
+.manlung-footer-social a{width:44px;height:44px;flex:0 0 44px}
+.manlung-footer-bottom{margin-top:.35rem;padding-top:.9rem;justify-content:center;text-align:center;gap:.75rem 1.2rem}
+.manlung-footer-bottom>span{display:block}
+.manlung-footer-legal{justify-content:center;align-items:center;gap:.5rem}
+.manlung-footer-legal a{padding:.3rem .6rem;border:1px solid rgba(148,163,184,.14);border-radius:8px;background:rgba(255,255,255,.025)}
+@media(max-width:600px){.manlung-footer-social{justify-content:flex-start}.manlung-footer-bottom{align-items:center}.manlung-footer-legal{width:100%}}
