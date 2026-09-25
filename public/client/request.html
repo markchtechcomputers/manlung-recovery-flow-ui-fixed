@@ -339,29 +339,7 @@
 
     <div class="container-narrow">
         
-<section class="request-flow-card" id="clientRequestsPanel" aria-labelledby="clientRequestsTitle">
-  <div class="request-flow-head">
-    <div>
-      <h2 id="clientRequestsTitle"><i class="fas fa-layer-group"></i> My Requests &amp; Evidence</h2>
-      <p class="request-flow-sub">Search your submitted requests, check progress, and open available evidence files.</p>
-    </div>
-    <button type="button" class="btn btn-outline-dark" id="refreshRequestsBtn"><i class="fas fa-rotate"></i> Refresh</button>
-  </div>
-  <div class="request-toolbar">
-    <label class="request-search" aria-label="Search requests and uploaded files">
-      <i class="fas fa-magnifying-glass"></i>
-      <input id="requestSearch" type="search" placeholder="Search case ID, request type, status or file name…" autocomplete="off">
-    </label>
-    <div class="request-filters" id="requestFilters" role="group" aria-label="Request status filters">
-      <button type="button" class="request-filter active" data-filter="all">All</button>
-      <button type="button" class="request-filter" data-filter="pending">Pending</button>
-      <button type="button" class="request-filter" data-filter="progress">In progress</button>
-      <button type="button" class="request-filter" data-filter="done">Completed</button>
-    </div>
-  </div>
-  <div id="requestCards" class="request-cards" aria-live="polite"><div class="request-empty">Loading your requests…</div></div>
-</section>
-        <div id="formContainer">
+<section class="request-flow-card request-dashboard-note" aria-label="Case tracking"><div class="request-flow-head"><div><h2><i class="fas fa-gauge-high"></i> Case Tracking</h2><p class="request-flow-sub">Your submitted and pending cases are managed from the Client Dashboard. This page is for creating a new recovery request and securely adding evidence.</p></div><a class="btn btn-primary" href="/client/dashboard.html"><i class="fas fa-folder-open"></i> Open My Cases</a></div></section><div id="formContainer">
             <div id="draftBanner" class="draft-banner" style="display:none;">
                 <span><i class="fas fa-clock-rotate-left"></i> We restored your unsaved draft from earlier.</span>
                 <button type="button" class="btn btn-outline-dark" style="padding:0.3rem 0.8rem; font-size:0.78rem;" onclick="clearDraft()">Discard draft</button>
@@ -837,43 +815,6 @@
 
         checkAuth();
     </script>
-  <script id="client-request-enhancement">
-(function(){
-  const state={cases:[],filter:'all',query:''};
-  const token=()=>localStorage.getItem('clientToken');
-  const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  function authHeaders(){const t=token();return t?{Authorization:'Bearer '+t}:{};}
-  function statusGroup(status){const s=String(status||'').toLowerCase();if(/success|completed|recovered|closed/.test(s))return 'done';if(/investig|awaiting|evidence|progress|active|review/.test(s))return 'progress';if(/reject|fail|cancel/.test(s))return 'failed';return 'pending';}
-  function statusIcon(group){return group==='done'?'fa-circle-check':group==='progress'?'fa-spinner':'fa-clock';}
-  function formatDate(v){const d=new Date(v||'');return Number.isNaN(d.getTime())?'—':d.toLocaleString([], {dateStyle:'medium',timeStyle:'short'});}
-  function fileIconForName(name){const s=String(name||'').toLowerCase();return s.endsWith('.pdf')?'fa-file-pdf':/^.*\.(jpg|jpeg|png)$/.test(s)?'fa-file-image':'fa-file';}
-  function renderRequests(){
-    const box=document.getElementById('requestCards');if(!box)return;
-    const q=state.query.trim().toLowerCase();
-    const list=state.cases.filter(c=>{
-      const group=statusGroup(c.status); if(state.filter!=='all'&&group!==state.filter)return false;
-      const files=Array.isArray(c.files)?c.files:[];
-      const hay=[c.caseId,c.caseType,c.status,c.priority,...files.map(f=>f.filename||f.originalName||'')].join(' ').toLowerCase();
-      return !q||hay.includes(q);
-    });
-    if(!list.length){box.innerHTML='<div class="request-empty"><i class="fas fa-folder-open"></i><div style="margin-top:.35rem">'+(state.cases.length?'No requests match your search/filter.':'No recovery requests yet.')+'</div><div style="margin-top:.25rem">Start a new request below and your progress will appear here.</div></div>';return;}
-    box.innerHTML=list.map(c=>{
-      const group=statusGroup(c.status), files=Array.isArray(c.files)?c.files:[];
-      const fileHtml=files.length?files.map(f=>{const name=f.filename||f.originalName||'Evidence file';const link=f.url?'<a href="'+esc(f.url)+'" target="_blank" rel="noopener noreferrer" title="Open '+esc(name)+'"><i class="fas '+fileIconForName(name)+'"></i> <span>'+esc(name)+'</span> <i class="fas fa-up-right-from-square"></i></a>':'<i class="fas '+fileIconForName(name)+'"></i> <span>'+esc(name)+'</span>';return '<div class="request-file-chip">'+link+'</div>';}).join(''):'<span class="request-file-chip"><i class="fas fa-paperclip"></i> No files uploaded</span>';
-      return '<article class="request-card"><div class="request-card-top"><div><div class="request-card-id"><i class="fas fa-folder-open"></i> '+esc(c.caseId||'Case')+'</div><div class="request-card-type">'+esc(c.caseType||'Recovery Request')+'</div></div><span class="request-status '+group+'"><i class="fas '+statusIcon(group)+(group==='progress'?' fa-spin':'')+'"></i> '+esc(c.status||'Pending Review')+'</span></div><div class="request-meta"><div><small>Status</small><strong>'+esc(c.status||'Pending Review')+'</strong></div><div><small>Submitted</small><strong>'+formatDate(c.createdAt||c.lastUpdated)+'</strong></div><div><small>Uploaded items</small><strong>'+files.length+' file'+(files.length===1?'':'s')+'</strong></div></div><div class="request-files">'+fileHtml+'</div><div class="request-actions"><a class="btn btn-outline-dark" href="/client/dashboard.html"><i class="fas fa-eye"></i> View case</a></div></article>';
-    }).join('');
-  }
-  async function loadClientRequests(){
-    const box=document.getElementById('requestCards');if(!box)return;
-    if(!token()){box.innerHTML='<div class="request-empty"><i class="fas fa-lock"></i><div style="margin-top:.35rem">Sign in to view your requests and evidence.</div></div>';return;}
-    try{const r=await fetch('/api/cases/client/me',{headers:authHeaders(),cache:'no-store'});const d=await r.json().catch(()=>({}));if(r.status===401){localStorage.removeItem('clientToken');location.href='/login.html';return;}if(!r.ok||!d.success)throw new Error(d.error||'Could not load your requests.');state.cases=d.cases||[];renderRequests();}catch(e){box.innerHTML='<div class="request-empty" style="color:#b91c1c"><i class="fas fa-circle-exclamation"></i><div style="margin-top:.35rem">'+esc(e.message)+'</div></div>';}}
-  document.getElementById('requestSearch')?.addEventListener('input',e=>{state.query=e.target.value;renderRequests();});
-  document.querySelectorAll('#requestFilters .request-filter').forEach(btn=>btn.addEventListener('click',()=>{state.filter=btn.dataset.filter||'all';document.querySelectorAll('#requestFilters .request-filter').forEach(b=>b.classList.toggle('active',b===btn));renderRequests();}));
-  document.getElementById('refreshRequestsBtn')?.addEventListener('click',()=>loadClientRequests());
-  window.refreshClientRequests=loadClientRequests;
-  loadClientRequests(); setInterval(loadClientRequests,45000);
-})();
-</script>
   <script src="/js/call-widget.js"></script>
 <script src="/js/pwa.js" defer></script>
 <footer class="manlung-footer" aria-label="Manlung Recovery footer">
