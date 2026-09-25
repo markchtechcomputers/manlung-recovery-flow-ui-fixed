@@ -2,7 +2,7 @@
   'use strict';
   if (!location.pathname.startsWith('/client/track.html')) return;
 
-  const token = () => localStorage.getItem('clientToken') || '';
+  const token = () => '';
   const user = () => { try { return JSON.parse(localStorage.getItem('clientUser') || 'null'); } catch (_) { return null; } };
   const caseId = () => { const p = new URLSearchParams(location.search); return (p.get('case') || p.get('caseId') || '').trim(); };
   const esc = (v) => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;');
@@ -32,8 +32,8 @@
   }
 
   async function boot(){
-    const id=caseId(), t=token(), me=user();
-    if(!id || !t || !me?.id) return;
+    const id=caseId(), me=user();
+    if(!id || !me?.id) return;
     styles();
     const content=document.getElementById('content'); if(!content) return;
     let n=0; while(n++<80 && !document.querySelector('.manlung-message-card')) await new Promise(r=>setTimeout(r,150));
@@ -53,9 +53,9 @@
     const showErr=(v)=>{err.textContent=v||'';err.style.display=v?'block':'none';};
 
     async function load(){
-      const tk=token(); if(!tk) return;
+      if(!me?.id) return;
       try{
-        const r=await fetch(`/api/messages/case/${encodeURIComponent(id)}?_=${Date.now()}`,{headers:{Authorization:`Bearer ${tk}`,Accept:'application/json'},cache:'no-store'});
+        const r=await fetch(`/api/messages/case/${encodeURIComponent(id)}?_=${Date.now()}`,{credentials:'include',headers:{Accept:'application/json'},cache:'no-store'});
         const d=await r.json().catch(()=>({})); if(!r.ok||!d.success) throw new Error(d.error||`Unable to load messages (${r.status})`);
         const msgs=Array.isArray(d.messages)?d.messages:[];
         const sig=msgs.map(m=>`${m.id}:${m.read_at||''}`).join('|');
@@ -66,13 +66,13 @@
         }
         const incoming=msgs.filter(m=>!m.read_at&&String(m.recipient_user_id)===String(me.id));
         unread.textContent=incoming.length?`${incoming.length} unread`:'All messages read';
-        if(incoming.length){ await Promise.all(incoming.map(m=>fetch(`/api/messages/${encodeURIComponent(m.id)}/read`,{method:'POST',headers:{Authorization:`Bearer ${tk}`,Accept:'application/json'}}).catch(()=>null))); signature=''; }
+        if(incoming.length){ await Promise.all(incoming.map(m=>fetch(`/api/messages/${encodeURIComponent(m.id)}/read`,{method:'POST',credentials:'include',headers:{Accept:'application/json'}}).catch(()=>null))); signature=''; }
         showErr(''); first=false;
       }catch(e){showErr(e.message||'Could not load the case conversation.');}
     }
     async function sendMessage(){
       const text=input.value.trim(); if(!text) return; send.disabled=true; showErr('');
-      try{const tk=token();const r=await fetch(`/api/messages/case/${encodeURIComponent(id)}`,{method:'POST',headers:{Authorization:`Bearer ${tk}`,'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({message:text})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw new Error(d.error||'Could not send message.');input.value='';count.textContent='0 / 5000';signature='';await load();list.scrollTop=list.scrollHeight;}catch(e){showErr(e.message||'Could not send message.');}finally{send.disabled=false;input.focus();}
+      try{const r=await fetch(`/api/messages/case/${encodeURIComponent(id)}`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({message:text})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw new Error(d.error||'Could not send message.');input.value='';count.textContent='0 / 5000';signature='';await load();list.scrollTop=list.scrollHeight;}catch(e){showErr(e.message||'Could not send message.');}finally{send.disabled=false;input.focus();}
     }
     input.addEventListener('input',()=>count.textContent=`${input.value.length} / 5000`);
     input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit();}});
