@@ -288,10 +288,11 @@
                 }
 
                 if (data.success && data.mfaRequired) {
-                    // The MFA ticket is stored in a secure HttpOnly cookie by the server.
-                    // Do not keep or resend the ticket from JavaScript; this prevents stale
-                    // tickets from surviving a previous login/deployment.
-                    pendingMfaTicket = true;
+                    // Keep the fresh, short-lived ticket only in memory as a compatibility
+                    // fallback. The server also sets an HttpOnly cookie. Sending the same
+                    // fresh ticket in the MFA request avoids browser cookie/path issues while
+                    // never persisting the ticket in localStorage or sessionStorage.
+                    pendingMfaTicket = data.mfaTicket || true;
                     sessionStorage.setItem('adminUser', JSON.stringify(data.user));
                     showMfaStep();
                     return;
@@ -335,8 +336,12 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
-                    // The server reads the short-lived MFA ticket from its HttpOnly cookie.
-                    body: JSON.stringify({ code }),
+                    // Prefer the fresh in-memory ticket; the server also accepts the
+                    // HttpOnly cookie as a fallback.
+                    body: JSON.stringify({
+                        code,
+                        ...(typeof pendingMfaTicket === 'string' ? { mfaTicket: pendingMfaTicket } : {}),
+                    }),
                 });
                 const data = await response.json();
 
