@@ -141,7 +141,6 @@
                 throw new Error('Could not complete GitHub sign-in.');
             }
 
-            localStorage.setItem('clientToken', appSession.token);
             localStorage.setItem('clientUser', JSON.stringify(appSession.user));
             await client.auth.signOut();
             clearOAuthUrl();
