@@ -596,7 +596,7 @@
 
         function fileIcon(file){ const t=String(file?.type||'').toLowerCase(); if(t==='application/pdf') return 'fa-file-pdf'; if(t.startsWith('image/')) return 'fa-file-image'; return 'fa-file'; }
         function formatBytes(bytes){ if(bytes<1024) return bytes+' B'; if(bytes<1024*1024) return (bytes/1024).toFixed(1)+' KB'; return (bytes/1024/1024).toFixed(2)+' MB'; }
-        function toast(message,type='success'){ const stack=document.getElementById('clientRequestToastStack'); if(!stack)return; const el=document.createElement('div'); el.className='client-toast '+type; el.innerHTML='<i class="fas '+(type==='success'?'fa-circle-check':'fa-circle-exclamation')+'"></i><span>'+escapeHtml(message)+'</span>'; stack.appendChild(el); setTimeout(()=>el.remove(),4200); }
+        function toast(message,type='success'){ const stack=document.getElementById('clientRequestToastStack'); if(!stack)return; const el=document.createElement('div'); el.className='client-toast '+type; el.innerHTML='<i class="fas '+(type==='success'?'fa-circle-check':'fa-circle-exclamation')+'"></i><span>'+String(message).replace(/[&<>\"\']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[c]))+'</span>'; stack.appendChild(el); setTimeout(()=>el.remove(),4200); }
         function renderFileList(){
             const container=document.getElementById('fileList'); if(!container)return;
             container.innerHTML='';
