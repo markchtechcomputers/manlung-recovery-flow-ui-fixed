@@ -315,6 +315,32 @@ async function listEvents({
   return data || [];
 }
 
+async function getOverview() {
+  const [users, events] = await Promise.all([listUsers({ limit: 500 }), listEvents({ limit: 100 })]);
+  const counts = { active: 0, restricted: 0, suspended: 0, blocked: 0 };
+  users.forEach(u => { const s = u.security_status || 'active'; counts[s] = (counts[s] || 0) + 1; });
+  const since = Date.now() - 86400000;
+  return {
+    users_total: users.length,
+    counts,
+    failed_logins_24h: events.filter(e => e.event_type === 'login_failed' && new Date(e.created_at).getTime() >= since).length,
+    suspicious_24h: events.filter(e => e.event_type === 'suspicious_login' && new Date(e.created_at).getTime() >= since).length,
+    high_priority_events: events.filter(e => ['high','critical'].includes(e.severity)).slice(0, 25),
+    recent_events: events.slice(0, 25),
+  };
+}
+
+async function getUserDetail(userId) {
+  const user = await getUser(userId);
+  if (!user) return null;
+  const [events, sessionsResult] = await Promise.all([
+    listEvents({ userId, limit: 100 }),
+    supabase.from('auth.sessions').select('id,created_at,updated_at,user_id').eq('user_id', userId).order('updated_at', { ascending: false }).limit(50),
+  ]);
+  if (sessionsResult.error) throw sessionsResult.error;
+  return { user, events, sessions: sessionsResult.data || [] };
+}
+
 module.exports = {
   listUsers,
   getUser,
