@@ -10,6 +10,15 @@ async function get(userId) {
     .maybeSingle();
 
   if (error) throw error;
+  if (data && data.subscription_status === 'active' && data.subscription_expires_at && new Date(data.subscription_expires_at).getTime() <= Date.now()) {
+    const { data: expired, error: updateError } = await supabase
+      .from(TABLE)
+      .update({ subscription_status: 'expired', updated_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .select()
+      .single();
+    if (!updateError) return expired;
+  }
   return data;
 }
 
