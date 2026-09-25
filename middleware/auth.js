@@ -31,11 +31,37 @@ function isDurablyRevoked(decoded, user) {
 }
 
 async function verifyRequestToken(req) {
-  const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, ADMIN_COOKIE) || getCookie(req, CLIENT_COOKIE);
+  const bearerToken = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || null;
+  const cookieToken = getCookie(req, ADMIN_COOKIE) || getCookie(req, CLIENT_COOKIE);
+  const token = bearerToken || cookieToken;
   if (!token) return { token: null, decoded: null, user: null };
-  if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
+
+  let verifiedToken = token;
+  let decoded;
+
+  try {
+    if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
+  } catch (error) {
+    // A stale client-side Bearer token can survive an old deployment or secret
+    // rotation. If the secure HttpOnly session cookie is valid, prefer it rather
+    // than letting the stale header break an otherwise valid browser session.
+    if (
+      bearerToken &&
+      cookieToken &&
+      error instanceof jwt.JsonWebTokenError &&
+      error.message === 'invalid signature'
+    ) {
+      verifiedToken = cookieToken;
+      if (isTokenRevoked(verifiedToken)) throw new Error('TOKEN_REVOKED');
+      decoded = jwt.verify(verifiedToken, process.env.JWT_SECRET);
+      if (isTokenRevoked(verifiedToken)) throw new Error('TOKEN_REVOKED');
+    } else {
+      throw error;
+    }
+  }
+
   const user = await User.findById(decoded.id);
   if (user && isDurablyRevoked(decoded, user)) throw new Error('SESSION_VERSION_REVOKED');
 
@@ -47,7 +73,7 @@ async function verifyRequestToken(req) {
     throw new Error(`ACCOUNT_${String(user.security_status).toUpperCase()}`);
   }
 
-  return { token, decoded, user };
+  return { token: verifiedToken, decoded, user };
 }
 
 const auth = async (req, res, next) => {
