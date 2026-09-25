@@ -86,10 +86,17 @@ function enforceCsrf(req, res) {
   if (!hasSessionCookie || req.headers.authorization) return true;
   const origin = String(req.headers.origin || '').trim();
   if (origin) {
+    const configuredOrigins = String(process.env.ALLOWED_ORIGINS || '')
+      .split(',')
+      .map((value) => value.trim().replace(/\/$/, ''))
+      .filter(Boolean);
+
     const allowed = new Set([
       String(process.env.PUBLIC_APP_URL || '').replace(/\/$/, ''),
+      'https://manlungrecovery.manlungshop.co.ke',
+      ...configuredOrigins,
       ...(process.env.NODE_ENV === 'production' ? [] : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:5000', 'http://127.0.0.1:3000']),
-    ]);
+    ].filter(Boolean));
     if (!allowed.has(origin)) {
       securityLog('csrf_origin_blocked', req);
       return res.status(403).json({ success: false, error: 'Cross-site request blocked.', code: 'CSRF_ORIGIN_INVALID' });
