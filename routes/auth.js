@@ -61,7 +61,8 @@ function normalizePhone(value) {
 
 const ADMIN_COOKIE = 'manlung_admin_session';
 const CLIENT_COOKIE = 'manlung_client_session';
-const MFA_TICKET_EXPIRE = '5m';
+const MFA_TICKET_COOKIE = 'manlung_admin_mfa_ticket';
+const MFA_TICKET_EXPIRE = '10m';
 
 // Owner identity is required for MFA management, but unlike ownerAuth it
 // intentionally does not require MFA yet: the Owner must be able to turn MFA on.
@@ -109,6 +110,25 @@ function clearAdminCookie(res) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
+  });
+}
+
+function setMfaTicketCookie(res, token) {
+  res.cookie(MFA_TICKET_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/api/auth/admin/mfa',
+    maxAge: 10 * 60 * 1000,
+  });
+}
+
+function clearMfaTicketCookie(res) {
+  res.clearCookie(MFA_TICKET_COOKIE, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/api/auth/admin/mfa',
   });
 }
 
@@ -472,6 +492,8 @@ router.post(
           { expiresIn: MFA_TICKET_EXPIRE }
         );
 
+        setMfaTicketCookie(res, mfaTicket);
+
         return res.json({
           success: true,
           mfaRequired: true,
@@ -588,11 +610,16 @@ router.post('/admin/logout', async (req, res) => {
 });
 
 router.post('/admin/mfa/login', [
-  body('mfaTicket').trim().notEmpty(),
+  body('mfaTicket').optional().trim(),
   body('code').trim().notEmpty(),
 ], async (req, res) => {
   try {
-    const ticket = jwt.verify(req.body.mfaTicket, process.env.JWT_SECRET);
+    const mfaTicket = String(req.body.mfaTicket || '').trim() || getCookie(req, MFA_TICKET_COOKIE);
+    if (!mfaTicket) {
+      return res.status(401).json({ error: 'Invalid or expired MFA session.' });
+    }
+
+    const ticket = jwt.verify(mfaTicket, process.env.JWT_SECRET);
     if (ticket.purpose !== 'admin_mfa_login') return res.status(401).json({ error: 'Invalid MFA session.' });
     const admin = await User.findById(ticket.id);
     if (!admin || !['admin', 'owner'].includes(admin.role) || !admin.mfa_enabled || !admin.mfa_secret) {
@@ -625,6 +652,7 @@ router.post('/admin/mfa/login', [
 
     const session = await User.bumpSessionVersion(admin.id);
     issueAdminSession(res, { ...admin, session_version: session?.session_version });
+    clearMfaTicketCookie(res);
 
     await SecurityMonitoring.recordEvent({
       eventType: 'MFA_SUCCESS',
@@ -638,7 +666,13 @@ router.post('/admin/mfa/login', [
 
     return res.json({ success: true, user: { id: admin.id, username: admin.username, email: admin.email, role: admin.role } });
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid or expired MFA session.' });
+    console.error('Admin MFA login error:', {
+      name: error?.name,
+      code: error?.code,
+      message: error?.message,
+    });
+    clearMfaTicketCookie(res);
+    return res.status(401).json({ error: 'Invalid or expired MFA session. Please sign in again.' });
   }
 });
 
