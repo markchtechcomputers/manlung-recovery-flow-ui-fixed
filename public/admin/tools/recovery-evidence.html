@@ -30,6 +30,7 @@ html.dark{--bg:#09111f;--card:#111827;--line:#26364f;--text:#f8fafc;--muted:#94a
 @media(max-width:950px){.layout{grid-template-columns:1fr}.case-list{max-height:330px}.grid{grid-template-columns:1fr}.evidence-card{grid-template-columns:minmax(170px,220px) minmax(0,1fr)}.case-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.evidence-card{grid-template-columns:1fr}.thumb{min-height:230px}.header-inner{padding:8px 12px;align-items:flex-start;flex-direction:column}.actions{width:100%}.actions a,.actions button{flex:1}.shell{padding:15px 12px 35px}.hero{padding:20px 17px}.toolbar{flex-direction:column}.grid{grid-template-columns:1fr}.case-summary{grid-template-columns:1fr}.detail-body{padding:12px}}
 .site-header>.container{max-width:1280px;min-height:68px;padding:8px 20px;box-sizing:border-box}.site-header .brand,.manlung-brand{display:flex;align-items:center;gap:10px;min-width:0}.manlung-site-logo,.admin-portal-logo{width:42px;height:42px;object-fit:contain;border-radius:10px}.site-header .brand h1,.manlung-brand-copy h1{margin:0;font-size:1rem;line-height:1.2}.site-header .brand span,.manlung-brand-copy span{display:block;margin-top:3px;font-size:.68rem}.site-header .header-actions,.header-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}</style>
+  <link rel="stylesheet" href="/css/footer.css">
 </head>
 <body>
 <header class="header"><div class="header-inner">
@@ -108,5 +109,21 @@ function closeViewer(){$('viewer').classList.remove('open');$('viewer').setAttri
 $('search').addEventListener('input',renderCases);$('refresh').onclick=loadCases;$('closeViewer').onclick=closeViewer;$('viewer').onclick=e=>{if(e.target===$('viewer'))closeViewer()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer()});setInterval(async()=>{if(document.hidden||!selectedCaseId)return;try{const d=await api('/api/cases/admin/case/'+encodeURIComponent(selectedCaseId));if(d.case){const merged={...allCases.find(c=>c.caseId===selectedCaseId),...d.case};const idx=allCases.findIndex(c=>c.caseId===selectedCaseId);if(idx>=0)allCases[idx]=merged;renderDetail(merged);await loadActivity(selectedCaseId);renderCases()}}catch(e){console.warn('Live evidence refresh failed:',e)}},10000);
 (async()=>{try{const d=await api('/api/auth/verify');currentRole=String(d.user?.role||'').toLowerCase();if(!d.success||!['admin','owner'].includes(currentRole)){location.replace('/admin/login.html');return}await loadCases()}catch(e){location.replace('/admin/login.html')}})();
 </script>
+<footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+    <div class="manlung-footer-grid">
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row"><a href="/" aria-label="Manlung Recovery Home"><img src="/icons/icon-512.png" alt="Manlung Recovery" class="manlung-footer-logo" width="46" height="46"></a><div><h2 id="footer-brand-title">Manlung Recovery</h2><p class="manlung-footer-brand-subtitle">Cyber Recovery &amp; Digital Investigation Portal</p></div></div>
+        <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
+      </section>
+      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
+      <section class="manlung-footer-column"><h3>Admin</h3><nav class="manlung-footer-links"><a href="/admin/dashboard.html">Admin Dashboard</a><a href="/admin/owner.html">Owner Portal</a><a href="/admin/reports.html">Reports</a><a href="/admin/tools/security.html">Security Center</a><a href="/contact.html">Support</a></nav></section>
+      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
+    </div>
+    <div class="manlung-footer-divider"></div>
+    <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a><a href="tel:+254724356178">+254 724 356 178</a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer">GitHub</a></div></div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+  </div>
+</footer>
 </body>
 </html>
