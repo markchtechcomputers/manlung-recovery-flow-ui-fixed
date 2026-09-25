@@ -42,9 +42,13 @@ app.set('trust proxy', 1);
 // and forwards the original protocol in X-Forwarded-Proto.
 app.use((req, res, next) => {
   if (process.env.NODE_ENV === 'production' && req.get('x-forwarded-proto') !== 'https') {
-    const host = req.get('host');
-    if (!host) return res.status(400).json({ success: false, error: 'Invalid host.' });
-    return res.redirect(308, `https://${host}${req.originalUrl}`);
+    let canonicalOrigin = String(process.env.PUBLIC_APP_URL || '').trim().replace(/\/$/, '');
+    try {
+      canonicalOrigin = new URL(canonicalOrigin).origin;
+    } catch (_) {
+      return res.status(500).json({ success: false, error: 'Production URL is not configured.' });
+    }
+    return res.redirect(308, `${canonicalOrigin}${req.originalUrl}`);
   }
   return next();
 });
