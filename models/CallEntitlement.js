@@ -26,6 +26,10 @@ function evaluate(entitlement, nowMs = Date.now()) {
   const expiryMs = entitlement?.subscription_expires_at
     ? new Date(entitlement.subscription_expires_at).getTime()
     : 0;
+  const freeExpiryMs = entitlement?.free_access_until
+    ? new Date(entitlement.free_access_until).getTime()
+    : 0;
+  const free = Boolean(freeExpiryMs > nowMs);
   const active = Boolean(
     entitlement &&
     entitlement.subscription_status === 'active' &&
@@ -33,15 +37,17 @@ function evaluate(entitlement, nowMs = Date.now()) {
   );
 
   return {
-    access: active,
-    status: active ? 'active' : 'expired',
+    access: active || free,
+    status: active || free ? 'active' : 'expired',
     subscription: active,
+    free,
     subscriptionPlan: active ? (entitlement.subscription_plan || null) : (entitlement?.subscription_plan || null),
     subscriptionStartAt: entitlement?.subscription_start_at || null,
     subscriptionExpiresAt: entitlement?.subscription_expires_at || null,
-    daysRemaining: active
-      ? Math.max(0, Math.ceil((expiryMs - nowMs) / 86400000))
-      : 0,
+    daysRemaining: Math.max(
+      active ? Math.ceil((expiryMs - nowMs) / 86400000) : 0,
+      free ? Math.ceil((freeExpiryMs - nowMs) / 86400000) : 0
+    ),
     trial: false,
     trialAvailable: false,
     trialUsed: Boolean(entitlement?.trial_started_at),
