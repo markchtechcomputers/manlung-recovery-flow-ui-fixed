@@ -60,6 +60,7 @@ function normalizePhone(value) {
 
 
 const ADMIN_COOKIE = 'manlung_admin_session';
+const CLIENT_COOKIE = 'manlung_client_session';
 const MFA_TICKET_EXPIRE = '5m';
 
 // Owner identity is required for MFA management, but unlike ownerAuth it
@@ -72,6 +73,25 @@ const ownerIdentity = async (req, res, next) => {
     next();
   });
 };
+
+function setClientCookie(res, token) {
+  res.cookie(CLIENT_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: SESSION_MAX_AGE_MS.client,
+  });
+}
+
+function clearClientCookie(res) {
+  res.clearCookie(CLIENT_COOKIE, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+  });
+}
 
 function setAdminCookie(res, token) {
   res.cookie(ADMIN_COOKIE, token, {
@@ -506,6 +526,26 @@ router.post('/client/logout-all', auth, async (req, res) => {
   } catch (error) {
     console.error('Client logout-all error:', error);
     res.status(500).json({ success: false, error: 'Could not revoke sessions.' });
+  }
+});
+
+router.post('/client/logout', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required.' });
+    await User.bumpSessionVersion(req.user.id);
+    clearClientCookie(res);
+    await SecurityMonitoring.recordEvent({
+      eventType: 'LOGOUT',
+      userId: req.user.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      details: { role: req.user.role, all_sessions: true },
+    });
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Client logout error:', error);
+    clearClientCookie(res);
+    return res.status(200).json({ success: true });
   }
 });
 
@@ -1215,10 +1255,10 @@ router.post(
       }
 
       const token = signToken(client);
+      setClientCookie(res, token);
 
       res.json({
         success: true,
-        token,
         user: {
           id: client.id,
           email: client.email,
