@@ -10,6 +10,40 @@ const SHARES = 'admin_document_shares';
 function cleanText(value, max = 100000) {
   return String(value ?? '').replace(/\u0000/g, '').slice(0, max);
 }
+function sanitizeDocumentHtml(value, max = 100000) {
+  let html = cleanText(value, max);
+  html = html.replace(/<\/?(script|style|iframe|object|embed|form|input|button|textarea|select|svg|math)[^>]*>/gi, '');
+  html = html.replace(/<!--([\\s\\S]*?)-->/g, '');
+  html = html.replace(/\s+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\\s>]+)/gi, '');
+  html = html.replace(/\s+(href|src)\s*=\s*(?:"[^"]*"|'[^']*'|[^\\s>]+)/gi, '');
+  html = html.replace(/\s+style\s*=\s*(?:"[^"]*"|'[^']*'|[^\\s>]+)/gi, '');
+  const allowed = new Set(['p','br','div','h1','h2','h3','strong','b','em','i','u','s','ul','ol','li','blockquote','font']);
+  html = html.replace(/<\\/?([a-z0-9]+)([^>]*)>/gi, (full, tag, attrs) => {
+    const name = String(tag).toLowerCase();
+    if (!allowed.has(name)) return '';
+    if (full.startsWith('</')) return '</' + name + '>';
+    if (name === 'br') return '<br>';
+    if (name === 'font') {
+      const face = String(attrs).match(/\\bface\\s*=\\s*["']([^"']{1,80})["']/i);
+      const size = String(attrs).match(/\\bsize\\s*=\\s*["']([1-7])["']/i);
+      return '<font' + (face ? ' face="' + face[1].replace(/["<>]/g,'') + '"' : '') + (size ? ' size="' + size[1] + '"' : '') + '>';
+    }
+    return '<' + name + '>';
+  });
+  return html;
+}
+function htmlToText(value) {
+  return String(value || '')
+    .replace(/<br\\s*\\/?>(?=.)/gi, '\\n')
+    .replace(/<\\/(p|div|h1|h2|h3|li|blockquote)>/gi, '\\n')
+    .replace(/<li>/gi, '• ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"').replace(/&#39;/gi, "'")
+    .replace(/\\n{3,}/g, '\\n\\n')
+    .trim();
+}
 function isOwner(doc, user) {
   return String(doc.owner_user_id) === String(user.id);
 }
@@ -30,7 +64,7 @@ function pdfEscape(value) {
   return String(value).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
 }
 function makePdf(title, content) {
-  const rawLines = [title, '', ...String(content || '').split(/\r?\n/)];
+  const rawLines = [title, '', ...htmlToText(content).split(/\r?\n/)];
   const lines = [];
   for (const raw of rawLines) {
     const line = String(raw);
@@ -99,7 +133,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const title = cleanText(req.body?.title, 240).trim() || 'Untitled Investigation Note';
-    const content = cleanText(req.body?.content, 100000);
+    const content = sanitizeDocumentHtml(req.body?.content, 100000);
     const caseId = cleanText(req.body?.caseId, 120).trim() || null;
     const { data, error } = await supabase.from(DOCS).insert({ owner_user_id: req.user.id, title, content, case_id: caseId }).select('id,title,content,case_id,created_at,updated_at').single();
     if (error) throw error;
@@ -127,7 +161,7 @@ router.put('/:id', async (req, res) => {
     if (!doc || !isOwner(doc, req.user)) return res.status(404).json({ success: false, error: 'Document not found.' });
     const patch = {};
     if (req.body?.title !== undefined) patch.title = cleanText(req.body.title, 240).trim() || 'Untitled Investigation Note';
-    if (req.body?.content !== undefined) patch.content = cleanText(req.body.content, 100000);
+    if (req.body?.content !== undefined) patch.content = sanitizeDocumentHtml(req.body.content, 100000);
     if (req.body?.caseId !== undefined) patch.case_id = cleanText(req.body.caseId, 120).trim() || null;
     const { data, error } = await supabase.from(DOCS).update(patch).eq('id', doc.id).eq('owner_user_id', req.user.id).select('id,title,content,case_id,created_at,updated_at').single();
     if (error) throw error;
