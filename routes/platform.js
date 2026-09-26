@@ -51,6 +51,43 @@ router.get('/health', async (_req, res) => {
   });
 });
 
+router.get('/public-stats', async (_req, res) => {
+  try {
+    const [{ count: members, error: membersError }, { data: cases, error: casesError }] = await Promise.all([
+      supabase.from('recovery_users').select('id', { head: true, count: 'exact' }),
+      supabase.from('recovery_cases').select('case_id,status')
+    ]);
+    if (membersError) throw membersError;
+    if (casesError) throw casesError;
+
+    const finishedStatuses = new Set(['Completed','Closed','Resolved','Recovered','Cancelled']);
+    const activeCases = (cases || []).filter(row => !finishedStatuses.has(String(row.status || '')));
+
+    let traced = 0;
+    const activeIds = activeCases.map(row => row.case_id).filter(Boolean);
+    if (activeIds.length) {
+      const { data: locations, error: locationError } = await supabase
+        .from('recovery_location_points')
+        .select('case_id')
+        .in('case_id', activeIds);
+      if (locationError) throw locationError;
+      traced = new Set((locations || []).map(row => String(row.case_id))).size;
+    }
+
+    res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
+    res.json({
+      success: true,
+      members: Number(members || 0),
+      activeCases: activeCases.length,
+      tracedCases: traced,
+      generatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Public recovery stats error:', error);
+    res.status(500).json({ success:false, error:'Stats temporarily unavailable.' });
+  }
+});
+
 router.get('/security', ownerAuth, async (_req, res) => {
   try {
     const admins = await User.listAdminsAndOwner();
