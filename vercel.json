@@ -116,6 +116,10 @@
       "dest": "/public/admin/login.html"
     },
     {
+      "src": "/verification/([^/]+)",
+      "dest": "/public/selfie.html"
+    },
+    {
       "src": "/admin/(.*)",
       "dest": "/public/admin/$1"
     },
