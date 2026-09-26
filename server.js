@@ -1186,7 +1186,7 @@ app.post('/api/link-scanner/scan', scannerLimiter, adminAuth, async (req, res) =
 // ============================================================
 app.get('/api/public/recovery-stats', async (req, res) => {
   try {
-    const { data: users, error: usersError } = await supabase
+    const { count: userCount, error: usersError } = await supabase
       .from('recovery_users')
       .select('id', { count: 'exact', head: true });
 
@@ -1231,7 +1231,7 @@ app.get('/api/public/recovery-stats', async (req, res) => {
       success: true,
       counts: {
         recoveriesAndActiveInvestigations: recovered + activeInvestigations,
-        registeredMembers: Number(users?.length || 0),
+        registeredMembers: Number(userCount || 0),
         casesCurrentlyTraced: currentlyTraced
       },
       updatedAt: new Date().toISOString()
