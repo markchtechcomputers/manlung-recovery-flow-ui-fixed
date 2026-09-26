@@ -589,6 +589,14 @@ router.post('/client/logout', auth, async (req, res) => {
   }
 });
 
+router.get('/admin/logout', (req, res) => {
+  // Idempotent browser logout fallback. This exists so logout still works
+  // when JavaScript is blocked, stale, or fails to attach the click handler.
+  clearAdminCookie(res);
+  clearMfaTicketCookie(res);
+  return res.redirect('/admin/login.html?logout=1');
+});
+
 router.post('/admin/logout', async (req, res) => {
   try {
     const token =
