@@ -30,15 +30,15 @@ html.dark{--bg:#0a1020;--card:#111827;--line:#26364f;--text:#f8fafc;--muted:#94a
 <div class="header-actions"><a class="btn btn-outline" href="/admin/tools.html"><i class="fas fa-toolbox"></i> Tools</a><a class="btn btn-outline" href="/admin/dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a><button class="btn btn-outline" data-theme-toggle="true" aria-label="Toggle theme"></button></div>
 </div></header>
 <main class="page">
-<section class="hero"><div class="eyebrow">Security Investigation</div><h1>Link Analysis</h1><p>Generate an authorized, short-lived video verification link tied to an existing Manlung Recovery case. The recipient completes one automatic camera verification capture.</p></section>
+<section class="hero"><div class="eyebrow">Security Investigation</div><h1>Link Analysis</h1><p>Generate an authorized, short-lived video verification link tied to an existing Manlung Recovery case. The recipient records one short, consent-based verification video.</p></section>
 <section class="card">
-<h2>Video Verification Link Generator</h2><p>Enter an existing case ID. The generated HTTPS link can be shared with the authorized recipient for automatic video verification.</p>
+<h2>Video Verification Link Generator</h2><p>Enter an existing case ID. The generated HTTPS link opens the short video verification page for the authorized recipient.</p>
 <div class="form"><label for="videoReference">Case ID</label><input id="videoReference" maxlength="120" autocomplete="off" placeholder="e.g. MRC-2026-001"></div>
 <div class="actions"><button type="button" class="btn btn-primary" id="generateVideoBtn">Generate Video Link</button><button type="button" class="btn btn-outline" id="clearVideoBtn">Clear</button></div>
 <div class="output" id="videoOutput">Your secure video verification link will appear here.</div>
 <button type="button" class="btn btn-outline" id="copyVideoBtn" disabled style="margin-top:9px">Copy Link</button>
 <div class="status" id="videoGeneratorStatus">Waiting</div>
-<div class="info"><strong>How it works:</strong> the request is short-lived and single-use. The recipient opens the HTTPS link, explicitly allows the browser camera, sees a 3 → 2 → 1 countdown, and one selfie is uploaded to the linked case evidence.</div>
+<div class="info"><strong>How it works:</strong> the request is short-lived and single-use. The recipient sees a clear consent screen, starts a roughly 6-second camera recording, and may allow location access so movement points can be captured during the recording. The verification page shows “Please wait…” while it checks, records and uploads, then closes itself when the browser permits it.</div>
 </section>
 </main>
 <script>
@@ -50,8 +50,8 @@ async function generateVideoLink(){
  try{
   const r=await fetch('/api/cases/admin/selfie-requests',{method:'POST',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({reference:value})});
   const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Could not generate link.');
-  generatedUrl=location.origin+'/selfie.html?id='+encodeURIComponent(d.request.token);
-  const a=document.createElement('a');a.href=generatedUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent=generatedUrl;
+  generatedUrl=location.origin+'/video.html?id='+encodeURIComponent(d.request.token);
+  const a=document.createElement('a');a.href=generatedUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open Video Verification: '+generatedUrl;
   output.textContent='';output.appendChild(a);copyBtn.disabled=false;status.textContent='Link Generated';
  }catch(e){output.textContent=e.message||'Action failed';status.textContent='Action Failed'}
 }

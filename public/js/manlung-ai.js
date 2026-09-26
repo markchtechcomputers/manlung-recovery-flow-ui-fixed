@@ -449,13 +449,15 @@
     const value=String(text||'').trim();if(!value)return;
     try{
       const u=new SpeechSynthesisUtterance(value);
-      u.lang=speechLanguage(value);u.rate=.98;
+      u.lang=speechLanguage(value);u.rate=.96;u.pitch=1;
       const voice=ensureSpeechVoice();if(voice)u.voice=voice;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(u);
-      setVoiceState?.('waiting','AI is speaking…');
-      u.onend=()=>{if(voiceSession&&voiceAutoResume)waitUntilSpeechIsFinished();};
-      u.onerror=()=>{setVoiceState('','');if(voiceSession&&voiceAutoResume)waitUntilSpeechIsFinished();};
+      const synth=window.speechSynthesis;
+      synth.cancel();
+      try{synth.resume()}catch(_){}
+      u.onstart=()=>setVoiceState?.('waiting','AI is speaking…');
+      u.onend=()=>{if(voiceSession&&voiceAutoResume)waitUntilSpeechIsFinished();else setVoiceState?.('','');};
+      u.onerror=()=>{setVoiceState?.('','');if(voiceSession&&voiceAutoResume)waitUntilSpeechIsFinished();};
+      synth.speak(u);
     }catch(e){console.warn('Manlung AI speech output error',e);}
   }
   function createLiveSpeaker(){
@@ -469,10 +471,12 @@
       speaking=true;
       try{
         const u=new SpeechSynthesisUtterance(text);
-        u.lang=speechLanguage(text);u.rate=.98;
+        u.lang=speechLanguage(text);u.rate=.96;u.pitch=1;
         const voice=ensureSpeechVoice();if(voice)u.voice=voice;
+        u.onstart=()=>setVoiceState?.('waiting','AI is speaking…');
         u.onend=()=>{speaking=false;pump();};
         u.onerror=()=>{speaking=false;pump();};
+        try{window.speechSynthesis.resume()}catch(_){}
         window.speechSynthesis.speak(u);
       }catch(_){speaking=false;pump();}
     };
@@ -696,8 +700,9 @@
        window.__MANLUNG_AI_VOICE_ON=next;
        syncVoiceButton();
        if(next){
+         unlockSpeechOutput();
          const unlock=new SpeechSynthesisUtterance('Voice enabled.');
-         unlock.lang='en-KE';unlock.rate=.98;
+         unlock.lang='en-KE';unlock.rate=.96;
          const v=ensureSpeechVoice();if(v)unlock.voice=v;
          try{window.speechSynthesis.cancel();window.speechSynthesis.speak(unlock);}catch(_){}
        }
@@ -804,7 +809,7 @@
       const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
       if(!SR){alert('Voice input is not supported here. Try Chrome or Edge.');return;}
       if(document.getElementById('manlungAiMic')?.classList.contains('recording')){stopListening();return;}
-      localStorage.setItem('manlung-ai-voice','on');window.__MANLUNG_AI_VOICE_ON=true;voiceSession=true;voiceAutoResume=true;
+      unlockSpeechOutput();localStorage.setItem('manlung-ai-voice','on');window.__MANLUNG_AI_VOICE_ON=true;voiceSession=true;voiceAutoResume=true;
       setVoiceState('recording','Listening… speak naturally');
       const voice=document.getElementById('manlungAiVoice');if(voice)voice.textContent='🔊 Voice on';
       startListening();

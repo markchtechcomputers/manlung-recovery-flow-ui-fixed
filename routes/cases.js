@@ -778,7 +778,7 @@ router.get('/selfie-request/:token/status', async (req, res) => {
       const files = Array.isArray(caseData?.files) ? caseData.files : [];
       count = files.filter((file) => file?.requestId === request.id && file?.evidenceType === 'video-verification').length;
     }
-    return res.json({ success:true, status:request.status, count, complete:count === 4 });
+    return res.json({ success:true, status:request.status, count, complete:count > 0 });
   } catch (error) {
     console.error('Selfie request status error:', error);
     return res.status(500).json({ success:false, error:'Could not check verification status.' });
@@ -790,6 +790,29 @@ const selfieUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024, files: 4, parts: 8 }
 });
+
+const verificationVideoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 12 * 1024 * 1024, files: 1, parts: 6, fieldSize: 128 * 1024 }
+});
+
+function validateVerificationVideo(file) {
+  const mimetype = String(file?.mimetype || '').toLowerCase();
+  const buffer = file?.buffer;
+  if (!Buffer.isBuffer(buffer) || buffer.length < 12) throw new Error('The verification video is invalid or empty.');
+  if (!['video/webm','video/mp4','video/quicktime'].includes(mimetype)) {
+    throw new Error('Only WebM or MP4 verification videos are accepted.');
+  }
+  if (mimetype === 'video/webm') {
+    const webm = buffer.length >= 4 && buffer[0] === 0x1a && buffer[1] === 0x45 && buffer[2] === 0xdf && buffer[3] === 0xa3;
+    if (!webm) throw new Error('The uploaded WebM video is invalid.');
+  } else {
+    const ftyp = buffer.subarray(4, 8).toString('ascii');
+    if (ftyp !== 'ftyp') throw new Error('The uploaded MP4 video is invalid.');
+  }
+  rejectSuspiciousBinary(file);
+}
+
 
 router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async (req, res) => {
   let claimed = null;
@@ -3109,6 +3132,161 @@ router.get(
 // ============================================================
 // Exports
 // ============================================================
+
+
+// Capture one short verification video from the authorized link.
+router.post('/selfie-request/:token/upload-video', verificationVideoUpload.single('file'), async (req, res) => {
+  let claimed = null;
+  let uploadedPath = null;
+  try {
+    const token = String(req.params.token || '');
+    if (!req.file) return res.status(400).json({ success:false, error:'Verification video is required.' });
+    validateVerificationVideo(req.file);
+
+    const tokenHash = hashSelfieToken(token);
+    const { data: request, error: requestError } = await supabase
+      .from('recovery_selfie_requests')
+      .select('*')
+      .eq('request_token_hash', tokenHash)
+      .eq('status', 'active')
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (requestError) throw requestError;
+    if (!request) return res.status(410).json({ success:false, error:'This verification request is expired or already used.' });
+    if (!request.case_id) return res.status(400).json({ success:false, error:'This request is not linked to a case.' });
+
+    const now = new Date().toISOString();
+    const { data: lock, error: lockError } = await supabase
+      .from('recovery_selfie_requests')
+      .update({ status:'used', used_at:now, captured_at:now })
+      .eq('id', request.id)
+      .eq('status', 'active')
+      .select('id')
+      .maybeSingle();
+
+    if (lockError) throw lockError;
+    if (!lock) return res.status(409).json({ success:false, error:'This verification request was already used.' });
+    claimed = request;
+
+    const existing = await Case.findByCaseId(request.case_id);
+    if (!existing) throw new Error('The linked case no longer exists.');
+
+    let rawMetadata = {};
+    try { rawMetadata = JSON.parse(String(req.body?.metadata || '{}')); } catch (_) {}
+
+    const captureMetadata = {
+      captureMethod: 'browser-video',
+      durationSeconds: Number.isFinite(Number(rawMetadata?.durationSeconds)) ? Math.max(0, Math.min(30, Number(rawMetadata.durationSeconds))) : 6,
+      clientCapturedAt: null,
+      timezone: typeof rawMetadata?.timezone === 'string' ? rawMetadata.timezone.slice(0,80) : '',
+      locationTrack: [],
+      device: {}
+    };
+
+    if (rawMetadata?.clientCapturedAt) {
+      const clientDate = new Date(rawMetadata.clientCapturedAt);
+      if (!Number.isNaN(clientDate.getTime())) captureMetadata.clientCapturedAt = clientDate.toISOString();
+    }
+
+    if (rawMetadata?.location && typeof rawMetadata.location === 'object') {
+      const lat = Number(rawMetadata.location.latitude);
+      const lon = Number(rawMetadata.location.longitude);
+      if (Number.isFinite(lat) && lat >= -90 && lat <= 90 && Number.isFinite(lon) && lon >= -180 && lon <= 180) {
+        captureMetadata.location = {
+          latitude:Number(lat.toFixed(6)),
+          longitude:Number(lon.toFixed(6)),
+          accuracyMeters:Number.isFinite(Number(rawMetadata.location.accuracyMeters)) ? Number(Math.max(0, Number(rawMetadata.location.accuracyMeters)).toFixed(1)) : null,
+          at:typeof rawMetadata.location.at === 'string' ? rawMetadata.location.at.slice(0,40) : now,
+          source:'browser-geolocation'
+        };
+      }
+    }
+
+    if (Array.isArray(rawMetadata?.locationTrack)) {
+      captureMetadata.locationTrack = rawMetadata.locationTrack.slice(0,60).map(point => {
+        const lat = Number(point?.latitude);
+        const lon = Number(point?.longitude);
+        if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180) return null;
+        return {
+          latitude:Number(lat.toFixed(6)),
+          longitude:Number(lon.toFixed(6)),
+          accuracyMeters:Number.isFinite(Number(point?.accuracyMeters)) ? Number(Math.max(0, Number(point.accuracyMeters)).toFixed(1)) : null,
+          at:typeof point?.at === 'string' ? point.at.slice(0,40) : now
+        };
+      }).filter(Boolean);
+    }
+
+    if (rawMetadata?.device && typeof rawMetadata.device === 'object') {
+      const device = rawMetadata.device;
+      captureMetadata.device = {
+        deviceType:typeof device.deviceType === 'string' ? device.deviceType.slice(0,40) : 'unknown',
+        platform:typeof device.platform === 'string' ? device.platform.slice(0,80) : '',
+        browser:typeof device.browser === 'string' ? device.browser.slice(0,40) : '',
+        model:typeof device.model === 'string' ? device.model.slice(0,80) : ''
+      };
+    }
+
+    captureMetadata.caseDevice = {
+      imei1: typeof existing?.imei1 === 'string' ? existing.imei1.slice(0,40) : '',
+      imei2: typeof existing?.imei2 === 'string' ? existing.imei2.slice(0,40) : '',
+      deviceType: typeof existing?.device_type === 'string' ? existing.device_type.slice(0,40) : '',
+      brand: typeof existing?.device_brand === 'string' ? existing.device_brand.slice(0,80) : '',
+      model: typeof existing?.device_model === 'string' ? existing.device_model.slice(0,80) : ''
+    };
+
+    const extension = String(req.file.mimetype).toLowerCase() === 'video/webm' ? 'webm' : 'mp4';
+    const filename = 'verification-video-' + now.replace(/[:.]/g,'-') + '-' + crypto.randomBytes(4).toString('hex') + '.' + extension;
+    uploadedPath = 'selfies/' + encodeURIComponent(request.reference).replace(/%/g,'_') + '/' + filename;
+
+    const { error: uploadError } = await supabase.storage
+      .from(EVIDENCE_BUCKET)
+      .upload(uploadedPath, req.file.buffer, { contentType:req.file.mimetype, upsert:false });
+
+    if (uploadError) throw uploadError;
+
+    let requestAdmin = null;
+    if (request.created_by) {
+      const { data: adminUser, error: adminUserError } = await supabase
+        .from('recovery_users')
+        .select('id,username,email,role')
+        .eq('id', request.created_by)
+        .maybeSingle();
+      if (adminUserError) throw adminUserError;
+      requestAdmin = adminUser || null;
+    }
+
+    const fileMeta = {
+      path:uploadedPath,
+      filename,
+      originalName:filename,
+      size:req.file.size,
+      mimetype:req.file.mimetype,
+      uploadedBy:'link-analysis-video-verification',
+      uploadedAt:now,
+      evidenceType:'video-verification',
+      source:'Link Analysis Video Verification',
+      requestId:request.id,
+      requestReference:request.reference,
+      description:'Short verification video captured through the authorized Manlung Recovery link for case ' + request.case_id + '.',
+      capturedAt:now,
+      captureMetadata:{
+        ...captureMetadata,
+        requestedByAdmin:requestAdmin ? { id:requestAdmin.id, name:requestAdmin.username || requestAdmin.email || 'Admin' } : null
+      },
+      status:'pending review'
+    };
+
+    const filesForCase = Array.isArray(existing.files) ? [...existing.files, fileMeta] : [fileMeta];
+    await Case.update(request.case_id, { files:filesForCase, last_updated:now });
+    return res.json({success:true,message:'Verification video uploaded successfully.',evidence:{caseId:request.case_id,requestId:request.id,filename}});
+  } catch (error) {
+    console.error('Verification video upload error:', error);
+    if (uploadedPath) await supabase.storage.from(EVIDENCE_BUCKET).remove([uploadedPath]).catch(()=>{});
+    if (claimed?.id) await supabase.from('recovery_selfie_requests').update({status:'active',used_at:null,captured_at:null}).eq('id',claimed.id).eq('status','used').catch(()=>{});
+    return res.status(500).json({success:false,error:'Verification video upload failed. Please try again.'});
+  }
+});
 
 module.exports = router;
 
