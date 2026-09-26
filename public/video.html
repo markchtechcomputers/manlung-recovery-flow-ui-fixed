@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Video Verification · Manlung Recovery</title>
+<style>
+:root{--bg:#07111d;--card:#102033;--line:#29445d;--text:#f8fafc;--muted:#a9bdd0;--accent:#22d3ee}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+body{display:grid;place-items:center;padding:20px}.card{width:min(720px,100%);background:linear-gradient(145deg,#102033,#0b1726);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}.brand img{width:46px;height:46px;border-radius:12px}.brand h1{font-size:1.05rem;margin:0}.brand p{font-size:.72rem;color:var(--muted);margin:3px 0 0}
+h2{font-size:1.45rem;margin:6px 0 8px}.intro{color:var(--muted);line-height:1.6;font-size:.9rem}
+.notice{margin:16px 0;padding:13px;border:1px solid rgba(34,211,238,.25);border-radius:13px;background:rgba(34,211,238,.06);font-size:.78rem;line-height:1.55}
+.check{display:flex;gap:10px;align-items:flex-start;margin:15px 0;color:var(--text);font-size:.82rem}.check input{margin-top:3px;accent-color:var(--accent)}
+.preview{position:relative;margin-top:18px;aspect-ratio:16/9;background:#02070d;border:1px solid var(--line);border-radius:16px;overflow:hidden}.preview video{width:100%;height:100%;object-fit:cover;display:block}.preview .cover{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,rgba(2,7,13,.18),rgba(2,7,13,.75));text-align:center;padding:20px}.cover strong{display:block;font-size:1rem}.cover span{display:block;color:#c7d7e5;font-size:.75rem;margin-top:5px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.btn{border:1px solid var(--line);background:#13283d;color:var(--text);border-radius:11px;padding:11px 16px;font-weight:800;cursor:pointer}.btn.primary{background:var(--accent);border-color:var(--accent);color:#06202a}.btn:disabled{opacity:.45;cursor:not-allowed}
+.status{margin-top:13px;color:var(--muted);font-size:.78rem;min-height:22px}.status.wait{color:#fde68a}.status.ok{color:#86efac}.status.error{color:#fca5a5}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(253,230,138,.35);border-top-color:#fde68a;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px}@keyframes spin{to{transform:rotate(360deg)}}
+.small{margin-top:12px;color:#7f97ac;font-size:.68rem;line-height:1.5}
+@media(max-width:560px){body{padding:10px}.card{padding:17px;border-radius:17px}.actions .btn{width:100%}}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="brand"><img src="/icons/icon-512.png" alt="Manlung Recovery"><div><h1>Manlung Recovery</h1><p>Authorized video verification</p></div></div>
+  <h2>Video Verification</h2>
+  <p class="intro">This secure link was created for an authorized case. You will record one short verification video. The camera and location are used only after you choose to start.</p>
+  <div class="notice"><strong>Privacy notice:</strong> the verification records the short video and, if you allow location access, a time-stamped location trail while the video is being recorded. The page shows a clear recording state and stops automatically.</div>
+  <label class="check"><input id="locationConsent" type="checkbox" checked> <span>I allow location access during this short verification so the case can receive movement points while the video is recording.</span></label>
+  <div class="preview"><video id="preview" autoplay muted playsinline></video><div class="cover" id="cover"><div><strong>Ready to record</strong><span>Tap Start Verification, then allow camera/location permissions if requested.</span></div></div></div>
+  <div class="actions"><button class="btn primary" id="startBtn" type="button">Start Verification</button><button class="btn" id="cancelBtn" type="button">Cancel</button></div>
+  <div class="status" id="status" aria-live="polite">Ready</div>
+  <div class="small">The verification normally takes about 6 seconds. When the secure upload finishes, this page will close itself when the browser permits it.</div>
+</main>
+<script>
+(()=>{"use strict";
+const token=new URLSearchParams(location.search).get("id")||"";
+const preview=document.getElementById("preview"),cover=document.getElementById("cover"),startBtn=document.getElementById("startBtn"),cancelBtn=document.getElementById("cancelBtn"),status=document.getElementById("status"),locationConsent=document.getElementById("locationConsent");
+let stream=null,watchId=null,points=[],started=false;
+function setStatus(text,type=""){status.className="status "+type;status.innerHTML=text}
+function stopLocation(){if(watchId!==null&&navigator.geolocation){try{navigator.geolocation.clearWatch(watchId)}catch(_){}}watchId=null}
+function stopCamera(){if(stream){stream.getTracks().forEach(t=>{try{t.stop()}catch(_){}});stream=null}preview.srcObject=null}
+function closeSelf(){setTimeout(()=>{try{window.close()}catch(_){}},700)}
+function locationPoint(p){if(!p?.coords)return;const latitude=Number(p.coords.latitude),longitude=Number(p.coords.longitude);if(!Number.isFinite(latitude)||!Number.isFinite(longitude))return;points.push({latitude:Number(latitude.toFixed(6)),longitude:Number(longitude.toFixed(6)),accuracyMeters:Number.isFinite(p.coords.accuracy)?Number(p.coords.accuracy.toFixed(1)):null,at:new Date().toISOString()});if(points.length>60)points=points.slice(-60)}
+function startLocation(){
+ if(!locationConsent.checked||!navigator.geolocation)return;
+ try{
+   watchId=navigator.geolocation.watchPosition(locationPoint,()=>{}, {enableHighAccuracy:true,maximumAge:0,timeout:5000});
+ }catch(_){}
+}
+async function upload(blob,metadata){
+ const fd=new FormData();fd.append("file",blob,"verification-video.webm");fd.append("metadata",JSON.stringify(metadata));
+ const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-video",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
+ let d={};try{d=await r.json()}catch(_){}
+ if(!r.ok||!d.success)throw new Error(d.error||"Verification upload failed.");
+ return d;
+}
+async function start(){
+ if(started)return;
+ started=true;startBtn.disabled=true;cancelBtn.disabled=true;points=[];
+ try{
+   if(!token||!/^[A-Za-z0-9_-]{32,120}$/.test(token))throw new Error("Invalid verification link.");
+   setStatus('<span class="spinner"></span>Please wait… checking secure link',"wait");
+   const check=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token),{credentials:"omit",cache:"no-store"});
+   const d=await check.json().catch(()=>({}));
+   if(!check.ok||!d.success)throw new Error(d.error||"This verification link is no longer available.");
+   if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera access is not supported by this browser.");
+   setStatus('<span class="spinner"></span>Please wait… starting camera',"wait");
+   stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:720}},audio:false});
+   preview.srcObject=stream;await preview.play().catch(()=>{});
+   cover.style.display="none";startLocation();
+   const mime=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(x=>MediaRecorder.isTypeSupported?.(x))||"";
+   if(!window.MediaRecorder||!mime)throw new Error("This browser cannot record the required verification video.");
+   const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:900000});
+   const chunks=[];let stopTimer;
+   recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
+   const stopped=new Promise((resolve,reject)=>{recorder.onstop=()=>resolve(new Blob(chunks,{type:mime}));recorder.onerror=e=>reject(e.error||new Error("Video recording failed."))});
+   setStatus('<span class="spinner"></span>Please wait… recording verification video',"wait");
+   recorder.start(250);
+   stopTimer=setTimeout(()=>{try{recorder.stop()}catch(_){}},6000);
+   const blob=await stopped;clearTimeout(stopTimer);stopLocation();
+   const metadata={clientCapturedAt:new Date().toISOString(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"",captureMethod:"browser-video",durationSeconds:6,locationTrack:points};
+   if(points[0])metadata.location=points[0];
+   setStatus('<span class="spinner"></span>Please wait… uploading securely',"wait");
+   await upload(blob,metadata);
+   stopCamera();
+   setStatus("Verification complete. This page will close.","ok");
+   closeSelf();
+ }catch(e){
+   console.error("Video verification error:",e);
+   stopLocation();stopCamera();started=false;startBtn.disabled=false;cancelBtn.disabled=false;cover.style.display="grid";
+   setStatus(e.message||"Verification could not finish. Please try again.","error");
+ }
+}
+function cancel(){stopLocation();stopCamera();try{window.close()}catch(_){}if(!started)location.replace("/")}
+startBtn.addEventListener("click",start);cancelBtn.addEventListener("click",cancel);
+})();
+</script>
+</body>
+</html>
