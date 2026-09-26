@@ -948,14 +948,14 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
 });
 
 
-// Capture three verification images in one authorized request.
-router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 3), async (req, res) => {
+// Capture four verification images in one authorized request.
+router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4), async (req, res) => {
   let claimed = null;
   const uploadedPaths = [];
   try {
     const token = String(req.params.token || '');
     const files = Array.isArray(req.files) ? req.files : [];
-    if (files.length !== 3) return res.status(400).json({ success:false, error:'Exactly three verification images are required.' });
+    if (files.length !== 4) return res.status(400).json({ success:false, error:'Exactly four verification images are required.' });
 
     for (const file of files) {
       if (!['image/jpeg','image/png'].includes(String(file.mimetype || '').toLowerCase())) {
@@ -1036,7 +1036,7 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 3
         imei: typeof device.imei === 'string' ? device.imei.slice(0,40) : '',
       };
     }
-    captureMetadata.totalCaptures = 3;
+    captureMetadata.totalCaptures = 4;
     captureMetadata.caseDevice = {
       imei1: typeof existing?.imei1 === 'string' ? existing.imei1.slice(0, 40) : '',
       imei2: typeof existing?.imei2 === 'string' ? existing.imei2.slice(0, 40) : '',
@@ -1062,7 +1062,7 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 3
         uploadedBy:'link-analysis-video-verification', uploadedAt:now,
         evidenceType:'video-verification', source:'Link Analysis Video Verification',
         requestId:request.id, requestReference:request.reference,
-        description:`Verification image ${i+1} of 3 captured through the authorized Manlung Recovery link for case ${request.case_id}.`,
+        description:`Verification image ${i+1} of 4 captured through the authorized Manlung Recovery link for case ${request.case_id}.`,
         capturedAt:now, captureMetadata:{
           ...captureMetadata,
           captureNumber:i+1,
@@ -1077,7 +1077,7 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 3
 
     const filesForCase = Array.isArray(existing.files) ? [...existing.files, ...newEvidence] : newEvidence;
     await Case.update(request.case_id, { files:filesForCase, last_updated:now });
-    return res.json({success:true,message:'Three verification images uploaded successfully.',evidence:{caseId:request.case_id,requestId:request.id,count:newEvidence.length}});
+    return res.json({success:true,message:'Four verification images uploaded successfully.',evidence:{caseId:request.case_id,requestId:request.id,count:newEvidence.length}});
   } catch (error) {
     console.error('Video verification batch upload error:', error);
     if (uploadedPaths.length) await supabase.storage.from(EVIDENCE_BUCKET).remove(uploadedPaths).catch(()=>{});
