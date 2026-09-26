@@ -1186,21 +1186,27 @@ app.post('/api/link-scanner/scan', scannerLimiter, adminAuth, async (req, res) =
 // ============================================================
 app.get('/api/public/recovery-stats', async (req, res) => {
   try {
-    const { count: userCount, error: usersError } = await supabase
+    const { count: memberCount, error: usersError } = await supabase
       .from('recovery_users')
-      .select('id', { count: 'exact', head: true });
+      .select('id', { count: 'exact', head: true })
+      .eq('role', 'client');
 
     if (usersError) throw usersError;
 
     const { data: cases, error: casesError } = await supabase
       .from('recovery_cases')
-      .select('id, status');
+      .select('id, status, last_location');
 
     if (casesError) throw casesError;
 
     const rows = Array.isArray(cases) ? cases : [];
-    const normalized = rows.map(row => String(row.status || '').trim().toLowerCase());
+    const normalizedRows = rows.map(row => ({
+      status: String(row.status || '').trim().toLowerCase(),
+      hasLocation: row.last_location !== null && row.last_location !== undefined && String(row.last_location).trim() !== ''
+    }));
 
+    // One case is counted once. Active recovery/investigation states are
+    // deliberately kept separate from the "currently traced" location count.
     const activeStatuses = new Set([
       'accepted',
       'under investigation',
@@ -1211,28 +1217,25 @@ app.get('/api/public/recovery-stats', async (req, res) => {
     ]);
 
     const tracedStatuses = new Set([
-      'accepted',
       'traced',
       'tracking'
     ]);
 
-    const recoveredStatuses = new Set([
-      'recovered',
-      'resolved',
-      'completed'
-    ]);
+    const recoveriesAndActiveInvestigations = normalizedRows.filter(
+      row => activeStatuses.has(row.status)
+    ).length;
 
-    const activeInvestigations = normalized.filter(status => activeStatuses.has(status)).length;
-    const recovered = normalized.filter(status => recoveredStatuses.has(status)).length;
-    const currentlyTraced = normalized.filter(status => tracedStatuses.has(status)).length;
+    const casesCurrentlyTraced = normalizedRows.filter(
+      row => tracedStatuses.has(row.status) && row.hasLocation
+    ).length;
 
     res.set('Cache-Control', 'no-store, max-age=0');
     return res.json({
       success: true,
       counts: {
-        recoveriesAndActiveInvestigations: recovered + activeInvestigations,
-        registeredMembers: Number(userCount || 0),
-        casesCurrentlyTraced: currentlyTraced
+        recoveriesAndActiveInvestigations,
+        registeredMembers: Number(memberCount || 0),
+        casesCurrentlyTraced
       },
       updatedAt: new Date().toISOString()
     });
