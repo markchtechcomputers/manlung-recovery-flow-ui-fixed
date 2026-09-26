@@ -642,7 +642,25 @@ router.post('/admin/mfa/login', [
     if (!admin || !['admin', 'owner'].includes(admin.role) || !admin.mfa_enabled || !admin.mfa_secret) {
       return res.status(401).json({ error: 'MFA session is invalid.' });
     }
-    const secret = decryptSecret(admin.mfa_secret);
+    let secret;
+    try {
+      secret = decryptSecret(admin.mfa_secret);
+    } catch (error) {
+      if (error?.code === 'MFA_SECRET_DECRYPT_FAILED') {
+        console.error('Admin MFA secret decryption failed:', {
+          userId: admin.id,
+          role: admin.role,
+          code: error.code,
+        });
+        clearMfaTicketCookie(res);
+        return res.status(503).json({
+          error: 'MFA configuration needs to be re-enrolled by the site owner.',
+          code: 'MFA_CONFIGURATION_INVALID',
+        });
+      }
+      throw error;
+    }
+
     let valid = verifyTotp(secret, req.body.code);
     if (!valid) {
       const index = consumeRecoveryCode(req.body.code, admin.mfa_recovery_code_hashes || []);
