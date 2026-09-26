@@ -1043,7 +1043,9 @@ html:not(.dark) body.admin-page-bg #pageContent span:not(.role-badge):not(.statu
             window.location.href = '/admin/login.html';
         }
 
-        document.getElementById('ownerLogoutBtn')?.addEventListener('click', handleLogout);\n\n        function roleBadge(admin) {
+        document.getElementById('ownerLogoutBtn')?.addEventListener('click', handleLogout);
+
+        function roleBadge(admin) {
             if (admin.role === 'owner') return '<span class="role-badge role-owner">Owner</span>';
             if (admin.role === 'admin' && admin.admin_status === 'pending') return '<span class="role-badge" style="background:#f7e7b0;color:#7d5d0a">Pending approval</span>';
             const cls = admin.admin_status === 'suspended' ? 'role-admin-suspended' : 'role-admin-active';
