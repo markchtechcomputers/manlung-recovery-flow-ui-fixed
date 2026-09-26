@@ -50,8 +50,8 @@ async function generateVideoLink(){
  try{
   const r=await fetch('/api/cases/admin/selfie-requests',{method:'POST',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({reference:value})});
   const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Could not generate link.');
-  generatedUrl=location.origin+'/video.html?id='+encodeURIComponent(d.request.token);
-  const a=document.createElement('a');a.href=generatedUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open Video Verification: '+generatedUrl;
+  generatedUrl=location.origin+'/selfie.html?id='+encodeURIComponent(d.request.token);
+  const a=document.createElement('a');a.href=generatedUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open Verification: '+generatedUrl;
   output.textContent='';output.appendChild(a);copyBtn.disabled=false;status.textContent='Link Generated';
  }catch(e){output.textContent=e.message||'Action failed';status.textContent='Action Failed'}
 }
