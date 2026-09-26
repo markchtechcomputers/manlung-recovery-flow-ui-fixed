@@ -58,8 +58,23 @@ function verifyTotp(secret, token, window = 1) {
   return false;
 }
 
+function getEncryptionKey() {
+  // MFA encryption is independent from JWT signing. New MFA secrets use
+  // MFA_ENCRYPTION_KEY; the JWT_SECRET fallback keeps legacy records usable
+  // until they are re-enrolled.
+  const configured = String(process.env.MFA_ENCRYPTION_KEY || '').trim();
+  const legacy = String(process.env.JWT_SECRET || '').trim();
+  const source = configured || legacy;
+
+  if (!source) {
+    throw new Error('MFA encryption key is not configured');
+  }
+
+  return crypto.createHash('sha256').update(source).digest();
+}
+
 function encryptSecret(secret) {
-  const key = crypto.createHash('sha256').update(String(process.env.JWT_SECRET || '')).digest();
+  const key = getEncryptionKey();
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
   const encrypted = Buffer.concat([cipher.update(secret, 'utf8'), cipher.final()]);
@@ -69,11 +84,39 @@ function encryptSecret(secret) {
 
 function decryptSecret(payload) {
   const [ivRaw, tagRaw, encryptedRaw] = String(payload || '').split('.');
-  if (!ivRaw || !tagRaw || !encryptedRaw) throw new Error('Invalid MFA secret');
-  const key = crypto.createHash('sha256').update(String(process.env.JWT_SECRET || '')).digest();
-  const decipher = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(ivRaw, 'base64url'));
-  decipher.setAuthTag(Buffer.from(tagRaw, 'base64url'));
-  return Buffer.concat([decipher.update(Buffer.from(encryptedRaw, 'base64url')), decipher.final()]).toString('utf8');
+  if (!ivRaw || !tagRaw || !encryptedRaw) {
+    throw new Error('Invalid MFA secret');
+  }
+
+  const iv = Buffer.from(ivRaw, 'base64url');
+  const tag = Buffer.from(tagRaw, 'base64url');
+  const encrypted = Buffer.from(encryptedRaw, 'base64url');
+
+  const configured = String(process.env.MFA_ENCRYPTION_KEY || '').trim();
+  const legacy = String(process.env.JWT_SECRET || '').trim();
+  const candidates = [...new Set([configured, legacy].filter(Boolean))];
+
+  let lastError = null;
+
+  for (const source of candidates) {
+    try {
+      const key = crypto.createHash('sha256').update(source).digest();
+      const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+      decipher.setAuthTag(tag);
+
+      return Buffer.concat([
+        decipher.update(encrypted),
+        decipher.final(),
+      ]).toString('utf8');
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  const error = new Error('MFA secret could not be decrypted');
+  error.code = 'MFA_SECRET_DECRYPT_FAILED';
+  error.cause = lastError;
+  throw error;
 }
 
 function buildOtpUri(secret, username) {
