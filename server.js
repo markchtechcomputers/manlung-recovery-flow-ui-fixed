@@ -1181,6 +1181,71 @@ app.post('/api/link-scanner/scan', scannerLimiter, adminAuth, async (req, res) =
 });
 
 // ============================================================
+// PUBLIC HOME LIVE COUNTERS
+// Counts only — no personal data is exposed.
+// ============================================================
+app.get('/api/public/recovery-stats', async (req, res) => {
+  try {
+    const { data: users, error: usersError } = await supabase
+      .from('recovery_users')
+      .select('id', { count: 'exact', head: true });
+
+    if (usersError) throw usersError;
+
+    const { data: cases, error: casesError } = await supabase
+      .from('recovery_cases')
+      .select('id, status');
+
+    if (casesError) throw casesError;
+
+    const rows = Array.isArray(cases) ? cases : [];
+    const normalized = rows.map(row => String(row.status || '').trim().toLowerCase());
+
+    const activeStatuses = new Set([
+      'accepted',
+      'under investigation',
+      'investigating',
+      'in progress',
+      'tracking',
+      'traced'
+    ]);
+
+    const tracedStatuses = new Set([
+      'accepted',
+      'traced',
+      'tracking'
+    ]);
+
+    const recoveredStatuses = new Set([
+      'recovered',
+      'resolved',
+      'completed'
+    ]);
+
+    const activeInvestigations = normalized.filter(status => activeStatuses.has(status)).length;
+    const recovered = normalized.filter(status => recoveredStatuses.has(status)).length;
+    const currentlyTraced = normalized.filter(status => tracedStatuses.has(status)).length;
+
+    res.set('Cache-Control', 'no-store, max-age=0');
+    return res.json({
+      success: true,
+      counts: {
+        recoveriesAndActiveInvestigations: recovered + activeInvestigations,
+        registeredMembers: Number(users?.length || 0),
+        casesCurrentlyTraced: currentlyTraced
+      },
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Public recovery stats error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Live recovery statistics are temporarily unavailable.'
+    });
+  }
+});
+
+// ============================================================
 // 404 FOR UNKNOWN API ROUTES
 // ============================================================
 
