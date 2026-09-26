@@ -1152,6 +1152,96 @@ router.delete('/admin/evidence/:caseId', ownerAuth, async (req, res) => {
   }
 });
 
+
+// ============================================================
+// Owner: Clear all evidence for a case
+// ============================================================
+
+router.delete('/admin/case/:caseId/evidence', ownerAuth, async (req, res) => {
+  try {
+    const caseId = String(req.params.caseId || '').trim();
+    const existing = await Case.findByCaseId(caseId);
+    if (!existing) return res.status(404).json({ success:false, error:'Case not found.' });
+
+    const files = Array.isArray(existing.files) ? existing.files : [];
+    const paths = files.map(file => String(file?.path || '').trim()).filter(Boolean);
+
+    if (paths.length) {
+      const { error } = await supabase.storage.from(EVIDENCE_BUCKET).remove(paths);
+      if (error) {
+        console.error('Clear case evidence storage error:', error);
+        return res.status(500).json({ success:false, error:'Could not clear the evidence files from storage.' });
+      }
+    }
+
+    const now = new Date().toISOString();
+    await Case.update(caseId, { files:[], last_updated:now });
+
+    try {
+      await CaseTimeline.create({
+        caseId,
+        actorUserId:req.user.id,
+        eventType:'evidence_cleared',
+        description:`All evidence files (${files.length}) were cleared by the owner.`,
+        metadata:{
+          actorName:req.user.name || req.user.email || null,
+          deletedCount:files.length,
+          source:'recovery-evidence-owner-clear'
+        }
+      });
+    } catch (timelineError) {
+      console.error('Evidence clear timeline event failed:', timelineError);
+    }
+
+    return res.json({
+      success:true,
+      message:'All case evidence was cleared successfully.',
+      caseId,
+      deletedCount:files.length
+    });
+  } catch (error) {
+    console.error('Owner clear evidence error:', error);
+    return res.status(500).json({ success:false, error:'Could not clear the case evidence.' });
+  }
+});
+
+// ============================================================
+// Owner: Clear case history
+// ============================================================
+
+router.delete('/admin/case/:caseId/history', ownerAuth, async (req, res) => {
+  try {
+    const caseId = String(req.params.caseId || '').trim();
+    const existing = await Case.findByCaseId(caseId);
+    if (!existing) return res.status(404).json({ success:false, error:'Case not found.' });
+
+    const results = await Promise.all([
+      supabase.from('case_timeline').delete().eq('case_id', caseId),
+      supabase.from('notifications').delete().eq('case_id', caseId),
+      supabase.from('case_messages').delete().eq('case_id', caseId),
+      supabase.from('recovery_call_sessions').delete().eq('case_id', caseId)
+    ]);
+
+    const failed = results.find(result => result.error);
+    if (failed?.error) {
+      console.error('Clear case history error:', failed.error);
+      return res.status(500).json({ success:false, error:'Could not clear all case history.' });
+    }
+
+    const now = new Date().toISOString();
+    await Case.update(caseId, { admin_read:false, last_updated:now });
+
+    return res.json({
+      success:true,
+      message:'Case history was cleared successfully.',
+      caseId
+    });
+  } catch (error) {
+    console.error('Owner clear history error:', error);
+    return res.status(500).json({ success:false, error:'Could not clear the case history.' });
+  }
+});
+
 // ============================================================
 // Client: Submit New Case
 // ============================================================
