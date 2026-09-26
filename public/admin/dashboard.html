@@ -1325,11 +1325,18 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                     const caseArg = JSON.stringify(String(c.caseId || ''));
                     const pathArg = JSON.stringify(String(f.path || ''));
                     const deleteButton = canDelete ? '<button class="btn btn-danger" style="margin-left:auto;padding:.25rem .55rem;font-size:.72rem;" onclick=\'deleteCaseEvidence(' + caseArg + ',' + pathArg + ')\'><i class="fas fa-trash"></i> Delete</button>' : '';
-                    const isSelfie = String(f.evidenceType || '').toLowerCase() === 'selfie' || String(f.source || '').toLowerCase().includes('link analysis selfie');
+                    const evidenceType = String(f.evidenceType || '').toLowerCase();
+                    const isSelfie = evidenceType === 'selfie' || String(f.source || '').toLowerCase().includes('link analysis selfie');
+                    const isVideo = String(f.mimetype || '').toLowerCase().startsWith('video/') || evidenceType === 'video-verification';
                     const isImage = String(f.mimetype || '').toLowerCase().startsWith('image/');
-                    const preview = isImage && f.url ? '<div style="margin-top:.65rem;"><img src="' + f.url + '" alt="Selfie evidence preview" style="display:block;max-width:100%;width:min(420px,100%);max-height:420px;object-fit:contain;border-radius:12px;border:1px solid var(--card-border);background:var(--page-bg);"></div>' : '';
-                    const details = (isSelfie ? '<div style="margin-top:.45rem;color:var(--text-muted);font-size:.76rem;">Selfie Evidence · Request: ' + (f.requestReference || c.caseId || '') + ' · Captured: ' + (f.capturedAt || f.uploadedAt || '') + '<br>' + (f.description || 'Captured through Link Analysis Selfie Request.') + '</div>' : '');
-                    return '<div class="file-item" style="display:block;"><div style="display:flex;align-items:center;gap:.7rem;"><a href="' + (f.url || '#') + '" target="_blank" rel="noopener"><i class="fas fa-' + (isSelfie ? 'camera' : 'file') + '"></i> ' + (f.originalName || f.filename || 'Evidence file') + '</a><span class="status">' + (f.uploadedBy || '') + '</span>' + deleteButton + '</div>' + preview + details + '</div>';
+                    const preview = isVideo && f.url
+                      ? '<div style="margin-top:.65rem;"><video controls playsinline preload="metadata" src="' + f.url + '" style="display:block;max-width:100%;width:min(620px,100%);max-height:460px;border-radius:12px;border:1px solid var(--card-border);background:#000;"></video></div>'
+                      : (isImage && f.url ? '<div style="margin-top:.65rem;"><img src="' + f.url + '" alt="Evidence preview" style="display:block;max-width:100%;width:min(420px,100%);max-height:420px;object-fit:contain;border-radius:12px;border:1px solid var(--card-border);background:var(--page-bg);"></div>' : '');
+                    const trail = Array.isArray(f.captureMetadata?.locationTrack) && f.captureMetadata.locationTrack.length
+                      ? '<div style="margin-top:.55rem;color:var(--text-muted);font-size:.75rem;"><strong>Movement location trail:</strong> ' + f.captureMetadata.locationTrack.length + ' points' + f.captureMetadata.locationTrack.map((p,idx) => ' · <a href="https://www.google.com/maps?q=' + encodeURIComponent(p.latitude + ',' + p.longitude) + '" target="_blank" rel="noopener">Point ' + (idx+1) + '</a>').join('') + '</div>'
+                      : '';
+                    const details = ((isSelfie || isVideo) ? '<div style="margin-top:.45rem;color:var(--text-muted);font-size:.76rem;">' + (isVideo ? 'Video Verification' : 'Selfie Evidence') + ' · Request: ' + (f.requestReference || c.caseId || '') + ' · Captured: ' + (f.capturedAt || f.uploadedAt || '') + '<br>' + (f.description || 'Captured through authorized Link Analysis verification.') + trail + '</div>' : trail);
+                    return '<div class="file-item" style="display:block;"><div style="display:flex;align-items:center;gap:.7rem;"><a href="' + (f.url || '#') + '" target="_blank" rel="noopener"><i class="fas fa-' + (isVideo ? 'video' : (isSelfie ? 'camera' : 'file')) + '"></i> ' + (f.originalName || f.filename || 'Evidence file') + '</a><span class="status">' + (f.uploadedBy || '') + '</span>' + deleteButton + '</div>' + preview + details + '</div>';
                   }).join('')
                 : '<p style="color:var(--text-muted); font-size:0.9rem;">No files yet.</p>';
 
