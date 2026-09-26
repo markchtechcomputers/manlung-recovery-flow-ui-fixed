@@ -393,11 +393,6 @@ app.use(express.urlencoded({
 app.use('/api/', inputSecurity);
 
 // ============================================================
-// Clean verification route: keeps the token in the path instead of exposing an HTML filename.
-app.get('/verification/:token', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'selfie.html'));
-});
-
 // STATIC FRONTEND FILES
 // ============================================================
 
