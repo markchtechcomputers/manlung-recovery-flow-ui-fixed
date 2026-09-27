@@ -49,8 +49,8 @@ router.get('/devices', adminAuth, async (req, res) => {
 });
 
 router.post('/devices/enrollment', adminAuth, [
-  body('deviceName').optional({ checkFalsy: true }).trim().isLength({ min: 2, max: 100 }),
-  body('platform').optional({ checkFalsy: true }).isIn(PLATFORMS),
+  body('deviceName').trim().isLength({ min: 2, max: 100 }),
+  body('platform').isIn(PLATFORMS),
   body('capabilities').optional().isObject(),
 ], async (req, res) => {
   if (!valid(req, res)) return;
@@ -242,8 +242,8 @@ router.get('/sessions/:id/signals', adminAuth, async (req, res) => {
 
 router.post('/device/enroll', [
   body('enrollmentToken').trim().isLength({ min: 20, max: 200 }),
-  body('deviceName').trim().isLength({ min: 2, max: 100 }),
-  body('platform').isIn(PLATFORMS),
+  body('deviceName').optional({ checkFalsy: true }).trim().isLength({ min: 2, max: 100 }),
+  body('platform').optional({ checkFalsy: true }).isIn(PLATFORMS),
   body('capabilities').optional().isObject(),
 ], async (req, res) => {
   if (!valid(req, res)) return;
