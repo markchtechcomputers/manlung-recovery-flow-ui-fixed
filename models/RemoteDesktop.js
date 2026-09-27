@@ -116,6 +116,37 @@ async function heartbeat(deviceId) {
   return data;
 }
 
+async function deleteDevice(deviceId) {
+  const { data: sessions, error: sessionLookupError } = await supabase.from('remote_sessions').select('id').eq('device_id', deviceId);
+  if (sessionLookupError) throw sessionLookupError;
+  const sessionIds = (sessions || []).map(x => x.id);
+  if (sessionIds.length) {
+    const { error } = await supabase.from('remote_session_signals').delete().in('session_id', sessionIds);
+    if (error) throw error;
+    const { error: auditError } = await supabase.from('remote_audit_events').delete().in('session_id', sessionIds);
+    if (auditError) throw auditError;
+  }
+  const { error: auditError } = await supabase.from('remote_audit_events').delete().eq('device_id', deviceId);
+  if (auditError) throw auditError;
+  const { error: sessionsError } = await supabase.from('remote_sessions').delete().eq('device_id', deviceId);
+  if (sessionsError) throw sessionsError;
+  const { data, error } = await supabase.from('remote_devices').delete().eq('id', deviceId).select('id').maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+async function deleteSession(sessionId, adminUserId) {
+  const session = await getSession(sessionId);
+  if (!session || session.admin_user_id !== adminUserId) return null;
+  const { error: signalError } = await supabase.from('remote_session_signals').delete().eq('session_id', sessionId);
+  if (signalError) throw signalError;
+  const { error: auditError } = await supabase.from('remote_audit_events').delete().eq('session_id', sessionId);
+  if (auditError) throw auditError;
+  const { data, error } = await supabase.from('remote_sessions').delete().eq('id', sessionId).eq('admin_user_id', adminUserId).select('id').maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 async function revokeDevice(deviceId) {
   const now = new Date().toISOString();
   const { data, error } = await supabase.from('remote_devices').update({
@@ -296,5 +327,5 @@ module.exports = {
   SESSION_MINUTES, ENROLLMENT_MINUTES, hashToken, listDevices, createEnrollment, enrollDevice,
   authenticateDevice, heartbeat, revokeDevice, createSession, getActiveSessionForDevice, getSession,
   listSessionsForAdmin, pendingForDevice, respondToSession, activateSession,
-  endSession, endAllForAdmin, addSignal, listSignals, audit, expireSessions,
+  endSession, endAllForAdmin, deleteDevice, deleteSession, addSignal, listSignals, audit, expireSessions,
 };
