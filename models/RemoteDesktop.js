@@ -60,7 +60,7 @@ async function createEnrollment({ ownerUserId, deviceName, platform, capabilitie
     enrollment_token_hash: hashToken(token),
     enrollment_expires_at: expiresAt,
     status: 'offline',
-    capabilities: capabilities || {},
+    capabilities: capabilities || existing.capabilities || {},
   }).select('id,device_name,platform,status,capabilities,created_at,enrollment_expires_at').single();
   if (error) throw error;
   return { device: data, enrollmentToken: token, enrollmentExpiresAt: expiresAt };
@@ -69,7 +69,7 @@ async function createEnrollment({ ownerUserId, deviceName, platform, capabilitie
 async function enrollDevice({ enrollmentToken, deviceName, platform, capabilities }) {
   const tokenHash = hashToken(enrollmentToken);
   const { data: existing, error: findError } = await supabase.from('remote_devices')
-    .select('id,status,device_name,platform,enrollment_expires_at')
+    .select('id,status,device_name,platform,capabilities,enrollment_expires_at')
     .eq('enrollment_token_hash', tokenHash)
     .maybeSingle();
   if (findError) throw findError;
