@@ -311,7 +311,7 @@ router.post('/device/heartbeat', requireDevice, async (req, res) => {
   }
 });
 
-router.get('/device/sessions/pending', requireDevice, async (req, res) => {
+router.get('/device/sessions/active', requireDevice, async (req, res) => {\n  try {\n    res.json({ success: true, session: await RemoteDesktop.getActiveSessionForDevice(req.remoteDevice.id) });\n  } catch (error) {\n    console.error('Remote device active session error:', error);\n    res.status(500).json({ error: 'Could not load active remote session.' });\n  }\n});\n\nrouter.get('/device/sessions/pending', requireDevice, async (req, res) => {
   try {
     res.json({ success: true, sessions: await RemoteDesktop.pendingForDevice(req.remoteDevice.id) });
   } catch (error) {
