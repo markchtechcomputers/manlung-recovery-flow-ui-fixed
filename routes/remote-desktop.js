@@ -81,7 +81,8 @@ router.post('/devices/enrollment', adminAuth, [
       success: true,
       device: result.device,
       enrollmentToken: result.enrollmentToken,
-      warning: 'Show this token only to the authorized device owner. It is not stored in plaintext.',
+      enrollmentExpiresAt: result.enrollmentExpiresAt,
+      warning: 'Show this token only to the authorized device owner. It expires after 15 minutes and is not stored in plaintext.',
     });
   } catch (error) {
     console.error('Remote enrollment creation error:', error);
@@ -149,6 +150,9 @@ router.post('/devices/:id/sessions', adminAuth, [
 
     res.status(201).json({ success: true, session });
   } catch (error) {
+    if (error?.code === 'REMOTE_DEVICE_BUSY') {
+      return res.status(409).json({ error: error.message, session: error.session || null });
+    }
     console.error('Remote session request error:', error);
     res.status(500).json({ error: 'Could not request remote access.' });
   }
