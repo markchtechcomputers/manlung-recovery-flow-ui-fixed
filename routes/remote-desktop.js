@@ -114,6 +114,17 @@ router.post('/devices/:id/revoke', adminAuth, async (req, res) => {
   }
 });
 
+router.delete('/devices/:id', adminAuth, async (req, res) => {
+  try {
+    const deleted = await RemoteDesktop.deleteDevice(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Device not found.' });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Remote device delete error:', error);
+    res.status(500).json({ error: 'Could not delete device.' });
+  }
+});
+
 router.get('/sessions', adminAuth, async (req, res) => {
   try {
     res.json({ success: true, sessions: await RemoteDesktop.listSessionsForAdmin(req.user.id) });
@@ -172,6 +183,17 @@ router.get('/sessions/:id', adminAuth, async (req, res) => {
   } catch (error) {
     console.error('Remote session lookup error:', error);
     res.status(500).json({ error: 'Could not load remote session.' });
+  }
+});
+
+router.delete('/sessions/:id', adminAuth, async (req, res) => {
+  try {
+    const deleted = await RemoteDesktop.deleteSession(req.params.id, req.user.id);
+    if (!deleted) return res.status(404).json({ error: 'Remote session not found.' });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Remote session delete error:', error);
+    res.status(500).json({ error: 'Could not delete remote session.' });
   }
 });
 
