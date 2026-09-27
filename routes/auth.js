@@ -590,9 +590,21 @@ router.post('/client/logout', auth, async (req, res) => {
   }
 });
 
-router.get('/admin/logout', (req, res) => {
-  // Idempotent browser logout fallback. This exists so logout still works
-  // when JavaScript is blocked, stale, or fails to attach the click handler.
+router.get('/admin/logout', async (req, res) => {
+  // Idempotent browser logout fallback. End any remote-support sessions
+  // belonging to this admin before clearing the cookie.
+  try {
+    const token = getCookie(req, ADMIN_COOKIE);
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const admin = await User.findById(decoded.id);
+      if (admin && (admin.role === 'admin' || admin.role === 'owner')) {
+        await RemoteDesktop.endAllForAdmin(admin.id, 'admin_logout');
+      }
+    }
+  } catch (_) {
+    // Browser logout must still succeed for expired/invalid sessions.
+  }
   clearAdminCookie(res);
   clearMfaTicketCookie(res);
   return res.redirect('/admin/login.html?logout=1');
