@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { supabase } = require('../config/supabase');
 
-const SESSION_MINUTES = 30;
+const SESSION_MINUTES = null;
 const ENROLLMENT_MINUTES = 15;
 const DEVICE_STALE_MS = 45 * 1000;
 
@@ -142,7 +142,7 @@ async function revokeDevice(deviceId) {
 
 async function createSession({ deviceId, adminUserId, requestedAudio = false }) {
   await expireSessions();
-  const expiresAt = new Date(Date.now() + SESSION_MINUTES * 60 * 1000).toISOString();
+  const expiresAt = null;
   const { data, error } = await supabase.from('remote_sessions').insert({
     device_id: deviceId,
     admin_user_id: adminUserId,
@@ -207,7 +207,7 @@ async function respondToSession(sessionId, deviceId, approved, approvedAudio = f
     .select('requested_audio,expires_at')
     .eq('id', sessionId).eq('device_id', deviceId).eq('status', 'requested').maybeSingle();
   if (pendingError) throw pendingError;
-  if (!pending || new Date(pending.expires_at).getTime() <= Date.now()) return null;
+  if (!pending || (pending.expires_at && new Date(pending.expires_at).getTime() <= Date.now())) return null;
 
   const existingRequestedAudio = Boolean(pending.requested_audio);
   const next = approved ? 'approved' : 'rejected';
