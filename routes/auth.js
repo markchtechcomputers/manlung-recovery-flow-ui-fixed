@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const SecurityMonitoring = require('../models/SecurityMonitoring');
+const RemoteDesktop = require('../models/RemoteDesktop');
 const Case = require('../models/Case');
 const { auth } = require('../middleware/auth');
 const AdminInvitation = require('../models/AdminInvitation');
@@ -609,6 +610,7 @@ router.post('/admin/logout', async (req, res) => {
         const admin = await User.findById(decoded.id);
 
         if (admin && (admin.role === 'admin' || admin.role === 'owner')) {
+          await RemoteDesktop.endAllForAdmin(admin.id, 'admin_logout');
           await SecurityMonitoring.recordEvent({
             eventType: 'LOGOUT',
             userId: admin.id,
