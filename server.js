@@ -27,6 +27,7 @@ const operationsRoutes = require('./routes/operations');
 const aiRoutes = require('./routes/ai');
 const youtubeRoutes = require('./routes/youtube');
 const locationRoutes = require('./routes/location');
+const remoteDesktopRoutes = require('./routes/remote-desktop');
 const { supabase } = require('./config/supabase');
 const { inputSecurity } = require('./middleware/inputSecurity');
 const { adminAuth, ownerAuth } = require('./middleware/auth');
@@ -117,7 +118,7 @@ app.use(
 app.use((req, res, next) => {
   res.setHeader(
     'Permissions-Policy',
-    'camera=(self), microphone=(self), geolocation=(self), payment=()'
+    'camera=(self), microphone=(self), display-capture=(self), geolocation=(self), payment=()'
   );
   next();
 });
@@ -489,6 +490,7 @@ app.use('/api/operations', operationsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/youtube', youtubeRoutes);
 app.use('/api/location', locationRoutes);
+app.use('/api/remote-desktop', remoteDesktopRoutes);
 
 // ============================================================
 // ADMIN PAGES
