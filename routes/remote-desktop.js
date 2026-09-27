@@ -255,14 +255,23 @@ router.post('/device/enroll', [
       capabilities: req.body.capabilities || {},
     });
     if (!result) return res.status(401).json({ error: 'Enrollment token is invalid or revoked.' });
-    await RemoteDesktop.audit({
-      deviceId: result.device.id,
-      actorType: 'device',
-      eventType: 'DEVICE_ENROLLED',
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent'),
-      details: { platform: result.device.platform },
-    });
+    try {
+      await RemoteDesktop.audit({
+        deviceId: result.device.id,
+        actorType: 'device',
+        eventType: 'DEVICE_ENROLLED',
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+        details: { platform: result.device.platform },
+      });
+    } catch (auditError) {
+      console.error('Remote device enrollment audit error:', {
+        code: auditError?.code,
+        message: auditError?.message,
+        details: auditError?.details,
+        hint: auditError?.hint,
+      });
+    }
     res.status(201).json({ success: true, device: result.device, deviceToken: result.deviceToken });
   } catch (error) {
     console.error('Remote device enrollment error:', error);
