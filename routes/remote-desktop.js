@@ -3,7 +3,6 @@ const { body, validationResult } = require('express-validator');
 const crypto = require('crypto');
 const { adminAuth } = require('../middleware/auth');
 const RemoteDesktop = require('../models/RemoteDesktop');
-const AdminAuditLog = require('../models/AdminAuditLog');
 
 const router = express.Router();
 
@@ -69,12 +68,6 @@ router.post('/devices/enrollment', adminAuth, [
       eventType: 'DEVICE_ENROLLMENT_CREATED',
       ipAddress: req.ip,
       userAgent: req.get('user-agent'),
-      details: { platform: result.device.platform },
-    });
-    await AdminAuditLog.record({
-      actor: req.user,
-      target: result.device,
-      action: 'remote_device_enrollment_created',
       details: { platform: result.device.platform },
     });
     res.status(201).json({
