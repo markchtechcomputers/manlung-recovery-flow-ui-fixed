@@ -3,7 +3,7 @@ const { supabase } = require('../config/supabase');
 
 const SESSION_MINUTES = null;
 const ENROLLMENT_MINUTES = 15;
-const DEVICE_STALE_MS = 45 * 1000;
+const DEVICE_STALE_MS = 90 * 1000;
 
 function hashToken(token) {
   return crypto.createHash('sha256').update(String(token)).digest('hex');
@@ -60,7 +60,7 @@ async function createEnrollment({ ownerUserId, deviceName, platform, capabilitie
     enrollment_token_hash: hashToken(token),
     enrollment_expires_at: expiresAt,
     status: 'offline',
-    capabilities: capabilities || existing.capabilities || {},
+    capabilities: capabilities || {},
   }).select('id,device_name,platform,status,capabilities,created_at,enrollment_expires_at').single();
   if (error) throw error;
   return { device: data, enrollmentToken: token, enrollmentExpiresAt: expiresAt };
