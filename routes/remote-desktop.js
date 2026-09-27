@@ -126,6 +126,7 @@ router.post('/devices/:id/sessions', adminAuth, [
     const devices = await RemoteDesktop.listDevices();
     const device = devices.find(x => x.id === req.params.id);
     if (!device || device.status === 'revoked') return res.status(404).json({ error: 'Device not found or revoked.' });
+    if (device.status !== 'online') return res.status(409).json({ error: 'Device is offline. Ask the device owner to reconnect the Manlung Remote Support page.' });
 
     const existing = (await RemoteDesktop.listSessionsForAdmin(req.user.id))
       .find(s => s.device_id === device.id && ['requested','approved','active'].includes(s.status));
