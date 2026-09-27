@@ -42,7 +42,6 @@ async function beginCapture(){try{
     status('Screen sharing started without audio');
   }
   $('active').classList.remove('hidden');$('stop').classList.remove('hidden');
-  await beginPeerOffer();
   const videoTrack=stream.getVideoTracks()[0];
   if(videoTrack)videoTrack.onended=()=>{if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}if(pc){pc.close();pc=null}$('active').classList.add('hidden');$('stop').classList.add('hidden');status('Screen sharing stopped. Device remains connected.')};
 }catch(e){
