@@ -61,15 +61,27 @@ router.post('/devices/enrollment', adminAuth, [
       platform: req.body.platform,
       capabilities: req.body.capabilities || {},
     });
-    await RemoteDesktop.audit({
-      deviceId: result.device.id,
-      actorUserId: req.user.id,
-      actorType: 'admin',
-      eventType: 'DEVICE_ENROLLMENT_CREATED',
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent'),
-      details: { platform: result.device.platform },
-    });
+    // Audit logging must not prevent a valid enrollment token from being issued.
+    // The token/device row is the primary operation; audit failures are logged and
+    // can be investigated separately.
+    try {
+      await RemoteDesktop.audit({
+        deviceId: result.device.id,
+        actorUserId: req.user.id,
+        actorType: 'admin',
+        eventType: 'DEVICE_ENROLLMENT_CREATED',
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+        details: { platform: result.device.platform },
+      });
+    } catch (auditError) {
+      console.error('Remote enrollment audit error:', {
+        code: auditError?.code,
+        message: auditError?.message,
+        details: auditError?.details,
+        hint: auditError?.hint,
+      });
+    }
     res.status(201).json({
       success: true,
       device: result.device,
