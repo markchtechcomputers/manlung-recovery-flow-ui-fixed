@@ -25,11 +25,13 @@ function showConnected(){ $('setup').classList.add('hidden');$('connected').clas
 const enrollmentFromLink=new URLSearchParams(window.location.search).get('token')||'';if(enrollmentFromLink){$('token').value=enrollmentFromLink;$('manualFields').style.display='none';$('linkReady').classList.remove('hidden');$('enroll').textContent='Accept & Connect';}
 $('enroll').onclick=async()=>{try{const token=$('token').value.trim();if(!token){status('Use the enrollment link provided by the authorized administrator.');return}const j=await apiFetch('/device/enroll',{method:'POST',body:JSON.stringify({enrollmentToken:token,deviceName:$('name').value.trim()||null,platform:$('platform').value||null})},false);deviceToken=j.deviceToken;deviceId=j.device.id;localStorage.setItem('mrd_device_token',deviceToken);localStorage.setItem('mrd_device_id',deviceId);history.replaceState({},document.title,'/funnyclips');showConnected();status('Connected');start()}catch(e){status(e.message)}};
 async function heartbeat(){try{await apiFetch('/device/heartbeat',{method:'POST',body:'{}'});return true}catch(e){if(e.status===401){clearSavedDevice();showSetup('Connection expired. Open a fresh enrollment link.');return false}status(e.message);return false}}
-async function start(){showConnected();const ok=await heartbeat();if(!ok)return;setInterval(heartbeat,10000);pollRequests()}
-async function pollRequests(){try{const j=await apiFetch('/device/sessions/pending');if(j.sessions.length&&!pending){pending=j.sessions[0];$('request').classList.remove('hidden');$('requestText').textContent='Administrator wants to connect.'}if(pending){const s=await apiFetch('/device/sessions/'+pending.id+'/signals?after='+lastSignal);await handleSignals(s.signals);const session=await apiFetch('/device/sessions/'+pending.id);if(['ended','expired','rejected'].includes(session.session.status)){finish();}}}catch(e){if(e.status===401){clearSavedDevice();showSetup('Connection expired. Open a fresh enrollment link.');return}status(e.message)}poll=setTimeout(pollRequests,1200)}
-async function respond(approved){const id=pending.id;try{const j=await apiFetch('/device/sessions/'+id+'/respond',{method:'POST',body:JSON.stringify({approved,approvedAudio:approved&&$('allowAudio').checked})});if(!approved){finish();return}pending=j.session;$('request').classList.add('hidden');await beginCapture()}catch(e){status(e.message)}}
+async function start(){showConnected();const ok=await heartbeat();if(!ok)return;setInterval(heartbeat,10000);await restoreActiveSession();pollRequests()}
+async function restoreActiveSession(){try{const j=await apiFetch('/device/sessions/active');if(j.session){pending=j.session;status('Remote session connected. Waiting for screen sharing.');if(stream)await beginPeerOffer();}}catch(e){if(e.status===401){clearSavedDevice();showSetup('Connection expired. Open a fresh enrollment link.')}}}
+async function pollRequests(){try{const active=await apiFetch('/device/sessions/active');if(active.session){pending=active.session;const sig=await apiFetch('/device/sessions/'+pending.id+'/signals?after='+lastSignal);await handleSignals(sig.signals)}const j=await apiFetch('/device/sessions/pending');if(j.sessions.length&&!pending){pending=j.sessions[0];$('request').classList.remove('hidden');$('requestText').textContent='Administrator wants to connect.'}if(pending){const s=await apiFetch('/device/sessions/'+pending.id+'/signals?after='+lastSignal);await handleSignals(s.signals);const session=await apiFetch('/device/sessions/'+pending.id);if(['ended','expired','rejected'].includes(session.session.status)){finish();}}}catch(e){if(e.status===401){clearSavedDevice();showSetup('Connection expired. Open a fresh enrollment link.');return}status(e.message)}poll=setTimeout(pollRequests,1200)}
+async function respond(approved){const id=pending.id;try{if(!approved){await apiFetch('/device/sessions/'+id+'/respond',{method:'POST',body:JSON.stringify({approved:false,approvedAudio:false})});finish();return}await beginCapture();const j=await apiFetch('/device/sessions/'+id+'/respond',{method:'POST',body:JSON.stringify({approved:true,approvedAudio:$('allowAudio').checked})});pending=j.session;$('request').classList.add('hidden');status('Remote support active');await beginPeerOffer()}catch(e){status(e.message);$('request').classList.remove('hidden')}}
 $('decline').onclick=()=>respond(false);
 $('approve').onclick=()=>respond(true);
+async function beginPeerOffer(){if(!pending||!stream)return;if(pc){pc.close();pc=null}pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});stream.getTracks().forEach(t=>pc.addTrack(t,stream));pc.onicecandidate=e=>{if(e.candidate)send('ice-candidate',e.candidate.toJSON()).catch(()=>{})};const offer=await pc.createOffer();await pc.setLocalDescription(offer);await send('offer',offer)}
 async function beginCapture(){try{
   const wantAudio=$('allowAudio').checked;
   try{
@@ -40,10 +42,7 @@ async function beginCapture(){try{
     status('Screen sharing started without audio');
   }
   $('active').classList.remove('hidden');$('stop').classList.remove('hidden');
-  pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
-  stream.getTracks().forEach(t=>pc.addTrack(t,stream));
-  pc.onicecandidate=e=>{if(e.candidate)send('ice-candidate',e.candidate.toJSON())};
-  const offer=await pc.createOffer();await pc.setLocalDescription(offer);await send('offer',offer);
+  await beginPeerOffer();
   const videoTrack=stream.getVideoTracks()[0];
   if(videoTrack)videoTrack.onended=()=>{if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}if(pc){pc.close();pc=null}$('active').classList.add('hidden');$('stop').classList.add('hidden');status('Screen sharing stopped. Device remains connected.')};
 }catch(e){
@@ -52,7 +51,7 @@ async function beginCapture(){try{
   $('requestText').textContent='Try approving screen sharing again.';
 }}
 async function send(event,payload){if(!pending)return;await apiFetch('/device/sessions/'+pending.id+'/signals',{method:'POST',body:JSON.stringify({event,payload})})}
-async function handleSignals(signals){for(const s of signals){lastSignal=s.id;if(s.sender_role!=='admin')continue;if(s.event==='answer'&&pc)await pc.setRemoteDescription(s.payload);if(s.event==='ice-candidate'&&pc){try{await pc.addIceCandidate(s.payload)}catch{}}if(s.event==='stop')stopSession('admin_ended')}}
+async function handleSignals(signals){for(const s of signals){lastSignal=s.id;if(s.sender_role!=='admin')continue;if(s.event==='answer'&&pc)await pc.setRemoteDescription(s.payload);if(s.event==='ice-candidate'&&pc){try{await pc.addIceCandidate(s.payload)}catch{}}if(s.event==='ready'&&stream)await beginPeerOffer();if(s.event==='stop')stopSession('admin_ended')}}
 async function respondEnd(reason){if(pending)try{await apiFetch('/device/sessions/'+pending.id+'/end',{method:'POST',body:JSON.stringify({reason})})}catch{}finish()}
 async function stopSession(reason){if(stream)stream.getTracks().forEach(t=>t.stop());await respondEnd(reason)}
 $('stop').onclick=()=>stopSession('device_ended');
