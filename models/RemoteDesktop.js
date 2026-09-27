@@ -158,11 +158,15 @@ async function pendingForDevice(deviceId) {
 }
 
 async function respondToSession(sessionId, deviceId, approved, approvedAudio = false) {
+  const { data: pending, error: pendingError } = await supabase.from('remote_sessions').select('requested_audio').eq('id', sessionId).eq('device_id', deviceId).eq('status', 'requested').maybeSingle();
+  if (pendingError) throw pendingError;
+  if (!pending) return null;
+  const existingRequestedAudio = Boolean(pending.requested_audio);
   const next = approved ? 'approved' : 'rejected';
   const update = {
     status: next,
     consented_at: new Date().toISOString(),
-    approved_audio: Boolean(approved && approvedAudio),
+    approved_audio: Boolean(approved && existingRequestedAudio && approvedAudio),
     updated_at: new Date().toISOString(),
     ...(approved ? { started_at: new Date().toISOString() } : { ended_at: new Date().toISOString(), end_reason: 'device_declined' }),
   };
