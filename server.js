@@ -411,6 +411,9 @@ app.get('/admin/tools/security.html', ownerAuth, (_req, res) => {
 app.get('/admin/tools/device-recovery.html', adminAuth, (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'tools', 'device-recovery.html'));
 });
+app.get('/admin/tools/remote-desktop.html', adminAuth, (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'tools', 'remote-desktop.html'));
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
