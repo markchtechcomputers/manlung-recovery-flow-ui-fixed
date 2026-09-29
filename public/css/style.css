@@ -129,12 +129,12 @@ html, body {
 
 /* ---------- Footer (always dark navy) ---------- */
 .site-footer {
-  background: linear-gradient(135deg, #081630, #0d2450);
+  background: #000;
   color: #a9c0ec;
   padding: 3.4rem 1.5rem 1.35rem;
   margin-top: 3rem;
   font-size: 0.9rem;
-  border-top: 1px solid rgba(110,168,255,.18);
+  border-top: 1px solid #000;
 }
 .site-footer-inner {
   max-width: 1200px;
