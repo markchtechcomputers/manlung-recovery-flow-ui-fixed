@@ -462,6 +462,19 @@
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
     <script src="/js/admin-session-guard.js"></script>
+<style id="admin-dashboard-control-spacing-fix">
+/* Keep dashboard controls visually separated and readable on all screen sizes. */
+.video-control-actions{display:flex !important;align-items:center !important;gap:.65rem !important;flex-wrap:wrap !important;}
+.video-control-actions .btn{display:inline-flex !important;align-items:center !important;justify-content:center !important;white-space:nowrap !important;}
+.filters-bar{gap:.65rem !important;}
+.filters-bar label{display:flex !important;align-items:center !important;gap:.4rem !important;white-space:nowrap !important;}
+.filters-bar .btn{display:inline-flex !important;align-items:center !important;justify-content:center !important;white-space:nowrap !important;}
+@media(max-width:760px){
+  .filters-bar{grid-template-columns:1fr !important;}
+  .filters-bar .btn{width:100%;}
+  .filters-bar label{padding:.25rem 0;}
+}
+</style>
 <style id="admin-dashboard-premium-ui">
 :root{
   --ad-bg:#f6f8fb;--ad-surface:#fff;--ad-border:#e5e7eb;--ad-text:#0f172a;
@@ -671,7 +684,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
         <div class="card" style="margin-bottom:1rem; border:1px solid #bfdbfe;">
             <div class="card-title"><i class="fas fa-video"></i> Case Video Call Control</div>
             <p style="color:var(--text-muted);margin:.35rem 0 .8rem;">Video calls are <strong>OFF by default</strong>. Enable them only for the specific case that needs a secure browser video connection.</p>
-            <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;">
+            <div class="video-control-actions">
                 <input id="videoControlCaseId" type="text" placeholder="Case ID (e.g. MRC-...)" style="flex:1;min-width:220px;padding:.65rem;border:1px solid var(--card-border);border-radius:10px;background:var(--card-bg);color:inherit;">
                 <button class="btn btn-outline-dark" type="button" onclick="checkCaseVideoAccess()">Check</button>
                 <button class="btn btn-success" type="button" onclick="setCaseVideoAccess(true)">Enable Video</button>
