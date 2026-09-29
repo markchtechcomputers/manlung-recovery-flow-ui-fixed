@@ -13,7 +13,7 @@
     .dashboard-hero p { margin:0; color:#c8d7f2; }
     .case-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:1rem; }
     .case-card { background:linear-gradient(180deg,var(--card-bg),rgba(239,246,255,.72)); border:1px solid var(--card-border); border-radius:18px; padding:1.2rem; box-shadow:0 4px 16px rgba(10,26,58,.05); }
-    .case-top { display:flex; justify-content:space-between; gap:.7rem; align-items:flex-start; margin-bottom:.8rem; }
+    .case-card.online-payment-case { background:linear-gradient(180deg,#fff8cc,#fff1a8); border-color:#f2c94c; box-shadow:0 8px 24px rgba(234,179,8,.18); }\n    .case-card.online-payment-case .case-type { color:#7a5b00; font-weight:800; }\n    .case-top { display:flex; justify-content:space-between; gap:.7rem; align-items:flex-start; margin-bottom:.8rem; }
     .case-id { font-weight:800; color:var(--text); }
     .case-type { color:var(--text-muted); font-size:.88rem; margin-top:.2rem; }
     .case-meta { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin:1rem 0; }
@@ -1169,7 +1169,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       grid.innerHTML=cases.map(c=>{
         const id=escapeHtml(c.caseId);
         const status=escapeHtml(c.status || 'Pending Review');
-        return `<article class="case-card">
+        return `<article class="case-card ${String(c.caseType||'').trim().toLowerCase()==='online payment service'?'online-payment-case':''}">
           <div class="case-top"><div><div class="case-id">${id}</div><div class="case-type">${escapeHtml(c.caseType || 'Recovery Request')}</div></div><span class="status-badge ${statusClass(c.status)}">${status}</span></div>
           <div class="case-meta"><div><small>Last updated</small><strong>${formatDate(c.lastUpdated || c.createdAt)}</strong></div><div><small>Admin</small><strong>${escapeHtml(c.investigator || 'Not assigned yet')}</strong></div></div>
           ${c.publicNotes ? `<div class="feedback"><strong><i class="fas fa-message"></i> Admin update</strong><div style="margin-top:.35rem;white-space:pre-wrap;">${escapeHtml(c.publicNotes)}</div></div>` : ''}
