@@ -1065,7 +1065,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             return false;
         }
 
-        function getStatusClass(status) {
+        function caseTypeClass(caseType) { return String(caseType||'').trim().toLowerCase()==='online payment service' ? 'online-payment-case' : ''; }\n\n        function getStatusClass(status) {
             const map = {
                 'Pending Review': 'status-pending',
                 'Accepted': 'status-progress',
@@ -1171,7 +1171,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                     const escalated = isEscalated(c);
                     const borderStyle = escalated ? 'border-left:4px solid var(--danger);' : '';
                     return `
-                    <tr style="${unreadStyle} ${borderStyle}">
+                    <tr class="${caseTypeClass(c.caseType)}" style="${unreadStyle} ${borderStyle}">
                         <td><input type="checkbox" class="rowCheck" value="${c.caseId}" ${selectedIds.has(c.caseId) ? 'checked' : ''} onchange="toggleRowSelect('${c.caseId}', this.checked)"></td>
                         <td><strong>${c.caseId}</strong>
                             ${c.adminRead ? '' : '<span class="status-badge" style="background:var(--accent); color:#fff; margin-left:6px;">NEW</span>'}
