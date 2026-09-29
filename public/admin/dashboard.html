@@ -1079,7 +1079,9 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             return false;
         }
 
-        function caseTypeClass(caseType) { return String(caseType||'').trim().toLowerCase()==='online payment service' ? 'online-payment-case' : ''; }\n\n        function getStatusClass(status) {
+        function caseTypeClass(caseType) { return String(caseType||'').trim().toLowerCase()==='online payment service' ? 'online-payment-case' : ''; }
+
+        function getStatusClass(status) {
             const map = {
                 'Pending Review': 'status-pending',
                 'Accepted': 'status-progress',
