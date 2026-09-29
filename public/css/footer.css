@@ -1,5 +1,5 @@
 /* Manlung Recovery — one clean footer system used across public, client and admin sections. */
-.manlung-footer{width:100%;margin-top:2rem;background:linear-gradient(135deg,#06101f 0%,#0a1d33 55%,#062c2d 100%);color:#dbeafe;border-top:3px solid #000;box-shadow:0 -12px 34px rgba(2,6,23,.16);overflow:hidden}
+.manlung-footer{width:100%;max-width:none;box-sizing:border-box;margin-top:2rem;background:#000;color:#fff;border-top:3px solid #000;box-shadow:0 -12px 34px rgba(2,6,23,.16);overflow:hidden}
 .manlung-footer *{box-sizing:border-box}
 .manlung-footer-inner{width:min(100% - 24px,1180px);margin:0 auto;padding:1.8rem 0 .75rem}
 .manlung-footer-grid{display:grid;grid-template-columns:minmax(260px,1.5fr) minmax(130px,.85fr) minmax(160px,1fr) minmax(190px,1.05fr);gap:1.6rem;align-items:start}
