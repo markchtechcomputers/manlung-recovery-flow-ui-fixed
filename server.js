@@ -27,7 +27,6 @@ const aiRoutes = require('./routes/ai');
 const { supabase } = require('./config/supabase');
 const { inputSecurity } = require('./middleware/inputSecurity');
 const OFFICIAL_WEBSITES = require('./config/official-websites');
-const { verifyTurnstile } = require('./services/turnstile');
 
 const app = express();
 
