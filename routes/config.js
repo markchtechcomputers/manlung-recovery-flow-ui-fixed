@@ -9,7 +9,7 @@ router.get('/public', (req, res) => {
     supabaseUrl: process.env.SUPABASE_URL || null,
     supabaseAnonKey: process.env.SUPABASE_ANON_KEY || null,
     turnstileSiteKey: TURNSTILE_SITE_KEY || null,
-    turnstileEnabled: String(process.env.TURNSTILE_ENFORCE || '').toLowerCase() === 'true' || (process.env.NODE_ENV === 'production' && Boolean(process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY)),
+    turnstileEnabled: Boolean(TURNSTILE_SITE_KEY),
   });
 });
 
