@@ -46,7 +46,9 @@
 .manlung-auth-shell{display:block!important;max-width:620px!important;margin:32px auto!important}
 .manlung-auth-form{width:100%!important;background-image:linear-gradient(rgba(255,255,255,.88),rgba(255,255,255,.94)),url("https://i.postimg.cc/43DBwV0f/opentext-image-ov-hightech-en.jpg")!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;border:1px solid rgba(203,213,225,.9);border-radius:22px;padding:30px;box-shadow:0 18px 55px rgba(15,23,42,.14);backdrop-filter:blur(3px)}
 .manlung-auth-page .manlung-auth-wrap{min-height:calc(100vh - 80px);display:flex;align-items:center;padding:24px 16px}
-.manlung-auth-page .manlung-auth-heading h2{margin-bottom:6px}
+.manlung-auth-page .manlung-auth-heading{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:10001!important;overflow:visible!important;flex:0 0 auto!important;color:#0f172a!important}
+.manlung-auth-page .manlung-auth-heading h2{display:block!important;visibility:visible!important;opacity:1!important;color:#0f172a!important;margin:0 0 6px!important}
+.manlung-auth-page .manlung-auth-heading p{display:block!important;visibility:visible!important;opacity:1!important;color:#64748b!important;margin:0!important}
 .manlung-auth-page .manlung-auth-heading p{color:#64748b}
 .manlung-auth-page .manlung-auth-tabs{background:rgba(255,255,255,.78);border-radius:14px;padding:4px}
 .manlung-auth-page .manlung-auth-form form,.manlung-auth-page .manlung-auth-heading{background:rgba(255,255,255,.72);border-radius:16px;padding:18px}
@@ -63,7 +65,8 @@
 
 .manlung-turnstile-title{font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:.45rem;margin-bottom:.2rem}
 .manlung-turnstile-help{font-size:.78rem;opacity:.72;margin-bottom:.55rem}
-.manlung-turnstile-widget{min-height:65px;display:flex;align-items:center}
+.manlung-turnstile-widget{min-height:78px!important;width:100%!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;position:relative!important;z-index:10001!important;overflow:visible!important;margin:10px 0 12px!important;padding:2px 0!important;background:rgba(255,255,255,.55)!important;border-radius:10px!important}
+.manlung-turnstile-widget iframe{display:block!important;visibility:visible!important;opacity:1!important;max-width:100%!important;min-width:300px!important}
 </style></head>
 <body class="manlung-auth-page">
 <header class="site-header">
@@ -285,12 +288,29 @@ async function setupClientTurnstile() {
       throw new Error('Cloudflare Turnstile did not load.');
     }
     host.innerHTML='';
-    clientTurnstileWidget=window.turnstile.render(host,{
-      sitekey:siteKey,
-      theme:'auto',
-      size:'normal',
-      appearance:'always'
-    });
+    const renderTurnstile=()=>{
+      try{
+        host.innerHTML='';
+        clientTurnstileWidget=window.turnstile.render(host,{
+          sitekey:siteKey,
+          theme:'auto',
+          size:'normal',
+          appearance:'always',
+          callback:()=>{host.dataset.turnstileReady='true';},
+          'error-callback':()=>{host.dataset.turnstileError='true';},
+          'expired-callback':()=>{host.dataset.turnstileReady='false';}
+        });
+        host.dataset.turnstileRendered='true';
+      }catch(renderError){
+        console.error('Turnstile render failed:',renderError);
+        host.dataset.turnstileError='true';
+      }
+    };
+    if(typeof window.turnstile.ready==='function'){
+      window.turnstile.ready(renderTurnstile);
+    }else{
+      renderTurnstile();
+    }
   } catch(error) {
     console.error('Turnstile setup failed:',error);
     host.dataset.turnstileError='true';
