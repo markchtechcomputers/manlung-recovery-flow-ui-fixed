@@ -33,7 +33,9 @@ function isDurablyRevoked(decoded, user) {
 async function verifyRequestToken(req) {
   const bearerToken = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || null;
   const cookieToken = getCookie(req, ADMIN_COOKIE) || getCookie(req, CLIENT_COOKIE);
-  const token = bearerToken || cookieToken;
+  // Browser sessions use the HttpOnly cookie as the authoritative session.
+  // A stale localStorage Bearer token must never force a valid cookie session out.
+  const token = cookieToken || bearerToken;
   if (!token) return { token: null, decoded: null, user: null };
 
   let verifiedToken = token;
@@ -50,9 +52,10 @@ async function verifyRequestToken(req) {
     if (
       bearerToken &&
       cookieToken &&
-      error instanceof jwt.JsonWebTokenError &&
-      error.message === 'invalid signature'
+      error instanceof jwt.JsonWebTokenError
     ) {
+      // If a browser sends both, fall back to its valid HttpOnly cookie when
+      // the stale Authorization header is invalid (including old signatures).
       verifiedToken = cookieToken;
       if (isTokenRevoked(verifiedToken)) throw new Error('TOKEN_REVOKED');
       decoded = jwt.verify(verifiedToken, process.env.JWT_SECRET);
