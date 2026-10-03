@@ -13,6 +13,11 @@ function getTurnstileSiteKey() {
     'CLOUDFLARE_TURNSTILE_PUBLIC_KEY',
     'CLOUDFLARE_TURNSTILE_SITEKEY',
     'CLOUDFLARE_TURNSTILE_PUBLIC_SITE_KEY',
+    'CLOUDFLARE_TURNSTILE_KEY',
+    'TURNSTILE_KEY',
+    'CF_TURNSTILE_SITE_KEY',
+    'CF_TURNSTILE_PUBLIC_KEY',
+    'CLOUDFLARE_SITEKEY',
   ];
   for (const name of direct) {
     const value = String(process.env[name] || '').trim();
