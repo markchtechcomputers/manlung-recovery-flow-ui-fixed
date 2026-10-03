@@ -346,8 +346,9 @@ async function setupClientTurnstile() {
           size:'normal',
           appearance:'always',
           callback:()=>{host.dataset.turnstileReady='true';host.dataset.turnstileError='false';},
-          'error-callback':()=>{host.dataset.turnstileReady='false';host.dataset.turnstileError='true';},
-          'expired-callback':()=>{host.dataset.turnstileReady='false';clientTurnstileWidget=null;}
+          'error-callback':(code)=>{console.error('Turnstile error code:',String(code||'unknown'));host.dataset.turnstileReady='false';host.dataset.turnstileError='true';clientTurnstileWidget=null;},
+          'expired-callback':()=>{console.warn('Turnstile token expired.');host.dataset.turnstileReady='false';clientTurnstileWidget=null;},
+          'timeout-callback':()=>{console.warn('Turnstile challenge timed out.');host.dataset.turnstileReady='false';clientTurnstileWidget=null;}
         });
         host.dataset.turnstileRendered='true';
       }catch(renderError){
