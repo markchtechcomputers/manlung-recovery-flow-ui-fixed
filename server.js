@@ -213,33 +213,48 @@ app.use('/api/notifications', notificationLimiter);
 
 // ============================================================
 // SENSITIVE AUTH RATE LIMITERS
-// ============================================================
 
-const loginLimiter = rateLimit({
+const adminLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 15,
+  max: 3,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => res.status(429).json({
     success: false,
-    error: 'Too many login attempts. Please wait 15 minutes and try again.'
+    code: 'AUTH_LOCKED',
+    error: 'Too many login attempts. Try again in 15 minutes.'
   }),
 });
 
-const mfaLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
+const clientLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => res.status(429).json({
     success: false,
-    error: 'Too many MFA attempts. Please wait and try again.'
+    code: 'AUTH_RATE_LIMITED',
+    error: 'Too many login attempts. Please try again later.'
   }),
 });
 
-app.use('/api/auth/admin/login', loginLimiter);
-app.use('/api/auth/client/login', loginLimiter);
+const mfaLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 6,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => res.status(429).json({
+    success: false,
+    code: 'MFA_RATE_LIMITED',
+    error: 'Too many MFA attempts. Try again in 15 minutes.'
+  }),
+});
+
+app.use('/api/auth/admin/login', adminLoginLimiter);
+app.use('/api/auth/owner/login', adminLoginLimiter);
+app.use('/api/auth/client/login', clientLoginLimiter);
 app.use('/api/auth/admin/mfa/login', mfaLimiter);
+app.use('/api/auth/owner/mfa/login', mfaLimiter);
 
 // ============================================================
 // AUTH ACTION RATE LIMITER
