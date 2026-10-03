@@ -27,6 +27,7 @@ const aiRoutes = require('./routes/ai');
 const { supabase } = require('./config/supabase');
 const { inputSecurity } = require('./middleware/inputSecurity');
 const OFFICIAL_WEBSITES = require('./config/official-websites');
+const { verifyTurnstile } = require('./services/turnstile');
 
 const app = express();
 
@@ -50,8 +51,8 @@ app.use(
         fontSrc: ["'self'", 'https://cdnjs.cloudflare.com', 'data:'],
         imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
         mediaSrc: ["'self'", 'https:', 'blob:'],
-        connectSrc: ["'self'", 'https://*.supabase.co', 'https://api.paystack.co', 'wss:', 'https:'],
-        frameSrc: ["'self'", 'https://js.paystack.co'],
+        connectSrc: ["'self'", 'https://*.supabase.co', 'https://api.paystack.co', 'https://challenges.cloudflare.com', 'wss:', 'https:'],
+        frameSrc: ["'self'", 'https://js.paystack.co', 'https://challenges.cloudflare.com'],
         workerSrc: ["'self'", 'blob:'],
         manifestSrc: ["'self'"],
       },
@@ -210,6 +211,36 @@ app.use('/api/notifications', notificationLimiter);
 // owner/admin login and incorrectly present the account as locked.
 // User.comparePassword records failures and applies the 132-year
 // persistent account lock after the third failed password attempt.
+
+// ============================================================
+// SENSITIVE AUTH RATE LIMITERS
+// ============================================================
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => res.status(429).json({
+    success: false,
+    error: 'Too many login attempts. Please wait 15 minutes and try again.'
+  }),
+});
+
+const mfaLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => res.status(429).json({
+    success: false,
+    error: 'Too many MFA attempts. Please wait and try again.'
+  }),
+});
+
+app.use('/api/auth/admin/login', loginLimiter);
+app.use('/api/auth/client/login', loginLimiter);
+app.use('/api/auth/admin/mfa/login', mfaLimiter);
 
 // ============================================================
 // AUTH ACTION RATE LIMITER
