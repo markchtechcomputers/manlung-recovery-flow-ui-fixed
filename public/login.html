@@ -268,24 +268,33 @@ async function handleForgot(event) {
 let clientTurnstileEnabled = false;
 let clientTurnstileWidget = null;
 async function setupClientTurnstile() {
+  const host=document.getElementById('clientTurnstile');
+  if(!host)return;
   try {
-    const response = await fetch('/api/config/public', {cache:'no-store'});
-    const config = await response.json();
-    clientTurnstileEnabled = Boolean(config.turnstileEnabled && config.turnstileSiteKey);
-    if (!clientTurnstileEnabled) return;
-    if (!window.turnstile) {
-      await new Promise((resolve,reject) => {
-        const start=Date.now();
-        const timer=setInterval(() => {
-          if(window.turnstile){clearInterval(timer);resolve();}
-          else if(Date.now()-start>10000){clearInterval(timer);reject(new Error('Cloudflare Turnstile did not load.'));}
-        },100);
-      });
+    const response=await fetch('/api/config/public',{cache:'no-store',credentials:'same-origin'});
+    if(!response.ok)throw new Error('Turnstile configuration request failed.');
+    const config=await response.json();
+    const siteKey=String(config.turnstileSiteKey||'').trim();
+    if(!siteKey)throw new Error('Turnstile public site key is not configured.');
+    clientTurnstileEnabled=true;
+    const start=Date.now();
+    while(!window.turnstile && Date.now()-start<15000){
+      await new Promise(resolve=>setTimeout(resolve,100));
     }
-    clientTurnstileWidget = window.turnstile.render('#clientTurnstile',{
-      sitekey:config.turnstileSiteKey, theme:'auto', size:'normal', appearance:'always'
+    if(!window.turnstile||typeof window.turnstile.render!=='function'){
+      throw new Error('Cloudflare Turnstile did not load.');
+    }
+    host.innerHTML='';
+    clientTurnstileWidget=window.turnstile.render(host,{
+      sitekey:siteKey,
+      theme:'auto',
+      size:'normal',
+      appearance:'always'
     });
-  } catch(error) { console.error('Turnstile setup failed:', error); }
+  } catch(error) {
+    console.error('Turnstile setup failed:',error);
+    host.dataset.turnstileError='true';
+  }
 }
 window.addEventListener('load', setupClientTurnstile);
 
