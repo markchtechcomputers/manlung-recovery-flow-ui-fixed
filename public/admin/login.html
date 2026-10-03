@@ -170,6 +170,7 @@
             if(!siteKey)throw new Error('Turnstile public site key is not configured.');
             adminTurnstileEnabled=true;
             adminTurnstileSiteKey=siteKey;
+            host.dataset.turnstileConfigured='true';
             const waitStart=Date.now();
             while(!window.turnstile && Date.now()-waitStart<15000){
               await new Promise(resolve=>setTimeout(resolve,100));
@@ -189,10 +190,13 @@
             });
           }catch(e){
             console.error('Turnstile setup failed:',e);
+            adminTurnstileEnabled=true;
             host.dataset.turnstileError='true';
+            host.innerHTML='<div role="alert" style="color:#fca5a5;font-weight:700;padding:10px 0">Cloudflare security verification could not load. Refresh the page and try again.</div>';
           }
         }
-        window.addEventListener('load',setupAdminTurnstile);
+        if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setupAdminTurnstile,{once:true});
+        else setupAdminTurnstile();
         function resetAdminTurnstile(){
           const host=document.getElementById('adminTurnstile');
           if(!host||!window.turnstile)return;
