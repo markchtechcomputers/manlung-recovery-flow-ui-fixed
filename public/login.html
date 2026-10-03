@@ -161,8 +161,8 @@ async function setupClientTurnstile() {
     clientTurnstileWidget = window.turnstile.render('#clientTurnstile', {
       sitekey: config.turnstileSiteKey,
       theme: 'auto',
-      size: 'flexible',
-      appearance: 'interaction-only'
+      size: 'normal',
+      appearance: 'always'
     });
   } catch (error) { console.error('Turnstile setup failed:', error); }
 }
