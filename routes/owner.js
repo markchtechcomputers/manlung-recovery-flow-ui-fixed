@@ -22,7 +22,7 @@ function checkValidation(req, res) {
   return true;
 }
 
-const MAX_ADMINS = 10; // matches the spec's explicit cap
+const MAX_ADMINS = 3000; // scalable active-admin ceiling; database and infrastructure remain the practical limits
 
 
 async function releaseAdminAssignments(adminId) {
@@ -446,6 +446,7 @@ router.put(
 
       if (req.body.status === 'suspended') await releaseAdminAssignments(target.id);
       const updated = await User.setAdminStatus(target.id, req.body.status);
+      await SecurityMonitoring.revokeSessions(target.id);
       if (!updated) return res.status(409).json({ error: 'Could not update status — try again.' });
 
       await AdminAuditLog.record({
@@ -477,6 +478,7 @@ router.delete('/admins/:userId', async (req, res) => {
 
     await releaseAdminAssignments(target.id);
     const updated = await User.removeAdminPrivileges(target.id);
+    await SecurityMonitoring.revokeSessions(target.id);
     if (!updated) return res.status(409).json({ error: 'Could not remove admin privileges — try again.' });
 
     await AdminAuditLog.record({ actor: req.user, target: updated, action: 'removed_admin' });
@@ -515,19 +517,7 @@ router.delete('/cases/:caseId/public-notes', async (req, res) => {
   }
 });
 
-// Audit trail — who did what, to whom, when
-router.delete('/audit-log', async (req, res) => {
-  try {
-    const { error } = await require('../config/supabase').supabase.from('recovery_admin_audit_log').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    if (error) throw error;
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Clear audit log error:', error);
-    res.status(500).json({ error: error.message || 'Could not clear audit log.' });
-  }
-});
-
-router.get('/audit-log', async (req, res) => {
+// Audit trail is append-only and cannot be destructively cleared.\nrouter.delete('/audit-log', async (req, res) => {\n  await SecurityMonitoring.recordEvent({\n    eventType: 'owner_action',\n    severity: 'high',\n    actorUserId: req.user.id,\n    ipAddress: req.ip,\n    userAgent: req.get('user-agent'),\n    path: req.path,\n    httpStatus: 403,\n    details: { action: 'attempted_audit_log_clear' },\n  }).catch(() => {});\n  return res.status(403).json({ success: false, error: 'Audit logs are append-only and cannot be cleared.' });\n});\n\nrouter.get('/audit-log', async (req, res) => {
   try {
     const log = await AdminAuditLog.list();
     res.json({ success: true, log });
