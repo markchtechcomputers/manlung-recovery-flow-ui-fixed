@@ -3,26 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <script src="/js/theme.js"></script>
-  <link rel="manifest" href="/manifest.webmanifest">
-  <meta name="theme-color" content="#ffffff">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0a1a3a">
   <title>My Cases · Manlung Recovery</title>
-    <meta name="robots" content="noindex,nofollow,noarchive">
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
   <style>
-    .dashboard-hero { background:linear-gradient(135deg,#0a1a3a,#17336b); color:#fff; border-radius:24px; padding:1.5rem; margin:1.5rem 0; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
+    .dashboard-hero { background:linear-gradient(135deg,#071a36,#123f7a 55%,#0f766e); color:#fff; border-radius:24px; padding:1.5rem; margin:1.5rem 0; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
     .dashboard-hero h2 { margin:0 0 .35rem; font-size:1.55rem; }
     .dashboard-hero p { margin:0; color:#c8d7f2; }
     .case-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:1rem; }
-    .case-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:1.2rem; box-shadow:0 4px 16px rgba(10,26,58,.05); }
+    .case-card { background:linear-gradient(180deg,var(--card-bg),rgba(239,246,255,.72)); border:1px solid var(--card-border); border-radius:18px; padding:1.2rem; box-shadow:0 4px 16px rgba(10,26,58,.05); }
+    .case-card.online-payment-case { background:linear-gradient(180deg,#fff8cc,#fff1a8); border-color:#f2c94c; box-shadow:0 8px 24px rgba(234,179,8,.18); }
+    .case-card.online-payment-case .case-type { color:#7a5b00; font-weight:800; }
     .case-top { display:flex; justify-content:space-between; gap:.7rem; align-items:flex-start; margin-bottom:.8rem; }
     .case-id { font-weight:800; color:var(--text); }
     .case-type { color:var(--text-muted); font-size:.88rem; margin-top:.2rem; }
     .case-meta { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin:1rem 0; }
-    .case-meta div { padding:.7rem; border-radius:10px; background:rgba(36,81,214,.05); }
+    .case-meta div { padding:.7rem; border-radius:12px; background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(20,184,166,.07)); border:1px solid rgba(59,130,246,.10); }
     .case-meta small { display:block; color:var(--text-muted); font-size:.72rem; margin-bottom:.2rem; }
     .case-meta strong { font-size:.88rem; }
     .feedback { margin:.8rem 0; padding:.8rem; border-radius:12px; background:var(--info-bg); color:var(--info-text); }
@@ -54,23 +51,65 @@
       #callWidget { right:10px !important; bottom:10px !important; }
       #callWidgetPanel { width:min(300px,calc(100vw - 20px)) !important; right:0 !important; }
     }
-  </style>
-<style id="manlung-footer-style">
-.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:#06101d;border-top:1px solid rgba(255,255,255,.08);color:#dbeafe}
-.manlung-footer-inner{max-width:1000px;margin:auto}
-.manlung-footer-brand{text-align:center;margin-bottom:1rem}
-.manlung-footer-brand h2{margin:0 0 .3rem;font-size:clamp(1rem,1.7vw,1.25rem);color:#fff}
-.manlung-footer-brand p{margin:0;color:#94a3b8;font-size:.8rem}
-.manlung-footer-links{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1rem 0}
-.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:background .18s ease,border-color .18s ease,color .18s ease}
-.manlung-footer-link:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#fff}
-.manlung-footer-link:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
-.manlung-footer-link:active{background:rgba(255,255,255,.1)}
-.manlung-footer-bottom{padding-top:.7rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;color:#64748b;font-size:.7rem}
-.manlung-footer-bottom strong{color:#94a3b8}
-@media(max-width:900px){.manlung-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}}
-@media(max-width:380px){.manlung-footer-links{grid-template-columns:1fr}}
+
+
+.account-delete-oauth{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  margin:18px 0;
+  padding:15px 16px;
+  border:1px solid rgba(30,64,175,.18);
+  border-radius:12px;
+  background:rgba(30,64,175,.06);
+}
+
+.account-delete-oauth[hidden]{
+  display:none;
+}
+
+.account-delete-oauth-icon{
+  flex:0 0 38px;
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:rgba(30,64,175,.12);
+  color:#1e40af;
+}
+
+.account-delete-oauth-content{
+  min-width:0;
+}
+
+.account-delete-oauth-content strong{
+  display:block;
+  margin-bottom:4px;
+  font-size:.95rem;
+}
+
+.account-delete-oauth-content p{
+  margin:0;
+  color:var(--text-muted);
+  font-size:.86rem;
+  line-height:1.5;
+}
+
+@media (max-width:600px){
+  .account-delete-oauth{
+    gap:11px;
+    padding:13px;
+  }
+
+  .account-delete-oauth-icon{
+    flex-basis:34px;
+    width:34px;
+    height:34px;
+  }
+}
+
 </style>
 <style id="manlung-header-style">
 .site-header{
@@ -389,20 +428,376 @@
 </style>
 
   <link rel="stylesheet" href="/css/theme.css">
+
+    <meta name="description" content="Cyber Recovery & Digital Investigation Portal">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png">
+
+    <!-- Open Graph / WhatsApp / Facebook / Telegram -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Manlung Recovery">
+    <meta property="og:description" content="Cyber Recovery & Digital Investigation Portal">
+    <meta property="og:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+    <meta property="og:image:secure_url" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:url" content="https://manlungrecovery.manlungshop.co.ke/">
+    <meta property="og:site_name" content="Manlung Recovery">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Manlung Recovery">
+    <meta name="twitter:description" content="Cyber Recovery & Digital Investigation Portal">
+    <meta name="twitter:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+
+
+<style id="client-header-visibility-fix">
+.header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.header-actions > * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.header-actions .btn,
+.header-actions a,
+.header-actions button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.header-actions .logout,
+.header-actions .btn-logout,
+.header-actions a[href*="logout"],
+.header-actions a[onclick*="logout"],
+.header-actions button[onclick*="logout"] {
+    color: #ffffff !important;
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+    text-decoration: none !important;
+}
+
+.header-actions .logout *,
+.header-actions .btn-logout *,
+.header-actions a[href*="logout"] *,
+.header-actions a[onclick*="logout"] *,
+.header-actions button[onclick*="logout"] * {
+    color: #ffffff !important;
+}
+
+@media (max-width: 700px) {
+    .header-actions {
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .header-actions .btn,
+    .header-actions a,
+    .header-actions button {
+        min-height: 40px !important;
+    }
+}
+</style>
+
+<style id="client-header-final-fix">.site-header .header-actions{display:flex!important;visibility:visible!important;opacity:1!important;gap:8px!important;flex-wrap:wrap!important}.site-header .header-actions>*{display:inline-flex!important;visibility:visible!important;opacity:1!important}.site-header .header-actions .btn,.site-header .header-actions a,.site-header .header-actions button{display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:center!important;color:#fff!important;text-decoration:none!important}.site-header .header-actions button[onclick="logout()"]{display:inline-flex!important;background:#dc2626!important;border:1px solid #dc2626!important;color:#fff!important;font-weight:700!important}.site-header .header-actions button[onclick="logout()"] i,.site-header .header-actions button[onclick="logout()"] span{color:#fff!important}@media(max-width:700px){.site-header .header-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important}.site-header .header-actions>*{width:100%!important;min-height:42px!important}}</style>    <link rel="stylesheet" href="/css/footer.css">
+    <script src="/js/support-fab.js"></script>
+    <link rel="stylesheet" href="/css/unified-ui.css">
+    
+<style id="account-delete-modal-styles">
+  .account-delete-modal{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:1rem;
+    background:rgba(2,8,23,.72);
+    backdrop-filter:blur(7px);
+  }
+
+  .account-delete-modal.is-open{
+    display:flex;
+  }
+
+  .account-delete-dialog{
+    width:min(100%,500px);
+    max-height:min(92vh,680px);
+    overflow-y:auto;
+    background:var(--card-bg,#fff);
+    color:var(--text,#111827);
+    border:1px solid rgba(220,38,38,.22);
+    border-radius:18px;
+    box-shadow:0 24px 70px rgba(0,0,0,.28);
+    padding:1.35rem;
+    animation:accountDeleteModalIn .18s ease-out;
+  }
+
+  @keyframes accountDeleteModalIn{
+    from{
+      opacity:0;
+      transform:translateY(10px) scale(.98);
+    }
+    to{
+      opacity:1;
+      transform:translateY(0) scale(1);
+    }
+  }
+
+  .account-delete-head{
+    display:flex;
+    align-items:flex-start;
+    gap:.9rem;
+  }
+
+  .account-delete-icon{
+    flex:0 0 46px;
+    width:46px;
+    height:46px;
+    display:grid;
+    place-items:center;
+    border-radius:14px;
+    background:rgba(220,38,38,.10);
+    color:#dc2626;
+    font-size:1.25rem;
+  }
+
+  .account-delete-title{
+    margin:0;
+    font-size:1.2rem;
+    font-weight:800;
+  }
+
+  .account-delete-close{
+    margin-left:auto;
+    width:40px;
+    height:40px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    color:inherit;
+    cursor:pointer;
+    font-size:1.15rem;
+  }
+
+  .account-delete-close:hover{
+    background:rgba(127,127,127,.10);
+  }
+
+  .account-delete-warning{
+    margin:1rem 0;
+    padding:.9rem 1rem;
+    border-radius:12px;
+    background:rgba(220,38,38,.08);
+    border:1px solid rgba(220,38,38,.16);
+    color:#b91c1c;
+    font-size:.9rem;
+    line-height:1.5;
+  }
+
+  .account-delete-copy{
+    margin:0 0 1rem;
+    color:var(--text-muted,#64748b);
+    font-size:.9rem;
+    line-height:1.55;
+  }
+
+  .account-delete-field{
+    position:relative;
+  }
+
+  .account-delete-field label{
+    display:block;
+    margin-bottom:.45rem;
+    font-size:.84rem;
+    font-weight:700;
+  }
+
+  .account-delete-field input{
+    width:100%;
+    min-height:46px;
+    box-sizing:border-box;
+    padding:.7rem 3rem .7rem .85rem;
+    border:1px solid var(--border,#cbd5e1);
+    border-radius:10px;
+    background:var(--input-bg,var(--card-bg,#fff));
+    color:inherit;
+    font:inherit;
+    outline:none;
+  }
+
+  .account-delete-field input:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,.12);
+  }
+
+  .account-delete-toggle{
+    position:absolute;
+    right:.35rem;
+    bottom:.35rem;
+    width:38px;
+    height:38px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:var(--text-muted,#64748b);
+    cursor:pointer;
+  }
+
+  .account-delete-toggle:hover{
+    background:rgba(127,127,127,.10);
+  }
+
+  .account-delete-error{
+    display:none;
+    margin-top:.7rem;
+    padding:.7rem .8rem;
+    border-radius:9px;
+    background:rgba(220,38,38,.08);
+    color:#b91c1c;
+    font-size:.82rem;
+    line-height:1.45;
+  }
+
+  .account-delete-error.is-visible{
+    display:block;
+  }
+
+  .account-delete-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:.65rem;
+    margin-top:1.2rem;
+  }
+
+  .account-delete-actions button{
+    min-height:44px;
+  }
+
+  .account-delete-confirm:disabled{
+    cursor:not-allowed;
+    opacity:.48;
+  }
+
+  .account-delete-confirm.is-loading{
+    pointer-events:none;
+  }
+
+  @media(max-width:560px){
+    .account-delete-modal{
+      padding:.7rem;
+      align-items:flex-end;
+    }
+
+    .account-delete-dialog{
+      width:100%;
+      max-height:88vh;
+      border-radius:18px 18px 12px 12px;
+      padding:1.05rem;
+    }
+
+    .account-delete-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+    }
+
+    .account-delete-actions button{
+      width:100%;
+    }
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    .account-delete-dialog{
+      animation:none;
+    }
+  }
+</style>
+
+<style id="manlung-client-dashboard-premium">
+.manlung-dashboard-main{max-width:1180px;padding-top:.5rem;padding-bottom:2rem}
+.manlung-dashboard-hero{position:relative;overflow:hidden;min-height:230px;padding:clamp(1.35rem,4vw,2.4rem);margin:1.2rem 0 1rem;border:1px solid rgba(96,165,250,.28);border-radius:26px;background:radial-gradient(circle at 90% 10%,rgba(56,189,248,.18),transparent 30%),linear-gradient(135deg,#081a39 0%,#12346d 55%,#1550a2 100%);box-shadow:0 24px 60px rgba(15,23,42,.16);display:flex;align-items:center;justify-content:space-between;gap:2rem}
+.manlung-dashboard-hero:after{content:"";position:absolute;width:260px;height:260px;right:-110px;bottom:-145px;border-radius:50%;border:1px solid rgba(255,255,255,.12);box-shadow:0 0 0 22px rgba(255,255,255,.025),0 0 0 44px rgba(255,255,255,.018)}
+.dashboard-hero-copy{position:relative;z-index:1;max-width:720px}.dashboard-kicker,.dashboard-section-kicker{display:inline-flex;align-items:center;gap:.38rem;color:#60a5fa;text-transform:uppercase;letter-spacing:.1em;font-size:.64rem;font-weight:900}.dashboard-kicker{color:#bfdbfe;padding:.35rem .65rem;border:1px solid rgba(191,219,254,.2);border-radius:999px;background:rgba(255,255,255,.06)}
+.manlung-dashboard-hero h2{margin:.75rem 0 .35rem;color:#fff;font-size:clamp(1.65rem,4vw,2.35rem);letter-spacing:-.035em}.manlung-dashboard-hero p{margin:0;color:#c9dcf5;line-height:1.65;max-width:670px}.dashboard-hero-trust{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}.dashboard-hero-trust span{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .58rem;border-radius:999px;background:rgba(255,255,255,.065);color:#dbeafe;font-size:.68rem;font-weight:750;border:1px solid rgba(255,255,255,.08)}
+.dashboard-hero-action{position:relative;z-index:2;display:flex;flex-direction:column;align-items:stretch;min-width:205px}.dashboard-primary-action{min-height:52px;border-radius:14px;gap:.55rem;box-shadow:0 14px 28px rgba(2,6,23,.22)}.dashboard-action-arrow{margin-left:auto}.dashboard-hero-action small{margin-top:.55rem;color:#b9cbe3;text-align:center;font-size:.66rem}
+.dashboard-overview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;margin-bottom:1rem}.dashboard-overview-card{position:relative;display:flex;align-items:center;gap:.8rem;min-width:0;padding:1rem 1.05rem;border:1px solid #e2e8f0;border-radius:17px;background:var(--card-bg,#fff);box-shadow:0 10px 28px rgba(15,23,42,.055);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.dashboard-overview-card:hover{transform:translateY(-2px);box-shadow:0 15px 34px rgba(15,23,42,.09);border-color:#cbd5e1}.overview-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:13px;background:#eff6ff;color:#2563eb}.overview-copy{min-width:0;display:grid}.overview-copy span{font-size:.68rem;font-weight:800;color:var(--text-muted)}.overview-copy strong{font-size:1.15rem;line-height:1.25;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.overview-copy small{font-size:.62rem;color:var(--text-muted);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.overview-corner{margin-left:auto;align-self:flex-start;color:#94a3b8;font-size:.65rem}.overview-donations .overview-icon{background:#ecfdf5;color:#059669}.overview-notices .overview-icon{background:#f5f3ff;color:#7c3aed}
+.dashboard-support-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1rem;margin-bottom:1rem;padding:1.05rem 1.15rem;border:1px solid #dbeafe;border-radius:18px;background:linear-gradient(135deg,#f8fbff,#fff);box-shadow:0 10px 28px rgba(15,23,42,.05)}.dashboard-support-art{width:56px;height:56px;display:grid;place-items:center;border-radius:15px;background:#fff;border:1px solid #e2e8f0;overflow:hidden}.dashboard-support-art img{width:42px;height:42px;object-fit:contain}.dashboard-support-copy h2{margin:.12rem 0 .18rem;font-size:1.02rem;color:var(--text)}.dashboard-support-copy p{margin:0;color:var(--text-muted);font-size:.74rem;line-height:1.5}.dashboard-donation-number{display:flex;align-items:baseline;gap:.55rem;margin-top:.45rem}.dashboard-donation-number strong{font-size:1rem;color:#059669}.dashboard-donation-number span{font-size:.64rem;color:var(--text-muted)}
+.manlung-dashboard-card{border-radius:20px!important;border:1px solid #e2e8f0!important;box-shadow:0 12px 32px rgba(15,23,42,.055)!important;padding:1.15rem!important;background:var(--card-bg,#fff)}
+.dashboard-section-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}.dashboard-section-head.compact{margin-bottom:.8rem}.dashboard-section-title{display:flex;align-items:center;gap:.7rem;min-width:0}.dashboard-section-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:12px;background:#eff6ff;color:#2563eb}.dashboard-section-icon.danger{background:#fff1f2;color:#dc2626}.dashboard-section-icon.notice{background:#f5f3ff;color:#7c3aed}.dashboard-section-title h2{margin:.12rem 0 0;font-size:1.05rem;color:var(--text);letter-spacing:-.02em}.dashboard-section-title p{margin:.18rem 0 0;color:var(--text-muted);font-size:.68rem}.dashboard-inline-count{font-size:.68rem;font-weight:700;color:var(--text-muted);margin-left:.2rem}.dashboard-mini-link{display:inline-flex;align-items:center;gap:.35rem;padding:.42rem .65rem;border:1px solid #dbeafe;border-radius:9px;background:#f8fbff;color:#2563eb;text-decoration:none;font-size:.67rem;font-weight:800;white-space:nowrap;cursor:pointer}.dashboard-mini-link:hover{background:#eff6ff;border-color:#bfdbfe}.case-grid{margin-top:.2rem}.dashboard-lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.privacy-panel{padding:.9rem;border:1px solid rgba(220,38,38,.12);border-radius:14px;background:linear-gradient(135deg,rgba(254,242,242,.65),rgba(255,255,255,.8))}.privacy-status{display:flex;align-items:center;gap:.55rem;margin-bottom:.65rem;color:#b91c1c}.privacy-status>i{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#fee2e2}.privacy-status span{display:grid}.privacy-status strong{font-size:.76rem;color:#7f1d1d}.privacy-status small{font-size:.62rem;color:var(--text-muted);margin-top:.08rem}.danger-kicker{color:#dc2626}.danger-copy{max-width:none;font-size:.72rem;line-height:1.55;margin:0 0 .75rem}.case-delete-btn{min-height:38px!important}
+.manlung-notifications-card{margin:0!important}.manlung-notification-head{display:none}.manlung-notification-list{max-height:285px;overflow:auto;padding-right:.15rem}.manlung-notification-item{padding:.7rem;border:1px solid rgba(148,163,184,.16);border-radius:12px;background:rgba(248,250,252,.72);transition:background .18s ease,border-color .18s ease}.manlung-notification-item.unread{border-color:rgba(96,165,250,.3);background:rgba(239,246,255,.7)}.manlung-notification-item+.manlung-notification-item{margin-top:.5rem}.manlung-notification-item h4{font-size:.78rem}.manlung-notification-item p{font-size:.7rem}.manlung-notification-meta{font-size:.6rem}.manlung-notification-badge{min-width:21px;height:21px;margin-left:.25rem;font-size:.62rem}.manlung-empty{padding:1.2rem;font-size:.72rem}
+@media(max-width:800px){.manlung-dashboard-hero{align-items:flex-start;flex-direction:column}.dashboard-hero-action{width:100%;max-width:330px}.dashboard-overview-grid{grid-template-columns:1fr}.dashboard-lower-grid{grid-template-columns:1fr}.dashboard-support-card{grid-template-columns:auto 1fr}.dashboard-support-action{grid-column:1/-1;margin-left:72px}}
+@media(max-width:560px){.manlung-dashboard-main{padding-top:0}.manlung-dashboard-hero{border-radius:20px;margin-top:.8rem;padding:1.15rem}.manlung-dashboard-hero h2{font-size:1.5rem}.dashboard-hero-trust{gap:.3rem}.dashboard-hero-trust span{font-size:.6rem}.dashboard-overview-card{padding:.85rem}.dashboard-support-card{grid-template-columns:auto 1fr;gap:.7rem;padding:.9rem}.dashboard-support-copy h2{font-size:.9rem}.dashboard-support-copy p{font-size:.67rem}.dashboard-donation-number{flex-direction:column;gap:.05rem}.dashboard-support-action{grid-column:1/-1;margin-left:0}.dashboard-support-action .btn{width:100%}.manlung-dashboard-card{padding:.9rem!important;border-radius:17px!important}.dashboard-section-head{align-items:flex-start}.dashboard-section-title p{display:none}.dashboard-mini-link{font-size:.62rem}.dashboard-section-icon{width:38px;height:38px;flex-basis:38px}}
+@media(prefers-reduced-motion:reduce){.dashboard-overview-card{transition:none}.manlung-dashboard-hero,.dashboard-overview-card{animation:none}}
+</style><style id="manlung-dashboard-clean-shell">
+html,body{margin:0!important;padding:0!important;overflow-x:hidden!important}
+body{background:linear-gradient(180deg,#f8fafc 0%,#eef4fb 48%,#f8fafc 100%)!important}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(circle at 10% 6%,rgba(37,99,235,.07),transparent 28%),radial-gradient(circle at 92% 28%,rgba(14,165,233,.05),transparent 24%)}
+.container.manlung-dashboard-main{max-width:1180px!important;margin:0 auto!important;padding:1rem 1rem 2rem!important}
+.dashboard-hero.manlung-dashboard-hero{position:relative;overflow:hidden;min-height:180px!important;margin:0 0 1rem!important;padding:1.55rem 1.65rem!important;border-radius:24px!important;background:linear-gradient(135deg,#071a38,#103b78 58%,#155e9c)!important;box-shadow:0 18px 45px rgba(7,26,56,.18)!important}
+.dashboard-hero-copy,.dashboard-hero-action{position:relative;z-index:1}.dashboard-kicker,.dashboard-section-kicker{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:#60a5fa}
+.dashboard-hero h2{font-size:2rem!important;letter-spacing:-.04em!important;margin:.4rem 0!important}.dashboard-hero p{max-width:680px!important;font-size:.9rem!important;line-height:1.6!important;color:#dbeafe!important}.dashboard-hero-trust{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.85rem}.dashboard-hero-trust span{padding:.36rem .6rem;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(255,255,255,.07);font-size:.67rem;font-weight:800;color:#e0ecff}.dashboard-primary-action{box-shadow:0 10px 25px rgba(0,0,0,.22)!important;border-radius:12px!important}.dashboard-hero-action small{display:block;margin-top:.5rem;color:#b9cbe5;font-size:.67rem}
+.dashboard-overview-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-bottom:.9rem}.dashboard-overview-card{position:relative;display:flex;align-items:center;gap:.7rem;min-height:88px;padding:.9rem;border:1px solid #e2e8f0;border-radius:17px;background:rgba(255,255,255,.92);box-shadow:0 8px 25px rgba(15,23,42,.05)}.overview-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:13px;background:#eff6ff;color:#2563eb}.overview-copy span{display:block;color:#64748b;font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}.overview-copy strong{display:block;margin:.08rem 0;font-size:1.18rem;color:#0f172a}.overview-copy small{display:block;color:#94a3b8;font-size:.65rem}.overview-corner{position:absolute;right:.75rem;top:.75rem;color:#cbd5e1;font-size:.68rem}
+.dashboard-support-card{display:grid;grid-template-columns:68px 1fr auto;align-items:center;gap:.9rem;margin-bottom:.9rem;padding:.9rem 1rem;border:1px solid #dbeafe;border-radius:19px;background:linear-gradient(110deg,#eff6ff,#fff 70%);box-shadow:0 8px 25px rgba(37,99,235,.05)}.dashboard-support-art{width:68px;height:68px;border-radius:15px;overflow:hidden;background:#dbeafe}.dashboard-support-art img{width:100%;height:100%;object-fit:cover}.dashboard-support-copy h2{margin:.18rem 0 .2rem;font-size:1.02rem;color:#0f172a}.dashboard-support-copy p{margin:0;color:#64748b;font-size:.75rem;line-height:1.5}.dashboard-donation-number{display:flex;align-items:baseline;gap:.5rem;margin-top:.4rem}.dashboard-donation-number strong{font-size:.88rem;color:#2563eb}.dashboard-donation-number span{font-size:.64rem;color:#64748b}
+.manlung-dashboard-card{border:1px solid #e2e8f0!important;border-radius:19px!important;background:rgba(255,255,255,.94)!important;box-shadow:0 8px 26px rgba(15,23,42,.05)!important}.dashboard-section-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 1.1rem;border-bottom:1px solid #eef2f7}.dashboard-section-head.compact{border-bottom:0;padding-bottom:.65rem}.dashboard-section-title{display:flex;align-items:center;gap:.65rem}.dashboard-section-title h2{margin:.08rem 0 0;font-size:1rem;color:#0f172a}.dashboard-section-title p{margin:.15rem 0 0;color:#64748b;font-size:.7rem}.dashboard-section-icon{width:36px;height:36px;display:grid;place-items:center;flex:0 0 36px;border-radius:10px;background:#eff6ff;color:#2563eb}.dashboard-section-icon.danger{background:#fff1f2;color:#dc2626}.dashboard-inline-count{display:inline-flex;margin-left:.2rem;padding:.18rem .42rem;border-radius:999px;background:#f1f5f9;color:#64748b;font-size:.63rem}.dashboard-mini-link{border:1px solid #dbeafe!important;border-radius:9px!important;background:#f8fbff!important;color:#2563eb!important;padding:.4rem .6rem!important;font-size:.67rem!important;font-weight:800!important}.case-grid{padding:0 1.1rem 1.1rem!important}.case-card{border-radius:15px!important;border-color:#e2e8f0!important;box-shadow:0 5px 16px rgba(15,23,42,.04)!important}.dashboard-lower-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.9rem;margin-top:.9rem}.privacy-panel{margin:0 1.1rem 1.1rem;padding:.9rem;border-radius:13px;background:#fff8f8;border:1px solid #fee2e2}.privacy-status{display:flex;gap:.6rem;align-items:center}.privacy-status>i{width:32px;height:32px;display:grid;place-items:center;border-radius:9px;background:#fee2e2;color:#dc2626}.privacy-status strong{display:block;font-size:.76rem}.privacy-status small{display:block;margin-top:.08rem;color:#94a3b8;font-size:.63rem}.danger-copy{font-size:.72rem!important;line-height:1.5!important}.case-delete-btn{border-radius:9px!important;font-size:.7rem!important}.manlung-notification-list{padding:0 1.1rem 1.1rem;max-height:270px;overflow:auto}.manlung-notification-item{border-radius:11px!important;background:#f8fafc!important;border-color:#e5e7eb!important}.manlung-notification-item.unread{background:#eff6ff!important;border-color:#bfdbfe!important}
+@media(max-width:800px){.dashboard-overview-grid{grid-template-columns:1fr 1fr}.dashboard-lower-grid{grid-template-columns:1fr}.dashboard-overview-card:last-child{grid-column:1/-1}}
+@media(max-width:600px){.container.manlung-dashboard-main{padding:.65rem .65rem 1.1rem!important}.dashboard-hero.manlung-dashboard-hero{padding:1.1rem!important;border-radius:18px!important}.dashboard-hero h2{font-size:1.38rem!important}.dashboard-hero p{font-size:.76rem!important}.dashboard-hero-action{width:100%}.dashboard-primary-action{width:100%;justify-content:center}.dashboard-overview-grid{grid-template-columns:1fr;gap:.5rem}.dashboard-overview-card,.dashboard-overview-card:last-child{grid-column:auto;min-height:72px;padding:.75rem}.dashboard-support-card{grid-template-columns:50px 1fr;gap:.65rem;padding:.75rem}.dashboard-support-art{width:50px;height:50px}.dashboard-support-action{grid-column:1/-1}.dashboard-support-action .btn{width:100%;justify-content:center}.dashboard-section-head{padding:.8rem}.dashboard-section-title p{display:none}.case-grid{padding:0 .8rem .8rem!important}.manlung-notification-list{padding:0 .8rem .8rem}}
+</style>
+<style id="manlung-incoming-call-dashboard-style">
+.manlung-incoming-call-card{display:none;position:relative;margin:0 0 1rem;padding:1.05rem 1.15rem;border:1px solid #86efac;border-radius:20px;background:linear-gradient(135deg,#f0fdf4,#ffffff 62%,#eff6ff);box-shadow:0 16px 40px rgba(16,185,129,.12);overflow:hidden}
+.manlung-incoming-call-card.is-visible{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:1rem;animation:manlungIncomingCallIn .35s ease-out}
+.manlung-incoming-call-card.is-active{border-color:#60a5fa;background:linear-gradient(135deg,#eff6ff,#ffffff 62%,#f0fdf4);box-shadow:0 18px 46px rgba(37,99,235,.14)}
+.manlung-incoming-call-card.is-active .manlung-incoming-call-avatar{border-color:#bfdbfe;box-shadow:0 0 0 5px rgba(37,99,235,.08);animation:none}
+.manlung-incoming-call-card.is-active .manlung-incoming-call-copy .kicker{color:#2563eb}
+.manlung-incoming-call-card.is-active .manlung-incoming-call-state{color:#15803d}
+.manlung-incoming-call-card:before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:linear-gradient(180deg,#16a34a,#2563eb)}
+.manlung-incoming-call-avatar{width:58px;height:58px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#0f2f63;border:3px solid #bbf7d0;box-shadow:0 0 0 5px rgba(34,197,94,.08);animation:manlungIncomingPulse 1.6s ease-in-out infinite}
+.manlung-incoming-call-avatar img{width:100%;height:100%;object-fit:cover}
+.manlung-incoming-call-copy .kicker{font-size:.66rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#15803d}
+.manlung-incoming-call-copy h3{margin:.18rem 0 .22rem;font-size:1.08rem;color:#0f172a}
+.manlung-incoming-call-copy p{margin:0;color:#475569;font-size:.72rem;line-height:1.5}
+.manlung-incoming-call-meta{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.55rem}
+.manlung-incoming-call-meta span{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .5rem;border-radius:999px;background:#fff;border:1px solid #dcfce7;color:#166534;font-size:.62rem;font-weight:800}
+.manlung-incoming-call-actions{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end}
+.manlung-incoming-call-actions button{min-height:42px;border:0;border-radius:11px;padding:.62rem .8rem;font-weight:900;cursor:pointer}
+.manlung-incoming-call-actions .accept{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;box-shadow:0 8px 20px rgba(22,163,74,.2)}
+.manlung-incoming-call-actions .decline{background:#fff1f2;color:#b91c1c;border:1px solid #fecdd3}
+.manlung-incoming-call-actions button:disabled{opacity:.55;cursor:wait}
+.manlung-incoming-call-state{display:none;margin-top:.55rem;font-size:.68rem;font-weight:800;color:#2563eb}
+.manlung-incoming-call-card.is-connecting .manlung-incoming-call-state{display:block}
+@keyframes manlungIncomingCallIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes manlungIncomingPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@media(max-width:760px){.manlung-incoming-call-card.is-visible{grid-template-columns:auto 1fr}.manlung-incoming-call-actions{grid-column:1/-1;justify-content:stretch}.manlung-incoming-call-actions button{flex:1}}
+@media(prefers-reduced-motion:reduce){.manlung-incoming-call-card.is-visible,.manlung-incoming-call-avatar{animation:none}}
+</style>
 </head>
 <body>
   <header class="site-header">
     <div class="container">
       <div class="brand manlung-client-brand">
         
-<img
+<a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home"><img
   class="manlung-site-logo"
-  src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
+  src="/icons/icon-512.png"
   alt="Manlung Recovery"
->
+></a>
 <img
           class="manlung-client-logo"
-          src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
+          src="/icons/icon-512.png"
           alt="Manlung Recovery logo"
         >
         <div class="manlung-client-copy">
@@ -411,119 +806,272 @@
         </div>
       </div>
       <div class="header-actions">
-        <button class="btn btn-outline" type="button" data-theme-toggle="true"><i class="fas fa-moon"></i><span>Theme</span></button>
-        <a class="btn btn-outline" href="/client/request.html"><i class="fas fa-plus"></i><span>New Request</span></a>
-        <a class="btn btn-outline" href="/client/settings.html"><i class="fas fa-user-gear"></i><span>Settings</span></a>
-        <a class="btn btn-outline" href="/"><i class="fas fa-home"></i><span>Home</span></a>
-        <button class="btn btn-outline" type="button" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+        <button class="btn btn-outline" type="button" data-theme-toggle="true"><span>Theme</span></button>
+        <a class="btn btn-outline" href="/client/request.html"><span>New Request</span></a>
+        <a class="btn btn-outline" href="/client/settings.html"><span>Settings</span></a>
+        <a class="btn btn-outline" href="/"><span>Home</span></a>
+        <button class="btn btn-outline" type="button" onclick="logout()"><span>Logout</span></button>
       </div>
     </div>
   </header>
 
-  <main class="container">
-    <section class="dashboard-hero">
-      <div>
+  <main class="container manlung-dashboard-main">
+    <section class="dashboard-hero manlung-dashboard-hero">
+      <div class="dashboard-hero-copy">
+        <span class="dashboard-kicker"><i class="fas fa-shield-halved"></i> Private Client Portal</span>
         <h2>Welcome back</h2>
-        <p>Every case stays tied to your account. Follow updates and speak directly with an available Admin.</p>
+        <p>Every case stays tied to your account. Follow progress, review updates and speak directly with an available Admin.</p>
+        <div class="dashboard-hero-trust">
+          <span><i class="fas fa-lock"></i> Secure account</span>
+          <span><i class="fas fa-clock"></i> Live updates</span>
+          <span><i class="fas fa-headset"></i> Admin support</span>
+        </div>
       </div>
-      <div class="dashboard-actions">
-        <a class="btn btn-primary" href="/client/request.html"><i class="fas fa-file-circle-plus"></i> Submit Case</a>
+      <div class="dashboard-hero-action">
+        <a class="btn btn-primary dashboard-primary-action" href="/client/request.html">
+          <i class="fas fa-file-circle-plus"></i>
+          <span>Submit a Case</span>
+          <i class="fas fa-arrow-right dashboard-action-arrow"></i>
+        </a>
+        <small>Start a new recovery request securely.</small>
       </div>
     </section>
 
-    <section class="card" style="margin-bottom:1rem;">
-      <div class="card-title"><img src="/images/donation.png" alt="Donation" style="width:2.3rem;height:2.3rem;object-fit:contain;display:inline-block;vertical-align:middle;margin-right:.45rem;"> Community Support</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
-        <div>
-          <strong id="publicDonationTotal">KES 0</strong>
-          <div style="font-size:.82rem;color:var(--text-muted);margin-top:.2rem;"><span id="publicDonationCount">0</span> confirmed donations</div>
-        </div>
+    <section id="manlungIncomingAdminCall" class="manlung-incoming-call-card" aria-live="assertive" aria-label="Incoming Admin call">
+  <div class="manlung-incoming-call-avatar">
+    <img src="https://i.postimg.cc/FHBztf67/Chat-GPT-Image-Aug-31-2026-11-17-24-AM.png" alt="Manlung Admin">
+  </div>
+  <div class="manlung-incoming-call-copy">
+    <span class="kicker"><i class="fas fa-phone-volume"></i> Incoming secure call</span>
+    <h3 id="manlungIncomingCallTitle">Your Admin is calling</h3>
+    <p id="manlungIncomingCallDescription">An Admin has started a secure browser call with you. Review the details below before answering.</p>
+    <div class="manlung-incoming-call-meta">
+      <span id="manlungIncomingCallAdmin"><i class="fas fa-user-shield"></i> Admin</span>
+      <span id="manlungIncomingCallCase"><i class="fas fa-folder-open"></i> Support callback</span>
+      <span><i class="fas fa-lock"></i> Secure audio</span>
+    </div>
+    <div id="manlungIncomingCallState" class="manlung-incoming-call-state">Preparing your secure call…</div>
+  </div>
+  <div class="manlung-incoming-call-actions">
+    <button type="button" class="decline" id="manlungIncomingCallDecline"><i class="fas fa-phone-slash"></i> Decline</button>
+    <button type="button" class="accept" id="manlungIncomingCallAccept"><i class="fas fa-phone"></i> Accept call</button>
+  </div>
+</section>
+
+    <section class="dashboard-overview-grid" aria-label="Portal overview">
+      <article class="dashboard-overview-card overview-cases">
+        <div class="overview-icon"><i class="fas fa-folder-open"></i></div>
+        <div class="overview-copy"><span>My Cases</span><strong id="dashboardCaseMetric">0</strong><small>Recovery cases linked to you</small></div>
+        <i class="fas fa-arrow-up-right-from-square overview-corner" aria-hidden="true"></i>
+      </article>
+      <article class="dashboard-overview-card overview-donations">
+        <div class="overview-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <div class="overview-copy"><span>Community Support</span><strong id="dashboardDonationMetric">KES 0</strong><small><span id="dashboardDonationCountMetric">0</span> confirmed donations</small></div>
+        <i class="fas fa-heart overview-corner" aria-hidden="true"></i>
+      </article>
+      <article class="dashboard-overview-card overview-notices">
+        <div class="overview-icon"><i class="fas fa-bell"></i></div>
+        <div class="overview-copy"><span>Notifications</span><strong id="dashboardNoticeMetric">0</strong><small>Unread account updates</small></div>
+        <i class="fas fa-chevron-right overview-corner" aria-hidden="true"></i>
+      </article>
+    </section>
+
+    <section class="dashboard-support-card">
+      <div class="dashboard-support-art">
+        <img src="/images/donation.png" alt="Community support">
+      </div>
+      <div class="dashboard-support-copy">
+        <span class="dashboard-section-kicker">Community support</span>
+        <h2>Help keep digital recovery resources accessible.</h2>
+        <p>Your support helps maintain recovery resources and digital safety information for the wider community.</p>
+        <div class="dashboard-donation-number"><strong id="publicDonationTotal">KES 0</strong><span><b id="publicDonationCount">0</b> confirmed donations</span></div>
+      </div>
+      <div class="dashboard-support-action">
         <a class="btn btn-primary" href="/donate.html"><i class="fas fa-heart"></i> Donate</a>
       </div>
     </section>
 
-    <section class="card" style="margin-bottom:1rem;">
-      <div class="card-title"><i class="fas fa-list-check"></i> My Cases <span id="caseCount" style="font-size:.78rem;color:var(--text-muted);font-weight:500;"></span></div>
-      <div id="casesState" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading your cases…</div>
+    <section class="card manlung-dashboard-card manlung-cases-card" id="myCasesSection">
+      <div class="dashboard-section-head">
+        <div class="dashboard-section-title">
+          <div class="dashboard-section-icon"><i class="fas fa-list-check"></i></div>
+          <div><span class="dashboard-section-kicker">Your recovery activity</span><h2>My Cases <span id="caseCount" class="dashboard-inline-count"></span></h2><p>Review every recovery request connected to your account.</p></div>
+        </div>
+        <a class="dashboard-mini-link" href="/client/request.html"><i class="fas fa-plus"></i> New case</a>
+      </div>
+      <div id="casesState" class="loading">Loading your cases…</div>
       <div id="casesGrid" class="case-grid"></div>
     </section>
 
-    <section id="accountDangerZone" class="card danger-zone" style="margin-top:1rem;">
-      <div class="card-title">
-        <i class="fas fa-user-shield"></i> Account &amp; Privacy
+    <section class="dashboard-lower-grid">
+      <section class="card manlung-dashboard-card danger-zone" id="accountDangerZone">
+        <div class="dashboard-section-head compact">
+          <div class="dashboard-section-title">
+            <div class="dashboard-section-icon danger"><i class="fas fa-user-shield"></i></div>
+            <div><span class="dashboard-section-kicker danger-kicker">Account control</span><h2>Account &amp; Privacy</h2></div>
+          </div>
+        </div>
+        <div class="privacy-panel">
+          <div class="privacy-status"><i class="fas fa-lock"></i><span><strong>Your account is yours</strong><small>Manage your data and access securely.</small></span></div>
+          <p class="danger-copy">Deleting your account permanently removes your account, linked recovery cases, and evidence files attached to those cases.</p>
+          <button type="button" class="btn btn-danger case-delete-btn" onclick="deleteMyAccount()"><i class="fas fa-user-xmark"></i> Delete My Account</button>
+        </div>
+      </section>
+
+      <section class="card manlung-dashboard-card manlung-notifications-card" id="manlungNotifications">
+        <div class="dashboard-section-head compact">
+          <div class="dashboard-section-title">
+            <div class="dashboard-section-icon notice"><i class="fas fa-bell"></i></div>
+            <div><span class="dashboard-section-kicker">Stay informed</span><h2>Notifications <span class="manlung-notification-badge" id="manlungNotificationCount">0</span></h2></div>
+          </div>
+          <button type="button" class="dashboard-mini-link dashboard-mark-all" onclick="markAllManlungNotificationsRead()">Mark all read</button>
+        </div>
+        <div class="manlung-notification-list" id="manlungNotificationList">
+          <div class="manlung-empty">Loading notifications…</div>
+        </div>
+      </section>
+    </section>
+  <section class="card" id="clientSecurityCenter" style="margin-top:1rem"><div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap"><div><h3 style="margin:0 0 .25rem">Account Security Center</h3><p style="margin:0;color:var(--text-muted);font-size:.82rem">Keep your recovery account protected while your cases are being handled.</p></div><span id="clientSecurityBadge" class="status-badge status-progress">Checking</span></div><div class="case-meta" style="margin-bottom:0"><div><small>Email verification</small><strong id="clientEmailSecurity">Checking…</strong></div><div><small>MFA</small><strong id="clientMfaSecurity">Checking…</strong></div><div><small>Account status</small><strong id="clientAccountSecurity">Checking…</strong></div><div><small>Last login</small><strong id="clientLastLogin">Checking…</strong></div></div><div style="margin-top:1rem;padding:.85rem;border-radius:12px;background:rgba(37,99,235,.06);font-size:.8rem;color:var(--text-muted)">Never share passwords, OTPs, recovery codes or signed evidence links. If you notice unexpected activity, sign out and contact Manlung Recovery support.</div></section>
+<section class="card" id="clientCaseOverview"><h3 style="margin:0 0 .8rem">Recovery Progress</h3><div class="case-meta" style="margin:0"><div><small>Total cases</small><strong id="clientCaseTotal">—</strong></div><div><small>In progress</small><strong id="clientCaseActive">—</strong></div><div><small>Completed</small><strong id="clientCaseCompleted">—</strong></div><div><small>Evidence items</small><strong id="clientEvidenceTotal">—</strong></div></div></section></main>
+
+<!-- Account deletion confirmation modal -->
+<div
+  id="accountDeleteModal"
+  class="account-delete-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="accountDeleteTitle"
+  aria-describedby="accountDeleteDescription"
+  aria-hidden="true"
+>
+  <div class="account-delete-dialog" role="document">
+    <div class="account-delete-head">
+      <div class="account-delete-icon" aria-hidden="true">
+        <i class="fas fa-triangle-exclamation"></i>
       </div>
-      <p class="danger-copy">
-        You control your account. Deleting it permanently removes your account,
-        your linked recovery cases, and the evidence files attached to those cases.
-      </p>
+
+      <div>
+        <h2 id="accountDeleteTitle" class="account-delete-title">
+          Permanently delete your account?
+        </h2>
+      </div>
+
       <button
         type="button"
-        class="btn btn-danger"
-        onclick="deleteMyAccount()"
+        class="account-delete-close"
+        id="accountDeleteClose"
+        aria-label="Close account deletion dialog"
       >
-        <i class="fas fa-user-xmark"></i> Delete My Account
+        <i class="fas fa-xmark"></i>
       </button>
-    </section>
-
-
-<section class="card manlung-notifications-card" id="manlungNotifications">
-  <div class="manlung-notification-head">
-    <div class="manlung-notification-title">
-      <i class="fas fa-bell"></i>
-      <strong>Notifications</strong>
-      <span class="manlung-notification-badge" id="manlungNotificationCount">0</span>
     </div>
-    <button type="button" class="btn" onclick="markAllManlungNotificationsRead()">Mark all read</button>
+
+    <div class="account-delete-warning">
+      <strong>This action cannot be undone.</strong><br>
+      Your Manlung Recovery account, linked recovery cases, and evidence
+      files attached to those cases will be permanently removed.
+    </div>
+
+    <p id="accountDeleteDescription" class="account-delete-copy">
+      To continue, enter your current account password. Your password is
+      verified securely on the server before anything is deleted.
+    </p>
+
+    <div class="account-delete-field" id="accountDeletePasswordField">
+      <label for="accountDeletePassword">Current password</label>
+
+      <input
+        type="password"
+        id="accountDeletePassword"
+        name="accountDeletePassword"
+        autocomplete="current-password"
+        placeholder="Enter your current password"
+      >
+
+      <button
+        type="button"
+        class="account-delete-toggle"
+        id="accountDeleteToggle"
+        aria-label="Show password"
+        aria-pressed="false"
+      >
+        <i class="fas fa-eye"></i>
+      </button>
+    </div>
+
+    <div
+      id="accountDeleteOAuth"
+      class="account-delete-oauth"
+      hidden
+    >
+      <div class="account-delete-oauth-icon" aria-hidden="true">
+        <i id="accountDeleteOAuthIcon" class="fas fa-shield-halved"></i>
+      </div>
+
+      <div class="account-delete-oauth-content">
+        <strong id="accountDeleteOAuthTitle">
+          Verify your identity
+        </strong>
+
+        <p id="accountDeleteOAuthText">
+          Continue with your sign-in provider to verify your identity
+          before permanently deleting your account.
+        </p>
+      </div>
+    </div>
+
+    <div
+      id="accountDeleteError"
+      class="account-delete-error"
+      role="alert"
+      aria-live="polite"
+    ></div>
+
+    <div class="account-delete-actions">
+      <button
+        type="button"
+        class="btn"
+        id="accountDeleteCancel"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-danger account-delete-confirm"
+        id="accountDeleteConfirm"
+        disabled
+      >
+        <i class="fas fa-trash-can"></i>
+        <span>Delete account</span>
+      </button>
+    </div>
   </div>
-  <div class="manlung-notification-list" id="manlungNotificationList">
-    <div class="manlung-empty">Loading notifications…</div>
-  </div>
-</section>
-
-</main>
-
-  <footer class="manlung-footer">
-<div class="manlung-footer-inner">
-<div class="manlung-footer-brand">
-<h2>Cyber Recovery &amp; Digital Investigation Portal</h2>
-<p>Secure support, recovery guidance, digital awareness and responsible assistance.</p>
 </div>
-<nav class="manlung-footer-links" aria-label="Footer navigation">
-<a class="manlung-footer-link" href="/about.html">About</a>
-<a class="manlung-footer-link" href="/blog.html">Blog</a>
-<a class="manlung-footer-link" href="/careers.html">Careers</a>
-<a class="manlung-footer-link" href="/terms.html">Terms</a>
-<a class="manlung-footer-link" href="/login.html">Client Portal</a>
-<a class="manlung-footer-link" href="/client/request.html">New Recovery Request</a>
-</nav>
-<div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</div>
-</div>
-</footer>
 
-  <script src="/js/call-webrtc.js"></script>
-  <script src="/js/call-widget.js"></script>
+  <script src="/js/call-webrtc.js?v=video-20260923"></script>
+  <script src="/js/call-widget.js?v=video-20260923"></script>
   <script>
-    const token = localStorage.getItem('clientToken');
+    const token = null;
 
     async function guardClientPortal() {
       // No client session: return to client sign-in.
-      if (!token) {
-        window.location.href = '/login.html';
-        return false;
-      }
+      
 
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
         const res = await fetch('/api/auth/verify', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          cache: 'no-store'
+          credentials: 'include',
+          cache: 'no-store',
+          signal: controller.signal
         });
+        clearTimeout(timeout);
 
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || !data.success) {
-          localStorage.removeItem('clientToken');
+          fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).catch(()=>{});
           localStorage.removeItem('clientUser');
           window.location.href = '/login.html';
           return false;
@@ -535,12 +1083,11 @@
           (data.user.role === 'admin' ||
            data.user.role === 'owner')
         ) {
-          window.location.href = '/admin/dashboard.html';
+          window.location.replace('/admin/dashboard.html');
           return false;
         }
 
         if (!data.user || data.user.role !== 'client') {
-          localStorage.removeItem('clientToken');
           localStorage.removeItem('clientUser');
           window.location.href = '/login.html';
           return false;
@@ -562,18 +1109,13 @@
 
         // Do not expose a client-only page when the session cannot
         // be verified.
-        localStorage.removeItem('clientToken');
         localStorage.removeItem('clientUser');
-        window.location.href = '/login.html';
+        window.location.replace('/login.html');
         return false;
       }
     }
 
-    function authHeaders(){
-      return {
-        Authorization: `Bearer ${token}`
-      };
-    }
+    function authHeaders(){ return { 'Content-Type': 'application/json' }; }
     function escapeHtml(value){
       return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     }
@@ -619,9 +1161,7 @@
       applyTheme();
     })();
     function logout(){
-      localStorage.removeItem('clientToken');
-      localStorage.removeItem('clientUser');
-      window.location.href='/login.html';
+      fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).finally(()=>window.location.href='/login.html');
     }
     function renderCases(cases){
       const state=document.getElementById('casesState');
@@ -632,7 +1172,7 @@
       grid.innerHTML=cases.map(c=>{
         const id=escapeHtml(c.caseId);
         const status=escapeHtml(c.status || 'Pending Review');
-        return `<article class="case-card">
+        return `<article class="case-card ${String(c.caseType||'').trim().toLowerCase()==='online payment service'?'online-payment-case':''}">
           <div class="case-top"><div><div class="case-id">${id}</div><div class="case-type">${escapeHtml(c.caseType || 'Recovery Request')}</div></div><span class="status-badge ${statusClass(c.status)}">${status}</span></div>
           <div class="case-meta"><div><small>Last updated</small><strong>${formatDate(c.lastUpdated || c.createdAt)}</strong></div><div><small>Admin</small><strong>${escapeHtml(c.investigator || 'Not assigned yet')}</strong></div></div>
           ${c.publicNotes ? `<div class="feedback"><strong><i class="fas fa-message"></i> Admin update</strong><div style="margin-top:.35rem;white-space:pre-wrap;">${escapeHtml(c.publicNotes)}</div></div>` : ''}
@@ -692,44 +1232,382 @@
       }
     }
 
-    async function deleteMyAccount(){
-      const first = confirm(
-        'Delete your Manlung Recovery account permanently? Your account, linked recovery cases, and uploaded evidence will be removed.'
+    function deleteMyAccount(){
+      const modal = document.getElementById('accountDeleteModal');
+      const passwordInput = document.getElementById('accountDeletePassword');
+      const passwordField = document.getElementById('accountDeletePasswordField');
+      const oauthBox = document.getElementById('accountDeleteOAuth');
+      const oauthTitle = document.getElementById('accountDeleteOAuthTitle');
+      const oauthText = document.getElementById('accountDeleteOAuthText');
+      const oauthIcon = document.getElementById('accountDeleteOAuthIcon');
+      const errorBox = document.getElementById('accountDeleteError');
+      const confirmButton = document.getElementById('accountDeleteConfirm');
+      const confirmText = confirmButton?.querySelector('span');
+
+      if(!modal || !passwordInput || !confirmButton){
+        console.error('Account deletion modal is not available.');
+        return;
+      }
+
+      const clientUser = JSON.parse(
+        localStorage.getItem('clientUser') || 'null'
       );
 
-      if(!first) return;
+      const provider = String(
+        clientUser?.auth_provider || ''
+      ).trim().toLowerCase();
 
-      const second = prompt(
-        'Type DELETE to confirm permanent account deletion.'
+      const isOAuth =
+        provider === 'google' ||
+        provider === 'github';
+
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden','false');
+
+      errorBox?.classList.remove('is-visible');
+
+      if(errorBox) errorBox.textContent='';
+
+      passwordInput.value='';
+
+      if(isOAuth){
+        passwordField?.setAttribute('hidden','');
+        oauthBox?.removeAttribute('hidden');
+
+        if(oauthTitle){
+          oauthTitle.textContent =
+            `Continue with ${provider === 'google' ? 'Google' : 'GitHub'}`;
+        }
+
+        if(oauthText){
+          oauthText.textContent =
+            `Continue with ${provider === 'google' ? 'Google' : 'GitHub'} to verify your identity before permanently deleting your account.`;
+        }
+
+        if(oauthIcon){
+          oauthIcon.className =
+            provider === 'google'
+              ? 'fab fa-google'
+              : 'fab fa-github';
+        }
+
+        confirmButton.disabled=false;
+
+        if(confirmText){
+          confirmText.textContent =
+            `Continue with ${provider === 'google' ? 'Google' : 'GitHub'}`;
+        }
+      }else{
+        passwordField?.removeAttribute('hidden');
+        oauthBox?.setAttribute('hidden','');
+
+        confirmButton.disabled=true;
+
+        if(confirmText){
+          confirmText.textContent='Delete account';
+        }
+
+        window.setTimeout(() => passwordInput.focus(), 50);
+      }
+    }
+
+    function closeDeleteAccountModal(){
+      const modal = document.getElementById('accountDeleteModal');
+      const passwordInput = document.getElementById('accountDeletePassword');
+      const errorBox = document.getElementById('accountDeleteError');
+      const confirmButton = document.getElementById('accountDeleteConfirm');
+
+      if(!modal) return;
+
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden','true');
+
+      if(passwordInput){
+        passwordInput.value='';
+        passwordInput.type='password';
+      }
+
+      if(errorBox){
+        errorBox.textContent='';
+        errorBox.classList.remove('is-visible');
+      }
+
+      if(confirmButton){
+        confirmButton.disabled=true;
+        confirmButton.classList.remove('is-loading');
+
+        const buttonText=confirmButton.querySelector('span');
+
+        if(buttonText){
+          buttonText.textContent='Delete account';
+        }
+      }
+
+      document.getElementById('accountDeleteToggle')?.setAttribute(
+        'aria-pressed',
+        'false'
       );
 
-      if(second !== 'DELETE'){
-        alert('Account deletion cancelled.');
+      const toggleIcon=document.querySelector('#accountDeleteToggle i');
+
+      if(toggleIcon){
+        toggleIcon.className='fas fa-eye';
+      }
+    }
+
+    async function startOAuthAccountDeletion(provider){
+      const normalizedProvider=String(provider||'').trim().toLowerCase();
+
+      if(normalizedProvider!=='google' && normalizedProvider!=='github'){
         return;
       }
 
       try{
-        const res = await fetch('/api/auth/client/account', {
-          method:'DELETE',
-          headers:authHeaders()
-        });
+        const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
 
-        const data = await res.json().catch(()=>({}));
-
-        if(!res.ok || !data.success){
-          throw new Error(data.error || `Could not delete account (${res.status})`);
+        if(!cfg.supabaseUrl || !cfg.supabaseAnonKey){
+          throw new Error('Social authentication is not configured.');
         }
 
-        localStorage.removeItem('clientToken');
-        localStorage.removeItem('clientUser');
+        if(!window.supabase?.createClient){
+          throw new Error('Social authentication is unavailable.');
+        }
 
-        alert('Your account has been deleted.');
-        window.location.href='/login.html';
+        const supabase=window.supabase.createClient(
+          cfg.supabaseUrl,
+          cfg.supabaseAnonKey
+        );
+
+        const redirectUrl =
+          window.location.origin +
+          '/oauth-callback.html?action=delete-account&provider=' +
+          encodeURIComponent(normalizedProvider);
+
+        const {error}=await supabase.auth.signInWithOAuth({
+          provider:normalizedProvider,
+          options:{
+            redirectTo:redirectUrl,
+            queryParams:{
+              prompt:'select_account'
+            }
+          }
+        });
+
+        if(error) throw error;
       }catch(error){
-        console.error('Delete account error:', error);
-        alert(error.message || 'Could not delete your account.');
+        console.error('OAuth account deletion sign-in error:',error);
+
+        const errorBox=document.getElementById('accountDeleteError');
+
+        if(errorBox){
+          errorBox.textContent =
+            error.message ||
+            'Social sign-in could not be started. Please try again.';
+          errorBox.classList.add('is-visible');
+        }
       }
     }
+
+    async function confirmDeleteMyAccount(){
+      const passwordInput=document.getElementById('accountDeletePassword');
+      const confirmButton=document.getElementById('accountDeleteConfirm');
+      const errorBox=document.getElementById('accountDeleteError');
+
+      if(!passwordInput || !confirmButton) return;
+
+      const password=passwordInput.value;
+
+      const clientUser=JSON.parse(
+        localStorage.getItem('clientUser') || 'null'
+      );
+
+      const provider=String(
+        clientUser?.auth_provider || ''
+      ).trim().toLowerCase();
+
+      if(provider==='google' || provider==='github'){
+        confirmButton.disabled=true;
+        confirmButton.classList.add('is-loading');
+
+        const buttonIcon=confirmButton.querySelector('i');
+        const buttonText=confirmButton.querySelector('span');
+
+        if(buttonIcon){
+          buttonIcon.className='fas fa-spinner fa-spin';
+        }
+
+        if(buttonText){
+          buttonText.textContent='Connecting…';
+        }
+
+        await startOAuthAccountDeletion(provider);
+        return;
+      }
+
+      if(!password) return;
+
+      if(errorBox){
+        errorBox.textContent='';
+        errorBox.classList.remove('is-visible');
+      }
+
+      confirmButton.disabled=true;
+      confirmButton.classList.add('is-loading');
+
+      const buttonIcon=confirmButton.querySelector('i');
+      const buttonText=confirmButton.querySelector('span');
+
+      if(buttonIcon){
+        buttonIcon.className='fas fa-spinner fa-spin';
+      }
+
+      if(buttonText){
+        buttonText.textContent='Deleting…';
+      }
+
+      try{
+        const res=await fetch('/api/auth/client/account',{
+          method:'DELETE',
+          headers:{
+            ...authHeaders(),
+            'Content-Type':'application/json'
+          },
+          body:JSON.stringify({password})
+        });
+
+        const data=await res.json().catch(()=>({}));
+
+        if(!res.ok || !data.success){
+          const deleteError = new Error(
+            data.error ||
+            'Could not delete your account.'
+          );
+
+          deleteError.code = data.code || '';
+          deleteError.provider = data.provider || '';
+
+          throw deleteError;
+        }
+
+        localStorage.removeItem('clientUser');
+
+        window.location.href='/login.html';
+      }catch(error){
+        console.error('Delete account error:',error);
+
+        if(errorBox){
+          if(error.code==='OAUTH_REAUTH_REQUIRED'){
+            const provider =
+              error.provider==='google'
+                ? 'Google'
+                : error.provider==='github'
+                  ? 'GitHub'
+                  : 'your sign-in provider';
+
+            errorBox.textContent =
+              `This account uses ${provider} sign-in. Please sign in again with ${provider} to verify your identity before deleting your account.`;
+          }else{
+            errorBox.textContent =
+              error.message ||
+              'Could not delete your account. Please try again.';
+          }
+
+          errorBox.classList.add('is-visible');
+        }
+
+        confirmButton.disabled=false;
+        confirmButton.classList.remove('is-loading');
+
+        if(buttonIcon){
+          buttonIcon.className='fas fa-trash-can';
+        }
+
+        if(buttonText){
+          buttonText.textContent='Delete account';
+        }
+
+        passwordInput.focus();
+      }
+    }
+
+    (function setupAccountDeleteModal(){
+      const modal=document.getElementById('accountDeleteModal');
+      const passwordInput=document.getElementById('accountDeletePassword');
+      const confirmButton=document.getElementById('accountDeleteConfirm');
+      const cancelButton=document.getElementById('accountDeleteCancel');
+      const closeButton=document.getElementById('accountDeleteClose');
+      const toggleButton=document.getElementById('accountDeleteToggle');
+
+      if(!modal || !passwordInput || !confirmButton) return;
+
+      passwordInput.addEventListener('input',()=>{
+        confirmButton.disabled=passwordInput.value.length===0;
+      });
+
+      passwordInput.addEventListener('keydown',(event)=>{
+        if(
+          event.key==='Enter' &&
+          passwordInput.value &&
+          !confirmButton.disabled
+        ){
+          event.preventDefault();
+          confirmDeleteMyAccount();
+        }
+      });
+
+      confirmButton.addEventListener(
+        'click',
+        confirmDeleteMyAccount
+      );
+
+      cancelButton?.addEventListener(
+        'click',
+        closeDeleteAccountModal
+      );
+
+      closeButton?.addEventListener(
+        'click',
+        closeDeleteAccountModal
+      );
+
+      toggleButton?.addEventListener('click',()=>{
+        const showing=passwordInput.type==='text';
+
+        passwordInput.type=showing?'password':'text';
+
+        toggleButton.setAttribute(
+          'aria-pressed',
+          String(!showing)
+        );
+
+        toggleButton.setAttribute(
+          'aria-label',
+          showing?'Show password':'Hide password'
+        );
+
+        const icon=toggleButton.querySelector('i');
+
+        if(icon){
+          icon.className=
+            showing?'fas fa-eye':'fas fa-eye-slash';
+        }
+      });
+
+      modal.addEventListener('click',(event)=>{
+        if(event.target===modal){
+          closeDeleteAccountModal();
+        }
+      });
+
+      document.addEventListener('keydown',(event)=>{
+        if(
+          event.key==='Escape' &&
+          modal.classList.contains('is-open')
+        ){
+          closeDeleteAccountModal();
+        }
+      });
+    })();
 
     async function loadDonationSummary(){
       try{
@@ -741,10 +1619,18 @@
         }
       }catch(error){ console.error('Donation summary error',error); }
     }
-    loadCases();
-    loadDonationSummary();
-    setInterval(loadCases, 15000);
-    setInterval(loadDonationSummary, 10000);
+    (async function bootClientDashboard(){
+      const authenticated = await guardClientPortal();
+      if (!authenticated) return;
+
+      await Promise.allSettled([
+        loadCases(),
+        loadDonationSummary()
+      ]);
+
+      setInterval(loadCases, 30000);
+      setInterval(loadDonationSummary, 30000);
+    })();
   </script>
 
 <script id="manlung-notifications-script">
@@ -754,16 +1640,7 @@
   let notificationToastTimer = null;
   let notificationAudioContext = null;
 
-  function manlungToken(){
-    return localStorage.getItem('clientToken') || '';
-  }
-
-  function manlungHeaders(){
-    const token = manlungToken();
-    return token
-      ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
-      : { 'Content-Type': 'application/json' };
-  }
+  function manlungHeaders(){ return { 'Content-Type': 'application/json' }; }
 
   function formatManlungDate(value){
     if(!value) return '';
@@ -994,6 +1871,129 @@
   window.hideNotificationToast =
     hideNotificationToast;
 
+  let manlungIncomingCall = null;
+  let manlungIncomingCallPoll = null;
+  let manlungActiveAdminCallId = null;
+
+  function renderIncomingAdminCall(call){
+    const card=document.getElementById('manlungIncomingAdminCall');
+    if(!card) return;
+    if(!call){
+      if(manlungActiveAdminCallId) return;
+      manlungIncomingCall=null;
+      card.classList.remove('is-visible','is-connecting','is-active');
+      card.setAttribute('aria-hidden','true');
+      return;
+    }
+    manlungIncomingCall={...call};
+    const adminName=escapeHtml(call.admin_name||'Manlung Admin');
+    const caseText=call.case_id ? `Case ${escapeHtml(call.case_id)}` : 'Support callback';
+    document.getElementById('manlungIncomingCallTitle').textContent=`Incoming call from ${call.admin_name||'Manlung Admin'}`;
+    document.getElementById('manlungIncomingCallDescription').textContent=call.case_id
+      ? `${call.admin_name||'Manlung Admin'} is calling about case ${call.case_id}. You can accept to start the secure browser audio call, or decline if you are unavailable.`
+      : `${call.admin_name||'Manlung Admin'} is calling you from Manlung Recovery. You can accept to start the secure browser audio call, or decline if you are unavailable.`;
+    document.getElementById('manlungIncomingCallAdmin').innerHTML='<i class="fas fa-user-shield"></i> '+adminName;
+    document.getElementById('manlungIncomingCallCase').innerHTML='<i class="fas fa-folder-open"></i> '+caseText;
+    card.classList.add('is-visible');
+    card.classList.remove('is-active');
+    card.setAttribute('aria-hidden','false');
+  }
+
+  function renderActiveAdminCall(state, call){
+    const card=document.getElementById('manlungIncomingAdminCall');
+    if(!card) return;
+    const adminName=escapeHtml(call?.admin_name||'Manlung Admin');
+    const caseText=call?.case_id ? 'Case '+escapeHtml(call.case_id) : 'Support callback';
+    manlungActiveAdminCallId=call?.id || manlungActiveAdminCallId;
+    card.classList.add('is-visible','is-active');
+    card.classList.remove('is-connecting');
+    card.setAttribute('aria-hidden','false');
+    const title=document.getElementById('manlungIncomingCallTitle');
+    const desc=document.getElementById('manlungIncomingCallDescription');
+    const admin=document.getElementById('manlungIncomingCallAdmin');
+    const caseEl=document.getElementById('manlungIncomingCallCase');
+    const stateEl=document.getElementById('manlungIncomingCallState');
+    const actions=card.querySelector('.manlung-incoming-call-actions');
+    if(title) title.textContent=state==='connected' ? 'Secure call connected' : 'Connecting to your Admin…';
+    if(desc) desc.textContent=state==='connected' ? 'You are now connected to your Admin. Keep this page open while the secure audio call is active.' : 'Your Admin has accepted the connection. Establishing secure browser audio…';
+    if(admin) admin.innerHTML='<i class="fas fa-user-shield"></i> '+adminName;
+    if(caseEl) caseEl.innerHTML='<i class="fas fa-folder-open"></i> '+caseText;
+    if(stateEl){stateEl.style.display='block';stateEl.textContent=state==='connected' ? '🟢 Live audio connection' : '🔄 Establishing secure audio connection…';}
+    if(actions){
+      actions.innerHTML=state==='connected'
+        ? '<button type="button" class="decline" id="manlungActiveCallEnd"><i class="fas fa-phone-slash"></i> End call</button>'
+        : '<button type="button" class="accept" disabled><i class="fas fa-spinner fa-spin"></i> Connecting…</button>';
+    }
+    document.getElementById('manlungActiveCallEnd')?.addEventListener('click',()=>{
+      window.dispatchEvent(new CustomEvent('manlung:dashboard-end-admin-call',{detail:{id:manlungActiveAdminCallId}}));
+    });
+  }
+
+  function setIncomingCallConnecting(connecting){
+    const card=document.getElementById('manlungIncomingAdminCall');
+    if(!card) return;
+    card.classList.toggle('is-connecting',!!connecting);
+    const accept=document.getElementById('manlungIncomingCallAccept');
+    const decline=document.getElementById('manlungIncomingCallDecline');
+    if(accept) accept.disabled=!!connecting;
+    if(decline) decline.disabled=!!connecting;
+  }
+
+  async function pollIncomingAdminCall(){
+    const headers=manlungHeaders();
+    if(!headers) return;
+    try{
+      const res=await fetch('/api/calls/client/callbacks',{credentials:'include',cache:'no-store'});
+      if(!res.ok) return;
+      const data=await res.json().catch(()=>({}));
+      const call=Array.isArray(data.calls)&&data.calls.length?data.calls[0]:null;
+      if(call && !manlungIncomingCall){
+        renderIncomingAdminCall(call);
+      }else if(call && manlungIncomingCall && String(call.id)!==String(manlungIncomingCall.id)){
+        renderIncomingAdminCall(call);
+      }else if(!call && manlungIncomingCall){
+        renderIncomingAdminCall(null);
+      }
+    }catch(_){}
+  }
+
+  function setupIncomingAdminCallDashboard(){
+    const accept=document.getElementById('manlungIncomingCallAccept');
+    const decline=document.getElementById('manlungIncomingCallDecline');
+    accept?.addEventListener('click',()=>{
+      if(!manlungIncomingCall)return;
+      setIncomingCallConnecting(true);
+      window.dispatchEvent(new CustomEvent('manlung:dashboard-accept-admin-call',{detail:{id:manlungIncomingCall.id}}));
+    });
+    decline?.addEventListener('click',()=>{
+      if(!manlungIncomingCall)return;
+      setIncomingCallConnecting(true);
+      window.dispatchEvent(new CustomEvent('manlung:dashboard-decline-admin-call',{detail:{id:manlungIncomingCall.id}}));
+    });
+    window.addEventListener('manlung:incoming-admin-call',event=>{
+      renderIncomingAdminCall(event.detail||null);
+    });
+    window.addEventListener('manlung:admin-call-accepting',()=>{
+      setIncomingCallConnecting(true);
+    });
+    window.addEventListener('manlung:admin-call-cleared',event=>{
+      const action=event?.detail?.action;
+      if(action==='accepted') renderActiveAdminCall('connecting',manlungIncomingCall||{id:event?.detail?.id});
+      else { manlungActiveAdminCallId=null; renderIncomingAdminCall(null); }
+      loadManlungNotifications();
+    });
+    window.addEventListener('manlung:admin-call-state',event=>{
+      const detail=event?.detail||{};
+      if(detail.id && manlungActiveAdminCallId && String(detail.id)!==String(manlungActiveAdminCallId)) return;
+      if(['requesting-mic','connecting','reconnecting'].includes(detail.state)) renderActiveAdminCall('connecting',manlungIncomingCall||detail);
+      else if(detail.state==='connected') renderActiveAdminCall('connected',manlungIncomingCall||detail);
+      else if(['connection-failed','ended-by-remote','ended'].includes(detail.state)){ manlungActiveAdminCallId=null; renderIncomingAdminCall(null); }
+    });
+    pollIncomingAdminCall();
+    clearInterval(manlungIncomingCallPoll);
+    manlungIncomingCallPoll=setInterval(pollIncomingAdminCall,2000);
+  }
+
   async function loadManlungNotifications(){
     const list = document.getElementById('manlungNotificationList');
     const badge = document.getElementById('manlungNotificationCount');
@@ -1054,6 +2054,8 @@
       });
 
       notificationReady = true;
+      const noticeMetric=document.getElementById("dashboardNoticeMetric");
+      if(noticeMetric) noticeMetric.textContent=String(unread);
 
       if(!notifications.length){
         list.innerHTML = '<div class="manlung-empty">No notifications yet.</div>';
@@ -1130,6 +2132,8 @@
   window.markManlungNotificationRead = markManlungNotificationRead;
   window.markAllManlungNotificationsRead = markAllManlungNotificationsRead;
 
+  document.addEventListener("DOMContentLoaded", setupIncomingAdminCallDashboard);
+
   document.addEventListener(
     'pointerdown',
     unlockNotificationSound,
@@ -1156,6 +2160,53 @@
 })();
 </script>
 
-<script src="/js/pwa.js" defer></script>
-</body>
+<script id="manlung-dashboard-metrics">
+(function(){
+  function syncMetric(id,value){const el=document.getElementById(id);if(el)el.textContent=value}
+  const oldLoadCases=window.loadCases;
+  const oldLoadDonationSummary=window.loadDonationSummary;
+  const casesGrid=document.getElementById('casesGrid');
+  const donation=document.getElementById('publicDonationTotal');
+  const count=document.getElementById('publicDonationCount');
+  const caseObserver=new MutationObserver(function(){
+    const cards=casesGrid?.querySelectorAll('.case-card')||[];
+    const n=cards.length;
+    syncMetric('dashboardCaseMetric',n);
+  });
+  if(casesGrid)caseObserver.observe(casesGrid,{childList:true,subtree:true});
+  if(donation){
+    const observer=new MutationObserver(function(){syncMetric('dashboardDonationMetric',donation.textContent||'KES 0')});
+    observer.observe(donation,{childList:true,characterData:true,subtree:true});
+  }
+  if(count){
+    const observer=new MutationObserver(function(){syncMetric('dashboardDonationCountMetric',count.textContent||'0')});
+    observer.observe(count,{childList:true,characterData:true,subtree:true});
+  }
+  const notice=document.getElementById('manlungNotificationCount');
+  if(notice){
+    const observer=new MutationObserver(function(){syncMetric('dashboardNoticeMetric',notice.textContent||'0')});
+    observer.observe(notice,{childList:true,characterData:true,subtree:true});
+  }
+})();
+</script><script src="/js/pwa.js" defer></script>
+<footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+    <div class="manlung-footer-grid">
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row">
+          <a href="/" aria-label="Manlung Recovery Home"><img src="/icons/icon-512.png" alt="Manlung Recovery" class="manlung-footer-logo" width="46" height="46"></a>
+          <div><h2 id="footer-brand-title">Manlung Recovery</h2><p class="manlung-footer-brand-subtitle">Cyber Recovery &amp; Digital Investigation Portal</p></div>
+        </div>
+        <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
+      </section>
+      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
+      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request.html">New Recovery Request</a><a href="/client/dashboard.html">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/donate.html" class="footer-important">Donate</a><a href="/careers.html" class="footer-important">Careers</a><a href="/contact.html">Contact</a></nav></section>
+      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
+    </div>
+    <div class="manlung-footer-divider"></div>
+    <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer">GitHub</a></div></div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+  </div>
+</footer>
+<script id="client-security-enhancement">(function(){const q=id=>document.getElementById(id);function fmtClient(v){return v?new Date(v).toLocaleString():'—'}async function loadClientSecurity(){try{const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)return;const u=d.user||{};q('clientEmailSecurity').textContent=u.email_verified_at?'Verified':'Protected verification required';q('clientMfaSecurity').textContent=u.mfa_enabled?'Enabled':'Not enabled';q('clientAccountSecurity').textContent=u.security_status||'Active';q('clientLastLogin').textContent=fmtClient(u.last_login_at);const badge=q('clientSecurityBadge');if((u.security_status||'active')!=='active'){badge.textContent='Review account';badge.className='status-badge status-rejected'}else{badge.textContent='Account protected';badge.className='status-badge status-completed'}}catch(e){console.warn('Client security center',e)}}async function loadClientProgress(){try{const r=await fetch('/api/cases/client/me',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)return;const cases=Array.isArray(d.cases)?d.cases:[];q('clientCaseTotal').textContent=cases.length;q('clientCaseActive').textContent=cases.filter(x=>/progress|active|investigat/i.test(x.status||'')).length;q('clientCaseCompleted').textContent=cases.filter(x=>/completed|closed/i.test(x.status||'')).length;q('clientEvidenceTotal').textContent=cases.reduce((n,x)=>n+(Array.isArray(x.files)?x.files.length:0),0)}catch(e){console.warn('Client progress',e)}}document.addEventListener('DOMContentLoaded',()=>{loadClientSecurity();loadClientProgress();setInterval(loadClientSecurity,60000);setInterval(loadClientProgress,30000)})})();</script></body>
 </html>

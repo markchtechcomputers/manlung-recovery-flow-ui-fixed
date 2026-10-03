@@ -1,0 +1,981 @@
+
+/* ==========================================================
+   MANLUNG RECOVERY — HERO FINAL BALANCED DESIGN
+   ========================================================== */
+
+.ml-balanced-hero {
+    position: relative !important;
+    isolation: isolate !important;
+    overflow: hidden !important;
+
+    min-height: 650px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    padding:
+        76px
+        clamp(20px, 5vw, 72px)
+        70px !important;
+
+    background:
+        radial-gradient(
+            circle at 82% 45%,
+            rgba(59,130,246,.12),
+            transparent 34%
+        ),
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f8fbff 60%,
+            #eef5ff 100%
+        ) !important;
+}
+
+/* ==========================================================
+   HERO IMAGE
+   ========================================================== */
+
+.ml-balanced-hero .ml-hero-device-visual {
+
+    position: absolute !important;
+
+    z-index: 2 !important;
+
+    width: 50% !important;
+    height: min(520px, 72%) !important;
+
+    right: 0 !important;
+    top: 50% !important;
+
+    transform: translateY(-50%) !important;
+
+    pointer-events: none !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    overflow: hidden !important;
+
+    border-radius: 26px 0 0 26px !important;
+}
+
+.ml-balanced-hero .ml-hero-device-visual img,
+.ml-balanced-hero .ml-hero-device-video {
+
+    display: block !important;
+
+    width: 100% !important;
+    height: auto !important;
+
+    max-width: none !important;
+
+    opacity: .98 !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+
+    border-radius: 24px !important;
+
+    filter:
+        drop-shadow(
+            0 28px 48px rgba(15,23,42,.15)
+        ) !important;
+}
+
+.ml-balanced-hero .ml-hero-device-video {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    background: #eaf2ff !important;
+    box-shadow:
+        0 24px 60px rgba(15,23,42,.12),
+        0 0 0 1px rgba(37,99,235,.08) !important;
+    transform: translateZ(0) scale(1.005) !important;
+}
+
+.ml-balanced-hero .ml-hero-video-shade {
+    position: absolute !important;
+    inset: 0 !important;
+    border-radius: 24px !important;
+    pointer-events: none !important;
+    z-index: 2 !important;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0) 55%,
+            rgba(255,255,255,.10) 100%
+        ) !important;
+}
+
+/* ==========================================================
+   LEFT HERO INFORMATION
+   ========================================================== */
+
+.ml-balanced-hero .ml-hero-copy {
+
+    position: relative !important;
+
+    z-index: 20 !important;
+
+    width: min(650px, 52%) !important;
+
+    margin-right: auto !important;
+
+    text-align: left !important;
+
+    padding: 10px 0 !important;
+}
+
+/* Badge */
+
+.ml-hero-badge {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    gap: 9px !important;
+
+    padding:
+        8px
+        13px !important;
+
+    margin-bottom: 20px !important;
+
+    border:
+        1px solid
+        rgba(37,99,235,.18) !important;
+
+    border-radius: 999px !important;
+
+    background:
+        rgba(255,255,255,.78) !important;
+
+    color: #2563eb !important;
+
+    font-size: 13px !important;
+
+    font-weight: 700 !important;
+
+    letter-spacing: .01em !important;
+
+    box-shadow:
+        0 5px 18px rgba(37,99,235,.08) !important;
+
+    backdrop-filter: blur(10px) !important;
+}
+
+.ml-badge-dot {
+
+    width: 8px !important;
+    height: 8px !important;
+
+    border-radius: 50% !important;
+
+    background: #16a34a !important;
+
+    box-shadow:
+        0 0 0 4px rgba(22,163,74,.10) !important;
+}
+
+/* Heading */
+
+.ml-balanced-hero .ml-hero-copy h1 {
+
+    margin:
+        0
+        0
+        22px !important;
+
+    max-width: 680px !important;
+
+    color: #0f172a !important;
+
+    font-size:
+        clamp(2.7rem, 5vw, 4.6rem) !important;
+
+    line-height: 1.02 !important;
+
+    letter-spacing: -.045em !important;
+
+    font-weight: 800 !important;
+}
+
+.ml-balanced-hero .ml-hero-copy h1 span {
+
+    display: block !important;
+
+    color: #2563eb !important;
+}
+
+/* Description */
+
+.ml-balanced-hero .ml-hero-description {
+
+    max-width: 620px !important;
+
+    margin:
+        0
+        0
+        30px !important;
+
+    color: #64748b !important;
+
+    font-size: 17px !important;
+
+    line-height: 1.7 !important;
+}
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
+
+.ml-hero-actions {
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    flex-wrap: wrap !important;
+
+    gap: 12px !important;
+
+    margin-bottom: 27px !important;
+}
+
+.ml-hero-primary,
+.ml-hero-secondary {
+
+    min-height: 50px !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 10px !important;
+
+    padding:
+        0
+        19px !important;
+
+    border-radius: 12px !important;
+
+    text-decoration: none !important;
+
+    font-size: 14px !important;
+
+    font-weight: 700 !important;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease !important;
+}
+
+.ml-hero-primary {
+
+    color: #ffffff !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        ) !important;
+
+    box-shadow:
+        0 10px 25px rgba(37,99,235,.22) !important;
+}
+
+.ml-hero-secondary {
+
+    color: #0f172a !important;
+
+    background: #ffffff !important;
+
+    border:
+        1px solid #dbe3ef !important;
+
+    box-shadow:
+        0 8px 20px rgba(15,23,42,.06) !important;
+}
+
+.ml-hero-primary:hover,
+.ml-hero-secondary:hover {
+
+    transform: translateY(-2px) !important;
+}
+
+/* ==========================================================
+   SECURITY INFORMATION
+   ========================================================== */
+
+.ml-hero-security-row {
+
+    display: flex !important;
+
+    flex-wrap: wrap !important;
+
+    align-items: center !important;
+
+    gap:
+        10px
+        18px !important;
+
+    color: #64748b !important;
+
+    font-size: 12px !important;
+
+    font-weight: 600 !important;
+}
+
+.ml-security-item {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+}
+
+.ml-security-item i {
+
+    color: #2563eb !important;
+
+    font-size: 13px !important;
+}
+
+/* ==========================================================
+   IMAGE BLEND
+   ========================================================== */
+
+.ml-balanced-hero::after {
+
+    content: "" !important;
+
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    z-index: 5 !important;
+
+    pointer-events: none !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.98) 0%,
+            rgba(255,255,255,.96) 28%,
+            rgba(255,255,255,.72) 45%,
+            rgba(255,255,255,.22) 66%,
+            rgba(255,255,255,0) 84%
+        ) !important;
+}
+
+/* Copy stays above fade */
+.ml-balanced-hero .ml-hero-copy {
+
+    z-index: 30 !important;
+}
+
+/* Image stays behind fade */
+.ml-balanced-hero .ml-hero-device-visual {
+
+    z-index: 3 !important;
+}
+
+/* ==========================================================
+   TABLET
+   ========================================================== */
+
+@media (max-width: 1000px) and (min-width: 769px) {
+
+    .ml-balanced-hero {
+
+        min-height: 590px !important;
+
+        padding-left: 35px !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy {
+
+        width: 56% !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-visual {
+
+        width: 52vw !important;
+
+        right: -55px !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy h1 {
+
+        font-size: 3.1rem !important;
+    }
+}
+
+/* ==========================================================
+   MOBILE — IMAGE FIRST
+   ========================================================== */
+
+@media (max-width: 768px) {
+
+    .ml-balanced-hero {
+
+        display: flex !important;
+
+        flex-direction: column !important;
+
+        align-items: stretch !important;
+
+        min-height: auto !important;
+
+        padding:
+            0
+            0
+            45px !important;
+
+        background:
+            linear-gradient(
+                180deg,
+                #f5f9ff 0%,
+                #ffffff 60%
+            ) !important;
+    }
+
+    /* IMAGE FIRST */
+
+    .ml-balanced-hero .ml-hero-device-visual {
+
+        position: relative !important;
+
+        order: -100 !important;
+
+        top: auto !important;
+        right: auto !important;
+
+        transform: none !important;
+
+        width: 100% !important;
+        height: auto !important;
+
+        margin: 0 auto !important;
+
+        border-radius: 0 !important;
+
+        z-index: 3 !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-visual img,
+    .ml-balanced-hero .ml-hero-device-video {
+
+        width: 100% !important;
+
+        height: auto !important;
+
+        object-fit: cover !important;
+        object-position: center !important;
+
+        border-radius: 18px !important;
+
+        filter:
+            drop-shadow(
+                0 16px 32px rgba(15,23,42,.10)
+            ) !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-video {
+        aspect-ratio: 16 / 10 !important;
+        min-height: 230px !important;
+        max-height: 360px !important;
+        background: #eaf2ff !important;
+        box-shadow:
+            0 18px 42px rgba(15,23,42,.10),
+            0 0 0 1px rgba(37,99,235,.07) !important;
+        transform: translateZ(0) !important;
+    }
+
+    .ml-balanced-hero .ml-hero-video-shade {
+        border-radius: 18px !important;
+        background:
+            linear-gradient(
+                180deg,
+                rgba(255,255,255,0) 60%,
+                rgba(255,255,255,.14) 100%
+            ) !important;
+    }
+
+    /* COPY AFTER IMAGE */
+
+    .ml-balanced-hero .ml-hero-copy {
+
+        order: 10 !important;
+
+        width: auto !important;
+
+        margin: 0 !important;
+
+        padding:
+            20px
+            20px
+            0 !important;
+
+        z-index: 30 !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy h1 {
+
+        font-size:
+            clamp(2.25rem, 10vw, 3.3rem) !important;
+
+        line-height: 1.04 !important;
+
+        letter-spacing: -.04em !important;
+    }
+
+    .ml-balanced-hero .ml-hero-description {
+
+        font-size: 15.5px !important;
+
+        line-height: 1.65 !important;
+
+        margin-bottom: 24px !important;
+    }
+
+    .ml-hero-badge {
+
+        font-size: 11.5px !important;
+
+        margin-bottom: 16px !important;
+    }
+
+    .ml-hero-actions {
+
+        flex-direction: column !important;
+
+        align-items: stretch !important;
+
+        width: 100% !important;
+    }
+
+    .ml-hero-primary,
+    .ml-hero-secondary {
+
+        width: 100% !important;
+
+        min-height: 50px !important;
+    }
+
+    .ml-hero-security-row {
+
+        display: grid !important;
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr)) !important;
+
+        gap: 12px !important;
+
+        margin-top: 5px !important;
+    }
+
+    /* Mobile fade only affects image */
+    .ml-balanced-hero::after {
+
+        top: 0 !important;
+
+        height: 42% !important;
+
+        bottom: auto !important;
+
+        background:
+            linear-gradient(
+                180deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,.05) 55%,
+                rgba(255,255,255,.82) 96%,
+                rgba(255,255,255,1) 100%
+            ) !important;
+    }
+}
+
+/* ==========================================================
+   SMALL PHONES
+   ========================================================== */
+
+@media (max-width: 480px) {
+
+    .ml-balanced-hero .ml-hero-copy {
+
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy h1 {
+
+        font-size: 2.25rem !important;
+    }
+
+    .ml-hero-security-row {
+
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ==========================================================
+   DARK MODE
+   ========================================================== */
+
+html.dark .ml-balanced-hero,
+body.dark .ml-balanced-hero {
+
+    background:
+        radial-gradient(
+            circle at 80% 42%,
+            rgba(99,102,241,.16),
+            transparent 36%
+        ),
+        linear-gradient(
+            135deg,
+            #0b0f19,
+            #111827
+        ) !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-copy h1,
+body.dark .ml-balanced-hero .ml-hero-copy h1 {
+
+    color: #ffffff !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-copy h1 span,
+body.dark .ml-balanced-hero .ml-hero-copy h1 span {
+
+    color: #60a5fa !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-description,
+body.dark .ml-balanced-hero .ml-hero-description {
+
+    color: #94a3b8 !important;
+}
+
+html.dark .ml-hero-badge,
+body.dark .ml-hero-badge {
+
+    color: #60a5fa !important;
+
+    background:
+        rgba(30,41,59,.75) !important;
+
+    border-color:
+        rgba(96,165,250,.22) !important;
+}
+
+html.dark .ml-hero-secondary,
+body.dark .ml-hero-secondary {
+
+    color: #ffffff !important;
+
+    background: #1e293b !important;
+
+    border-color: #334155 !important;
+}
+
+html.dark .ml-security-item,
+body.dark .ml-security-item {
+
+    color: #94a3b8 !important;
+}
+
+html.dark .ml-balanced-hero::after,
+body.dark .ml-balanced-hero::after {
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(11,15,25,1) 0%,
+            rgba(11,15,25,.97) 28%,
+            rgba(11,15,25,.78) 48%,
+            rgba(11,15,25,.24) 70%,
+            rgba(11,15,25,0) 88%
+        ) !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-device-visual img,
+body.dark .ml-balanced-hero .ml-hero-device-visual img,
+html.dark .ml-balanced-hero .ml-hero-device-video,
+body.dark .ml-balanced-hero .ml-hero-device-video {
+
+    filter:
+        drop-shadow(0 25px 45px rgba(0,0,0,.45))
+        brightness(.88) !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-device-video,
+body.dark .ml-balanced-hero .ml-hero-device-video {
+    background: #0f172a !important;
+    box-shadow:
+        0 24px 60px rgba(0,0,0,.34),
+        0 0 0 1px rgba(96,165,250,.12) !important;
+}
+
+html.dark .ml-balanced-hero .ml-hero-video-shade,
+body.dark .ml-balanced-hero .ml-hero-video-shade {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(11,15,25,0) 55%,
+            rgba(11,15,25,.14) 100%
+        ) !important;
+}
+
+@media (max-width: 768px) {
+
+    html.dark .ml-balanced-hero::after,
+    body.dark .ml-balanced-hero::after {
+
+        background:
+            linear-gradient(
+                180deg,
+                rgba(11,15,25,0) 0%,
+                rgba(11,15,25,.04) 55%,
+                rgba(11,15,25,.82) 96%,
+                rgba(11,15,25,1) 100%
+            ) !important;
+    }
+}
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .ml-balanced-hero *,
+    .ml-balanced-hero *::before,
+    .ml-balanced-hero *::after {
+
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+
+/* ==========================================================
+   HERO VIDEO BACKGROUND — FULL BLEED / COPY ON TOP
+   ========================================================== */
+
+.ml-balanced-hero {
+    min-height: 680px !important;
+    padding: 0 !important;
+    background: #07111f !important;
+    overflow: hidden !important;
+}
+
+.ml-balanced-hero .ml-hero-device-visual {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    z-index: 1 !important;
+    display: block !important;
+}
+
+.ml-balanced-hero .ml-hero-device-video {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    aspect-ratio: auto !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: 0 !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.ml-balanced-hero .ml-hero-video-shade {
+    position: absolute !important;
+    inset: 0 !important;
+    border-radius: 0 !important;
+    z-index: 2 !important;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(3,10,20,.92) 0%,
+            rgba(3,10,20,.82) 28%,
+            rgba(3,10,20,.58) 50%,
+            rgba(3,10,20,.28) 72%,
+            rgba(3,10,20,.18) 100%
+        ) !important;
+}
+
+.ml-balanced-hero::after {
+    content: none !important;
+}
+
+.ml-balanced-hero .ml-hero-copy {
+    position: relative !important;
+    z-index: 10 !important;
+    width: min(760px, 62%) !important;
+    margin: 0 !important;
+    padding: 90px clamp(24px, 7vw, 110px) !important;
+    text-align: left !important;
+    color: #fff !important;
+}
+
+.ml-balanced-hero .ml-hero-copy h1 {
+    color: #fff !important;
+    text-shadow: 0 3px 24px rgba(0,0,0,.38) !important;
+}
+
+.ml-balanced-hero .ml-hero-copy h1 span {
+    color: #7dd3fc !important;
+}
+
+.ml-balanced-hero .ml-hero-description {
+    color: rgba(255,255,255,.9) !important;
+    text-shadow: 0 2px 14px rgba(0,0,0,.35) !important;
+}
+
+.ml-balanced-hero .ml-hero-badge {
+    color: #dbeafe !important;
+    background: rgba(8,25,45,.62) !important;
+    border-color: rgba(147,197,253,.35) !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,.18) !important;
+    backdrop-filter: blur(12px) !important;
+}
+
+.ml-balanced-hero .ml-hero-secondary {
+    color: #fff !important;
+    background: rgba(15,23,42,.58) !important;
+    border-color: rgba(255,255,255,.28) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.ml-balanced-hero .ml-hero-security-row {
+    color: rgba(255,255,255,.86) !important;
+}
+
+.ml-balanced-hero .ml-security-item i {
+    color: #7dd3fc !important;
+}
+
+@media (max-width: 768px) {
+    .ml-balanced-hero {
+        min-height: 760px !important;
+        display: block !important;
+        padding: 0 !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-visual {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        order: initial !important;
+        z-index: 1 !important;
+    }
+
+    .ml-balanced-hero .ml-hero-device-video {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
+        border-radius: 0 !important;
+        object-fit: cover !important;
+    }
+
+    .ml-balanced-hero .ml-hero-video-shade {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(3,10,20,.34) 0%,
+                rgba(3,10,20,.54) 34%,
+                rgba(3,10,20,.84) 72%,
+                rgba(3,10,20,.94) 100%
+            ) !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy {
+        position: relative !important;
+        width: auto !important;
+        margin: 0 !important;
+        padding: 95px 20px 55px !important;
+        z-index: 10 !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy h1 {
+        color: #fff !important;
+    }
+
+    .ml-balanced-hero .ml-hero-description {
+        color: rgba(255,255,255,.92) !important;
+    }
+
+    .ml-hero-security-row {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .ml-balanced-hero {
+        min-height: 820px !important;
+    }
+
+    .ml-balanced-hero .ml-hero-copy {
+        padding: 82px 16px 45px !important;
+    }
+
+    .ml-hero-security-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
+<style>
+/* HERO BALANCE POLISH */
+.ml-balanced-hero .ml-hero-copy {
+    max-width: 720px !important;
+    padding-top: clamp(72px, 9vh, 104px) !important;
+    padding-bottom: clamp(60px, 8vh, 90px) !important;
+}
+.ml-balanced-hero .ml-hero-badge { margin-bottom: 18px !important; }
+.ml-balanced-hero .ml-hero-copy h1 {
+    font-size: clamp(2.6rem, 4.6vw, 4.25rem) !important;
+    line-height: 1.03 !important;
+    margin-bottom: 20px !important;
+}
+.ml-balanced-hero .ml-hero-description {
+    max-width: 650px !important;
+    font-size: clamp(15px, 1.25vw, 17px) !important;
+    line-height: 1.65 !important;
+    margin-bottom: 26px !important;
+}
+.ml-hero-actions { margin-bottom: 24px !important; }
+.ml-hero-security-row { gap: 10px 22px !important; }
+@media (min-width: 769px) {
+    .ml-balanced-hero .ml-hero-copy {
+        width: min(720px, 62vw) !important;
+    }
+}
+@media (max-width: 768px) {
+    .ml-balanced-hero .ml-hero-copy {
+        padding-top: 78px !important;
+        padding-bottom: 42px !important;
+    }
+    .ml-balanced-hero .ml-hero-copy h1 {
+        font-size: clamp(2.15rem, 9.5vw, 3.1rem) !important;
+    }
+}
+</style>

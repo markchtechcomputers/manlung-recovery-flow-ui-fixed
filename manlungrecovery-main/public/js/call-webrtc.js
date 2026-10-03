@@ -112,14 +112,31 @@
       const data = await res.json();
       const session = data?.session;
       if (!session) return null;
-      return isInitiator ? (session.client_user_id || null) : (session.admin_user_id || null);
+      if (data?.participant_user_id) return String(data.participant_user_id);
+      // The signaling identity must be the authenticated participant, not
+      // simply the initiator/non-initiator role. A client is the initiator for
+      // Client -> Admin calls, while an admin is the initiator for Admin ->
+      // Client callbacks. Using the role alone reverses Client -> Admin and
+      // causes one browser to discard the other side's SDP/ICE as its own.
+      const tokenUserId = currentUserIdFromHeaders(headers);
+      if (tokenUserId && (
+        tokenUserId === session.client_user_id ||
+        tokenUserId === session.admin_user_id
+      )) {
+        return tokenUserId;
+      }
+
+      // Safe fallback for sessions where the JWT cannot be decoded locally.
+      return isInitiator
+        ? (session.client_user_id || null)
+        : (session.admin_user_id || null);
     } catch (_) {
       return null;
     }
   }
 
   class CallPeer {
-    constructor({ sessionId, isInitiator, headers, onStateChange, onDuration }) {
+    constructor({ sessionId, isInitiator, headers, onStateChange, onDuration, videoEnabled = false }) {
       this.sessionId = sessionId;
       this.isInitiator = !!isInitiator;
       this.headers = headers || {};
@@ -140,6 +157,10 @@
       this.remoteDescriptionSet = false;
       this.pendingIce = [];
       this.remoteAudio = null;
+      this.remoteVideoElement = null;
+      this.remoteStream = null;
+      this.localVideoElement = null;
+      this.videoEnabled = !!videoEnabled;
       this.signalCursor = 0;
       this.signalTimer = null;
       this.sessionStatusTimer = null;
@@ -148,6 +169,10 @@
       this.endSent = false;
       this.remoteEndSeen = false;
       this.connectionTimeout = null;
+      this.reconnectAttempts = 0;
+      this.reconnectTimer = null;
+      this.reconnectInFlight = false;
+      this.maxReconnectAttempts = 4;
     }
 
     setState(state, extra) {
@@ -161,10 +186,26 @@
       }
 
       this.setState('requesting-mic');
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-        video: false,
-      });
+      try {
+        this.localStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+          video: this.videoEnabled ? { width: { ideal: 1280, max: 1920 }, height: { ideal: 720, max: 1080 }, frameRate: { ideal: 24, max: 30 }, facingMode: 'user' } : false,
+        });
+        this.videoEnabled = this.videoEnabled && this.localStream.getVideoTracks().length > 0;
+      } catch (mediaError) {
+        console.warn('[Manlung WebRTC] requested media unavailable; using audio-only fallback:', mediaError?.name || mediaError);
+        try {
+          this.localStream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+            video: false,
+          });
+          this.videoEnabled = false;
+        } catch (audioError) {
+          await this.terminateSession('media_permission_denied').catch(() => {});
+          this.setState('permission-denied', 'Microphone/camera permission was not granted.');
+          throw audioError;
+        }
+      }
 
       // Resolve the signaling identity from the server-side call session.
       // This is more reliable than decoding a JWT in the browser, especially
@@ -183,6 +224,12 @@
       this.pc.ontrack = event => {
         const stream = event.streams?.[0];
         if (!stream) return;
+        this.remoteStream = stream;
+        if (this.remoteVideoElement) {
+          this.remoteVideoElement.srcObject = stream;
+          this.remoteVideoElement.style.display = stream.getVideoTracks().length ? '' : 'none';
+          this.remoteVideoElement.play().catch(() => {});
+        }
         if (!this.remoteAudio) {
           this.remoteAudio = document.createElement('audio');
           this.remoteAudio.autoplay = true;
@@ -211,10 +258,10 @@
 
       this.pc.oniceconnectionstatechange = () => {
         const state = this.pc?.iceConnectionState;
-        if (state === 'failed') {
-          this.setState('connection-failed', 'ICE negotiation failed. Check that the Vercel TURN_URL, TURN_USERNAME and TURN_CREDENTIAL variables are configured for production.');
+        if (state === 'failed' && this.connectedAt) {
+          this.requestReconnect('ICE connection failed');
         } else if (state === 'disconnected' && this.connectedAt) {
-          this.setState('reconnecting');
+          this.requestReconnect('ICE connection disconnected');
         }
       };
 
@@ -222,6 +269,7 @@
         const state = this.pc?.connectionState;
         if (state === 'connected' && !this.connectedAt) {
           if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
+      if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
           this.connectionTimeout = null;
           stopRingtone();
           this.connectedAt = Date.now();
@@ -232,9 +280,14 @@
             }
           }, 1000);
         } else if (state === 'failed') {
-          this.setState('connection-failed', 'WebRTC could not establish an audio path. TURN is required for some mobile, VPN and restricted networks.');
+          if (this.connectedAt) {
+            this.requestReconnect('WebRTC connection failed');
+          } else {
+            this.setState('connection-failed', 'WebRTC could not establish an audio/video path. TURN is required for some mobile, VPN and restricted networks.');
+            this.terminateSession('connection_failed').catch(() => {});
+          }
         } else if (state === 'disconnected' && this.connectedAt) {
-          this.setState('reconnecting');
+          this.requestReconnect('WebRTC connection disconnected');
         }
       };
 
@@ -256,8 +309,43 @@
       this.connectionTimeout = setTimeout(() => {
         if (!this.ended && !this.connectedAt) {
           this.setState('connection-failed', 'Connection timed out. This usually means the network needs a working TURN relay.');
+          this.terminateSession('connection_timeout').catch(() => {});
         }
       }, 20000);
+    }
+
+    async requestReconnect(reason) {
+      if (this.ended || !this.connectedAt || this.reconnectInFlight) return;
+      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        this.setState('connection-failed', reason + '. Automatic reconnection attempts were exhausted.');
+        this.terminateSession('reconnect_failed').catch(() => {});
+        return;
+      }
+      clearTimeout(this.reconnectTimer);
+      const attempt = ++this.reconnectAttempts;
+      this.reconnectTimer = setTimeout(async () => {
+        if (this.ended || !this.pc || this.reconnectInFlight) return;
+        this.reconnectInFlight = true;
+        this.setState('reconnecting', `Reconnecting… attempt ${attempt}/${this.maxReconnectAttempts}`);
+        try {
+          if (this.isInitiator) {
+            const offer = await this.pc.createOffer({ iceRestart: true });
+            await this.pc.setLocalDescription(offer);
+            await this.sendSignal('offer', {
+              sdp: { type: this.pc.localDescription?.type || 'offer', sdp: this.pc.localDescription?.sdp || '' },
+              reconnect: true,
+              attempt
+            });
+          }
+        } catch (error) {
+          console.warn('[Manlung WebRTC] reconnect attempt failed:', error);
+        } finally {
+          this.reconnectInFlight = false;
+          if (!this.ended && this.pc?.connectionState !== 'connected' && this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.requestReconnect('Retrying connection');
+          }
+        }
+      }, Math.min(1000 * Math.pow(2, attempt - 1), 8000));
     }
 
     async sendSignal(event, payload) {
@@ -302,11 +390,14 @@
           await this.pc.setRemoteDescription(offerDescription);
           this.remoteDescriptionSet = true;
           await this.flushPendingIce();
-          if (!this.answerSent) {
+          const reconnectOffer = signal.payload?.reconnect === true;
+          if (!this.answerSent || reconnectOffer) {
             const answer = await this.pc.createAnswer();
             await this.pc.setLocalDescription(answer);
             await this.sendSignal('answer', {
               sdp: { type: this.pc.localDescription?.type || 'answer', sdp: this.pc.localDescription?.sdp || '' },
+              reconnect: reconnectOffer,
+              attempt: signal.payload?.attempt || 0
             });
             this.answerSent = true;
           }
@@ -338,7 +429,7 @@
     async sendOffer() {
       if (!this.isInitiator || this.offerSent || !this.pc || this.ended) return;
       this.offerSent = true;
-      const offer = await this.pc.createOffer({ offerToReceiveAudio: true });
+      const offer = await this.pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
       await this.pc.setLocalDescription(offer);
       await this.sendSignal('offer', { sdp: this.pc.localDescription });
     }
@@ -348,6 +439,22 @@
       const candidates = this.pendingIce.splice(0);
       for (const candidate of candidates) {
         try { await this.pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch (_) {}
+      }
+    }
+
+    attachMediaElements({ local, remote } = {}) {
+      this.localVideoElement = local || this.localVideoElement;
+      this.remoteVideoElement = remote || this.remoteVideoElement;
+      if (this.localVideoElement && this.localStream) {
+        this.localVideoElement.srcObject = this.localStream;
+        this.localVideoElement.muted = true;
+        this.localVideoElement.style.display = this.videoEnabled ? '' : 'none';
+        this.localVideoElement.play().catch(() => {});
+      }
+      if (this.remoteVideoElement && this.remoteStream) {
+        this.remoteVideoElement.srcObject = this.remoteStream;
+        this.remoteVideoElement.style.display = this.remoteStream.getVideoTracks().length ? '' : 'none';
+        this.remoteVideoElement.play().catch(() => {});
       }
     }
 
@@ -409,11 +516,45 @@
 
     async end() {
       if (this.ended) return;
+      /* End must be durable even if signaling is delayed or the caller forgets
+         to make a second API request. Send both the lightweight peer signal
+         and the authenticated session-end request, then clean up locally. */
+      if (!this.endSent) {
+        this.endSent = true;
+        try {
+          await Promise.race([
+            this.sendSignal('end', {}),
+            new Promise(resolve => setTimeout(resolve, 1000)),
+          ]);
+        } catch (_) {}
+      }
+
       try {
-        if (!this.endSent) {
-          this.endSent = true;
-          await this.sendSignal('end', {});
-        }
+        await Promise.race([
+          fetch(`/api/calls/${encodeURIComponent(this.sessionId)}/end`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...this.headers },
+            body: JSON.stringify({ reason: 'peer_hangup' }),
+            keepalive: true,
+          }),
+          new Promise(resolve => setTimeout(resolve, 2000)),
+        ]);
+      } catch (_) {}
+
+      this.cleanup();
+    }
+
+    async terminateSession(reason) {
+      if (this.ended) return;
+      try {
+        await Promise.race([
+          fetch(`/api/calls/${encodeURIComponent(this.sessionId)}/end`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...this.headers },
+            body: JSON.stringify({ reason })
+          }),
+          new Promise(resolve => setTimeout(resolve, 1500))
+        ]);
       } catch (_) {}
       this.cleanup();
     }

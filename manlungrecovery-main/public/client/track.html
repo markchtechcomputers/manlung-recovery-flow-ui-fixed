@@ -3,31 +3,10 @@
 <head>
     <meta charset="UTF-8">
   <script src="/js/theme.js"></script>
-    <link rel="manifest" href="/manifest.webmanifest">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Case Details · Manlung Recovery</title>
-    <meta name="robots" content="noindex,nofollow,noarchive">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style id="manlung-footer-style">
-.manlung-footer{margin-top:2.5rem;padding:1.6rem 1rem .8rem;background:#06101d;border-top:1px solid rgba(255,255,255,.08);color:#dbeafe}
-.manlung-footer-inner{max-width:1000px;margin:auto}
-.manlung-footer-brand{text-align:center;margin-bottom:1rem}
-.manlung-footer-brand h2{margin:0 0 .3rem;font-size:clamp(1rem,1.7vw,1.25rem);color:#fff}
-.manlung-footer-brand p{margin:0;color:#94a3b8;font-size:.8rem}
-.manlung-footer-links{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin:1rem 0}
-.manlung-footer-link{display:flex;align-items:center;justify-content:center;min-height:42px;padding:.45rem .35rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#dbeafe;text-decoration:none;font-weight:600;font-size:.76rem;text-align:center;transition:background .18s ease,border-color .18s ease,color .18s ease}
-.manlung-footer-link:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);color:#fff}
-.manlung-footer-link:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
-.manlung-footer-link:active{background:rgba(255,255,255,.1)}
-.manlung-footer-bottom{padding-top:.7rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;color:#64748b;font-size:.7rem}
-.manlung-footer-bottom strong{color:#94a3b8}
-@media(max-width:900px){.manlung-footer-links{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:600px){.manlung-footer{margin-top:2rem;padding:1.3rem .65rem .7rem}.manlung-footer-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;margin:.8rem 0}.manlung-footer-link{min-height:40px;font-size:.72rem}}
-@media(max-width:380px){.manlung-footer-links{grid-template-columns:1fr}}
-</style>
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
 <style id="manlung-header-style">
 .site-header{
   position:sticky;
@@ -227,6 +206,58 @@
 </style>
 
 
+<style id="manlung-track-premium-style">
+.track-entry-card{
+  margin:1.25rem 0;
+  padding:clamp(1.35rem,3vw,2rem);
+  border:1px solid #dbeafe;
+  border-radius:22px;
+  background:linear-gradient(135deg,#ffffff,#f7fbff);
+  box-shadow:0 18px 50px rgba(15,23,42,.08);
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:1rem 1.15rem;
+  align-items:center;
+}
+.track-entry-icon{
+  width:58px;height:58px;border-radius:17px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#2563eb,#1d4ed8);color:#fff;
+  box-shadow:0 12px 26px rgba(37,99,235,.2);font-size:1.2rem;
+}
+.track-entry-copy{min-width:0}
+.track-eyebrow{display:block;text-transform:uppercase;letter-spacing:.1em;font-size:.66rem;font-weight:900;color:#2563eb;margin-bottom:.25rem}
+.track-entry-copy h2{margin:0;color:#0f172a;font-size:clamp(1.25rem,3vw,1.7rem)}
+.track-entry-copy p{margin:.45rem 0 0;color:#64748b;line-height:1.55}
+.track-entry-form{grid-column:1/-1;padding-top:.25rem}
+.track-entry-form label{display:block;font-size:.74rem;font-weight:800;color:#334155;margin-bottom:.4rem}
+.track-entry-controls{display:flex;gap:.6rem}
+.track-entry-controls input{flex:1;min-height:48px;border:1px solid #cbd5e1;border-radius:12px;padding:.7rem .8rem;background:#fff;color:#0f172a}
+.track-entry-controls input:focus{outline:2px solid rgba(37,99,235,.16);border-color:#2563eb}
+.track-entry-controls .btn{min-height:48px}
+.track-entry-form small{display:block;margin-top:.4rem;color:#64748b;font-size:.68rem}
+.track-help-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:0 0 1rem}
+.track-help-grid article{display:grid;grid-template-columns:auto 1fr;column-gap:.65rem;padding:1rem;border:1px solid #e2e8f0;border-radius:15px;background:#fff}
+.track-help-grid i{grid-row:span 2;color:#2563eb;font-size:1rem;margin-top:.15rem}
+.track-help-grid strong{font-size:.78rem;color:#0f172a}
+.track-help-grid span{font-size:.7rem;color:#64748b;line-height:1.45;margin-top:.15rem}
+@media(max-width:650px){
+ .track-entry-card{grid-template-columns:auto 1fr;border-radius:18px}
+ .track-entry-controls{flex-direction:column}
+ .track-entry-controls .btn{width:100%}
+ .track-help-grid{grid-template-columns:1fr}
+}
+</style>
+<script>
+function openCaseFromForm(event){
+  event.preventDefault();
+  const input=document.getElementById('trackCaseInput');
+  const value=(input?.value||'').trim();
+  if(!value) return false;
+  window.location.href='/client/track.html?case='+encodeURIComponent(value);
+  return false;
+}
+</script>
+
 <style id="manlung-message-style">
 .manlung-message-card{margin-top:1rem}
 .manlung-message-list{display:grid;gap:.6rem;max-height:420px;overflow:auto;padding:.2rem;scrollbar-width:thin;scrollbar-color:rgba(100,116,139,.55) transparent}.manlung-message-list::-webkit-scrollbar{width:7px;height:7px}.manlung-message-list::-webkit-scrollbar-track{background:transparent}.manlung-message-list::-webkit-scrollbar-thumb{background:rgba(100,116,139,.42);border-radius:999px}.manlung-message-list::-webkit-scrollbar-thumb:hover{background:rgba(36,81,214,.68)}
@@ -279,23 +310,54 @@
 </style>
 
   <link rel="stylesheet" href="/css/theme.css">
+
+    <meta name="description" content="Cyber Recovery & Digital Investigation Portal">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png">
+
+    <!-- Open Graph / WhatsApp / Facebook / Telegram -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Manlung Recovery">
+    <meta property="og:description" content="Cyber Recovery & Digital Investigation Portal">
+    <meta property="og:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+    <meta property="og:image:secure_url" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:url" content="https://manlungrecovery.manlungshop.co.ke/">
+    <meta property="og:site_name" content="Manlung Recovery">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Manlung Recovery">
+    <meta name="twitter:description" content="Cyber Recovery & Digital Investigation Portal">
+    <meta name="twitter:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
+
+    <link rel="stylesheet" href="/css/footer.css">
+    <script src="/js/support-fab.js"></script>
+    <link rel="stylesheet" href="/css/unified-ui.css">
+    <script src="/js/client-session-guard.js"></script>
 </head>
 <body>
     <header class="site-header">
         <div class="container">
             <div class="brand">
                 
-<img
+<a class="manlung-home-logo" href="/" aria-label="Manlung Recovery Home" title="Home"><img
   class="manlung-site-logo"
-  src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"
+  src="/icons/icon-512.png"
   alt="Manlung Recovery"
->
-<h1><i class="fas fa-folder-open"></i> Case Details</h1>
+></a>
+<h1> Case Details</h1>
                 <span id="caseIdHeading">Loading…</span>
             </div>
             <div class="header-actions">
-                <a href="/client/dashboard.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Dashboard</a>
-                <a href="/" class="btn btn-outline"><i class="fas fa-home"></i> Home</a>
+                <a href="/client/dashboard.html" class="btn btn-outline"> Dashboard</a>
+                <a href="/" class="btn btn-outline"> Home</a>
             </div>
         </div>
     </header>
@@ -303,24 +365,6 @@
     <div class="container">
         <div id="content"></div>
     </div>
-
-    <footer class="manlung-footer">
-<div class="manlung-footer-inner">
-<div class="manlung-footer-brand">
-<h2>Cyber Recovery &amp; Digital Investigation Portal</h2>
-<p>Secure support, recovery guidance, digital awareness and responsible assistance.</p>
-</div>
-<nav class="manlung-footer-links" aria-label="Footer navigation">
-<a class="manlung-footer-link" href="/about.html">About</a>
-<a class="manlung-footer-link" href="/blog.html">Blog</a>
-<a class="manlung-footer-link" href="/careers.html">Careers</a>
-<a class="manlung-footer-link" href="/terms.html">Terms</a>
-<a class="manlung-footer-link" href="/login.html">Client Portal</a>
-<a class="manlung-footer-link" href="/client/request.html">New Recovery Request</a>
-</nav>
-<div class="manlung-footer-bottom">&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</div>
-</div>
-</footer>
 
     <script>
         function getStatusClass(status) {
@@ -343,18 +387,41 @@
             const params = new URLSearchParams(window.location.search);
             const caseId = params.get('case');
             const content = document.getElementById('content');
-            const token = localStorage.getItem('clientToken');
-            if (!token) { window.location.href = '/login.html'; return; }
+            const token = null;
+            if (false) { window.location.href = '/login.html'; return; }
 
             if (!caseId) {
-                content.innerHTML = '<div class="card"><p class="error-text">No case ID provided.</p></div>';
+                document.getElementById('caseIdHeading').textContent = 'Track an existing case';
+                content.innerHTML = `
+                    <section class="track-entry-card">
+                        <div class="track-entry-icon"><i class="fas fa-route"></i></div>
+                        <div class="track-entry-copy">
+                            <span class="track-eyebrow">Secure case tracking</span>
+                            <h2>Where is your case now?</h2>
+                            <p>Enter your private case reference to view available progress, updates, messages and next steps.</p>
+                        </div>
+                        <form class="track-entry-form" onsubmit="return openCaseFromForm(event)">
+                            <label for="trackCaseInput">Case reference</label>
+                            <div class="track-entry-controls">
+                                <input id="trackCaseInput" type="text" autocomplete="off" placeholder="e.g. MRC-2026-0012" required>
+                                <button class="btn btn-primary" type="submit"><i class="fas fa-arrow-right"></i> View Case</button>
+                            </div>
+                            <small>Use the case ID provided after submitting your recovery request.</small>
+                        </form>
+                    </section>
+                    <section class="track-help-grid">
+                        <article><i class="fas fa-shield-halved"></i><strong>Private</strong><span>Case details are shown only after client authentication.</span></article>
+                        <article><i class="fas fa-list-check"></i><strong>Structured</strong><span>Follow status, timeline, files and meaningful updates in one place.</span></article>
+                        <article><i class="fas fa-headset"></i><strong>Need help?</strong><span>Open your Client Portal or use available support options.</span></article>
+                    </section>
+                `;
                 return;
             }
 
             document.getElementById('caseIdHeading').textContent = caseId;
 
             try {
-                const res = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`, { credentials: 'include', cache: 'no-store' });
                 const data = await res.json();
 
                 if (!data.success) {
@@ -422,15 +489,11 @@
 <script id="manlung-timeline-script">
 (function(){
   function token(){
-    return localStorage.getItem('clientToken') || '';
+    return '';
   }
 
-  function headers(){
-    const t = token();
-    return t
-      ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' }
-      : { 'Content-Type': 'application/json' };
-  }
+  function headers(){ return { 'Content-Type': 'application/json' }; }
+
 
   function escapeHtml(value){
     return String(value ?? '')
@@ -539,17 +602,13 @@ function clientMessageDate(value) {
 async function loadClientCaseMessages(caseId) {
     currentCaseIdForMessages = caseId;
     const list = document.getElementById('caseMessagesList');
-    const token = localStorage.getItem('clientToken');
-
-    if (!list || !token) return;
+    if (!list) return;
 
     try {
         const res = await fetch(
             `/api/messages/case/${encodeURIComponent(caseId)}`,
             {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+                credentials:'include',
                 cache: 'no-store'
             }
         );
@@ -608,9 +667,7 @@ async function loadClientCaseMessages(caseId) {
 async function sendClientCaseMessage() {
     const input = document.getElementById('caseMessageInput');
     const status = document.getElementById('caseMessageStatus');
-    const token = localStorage.getItem('clientToken');
-
-    if (!input || !currentCaseIdForMessages || !token) return;
+    if (!input || !currentCaseIdForMessages) return;
 
     const message = input.value.trim();
 
@@ -626,8 +683,8 @@ async function sendClientCaseMessage() {
             `/api/messages/case/${encodeURIComponent(currentCaseIdForMessages)}`,
             {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ message })
@@ -653,5 +710,44 @@ async function sendClientCaseMessage() {
 
   <script src="/js/call-widget.js"></script>
 <script src="/js/pwa.js" defer></script>
+<footer class="manlung-footer" aria-label="Manlung Recovery footer">
+  <div class="manlung-footer-inner">
+    <div class="manlung-footer-grid">
+      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
+        <div class="manlung-footer-brand-row">
+          <a href="/" aria-label="Manlung Recovery Home"><img src="/icons/icon-512.png" alt="Manlung Recovery" class="manlung-footer-logo" width="46" height="46"></a>
+          <div><h2 id="footer-brand-title">Manlung Recovery</h2><p class="manlung-footer-brand-subtitle">Cyber Recovery &amp; Digital Investigation Portal</p></div>
+        </div>
+        <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
+      </section>
+      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
+      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request.html">New Recovery Request</a><a href="/client/dashboard.html">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/donate.html" class="footer-important">Donate</a><a href="/careers.html" class="footer-important">Careers</a><a href="/contact.html">Contact</a></nav></section>
+      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
+    </div>
+    <div class="manlung-footer-divider"></div>
+    <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer">GitHub</a></div></div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+  </div>
+</footer>
+<script id="manlung-live-location-link">
+(function(){
+  const caseId=new URLSearchParams(location.search).get('case');
+  if(!caseId)return;
+  function add(){
+    const content=document.getElementById('content');
+    if(!content||document.getElementById('manlungLiveLocationCard'))return;
+    const card=document.createElement('section');
+    card.id='manlungLiveLocationCard';
+    card.className='card';
+    card.style.cssText='margin-top:1rem;border:1px solid rgba(37,99,235,.2);background:linear-gradient(135deg,rgba(37,99,235,.06),rgba(14,165,233,.03));';
+    card.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:.8rem"><img src="https://i.postimg.cc/3w6BvBsT/icon-512.png" alt="Manlung Recovery" width="48" height="48" style="border-radius:12px;object-fit:cover"><div><strong style="display:block">Live device location</strong><span style="color:var(--text-muted);font-size:.78rem">Share your own device location for this case.</span></div></div><a class="btn btn-primary" href="/client/live-location.html?case='+encodeURIComponent(caseId)+'"><i class="fas fa-location-crosshairs"></i> Open Live Tracker</a></div><p style="margin:.7rem 0 0;color:var(--text-muted);font-size:.72rem">Sharing starts only after you press Start and grant browser location permission.</p>';
+    const first=content.querySelector('.card');
+    if(first)first.parentNode.insertBefore(card,first.nextSibling);else content.prepend(card);
+  }
+  const target=document.getElementById('content')||document.body;
+  new MutationObserver(add).observe(target,{childList:true,subtree:true});
+  add();
+})();
+</script>
 </body>
 </html>
