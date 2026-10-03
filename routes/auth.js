@@ -543,8 +543,11 @@ router.post(
         });
       }
 
-      const session = await User.bumpSessionVersion(admin.id);
-      issueAdminSession(res, { ...admin, session_version: session?.session_version });
+      // Normal login must not depend on session_version being present in the
+      // production database. Session revocation is handled by explicit security
+      // actions; issuing the session directly keeps login from failing with a
+      // server error when an older deployment/database is missing that field.
+      issueAdminSession(res, admin);
 
       console.log(`Admin/Owner login successful: ${admin.username} (${admin.role})`);
 
@@ -730,8 +733,9 @@ router.post('/admin/mfa/login', [
       return res.status(401).json({ error: 'Invalid authentication code.' });
     }
 
-    const session = await User.bumpSessionVersion(admin.id);
-    issueAdminSession(res, { ...admin, session_version: session?.session_version });
+    // MFA verification completes the login; do not make the login itself
+    // depend on a session_version database update.
+    issueAdminSession(res, admin);
     clearMfaTicketCookie(res);
 
     await SecurityMonitoring.recordEvent({
