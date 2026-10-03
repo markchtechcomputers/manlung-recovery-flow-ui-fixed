@@ -287,6 +287,7 @@ async function listEvents({
   eventType,
   severity,
   limit = 200,
+  offset = 0,
 } = {}) {
   let query = supabase
     .from(EVENTS_TABLE)
@@ -294,7 +295,7 @@ async function listEvents({
       'id,event_type,severity,user_id,login_identifier,ip_hash,user_agent_hash,path,http_status,metadata,created_at'
     )
     .order('created_at', { ascending: false })
-    .limit(Math.min(Number(limit) || 200, 500));
+    .range(Math.max(Number(offset) || 0, 0), Math.max(Number(offset) || 0, 0) + Math.min(Number(limit) || 200, 500) - 1);
 
   if (userId) {
     query = query.eq('user_id', userId);
