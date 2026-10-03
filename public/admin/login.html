@@ -190,8 +190,8 @@
                 adminTurnstileWidget = window.turnstile.render('#adminTurnstile', {
                     sitekey: config.turnstileSiteKey,
                     theme: 'dark',
-                    size: 'flexible',
-                    appearance: 'interaction-only'
+                    size: 'normal',
+                    appearance: 'always'
                 });
             } catch (error) { console.error('Turnstile setup failed:', error); }
         }
