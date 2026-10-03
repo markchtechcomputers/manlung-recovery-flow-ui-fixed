@@ -139,12 +139,12 @@ function sanitizeMetadata(metadata) {
   return result;
 }
 
-async function listUsers({ search, status, role, limit = 100 } = {}) {
+async function listUsers({ search, status, role, limit = 100, offset = 0 } = {}) {
   let query = supabase
     .from(USERS_TABLE)
     .select(USER_SELECT)
     .order('created_at', { ascending: false })
-    .limit(Math.min(Number(limit) || 100, 500));
+    .range(Math.max(Number(offset) || 0, 0), Math.max(Number(offset) || 0, 0) + Math.min(Number(limit) || 100, 500) - 1);
 
   if (search) {
     const like = `%${String(search).trim()}%`;
