@@ -48,6 +48,7 @@
     <link rel="stylesheet" href="/css/footer.css">
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
 </head>
 <body>
     <div class="center-wrap">
@@ -68,6 +69,7 @@
                     <label><i class="fas fa-lock"></i> Password</label>
                     <input type="password" id="adminPassword" placeholder="Enter password" required>
                 </div>
+                <div id="adminTurnstile" style="margin:.75rem 0;"></div>
                 <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
                     <i class="fas fa-arrow-right-to-bracket"></i> Login
                 </button>
@@ -158,9 +160,27 @@
     <script>
         let pendingMfaTicket = null;
         let mfaEnrollmentUser = null;
+        let adminTurnstileEnabled = false;
+        let adminTurnstileWidget = null;
 
         document.getElementById('adminLoginForm')
             ?.addEventListener('submit', handleAdminLogin);
+
+        async function setupAdminTurnstile() {
+            try {
+                const config = await fetch('/api/config/public', { cache: 'no-store' }).then(r => r.json());
+                adminTurnstileEnabled = Boolean(config.turnstileEnabled && config.turnstileSiteKey);
+                if (!adminTurnstileEnabled || !window.turnstile) return;
+                adminTurnstileWidget = window.turnstile.render('#adminTurnstile', {
+                    sitekey: config.turnstileSiteKey,
+                    theme: 'dark',
+                    size: 'flexible',
+                    appearance: 'interaction-only'
+                });
+            } catch (_) {}
+        }
+
+        window.addEventListener('load', setupAdminTurnstile);
 
         function showMfaEnrollment(user) {
             mfaEnrollmentUser = user;
@@ -274,14 +294,26 @@
             const errorEl = document.getElementById('loginError');
             errorEl.textContent = '';
 
+            const turnstileToken = adminTurnstileEnabled && window.turnstile && adminTurnstileWidget !== null
+                ? window.turnstile.getResponse(adminTurnstileWidget)
+                : null;
+            if (adminTurnstileEnabled && !turnstileToken) {
+                errorEl.textContent = 'Please complete the Cloudflare security verification.';
+                return;
+            }
+
             try {
                 const response = await fetch('/api/auth/admin/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
-                    body: JSON.stringify({ username, password }),
+                    body: JSON.stringify({ username, password, turnstileToken }),
                 });
                 const data = await response.json();
+
+                if (adminTurnstileWidget !== null && window.turnstile) {
+                    window.turnstile.reset(adminTurnstileWidget);
+                }
 
                 if (data.success && data.mfaRequired) {
                     pendingMfaTicket = data.mfaTicket;
