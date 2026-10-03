@@ -1242,8 +1242,8 @@ html:not(.dark) body.admin-page-bg #pageContent span:not(.role-badge):not(.statu
         }
         async function deleteCareerApplication(id){ if(!confirm('Delete this application?')) return; try{const res=await fetch(`/api/careers/admin/${id}`,{method:'DELETE',headers:authHeaders()});const d=await res.json();if(!res.ok||!d.success){alert(d.error||'Could not delete application.');return;}loadCareerApplications();}catch(e){alert('Network error.');}}
         async function clearCareerApplications(){ if(!confirm('Delete ALL career applications? This cannot be undone.')) return; try{const res=await fetch('/api/careers/admin',{method:'DELETE',headers:authHeaders()});const d=await res.json();if(!res.ok||!d.success){alert(d.error||'Could not clear applications.');return;}loadCareerApplications();}catch(e){alert('Network error.');}}
-        async function clearAuditLog(){ if(!confirm('Clear the entire Audit Log? This cannot be undone.')) return; try{const res=await fetch('/api/owner/audit-log',{method:'DELETE',headers:authHeaders()});const d=await res.json();if(!res.ok||!d.success){alert(d.error||'Could not clear audit log.');return;}loadAuditLog();}catch(e){alert('Network error.');}}
-        window.setCareerStatus=setCareerStatus; window.deleteCareerApplication=deleteCareerApplication; window.clearCareerApplications=clearCareerApplications; window.clearAuditLog=clearAuditLog;
+        
+        window.setCareerStatus=setCareerStatus; window.deleteCareerApplication=deleteCareerApplication; window.clearCareerApplications=clearCareerApplications;
 
         function showDenied() {
             document.getElementById('pageContent').style.display = 'none';
