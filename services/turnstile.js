@@ -1,8 +1,12 @@
 const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
+// Accept the descriptive Cloudflare-prefixed names as well as the original
+// project names so existing deployments do not break during key rotation.
+const TURNSTILE_SECRET_KEY = process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY;
+
 function isEnabled() {
   if (String(process.env.TURNSTILE_ENFORCE || '').toLowerCase() === 'true') return true;
-  return process.env.NODE_ENV === 'production' && Boolean(process.env.TURNSTILE_SECRET_KEY);
+  return process.env.NODE_ENV === 'production' && Boolean(TURNSTILE_SECRET_KEY);
 }
 
 async function verifyTurnstile(token, remoteIp) {
@@ -10,7 +14,7 @@ async function verifyTurnstile(token, remoteIp) {
   if (!token || typeof token !== 'string' || token.length > 2048) {
     return { success: false, errorCodes: ['missing-or-invalid-token'] };
   }
-  if (!process.env.TURNSTILE_SECRET_KEY) {
+  if (!TURNSTILE_SECRET_KEY) {
     return { success: false, errorCodes: ['missing-server-secret'] };
   }
 
@@ -22,7 +26,7 @@ async function verifyTurnstile(token, remoteIp) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        secret: process.env.TURNSTILE_SECRET_KEY,
+        secret: TURNSTILE_SECRET_KEY,
         response: token,
         remoteip: remoteIp || undefined,
       }),
