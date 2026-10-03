@@ -23,12 +23,13 @@ async function create({
   return data;
 }
 
-async function listForCase(caseId) {
+async function listForCase(caseId, { limit = 100, offset = 0 } = {}) {
   const { data, error } = await supabase
     .from(TABLE)
     .select('id,case_id,sender_user_id,recipient_user_id,message,read_at,created_at')
     .eq('case_id', caseId)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    .range(Math.max(0, Number(offset) || 0), Math.max(0, Number(offset) || 0) + Math.min(200, Math.max(1, Number(limit) || 100)) - 1);
 
   if (error) throw error;
   return data || [];
