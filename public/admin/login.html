@@ -158,7 +158,35 @@
     <script>
         let adminTurnstileEnabled=false;
         let adminTurnstileWidget=null;
-        async function setupAdminTurnstile(){try{const r=await fetch('/api/config/public',{cache:'no-store'});const c=await r.json();adminTurnstileEnabled=Boolean(c.turnstileEnabled&&c.turnstileSiteKey);if(!adminTurnstileEnabled)return;if(!window.turnstile){await new Promise((resolve,reject)=>{const s=Date.now(),t=setInterval(()=>{if(window.turnstile){clearInterval(t);resolve()}else if(Date.now()-s>10000){clearInterval(t);reject(new Error('Cloudflare Turnstile did not load.'))}},100)})}adminTurnstileWidget=window.turnstile.render('#adminTurnstile',{sitekey:c.turnstileSiteKey,theme:'dark',size:'normal',appearance:'always'});}catch(e){console.error('Turnstile setup failed:',e)}}
+        async function setupAdminTurnstile(){
+          const host=document.getElementById('adminTurnstile');
+          if(!host)return;
+          try{
+            const r=await fetch('/api/config/public',{cache:'no-store',credentials:'same-origin'});
+            if(!r.ok)throw new Error('Turnstile configuration request failed.');
+            const c=await r.json();
+            const siteKey=String(c.turnstileSiteKey||'').trim();
+            if(!siteKey)throw new Error('Turnstile public site key is not configured.');
+            adminTurnstileEnabled=true;
+            const waitStart=Date.now();
+            while(!window.turnstile && Date.now()-waitStart<15000){
+              await new Promise(resolve=>setTimeout(resolve,100));
+            }
+            if(!window.turnstile||typeof window.turnstile.render!=='function'){
+              throw new Error('Cloudflare Turnstile did not load.');
+            }
+            host.innerHTML='';
+            adminTurnstileWidget=window.turnstile.render(host,{
+              sitekey:siteKey,
+              theme:'dark',
+              size:'normal',
+              appearance:'always'
+            });
+          }catch(e){
+            console.error('Turnstile setup failed:',e);
+            host.dataset.turnstileError='true';
+          }
+        }
         window.addEventListener('load',setupAdminTurnstile);
         let pendingMfaTicket = null;
         let mfaEnrollmentUser = null;
