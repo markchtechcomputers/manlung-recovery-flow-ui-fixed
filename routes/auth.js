@@ -539,7 +539,6 @@ router.post(
         return res.json({
           success: true,
           mfaRequired: true,
-          mfaTicket,
           user: { id: admin.id, username: admin.username, email: admin.email, role: admin.role },
         });
       }
