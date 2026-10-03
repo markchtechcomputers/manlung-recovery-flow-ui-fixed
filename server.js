@@ -45,7 +45,7 @@ app.use(
         objectSrc: ["'none'"],
         frameAncestors: ["'none'"],
         formAction: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://js.paystack.co'],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://js.paystack.co', 'https://challenges.cloudflare.com'],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com'],
         fontSrc: ["'self'", 'https://cdnjs.cloudflare.com', 'data:'],
         imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
