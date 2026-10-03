@@ -13,7 +13,9 @@
     .dashboard-hero p { margin:0; color:#c8d7f2; }
     .case-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:1rem; }
     .case-card { background:linear-gradient(180deg,var(--card-bg),rgba(239,246,255,.72)); border:1px solid var(--card-border); border-radius:18px; padding:1.2rem; box-shadow:0 4px 16px rgba(10,26,58,.05); }
-    .case-card.online-payment-case { background:linear-gradient(180deg,#fff8cc,#fff1a8); border-color:#f2c94c; box-shadow:0 8px 24px rgba(234,179,8,.18); }\n    .case-card.online-payment-case .case-type { color:#7a5b00; font-weight:800; }\n    .case-top { display:flex; justify-content:space-between; gap:.7rem; align-items:flex-start; margin-bottom:.8rem; }
+    .case-card.online-payment-case { background:linear-gradient(180deg,#fff8cc,#fff1a8); border-color:#f2c94c; box-shadow:0 8px 24px rgba(234,179,8,.18); }
+    .case-card.online-payment-case .case-type { color:#7a5b00; font-weight:800; }
+    .case-top { display:flex; justify-content:space-between; gap:.7rem; align-items:flex-start; margin-bottom:.8rem; }
     .case-id { font-weight:800; color:var(--text); }
     .case-type { color:var(--text-muted); font-size:.88rem; margin-top:.2rem; }
     .case-meta { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin:1rem 0; }
@@ -855,7 +857,8 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
     <button type="button" class="accept" id="manlungIncomingCallAccept"><i class="fas fa-phone"></i> Accept call</button>
   </div>
 </section>
-\n    <section class="dashboard-overview-grid" aria-label="Portal overview">
+
+    <section class="dashboard-overview-grid" aria-label="Portal overview">
       <article class="dashboard-overview-card overview-cases">
         <div class="overview-icon"><i class="fas fa-folder-open"></i></div>
         <div class="overview-copy"><span>My Cases</span><strong id="dashboardCaseMetric">0</strong><small>Recovery cases linked to you</small></div>
