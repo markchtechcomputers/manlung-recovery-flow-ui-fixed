@@ -375,6 +375,29 @@ const careerSubmissionLimiter = rateLimit({
 app.post('/api/careers', careerSubmissionLimiter);
 
 // ============================================================
+// MESSAGE / CALLBACK ABUSE PROTECTION
+// ============================================================
+
+const messageLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => res.status(429).json({ success: false, error: 'Too many message requests. Please slow down and try again.' }),
+});
+
+const callCallbackLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => res.status(429).json({ success: false, error: 'Too many callback attempts. Please wait before trying again.' }),
+});
+
+app.use('/api/messages/case', messageLimiter);
+app.use('/api/calls/admin/callback', callCallbackLimiter);
+
+// ============================================================
 // BODY PARSERS
 // ============================================================
 
