@@ -117,9 +117,7 @@ router.get('/case/:caseId', auth, async (req, res) => {
     }
 
     const messages =
-      await CaseMessage.listForCase(
-        req.params.caseId
-      );
+      await CaseMessage.listForCase(req.params.caseId, { limit: 200, offset: Math.max(0, Number(req.query.offset) || 0) });
 
     res.json({
       success: true,
