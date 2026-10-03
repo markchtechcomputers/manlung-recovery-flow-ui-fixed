@@ -158,6 +158,7 @@
     <script>
         let adminTurnstileEnabled=false;
         let adminTurnstileWidget=null;
+        let adminTurnstileSiteKey='';
         async function setupAdminTurnstile(){
           const host=document.getElementById('adminTurnstile');
           if(!host)return;
@@ -168,6 +169,7 @@
             const siteKey=String(c.turnstileSiteKey||'').trim();
             if(!siteKey)throw new Error('Turnstile public site key is not configured.');
             adminTurnstileEnabled=true;
+            adminTurnstileSiteKey=siteKey;
             const waitStart=Date.now();
             while(!window.turnstile && Date.now()-waitStart<15000){
               await new Promise(resolve=>setTimeout(resolve,100));
@@ -180,7 +182,10 @@
               sitekey:siteKey,
               theme:'dark',
               size:'normal',
-              appearance:'always'
+              appearance:'always',
+              callback:()=>{host.dataset.turnstileReady='true';},
+              'error-callback':()=>{host.dataset.turnstileError='true';adminTurnstileWidget=null;},
+              'expired-callback':()=>{host.dataset.turnstileReady='false';adminTurnstileWidget=null;}
             });
           }catch(e){
             console.error('Turnstile setup failed:',e);
@@ -188,6 +193,22 @@
           }
         }
         window.addEventListener('load',setupAdminTurnstile);
+        function resetAdminTurnstile(){
+          const host=document.getElementById('adminTurnstile');
+          if(!host||!window.turnstile)return;
+          try{
+            if(adminTurnstileWidget!==null && typeof window.turnstile.reset==='function'){
+              window.turnstile.reset(adminTurnstileWidget);
+              return;
+            }
+          }catch(error){ console.warn('Turnstile reset failed:',error); }
+          if(adminTurnstileSiteKey && typeof window.turnstile.render==='function'){
+            try{
+              host.innerHTML='';
+              adminTurnstileWidget=window.turnstile.render(host,{sitekey:adminTurnstileSiteKey,theme:'dark',size:'normal',appearance:'always'});
+            }catch(error){ console.warn('Turnstile re-render failed:',error); }
+          }
+        }
         let pendingMfaTicket = null;
         let mfaEnrollmentUser = null;
 
@@ -309,11 +330,13 @@
             const username = document.getElementById('adminUsername').value.trim();
             const password = document.getElementById('adminPassword').value;
             const errorEl = document.getElementById('loginError');
+            const submitButton = document.querySelector('#adminLoginForm button[type="submit"]');
             errorEl.textContent = '';
 
             try {
                 const turnstileToken=adminTurnstileEnabled&&window.turnstile&&adminTurnstileWidget!==null?window.turnstile.getResponse(adminTurnstileWidget):null;
                 if(adminTurnstileEnabled&&!turnstileToken){document.getElementById('loginError').textContent='Please complete the Cloudflare security verification.';return;}
+                if(submitButton) submitButton.disabled=true;
                 const response = await fetch('/api/auth/admin/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -348,9 +371,13 @@
                 }
 
                 errorEl.textContent = data.error || 'Invalid credentials';
+                resetAdminTurnstile();
             } catch (error) {
                 errorEl.textContent = error?.message || 'Unable to reach the login service. Please try again.';
                 console.error('Login error:', error);
+                resetAdminTurnstile();
+            } finally {
+                if(submitButton) submitButton.disabled=false;
             }
         }
 
