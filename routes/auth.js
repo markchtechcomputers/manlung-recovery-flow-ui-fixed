@@ -1379,11 +1379,12 @@ router.post(
         });
       }
 
-      // Each successful login creates a new account session version.
-      // Any older browser session carrying the previous version is rejected
-      // by the auth middleware on its next request.
-      const session = await User.bumpSessionVersion(client.id);
-      const token = signToken({ ...client, session_version: session?.session_version });
+      // Do not rotate the account-wide session version on every normal login.
+      // Rotating it here would immediately invalidate every other active client
+      // browser session. Session-version changes remain reserved for explicit
+      // security actions such as logout-all, password/security changes, or admin
+      // revocation.
+      const token = signToken(client);
       setClientCookie(res, token);
 
       res.json({
