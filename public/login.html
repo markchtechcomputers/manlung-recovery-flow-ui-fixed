@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="/css/unified-ui.css">
   <link rel="stylesheet" href="/css/auth-premium.css">
   <script src="/js/support-fab.js"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
 </head>
 <body class="manlung-auth-page">
 <header class="site-header">
@@ -67,6 +68,7 @@
           <div class="form-group"><label for="loginEmail">Email address</label><input type="email" id="loginEmail" autocomplete="email" placeholder="you@example.com" required></div>
           <div class="form-group"><label for="loginPassword">Password</label><input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter your password" required></div>
           <div class="manlung-auth-links"><span></span><a href="#" onclick="showForgot(event)">Forgot password?</a></div>
+          <div id="clientTurnstile" style="margin:.75rem 0;"></div>
           <button type="submit" class="btn btn-primary manlung-auth-primary"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> Sign In</button>
           <div id="loginError" class="manlung-auth-message error-text" role="alert"></div>
         </form>
@@ -132,12 +134,56 @@ async function handleForgot(event) {
     else showMessage(errorEl,data.error||'Could not process request');
   } catch(err){showMessage(errorEl,'Could not reach the server ('+err.message+').');}
 }
+let clientTurnstileEnabled = false;
+let clientTurnstileWidget = null;
+
+async function setupClientTurnstile() {
+  try {
+    const config = await fetch('/api/config/public', {cache:'no-store'}).then(r => r.json());
+    clientTurnstileEnabled = Boolean(config.turnstileEnabled && config.turnstileSiteKey);
+    if (!clientTurnstileEnabled || !window.turnstile) return;
+    clientTurnstileWidget = window.turnstile.render('#clientTurnstile', {
+      sitekey: config.turnstileSiteKey,
+      theme: 'auto',
+      size: 'flexible',
+      appearance: 'interaction-only'
+    });
+  } catch (_) {}
+}
+
 async function handleLogin(event) {
   event.preventDefault();
-  const email=document.getElementById('loginEmail').value; const password=document.getElementById('loginPassword').value; const errorEl=document.getElementById('loginError'); showMessage(errorEl,'');
-  try { const res=await fetch('/api/auth/client/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})}); const data=await res.json(); if(data.success){localStorage.setItem('clientToken',data.token);localStorage.setItem('clientUser',JSON.stringify(data.user));window.location.href='/client/dashboard.html';} else showMessage(errorEl,data.error||'Invalid credentials'); }
-  catch(err){showMessage(errorEl,'Could not reach the server ('+err.message+'). Is it running?');}
+  const email=document.getElementById('loginEmail').value;
+  const password=document.getElementById('loginPassword').value;
+  const errorEl=document.getElementById('loginError');
+  showMessage(errorEl,'');
+  try {
+    const turnstileToken = clientTurnstileEnabled && window.turnstile && clientTurnstileWidget !== null
+      ? window.turnstile.getResponse(clientTurnstileWidget)
+      : null;
+    if (clientTurnstileEnabled && !turnstileToken) {
+      showMessage(errorEl,'Please complete the Cloudflare security verification.');
+      return;
+    }
+    const res=await fetch('/api/auth/client/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password,turnstileToken})
+    });
+    const data=await res.json();
+    if(data.success){
+      localStorage.setItem('clientToken',data.token);
+      localStorage.setItem('clientUser',JSON.stringify(data.user));
+      window.location.href='/client/dashboard.html';
+    } else {
+      showMessage(errorEl,data.error||'Invalid credentials');
+      if (clientTurnstileWidget !== null && window.turnstile) window.turnstile.reset(clientTurnstileWidget);
+    }
+  } catch(err){
+    showMessage(errorEl,'Could not reach the server ('+err.message+'). Is it running?');
+  }
 }
+window.addEventListener('load', setupClientTurnstile);
 async function handleRegister(event) {
   event.preventDefault();
   const fullName=document.getElementById('regName').value; const email=document.getElementById('regEmail').value; const phone=document.getElementById('regPhone').value; const password=document.getElementById('regPassword').value; const errorEl=document.getElementById('registerError'); showMessage(errorEl,'');
