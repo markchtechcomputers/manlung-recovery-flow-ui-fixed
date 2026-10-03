@@ -238,8 +238,6 @@ const mfaLimiter = rateLimit({
   }),
 });
 
-app.use('/api/auth/admin/login', adminLoginLimiter);
-app.use('/api/auth/owner/login', adminLoginLimiter);
 app.use('/api/auth/client/login', clientLoginLimiter);
 app.use('/api/auth/admin/mfa/login', mfaLimiter);
 app.use('/api/auth/owner/mfa/login', mfaLimiter);
