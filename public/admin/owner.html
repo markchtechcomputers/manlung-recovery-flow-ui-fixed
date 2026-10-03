@@ -685,7 +685,7 @@
                 box.innerHTML = data.applications.map(a => `
                   <div class="case-item" style="margin-bottom:.7rem;">
                     <div class="case-info" style="flex:1;">
-                      <strong>${escapeHtml(a.full_name)}</strong>
+                      <strong>${escapeHtml(a.username || a.email || 'Unnamed user')}</strong>
                       <span>${escapeHtml(a.role_interested)} · ${escapeHtml(a.email)} · ${escapeHtml(a.phone)}</span>
                       <span>${escapeHtml(a.location)}</span>
                       <span class="status-badge">${escapeHtml(a.status)}</span>
@@ -798,7 +798,7 @@
                     ">
                         <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
                             <div>
-                                <strong>${escapeSecurityHtml(user.full_name || user.username || 'Unnamed user')}</strong>
+                                <strong>${escapeSecurityHtml(user.username || user.email || 'Unnamed user')}</strong>
                                 <div style="font-size:.85rem;color:#6b7280;margin-top:.2rem;">
                                     ${escapeSecurityHtml(user.email || 'No email')}
                                     · ${securityRoleLabel(user.role)}
@@ -1095,7 +1095,7 @@
                         ">
                             ${escapeSecurityHtml(
                                 user
-                                    ? (user.full_name || user.username || user.email || user.id)
+                                    ? (user.username || user.email || user.id)
                                     : (event.user_id || 'System')
                             )}
                             · ${escapeSecurityHtml(securityFormatDate(event.created_at))}
