@@ -24,7 +24,8 @@ begin
     'case_messages',
     'notifications',
     'career_applications',
-    'recovery_donations'
+    'recovery_donations',
+    'recovery_security_events'
   ]
   loop
     if to_regclass('public.' || table_name) is not null then
