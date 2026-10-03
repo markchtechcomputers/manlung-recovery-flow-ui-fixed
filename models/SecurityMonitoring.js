@@ -317,12 +317,15 @@ async function listEvents({
 }
 
 async function getOverview() {
-  const [users, events] = await Promise.all([listUsers({ limit: 500 }), listEvents({ limit: 100 })]);
+  const [users, events, userCount, eventCount] = await Promise.all([listUsers({ limit: 100 }), listEvents({ limit: 100 }), supabase.from(USERS_TABLE).select('id', { count: 'exact', head: true }), supabase.from(EVENTS_TABLE).select('id', { count: 'exact', head: true })]);
+  if (userCount.error) throw userCount.error;
+  if (eventCount.error) throw eventCount.error;
   const counts = { active: 0, restricted: 0, suspended: 0, blocked: 0 };
   users.forEach(u => { const s = u.security_status || 'active'; counts[s] = (counts[s] || 0) + 1; });
   const since = Date.now() - 86400000;
   return {
-    users_total: users.length,
+    users_total: userCount.count || 0,
+    events_total: eventCount.count || 0,
     counts,
     failed_logins_24h: events.filter(e => e.event_type === 'login_failed' && new Date(e.created_at).getTime() >= since).length,
     suspicious_24h: events.filter(e => e.event_type === 'suspicious_login' && new Date(e.created_at).getTime() >= since).length,
