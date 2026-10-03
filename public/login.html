@@ -139,16 +139,32 @@ let clientTurnstileWidget = null;
 
 async function setupClientTurnstile() {
   try {
-    const config = await fetch('/api/config/public', {cache:'no-store'}).then(r => r.json());
+    const configResponse = await fetch('/api/config/public', {cache:'no-store'});
+    if (!configResponse.ok) throw new Error('Authentication configuration unavailable (' + configResponse.status + ').');
+    const config = await configResponse.json();
     clientTurnstileEnabled = Boolean(config.turnstileEnabled && config.turnstileSiteKey);
-    if (!clientTurnstileEnabled || !window.turnstile) return;
+    if (!clientTurnstileEnabled) return;
+    if (!window.turnstile) {
+      await new Promise((resolve, reject) => {
+        const started = Date.now();
+        const timer = setInterval(() => {
+          if (window.turnstile) {
+            clearInterval(timer);
+            resolve();
+          } else if (Date.now() - started > 10000) {
+            clearInterval(timer);
+            reject(new Error('Cloudflare Turnstile did not load.'));
+          }
+        }, 100);
+      });
+    }
     clientTurnstileWidget = window.turnstile.render('#clientTurnstile', {
       sitekey: config.turnstileSiteKey,
       theme: 'auto',
       size: 'flexible',
       appearance: 'interaction-only'
     });
-  } catch (_) {}
+  } catch (error) { console.error('Turnstile setup failed:', error); }
 }
 
 async function handleLogin(event) {
