@@ -14,6 +14,7 @@ const { auth } = require('../middleware/auth');
 const AdminInvitation = require('../models/AdminInvitation');
 const AdminPermission = require('../models/AdminPermission');
 const { sendEmail } = require('../services/email');
+const { verifyTurnstile } = require('../services/turnstile');
 const { supabase, EVIDENCE_BUCKET } = require('../config/supabase');
 const {
   generateSecret, verifyTotp, encryptSecret, decryptSecret, buildOtpUri,
@@ -87,6 +88,29 @@ function getCookie(req, name) {
 function issueAdminSession(res, user) {
   const token = signToken(user);
   setAdminCookie(res, token);
+}
+
+async function requireTurnstile(req, res) {
+  const token = req.body?.turnstileToken;
+  const result = await verifyTurnstile(token, req.ip);
+  if (!result.success) {
+    await SecurityMonitoring.recordEvent({
+      eventType: 'AUTH_FAILED',
+      severity: 'medium',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      loginIdentifier: req.body?.email || req.body?.username || null,
+      path: req.path,
+      httpStatus: 403,
+      details: { reason: 'turnstile_rejected', error_codes: result.errorCodes },
+    }).catch(() => {});
+    res.status(403).json({
+      success: false,
+      error: 'Security verification failed. Please complete the Cloudflare verification and try again.',
+    });
+    return false;
+  }
+  return true;
 }
 
 function checkValidation(req, res) {
@@ -294,6 +318,7 @@ router.post(
   ],
   async (req, res) => {
     if (!checkValidation(req, res)) return;
+    if (!(await requireTurnstile(req, res))) return;
 
     try {
       const login = req.body.username.trim();
@@ -810,6 +835,7 @@ router.post(
   ],
   async (req, res) => {
     if (!checkValidation(req, res)) return;
+    if (!(await requireTurnstile(req, res))) return;
 
     try {
       const {
