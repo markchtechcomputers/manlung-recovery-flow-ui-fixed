@@ -163,25 +163,34 @@ function issueAdminSession(res, user) {
 }
 
 async function requireTurnstile(req, res) {
-  const result = await verifyTurnstile(req.body?.turnstileToken, req.ip);
-  if (!result.success) {
-    await SecurityMonitoring.recordEvent({
-      eventType: 'AUTH_FAILED',
-      severity: 'medium',
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent'),
-      loginIdentifier: req.body?.email || req.body?.username || null,
-      path: req.path,
-      httpStatus: 403,
-      details: { reason: 'turnstile_rejected', error_codes: result.errorCodes },
-    }).catch(() => {});
-    res.status(403).json({
+  try {
+    const result = await verifyTurnstile(req.body?.turnstileToken, req.ip);
+    if (!result.success) {
+      await SecurityMonitoring.recordEvent({
+        eventType: 'AUTH_FAILED',
+        severity: 'medium',
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+        loginIdentifier: req.body?.email || req.body?.username || null,
+        path: req.path,
+        httpStatus: 403,
+        details: { reason: 'turnstile_rejected', error_codes: result.errorCodes },
+      }).catch(() => {});
+      res.status(403).json({
+        success: false,
+        error: 'Security verification failed. Please complete the Cloudflare verification and try again.',
+      });
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('Turnstile verification error:', error);
+    res.status(503).json({
       success: false,
-      error: 'Security verification failed. Please complete the Cloudflare verification and try again.',
+      error: 'Security verification is temporarily unavailable. Please try again.',
     });
     return false;
   }
-  return true;
 }
 
 function checkValidation(req, res) {
