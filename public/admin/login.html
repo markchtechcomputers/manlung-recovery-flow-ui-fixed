@@ -303,7 +303,7 @@
                     // fallback. The server also sets an HttpOnly cookie. Sending the same
                     // fresh ticket in the MFA request avoids browser cookie/path issues while
                     // never persisting the ticket in localStorage or sessionStorage.
-                    pendingMfaTicket = data.mfaTicket || true;
+                    pendingMfaTicket = true;
                     sessionStorage.setItem('adminUser', JSON.stringify(data.user));
                     showMfaStep();
                     return;
@@ -351,7 +351,7 @@
                     // HttpOnly cookie as a fallback.
                     body: JSON.stringify({
                         code,
-                        ...(typeof pendingMfaTicket === 'string' ? { mfaTicket: pendingMfaTicket } : {}),
+                        
                     }),
                 });
                 const data = await response.json();
