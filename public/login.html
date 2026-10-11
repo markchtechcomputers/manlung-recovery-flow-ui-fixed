@@ -172,9 +172,11 @@ async function setupClientTurnstile() {
   })();
 
   try {
-    const [config] = await Promise.all([configPromise, turnstilePromise]);
+    const config = await configPromise;
     clientTurnstileEnabled = Boolean(config.turnstileEnabled && config.turnstileSiteKey);
-    if (!clientTurnstileEnabled || !window.turnstile || !document.getElementById('clientTurnstile')) return;
+    if (!clientTurnstileEnabled) return;
+    await turnstilePromise;
+    if (!window.turnstile || !document.getElementById('clientTurnstile')) return;
 
     clientTurnstileWidget = window.turnstile.render('#clientTurnstile', {
       sitekey: config.turnstileSiteKey,
