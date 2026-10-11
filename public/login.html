@@ -142,33 +142,51 @@ let clientTurnstileEnabled = false;
 let clientTurnstileWidget = null;
 
 async function setupClientTurnstile() {
+  const widgetEl = document.getElementById('clientTurnstile');
+  if (!widgetEl || clientTurnstileWidget !== null) return;
+
+  // Start loading the public auth config and waiting for Cloudflare together,
+  // rather than making the visitor wait for two sequential network operations.
+  const configPromise = fetch('/api/config/public', { cache: 'no-store' }).then(response => {
+    if (!response.ok) throw new Error('Authentication configuration unavailable (' + response.status + ').');
+    return response.json();
+  });
+
+  const turnstilePromise = (async () => {
+    if (window.turnstile) return window.turnstile;
+    await new Promise((resolve, reject) => {
+      let settled = false;
+      const finish = (error) => {
+        if (settled) return;
+        settled = true;
+        clearInterval(timer);
+        clearTimeout(timeout);
+        error ? reject(error) : resolve();
+      };
+      const timer = setInterval(() => {
+        if (window.turnstile) finish();
+      }, 50);
+      const timeout = setTimeout(() => finish(new Error('Cloudflare Turnstile did not load.')), 10000);
+    });
+    return window.turnstile;
+  })();
+
   try {
-    const configResponse = await fetch('/api/config/public', {cache:'no-store'});
-    if (!configResponse.ok) throw new Error('Authentication configuration unavailable (' + configResponse.status + ').');
-    const config = await configResponse.json();
+    const [config] = await Promise.all([configPromise, turnstilePromise]);
     clientTurnstileEnabled = Boolean(config.turnstileEnabled && config.turnstileSiteKey);
-    if (!clientTurnstileEnabled) return;
-    if (!window.turnstile) {
-      await new Promise((resolve, reject) => {
-        const started = Date.now();
-        const timer = setInterval(() => {
-          if (window.turnstile) {
-            clearInterval(timer);
-            resolve();
-          } else if (Date.now() - started > 10000) {
-            clearInterval(timer);
-            reject(new Error('Cloudflare Turnstile did not load.'));
-          }
-        }, 100);
-      });
-    }
+    if (!clientTurnstileEnabled || !window.turnstile || !document.getElementById('clientTurnstile')) return;
+
     clientTurnstileWidget = window.turnstile.render('#clientTurnstile', {
       sitekey: config.turnstileSiteKey,
       theme: 'auto',
       size: 'normal',
       appearance: 'always'
     });
-  } catch (error) { console.error('Turnstile setup failed:', error); }
+  } catch (error) {
+    console.error('Turnstile setup failed:', error);
+    // Keep login usable when Turnstile is disabled; when enabled but unavailable,
+    // login will ask for verification rather than bypassing server-side checks.
+  }
 }
 
 async function handleLogin(event) {
@@ -203,8 +221,11 @@ async function handleLogin(event) {
     showMessage(errorEl,'Could not reach the server ('+err.message+'). Is it running?');
   }
 }
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupClientTurnstile, { once: true });
-else setupClientTurnstile();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupClientTurnstile, { once: true });
+} else {
+  setupClientTurnstile();
+}
 async function handleRegister(event) {
   event.preventDefault();
   const fullName=document.getElementById('regName').value; const email=document.getElementById('regEmail').value; const phone=document.getElementById('regPhone').value; const password=document.getElementById('regPassword').value; const errorEl=document.getElementById('registerError'); showMessage(errorEl,'');
