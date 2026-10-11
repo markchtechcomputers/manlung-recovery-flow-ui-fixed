@@ -287,7 +287,7 @@ async function setupClientTurnstile() {
     });
   } catch(error) { console.error('Turnstile setup failed:', error); }
 }
-window.addEventListener('load', setupClientTurnstile);
+document.addEventListener('DOMContentLoaded', setupClientTurnstile);
 
 async function handleLogin(event) {
   event.preventDefault();
@@ -644,12 +644,15 @@ async function ensureGoogleGIS(){
 
 async function setupOfficialGoogleButtons(){
   try{
-    const cfgRes=await fetch('/api/auth/google',{cache:'no-store'});
-    const cfgText=await cfgRes.text();
+    // Fetch the public client ID and wait for Google's library at the same time.
+    const [cfgResponse] = await Promise.all([
+      fetch('/api/auth/google',{cache:'no-store'}),
+      ensureGoogleGIS()
+    ]);
+    const cfgText=await cfgResponse.text();
     let cfg;
     try{cfg=JSON.parse(cfgText);}catch(_){throw new Error('Google authentication API returned an invalid response.');}
-    if(!cfgRes.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
-    await ensureGoogleGIS();
+    if(!cfgResponse.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
     if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh and try again.');
 
     google.accounts.id.initialize({
