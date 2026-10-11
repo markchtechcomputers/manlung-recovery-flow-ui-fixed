@@ -53,7 +53,7 @@
 .manlung-auth-page .manlung-auth-heading{margin-bottom:12px}
 @media (max-width:640px){.manlung-auth-form{padding:18px}.manlung-auth-page .manlung-auth-form form,.manlung-auth-page .manlung-auth-heading{padding:14px}}
 
-.manlung-auth-tabs,.manlung-auth-tabs button,.manlung-social-grid,.manlung-social-btn,.manlung-google-btn{position:relative;z-index:10000;pointer-events:auto!important}.manlung-social-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;width:100%!important;align-items:stretch!important}.manlung-social-btn,.manlung-google-btn{box-sizing:border-box!important;width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;max-width:100%!important}.manlung-social-btn{display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;white-space:nowrap!important;overflow:hidden!important}.manlung-google-btn{display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;min-height:48px!important}.manlung-google-btn iframe{display:block!important;max-width:100%!important}.manlung-auth-tabs{display:flex!important}.manlung-auth-tabs button{cursor:pointer!important;flex:1!important}@media(max-width:640px){.manlung-social-grid{grid-template-columns:1fr!important}}
+.manlung-auth-tabs,.manlung-auth-tabs button,.manlung-social-grid,.manlung-social-btn{position:relative;z-index:10000;pointer-events:auto!important}.manlung-social-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;width:100%!important;align-items:stretch!important}.manlung-social-btn{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;max-width:100%!important;padding:0 16px!important;border:1px solid #cbd5e1!important;border-radius:10px!important;background:#fff!important;color:#111827!important;font-size:14px!important;font-weight:600!important;line-height:1!important;white-space:nowrap!important;overflow:hidden!important;cursor:pointer!important;transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease!important}.manlung-social-btn:hover{background:#f8fafc!important;border-color:#94a3b8!important;box-shadow:0 1px 3px rgba(15,23,42,.08)!important}.manlung-social-btn:focus-visible{outline:2px solid #2563eb!important;outline-offset:2px!important}.manlung-social-btn:disabled{opacity:.65;cursor:wait}.manlung-social-icon{display:block!important;width:18px!important;height:18px!important;flex:0 0 18px!important}.manlung-auth-tabs{display:flex!important}.manlung-auth-tabs button{cursor:pointer!important;flex:1!important}
 </style><style>
 .manlung-password-field{position:relative;display:flex;align-items:center}
 .manlung-password-field input{padding-right:3rem!important}
@@ -91,8 +91,8 @@
       <div id="loginPanel">
         <div class="manlung-auth-heading"><h2>Welcome back</h2><p>Sign in to access your client portal.</p></div>
         <div class="manlung-social-grid">
-          <div id="googleLoginBtn" class="manlung-google-btn" aria-label="Continue with Google"></div>
-          <button type="button" id="githubLoginBtn" class="manlung-social-btn" aria-label="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i> Continue with GitHub</button>
+          <button type="button" id="googleLoginBtn" class="manlung-social-btn" aria-label="Continue with Google"><svg class="manlung-social-icon" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 37.99 46.98 31.86 46.98 24.55z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.15 1.45-4.9 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button>
+          <button type="button" id="githubLoginBtn" class="manlung-social-btn" aria-label="Continue with GitHub"><svg class="manlung-social-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.6 1.21 3.23.92.1-.72.39-1.21.71-1.49-2.47-.28-5.07-1.24-5.07-5.5 0-1.21.43-2.2 1.15-2.98-.12-.28-.5-1.41.11-2.94 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.53.23 2.66.11 2.94.72.78 1.15 1.77 1.15 2.98 0 4.27-2.6 5.22-5.08 5.5.4.35.76 1.02.76 2.06V22c0 .29.2.63.77.52A11.1 11.1 0 0 0 12 .9z"/></svg><span>Continue with GitHub</span></button>
         </div>
         <div class="manlung-auth-divider">or continue with email</div>
         <form id="loginForm" onsubmit="handleLogin(event)">
@@ -117,7 +117,7 @@
 
       <div id="registerPanel" hidden>
         <div class="manlung-auth-heading"><h2>Create your account</h2><p>Create a secure client account before submitting a recovery request.</p></div>
-        <div class="manlung-social-grid"><div id="googleRegisterBtn" class="manlung-google-btn" aria-label="Continue with Google"></div><button type="button" id="githubRegisterBtn" class="manlung-social-btn" aria-label="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i> Continue with GitHub</button></div>
+        <div class="manlung-social-grid"><button type="button" id="googleRegisterBtn" class="manlung-social-btn" aria-label="Continue with Google"><svg class="manlung-social-icon" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 37.99 46.98 31.86 46.98 24.55z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.15 1.45-4.9 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button><button type="button" id="githubRegisterBtn" class="manlung-social-btn" aria-label="Continue with GitHub"><svg class="manlung-social-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.6 1.21 3.23.92.1-.72.39-1.21.71-1.49-2.47-.28-5.07-1.24-5.07-5.5 0-1.21.43-2.2 1.15-2.98-.12-.28-.5-1.41.11-2.94 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.53.23 2.66.11 2.94.72.78 1.15 1.77 1.15 2.98 0 4.27-2.6 5.22-5.08 5.5.4.35.76 1.02.76 2.06V22c0 .29.2.63.77.52A11.1 11.1 0 0 0 12 .9z"/></svg><span>Continue with GitHub</span></button></div>
         <div class="manlung-auth-divider">or create with email verification</div>
         <form id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group"><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="200" placeholder="Your full name" required></div>
@@ -190,7 +190,6 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 function showTab(tab) {
   document.getElementById('loginPanel').hidden = tab !== 'login';
@@ -631,89 +630,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   handleEmailVerificationResult();
 });
 
-async function ensureGoogleGIS(){
-  if(window.google?.accounts?.id)return true;
-  return new Promise((resolve,reject)=>{
-    const started=Date.now();
-    const timer=setInterval(()=>{
-      if(window.google?.accounts?.id){clearInterval(timer);resolve(true);}
-      else if(Date.now()-started>10000){clearInterval(timer);reject(new Error('Google authentication could not load. Please refresh the page.'));}
-    },100);
-  });
-}
-
-async function setupOfficialGoogleButtons(){
-  try{
-    // Fetch the public client ID and wait for Google's library at the same time.
-    const [cfgResponse] = await Promise.all([
-      fetch('/api/auth/google',{cache:'no-store'}),
-      ensureGoogleGIS()
-    ]);
-    const cfgText=await cfgResponse.text();
-    let cfg;
-    try{cfg=JSON.parse(cfgText);}catch(_){throw new Error('Google authentication API returned an invalid response.');}
-    if(!cfgResponse.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
-    if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh and try again.');
-
-    google.accounts.id.initialize({
-      client_id:cfg.clientId,
-      auto_select:false,
-      cancel_on_tap_outside:true,
-      callback:async response=>{
-        try{
-          if(!response?.credential)throw new Error('Google sign-in was cancelled.');
-          const errorTarget=window.__manlungGoogleErrorTarget||'loginError';
-          const res=await fetch('/api/auth/google',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({credential:response.credential})
-          });
-          const text=await res.text();
-          let data;
-          try{data=JSON.parse(text);}catch(_){throw new Error('Google sign-in API returned an invalid response.');}
-          if(!res.ok||!data.success)throw new Error(data.error||'Google authentication failed. Please try again.');
-          localStorage.setItem('clientUser',JSON.stringify(data.user));
-          window.location.replace('/client/dashboard.html');
-        }catch(err){
-          showMessage(document.getElementById(window.__manlungGoogleErrorTarget||'loginError'),err.message||'Google authentication failed.');
-        }
-      }
-    });
-
-    [
-      ['googleLoginBtn','loginError'],
-      ['googleRegisterBtn','registerError']
-    ].forEach(([id,errorTarget])=>{
-      const host=document.getElementById(id);
-      if(!host)return;
-      host.innerHTML='';
-      const grid=host.parentElement;
-      const form=host.closest('.manlung-auth-form');
-      const gridWidth=grid?.getBoundingClientRect().width||0;
-      const formWidth=form?.clientWidth||400;
-      const buttonWidth=Math.max(200,Math.min(360,Math.floor(gridWidth>0?gridWidth-8:((formWidth-12)/2))));
-      google.accounts.id.renderButton(host,{
-        type:'standard',
-        theme:'outline',
-        size:'large',
-        text:'continue_with',
-        shape:'rectangular',
-        logo_alignment:'center',
-        button_auto_select:false,
-        width:buttonWidth,
-        click_listener:()=>{
-          window.__manlungGoogleErrorTarget=errorTarget;
-          localStorage.removeItem('clientUser');
-        }
-      });
-    });
-  }catch(err){
-    showMessage(document.getElementById('loginError'),err.message||'Google authentication could not be loaded.');
-  }
-}
-
 async function startSocialSignup(provider){
-  if(provider!=='github')return;
+  if(provider!=='github' && provider!=='google')return;
 
   localStorage.removeItem('clientUser');
 
@@ -739,7 +657,7 @@ async function startSocialSignup(provider){
     );
 
     const {error}=await supabase.auth.signInWithOAuth({
-      provider:'github',
+      provider,
       options:{
         redirectTo:window.location.origin+'/oauth-callback.html'
       }
@@ -747,17 +665,15 @@ async function startSocialSignup(provider){
 
     if(error)throw error;
   }catch(err){
-    const target=document.getElementById('loginError');
-    showMessage(
-      target,
-      err.message||'GitHub authentication could not be started.'
-    );
+    const target=document.getElementById(document.getElementById('registerPanel').hidden?'loginError':'registerError');
+    showMessage(target,err.message||`${provider==='google'?'Google':'GitHub'} authentication could not be started.`);
   }
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
   setupOfficialGoogleButtons();
   ['githubLoginBtn','githubRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('github')));
+  ['googleLoginBtn','googleRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('google')));
 });
 async function handleSocialCallback(){
   if(!window.supabase?.createClient)return;
