@@ -81,7 +81,7 @@ router.get('/queue', adminAuth, async (req, res) => {
 
 router.get('/workload', adminAuth, async (req, res) => {
   try {
-    const { data: admins, error: ae } = await supabase.from('recovery_users').select('id,username,email,full_name,role,admin_status').in('role',['admin','owner']);
+    const { data: admins, error: ae } = await supabase.from('recovery_users').select('id,username,email,role,admin_status').in('role',['admin','owner']);
     if (ae) throw ae;
     const { data: cases, error: ce } = await supabase.from('recovery_cases').select('assigned_admin_id,status,priority,sla_due_at');
     if (ce) throw ce;
