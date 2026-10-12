@@ -1,5 +1,5 @@
 (() => {
-  const DISMISS_KEY = 'manlung-pwa-banner-dismissed-v2';
+  const DISMISS_KEY = 'manlung-pwa-banner-dismissed-v3';
   // The install prompt is intentionally a homepage-only experience and a dismissal is permanent.
   const DISMISS_DAYS = 0;
   const IS_HOME = window.location.pathname === '/' || window.location.pathname === '/index.html';
@@ -249,14 +249,14 @@
       <div class="manlung-pwa-copy">
         <strong class="manlung-pwa-title">Manlung Recovery App</strong>
         <span class="manlung-pwa-text">
-          Faster access, easier recovery assistance and saves on data.
+          Install the Android app for quick access to Manlung Recovery.
         </span>
       </div>
 
       <button
         type="button"
         class="manlung-pwa-download"
-      >DOWNLOAD</button>
+      >GET APK</button>
     `;
 
     document.body.appendChild(banner);
@@ -269,8 +269,6 @@
     return banner;
   }
 
-  let deferredPrompt = null;
-
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker
@@ -281,71 +279,26 @@
     });
   }
 
-  window.addEventListener('beforeinstallprompt', event => {
-    console.log('[Manlung PWA] beforeinstallprompt fired');
-
-    event.preventDefault();
-    deferredPrompt = event;
-
-    if (!IS_HOME) return;
-
-    if (isStandalone()) {
-      console.log('[Manlung PWA] App is already installed');
-      return;
-    }
-
-    if (wasRecentlyDismissed()) return;
-
+  // Always offer the direct Android APK download on the homepage. The APK
+  // opens the live website, while the existing browser-based PWA remains usable.
+  window.addEventListener('load', () => {
+    if (!IS_HOME || isStandalone() || wasRecentlyDismissed()) return;
     const banner = createBanner();
-
-    requestAnimationFrame(() => {
-      banner.classList.add('is-visible');
-    });
+    window.requestAnimationFrame(() => banner.classList.add('is-visible'));
   });
 
   window.addEventListener('appinstalled', () => {
-    deferredPrompt = null;
-
     const banner = document.getElementById('manlung-pwa-banner');
-
     if (banner) {
       banner.classList.remove('is-visible');
-      setTimeout(() => banner.remove(), 300);
+      window.setTimeout(() => banner.remove(), 300);
     }
   });
 
-  document.addEventListener('click', async event => {
+  document.addEventListener('click', event => {
     const button = event.target.closest('.manlung-pwa-download');
-
-    if (!button || !deferredPrompt) {
-      return;
-    }
-
-    button.disabled = true;
-    button.textContent = 'INSTALLING...';
-
-    try {
-      deferredPrompt.prompt();
-
-      const result = await deferredPrompt.userChoice;
-
-      if (result.outcome === 'dismissed') {
-        button.disabled = false;
-        button.textContent = 'DOWNLOAD';
-      } else {
-        const banner = document.getElementById('manlung-pwa-banner');
-
-        if (banner) {
-          banner.classList.remove('is-visible');
-        }
-      }
-    } catch (error) {
-      console.warn('PWA installation failed:', error);
-      button.disabled = false;
-      button.textContent = 'DOWNLOAD';
-    }
-
-    deferredPrompt = null;
+    if (!button) return;
+    window.location.assign('/download-app.html');
   });
 
   /*
