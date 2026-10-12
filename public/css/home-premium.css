@@ -228,3 +228,155 @@ body.dark .brand-copy h1,body.dark .home-nav a{color:#f8fafc!important}.dark .br
     border-radius:0 0 20px 20px!important;
   }
 }
+
+
+/* =========================================================
+   MANLUNG RECOVERY — MOBILE-FIRST HOMEPAGE POLISH
+   Tighter spacing, clearer hierarchy, and touch-friendly controls.
+   Desktop styles remain unchanged.
+   ========================================================= */
+@media (max-width: 780px) {
+  html, body { width:100%; max-width:100%; overflow-x:clip!important; }
+  body { -webkit-text-size-adjust:100%; }
+  .home-header-container {
+    min-height:64px!important;
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    gap:10px!important;
+    padding:9px 12px!important;
+  }
+  .home-header-container>.manlung-home-logo,
+  .home-header-container .manlung-site-logo {
+    width:40px!important;height:40px!important;flex:0 0 40px!important;
+  }
+  .home-header-container .brand,
+  .home-header-container .brand-copy { min-width:0!important; }
+  .brand-copy h1 { font-size:.94rem!important;line-height:1.1!important;letter-spacing:-.025em!important; }
+  .home-header-container .brand-copy span {
+    font-size:.61rem!important;line-height:1.25!important;white-space:normal!important;
+    max-width:190px!important;
+  }
+  .site-header .header-actions { display:flex!important;align-items:center!important;gap:7px!important; }
+  .site-header .header-actions .btn-primary { display:none!important; }
+  .site-header .header-actions button[data-theme-toggle=true] {
+    width:38px!important;min-width:38px!important;height:38px!important;min-height:38px!important;
+  }
+  .home-mobile-menu { width:38px!important;height:38px!important;flex:0 0 38px!important;border-radius:11px!important; }
+  .home-mobile-nav { padding:8px 12px 12px!important;box-shadow:0 14px 25px rgba(15,23,42,.08); }
+  .home-mobile-nav a { min-height:44px;display:flex!important;align-items:center;padding:11px 12px!important;font-size:.83rem!important; }
+  .home-page-container { max-width:100%!important;padding:0 0 30px!important; }
+  .home-page-container > .home-hero,
+  .home-page-container .home-hero.ml-hero-enhanced {
+    width:100vw!important;max-width:100vw!important;
+    margin-left:calc(50% - 50vw)!important;margin-right:calc(50% - 50vw)!important;
+    border-radius:0 0 22px 22px!important;
+  }
+  .home-hero {
+    min-height:0!important;display:block!important;
+    background:radial-gradient(ellipse at 88% 8%,rgba(37,99,235,.15),transparent 38%),linear-gradient(160deg,#f8fbff 0%,#fff 62%,#eef5ff 100%)!important;
+    box-shadow:0 14px 30px rgba(30,64,175,.07)!important;
+  }
+  .dark .home-hero {
+    background:radial-gradient(ellipse at 88% 8%,rgba(59,130,246,.22),transparent 40%),linear-gradient(160deg,#081225 0%,#0f172a 65%,#101c31 100%)!important;
+  }
+  .home-hero-content {
+    width:100%!important;max-width:560px!important;grid-template-columns:minmax(0,1fr)!important;
+    gap:22px!important;padding:35px 20px 25px!important;margin:0 auto!important;
+  }
+  .hero-copy { min-width:0!important;text-align:left!important; }
+  .hero-badge { max-width:100%;font-size:.66rem!important;line-height:1.35;padding:7px 10px!important; }
+  .hero-copy h1 {
+    font-size:clamp(2.15rem,9.5vw,3.15rem)!important;line-height:1.03!important;
+    letter-spacing:-.055em!important;margin:17px 0 13px!important;text-wrap:balance;
+  }
+  .hero-copy>p { max-width:38rem!important;font-size:.91rem!important;line-height:1.68!important;margin-bottom:20px!important; }
+  .hero-actions { display:grid!important;grid-template-columns:1fr!important;gap:10px!important;width:100%!important; }
+  .hero-actions .btn { width:100%!important;min-height:48px!important;justify-content:center!important;border-radius:12px!important;font-size:.83rem!important; }
+  .hero-trust-row { display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px 12px!important;margin-top:19px!important;text-align:left!important;font-size:.68rem!important; }
+  .hero-trust-row span { align-items:flex-start!important;line-height:1.4!important; }
+  .hero-visual { min-height:0!important;width:100%!important;margin:0!important;padding:0 2px 6px!important; }
+  .hero-visual-glow { width:210px!important;height:210px!important; }
+  .security-panel { width:100%!important;max-width:440px!important;margin:0 auto!important;padding:13px!important;border-radius:18px!important; }
+  .security-panel-top { font-size:.64rem!important; }
+  .security-screen { gap:11px!important;margin-top:13px!important;padding:19px 13px!important;border-radius:13px!important; }
+  .screen-icon { width:46px!important;height:46px!important;flex:0 0 46px!important;border-radius:13px!important;font-size:1.05rem!important; }
+  .security-screen strong { font-size:.87rem!important;line-height:1.3!important; }
+  .security-screen span { font-size:.64rem!important;line-height:1.4!important; }
+  .screen-stats { gap:7px!important; }
+  .screen-stats div { min-width:0!important;padding:10px 7px!important;border-radius:10px!important; }
+  .screen-stats strong { font-size:.9rem!important; }
+  .screen-stats span { font-size:.57rem!important;line-height:1.3!important;overflow-wrap:anywhere; }
+  .floating-mini-card { max-width:48%;font-size:.58rem!important;padding:8px 9px!important;border-radius:10px!important; }
+  .mini-one { left:-3px!important;bottom:0!important; }
+  .mini-two { right:-3px!important;top:0!important; }
+  .intro-strip { grid-template-columns:minmax(0,1fr)!important;gap:13px!important;padding:42px 20px 8px!important; }
+  .intro-strip h2,.section-heading h2,.demo-copy h2,.tracker-copy h2,.support-section h2,.final-cta h2 {
+    font-size:clamp(1.65rem,7vw,2.15rem)!important;line-height:1.12!important;letter-spacing:-.045em!important;
+  }
+  .intro-strip p,.section-heading p,.demo-copy>p,.tracker-copy>p,.support-section p,.final-cta p {
+    font-size:.87rem!important;line-height:1.7!important;
+  }
+  .home-section { padding:48px 18px!important; }
+  .section-heading { margin-bottom:26px!important; }
+  .section-heading .eyebrow { font-size:.65rem!important; }
+  .section-heading h2 { margin-top:8px!important; }
+  .section-heading p { margin-top:10px!important; }
+  .premium-service-grid,.process-flow { grid-template-columns:minmax(0,1fr)!important;gap:13px!important; }
+  .premium-service-card { min-height:0!important;padding:22px 19px!important;border-radius:17px!important; }
+  .premium-service-card h3 { font-size:1.02rem!important;line-height:1.3!important;margin:17px 0 8px!important; }
+  .premium-service-card p { font-size:.82rem!important;line-height:1.65!important; }
+  .premium-service-card .service-learn { min-height:42px;padding-top:13px!important;font-size:.78rem!important; }
+  .process-step { min-height:0!important;padding:21px 19px!important; }
+  .how-section { border-radius:18px!important;padding:26px 16px!important; }
+  .demo-section { gap:22px!important; }
+  .demo-window { border-radius:15px!important; }
+  .demo-window-body { grid-template-columns:42px minmax(0,1fr)!important;min-width:0!important; }
+  .demo-sidebar { padding:13px 8px!important; }
+  .demo-main { min-width:0!important;padding:13px!important; }
+  .demo-title-row { align-items:flex-start!important; }
+  .demo-title-row strong { font-size:.78rem!important; }
+  .demo-title-row em { white-space:nowrap;font-size:.52rem!important; }
+  .demo-cards { grid-template-columns:1fr!important; }
+  .demo-cards>div { display:grid;grid-template-columns:20px 1fr;column-gap:8px;align-items:center;padding:10px!important; }
+  .demo-cards i { grid-row:span 2; }
+  .demo-cards strong { margin:0!important;font-size:.67rem!important; }
+  .demo-cards small { margin-top:2px!important; }
+  .tracker-card { gap:20px!important;padding:20px 16px!important;border-radius:17px!important; }
+  .tracker-form { flex-wrap:wrap!important;padding:9px!important; }
+  .tracker-form input { min-height:42px!important;flex-basis:calc(100% - 30px)!important;font-size:16px!important; }
+  .tracker-form .btn { width:100%!important;min-height:44px!important; }
+  .trust-grid { grid-template-columns:1fr!important; }
+  .trust-grid>div { display:grid;grid-template-columns:28px 1fr;column-gap:10px;align-items:center;text-align:left!important;padding:14px 16px!important; }
+  .trust-grid>div i { grid-row:span 2;margin:0!important;font-size:1rem; }
+  .trust-grid strong { font-size:.77rem!important; }
+  .trust-grid span { font-size:.65rem!important;margin-top:2px!important; }
+  .scanner-support-section { gap:14px!important;padding:24px 18px!important;border-radius:17px!important; }
+  .scanner-support-section h2 { font-size:1.35rem!important;line-height:1.15!important; }
+  .support-section { gap:20px!important; }
+  .support-target { min-width:0!important;width:100%!important;padding:18px!important; }
+  .final-cta { gap:18px!important;padding-bottom:16px!important; }
+  .final-cta-actions { display:grid!important;grid-template-columns:1fr!important;gap:9px!important; }
+  .final-cta-actions .btn { width:100%!important;min-height:46px!important;justify-content:center!important; }
+  .recovery-journey-section { padding-top:42px!important; }
+  .recovery-journey-grid { grid-template-columns:minmax(0,1fr)!important;gap:13px!important; }
+  .recovery-journey-card { border-radius:16px!important; }
+  .recovery-journey-card img { aspect-ratio:16/10!important; }
+  .recovery-journey-card>div { padding:16px!important; }
+  .home-demo-section { margin-top:25px!important; }
+  .service-modal-scroll { padding:10px!important; }
+  .service-modal-panel { width:100%!important;padding:19px!important;border-radius:17px!important; }
+}
+@media (max-width: 420px) {
+  .home-header-container { padding:8px 10px!important;gap:8px!important; }
+  .home-header-container>.manlung-home-logo,.home-header-container .manlung-site-logo { width:36px!important;height:36px!important;flex-basis:36px!important; }
+  .brand-copy h1 { font-size:.85rem!important; }
+  .home-header-container .brand-copy span { font-size:.56rem!important;max-width:155px!important; }
+  .site-header .header-actions button[data-theme-toggle=true],.home-mobile-menu { width:35px!important;min-width:35px!important;height:35px!important;min-height:35px!important; }
+  .home-hero-content { padding:29px 16px 22px!important;gap:20px!important; }
+  .hero-copy h1 { font-size:clamp(2rem,9.3vw,2.65rem)!important; }
+  .hero-copy>p { font-size:.86rem!important; }
+  .hero-trust-row { font-size:.63rem!important;gap:9px!important; }
+  .home-section { padding:42px 15px!important; }
+  .premium-service-card { padding:20px 16px!important; }
+  .tracker-card { padding:17px 13px!important; }
+}
