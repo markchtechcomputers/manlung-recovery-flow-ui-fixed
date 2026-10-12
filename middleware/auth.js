@@ -143,7 +143,19 @@ const adminAuth = async (req, res, next) => {
 
 const ownerAuth = async (req, res, next) => {
   await auth(req, res, () => {
-    if (req.user.role !== 'owner') return res.status(403).json({ error: 'Owner access required' });
+    if (req.user.role !== 'owner') {
+      // Direct browser navigation to the owner-only security page should return
+      // admins to the tools directory. Keep JSON/API requests on the existing
+      // 403 response so API authorization semantics do not change.
+      if (
+        req.method === 'GET' &&
+        req.path === '/admin/tools/security.html' &&
+        req.accepts('html')
+      ) {
+        return res.redirect(302, '/admin/tools.html');
+      }
+      return res.status(403).json({ error: 'Owner access required' });
+    }
     if (req.user.mfa_enabled === true) {
       const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, ADMIN_COOKIE);
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
