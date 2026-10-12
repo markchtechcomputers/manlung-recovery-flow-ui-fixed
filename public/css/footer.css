@@ -50,3 +50,49 @@
 .manlung-footer .manlung-footer-social a{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;min-width:82px!important;height:auto!important;min-height:38px!important;flex:0 0 auto!important;margin:0!important;padding:10px 14px!important;border-radius:10px!important;white-space:nowrap!important;font-size:12px!important;line-height:1.2!important}
 @media(max-width:900px){.manlung-footer .manlung-footer-social{justify-content:flex-start!important}}
 @media(max-width:600px){.manlung-footer .manlung-footer-social{width:100%!important;gap:9px!important}.manlung-footer .manlung-footer-social a{min-width:0!important;min-height:38px!important;padding:10px 12px!important}}
+
+
+/* Site-wide page layout fix for owner/admin tools.
+   Keep all page content in normal vertical flow; the footer sits after main
+   content and is pushed to the viewport bottom only when the page is short. */
+html {
+  min-height: 100%;
+}
+
+html body {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  min-height: 100vh !important;
+  height: auto !important;
+}
+
+html body > header,
+html body > .site-header {
+  flex: 0 0 auto !important;
+}
+
+html body > main,
+html body > #page,
+html body > .tools-shell,
+html body > .wrap,
+html body > .dr-shell,
+html body > .page,
+html body > .admin-shell {
+  flex: 1 0 auto !important;
+  width: 100%;
+}
+
+html body > .manlung-footer,
+html body footer.manlung-footer {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  float: none !important;
+  clear: both !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: auto 0 0 !important;
+}
