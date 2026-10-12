@@ -162,9 +162,6 @@ html.dark .ml-hero-security-row, body.dark .ml-hero-security-row { color: #cbd5e
 html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !important; }
 
 @media (max-width: 768px) {
-  /* Keep desktop hero trust labels; hide this row only on phones. */
-  .ml-balanced-hero .ml-hero-security-row { display: none !important; }
-
   .ml-balanced-hero {
     display: flex !important;
     flex-direction: column !important;
