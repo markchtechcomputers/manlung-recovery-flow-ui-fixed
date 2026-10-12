@@ -49,7 +49,24 @@ app.post('/',async(req,res)=>{
   const email=String(p.email||'').trim().toLowerCase();if(!email)return res.status(400).json({success:false,error:'Google did not provide an email address.'});
   let user=await User.findByEmail(email);
   if(user&&user.role!=='client')return res.status(409).json({success:false,error:'This email belongs to a staff account. Use staff login.'});
-  if(!user)user=await User.create({username:(email.split('@')[0].replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,55)||'client')+'-'+crypto.randomBytes(3).toString('hex'),password:crypto.randomBytes(32).toString('base64url') + 'A!1',role:'client',email,phone:null});
+  if(!user){
+   try{
+    user=await User.create({
+     username:(email.split('@')[0].replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,55)||'client')+'-'+crypto.randomBytes(3).toString('hex'),
+     password:crypto.randomBytes(32).toString('base64url')+'A!1',
+     role:'client',email,phone:null
+    });
+   }catch(createError){
+    // Two sign-in attempts can race while creating the same first-time account.
+    // Re-read by verified email before treating the creation attempt as a failure.
+    user=await User.findByEmail(email).catch(()=>null);
+    if(!user){
+     console.error('Google account creation failed:',createError.code||createError.message);
+     throw createError;
+    }
+    if(user.role!=='client')return res.status(409).json({success:false,error:'This email belongs to a staff account. Use staff login.'});
+   }
+  }
   const sessionToken=token(user);
   setClientCookie(res,sessionToken);
   const profilePicture = /^https:\/\/[^\s"'<>]+$/i.test(String(p.picture || '')) ? String(p.picture) : null;

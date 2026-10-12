@@ -53,6 +53,7 @@
 .manlung-auth-page .manlung-auth-heading{margin-bottom:12px}
 @media (max-width:640px){.manlung-auth-form{padding:18px}.manlung-auth-page .manlung-auth-form form,.manlung-auth-page .manlung-auth-heading{padding:14px}}
 
+#loginPanel[hidden],#registerPanel[hidden],#emailOtpPanel[hidden],#forgotForm[hidden]{display:none!important;visibility:hidden!important}
 .manlung-auth-tabs,.manlung-auth-tabs button,.manlung-social-grid,.manlung-social-btn,.manlung-google-btn{position:relative;z-index:10000;pointer-events:auto!important}.manlung-social-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;width:100%!important;align-items:stretch!important}.manlung-social-btn,.manlung-google-btn{box-sizing:border-box!important;width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;max-width:100%!important}.manlung-social-btn{display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;white-space:nowrap!important;overflow:hidden!important}.manlung-google-btn{display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;min-height:48px!important}.manlung-google-btn iframe{display:block!important;max-width:100%!important}.manlung-auth-tabs{display:flex!important}.manlung-auth-tabs button{cursor:pointer!important;flex:1!important}@media(max-width:640px){.manlung-social-grid{grid-template-columns:1fr!important}}
 </style><style>
 .manlung-password-field{position:relative;display:flex;align-items:center}
@@ -146,7 +147,7 @@
       <div id="emailOtpPanel" hidden>
         <div class="manlung-auth-heading">
           <h2>Verify your email</h2>
-          <p id="emailOtpDescription">We sent an 8-digit verification code to your email address.</p>
+          <p id="emailOtpDescription">We sent a verification code to your email address. Enter all 6–8 digits shown in the email.</p>
         </div>
         <form id="emailOtpForm" onsubmit="handleEmailOtp(event)">
           <div class="form-group">
@@ -156,8 +157,8 @@
               inputmode="numeric"
               autocomplete="one-time-code"
               maxlength="8"
-              pattern="[0-9]{8}"
-              placeholder="Enter 8-digit code"
+              pattern="[0-9]{6,8}"
+              placeholder="Enter email code"
               required
               style="letter-spacing:.35em;text-align:center;font-size:1.25rem;font-weight:700;"
             >
@@ -512,8 +513,8 @@ async function handleEmailOtp(event) {
 
   showMessage(errorEl, '');
 
-  if (!/^\d{8}$/.test(code)) {
-    showMessage(errorEl, 'Enter the 8-digit verification code from your email.');
+  if (!/^\d{6,8}$/.test(code)) {
+    showMessage(errorEl, 'Enter the 6–8 digit verification code from your email.');
     return;
   }
 
@@ -637,7 +638,10 @@ async function ensureGoogleGIS(){
     const started=Date.now();
     const timer=setInterval(()=>{
       if(window.google?.accounts?.id){clearInterval(timer);resolve(true);}
-      else if(Date.now()-started>10000){clearInterval(timer);reject(new Error('Google authentication could not load. Please refresh the page.'));}
+      else if(Date.now()-started>12000){
+        clearInterval(timer);
+        reject(new Error('Google sign-in did not load. Check your connection, disable content blockers for this site, or use email sign-in.'));
+      }
     },100);
   });
 }
@@ -659,6 +663,7 @@ async function setupOfficialGoogleButtons(){
       client_id:cfg.clientId,
       auto_select:false,
       cancel_on_tap_outside:true,
+      itp_support:true,
       callback:async response=>{
         try{
           if(!response?.credential)throw new Error('Google sign-in was cancelled.');
@@ -687,6 +692,7 @@ async function setupOfficialGoogleButtons(){
       const host=document.getElementById(id);
       if(!host)return;
       host.innerHTML='';
+      host.setAttribute('aria-busy','true');
       const grid=host.parentElement;
       const form=host.closest('.manlung-auth-form');
       const gridWidth=grid?.getBoundingClientRect().width||0;
@@ -704,11 +710,22 @@ async function setupOfficialGoogleButtons(){
         click_listener:()=>{
           window.__manlungGoogleErrorTarget=errorTarget;
           localStorage.removeItem('clientUser');
+          showMessage(document.getElementById(errorTarget),'');
         }
       });
+      host.removeAttribute('aria-busy');
     });
   }catch(err){
-    showMessage(document.getElementById('loginError'),err.message||'Google authentication could not be loaded.');
+    console.error('Google button setup failed:',err);
+    const message=err.message||'Google authentication could not be loaded.';
+    showMessage(document.getElementById('loginError'),message);
+    showMessage(document.getElementById('registerError'),message);
+    ['googleLoginBtn','googleRegisterBtn'].forEach(id=>{
+      const host=document.getElementById(id);
+      if(host&&!host.children.length){
+        host.innerHTML='<button type="button" class="btn btn-outline" style="width:100%;min-height:48px" onclick="location.reload()">Retry Google sign-in</button>';
+      }
+    });
   }
 }
 
