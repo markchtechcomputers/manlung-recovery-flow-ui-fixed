@@ -383,3 +383,18 @@ body.dark .brand-copy h1,body.dark .home-nav a{color:#f8fafc!important}.dark .br
 }
 
 /* Mobile contrast overrides removed: theme-aware styles are defined in theme.css and ml-hero-visual-fix.css. */
+
+
+/* 2026-10-12: Remove the entire decorative right-side hero panel on every screen size. */
+.home-hero-content{grid-template-columns:minmax(0,1fr)!important;max-width:1160px!important;}
+.home-hero-content>.hero-copy{grid-column:1 / -1!important;width:100%!important;max-width:100%!important;}
+.home-hero-content .hero-copy>p{max-width:850px!important;}
+.home-hero-content .hero-visual,
+.home-hero-content .ml-hero-device-visual,
+.home-hero-content .hero-visual-glow,
+.home-hero-content .security-panel,
+.home-hero-content .floating-mini-card{display:none!important;visibility:hidden!important;width:0!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;}
+@media(max-width:780px){
+  .home-hero-content{grid-template-columns:minmax(0,1fr)!important;gap:0!important;}
+  .home-hero-content>.hero-copy{grid-column:1 / -1!important;}
+}
