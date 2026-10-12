@@ -152,3 +152,63 @@ body.dark .brand-copy h1,body.dark .home-nav a{color:#f8fafc!important}.dark .br
   }
 }
 
+
+
+/* MANLUNG HERO DESIGN OPTION 1 — lightweight CSS cybersecurity background.
+   Keeps the existing hero layout and content; replaces only the video layer. */
+.ml-hero-device-visual{display:none!important}
+.home-hero .hero-visual{
+  isolation:isolate!important;
+  overflow:hidden!important;
+  border:1px solid rgba(96,165,250,.24)!important;
+  border-radius:26px!important;
+  padding:24px!important;
+  background:
+    radial-gradient(ellipse at 78% 18%,rgba(37,99,235,.34),transparent 38%),
+    radial-gradient(ellipse at 18% 85%,rgba(14,165,233,.17),transparent 42%),
+    linear-gradient(145deg,#071225 0%,#0a1630 48%,#050b18 100%)!important;
+  box-shadow:0 28px 75px rgba(15,23,42,.22),inset 0 1px 0 rgba(147,197,253,.08)!important;
+}
+.home-hero .hero-visual::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.48;
+  background-image:
+    linear-gradient(rgba(96,165,250,.10) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(96,165,250,.10) 1px,transparent 1px);
+  background-size:34px 34px;
+  mask-image:linear-gradient(135deg,transparent 0%,#000 35%,#000 78%,transparent 100%);
+}
+.home-hero .hero-visual::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  width:250px;
+  height:250px;
+  right:-65px;
+  top:-70px;
+  border:1px solid rgba(96,165,250,.26);
+  border-radius:50%;
+  box-shadow:0 0 0 22px rgba(59,130,246,.035),0 0 0 48px rgba(59,130,246,.025),0 0 65px rgba(37,99,235,.22);
+}
+.home-hero .hero-visual .hero-visual-glow{
+  z-index:0!important;
+  background:rgba(37,99,235,.22)!important;
+  filter:blur(42px)!important;
+}
+.home-hero .hero-visual .security-panel{z-index:2!important}
+.home-hero .hero-visual .floating-mini-card{z-index:3!important}
+.dark .home-hero .hero-visual{
+  border-color:rgba(96,165,250,.28)!important;
+  box-shadow:0 28px 75px rgba(0,0,0,.32),inset 0 1px 0 rgba(147,197,253,.08)!important;
+}
+@media(max-width:780px){
+  .home-hero .hero-visual{padding:16px!important;border-radius:20px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .home-hero .hero-visual::before,.home-hero .hero-visual::after{animation:none!important}
+}
