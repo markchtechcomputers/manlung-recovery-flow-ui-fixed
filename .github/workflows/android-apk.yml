@@ -35,14 +35,17 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Set up Android SDK
+      - name: Set up Android SDK tools
         uses: android-actions/setup-android@v3
+        with:
+          accept-android-sdk-licenses: false
+          log-accepted-android-sdk-licenses: false
 
       - name: Accept Android SDK licenses and install build packages
         shell: bash
         run: |
-          set -euo pipefail
-          yes | sdkmanager --licenses >/dev/null
+          set -eo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Generate Android wrapper for the live website
