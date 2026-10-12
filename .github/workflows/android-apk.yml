@@ -49,14 +49,14 @@ jobs:
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Generate Android wrapper for the live website
+      - name: Generate Android wrapper with the official Manlung icon
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p android-wrapper/www
           cd android-wrapper
           npm init -y
-          npm install @capacitor/core@^7 @capacitor/cli@^7 @capacitor/android@^7
+          npm install @capacitor/core@^7 @capacitor/cli@^7 @capacitor/android@^7 @capacitor/assets@^3 sharp
           cat > www/index.html <<'HTML'
           <!doctype html>
           <html lang="en">
@@ -87,7 +87,17 @@ jobs:
             }
           }
           JSON
+          mkdir -p assets
+          curl --fail --silent --show-error --location             "https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"             --output /tmp/manlung-icon.png
+          node --input-type=module <<'NODE'
+          import sharp from 'sharp';
+          await sharp('/tmp/manlung-icon.png')
+            .resize(1024, 1024, { fit: 'contain', background: '#ffffff' })
+            .png()
+            .toFile('assets/icon.png');
+          NODE
           npx cap add android
+          npx capacitor-assets generate --android
           cd android
           ./gradlew --no-daemon assembleDebug
           cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/ManlungRecovery.apk"
@@ -100,7 +110,7 @@ jobs:
           set -euo pipefail
           if gh release view android-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload android-latest ManlungRecovery.apk --clobber --repo "$GITHUB_REPOSITORY"
-            gh release edit android-latest --title "Manlung Recovery Android APK" --notes "Latest installable Android package for Manlung Recovery. The app opens the live website, so web content updates appear when the device is online." --repo "$GITHUB_REPOSITORY"
+            gh release edit android-latest --title "Manlung Recovery Android APK" --notes "Latest installable Android package for Manlung Recovery. Uses the official Manlung Recovery icon and opens the live website, so web content updates appear when the device is online. This direct-download APK is not Play Store verified." --repo "$GITHUB_REPOSITORY"
           else
-            gh release create android-latest ManlungRecovery.apk --title "Manlung Recovery Android APK" --notes "Installable Android package for Manlung Recovery. The app opens the live website, so web content updates appear when the device is online." --repo "$GITHUB_REPOSITORY"
+            gh release create android-latest ManlungRecovery.apk --title "Manlung Recovery Android APK" --notes "Installable Android package for Manlung Recovery. Uses the official Manlung Recovery icon and opens the live website, so web content updates appear when the device is online. This direct-download APK is not Play Store verified." --repo "$GITHUB_REPOSITORY"
           fi
