@@ -286,6 +286,26 @@
 }
 </style>
 
+<style id="manlung-notification-shortcut-fix">
+.dashboard-notices-shortcut{
+  appearance:none;
+  -webkit-appearance:none;
+  font:inherit;
+  color:inherit;
+  text-align:left;
+  width:100%;
+  cursor:pointer;
+  position:relative;
+}
+.dashboard-notices-shortcut:focus-visible{
+  outline:3px solid #60a5fa;
+  outline-offset:3px;
+}
+.dashboard-notices-shortcut:hover .overview-icon{transform:translateY(-2px)}
+.dashboard-notices-shortcut .overview-icon{transition:transform .18s ease}
+#manlungNotifications{scroll-margin-top:90px}
+</style>
+
 <style id="manlung-notifications-style">
 .manlung-notifications-card{margin:1rem 0}
 .manlung-notification-head{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:.8rem}
@@ -293,6 +313,11 @@
 .manlung-notification-title i{color:#60a5fa}
 .manlung-notification-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 .35rem;border-radius:999px;background:#2563eb;color:#fff;font-size:.7rem;font-weight:800}
 .manlung-notification-list{display:grid;gap:.55rem}
+.dashboard-notification-actions{display:flex;align-items:center;justify-content:flex-end;gap:.55rem;flex-wrap:wrap}
+.dashboard-notification-actions button{display:inline-flex;align-items:center;gap:.35rem}
+.manlung-profile-avatar{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#2563eb,#0f766e);color:#fff;font-size:.9rem;font-weight:900;border:2px solid rgba(255,255,255,.24)}
+.manlung-profile-avatar img{width:100%;height:100%;object-fit:cover}
+@media(max-width:480px){.dashboard-notification-actions{width:100%;justify-content:flex-start}.manlung-profile-avatar{width:36px;height:36px;flex-basis:36px}}
 .manlung-notification-item{padding:.75rem;border:1px solid rgba(148,163,184,.16);border-radius:9px;background:rgba(255,255,255,.025)}
 .manlung-notification-item.unread{border-color:rgba(96,165,250,.3);background:rgba(37,99,235,.06)}
 .manlung-notification-item h4{margin:0 0 .25rem;color:var(--text);font-size:.88rem}
@@ -806,11 +831,11 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         </div>
       </div>
       <div class="header-actions">
-        <button class="btn btn-outline" type="button" data-theme-toggle="true"><span>Theme</span></button>
-        <a class="btn btn-outline" href="/client/request.html"><span>New Request</span></a>
-        <a class="btn btn-outline" href="/client/settings.html"><span>Settings</span></a>
-        <a class="btn btn-outline" href="/"><span>Home</span></a>
-        <button class="btn btn-outline" type="button" onclick="logout()"><span>Logout</span></button>
+        <button class="btn btn-outline" type="button" data-theme-toggle="true"><i class="fas fa-circle-half-stroke" aria-hidden="true"></i><span>Theme</span></button>
+        <a class="btn btn-outline" href="/client/request.html"><i class="fas fa-file-circle-plus" aria-hidden="true"></i><span>New Request</span></a>
+        <a class="btn btn-outline" href="/client/settings.html"><i class="fas fa-user-gear" aria-hidden="true"></i><span>Settings</span></a>
+        <a class="btn btn-outline" href="/"><i class="fas fa-house" aria-hidden="true"></i><span>Home</span></a>
+        <button class="btn btn-outline" type="button" onclick="logout()"><i class="fas fa-right-from-bracket" aria-hidden="true"></i><span>Logout</span></button>
       </div>
     </div>
   </header>
@@ -819,7 +844,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
     <section class="dashboard-hero manlung-dashboard-hero">
       <div class="dashboard-hero-copy">
         <span class="dashboard-kicker"><i class="fas fa-shield-halved"></i> Private Client Portal</span>
-        <h2>Welcome back</h2>
+        <h2 id="welcomeGreeting">Welcome back</h2>
         <p>Every case stays tied to your account. Follow progress, review updates and speak directly with an available Admin.</p>
         <div class="dashboard-hero-trust">
           <span><i class="fas fa-lock"></i> Secure account</span>
@@ -869,11 +894,13 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         <div class="overview-copy"><span>Community Support</span><strong id="dashboardDonationMetric">KES 0</strong><small><span id="dashboardDonationCountMetric">0</span> confirmed donations</small></div>
         <i class="fas fa-heart overview-corner" aria-hidden="true"></i>
       </article>
-      <article class="dashboard-overview-card overview-notices">
-        <div class="overview-icon"><i class="fas fa-bell"></i></div>
-        <div class="overview-copy"><span>Notifications</span><strong id="dashboardNoticeMetric">0</strong><small>Unread account updates</small></div>
+      <button type="button" class="dashboard-overview-card overview-notices dashboard-notices-shortcut"
+        id="dashboardNotificationsShortcut" aria-label="Open notifications"
+        onclick="document.getElementById('manlungNotifications')?.scrollIntoView({behavior:'smooth',block:'start'});">
+        <span class="overview-icon" aria-hidden="true"><i class="fas fa-bell"></i></span>
+        <span class="overview-copy"><span>Notifications</span><strong id="dashboardNoticeMetric">0</strong><small>Unread account updates</small></span>
         <i class="fas fa-chevron-right overview-corner" aria-hidden="true"></i>
-      </article>
+      </button>
     </section>
 
     <section class="dashboard-support-card">
@@ -924,7 +951,10 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
             <div class="dashboard-section-icon notice"><i class="fas fa-bell"></i></div>
             <div><span class="dashboard-section-kicker">Stay informed</span><h2>Notifications <span class="manlung-notification-badge" id="manlungNotificationCount">0</span></h2></div>
           </div>
-          <button type="button" class="dashboard-mini-link dashboard-mark-all" onclick="markAllManlungNotificationsRead()">Mark all read</button>
+          <div class="dashboard-notification-actions">
+            <button type="button" class="dashboard-mini-link" id="enableBrowserNotifications" onclick="enableManlungBrowserNotifications()"><i class="fas fa-bell" aria-hidden="true"></i> Enable alerts</button>
+            <button type="button" class="dashboard-mini-link dashboard-mark-all" onclick="markAllManlungNotificationsRead()"><i class="fas fa-check-double" aria-hidden="true"></i> Mark all read</button>
+          </div>
         </div>
         <div class="manlung-notification-list" id="manlungNotificationList">
           <div class="manlung-empty">Loading notifications…</div>
@@ -1099,6 +1129,22 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
           'clientUser',
           JSON.stringify(data.user)
         );
+        const accountName = String(data.user.username || data.user.name || '').trim();
+        const firstName = accountName ? accountName.split(/\s+/)[0] : '';
+        const greeting = document.getElementById('welcomeGreeting');
+        if (greeting) greeting.textContent = firstName ? 'Welcome back, ' + firstName : 'Welcome back';
+        const welcomeLine = document.getElementById('welcomeLine');
+        if (welcomeLine) welcomeLine.textContent = data.user.email || 'Your cases, progress and Admin updates';
+        const brand = document.querySelector('.manlung-client-brand');
+        if (brand && !document.getElementById('manlungClientAvatar')) {
+          const avatar = document.createElement('div');
+          avatar.id = 'manlungClientAvatar';
+          avatar.className = 'manlung-profile-avatar';
+          avatar.setAttribute('aria-label', 'Your profile');
+          avatar.textContent = (accountName || data.user.email || 'MR').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(part => part[0].toUpperCase()).join('') || 'MR';
+          const logo = brand.querySelector('.manlung-client-logo');
+          if (logo) logo.insertAdjacentElement('afterend', avatar);
+        }
 
         return true;
       } catch (error) {
@@ -1843,6 +1889,15 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
     }
 
     playNotificationSound();
+    if ('Notification' in window && Notification.permission === 'granted' && !document.hidden) {
+      try {
+        new Notification(notification.title || 'Manlung Recovery update', {
+          body: notification.message || 'There is a new update in your client portal.',
+          icon: '/icons/icon-192.png',
+          tag: String(notification.id || 'manlung-update')
+        });
+      } catch (_) {}
+    }
 
     clearTimeout(
       notificationToastTimer
@@ -2127,6 +2182,39 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       .replaceAll('"','&quot;')
       .replaceAll("'","&#039;");
   }
+
+  window.enableManlungBrowserNotifications = async function(){
+    const button = document.getElementById('enableBrowserNotifications');
+    if (!('Notification' in window)) {
+      if (button) button.innerHTML = '<i class="fas fa-circle-info" aria-hidden="true"></i> Alerts unavailable';
+      return;
+    }
+    if (!window.isSecureContext) {
+      if (button) button.innerHTML = '<i class="fas fa-lock" aria-hidden="true"></i> HTTPS required';
+      return;
+    }
+    try {
+      const permission = Notification.permission === 'default'
+        ? await Notification.requestPermission()
+        : Notification.permission;
+      if (button) {
+        button.innerHTML = permission === 'granted'
+          ? '<i class="fas fa-bell" aria-hidden="true"></i> Alerts enabled'
+          : '<i class="fas fa-bell-slash" aria-hidden="true"></i> Alerts blocked';
+        button.disabled = permission === 'granted';
+      }
+      if (permission === 'granted') {
+        new Notification('Manlung Recovery alerts enabled', {
+          body: 'Browser alerts can appear for new updates while the client portal is open.',
+          icon: '/icons/icon-192.png',
+          tag: 'manlung-alerts-enabled'
+        });
+      }
+    } catch (error) {
+      console.warn('Browser notification permission error:', error);
+      if (button) button.textContent = 'Could not enable alerts';
+    }
+  };
 
   window.loadManlungNotifications = loadManlungNotifications;
   window.markManlungNotificationRead = markManlungNotificationRead;
