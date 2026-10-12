@@ -146,7 +146,7 @@
       <div id="emailOtpPanel" hidden>
         <div class="manlung-auth-heading">
           <h2>Verify your email</h2>
-          <p id="emailOtpDescription">We sent an 8-digit verification code to your email address.</p>
+          <p id="emailOtpDescription">We sent a verification code to your email address. Enter all 6–8 digits shown in the email.</p>
         </div>
         <form id="emailOtpForm" onsubmit="handleEmailOtp(event)">
           <div class="form-group">
@@ -156,8 +156,8 @@
               inputmode="numeric"
               autocomplete="one-time-code"
               maxlength="8"
-              pattern="[0-9]{8}"
-              placeholder="Enter 8-digit code"
+              pattern="[0-9]{6,8}"
+              placeholder="Enter email code"
               required
               style="letter-spacing:.35em;text-align:center;font-size:1.25rem;font-weight:700;"
             >
@@ -512,8 +512,8 @@ async function handleEmailOtp(event) {
 
   showMessage(errorEl, '');
 
-  if (!/^\d{8}$/.test(code)) {
-    showMessage(errorEl, 'Enter the 8-digit verification code from your email.');
+  if (!/^\d{6,8}$/.test(code)) {
+    showMessage(errorEl, 'Enter the 6–8 digit verification code from your email.');
     return;
   }
 
