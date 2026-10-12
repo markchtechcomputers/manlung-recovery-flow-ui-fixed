@@ -194,13 +194,14 @@ body.dark .brand-copy h1,body.dark .home-nav a{color:#f8fafc!important}.dark .br
   box-shadow:0 28px 75px rgba(0,0,0,.32),inset 0 1px 0 rgba(147,197,253,.08)!important;
 }
 
-/* Ensure the empty CSS visual has real height on narrow screens. */
+/* Keep the decorative hero visual compact on phones so it cannot dominate the first screen. */
 @media(max-width:768px){
   .ml-balanced-hero .ml-hero-device-visual.ml-css-cyber-background{
     position:relative!important;
+    order:2!important;
     width:100%!important;
-    height:clamp(220px,62vw,340px)!important;
-    min-height:220px!important;
+    height:clamp(84px,24vw,120px)!important;
+    min-height:0!important;
     margin:0 auto!important;
     border-radius:0!important;
   }
