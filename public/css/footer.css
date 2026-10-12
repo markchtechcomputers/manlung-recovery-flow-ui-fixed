@@ -96,3 +96,61 @@ html body footer.manlung-footer {
   max-width: none !important;
   margin: auto 0 0 !important;
 }
+
+
+/* Security center and owner tools: use a true three-row page layout.
+   This supersedes legacy flex rules that can leave the footer mid-page. */
+html {
+  min-height: 100%;
+  height: 100%;
+}
+
+html body {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto 1fr auto !important;
+  align-content: stretch !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+html body > header,
+html body > .site-header {
+  grid-row: 1 !important;
+  align-self: start !important;
+  width: 100% !important;
+}
+
+html body > main:not([style*="display: none"]):not([hidden]),
+html body > #page:not([style*="display: none"]):not([hidden]),
+html body > .wrap:not([style*="display: none"]):not([hidden]),
+html body > .admin-shell:not([style*="display: none"]):not([hidden]),
+html body > .tools-shell:not([style*="display: none"]):not([hidden]),
+html body > .page:not([style*="display: none"]):not([hidden]) {
+  grid-row: 2 !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+html body > main[style*="display: none"],
+html body > [hidden] {
+  display: none !important;
+}
+
+html body > footer.manlung-footer,
+html body > .manlung-footer {
+  grid-row: 3 !important;
+  align-self: end !important;
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  float: none !important;
+  clear: both !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
