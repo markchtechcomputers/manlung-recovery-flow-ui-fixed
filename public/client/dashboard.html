@@ -1125,11 +1125,14 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 
         // Keep the local client user record synchronized with the
         // server-authoritative account role.
-        localStorage.setItem(
-          'clientUser',
-          JSON.stringify(data.user)
-        );
-        const accountName = String(data.user.username || data.user.name || '').trim();
+        let savedClientUser = {};
+        try { savedClientUser = JSON.parse(localStorage.getItem('clientUser') || '{}') || {}; } catch (_) {}
+        const clientUser = {
+          ...data.user,
+          profilePicture: data.user.profilePicture || savedClientUser.profilePicture || null
+        };
+        localStorage.setItem('clientUser', JSON.stringify(clientUser));
+        const accountName = String(clientUser.username || clientUser.name || '').trim();
         const firstName = accountName ? accountName.split(/\s+/)[0] : '';
         const greeting = document.getElementById('welcomeGreeting');
         if (greeting) greeting.textContent = firstName ? 'Welcome back, ' + firstName : 'Welcome back';
@@ -1141,7 +1144,18 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
           avatar.id = 'manlungClientAvatar';
           avatar.className = 'manlung-profile-avatar';
           avatar.setAttribute('aria-label', 'Your profile');
-          avatar.textContent = (accountName || data.user.email || 'MR').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(part => part[0].toUpperCase()).join('') || 'MR';
+          const initials = (accountName || clientUser.email || 'MR').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(part => part[0].toUpperCase()).join('') || 'MR';
+          if (clientUser.profilePicture && /^https:\/\//i.test(clientUser.profilePicture)) {
+            const photo = document.createElement('img');
+            photo.src = clientUser.profilePicture;
+            photo.alt = '';
+            photo.referrerPolicy = 'no-referrer';
+            photo.loading = 'lazy';
+            photo.onerror = () => { photo.remove(); avatar.textContent = initials; };
+            avatar.appendChild(photo);
+          } else {
+            avatar.textContent = initials;
+          }
           const logo = brand.querySelector('.manlung-client-logo');
           if (logo) logo.insertAdjacentElement('afterend', avatar);
         }
