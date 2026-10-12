@@ -475,3 +475,48 @@ body.dark .brand-copy h1,body.dark .home-nav a{color:#f8fafc!important}.dark .br
   /* The mobile homepage intentionally keeps a dark high-contrast palette. */
   body:not(.light) { background:#070d18!important;color:#e5edf8!important; }
 }
+
+
+/* MOBILE HERO PATCH: fix uneven/white areas inside the hero only. Do not alter theme mode or other sections. */
+@media (max-width: 780px) {
+  .home-page-container > .home-hero,
+  .home-page-container .home-hero.ml-hero-enhanced {
+    position:relative!important;
+    isolation:isolate!important;
+    overflow:hidden!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:#0b1424!important;
+    background-image:linear-gradient(145deg,#0b1424 0%,#0d1b30 58%,#101b2c 100%)!important;
+    box-shadow:none!important;
+  }
+  .home-page-container > .home-hero::before,
+  .home-page-container > .home-hero::after,
+  .home-page-container .home-hero.ml-hero-enhanced::before,
+  .home-page-container .home-hero.ml-hero-enhanced::after {
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+  }
+  .home-hero .hero-visual,
+  .home-hero .security-panel,
+  .home-hero .security-screen,
+  .home-hero .screen-stats > div,
+  .home-hero .floating-mini-card {
+    background-color:#0e1a2c!important;
+    border-color:#2b3e58!important;
+  }
+  .home-hero .security-screen {
+    background-image:linear-gradient(135deg,#142641,#101a2c)!important;
+  }
+  .home-hero .screen-stats > div { background-image:none!important; }
+  .home-hero .floating-mini-card { color:#e5edf8!important; }
+  .home-hero .hero-visual-glow {
+    background:rgba(37,99,235,.12)!important;
+    opacity:.65!important;
+  }
+}
