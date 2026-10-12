@@ -462,7 +462,8 @@
     if(path==='/admin/login.html'||path==='/admin/register.html'||path==='/login.html')return;
     window.__MANLUNG_CALL_WIDGET_INIT__=true;
     buildWidget();
-    startCallbackPolling();
+    // Admin-callback polling is client-only; avoid repeated 403s on public/admin pages.
+    if (window.location.pathname.toLowerCase().startsWith('/client/')) startCallbackPolling();
     try{await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js');}
     catch(e){console.warn('Supabase Realtime SDK failed to load');}
   }
