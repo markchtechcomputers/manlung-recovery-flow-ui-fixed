@@ -719,3 +719,190 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     min-height: 230px !important;
   }
 }
+
+
+/* 2026-10-12: Hero correction — rectangular image panel, fixed copy, phone-safe flow. */
+.ml-image-slideshow-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .92fr) !important;
+  align-items: center !important;
+  gap: clamp(24px, 4vw, 56px) !important;
+  min-height: 560px !important;
+  height: auto !important;
+  padding: clamp(32px, 5vw, 72px) !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: linear-gradient(135deg, #f8fbff 0%, #fff 56%, #edf4ff 100%) !important;
+}
+.ml-image-slideshow-hero > .ml-hero-slideshow {
+  position: relative !important;
+  inset: auto !important;
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+  order: initial !important;
+  width: 100% !important;
+  height: clamp(300px, 36vw, 470px) !important;
+  min-height: 300px !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: #071426 !important;
+  box-shadow: 0 18px 42px rgba(2, 6, 23, .18) !important;
+}
+.ml-image-slideshow-hero .ml-hero-slideshow-track {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+.ml-image-slideshow-hero img.ml-hero-slide {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  background: #071426 !important;
+  will-change: transform, opacity !important;
+}
+.ml-image-slideshow-hero > .ml-hero-slideshow-overlay {
+  display: none !important;
+}
+.ml-image-slideshow-hero > .ml-hero-copy {
+  position: relative !important;
+  z-index: 3 !important;
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  max-width: 680px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  background: transparent !important;
+}
+.ml-image-slideshow-hero .ml-hero-copy h1 {
+  font-size: clamp(2.35rem, 4.1vw, 4.1rem) !important;
+  line-height: 1.04 !important;
+  margin: 0 0 18px !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+.ml-image-slideshow-hero .ml-hero-description {
+  max-width: 620px !important;
+  font-size: clamp(1rem, 1.25vw, 1.1rem) !important;
+  line-height: 1.7 !important;
+}
+.ml-image-slideshow-hero .ml-hero-badge,
+.ml-image-slideshow-hero .ml-badge-dot,
+.ml-image-slideshow-hero [class*="badge"] .ml-badge-dot {
+  display: none !important;
+  visibility: hidden !important;
+}
+.ml-image-slideshow-hero .ml-hero-security-row {
+  opacity: 1 !important;
+  animation: none !important;
+}
+@media (max-width: 768px) {
+  .ml-image-slideshow-hero {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    min-height: 0 !important;
+    padding: 0 0 24px !important;
+    border-radius: 0 !important;
+    background: #071426 !important;
+  }
+  .ml-image-slideshow-hero > .ml-hero-slideshow {
+    position: relative !important;
+    inset: auto !important;
+    order: 0 !important;
+    width: 100% !important;
+    height: clamp(230px, 70vw, 350px) !important;
+    min-height: 230px !important;
+    aspect-ratio: 4 / 3 !important;
+    flex: 0 0 auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .ml-image-slideshow-hero img.ml-hero-slide {
+    object-fit: cover !important;
+    object-position: center 42% !important;
+  }
+  .ml-image-slideshow-hero > .ml-hero-slideshow-overlay {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 0 auto 0 !important;
+    height: clamp(230px, 70vw, 350px) !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+    background: linear-gradient(180deg, rgba(3,10,25,.02) 45%, rgba(3,10,25,.22) 100%) !important;
+  }
+  .ml-image-slideshow-hero > .ml-hero-copy {
+    order: 1 !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 26px 20px 8px !important;
+    background: #071426 !important;
+    text-align: left !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-copy h1 {
+    font-size: clamp(2rem, 8.5vw, 2.8rem) !important;
+    line-height: 1.08 !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-description {
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-primary,
+  .ml-image-slideshow-hero .ml-hero-secondary {
+    width: 100% !important;
+    min-height: 50px !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
+    white-space: normal !important;
+  }
+}
+@media (max-width: 380px) {
+  .ml-image-slideshow-hero > .ml-hero-slideshow {
+    height: 230px !important;
+    min-height: 230px !important;
+  }
+  .ml-image-slideshow-hero > .ml-hero-copy {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* Each image enters from the left; outgoing image exits to the left. Copy stays still. */
+.ml-image-slideshow-hero .ml-hero-slide {
+  opacity: 0 !important;
+  transform: translateX(100%) !important;
+  transition: transform .85s cubic-bezier(.22,.61,.36,1), opacity .85s ease !important;
+}
+.ml-image-slideshow-hero .ml-hero-slide.is-current {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+  z-index: 2 !important;
+}
+.ml-image-slideshow-hero .ml-hero-slide.is-leaving {
+  opacity: 0 !important;
+  transform: translateX(-100%) !important;
+  z-index: 1 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-image-slideshow-hero .ml-hero-slide {
+    transition: none !important;
+    transform: none !important;
+  }
+}
