@@ -640,3 +640,52 @@ textarea { min-height: 100px; resize: vertical; }
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
 }
 
+
+
+/* Shared spacing tokens for the homepage and legacy pages using style.css. */
+:root {
+  --mr-space-1: 4px;
+  --mr-space-2: 8px;
+  --mr-space-3: 12px;
+  --mr-space-4: 16px;
+  --mr-space-5: 20px;
+  --mr-space-6: 24px;
+  --mr-space-8: 32px;
+  --mr-page-gutter: clamp(16px, 3.2vw, 32px);
+}
+
+html body main {
+  min-width: 0;
+}
+
+html body main > .container,
+html body main > .page-container,
+html body main > .content-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--mr-page-gutter);
+  box-sizing: border-box;
+}
+
+html body main :where(.card, .feature-card, .stat-card, .case-item, .upload-zone) {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+html body main :where(.features, .stats-grid, .row-2, .row-3) {
+  gap: clamp(12px, 2vw, 24px);
+}
+
+html body main :where(img, video, iframe, canvas) {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  :root { --mr-page-gutter: 12px; }
+  html body main > .container,
+  html body main > .page-container,
+  html body main > .content-container {
+    padding-inline: var(--mr-page-gutter);
+  }
+}
