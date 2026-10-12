@@ -286,6 +286,26 @@
 }
 </style>
 
+<style id="manlung-notification-shortcut-fix">
+.dashboard-notices-shortcut{
+  appearance:none;
+  -webkit-appearance:none;
+  font:inherit;
+  color:inherit;
+  text-align:left;
+  width:100%;
+  cursor:pointer;
+  position:relative;
+}
+.dashboard-notices-shortcut:focus-visible{
+  outline:3px solid #60a5fa;
+  outline-offset:3px;
+}
+.dashboard-notices-shortcut:hover .overview-icon{transform:translateY(-2px)}
+.dashboard-notices-shortcut .overview-icon{transition:transform .18s ease}
+#manlungNotifications{scroll-margin-top:90px}
+</style>
+
 <style id="manlung-notifications-style">
 .manlung-notifications-card{margin:1rem 0}
 .manlung-notification-head{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:.8rem}
@@ -874,11 +894,13 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         <div class="overview-copy"><span>Community Support</span><strong id="dashboardDonationMetric">KES 0</strong><small><span id="dashboardDonationCountMetric">0</span> confirmed donations</small></div>
         <i class="fas fa-heart overview-corner" aria-hidden="true"></i>
       </article>
-      <article class="dashboard-overview-card overview-notices">
-        <div class="overview-icon"><i class="fas fa-bell"></i></div>
-        <div class="overview-copy"><span>Notifications</span><strong id="dashboardNoticeMetric">0</strong><small>Unread account updates</small></div>
+      <button type="button" class="dashboard-overview-card overview-notices dashboard-notices-shortcut"
+        id="dashboardNotificationsShortcut" aria-label="Open notifications"
+        onclick="document.getElementById('manlungNotifications')?.scrollIntoView({behavior:'smooth',block:'start'});">
+        <span class="overview-icon" aria-hidden="true"><i class="fas fa-bell"></i></span>
+        <span class="overview-copy"><span>Notifications</span><strong id="dashboardNoticeMetric">0</strong><small>Unread account updates</small></span>
         <i class="fas fa-chevron-right overview-corner" aria-hidden="true"></i>
-      </article>
+      </button>
     </section>
 
     <section class="dashboard-support-card">
