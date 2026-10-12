@@ -50,3 +50,24 @@
 .manlung-footer .manlung-footer-social a{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;min-width:82px!important;height:auto!important;min-height:38px!important;flex:0 0 auto!important;margin:0!important;padding:10px 14px!important;border-radius:10px!important;white-space:nowrap!important;font-size:12px!important;line-height:1.2!important}
 @media(max-width:900px){.manlung-footer .manlung-footer-social{justify-content:flex-start!important}}
 @media(max-width:600px){.manlung-footer .manlung-footer-social{width:100%!important;gap:9px!important}.manlung-footer .manlung-footer-social a{min-width:0!important;min-height:38px!important;padding:10px 12px!important}}
+
+/* Layout safety: the shared footer must stay in normal document flow.
+   Some admin tools use their own page shells; prevent inherited fixed/absolute
+   positioning or centering transforms from pinning the footer mid-screen. */
+html body > .manlung-footer,
+html body .manlung-footer {
+  position: static !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+  float: none !important;
+  clear: both;
+  align-self: stretch;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 2rem 0 0 !important;
+}
