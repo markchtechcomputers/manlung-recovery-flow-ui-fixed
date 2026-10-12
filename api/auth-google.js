@@ -52,7 +52,8 @@ app.post('/',async(req,res)=>{
   if(!user)user=await User.create({username:(email.split('@')[0].replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,55)||'client')+'-'+crypto.randomBytes(3).toString('hex'),password:crypto.randomBytes(32).toString('base64url') + 'A!1',role:'client',email,phone:null});
   const sessionToken=token(user);
   setClientCookie(res,sessionToken);
-  res.json({success:true,user:{id:user.id,email:user.email,username:user.username,role:user.role}});
+  const profilePicture = /^https:\/\/[^\s"'<>]+$/i.test(String(p.picture || '')) ? String(p.picture) : null;
+  res.json({success:true,user:{id:user.id,email:user.email,username:user.username,role:user.role,profilePicture}});
  }catch(e){console.error('Google Cloud auth error:',e.response?.data||e.message);res.status(502).json({success:false,error:'Google authentication service is temporarily unavailable.'});}
 });
 module.exports=app;
