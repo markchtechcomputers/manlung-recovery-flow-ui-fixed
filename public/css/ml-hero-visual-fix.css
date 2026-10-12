@@ -459,3 +459,104 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     transform: none !important;
   }
 }
+
+
+/* MOBILE HERO FLOW: show the slideshow as a clear image banner above the copy. */
+@media (max-width: 768px) {
+  .ml-image-slideshow-hero {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    min-height: 0 !important;
+    padding: 0 0 28px !important;
+    gap: 0 !important;
+    background: #071426 !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-slideshow {
+    position: relative !important;
+    inset: auto !important;
+    order: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: clamp(220px, 62vw, 330px) !important;
+    flex: 0 0 auto !important;
+    overflow: hidden !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-slideshow-track {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-slide {
+    object-fit: cover !important;
+    object-position: center center !important;
+    filter: saturate(1.02) contrast(1.03) brightness(.88) !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-slideshow-overlay {
+    position: absolute !important;
+    inset: 0 0 auto 0 !important;
+    height: clamp(220px, 62vw, 330px) !important;
+    z-index: 1 !important;
+    background: linear-gradient(180deg, rgba(3,10,25,.08) 0%, rgba(3,10,25,.05) 55%, rgba(3,10,25,.48) 100%) !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-copy {
+    order: 1 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 26px 20px 8px !important;
+    text-align: left !important;
+    background: #071426 !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-copy h1 {
+    font-size: clamp(2rem, 8.2vw, 2.8rem) !important;
+    line-height: 1.1 !important;
+    margin: 0 0 14px !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-description {
+    max-width: 100% !important;
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+    margin: 0 0 20px !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 10px !important;
+    margin: 0 0 20px !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-primary,
+  .ml-image-slideshow-hero .ml-hero-secondary {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-height: 50px !important;
+    padding: 12px 16px !important;
+    justify-content: center !important;
+    white-space: normal !important;
+    text-align: center !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-security-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 11px !important;
+    font-size: 12px !important;
+  }
+}
+@media (max-width: 380px) {
+  .ml-image-slideshow-hero .ml-hero-slideshow,
+  .ml-image-slideshow-hero .ml-hero-slideshow-overlay {
+    height: 220px !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-copy {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-copy h1 {
+    font-size: 1.9rem !important;
+  }
+}
