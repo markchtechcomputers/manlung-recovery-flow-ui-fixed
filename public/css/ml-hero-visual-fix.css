@@ -425,3 +425,37 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     transform: none !important;
   }
 }
+
+
+/* HERO COPY: remove the old badge and reveal readable text in sequence. */
+.ml-image-slideshow-hero .ml-hero-badge { display: none !important; }
+.ml-image-slideshow-hero .ml-hero-sequence-title {
+  opacity: 0;
+  animation: mlHeroTextReveal .8s ease-out .25s forwards;
+}
+.ml-image-slideshow-hero .ml-hero-sequence-description {
+  opacity: 0;
+  animation: mlHeroTextReveal .8s ease-out 1.7s forwards;
+}
+.ml-image-slideshow-hero .ml-hero-actions {
+  opacity: 0;
+  animation: mlHeroTextReveal .7s ease-out 2.6s forwards;
+}
+.ml-image-slideshow-hero .ml-hero-security-row {
+  opacity: 0;
+  animation: mlHeroTextReveal .7s ease-out 3.1s forwards;
+}
+@keyframes mlHeroTextReveal {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-image-slideshow-hero .ml-hero-sequence-title,
+  .ml-image-slideshow-hero .ml-hero-sequence-description,
+  .ml-image-slideshow-hero .ml-hero-actions,
+  .ml-image-slideshow-hero .ml-hero-security-row {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
