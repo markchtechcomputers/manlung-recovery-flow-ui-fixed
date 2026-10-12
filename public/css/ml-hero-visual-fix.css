@@ -649,3 +649,40 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+
+/* Mobile hero: full-width rectangular frame, preserve the entire photo without cropping. */
+@media (max-width: 768px) {
+  section.ml-image-slideshow-hero > .ml-hero-slideshow {
+    width: 100% !important;
+    height: clamp(220px, 72vw, 360px) !important;
+    min-height: 220px !important;
+    aspect-ratio: 4 / 3 !important;
+    border-radius: 0 !important;
+    background: #071426 !important;
+    overflow: hidden !important;
+  }
+  section.ml-image-slideshow-hero .ml-hero-slideshow-track {
+    background: #071426 !important;
+  }
+  section.ml-image-slideshow-hero img.ml-hero-slide {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    background: #071426 !important;
+  }
+  section.ml-image-slideshow-hero > .ml-hero-slideshow-overlay {
+    height: clamp(220px, 72vw, 360px) !important;
+    background: linear-gradient(180deg, rgba(3,10,25,.02) 45%, rgba(3,10,25,.2) 100%) !important;
+  }
+}
+@media (max-width: 380px) {
+  section.ml-image-slideshow-hero > .ml-hero-slideshow {
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+  section.ml-image-slideshow-hero > .ml-hero-slideshow-overlay {
+    height: 220px !important;
+  }
+}
