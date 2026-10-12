@@ -1,6 +1,6 @@
 (() => {
-  const DISMISS_KEY = 'manlung-pwa-banner-dismissed-v3';
-  // The install prompt is intentionally a homepage-only experience and a dismissal is permanent.
+  const DISMISS_KEY = 'manlung-apk-banner-dismissed-v1';
+  // Promote the Android APK on the homepage; this is not a browser PWA install prompt.
   const DISMISS_DAYS = 0;
   const IS_HOME = window.location.pathname === '/' || window.location.pathname === '/index.html';
 
@@ -279,10 +279,9 @@
     });
   }
 
-  // Always offer the direct Android APK download on the homepage. The APK
-  // opens the live website, while the existing browser-based PWA remains usable.
+  // Offer the Android APK download on the homepage. The APK opens the live website.
   window.addEventListener('load', () => {
-    if (!IS_HOME || isStandalone() || wasRecentlyDismissed()) return;
+    if (!IS_HOME || wasRecentlyDismissed()) return;
     const banner = createBanner();
     window.requestAnimationFrame(() => banner.classList.add('is-visible'));
   });
