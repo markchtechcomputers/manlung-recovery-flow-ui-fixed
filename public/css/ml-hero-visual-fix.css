@@ -638,3 +638,14 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     padding-right: 16px !important;
   }
 }
+
+
+/* Remove the unwanted homepage label everywhere, regardless of wrapper placement. */
+.ml-hero-badge,
+.ml-image-slideshow-hero .ml-hero-badge,
+[class~="ml-hero-badge"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
