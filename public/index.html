@@ -1599,7 +1599,7 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
             <section class="hero home-hero ml-hero-enhanced ml-balanced-hero ml-image-slideshow-hero" aria-labelledby="hero-title">
     <div class="ml-hero-slideshow" aria-hidden="true">
       <div class="ml-hero-slideshow-track">
-        <img class="ml-hero-slide" src="https://files.catbox.moe/xhk8j4.jpg" alt="" fetchpriority="high" decoding="async">
+        <img class="ml-hero-slide is-current" src="https://files.catbox.moe/xhk8j4.jpg" alt="" fetchpriority="high" decoding="async">
         <img class="ml-hero-slide" src="https://files.catbox.moe/hh0zlx.jpg" alt="" loading="lazy" decoding="async">
         <img class="ml-hero-slide" src="https://files.catbox.moe/m42ppx.jpg" alt="" loading="lazy" decoding="async">
         <img class="ml-hero-slide" src="https://files.catbox.moe/y9kbxo.jpg" alt="" loading="lazy" decoding="async">
@@ -1616,7 +1616,6 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
         <img class="ml-hero-slide" src="https://files.catbox.moe/a6fc0u.jpg" alt="" loading="lazy" decoding="async">
         <img class="ml-hero-slide" src="https://files.catbox.moe/3yes2b.jpg" alt="" loading="lazy" decoding="async">
         <img class="ml-hero-slide" src="https://files.catbox.moe/abrwd7.jpg" alt="" loading="lazy" decoding="async">
-        <img class="ml-hero-slide" src="https://files.catbox.moe/xhk8j4.jpg" alt="" loading="lazy" decoding="async" aria-hidden="true">
       </div>
     </div>
     <div class="ml-hero-slideshow-overlay" aria-hidden="true"></div>
@@ -1642,24 +1641,27 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
     if (!track || track.dataset.initialized === 'true') return;
     track.dataset.initialized = 'true';
     const slides = Array.from(track.querySelectorAll('.ml-hero-slide'));
-    const realSlideCount = slides.length - 1; // Last slide duplicates the first for a seamless loop.
-    if (realSlideCount < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (slides.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     let index = 0;
     let timer;
+    let transitionTimer;
     const showNext = () => {
-      index += 1;
-      track.style.transition = 'transform 850ms cubic-bezier(.22,.61,.36,1)';
-      track.style.transform = 'translate3d(-' + (index * 100 / slides.length) + '%,0,0)';
-      if (index === realSlideCount) {
-        window.setTimeout(() => {
-          track.style.transition = 'none';
-          track.style.transform = 'translate3d(0,0,0)';
-          index = 0;
-        }, 900);
-      }
+      const current = slides[index];
+      const nextIndex = (index + 1) % slides.length;
+      const next = slides[nextIndex];
+      current.classList.remove('is-current');
+      current.classList.add('is-leaving');
+      next.classList.add('is-current');
+      index = nextIndex;
+      window.clearTimeout(transitionTimer);
+      transitionTimer = window.setTimeout(() => current.classList.remove('is-leaving'), 900);
     };
-    const start = () => { if (!timer) timer = window.setInterval(showNext, 4500); };
-    const stop = () => { if (timer) { window.clearInterval(timer); timer = undefined; } };
+    const start = () => {
+      if (!timer && !document.hidden) timer = window.setInterval(showNext, 4500);
+    };
+    const stop = () => {
+      if (timer) { window.clearInterval(timer); timer = undefined; }
+    };
     document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
     start();
   };
