@@ -979,3 +979,95 @@ body.dark .ml-balanced-hero .ml-hero-video-shade {
     }
 }
 </style>
+
+/* MOBILE HERO ACTUAL FIX: this stylesheet controls the enhanced hero and loads after home-premium.css. */
+@media (max-width: 768px) {
+  .ml-balanced-hero {
+    position:relative!important;
+    isolation:isolate!important;
+    overflow:hidden!important;
+    min-height:0!important;
+    padding:0 0 28px!important;
+    background:#081321!important;
+    background-image:linear-gradient(180deg,#081321 0%,#0b1728 100%)!important;
+  }
+  .ml-balanced-hero .ml-hero-device-visual {
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    margin:0!important;
+    border-radius:0!important;
+    overflow:hidden!important;
+    z-index:0!important;
+    background:#081321!important;
+  }
+  .ml-balanced-hero .ml-hero-device-video,
+  .ml-balanced-hero .ml-hero-device-visual img {
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    object-fit:cover!important;
+    object-position:center center!important;
+    border-radius:0!important;
+    background:#081321!important;
+    filter:brightness(.38) saturate(.72) contrast(1.12)!important;
+    box-shadow:none!important;
+    transform:none!important;
+  }
+  .ml-balanced-hero .ml-hero-video-shade {
+    position:absolute!important;
+    inset:0!important;
+    z-index:2!important;
+    border-radius:0!important;
+    background:linear-gradient(180deg,rgba(4,10,20,.34) 0%,rgba(4,10,20,.64) 42%,#081321 100%)!important;
+  }
+  .ml-balanced-hero::before {
+    content:""!important;
+    position:absolute!important;
+    inset:0!important;
+    z-index:3!important;
+    pointer-events:none!important;
+    background:linear-gradient(180deg,rgba(8,19,33,.08) 0%,rgba(8,19,33,.15) 32%,#081321 100%)!important;
+  }
+  .ml-balanced-hero::after { content:none!important;display:none!important; }
+  .ml-balanced-hero .ml-hero-copy {
+    position:relative!important;
+    z-index:5!important;
+    width:auto!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:clamp(300px,82vw,390px) 18px 0!important;
+    color:#f8fafc!important;
+    text-align:left!important;
+  }
+  .ml-balanced-hero .ml-hero-badge {
+    color:#dbeafe!important;
+    background:rgba(8,19,33,.82)!important;
+    border-color:rgba(147,197,253,.38)!important;
+    box-shadow:none!important;
+  }
+  .ml-balanced-hero .ml-hero-copy h1 {
+    color:#f8fafc!important;
+    text-shadow:0 2px 18px rgba(0,0,0,.42)!important;
+  }
+  .ml-balanced-hero .ml-hero-copy h1 span { color:#7dd3fc!important; }
+  .ml-balanced-hero .ml-hero-description {
+    color:#dbe5f2!important;
+    text-shadow:0 1px 12px rgba(0,0,0,.38)!important;
+  }
+  .ml-balanced-hero .ml-hero-secondary {
+    color:#f8fafc!important;
+    background:rgba(15,23,42,.84)!important;
+    border-color:rgba(255,255,255,.3)!important;
+  }
+  .ml-balanced-hero .ml-hero-security-row { color:#dbe5f2!important; }
+}
+@media (max-width: 480px) {
+  .ml-balanced-hero .ml-hero-copy {
+    padding:clamp(270px,78vw,340px) 16px 0!important;
+  }
+}
