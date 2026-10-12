@@ -359,3 +359,48 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
 @media (prefers-reduced-motion: reduce) {
   .ml-image-slideshow-hero .ml-hero-slideshow-track { transition: none !important; transform: none !important; }
 }
+
+
+/* FIX: slide one background image at a time from right to left.
+   Hero copy and buttons remain stationary above the background. */
+.ml-image-slideshow-hero .ml-hero-slideshow-track {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  transform: none !important;
+}
+.ml-image-slideshow-hero .ml-hero-slide {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  object-fit: cover !important;
+  object-position: center 45% !important;
+  opacity: 1 !important;
+  transform: translate3d(100%,0,0) !important;
+  transition: transform 850ms cubic-bezier(.22,.61,.36,1) !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+.ml-image-slideshow-hero .ml-hero-slide.is-current {
+  transform: translate3d(0,0,0) !important;
+  z-index: 2 !important;
+}
+.ml-image-slideshow-hero .ml-hero-slide.is-leaving {
+  transform: translate3d(-100%,0,0) !important;
+  z-index: 3 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-image-slideshow-hero .ml-hero-slide,
+  .ml-image-slideshow-hero .ml-hero-slide.is-current,
+  .ml-image-slideshow-hero .ml-hero-slide.is-leaving {
+    transition: none !important;
+    transform: none !important;
+  }
+}
