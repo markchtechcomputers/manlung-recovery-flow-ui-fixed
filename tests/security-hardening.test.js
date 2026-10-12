@@ -155,3 +155,16 @@ test('donation total exposes a configurable target and percentage', () => {
   assert.match(donations, /DONATION_TARGET_KES/);
   assert.match(donations, /percentage/);
 });
+
+test('owner security monitoring avoids querying a missing full_name column', () => {
+  const monitoring = fs.readFileSync(
+    path.join(__dirname, '..', 'models', 'SecurityMonitoring.js'),
+    'utf8'
+  );
+  const selectBlock = monitoring.match(/const USER_SELECT = `([\s\S]*?)`;/);
+
+  assert.ok(selectBlock, 'USER_SELECT must be defined');
+  assert.doesNotMatch(selectBlock[1], /\bfull_name\b/);
+  assert.match(monitoring, /full_name:\s*user\.username\s*\|\|\s*user\.email/);
+  assert.match(monitoring, /return \(data \|\| \[\]\)\.map\(addDisplayName\)/);
+});
