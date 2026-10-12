@@ -686,3 +686,36 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     height: 220px !important;
   }
 }
+
+
+/* 2026-10-12 FINAL PHONE IMAGE FLOW: clean, edge-to-edge swipe frame. */
+@media (max-width: 768px) {
+  section.ml-image-slideshow-hero > .ml-hero-slideshow {
+    height: clamp(230px, 70vw, 350px) !important;
+    min-height: 230px !important;
+    aspect-ratio: 4 / 3 !important;
+    border-radius: 0 0 18px 18px !important;
+    background: #071426 !important;
+    box-shadow: 0 10px 24px rgba(2, 6, 23, .18) !important;
+  }
+  section.ml-image-slideshow-hero img.ml-hero-slide {
+    object-fit: cover !important;
+    object-position: center 42% !important;
+    background: #071426 !important;
+  }
+  section.ml-image-slideshow-hero > .ml-hero-slideshow-overlay {
+    height: clamp(230px, 70vw, 350px) !important;
+    border-radius: 0 0 18px 18px !important;
+    background: linear-gradient(180deg, rgba(3,10,25,.03) 48%, rgba(3,10,25,.26) 100%) !important;
+  }
+  section.ml-image-slideshow-hero > .ml-hero-copy {
+    padding: 24px 18px 8px !important;
+  }
+}
+@media (max-width: 380px) {
+  section.ml-image-slideshow-hero > .ml-hero-slideshow,
+  section.ml-image-slideshow-hero > .ml-hero-slideshow-overlay {
+    height: 230px !important;
+    min-height: 230px !important;
+  }
+}
