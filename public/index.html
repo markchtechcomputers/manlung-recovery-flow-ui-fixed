@@ -1427,7 +1427,7 @@ img[src*="gctxrf7M"] {
 
 
 
-    <link rel="stylesheet" href="/css/ml-hero-visual-fix.css?v=hero19removedmarkup">
+    <link rel="stylesheet" href="/css/ml-hero-visual-fix.css?v=hero-slideshow-20261012">
   <link rel="stylesheet" href="/css/startup-loader.css">
   <script src="/js/startup-loader.js" defer></script>
 <style id="manlung-mobile-app-icon">
@@ -1596,48 +1596,77 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
 
     <main>
         <div class="container home-page-container">
-            <section class="hero home-hero ml-hero-enhanced ml-balanced-hero" aria-labelledby="hero-title">
-<!-- MANLUNG HERO COPY FIX -->
-<div class="ml-hero-copy">
-
-    <h1 id="hero-title">
-        Professional Cyber Recovery
-        <span>&amp; Digital Investigation</span>
-    </h1>
-
-    <p class="ml-hero-description">
-        Recover, investigate, and protect your digital world with structured assistance for
-        devices, compromised accounts, online scams, digital assets, and cybersecurity incidents.
-    </p>
-
-    <div class="ml-hero-actions">
-        <a href="/client/request.html" class="ml-hero-primary">
-            <span>Submit a Request</span>
-            <i class="fas fa-arrow-right" aria-hidden="true"></i>
-        </a>
-        <a href="/client/track.html" class="ml-hero-secondary">
-            <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
-            <span>Track Your Case</span>
-        </a>
+            <section class="hero home-hero ml-hero-enhanced ml-balanced-hero ml-image-slideshow-hero" aria-labelledby="hero-title">
+    <div class="ml-hero-slideshow" aria-hidden="true">
+      <div class="ml-hero-slideshow-track">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/xhk8j4.jpg" alt="" fetchpriority="high" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/hh0zlx.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/m42ppx.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/y9kbxo.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/qljz0e.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/o63owb.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/m3qvhc.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/ijcjj7.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/e9uqjc.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/06al92.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/xeq9r3.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/6gcf45.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/vm4j7u.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/xj5b5t.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/a6fc0u.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/3yes2b.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/abrwd7.jpg" alt="" loading="lazy" decoding="async">
+        <img class="ml-hero-slide" src="https://files.catbox.moe/xhk8j4.jpg" alt="" loading="lazy" decoding="async" aria-hidden="true">
+      </div>
     </div>
-
-</div>
-<!-- /MANLUNG HERO COPY FIX -->
-
-<!-- MANLUNG HERO DEVICE VISUAL -->
-<!-- Removed decorative right-side hero visual for desktop and mobile. -->
-<!-- CSS cybersecurity background replaces the former hero video. -->
-
-
-
-
-<!-- MANLUNG HERO DEVICE VISUAL -->
-</div>
-                        </div>
-                        <div class="floating-mini-card mini-two"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>Protected</span></div>
-                    </div>
-                </div>
-            </section>
+    <div class="ml-hero-slideshow-overlay" aria-hidden="true"></div>
+    <div class="ml-hero-copy">
+      <p class="ml-hero-badge"><span class="ml-badge-dot"></span> Professional Digital Recovery Support</p>
+      <h1 id="hero-title">Professional Cyber Recovery <span>&amp; Digital Investigation</span></h1>
+      <p class="ml-hero-description">Recover, investigate, and protect your digital world with structured assistance for devices, compromised accounts, online scams, digital assets, and cybersecurity incidents.</p>
+      <div class="ml-hero-actions">
+        <a href="/client/request.html" class="ml-hero-primary"><span>Submit a Request</span><i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        <a href="/client/track.html" class="ml-hero-secondary"><i class="fas fa-location-crosshairs" aria-hidden="true"></i><span>Track Your Case</span></a>
+      </div>
+      <div class="ml-hero-security-row">
+        <span class="ml-security-item"><i class="fas fa-shield-halved" aria-hidden="true"></i> Security-focused support</span>
+        <span class="ml-security-item"><i class="fas fa-user-shield" aria-hidden="true"></i> Privacy-conscious process</span>
+      </div>
+    </div>
+</section>
+<script>
+(() => {
+  const initManlungHeroSlideshow = () => {
+    const hero = document.querySelector('.ml-image-slideshow-hero');
+    const track = hero && hero.querySelector('.ml-hero-slideshow-track');
+    if (!track || track.dataset.initialized === 'true') return;
+    track.dataset.initialized = 'true';
+    const slides = Array.from(track.querySelectorAll('.ml-hero-slide'));
+    const realSlideCount = slides.length - 1; // Last slide duplicates the first for a seamless loop.
+    if (realSlideCount < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let index = 0;
+    let timer;
+    const showNext = () => {
+      index += 1;
+      track.style.transition = 'transform 850ms cubic-bezier(.22,.61,.36,1)';
+      track.style.transform = 'translate3d(-' + (index * 100 / slides.length) + '%,0,0)';
+      if (index === realSlideCount) {
+        window.setTimeout(() => {
+          track.style.transition = 'none';
+          track.style.transform = 'translate3d(0,0,0)';
+          index = 0;
+        }, 900);
+      }
+    };
+    const start = () => { if (!timer) timer = window.setInterval(showNext, 4500); };
+    const stop = () => { if (timer) { window.clearInterval(timer); timer = undefined; } };
+    document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+    start();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initManlungHeroSlideshow, { once: true });
+  else initManlungHeroSlideshow();
+})();
+</script>
 
             
 
