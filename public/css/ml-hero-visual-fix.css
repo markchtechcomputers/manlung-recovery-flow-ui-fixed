@@ -215,3 +215,40 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
 @media (prefers-reduced-motion: reduce) {
   .ml-balanced-hero *, .ml-balanced-hero *::before, .ml-balanced-hero *::after { animation: none !important; transition: none !important; }
 }
+
+
+/* FINAL OVERRIDE: remove the right-hand hero visual entirely on desktop and mobile. */
+.ml-balanced-hero .ml-hero-device-visual,
+.ml-hero-enhanced .ml-hero-device-visual,
+.ml-css-cyber-background {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+.ml-balanced-hero {
+  display: block !important;
+  min-height: 0 !important;
+}
+.ml-balanced-hero .ml-hero-copy {
+  width: 100% !important;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+}
+.ml-balanced-hero .ml-hero-description {
+  max-width: 850px !important;
+}
+@media (max-width: 768px) {
+  .ml-balanced-hero .ml-hero-copy {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 24px 20px !important;
+    margin: 0 !important;
+  }
+}
