@@ -437,7 +437,8 @@ app.get('/api/health', async (req, res) => {
         count: 'exact',
         head: true,
       })
-      .limit(1);
+      .limit(1)
+      .abortSignal(AbortSignal.timeout(5000));
 
     health.database = error ? 'error' : 'ok';
 

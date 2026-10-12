@@ -7,7 +7,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('node:http');
 
-process.env.SUPABASE_URL = 'https://placeholder.supabase.co';
+process.env.SUPABASE_URL = 'http://127.0.0.1:1';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'placeholder-key';
 process.env.JWT_SECRET = 'test-secret-for-ci-only';
 process.env.JWT_EXPIRE = '1d';
@@ -117,7 +117,7 @@ test('client register rejects a too-short password', async () => {
     password: '123',
   });
   assert.equal(status, 400);
-  assert.match(json.error, /8.*characters/i);
+  assert.match(json.error, /12.*characters/i);
 });
 
 test('case submit rejects missing required fields (never fakes success)', async () => {

@@ -181,3 +181,13 @@ test('dependency automation is enabled', () => {
   assert.match(dependabot, /interval:\s*weekly/);
   assert.match(audit, /npm audit --audit-level=high/);
 });
+
+
+test('owner security monitoring exports the methods used by owner routes', () => {
+  process.env.SUPABASE_URL = process.env.SUPABASE_URL || 'http://127.0.0.1:1';
+  process.env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'test-service-role-key';
+  const monitoring = require('../models/SecurityMonitoring');
+  assert.equal(typeof monitoring.getOverview, 'function');
+  assert.equal(typeof monitoring.getUserDetail, 'function');
+  assert.equal(typeof monitoring.listUsers, 'function');
+});

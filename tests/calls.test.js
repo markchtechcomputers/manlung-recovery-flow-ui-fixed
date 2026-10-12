@@ -6,7 +6,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('node:http');
 
-process.env.SUPABASE_URL = 'https://placeholder.supabase.co';
+process.env.SUPABASE_URL = 'http://127.0.0.1:1';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'placeholder-key';
 process.env.JWT_SECRET = 'test-secret-for-ci-only';
 process.env.JWT_EXPIRE = '1d';
@@ -44,10 +44,12 @@ test('entitlement: active paid subscription grants Call Admin access', () => {
   assert.ok(result.daysRemaining >= 1);
 });
 
-test('subscription plans use the requested KES prices', () => {
+test('subscription plans expose configured KES prices and discounts', () => {
   const plans = require('../config/call-subscription').CALL_SUBSCRIPTION_PLANS;
   assert.equal(plans.monthly.amountKes, 300);
-  assert.equal(plans.six_months.amountKes, 1800);
+  assert.equal(plans.six_months.amountKes, 1710);
+  assert.equal(plans.six_months.normalAmountKes, 1800);
+  assert.equal(plans.six_months.discountPercent, 5);
   assert.equal(plans.yearly.normalAmountKes, 3600);
   assert.equal(plans.yearly.discountPercent, 10);
   assert.equal(plans.yearly.amountKes, 3240);

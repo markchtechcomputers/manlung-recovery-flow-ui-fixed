@@ -154,3 +154,46 @@ html body > .manlung-footer {
   max-width: none !important;
   margin: 0 !important;
 }
+
+
+/* Correct vertical layout for owner/admin tools and any page using this footer.
+   Several tool wrappers use margin:auto, which centers them inside a flex body.
+   Clear only vertical auto-margins and let the primary content region grow. */
+html {
+  min-height: 100%;
+}
+
+html body {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  min-height: 100vh !important;
+  height: auto !important;
+}
+
+html body > main,
+html body > #page,
+html body > .page,
+html body > .wrap,
+html body > .admin-shell,
+html body > .tools-shell,
+html body > .dr-shell {
+  flex: 1 0 auto !important;
+  margin-block-start: 0 !important;
+  margin-block-end: 0 !important;
+}
+
+html body > .manlung-footer,
+html body > footer.manlung-footer {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  float: none !important;
+  clear: both !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-block-start: auto !important;
+  margin-block-end: 0 !important;
+}

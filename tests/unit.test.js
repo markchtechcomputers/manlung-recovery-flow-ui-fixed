@@ -3,7 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-process.env.SUPABASE_URL = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+process.env.SUPABASE_URL = process.env.SUPABASE_URL || 'http://127.0.0.1:1';
 process.env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder';
 
 const { normalizeSupabaseUrl } = require('../config/supabase');

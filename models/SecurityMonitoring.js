@@ -333,12 +333,18 @@ async function getOverview() {
 async function getUserDetail(userId) {
   const user = await getUser(userId);
   if (!user) return null;
-  const [events, sessionsResult] = await Promise.all([
-    listEvents({ userId, limit: 100 }),
-    supabase.from('auth.sessions').select('id,created_at,updated_at,user_id').eq('user_id', userId).order('updated_at', { ascending: false }).limit(50),
-  ]);
-  if (sessionsResult.error) throw sessionsResult.error;
-  return { user, events, sessions: sessionsResult.data || [] };
+  const events = await listEvents({ userId, limit: 100 });
+
+  // Supabase Auth's internal auth.sessions table is not part of the public
+  // PostgREST API. Do not query it through supabase.from(); that request fails
+  // on standard Supabase projects. Session revocation remains supported via
+  // the application's session_version check.
+  return {
+    user,
+    events,
+    sessions: [],
+    sessions_note: 'Auth session records are not exposed through the Data API. Use Revoke Sessions to invalidate application sessions.',
+  };
 }
 
 
@@ -415,6 +421,8 @@ async function getCaseIntelligence(caseId) {
 module.exports = {
   listUsers,
   getUser,
+  getOverview,
+  getUserDetail,
   setSecurityStatus,
   revokeSessions,
   recordEvent,

@@ -2,7 +2,7 @@
 // Test-only environment bootstrap.
 // Never use these values in production.
 process.env.SUPABASE_URL =
-  process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+  process.env.SUPABASE_URL || 'http://127.0.0.1:1';
 
 process.env.SUPABASE_SERVICE_ROLE_KEY =
   process.env.SUPABASE_SERVICE_ROLE_KEY || 'test-service-role-key';
