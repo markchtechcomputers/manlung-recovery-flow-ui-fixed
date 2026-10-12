@@ -20,16 +20,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm install
-      - name: Export resolved lockfile for one-time lockfile repair
-        run: |
-          node <<'NODE'
-          const fs = require('node:fs');
-          const encoded = fs.readFileSync('package-lock.json').toString('base64');
-          for (let i = 0, part = 0; i < encoded.length; i += 3000, part++) {
-            console.log('LOCKFILE_PART_' + String(part).padStart(3, '0') + ':' + encoded.slice(i, i + 3000));
-          }
-          NODE
+      - run: npm ci
       - run: npm run build
       - run: npm test
       - run: npm audit --audit-level=high
