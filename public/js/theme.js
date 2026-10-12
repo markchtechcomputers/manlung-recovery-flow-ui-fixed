@@ -245,6 +245,66 @@
       const style = document.createElement('style');
       style.id = 'manlung-android-app-mode-style';
       style.textContent = `
+        /* Keep the live site inside the visible Android app viewport. */
+        html.manlung-android-app,
+        body.manlung-android-app {
+          width: 100%;
+          min-width: 0 !important;
+          max-width: 100%;
+          overflow-x: clip !important;
+          overscroll-behavior-x: none;
+        }
+        html.manlung-android-app body.manlung-android-app {
+          box-sizing: border-box;
+          padding-left: env(safe-area-inset-left, 0px);
+          padding-right: env(safe-area-inset-right, 0px);
+          padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        html.manlung-android-app body.manlung-android-app *,
+        html.manlung-android-app body.manlung-android-app *::before,
+        html.manlung-android-app body.manlung-android-app *::after {
+          box-sizing: border-box;
+        }
+        html.manlung-android-app body.manlung-android-app img,
+        html.manlung-android-app body.manlung-android-app video,
+        html.manlung-android-app body.manlung-android-app iframe,
+        html.manlung-android-app body.manlung-android-app canvas,
+        html.manlung-android-app body.manlung-android-app table {
+          max-width: 100%;
+        }
+        html.manlung-android-app body.manlung-android-app .container,
+        html.manlung-android-app body.manlung-android-app main,
+        html.manlung-android-app body.manlung-android-app section,
+        html.manlung-android-app body.manlung-android-app .card,
+        html.manlung-android-app body.manlung-android-app .panel {
+          min-width: 0;
+        }
+        html.manlung-android-app body.manlung-android-app input,
+        html.manlung-android-app body.manlung-android-app select,
+        html.manlung-android-app body.manlung-android-app textarea,
+        html.manlung-android-app body.manlung-android-app button {
+          max-width: 100%;
+        }
+        html.manlung-android-app body.manlung-android-app .site-header,
+        html.manlung-android-app body.manlung-android-app .mobile-friendly-header {
+          padding-top: env(safe-area-inset-top, 0px);
+        }
+        @media (max-width: 700px) {
+          html.manlung-android-app body.manlung-android-app .container,
+          html.manlung-android-app body.manlung-android-app .page-container,
+          html.manlung-android-app body.manlung-android-app .content-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+          }
+          html.manlung-android-app body.manlung-android-app .header-actions {
+            max-width: 100%;
+            min-width: 0;
+          }
+        }
         html.manlung-android-app body.manlung-android-app .site-footer,
         html.manlung-android-app body.manlung-android-app footer.site-footer,
         html.manlung-android-app body.manlung-android-app [data-desktop-only],
