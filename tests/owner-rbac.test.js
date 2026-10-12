@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const jwt = require('jsonwebtoken');
 
-process.env.SUPABASE_URL = 'https://placeholder.supabase.co';
+process.env.SUPABASE_URL = 'http://127.0.0.1:1';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'placeholder-key';
 process.env.JWT_SECRET = 'test-secret-for-ci-only';
 process.env.JWT_EXPIRE = '1d';
