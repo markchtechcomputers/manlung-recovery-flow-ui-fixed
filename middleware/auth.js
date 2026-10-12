@@ -125,6 +125,21 @@ const optionalAuth = async (req, res, next) => {
     if (!user) return res.status(401).json({ error: 'User not found' });
     if (isDurablyRevoked(decoded, user)) return res.status(401).json({ error: 'Session revoked.', code: 'SESSION_REVOKED' });
     if (isSessionExpired(decoded, user)) return res.status(401).json({ error: 'Session expired.', code: 'SESSION_EXPIRED' });
+    if (user.security_status && user.security_status !== 'active') {
+      const status = String(user.security_status).toUpperCase();
+      if (['RESTRICTED', 'SUSPENDED', 'BLOCKED'].includes(status)) {
+        return res.status(403).json({
+          error: 'Account access has been restricted by the site owner.',
+          code: `ACCOUNT_${status}`,
+        });
+      }
+    }
+    if ((user.role === 'owner' || user.role === 'admin') && user.mfa_enabled === true && decoded.mfa !== true) {
+      return res.status(403).json({ error: 'MFA verification required', code: 'MFA_REQUIRED' });
+    }
+    if (user.role === 'admin' && user.admin_status === 'suspended') {
+      return res.status(403).json({ error: 'Your admin access has been suspended.' });
+    }
     req.user = user;
     next();
   } catch (error) {
