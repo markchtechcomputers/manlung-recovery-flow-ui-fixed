@@ -52,11 +52,29 @@
 @media(max-width:600px){.manlung-footer .manlung-footer-social{width:100%!important;gap:9px!important}.manlung-footer .manlung-footer-social a{min-width:0!important;min-height:38px!important;padding:10px 12px!important}}
 
 
-/* Site-wide page layout fix for owner/admin tools.
-   Keep all page content in normal vertical flow; the footer sits after main
-   content and is pushed to the viewport bottom only when the page is short. */
+
+/* ---------------------------------------------------------
+   Shared layout foundation — consistent page rhythm.
+   Avoid competing flex/grid body layouts: normal document flow
+   handles content, while a single flex column keeps short-page
+   footers at the bottom without vertically centering the content.
+   --------------------------------------------------------- */
+:root {
+  --mr-space-1: 4px;
+  --mr-space-2: 8px;
+  --mr-space-3: 12px;
+  --mr-space-4: 16px;
+  --mr-space-5: 20px;
+  --mr-space-6: 24px;
+  --mr-space-8: 32px;
+  --mr-space-10: 40px;
+  --mr-content-width: 1200px;
+  --mr-page-gutter: clamp(16px, 3.2vw, 32px);
+}
+
 html {
   min-height: 100%;
+  height: auto;
 }
 
 html body {
@@ -64,112 +82,17 @@ html body {
   flex-direction: column !important;
   align-items: stretch !important;
   justify-content: flex-start !important;
+  min-width: 0;
   min-height: 100vh !important;
   height: auto !important;
+  margin: 0 !important;
 }
 
 html body > header,
-html body > .site-header {
+html body > .site-header,
+html body > .mobile-friendly-header {
   flex: 0 0 auto !important;
-}
-
-html body > main,
-html body > #page,
-html body > .tools-shell,
-html body > .wrap,
-html body > .dr-shell,
-html body > .page,
-html body > .admin-shell {
-  flex: 1 0 auto !important;
   width: 100%;
-}
-
-html body > .manlung-footer,
-html body footer.manlung-footer {
-  position: static !important;
-  inset: auto !important;
-  transform: none !important;
-  float: none !important;
-  clear: both !important;
-  flex: 0 0 auto !important;
-  width: 100% !important;
-  max-width: none !important;
-  margin: auto 0 0 !important;
-}
-
-
-/* Security center and owner tools: use a true three-row page layout.
-   This supersedes legacy flex rules that can leave the footer mid-page. */
-html {
-  min-height: 100%;
-  height: 100%;
-}
-
-html body {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) !important;
-  grid-template-rows: auto 1fr auto !important;
-  align-content: stretch !important;
-  align-items: stretch !important;
-  justify-content: stretch !important;
-  min-height: 100vh !important;
-  height: auto !important;
-  margin: 0 !important;
-}
-
-html body > header,
-html body > .site-header {
-  grid-row: 1 !important;
-  align-self: start !important;
-  width: 100% !important;
-}
-
-html body > main:not([style*="display: none"]):not([hidden]),
-html body > #page:not([style*="display: none"]):not([hidden]),
-html body > .wrap:not([style*="display: none"]):not([hidden]),
-html body > .admin-shell:not([style*="display: none"]):not([hidden]),
-html body > .tools-shell:not([style*="display: none"]):not([hidden]),
-html body > .page:not([style*="display: none"]):not([hidden]) {
-  grid-row: 2 !important;
-  align-self: stretch !important;
-  width: 100% !important;
-  min-width: 0 !important;
-}
-
-html body > main[style*="display: none"],
-html body > [hidden] {
-  display: none !important;
-}
-
-html body > footer.manlung-footer,
-html body > .manlung-footer {
-  grid-row: 3 !important;
-  align-self: end !important;
-  position: static !important;
-  inset: auto !important;
-  transform: none !important;
-  float: none !important;
-  clear: both !important;
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
-}
-
-
-/* Correct vertical layout for owner/admin tools and any page using this footer.
-   Several tool wrappers use margin:auto, which centers them inside a flex body.
-   Clear only vertical auto-margins and let the primary content region grow. */
-html {
-  min-height: 100%;
-}
-
-html body {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  justify-content: flex-start !important;
-  min-height: 100vh !important;
-  height: auto !important;
 }
 
 html body > main,
@@ -180,12 +103,13 @@ html body > .admin-shell,
 html body > .tools-shell,
 html body > .dr-shell {
   flex: 1 0 auto !important;
+  min-width: 0;
   margin-block-start: 0 !important;
   margin-block-end: 0 !important;
 }
 
-html body > .manlung-footer,
-html body > footer.manlung-footer {
+html body > footer.manlung-footer,
+html body > .manlung-footer {
   position: static !important;
   inset: auto !important;
   transform: none !important;
@@ -196,4 +120,72 @@ html body > footer.manlung-footer {
   max-width: none !important;
   margin-block-start: auto !important;
   margin-block-end: 0 !important;
+}
+
+/* A predictable content gutter without forcing every component into flex. */
+html body > main:not(.full-bleed),
+html body > #page:not(.full-bleed),
+html body > .admin-shell:not(.full-bleed),
+html body > .tools-shell:not(.full-bleed),
+html body > .dr-shell:not(.full-bleed) {
+  padding-inline: var(--mr-page-gutter);
+  box-sizing: border-box;
+}
+
+html body main :where(img, video, canvas, iframe, svg) {
+  max-width: 100%;
+}
+
+html body main :where(input, select, textarea, button) {
+  max-width: 100%;
+}
+
+html body main :where(.card, .panel, .form-card, .content-card, .section-card) {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+html body main :where(.grid, .card-grid, .cards-grid, .stats-grid, .features-grid) {
+  min-width: 0;
+  gap: clamp(12px, 2vw, 24px);
+}
+
+html body main :where(.row, .form-row, .actions, .button-row, .toolbar) {
+  min-width: 0;
+  gap: clamp(8px, 1.5vw, 16px);
+}
+
+html body main :where(.row, .form-row, .actions, .button-row, .toolbar) > * {
+  min-width: 0;
+}
+
+html body main :where(h1, h2, h3, h4, p, li, label, a, button) {
+  overflow-wrap: anywhere;
+}
+
+html body main :where(h1, h2, h3, h4) {
+  line-height: 1.2;
+}
+
+html body main :where(p, ul, ol) {
+  line-height: 1.6;
+}
+
+html body main :where(section + section, .section + .section, .panel + .panel, .card + .card) {
+  margin-block-start: clamp(16px, 2.4vw, 28px);
+}
+
+@media (max-width: 700px) {
+  :root { --mr-page-gutter: 16px; }
+  html body > main:not(.full-bleed),
+  html body > #page:not(.full-bleed),
+  html body > .admin-shell:not(.full-bleed),
+  html body > .tools-shell:not(.full-bleed),
+  html body > .dr-shell:not(.full-bleed) {
+    padding-inline: var(--mr-page-gutter);
+  }
+}
+
+@media (max-width: 420px) {
+  :root { --mr-page-gutter: 12px; }
 }
