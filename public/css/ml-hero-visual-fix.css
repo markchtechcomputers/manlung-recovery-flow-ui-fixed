@@ -176,7 +176,7 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     top: auto !important; right: auto !important;
     transform: none !important;
     width: 100% !important;
-    height: clamp(92px, 26vw, 140px) !important;
+    height: clamp(84px, 24vw, 120px) !important;
     min-height: 0 !important;
     margin: 0 !important;
     border-radius: 0 !important;
@@ -186,7 +186,7 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     width: auto !important;
     max-width: none !important;
     margin: 0 !important;
-    padding: 22px 20px 0 !important;
+    padding: 8px 20px 0 !important;
   }
   .ml-balanced-hero .ml-hero-copy h1 {
     font-size: clamp(2rem, 8.8vw, 2.8rem) !important;
@@ -208,7 +208,7 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
   }
 }
 @media (max-width: 480px) {
-  .ml-balanced-hero .ml-hero-copy { padding: 18px 16px 0 !important; }
+  .ml-balanced-hero .ml-hero-copy { padding: 6px 16px 0 !important; }
   .ml-balanced-hero .ml-hero-copy h1 { font-size: 2.05rem !important; }
   .ml-hero-security-row { grid-template-columns: 1fr !important; }
 }
