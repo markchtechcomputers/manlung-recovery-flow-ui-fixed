@@ -191,3 +191,13 @@ test('owner security monitoring exports the methods used by owner routes', () =>
   assert.equal(typeof monitoring.getUserDetail, 'function');
   assert.equal(typeof monitoring.listUsers, 'function');
 });
+
+
+test('optional authentication enforces account restrictions, admin suspension, and MFA', () => {
+  const auth = fs.readFileSync(path.join(__dirname, '..', 'middleware', 'auth.js'), 'utf8');
+  const optionalAuthBody = auth.slice(auth.indexOf('const optionalAuth ='), auth.indexOf('const adminAuth ='));
+  assert.match(optionalAuthBody, /user\.security_status/);
+  assert.match(optionalAuthBody, /ACCOUNT_\$\{status\}/);
+  assert.match(optionalAuthBody, /user\.mfa_enabled === true/);
+  assert.match(optionalAuthBody, /user\.admin_status === 'suspended'/);
+});
