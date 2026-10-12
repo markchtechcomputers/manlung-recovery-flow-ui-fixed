@@ -71,3 +71,33 @@ html body .manlung-footer {
   max-width: none;
   margin: 2rem 0 0 !important;
 }
+
+
+/* Fix owner/admin pages whose body shell centers all children vertically.
+   Keep the document in a normal top-to-bottom page flow and let the footer
+   take the remaining space on short pages instead of appearing mid-screen. */
+html,
+body {
+  min-height: 100%;
+}
+
+html body {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+}
+
+html body > .manlung-footer {
+  margin-top: auto !important;
+  flex: 0 0 auto !important;
+}
+
+/* Main page regions should remain in normal flow above the footer. */
+html body > main,
+html body > #page,
+html body > .tools-shell,
+html body > .wrap,
+html body > .admin-shell {
+  flex: 0 0 auto;
+}
