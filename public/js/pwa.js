@@ -278,7 +278,16 @@
     return banner;
   }
 
-  if ('serviceWorker' in navigator) {
+  // The Android APK is a native Capacitor wrapper, not a second PWA.
+  // Keep browser PWA/offline support on the website, but never register or retain
+  // a service worker inside the APK's WebView.
+  if (isAndroidApp()) {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then(registrations => Promise.all(registrations.map(registration => registration.unregister())))
+        .catch(() => {});
+    }
+  } else if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker
         .register('/service-worker.js', { scope: '/' })
