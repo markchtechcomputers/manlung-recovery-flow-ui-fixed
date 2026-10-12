@@ -4,6 +4,15 @@
   const DISMISS_DAYS = 0;
   const IS_HOME = window.location.pathname === '/' || window.location.pathname === '/index.html';
 
+  function isAndroidApp() {
+    try {
+      return Boolean(window.Capacitor?.isNativePlatform?.()) ||
+        /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator.userAgent);
+    } catch (_) {
+      return false;
+    }
+  }
+
   function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches ||
       window.navigator.standalone === true;
@@ -281,7 +290,7 @@
 
   // Offer the Android APK download on the homepage. The APK opens the live website.
   window.addEventListener('load', () => {
-    if (!IS_HOME || wasRecentlyDismissed()) return;
+    if (isAndroidApp() || !IS_HOME || wasRecentlyDismissed()) return;
     const banner = createBanner();
     window.requestAnimationFrame(() => banner.classList.add('is-visible'));
   });
@@ -295,6 +304,7 @@
   });
 
   document.addEventListener('click', event => {
+    if (isAndroidApp()) return;
     const button = event.target.closest('.manlung-pwa-download');
     if (!button) return;
     window.location.assign('/download-app.html');
