@@ -307,6 +307,7 @@
         }
         html.manlung-android-app body.manlung-android-app .site-footer,
         html.manlung-android-app body.manlung-android-app footer.site-footer,
+        html.manlung-android-app body.manlung-android-app .manlung-footer,
         html.manlung-android-app body.manlung-android-app [data-desktop-only],
         html.manlung-android-app body.manlung-android-app .desktop-only,
         html.manlung-android-app body.manlung-android-app .desktop-only-section,
