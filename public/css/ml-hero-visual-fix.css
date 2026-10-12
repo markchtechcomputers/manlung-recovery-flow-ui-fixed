@@ -404,3 +404,24 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     transform: none !important;
   }
 }
+
+
+/* DIRECTION CORRECTION: each background image swipes in from the LEFT, then exits LEFT; repeat. */
+.ml-image-slideshow-hero .ml-hero-slide {
+  transform: translate3d(-100%,0,0) !important;
+  transition: transform 850ms cubic-bezier(.22,.61,.36,1) !important;
+}
+.ml-image-slideshow-hero .ml-hero-slide.is-current {
+  transform: translate3d(0,0,0) !important;
+}
+.ml-image-slideshow-hero .ml-hero-slide.is-leaving {
+  transform: translate3d(-100%,0,0) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-image-slideshow-hero .ml-hero-slide,
+  .ml-image-slideshow-hero .ml-hero-slide.is-current,
+  .ml-image-slideshow-hero .ml-hero-slide.is-leaving {
+    transition: none !important;
+    transform: none !important;
+  }
+}
