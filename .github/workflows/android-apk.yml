@@ -5,8 +5,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - ".github/workflows/android-apk.yml"
 
 permissions:
   contents: write
@@ -110,7 +108,7 @@ jobs:
           set -euo pipefail
           if gh release view android-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload android-latest ManlungRecovery.apk --clobber --repo "$GITHUB_REPOSITORY"
-            gh release edit android-latest --title "Manlung Recovery Android APK" --notes "Latest installable Android package for Manlung Recovery. Uses the official Manlung Recovery icon and opens the live website, so web content updates appear when the device is online. This direct-download APK is not Play Store verified." --repo "$GITHUB_REPOSITORY"
+            gh release edit android-latest --title "Manlung Recovery Android APK" --notes "Latest installable Android package for Manlung Recovery. Automatically rebuilt from main-branch updates. Uses the official Manlung Recovery icon and opens the live website, so web content updates appear when the device is online. APK replacement is published here; Android may still require the user to approve installation. This direct-download APK is not Play Store verified." --repo "$GITHUB_REPOSITORY"
           else
-            gh release create android-latest ManlungRecovery.apk --title "Manlung Recovery Android APK" --notes "Installable Android package for Manlung Recovery. Uses the official Manlung Recovery icon and opens the live website, so web content updates appear when the device is online. This direct-download APK is not Play Store verified." --repo "$GITHUB_REPOSITORY"
+            gh release create android-latest ManlungRecovery.apk --title "Manlung Recovery Android APK" --notes "Installable Android package for Manlung Recovery. Automatically rebuilt from main-branch updates. Uses the official Manlung Recovery icon and opens the live website, so web content updates appear when the device is online. APK replacement is published here; Android may still require the user to approve installation. This direct-download APK is not Play Store verified." --repo "$GITHUB_REPOSITORY"
           fi
