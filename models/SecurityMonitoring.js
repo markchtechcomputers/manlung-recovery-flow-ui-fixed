@@ -139,6 +139,17 @@ function sanitizeMetadata(metadata) {
   return result;
 }
 
+function addDisplayName(user) {
+  if (!user) return user;
+
+  // `recovery_users` has no `full_name` column. Keep the UI compatible without
+  // asking PostgREST to select a column that does not exist.
+  return {
+    ...user,
+    full_name: user.username || user.email || 'Unknown user',
+  };
+}
+
 async function listUsers({ search, status, role, limit = 100 } = {}) {
   let query = supabase
     .from(USERS_TABLE)
@@ -169,7 +180,7 @@ async function listUsers({ search, status, role, limit = 100 } = {}) {
 
   if (error) throw error;
 
-  return data || [];
+  return (data || []).map(addDisplayName);
 }
 
 async function getUser(userId) {
@@ -181,7 +192,7 @@ async function getUser(userId) {
 
   if (error) throw error;
 
-  return data;
+  return addDisplayName(data);
 }
 
 async function setSecurityStatus(userId, status, reason, actorId) {
@@ -205,7 +216,7 @@ async function setSecurityStatus(userId, status, reason, actorId) {
 
   if (error) throw error;
 
-  return data;
+  return addDisplayName(data);
 }
 
 async function revokeSessions(userId) {
