@@ -560,3 +560,81 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     font-size: 1.9rem !important;
   }
 }
+
+
+/* FINAL MOBILE FIX: visible, well-framed swipe images; no legacy badge. */
+.ml-image-slideshow-hero .ml-hero-badge,
+.ml-image-slideshow-hero p.ml-hero-badge {
+  display: none !important;
+}
+@media (max-width: 768px) {
+  section.ml-image-slideshow-hero {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+    min-height: 0 !important;
+    padding: 0 0 24px !important;
+  }
+  section.ml-image-slideshow-hero > .ml-hero-slideshow {
+    position: relative !important;
+    inset: auto !important;
+    order: 0 !important;
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    height: clamp(230px, 68vw, 340px) !important;
+    min-height: 230px !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    overflow: hidden !important;
+    border-radius: 0 0 18px 18px !important;
+  }
+  section.ml-image-slideshow-hero .ml-hero-slideshow-track {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+  section.ml-image-slideshow-hero img.ml-hero-slide {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+  section.ml-image-slideshow-hero > .ml-hero-slideshow-overlay {
+    position: absolute !important;
+    inset: 0 0 auto 0 !important;
+    height: clamp(230px, 68vw, 340px) !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+    background: linear-gradient(180deg, rgba(3,10,25,.02) 35%, rgba(3,10,25,.38) 100%) !important;
+  }
+  section.ml-image-slideshow-hero > .ml-hero-copy {
+    position: relative !important;
+    order: 1 !important;
+    z-index: 2 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 26px 20px 8px !important;
+    background: #071426 !important;
+  }
+}
+@media (max-width: 380px) {
+  section.ml-image-slideshow-hero > .ml-hero-slideshow {
+    height: 230px !important;
+    min-height: 230px !important;
+  }
+  section.ml-image-slideshow-hero > .ml-hero-copy {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
