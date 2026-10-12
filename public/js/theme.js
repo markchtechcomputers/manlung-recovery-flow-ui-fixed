@@ -227,7 +227,63 @@
     play();
   }
 
+  function isAndroidApp() {
+    try {
+      return Boolean(window.Capacitor?.isNativePlatform?.()) ||
+        /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator.userAgent);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function installAndroidAppMode() {
+    if (!isAndroidApp()) return;
+    document.documentElement.classList.add('manlung-android-app');
+    document.body?.classList.add('manlung-android-app');
+
+    if (!document.getElementById('manlung-android-app-mode-style')) {
+      const style = document.createElement('style');
+      style.id = 'manlung-android-app-mode-style';
+      style.textContent = `
+        html.manlung-android-app body.manlung-android-app .site-footer,
+        html.manlung-android-app body.manlung-android-app footer.site-footer,
+        html.manlung-android-app body.manlung-android-app [data-desktop-only],
+        html.manlung-android-app body.manlung-android-app .desktop-only,
+        html.manlung-android-app body.manlung-android-app .desktop-only-section,
+        html.manlung-android-app body.manlung-android-app .website-only,
+        html.manlung-android-app body.manlung-android-app .pwa-install-prompt,
+        html.manlung-android-app body.manlung-android-app #manlung-pwa-banner {
+          display: none !important;
+        }
+        html.manlung-android-app body.manlung-android-app a[href*="download-app.html"],
+        html.manlung-android-app body.manlung-android-app a[href*="ManlungRecovery.apk"],
+        html.manlung-android-app body.manlung-android-app a[href*="/releases/download/android-latest/"] {
+          display: none !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const removeAppOnlyPromos = () => {
+      document.querySelectorAll(
+        '#manlung-pwa-banner, [data-pwa-install], .pwa-install-prompt, .apk-download-prompt'
+      ).forEach(node => node.remove());
+      document.querySelectorAll(
+        'a[href*="download-app.html"], a[href*="ManlungRecovery.apk"], a[href*="/releases/download/android-latest/"]'
+      ).forEach(link => {
+        link.setAttribute('aria-hidden', 'true');
+        link.setAttribute('tabindex', '-1');
+      });
+    };
+    removeAppOnlyPromos();
+    if (!window.__manlungAppModeObserver && document.body) {
+      window.__manlungAppModeObserver = new MutationObserver(removeAppOnlyPromos);
+      window.__manlungAppModeObserver.observe(document.body, { childList: true, subtree: true });
+    }
+  }
+
   function boot() {
+    installAndroidAppMode();
     removeLegacyNavigationColours();
     convertLegacyButtons();
     installHeaderPolish();
