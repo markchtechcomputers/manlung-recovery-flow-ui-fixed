@@ -1646,13 +1646,41 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
         muted
         loop
         playsinline
-        preload="auto"
-    >
-        <source src="https://files.catbox.moe/uj2its.mp4" type="video/mp4">
-    </video>
+        preload="none"
+        loading="lazy"
+        poster="/images/hero-video-poster.jpg"
+        data-video-src="https://files.catbox.moe/uj2its.mp4"
+    ></video>
     <div class="ml-hero-video-shade"></div>
 </div>
 <!-- /MANLUNG HERO DEVICE VISUAL -->
+<script>
+/* Load the decorative hero video after the page is usable, not during initial HTML parsing. */
+(function () {
+  function startHeroVideo() {
+    var video = document.querySelector('.ml-hero-device-video[data-video-src]');
+    if (!video || video.dataset.loaded === 'true') return;
+    video.dataset.loaded = 'true';
+    var source = document.createElement('source');
+    source.src = video.getAttribute('data-video-src');
+    source.type = 'video/mp4';
+    video.appendChild(source);
+    video.load();
+    var playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(function () {});
+    }
+  }
+  if (document.readyState === 'complete') {
+    window.setTimeout(startHeroVideo, 1200);
+  } else {
+    window.addEventListener('load', function () {
+      window.setTimeout(startHeroVideo, 1200);
+    }, { once: true });
+  }
+})();
+</script>
+
 
 
 
