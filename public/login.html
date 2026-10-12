@@ -637,7 +637,10 @@ async function ensureGoogleGIS(){
     const started=Date.now();
     const timer=setInterval(()=>{
       if(window.google?.accounts?.id){clearInterval(timer);resolve(true);}
-      else if(Date.now()-started>10000){clearInterval(timer);reject(new Error('Google authentication could not load. Please refresh the page.'));}
+      else if(Date.now()-started>12000){
+        clearInterval(timer);
+        reject(new Error('Google sign-in did not load. Check your connection, disable content blockers for this site, or use email sign-in.'));
+      }
     },100);
   });
 }
@@ -659,6 +662,7 @@ async function setupOfficialGoogleButtons(){
       client_id:cfg.clientId,
       auto_select:false,
       cancel_on_tap_outside:true,
+      itp_support:true,
       callback:async response=>{
         try{
           if(!response?.credential)throw new Error('Google sign-in was cancelled.');
@@ -687,6 +691,7 @@ async function setupOfficialGoogleButtons(){
       const host=document.getElementById(id);
       if(!host)return;
       host.innerHTML='';
+      host.setAttribute('aria-busy','true');
       const grid=host.parentElement;
       const form=host.closest('.manlung-auth-form');
       const gridWidth=grid?.getBoundingClientRect().width||0;
@@ -704,11 +709,22 @@ async function setupOfficialGoogleButtons(){
         click_listener:()=>{
           window.__manlungGoogleErrorTarget=errorTarget;
           localStorage.removeItem('clientUser');
+          showMessage(document.getElementById(errorTarget),'');
         }
       });
+      host.removeAttribute('aria-busy');
     });
   }catch(err){
-    showMessage(document.getElementById('loginError'),err.message||'Google authentication could not be loaded.');
+    console.error('Google button setup failed:',err);
+    const message=err.message||'Google authentication could not be loaded.';
+    showMessage(document.getElementById('loginError'),message);
+    showMessage(document.getElementById('registerError'),message);
+    ['googleLoginBtn','googleRegisterBtn'].forEach(id=>{
+      const host=document.getElementById(id);
+      if(host&&!host.children.length){
+        host.innerHTML='<button type="button" class="btn btn-outline" style="width:100%;min-height:48px" onclick="location.reload()">Retry Google sign-in</button>';
+      }
+    });
   }
 }
 
