@@ -1,0 +1,95 @@
+name: Build Manlung Recovery Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/android-apk.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: manlung-android-apk
+  cancel-in-progress: false
+
+jobs:
+  build-apk:
+    name: Build and publish installable APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Generate Android wrapper for the live website
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p android-wrapper/www
+          cd android-wrapper
+          npm init -y
+          npm install @capacitor/core@^7 @capacitor/cli@^7 @capacitor/android@^7
+          cat > www/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <title>Manlung Recovery</title>
+            </head>
+            <body><p>Opening Manlung Recovery…</p></body>
+          </html>
+          HTML
+          cat > capacitor.config.json <<'JSON'
+          {
+            "appId": "co.manlungrecovery.app",
+            "appName": "Manlung Recovery",
+            "webDir": "www",
+            "server": {
+              "url": "https://manlungrecovery.manlungshop.co.ke/",
+              "cleartext": false,
+              "allowNavigation": [
+                "manlungrecovery.manlungshop.co.ke",
+                "accounts.google.com",
+                "github.com"
+              ]
+            },
+            "android": {
+              "allowMixedContent": false
+            }
+          }
+          JSON
+          npx cap add android
+          cd android
+          ./gradlew --no-daemon assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/ManlungRecovery.apk"
+
+      - name: Publish latest APK download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view android-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload android-latest ManlungRecovery.apk --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit android-latest --title "Manlung Recovery Android APK" --notes "Latest installable Android package for Manlung Recovery. The app opens the live website, so web content updates appear when the device is online." --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create android-latest ManlungRecovery.apk --title "Manlung Recovery Android APK" --notes "Installable Android package for Manlung Recovery. The app opens the live website, so web content updates appear when the device is online." --repo "$GITHUB_REPOSITORY"
+          fi
