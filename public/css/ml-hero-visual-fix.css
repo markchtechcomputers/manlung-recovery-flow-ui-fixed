@@ -252,3 +252,110 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     margin: 0 !important;
   }
 }
+
+
+/* MANLUNG RECOVERY — 17-image right-to-left hero slideshow (replaces the former video). */
+.ml-image-slideshow-hero {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  min-height: 590px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 76px clamp(20px, 7vw, 100px) !important;
+  background: #061226 !important;
+}
+.ml-image-slideshow-hero .ml-hero-slideshow {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+.ml-image-slideshow-hero .ml-hero-slideshow-track {
+  position: absolute !important;
+  inset: 0 auto 0 0 !important;
+  display: flex !important;
+  width: 1800% !important;
+  height: 100% !important;
+  transform: translate3d(0,0,0);
+  will-change: transform;
+}
+.ml-image-slideshow-hero .ml-hero-slide {
+  display: block !important;
+  flex: 0 0 calc(100% / 18) !important;
+  width: calc(100% / 18) !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center 45% !important;
+  opacity: 1 !important;
+  filter: saturate(.9) contrast(1.04) brightness(.72) !important;
+}
+.ml-image-slideshow-hero .ml-hero-slideshow-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(90deg, rgba(3,10,25,.88) 0%, rgba(3,10,25,.72) 48%, rgba(3,10,25,.38) 100%),
+    linear-gradient(0deg, rgba(3,10,25,.38), rgba(3,10,25,.12)) !important;
+}
+.ml-image-slideshow-hero .ml-hero-copy {
+  position: relative !important;
+  z-index: 2 !important;
+  width: min(900px, 100%) !important;
+  max-width: 900px !important;
+  margin: 0 auto 0 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+.ml-image-slideshow-hero .ml-hero-copy h1 {
+  color: #fff !important;
+  max-width: 850px !important;
+  font-size: clamp(2.7rem, 5.2vw, 4.65rem) !important;
+  line-height: 1.04 !important;
+  text-shadow: 0 3px 24px rgba(0,0,0,.32) !important;
+}
+.ml-image-slideshow-hero .ml-hero-copy h1 span { color: #7dd3fc !important; }
+.ml-image-slideshow-hero .ml-hero-description {
+  max-width: 760px !important;
+  color: #f1f5f9 !important;
+  text-shadow: 0 2px 12px rgba(0,0,0,.35) !important;
+}
+.ml-image-slideshow-hero .ml-hero-badge {
+  background: rgba(15,23,42,.65) !important;
+  border-color: rgba(147,197,253,.4) !important;
+  color: #e0f2fe !important;
+  backdrop-filter: blur(8px);
+}
+.ml-image-slideshow-hero .ml-hero-secondary {
+  color: #fff !important;
+  background: rgba(15,23,42,.58) !important;
+  border-color: rgba(226,232,240,.45) !important;
+  backdrop-filter: blur(8px);
+}
+.ml-image-slideshow-hero .ml-hero-security-row { color: #f1f5f9 !important; }
+.ml-image-slideshow-hero .ml-security-item i { color: #7dd3fc !important; }
+@media (max-width: 768px) {
+  .ml-image-slideshow-hero {
+    min-height: 0 !important;
+    padding: 48px 20px 42px !important;
+    align-items: center !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-copy {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-copy h1 {
+    font-size: clamp(2.2rem, 9vw, 3.15rem) !important;
+  }
+  .ml-image-slideshow-hero .ml-hero-description { font-size: .96rem !important; }
+  .ml-image-slideshow-hero .ml-hero-slideshow-overlay {
+    background: linear-gradient(90deg, rgba(3,10,25,.82), rgba(3,10,25,.62)) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-image-slideshow-hero .ml-hero-slideshow-track { transition: none !important; transform: none !important; }
+}
