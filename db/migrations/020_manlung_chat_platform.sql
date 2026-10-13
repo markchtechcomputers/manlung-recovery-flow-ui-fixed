@@ -219,3 +219,90 @@ where g.slug='manlung-community' and u.role in ('client','admin','owner')
 on conflict(group_id,user_id) do nothing;
 
 notify pgrst,'reload schema';
+
+
+-- Enforce the one-free-status-per-rolling-24-hours rule atomically.
+create or replace function public.recovery_chat_consume_status_allowance()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare w public.recovery_chat_status_wallets%rowtype;
+begin
+ insert into public.recovery_chat_status_wallets(user_id) values(new.user_id)
+ on conflict(user_id) do nothing;
+ select * into w from public.recovery_chat_status_wallets where user_id=new.user_id for update;
+ if w.free_status_last_used_at is null or w.free_status_last_used_at <= now()-interval '24 hours' then
+  update public.recovery_chat_status_wallets set free_status_last_used_at=now(),updated_at=now() where user_id=new.user_id;
+ elsif w.paid_status_credits > 0 then
+  update public.recovery_chat_status_wallets set paid_status_credits=paid_status_credits-1,updated_at=now() where user_id=new.user_id;
+ else
+  raise exception 'STATUS_ALLOWANCE_EXHAUSTED' using errcode='P0001';
+ end if;
+ new.expires_at := now()+interval '24 hours';
+ return new;
+end;
+$$;
+drop trigger if exists recovery_chat_status_allowance_trigger on public.recovery_chat_status_posts;
+create trigger recovery_chat_status_allowance_trigger
+before insert on public.recovery_chat_status_posts
+for each row execute function public.recovery_chat_consume_status_allowance();
+revoke all on function public.recovery_chat_consume_status_allowance() from public,anon,authenticated;
+
+-- Fulfill only after server-side Paystack verification. A repeated call never grants credits twice.
+create or replace function public.recovery_chat_fulfill_status_purchase(p_purchase_id uuid,p_provider_transaction_id text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare p public.recovery_chat_status_purchases%rowtype;
+begin
+ select * into p from public.recovery_chat_status_purchases where id=p_purchase_id for update;
+ if not found then raise exception 'STATUS_PURCHASE_NOT_FOUND'; end if;
+ if p.status='paid' then return false; end if;
+ if p.status<>'pending' or p.amount_kes<>100 or p.currency<>'KES' or p.credits<>2
+    or p_provider_transaction_id is null or length(trim(p_provider_transaction_id))=0 then
+  raise exception 'STATUS_PURCHASE_INVALID';
+ end if;
+ update public.recovery_chat_status_purchases set status='paid',provider_transaction_id=p_provider_transaction_id,paid_at=now()
+ where id=p_purchase_id;
+ insert into public.recovery_chat_status_wallets(user_id,paid_status_credits) values(p.user_id,2)
+ on conflict(user_id) do update set paid_status_credits=public.recovery_chat_status_wallets.paid_status_credits+2,updated_at=now();
+ return true;
+end;
+$$;
+revoke all on function public.recovery_chat_fulfill_status_purchase(uuid,text) from public,anon,authenticated;
+grant execute on function public.recovery_chat_fulfill_status_purchase(uuid,text) to service_role;
+
+-- Enroll existing and future eligible users in the default group; each user's archive preference is independent.
+create or replace function public.recovery_chat_sync_default_membership()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare gid uuid;
+begin
+ select id into gid from public.recovery_chat_groups where slug='manlung-community' limit 1;
+ if gid is null then return new; end if;
+ if new.role in ('client','admin','owner') then
+  insert into public.recovery_chat_profiles(user_id,display_name)
+  values(new.id,coalesce(nullif(trim(new.username),''),'Member')) on conflict(user_id) do nothing;
+  insert into public.recovery_chat_status_wallets(user_id) values(new.id) on conflict(user_id) do nothing;
+  insert into public.recovery_chat_group_members(group_id,user_id,archived)
+  values(gid,new.id,true) on conflict(group_id,user_id) do nothing;
+ else
+  delete from public.recovery_chat_group_members where group_id=gid and user_id=new.id;
+ end if;
+ return new;
+end;
+$$;
+drop trigger if exists recovery_chat_default_membership_trigger on public.recovery_users;
+create trigger recovery_chat_default_membership_trigger
+after insert or update of role on public.recovery_users
+for each row execute function public.recovery_chat_sync_default_membership();
+revoke all on function public.recovery_chat_sync_default_membership() from public,anon,authenticated;
+
+notify pgrst,'reload schema';
