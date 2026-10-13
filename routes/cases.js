@@ -1314,13 +1314,12 @@ router.post(
 
   rejectInvalidCaseBeforeAuth,
   verifyCaseTurnstile,
-
-  auth,
+  optionalAuth,
 
   async (req, res) => {
-    if (req.user.role !== 'client') {
+    if (req.user && req.user.role !== 'client') {
       return res.status(403).json({
-        error: 'Client access required',
+        error: 'Client accounts may submit recovery requests; please use the appropriate admin portal for staff actions.',
       });
     }
 
@@ -1328,12 +1327,12 @@ router.post(
       const caseFields =
         mapBodyToCaseFields(req.body);
 
-      // Every submitted case is permanently tied to the authenticated
-      // client account. The case ID is only an identifier, never a password.
-      caseFields.client_user_id = req.user.id;
-      caseFields.email = req.user.email;
+      // Requests are open worldwide, including visitors without an account.
+      // Authenticated client submissions remain linked to that client account.
+      caseFields.client_user_id = req.user?.id || null;
+      caseFields.email = req.user?.email || caseFields.email;
       caseFields.client_name =
-        req.user.username ||
+        req.user?.username ||
         caseFields.client_name;
 
       const uploadedFiles = [];
