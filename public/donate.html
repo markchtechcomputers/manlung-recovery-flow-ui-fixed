@@ -9,19 +9,16 @@
 <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
 <style>
 :root{--donation-ink:#10213b;--donation-muted:#61738a;--donation-green:#16a34a;--donation-line:#dce6ef}
-body:has(.donation-shell){background:#edf4f7 url("https://manlungrecovery.manlungshop.co.ke/images/donation.png") center/cover fixed no-repeat}
-body:has(.donation-shell)::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(135deg,rgba(245,250,252,.88),rgba(235,245,250,.78))}
-.donation-shell{max-width:1120px}
-.donation-card{background:rgba(255,255,255,.94);backdrop-filter:blur(12px)}
-.donation-jar-panel{display:flex;align-items:center;justify-content:center;gap:1.25rem;margin:1.35rem auto 1.1rem;padding:1rem 1.2rem;border:1px solid rgba(22,163,74,.18);border-radius:20px;background:linear-gradient(110deg,rgba(240,253,244,.94),rgba(239,246,255,.9));}
-.donation-jar-image{display:block;width:min(38%,190px);height:155px;object-fit:contain;border-radius:14px;mix-blend-mode:multiply}
-.donation-jar-copy{max-width:330px;color:#166534;font-size:clamp(1rem,2.4vw,1.25rem);line-height:1.45;font-weight:800}
-.donation-jar-copy span{display:block;margin-top:.35rem;color:#61738a;font-size:.85rem;line-height:1.55;font-weight:500}
+/* Use the supplied donation-jar photo as the page background, not as another content block. */
+body:has(.donation-shell){background:#edf4f7 url("https://i.postimg.cc/sDC2RgW8/donation-jar-on-white-background-BXYT9E.jpg") center/cover fixed no-repeat}
+body:has(.donation-shell)::before{content:"";position:fixed;inset:0;z-index:-1;background:rgba(244,248,250,.62)}
+.donation-shell{max-width:920px}
+.donation-card{background:rgba(255,255,255,.94);backdrop-filter:blur(8px)}
 .manlung-footer .manlung-footer-social{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:16px!important;flex-wrap:wrap!important}
 .manlung-footer .manlung-footer-social a{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;flex:0 0 36px!important;padding:0!important;border:0!important;background:transparent!important;color:#a9bfd5!important;font-size:0!important}
 .manlung-footer .manlung-footer-social a i{display:inline-block!important;font-size:25px!important;color:currentColor!important}
 .manlung-footer .manlung-footer-social a span{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-@media(max-width:600px){body:has(.donation-shell){background-attachment:scroll}.donation-jar-panel{gap:.65rem;padding:.75rem}.donation-jar-image{width:42%;height:125px}.donation-jar-copy{font-size:1rem}.donation-jar-copy span{font-size:.78rem}.manlung-footer .manlung-footer-social{justify-content:flex-start!important}}
+@media(max-width:600px){body:has(.donation-shell){background-attachment:scroll}.manlung-footer .manlung-footer-social{justify-content:flex-start!important}}
 
 .donation-shell{max-width:920px;margin:clamp(1rem,4vw,3rem) auto;padding:clamp(.65rem,2.5vw,1.4rem)}
 .donation-card{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff 0%,#f7fbff 100%);border:1px solid #dbe7f1;border-radius:28px;padding:clamp(1.1rem,4vw,2.6rem);box-shadow:0 24px 70px rgba(15,39,72,.12)}
@@ -305,10 +302,6 @@ body:has(.donation-shell)::before{content:"";position:fixed;inset:0;z-index:-1;b
     <div class="donation-heart"><img src="/images/donation.png" alt="" style="width:48px;height:48px;object-fit:contain;display:block" loading="lazy"></div>
     <h1 id="donation-title">Support Our Work</h1>
     <p>Every confirmed donation helps us maintain the platform and provide recovery support. Every contribution makes a difference.</p>
-  </div>
-  <div class="donation-jar-panel" aria-label="Donation jar illustration">
-    <img class="donation-jar-image" src="https://i.postimg.cc/sDC2RgW8/donation-jar-on-white-background-BXYT9E.jpg" alt="Donation jar representing community support" loading="lazy">
-    <p class="donation-jar-copy">Small contributions. Real impact.<span>Your support helps keep recovery resources available to the people who need them.</span></p>
   </div>
   <section class="total-card" aria-label="Donation progress">
     <small>Total confirmed donations</small>
