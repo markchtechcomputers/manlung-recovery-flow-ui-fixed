@@ -8,20 +8,34 @@
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
 <style>
-.donation-shell{max-width:720px;margin:2rem auto;padding:1rem}
-.donation-card{background:var(--card-bg,#fff);border:1px solid var(--card-border,#e5e7eb);border-radius:28px;padding:2rem;box-shadow:0 16px 50px rgba(10,26,58,.08)}
-.donation-head{text-align:center}.donation-heart{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;margin:0 auto 1rem;background:#eef5ff;color:#2451d6;font-size:1.8rem}
-.donation-head h1{margin:0;font-size:2rem}.donation-head p{color:var(--text-muted);line-height:1.6}
-.total-card{margin:1.4rem 0;padding:1.2rem;border-radius:20px;background:linear-gradient(135deg,#0a1a3a,#2451d6);color:#fff;text-align:center}
-.total-card small{opacity:.8}.total-card strong{display:block;font-size:2.2rem;margin:.2rem 0}.total-card span{opacity:.85;font-size:.82rem}
-.amount-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin:1rem 0}
-.amount-btn{padding:.8rem;border:1px solid var(--card-border,#dbe2ef);border-radius:14px;background:var(--page-bg,#fff);font-weight:800;cursor:pointer}
-.amount-btn.active{background:#0a1a3a;color:#fff;border-color:#0a1a3a}
-.field{margin:.8rem 0}.field label{display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem}.field input{width:100%;padding:.85rem 1rem;border-radius:13px;border:1px solid #dbe2ef;font:inherit}
-.donate-action{width:100%;padding:1rem;border:0;border-radius:15px;background:#2451d6;color:#fff;font-weight:800;font-size:1rem;cursor:pointer}.donate-action:disabled{opacity:.6;cursor:wait}
-.notice{font-size:.76rem;color:var(--text-muted);text-align:center;margin-top:1rem;line-height:1.5}
-.donation-progress{margin-top:1rem;text-align:left}.donation-progress-track{height:10px;width:100%;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.18)}.donation-progress-bar{height:100%;width:0;border-radius:inherit;background:#fff;box-shadow:0 0 16px rgba(255,255,255,.45);transition:width .9s cubic-bezier(.22,.8,.24,1)}.donation-progress-meta{display:flex;justify-content:space-between;gap:1rem;margin-top:.45rem;font-size:.72rem;opacity:.9}.donation-progress-meta strong{color:#fff}
-@media(max-width:600px){.donation-card{padding:1.25rem}.amount-grid{grid-template-columns:repeat(2,1fr)}.donation-head h1{font-size:1.55rem}}
+:root{--donation-ink:#10213b;--donation-muted:#61738a;--donation-green:#16a34a;--donation-line:#dce6ef}
+.donation-shell{max-width:920px;margin:clamp(1rem,4vw,3rem) auto;padding:clamp(.65rem,2.5vw,1.4rem)}
+.donation-card{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff 0%,#f7fbff 100%);border:1px solid #dbe7f1;border-radius:28px;padding:clamp(1.1rem,4vw,2.6rem);box-shadow:0 24px 70px rgba(15,39,72,.12)}
+.donation-card:before{content:"";position:absolute;inset:0 0 auto;height:5px;background:linear-gradient(90deg,#16a34a,#22c55e,#93c5fd)}
+.donation-head{text-align:center;max-width:650px;margin:0 auto}
+.donation-heart{width:76px;height:76px;border-radius:23px;display:grid;place-items:center;margin:0 auto 1rem;background:linear-gradient(145deg,#eafbf0,#eaf2ff);color:#15803d;font-size:1.8rem;box-shadow:inset 0 0 0 1px rgba(22,163,74,.1)}
+.donation-head h1{margin:0;color:var(--donation-ink);font-size:clamp(1.75rem,4vw,2.35rem);line-height:1.12;letter-spacing:-.04em;font-weight:900}
+.donation-head p{margin:.8rem auto 0;color:var(--donation-muted);font-size:1rem;line-height:1.7;max-width:520px}
+.total-card{margin:1.7rem 0;padding:clamp(1.2rem,3vw,1.8rem);border-radius:22px;background:radial-gradient(ellipse at 100% 0%,rgba(34,197,94,.19),transparent 38%),linear-gradient(135deg,#0b1d35,#15365a 70%,#174c62);color:#fff;text-align:left;box-shadow:0 15px 35px rgba(11,29,53,.16)}
+.total-card small{display:block;opacity:.82;font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.total-card strong{display:block;font-size:clamp(2rem,5vw,2.75rem);letter-spacing:-.04em;line-height:1.15;margin:.35rem 0}
+.total-card span{opacity:.88;font-size:.9rem}
+.donation-progress{margin-top:1.4rem;text-align:left}.donation-progress-track{height:11px;width:100%;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.17)}.donation-progress-bar{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#4ade80,#bbf7d0);box-shadow:0 0 14px rgba(74,222,128,.25);transition:width .7s ease}.donation-progress-meta{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:.65rem;font-size:.8rem;opacity:.9}.donation-progress-meta strong{display:inline;margin:0;font-size:inherit;letter-spacing:0}
+.donation-form-section{margin-top:1.6rem}.donation-section-heading{margin:0 0 .35rem;color:var(--donation-ink);font-size:1.12rem;font-weight:850}.donation-section-copy{margin:0;color:var(--donation-muted);font-size:.88rem;line-height:1.55}
+.amount-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin:1rem 0 1.3rem}
+.amount-btn{min-height:52px;padding:.75rem .55rem;border:1px solid #d7e2ed;border-radius:14px;background:#fff;color:#203b59;font:inherit;font-size:.9rem;font-weight:800;cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease}
+.amount-btn:hover{border-color:#16a34a;transform:translateY(-1px);box-shadow:0 5px 15px rgba(22,163,74,.08)}
+.amount-btn.active{background:#eafbf0;color:#166534;border-color:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,.12)}
+.field{margin:.9rem 0}.field label{display:block;color:#263b52;font-size:.88rem;font-weight:750;margin-bottom:.42rem}.field input{box-sizing:border-box;width:100%;min-height:49px;padding:.8rem .95rem;border-radius:13px;border:1px solid #d7e2ed;background:#fff;color:#10213b;font:inherit;transition:border-color .15s ease,box-shadow .15s ease}.field input::placeholder{color:#91a0b1}.field input:focus{outline:none;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+.donation-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1rem}.donation-fields .field:first-child{grid-column:1/-1}
+.donate-action{display:flex;align-items:center;justify-content:center;gap:.65rem;width:100%;min-height:56px;margin-top:1.15rem;padding:1rem;border:0;border-radius:15px;background:linear-gradient(100deg,#15803d,#16a34a);color:#fff;font:inherit;font-weight:850;font-size:1rem;cursor:pointer;box-shadow:0 10px 24px rgba(22,163,74,.2);transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+.donate-action:hover{filter:brightness(1.04);transform:translateY(-1px);box-shadow:0 13px 28px rgba(22,163,74,.24)}.donate-action:disabled{opacity:.6;cursor:wait;transform:none}
+.donation-security-note{display:flex;align-items:center;justify-content:center;gap:.45rem;margin:.8rem 0 0;color:#66798e;font-size:.78rem;line-height:1.5;text-align:center}.donation-security-note i{color:#16a34a}
+.notice{font-size:.86rem;color:#53667d;text-align:center;margin-top:1rem;line-height:1.6;overflow-wrap:anywhere}
+.donation-progress[aria-label]{display:block}
+.donation-card button:focus-visible{outline:3px solid #86efac;outline-offset:3px}
+@media(max-width:600px){.donation-shell{margin:.7rem auto;padding:.55rem}.donation-card{padding:1.15rem;border-radius:21px}.donation-head h1{font-size:1.7rem}.donation-head p{font-size:.92rem}.donation-heart{width:64px;height:64px;border-radius:19px}.total-card{margin:1.2rem 0;padding:1.15rem;border-radius:18px}.amount-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}.amount-btn{min-height:50px;font-size:.88rem}.donation-fields{grid-template-columns:1fr}.donation-fields .field:first-child{grid-column:auto}.donation-progress-meta{font-size:.74rem}.donate-action{min-height:54px}}
+@media(prefers-reduced-motion:reduce){.amount-btn,.donate-action,.field input,.donation-progress-bar{transition:none}}
 </style>
 <style id="manlung-header-style">
 .site-header{
@@ -272,36 +286,43 @@
 ></a>
 <h1> Manlung Recovery</h1><span>Support our recovery work</span></div><div class="header-actions"><a class="btn btn-outline" href="/"> Home</a></div></div></header>
 <main class="donation-shell">
-<section class="donation-card">
+<section class="donation-card" aria-labelledby="donation-title">
   <div class="donation-head">
-    <div class="donation-heart"><img src="/images/donation.png" alt="Donation" style="width:48px;height:48px;object-fit:contain;display:block;" loading="lazy"></div>
-    <h1>Support Our Work</h1>
-    <p>Every confirmed donation helps us maintain the platform and provide recovery support.</p>
+    <div class="donation-heart"><img src="/images/donation.png" alt="" style="width:48px;height:48px;object-fit:contain;display:block" loading="lazy"></div>
+    <h1 id="donation-title">Support Our Work</h1>
+    <p>Every confirmed donation helps us maintain the platform and provide recovery support. Every contribution makes a difference.</p>
   </div>
-  <div class="total-card">
+  <section class="total-card" aria-label="Donation progress">
     <small>Total confirmed donations</small>
     <strong id="totalRaised">KES 0</strong>
-    <span id="donationCount">0 donations</span>
-    <div class="donation-progress" aria-label="Donation progress">
-      <div class="donation-progress-track"><div id="donationProgressBar" class="donation-progress-bar" style="width:0%"></div></div>
+    <span id="donationCount">0 confirmed donations</span>
+    <div class="donation-progress" aria-label="Donation goal progress">
+      <div class="donation-progress-track" role="progressbar" aria-label="Fundraising goal progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="donationProgressTrack"><div id="donationProgressBar" class="donation-progress-bar" style="width:0%"></div></div>
       <div class="donation-progress-meta"><span id="donationProgressPercent">0%</span><span>Goal <strong id="donationTarget">KES 570,001</strong></span></div>
     </div>
+  </section>
+  <section class="donation-form-section" aria-labelledby="choose-amount-title">
+    <h2 class="donation-section-heading" id="choose-amount-title">Choose your contribution</h2>
+    <p class="donation-section-copy">Select an amount or enter a custom donation in Kenyan shillings.</p>
+    <div class="amount-grid" role="group" aria-label="Suggested donation amounts">
+      <button type="button" class="amount-btn" data-amount="50">KES 50</button>
+      <button type="button" class="amount-btn" data-amount="100">KES 100</button>
+      <button type="button" class="amount-btn" data-amount="300">KES 300</button>
+      <button type="button" class="amount-btn" data-amount="500">KES 500</button>
+      <button type="button" class="amount-btn" data-amount="1000">KES 1,000</button>
+      <button type="button" class="amount-btn" data-amount="2500">KES 2,500</button>
+      <button type="button" class="amount-btn" data-amount="5000">KES 5,000</button>
+      <button type="button" class="amount-btn" data-amount="10000">KES 10,000</button>
+    </div>
+  </section>
+  <div class="donation-fields">
+    <div class="field"><label for="amount">Custom amount (KES)</label><input id="amount" type="number" min="50" max="5700010" step="1" inputmode="numeric" placeholder="Enter amount (minimum KES 50)" aria-describedby="amount-help"><p id="amount-help" class="donation-section-copy">Minimum KES 50.</p></div>
+    <div class="field"><label for="donorName">Your name <span style="font-weight:500;color:#718096">(optional)</span></label><input id="donorName" type="text" maxlength="120" autocomplete="name" placeholder="Your full name"></div>
+    <div class="field"><label for="email">Email for payment receipt</label><input id="email" type="email" required autocomplete="email" inputmode="email" placeholder="you@example.com"></div>
   </div>
-  <div class="amount-grid">
-    <button class="amount-btn" data-amount="50">KES 50</button>
-    <button class="amount-btn" data-amount="100">KES 100</button>
-    <button class="amount-btn" data-amount="300">KES 300</button>
-    <button class="amount-btn" data-amount="500">KES 500</button>
-    <button class="amount-btn" data-amount="1000">KES 1,000</button>
-    <button class="amount-btn" data-amount="2500">KES 2,500</button>
-    <button class="amount-btn" data-amount="5000">KES 5,000</button>
-    <button class="amount-btn" data-amount="10000">KES 10,000</button>
-  </div>
-  <div class="field"><label for="amount">Custom amount (KES)</label><input id="amount" type="number" min="50" max="5700010" step="1" placeholder="Enter amount"></div>
-  <div class="field"><label for="donorName">Your name</label><input id="donorName" type="text" maxlength="120" placeholder="Your full name"></div>
-  <div class="field"><label for="email">Email for payment receipt</label><input id="email" type="email" required autocomplete="email" placeholder="you@example.com"></div>
-  <button class="donate-action" id="donateBtn"><i class="fas fa-heart"></i> Donate Securely</button>
-  <p id="status" class="notice"></p>
+  <button type="button" class="donate-action" id="donateBtn"><i class="fas fa-lock" aria-hidden="true"></i> Donate Securely</button>
+  <p class="donation-security-note"><i class="fas fa-shield-alt" aria-hidden="true"></i> Secure checkout powered by Paystack. Your donation is counted after payment confirmation.</p>
+  <p id="status" class="notice" role="status" aria-live="polite"></p>
 </section>
 </main>
 <script src="https://js.paystack.co/v2/inline.js"></script>
@@ -321,7 +342,7 @@ async function loadTotal(){
   document.getElementById('donationTarget').textContent=money(target);
   const bar=document.getElementById('donationProgressBar');
   const pctEl=document.getElementById('donationProgressPercent');
-  if(bar) bar.style.width=`${pct}%`;
+  if(bar) bar.style.width=`${pct}%`;\n  const progressTrack=document.getElementById('donationProgressTrack');\n  if(progressTrack) progressTrack.setAttribute('aria-valuenow',String(Math.round(pct)));
   if(pctEl) pctEl.textContent=`${pct.toFixed(pct%1?1:0)}%`;
  }catch(e){console.error('Donation total error',e);}
 }
