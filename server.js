@@ -75,7 +75,7 @@ app.use(
         frameAncestors: ["'none'"],
         formAction: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://js.paystack.co', 'https://unpkg.com', 'https://challenges.cloudflare.com', 'https://accounts.google.com'],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://unpkg.com'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://unpkg.com', 'https://accounts.google.com'],
         fontSrc: ["'self'", 'https://cdnjs.cloudflare.com', 'data:'],
         imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
         mediaSrc: ["'self'", 'https:', 'blob:'],
