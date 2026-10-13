@@ -310,7 +310,7 @@
     <h2 id="submissionModalTitle">Request submitted successfully</h2>
     <p>Your recovery request has been received and is now in our review workflow.</p>
     <div class="submission-case"><i class="fas fa-folder-open" aria-hidden="true"></i><span>Case ID: <strong id="submittedCaseIdModal">—</strong></span></div>
-    <p>Keep your Case ID safe. You can use it to track your request and receive updates.</p>
+    <p>Keep your Case ID safe. Our support team will use the contact details you provide to follow up. If your case is linked to a client account, you can also track it from your dashboard.</p>
     <div class="submission-actions"><a class="btn btn-primary" href="/client/dashboard.html"><i class="fas fa-gauge"></i> Open Dashboard</a><button type="button" class="btn btn-outline-dark" onclick="closeSubmissionModal()">Continue</button></div>
   </div>
 </div>
@@ -324,7 +324,7 @@
   alt="Manlung Recovery"
 ></a>
 <h1> New Recovery Request</h1>
-                <span>Fill in the details below</span>
+                <span>Worldwide support · Submit a request from any country</span>
             </div>
             <div class="header-actions">
                 <button class="btn btn-outline" data-theme-toggle="true"></button>
@@ -379,15 +379,15 @@
                     <div class="card-title"><i class="fas fa-user"></i> Personal Information</div>
                     <div class="row-2">
                         <div class="form-group"><label>Full Name *</label><input id="fullName" required></div>
-                        <div class="form-group"><label>Phone Number *</label><input id="phone" required></div>
+                        <div class="form-group"><label>Phone Number *</label><input id="phone" type="tel" autocomplete="tel" placeholder="+1 555 123 4567 (include country code)" required><small class="field-hint">Use your international dialing code, for example +1, +44, or +254.</small></div>
                     </div>
                     <div class="row-2">
                         <div class="form-group"><label>Email *</label><input type="email" id="email" required></div>
-                        <div class="form-group"><label>Country</label><input id="country" value="Kenya"></div>
+                        <div class="form-group"><label>Country *</label><input id="country" autocomplete="country-name" placeholder="Enter your country" required></div>
                     </div>
                     <div class="row-3">
-                        <div class="form-group"><label>County/State</label><input id="county"></div>
-                        <div class="form-group"><label>Town/City</label><input id="city"></div>
+                        <div class="form-group"><label>State / Province / Region</label><input id="county" autocomplete="address-level1" placeholder="If applicable"></div>
+                        <div class="form-group"><label>Town / City</label><input id="city" autocomplete="address-level2"></div>
                         <div class="form-group"><label>Preferred Contact</label>
                             <select id="contactMethod"><option>Phone</option><option>Email</option><option>Telegram</option></select>
                         </div>
@@ -675,7 +675,7 @@
             document.getElementById('draftBanner').style.display = 'none';
         }
 
-        const REQUIRED_FIELD_IDS = ['caseType', 'fullName', 'phone', 'email', 'incidentDesc'];
+        const REQUIRED_FIELD_IDS = ['caseType', 'fullName', 'phone', 'email', 'country', 'incidentDesc'];
         function updateProgress() {
             const filled = REQUIRED_FIELD_IDS.filter(id => {
                 const el = document.getElementById(id);
@@ -739,13 +739,6 @@
 
             const submitBtn = document.getElementById('submitBtn');
             const statusEl = document.getElementById('submitStatus');
-            const token = null;
-            if (false) {
-                alert('Please sign in to submit a recovery case. Your case must be linked to your account so only you can track it.');
-                window.location.href = '/login.html';
-                return;
-            }
-
             submitBtn.disabled = true;
             statusEl.textContent = 'Submitting request…';
 
@@ -831,11 +824,6 @@
         document.getElementById('submissionModalOverlay').addEventListener('click',e=>{if(e.target.id==='submissionModalOverlay')closeSubmissionModal();});
         async function checkAuth() {
             const token = null;
-            if (false) {
-                const notice = document.getElementById('submitStatus');
-                if (notice) notice.textContent = 'Please sign in before submitting a case.';
-                return false;
-            }
             try {
                 const response = await fetch('/api/auth/verify', { credentials:'include' });
                 const data = await response.json();
