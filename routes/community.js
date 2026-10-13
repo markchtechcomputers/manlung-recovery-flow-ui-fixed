@@ -36,6 +36,7 @@ function publicProfile(profile, user, presence) {
     readReceiptsEnabled: profile?.read_receipts_enabled !== false,
     recentlyActive: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
     online: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
+    online: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
     lastSeenAt: profile?.last_seen_visibility === 'nobody' ? null : last,
   };
 }
@@ -78,7 +79,7 @@ router.get('/members', async (req, res) => {
     (blocks || []).forEach(b => { blocked.add(b.blocker_user_id); blocked.add(b.blocked_user_id); });
     const pMap = new Map((profiles || []).map(p => [p.user_id, p]));
     const liveMap = new Map((presence || []).map(p => [p.user_id, p]));
-    const members = (users || []).filter(u => u.id !== req.user.id && !blocked.has(u.id) && (!u.security_status || u.security_status === 'active'))
+    const members = (users || []).filter(u => u.id !== req.user.id && !blocked.has(u.id) && (!u.security_status || u.security_status === 'active') && (!u.security_status || u.security_status === 'active'))
       .map(u => ({ user: u, profile: pMap.get(u.id) }))
       .filter(x => x.profile?.discoverable !== false)
       .map(x => publicProfile(x.profile, x.user, liveMap.get(x.user.id)));
