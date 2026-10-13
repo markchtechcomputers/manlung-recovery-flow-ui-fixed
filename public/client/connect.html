@@ -109,7 +109,7 @@ $('archivedCommunity').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key=
 $('profileBtn').addEventListener('click',()=>{if(!current){toast('Choose a member first.');return}toast(current.name+' · '+roleLabel(current))});
 $('chatMenu').addEventListener('click',async()=>{if(currentGroup){try{const next=!currentGroup.archived;const r=await fetch('/api/community/groups/'+encodeURIComponent(currentGroup.id)+'/archive',{method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({archived:next})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Could not update archive');currentGroup.archived=next;toast(next?'Community archived':'Community unarchived');loadGroups()}catch(e){toast(e.message)}return}if(current){const reason=prompt('Optional reason to block this member (leave blank to block):');if(reason===null)return;try{const r=await fetch('/api/community/blocks/'+encodeURIComponent(current.id),{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Could not block member');current=null;app.classList.remove('chat-open');toast('Member blocked');loadMembers()}catch(e){toast(e.message)}return}toast('Choose a member or community to see options.')});
 $('attachBtn').addEventListener('click',()=>toast('Photo and document sharing will be enabled after secure private storage is configured.'));
-heartbeat();loadMembers();loadGroups();setInterval(()=>{heartbeat();loadMembers()},30000);
+heartbeat();loadMembers();loadGroups();setInterval(()=>{heartbeat();loadMembers()},30000);setInterval(()=>{if(current||currentGroup)loadMessages()},5000);
 })();
 </script>
 </body>
