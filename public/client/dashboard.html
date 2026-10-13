@@ -820,11 +820,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
   src="/icons/icon-512.png"
   alt="Manlung Recovery"
 ></a>
-<img
-          class="manlung-client-logo"
-          src="/icons/icon-512.png"
-          alt="Manlung Recovery logo"
-        >
+
         <div class="manlung-client-copy">
           <h1>Manlung Recovery</h1>
           <span id="welcomeLine">Your cases, progress and Admin updates</span>
@@ -1145,7 +1141,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
           avatar.className = 'manlung-profile-avatar';
           avatar.setAttribute('aria-label', 'Your profile');
           const initials = (accountName || clientUser.email || 'MR').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(part => part[0].toUpperCase()).join('') || 'MR';
-          if (clientUser.profilePicture && /^https:\/\//i.test(clientUser.profilePicture)) {
+          if (clientUser.profilePicture && (/^https:\/\//i.test(clientUser.profilePicture) || /^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(clientUser.profilePicture))) {
             const photo = document.createElement('img');
             photo.src = clientUser.profilePicture;
             photo.alt = '';
@@ -1156,7 +1152,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
           } else {
             avatar.textContent = initials;
           }
-          const logo = brand.querySelector('.manlung-client-logo');
+          const logo = brand.querySelector('.manlung-home-logo');
           if (logo) logo.insertAdjacentElement('afterend', avatar);
         }
 
