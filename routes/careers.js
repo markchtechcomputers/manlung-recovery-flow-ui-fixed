@@ -10,6 +10,33 @@ const TABLE = 'career_applications';
 const CAREER_MAX_FILE_SIZE = 10 * 1024 * 1024;
 const SIGNED_URL_TTL = 15 * 60;
 
+// Public widget key only; the secret key must remain server-side.
+router.get('/turnstile-config', (_req, res) => {
+  const siteKey = String(process.env.TURNSTILE_SITE_KEY || '').trim();
+  if (!siteKey) return res.status(503).json({ error: 'Cloudflare verification is not configured.' });
+  return res.set('Cache-Control', 'no-store').json({ siteKey });
+});
+
+async function verifyTurnstile(token, remoteIp) {
+  const secret = String(process.env.TURNSTILE_SECRET_KEY || '').trim();
+  if (!secret) return { configured: false, success: false };
+  if (!token || typeof token !== 'string' || token.length > 2048) return { configured: true, success: false };
+  try {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret, response: token, ...(remoteIp ? { remoteip: remoteIp } : {}) }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) return { configured: true, success: false };
+    const result = await response.json();
+    return { configured: true, success: result.success === true };
+  } catch (error) {
+    console.error('Career Turnstile verification failed:', error?.message || error);
+    return { configured: true, success: false };
+  }
+}
+
 const careerUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: CAREER_MAX_FILE_SIZE, files: 2, fields: 12, parts: 16, fieldSize: 64 * 1024 },
@@ -79,6 +106,9 @@ router.post(
   ],
   async (req, res) => {
     if (!valid(req, res)) return;
+    const turnstile = await verifyTurnstile(req.body['cf-turnstile-response'], req.ip);
+    if (!turnstile.configured) return res.status(503).json({ error: 'Security verification is not configured. Please contact the site owner.' });
+    if (!turnstile.success) return res.status(400).json({ error: 'Cloudflare verification failed or expired. Please complete the check again.' });
     const uploadedPaths = [];
     try {
       const cv = req.files?.cv?.[0];
