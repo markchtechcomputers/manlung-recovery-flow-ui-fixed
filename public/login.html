@@ -128,6 +128,31 @@
 @media(prefers-reduced-motion:reduce){.manlung-auth-page .manlung-auth-primary{transition:none!important}}
 </style>
 
+
+<style id="manlung-login-focus-and-password-fix">
+/* Login is a focused authentication-only screen: no site chrome. */
+.manlung-auth-page .site-header,
+.manlung-auth-page header.site-header,
+.manlung-auth-page .manlung-footer,
+.manlung-auth-page footer,
+.manlung-auth-page #supportFab,
+.manlung-auth-page .support-fab,
+.manlung-auth-page .support-fab-container,
+.manlung-auth-page .chat-widget,
+.manlung-auth-page .chatbot-widget{display:none!important}
+.manlung-auth-page{min-height:100svh!important}
+.manlung-auth-page .manlung-auth-wrap{min-height:100svh!important;padding:22px 14px!important;box-sizing:border-box!important}
+.manlung-auth-page .manlung-auth-shell{margin:auto!important}
+.manlung-auth-page .manlung-password-field{position:relative!important;width:100%!important}
+.manlung-auth-page .manlung-password-field input{width:100%!important;padding-right:52px!important}
+.manlung-auth-page .manlung-password-toggle{position:absolute!important;z-index:20!important;right:6px!important;top:50%!important;transform:translateY(-50%)!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:40px!important;height:40px!important;min-width:40px!important;padding:0!important;border:0!important;border-radius:8px!important;background:transparent!important;color:#475569!important;cursor:pointer!important;pointer-events:auto!important}
+.manlung-auth-page .manlung-password-toggle:hover{background:rgba(37,99,235,.09)!important;color:#1d4ed8!important}
+.manlung-auth-page .manlung-password-toggle:focus-visible{outline:2px solid #3b82f6!important;outline-offset:1px!important}
+.manlung-auth-page .manlung-password-toggle i{font-size:16px!important;pointer-events:none!important}
+.dark.manlung-auth-page .manlung-password-toggle{color:#cbd5e1!important}
+@media(max-width:640px){.manlung-auth-page .manlung-auth-wrap{min-height:100svh!important;padding:16px 12px!important}}
+</style>
+
 </head>
 <body class="manlung-auth-page">
 <header class="site-header">
