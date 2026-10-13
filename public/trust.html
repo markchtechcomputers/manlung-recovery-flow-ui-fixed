@@ -4,111 +4,214 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>How It Works &amp; Trust | Manlung Recovery</title>
-  <meta name="description" content="Understand how Manlung Recovery handles requests, explains service scope and fees, protects sensitive information, and sets realistic recovery expectations.">
+  <meta name="description" content="See how Manlung Recovery reviews requests, explains service scope and fees, protects sensitive information, and sets realistic recovery expectations.">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://manlungrecovery.manlungshop.co.ke/trust.html">
-  <meta name="theme-color" content="#0b192b">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="/icons/icon-512.png">
   <link rel="stylesheet" href="/css/theme.css">
   <link rel="stylesheet" href="/css/footer.css">
-  <link rel="stylesheet" href="/css/unified-ui.css">
   <script src="/js/theme.js"></script>
   <style>
-    :root{--trust-ink:#122338;--trust-muted:#526579;--trust-line:#dbe4ee;--trust-panel:#fff;--trust-accent:#087f8c}
-    html.dark{--trust-ink:#edf5fc;--trust-muted:#a9bbcd;--trust-line:#294158;--trust-panel:#0e1d2e;--trust-accent:#5eead4}
-    body{margin:0;background:var(--page-bg,#f5f8fc);color:var(--text,var(--trust-ink));font:16px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}
-    .trust-wrap{width:min(980px,calc(100% - 32px));margin:0 auto;padding:30px 0 56px}
-    .trust-nav{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px max(16px,calc((100% - 980px)/2));background:var(--card-bg,#fff);border-bottom:1px solid var(--trust-line)}
-    .trust-brand{font-weight:800;color:var(--text,var(--trust-ink));text-decoration:none}
-    .trust-nav-links{display:flex;gap:14px;flex-wrap:wrap}.trust-nav-links a{color:var(--link,var(--trust-accent));font-weight:650;text-decoration:none}
-    .trust-hero,.trust-card{background:var(--card-bg,var(--trust-panel));border:1px solid var(--trust-line);border-radius:18px;padding:clamp(20px,4vw,32px);margin:16px 0;box-shadow:0 8px 26px rgba(15,23,42,.045)}
-    .trust-eyebrow{display:inline-block;color:var(--trust-accent);font-size:.78rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
-    h1{font-size:clamp(2rem,6vw,3.35rem);line-height:1.1;letter-spacing:-.04em;margin:.6rem 0 1rem;max-width:780px}
-    h2{font-size:clamp(1.2rem,3vw,1.55rem);line-height:1.25;margin:0 0 12px}
-    h3{font-size:1.04rem;margin:0 0 5px}
-    p{margin:.55rem 0;color:var(--text,var(--trust-ink))} .muted{color:var(--text-muted,var(--trust-muted))}
-    .trust-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-    .trust-step{display:flex;gap:13px;align-items:flex-start;padding:15px 0;border-top:1px solid var(--trust-line)}
-    .trust-number{display:grid;place-items:center;flex:0 0 36px;height:36px;border-radius:10px;background:rgba(8,127,140,.12);color:var(--trust-accent);font-weight:850}
-    .trust-callout{border-left:4px solid var(--trust-accent);padding:14px 16px;background:rgba(8,127,140,.08);border-radius:0 12px 12px 0;margin:16px 0}
-    .trust-list{padding-left:1.2rem}.trust-list li{margin:.55rem 0}
-    .trust-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
-    .trust-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 15px;border-radius:10px;border:1px solid var(--trust-line);font-weight:750;text-decoration:none;color:var(--text,var(--trust-ink))}
-    .trust-button.primary{background:#0f766e;border-color:#0f766e;color:#fff}
+    :root{
+      color-scheme:light;
+      --trust-bg:#f5f8fc;--trust-surface:#fff;--trust-ink:#102338;
+      --trust-muted:#526579;--trust-line:#dce5ef;--trust-accent:#0b5b91;
+      --trust-accent-dark:#08456f;--trust-soft:#eaf4fb;
+      --trust-shadow:0 12px 32px rgba(15,35,56,.07);
+    }
+    html.dark{
+      color-scheme:dark;
+      --trust-bg:#07111d;--trust-surface:#0e1d2e;--trust-ink:#edf5fc;
+      --trust-muted:#a9bbcd;--trust-line:#294158;--trust-accent:#8acbff;
+      --trust-accent-dark:#b7e0ff;--trust-soft:#122b40;
+      --trust-shadow:0 14px 34px rgba(0,0,0,.22);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--trust-bg);color:var(--trust-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.7}
+    body{display:flex;flex-direction:column}
+    a{color:var(--trust-accent);text-underline-offset:3px}
+    a:focus-visible{outline:3px solid #38bdf8;outline-offset:3px;border-radius:5px}
+    .trust-nav{position:sticky;top:0;z-index:1000;background:var(--trust-surface);border-bottom:2px solid #102a43;box-shadow:0 5px 18px rgba(7,17,29,.06)}
+    .trust-nav-inner{width:min(1180px,100%);min-height:72px;margin:auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+    .trust-brand{display:flex;align-items:center;gap:11px;min-width:0;color:var(--trust-ink);text-decoration:none}
+    .trust-brand img{width:42px;height:42px;object-fit:contain;flex:0 0 42px}
+    .trust-brand-copy{display:flex;flex-direction:column;line-height:1.2}
+    .trust-brand-copy strong{font-size:.95rem;font-weight:850;letter-spacing:.015em}
+    .trust-brand-copy small{margin-top:4px;color:var(--trust-muted);font-size:.64rem;font-weight:700;letter-spacing:.06em}
+    .trust-nav-links{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap}
+    .trust-nav-links a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 11px;border:1px solid transparent;border-radius:10px;color:var(--trust-ink);font-size:.78rem;font-weight:750;text-decoration:none;white-space:nowrap}
+    .trust-nav-links a:hover,.trust-nav-links a[aria-current=page]{background:var(--trust-soft);color:var(--trust-accent)}
+    .trust-nav-links .trust-nav-cta{background:#0b4f85;color:#fff;border-color:#0b4f85}
+    .trust-nav-links .trust-nav-cta:hover{background:#083e69;color:#fff}
+    .trust-wrap{width:min(1060px,100%);margin:0 auto;padding:clamp(20px,4vw,42px) 20px 56px;flex:1}
+    .trust-hero{position:relative;overflow:hidden;padding:clamp(26px,5vw,52px);border:1px solid var(--trust-line);border-radius:24px;background:linear-gradient(125deg,var(--trust-surface) 0%,var(--trust-soft) 100%);box-shadow:var(--trust-shadow)}
+    .trust-hero:after{content:"";position:absolute;right:-70px;top:-100px;width:260px;height:260px;border-radius:50%;border:36px solid rgba(56,189,248,.10);pointer-events:none}
+    .trust-hero-content{position:relative;z-index:1;max-width:790px}
+    .trust-eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--trust-accent);font-size:.76rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase}
+    .trust-eyebrow:before{content:"";width:24px;height:3px;border-radius:9px;background:#22c55e}
+    h1{max-width:760px;margin:13px 0 16px;font-size:clamp(2.15rem,5.7vw,3.8rem);font-weight:850;line-height:1.07;letter-spacing:-.045em}
+    .trust-intro{max-width:720px;margin:0;color:var(--trust-muted);font-size:clamp(1rem,1.5vw,1.12rem);line-height:1.8}
+    .trust-actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:24px}
+    .trust-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:47px;padding:11px 17px;border:1px solid var(--trust-line);border-radius:11px;background:var(--trust-surface);color:var(--trust-ink);font-weight:800;text-decoration:none;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+    .trust-button:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(15,35,56,.10)}
+    .trust-button.primary{background:#0b4f85;border-color:#0b4f85;color:#fff}
+    .trust-button.primary:hover{background:#083e69}
+    .trust-principles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 28px}
+    .trust-principle{display:flex;align-items:center;gap:11px;padding:14px;border:1px solid var(--trust-line);border-radius:14px;background:var(--trust-surface);color:var(--trust-muted);font-size:.85rem;font-weight:700}
+    .trust-principle-icon{display:grid;place-items:center;width:35px;height:35px;flex:0 0 35px;border-radius:10px;background:var(--trust-soft);color:var(--trust-accent);font-size:1rem}
+    .trust-card{margin-top:22px;padding:clamp(21px,3.5vw,32px);border:1px solid var(--trust-line);border-radius:20px;background:var(--trust-surface);box-shadow:var(--trust-shadow)}
+    .trust-section-kicker{display:block;margin-bottom:7px;color:var(--trust-accent);font-size:.72rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase}
+    h2{margin:0 0 9px;font-size:clamp(1.35rem,3vw,1.8rem);line-height:1.25;letter-spacing:-.025em;font-weight:820}
+    .trust-section-intro{max-width:760px;margin:0 0 21px;color:var(--trust-muted)}
+    h3{margin:0 0 7px;font-size:1.02rem;line-height:1.35;font-weight:800;letter-spacing:-.01em}
+    p{margin:.55rem 0;color:var(--trust-ink)}
+    .muted{color:var(--trust-muted)}
+    .trust-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+    .trust-step{display:flex;gap:14px;align-items:flex-start;padding:18px;border:1px solid var(--trust-line);border-radius:15px;background:var(--trust-bg)}
+    .trust-number{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:var(--trust-soft);color:var(--trust-accent);font-size:.88rem;font-weight:900}
+    .trust-step p{margin:0;color:var(--trust-muted);font-size:.94rem;line-height:1.7}
+    .trust-services{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+    .trust-service{padding:19px;border:1px solid var(--trust-line);border-radius:15px;background:var(--trust-bg)}
+    .trust-service h3{display:flex;align-items:flex-start;gap:10px}
+    .trust-service-mark{display:grid;place-items:center;width:29px;height:29px;flex:0 0 29px;border-radius:9px;background:var(--trust-soft);color:var(--trust-accent);font-size:.8rem}
+    .trust-service p{margin:0;color:var(--trust-muted);font-size:.94rem}
+    .trust-callout{margin:19px 0 12px;padding:17px 18px;border:1px solid rgba(11,91,145,.2);border-left:4px solid #0b5b91;border-radius:0 13px 13px 0;background:var(--trust-soft)}
+    .trust-callout p{margin:0}
+    .trust-callout strong{color:var(--trust-ink)}
+    .trust-list{padding-left:1.25rem;margin:14px 0}
+    .trust-list li{margin:.65rem 0;padding-left:3px}
+    .trust-list li::marker{color:var(--trust-accent)}
+    .trust-security{border-color:rgba(34,197,94,.35)}
+    .trust-security .trust-callout{border-color:rgba(34,197,94,.28);border-left-color:#22c55e;background:rgba(34,197,94,.09)}
+    .trust-security .trust-section-kicker{color:#159447}
     .trust-small{font-size:.9rem}
-    @media(max-width:680px){.trust-grid{grid-template-columns:1fr}.trust-nav{align-items:flex-start;flex-direction:column}.trust-nav-links{gap:12px}.trust-wrap{padding-top:18px}}
+    .trust-bottom-cta{display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;background:linear-gradient(125deg,#0b1b2d,#123958);border-color:#123958;color:#fff}
+    .trust-bottom-cta h2,.trust-bottom-cta p{color:#fff}
+    .trust-bottom-cta p{max-width:620px;color:#d1dfeb}
+    .trust-bottom-cta .trust-button{background:#fff;border-color:#fff;color:#102338}
+    .trust-bottom-cta .trust-button.primary{background:#22c55e;border-color:#22c55e;color:#071b12}
+    .trust-bottom-cta .trust-actions{margin-top:0}
+    @media(max-width:820px){
+      .trust-nav-inner{align-items:flex-start;flex-direction:column;gap:8px;padding:10px 14px}
+      .trust-nav-links{width:100%;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+      .trust-nav-links::-webkit-scrollbar{display:none}
+      .trust-nav-links a{flex:0 0 auto}
+    }
+    @media(max-width:650px){
+      .trust-wrap{padding:18px 13px 36px}
+      .trust-hero{border-radius:18px}
+      .trust-principles,.trust-steps,.trust-services{grid-template-columns:1fr}
+      .trust-principles{gap:8px;margin-bottom:20px}
+      .trust-principle{padding:11px 12px}
+      .trust-card{margin-top:16px;border-radius:17px}
+      .trust-step{padding:15px;gap:11px}
+      .trust-number{width:37px;height:37px;flex-basis:37px}
+      .trust-actions{flex-direction:column;align-items:stretch}
+      .trust-button{width:100%}
+      .trust-bottom-cta .trust-actions{width:100%}
+    }
+    @media(prefers-reduced-motion:reduce){.trust-button{transition:none}.trust-button:hover{transform:none}}
   </style>
 </head>
 <body>
 <header class="trust-nav">
-  <a class="trust-brand" href="/">MANLUNG RECOVERY</a>
-  <nav class="trust-nav-links" aria-label="Main navigation">
-    <a href="/services.html">Services</a>
-    <a href="/faq.html">FAQ</a>
-    <a href="/contact.html">Contact</a>
-    <a href="/client/request.html">Submit a request</a>
-  </nav>
+  <div class="trust-nav-inner">
+    <a class="trust-brand" href="/" aria-label="Manlung Recovery home">
+      <img src="/icons/icon-512.png" alt="" width="42" height="42">
+      <span class="trust-brand-copy"><strong>MANLUNG RECOVERY</strong><small>CYBER RECOVERY · DIGITAL SUPPORT</small></span>
+    </a>
+    <nav class="trust-nav-links" aria-label="Main navigation">
+      <a href="/services.html">Services</a>
+      <a href="/trust.html" aria-current="page">How it works</a>
+      <a href="/faq.html">FAQ</a>
+      <a href="/contact.html">Contact</a>
+      <a class="trust-nav-cta" href="/client/request.html">Submit a request&nbsp; ↗</a>
+    </nav>
+  </div>
 </header>
 <main class="trust-wrap">
   <section class="trust-hero">
-    <span class="trust-eyebrow">How it works · Trust &amp; Safety</span>
-    <h1>Clear steps. Honest expectations. Your security first.</h1>
-    <p class="muted">Manlung Recovery provides digital recovery guidance, case review and investigation support. We explain the proposed work and its limits so you can make an informed decision before committing to paid work.</p>
-    <div class="trust-actions">
-      <a class="trust-button primary" href="/client/request.html">Submit a recovery request</a>
-      <a class="trust-button" href="/contact.html">Contact us first</a>
+    <div class="trust-hero-content">
+      <span class="trust-eyebrow">How it works · Trust &amp; Safety</span>
+      <h1>Clear answers. A defined process. Your security first.</h1>
+      <p class="trust-intro">When something goes wrong online, you deserve to understand your options. Manlung Recovery provides digital recovery guidance, case review and investigation support—with the proposed work, costs and limitations explained before paid work begins.</p>
+      <div class="trust-actions">
+        <a class="trust-button primary" href="/client/request.html">Submit a recovery request <span aria-hidden="true">↗</span></a>
+        <a class="trust-button" href="/contact.html">Contact us first</a>
+      </div>
     </div>
   </section>
 
+  <div class="trust-principles" aria-label="Our principles">
+    <div class="trust-principle"><span class="trust-principle-icon" aria-hidden="true">✓</span><span>Understand the process before you proceed</span></div>
+    <div class="trust-principle"><span class="trust-principle-icon" aria-hidden="true">KES</span><span>Agree on fees before paid work starts</span></div>
+    <div class="trust-principle"><span class="trust-principle-icon" aria-hidden="true">⌑</span><span>Keep passwords and security codes private</span></div>
+  </div>
+
   <section class="trust-card" aria-labelledby="process-heading">
+    <span class="trust-section-kicker">The process</span>
     <h2 id="process-heading">What happens after you submit a request?</h2>
-    <div class="trust-step"><span class="trust-number">01</span><div><h3>Sign in and submit your case</h3><p>Use the client portal to describe what happened and provide only information relevant to the issue. You need a client account to submit a recovery request.</p></div></div>
-    <div class="trust-step"><span class="trust-number">02</span><div><h3>We review the information</h3><p>The case is reviewed to understand the issue, whether it fits the services available, and what clarification or evidence may be needed. A request is not a guarantee that the case will be accepted or resolved.</p></div></div>
-    <div class="trust-step"><span class="trust-number">03</span><div><h3>Understand the scope and cost</h3><p>Before any separately charged work begins, ask for written confirmation of the work proposed, what it includes and excludes, the fee in Kenyan shillings (KES), any third-party charges, and the expected deliverables.</p></div></div>
-    <div class="trust-step"><span class="trust-number">04</span><div><h3>Follow updates through your case</h3><p>For an accepted case, use the case portal and case ID to review available updates and communications. We may recommend contacting your bank, mobile-money provider, online platform, device provider or relevant authorities when appropriate.</p></div></div>
+    <p class="trust-section-intro">Here is what to expect, from your first request to case updates.</p>
+    <div class="trust-steps">
+      <article class="trust-step"><span class="trust-number">01</span><div><h3>Submit your case</h3><p>Sign in to the client portal and describe what happened. Share only information relevant to the issue. A client account is required to submit a recovery request.</p></div></article>
+      <article class="trust-step"><span class="trust-number">02</span><div><h3>We review the information</h3><p>We assess the issue, whether it fits the services available, and what clarification or evidence may be needed. A request does not guarantee acceptance or a particular outcome.</p></div></article>
+      <article class="trust-step"><span class="trust-number">03</span><div><h3>Agree on the scope and cost</h3><p>Before separately charged work begins, request written confirmation of the proposed work, what is included and excluded, the fee in Kenyan shillings (KES), any third-party charges and expected deliverables.</p></div></article>
+      <article class="trust-step"><span class="trust-number">04</span><div><h3>Follow case updates</h3><p>For an accepted case, use the client portal and case ID to view available updates. Where appropriate, we may recommend contacting your bank, mobile-money provider, platform, device provider or relevant authorities.</p></div></article>
+    </div>
   </section>
 
   <section class="trust-card" aria-labelledby="fees-heading">
-    <h2 id="fees-heading">Services and fees</h2>
-    <div class="trust-grid">
-      <div><h3>Digital recovery guidance</h3><p>Help understanding relevant account, device, platform or provider recovery procedures and practical next steps.</p></div>
-      <div><h3>Case and evidence review</h3><p>Review of the information you provide to assess the issue, identify gaps and clarify possible next steps within the agreed scope.</p></div>
-      <div><h3>Digital investigation support</h3><p>Investigation or evidence-organisation work only where it is lawful, technically feasible and explicitly agreed. Findings are not proof that funds or assets have been recovered.</p></div>
-      <div><h3>Case tracking and support</h3><p>Case submission and tracking, plus the currently available Call Admin feature, are described in our Terms as free features unless the website says otherwise.</p></div>
+    <span class="trust-section-kicker">Services &amp; costs</span>
+    <h2 id="fees-heading">Know what a service includes</h2>
+    <p class="trust-section-intro">The right next step depends on your situation. The exact scope and any fee should be confirmed with you before paid work begins.</p>
+    <div class="trust-services">
+      <article class="trust-service"><h3><span class="trust-service-mark" aria-hidden="true">01</span>Digital recovery guidance</h3><p>Guidance on relevant account, device, platform or provider recovery procedures, plus practical next steps you can consider.</p></article>
+      <article class="trust-service"><h3><span class="trust-service-mark" aria-hidden="true">02</span>Case and evidence review</h3><p>Review of the information you provide to assess the issue, identify missing details and clarify possible next steps within the agreed scope.</p></article>
+      <article class="trust-service"><h3><span class="trust-service-mark" aria-hidden="true">03</span>Digital investigation support</h3><p>Investigation or evidence-organisation work only where lawful, technically feasible and explicitly agreed. Findings do not mean assets have been recovered.</p></article>
+      <article class="trust-service"><h3><span class="trust-service-mark" aria-hidden="true">04</span>Case tracking and support</h3><p>Case submission and tracking, plus the currently available Call Admin feature, are described in our Terms as free features unless the website states otherwise.</p></article>
     </div>
-    <div class="trust-callout"><strong>Before paying:</strong> get the exact scope, total fee, any additional charges, payment recipient and applicable terms in writing. If a price or deliverable is unclear, pause and ask us to clarify it. Do not pay based only on pressure or a promise of guaranteed recovery.</div>
-    <p class="muted trust-small">There is no universal price for every possible investigation. Any paid work must be quoted and agreed separately before it begins; do not assume that an enquiry or case submission means you have accepted a paid service.</p>
+    <div class="trust-callout"><p><strong>Before you pay:</strong> get the proposed work, total fee, any additional charges, payment recipient and applicable terms in writing. If anything is unclear, pause and ask. Never pay because someone pressures you or promises guaranteed recovery.</p></div>
+    <p class="muted trust-small">There is no single price for every possible investigation. Any paid work must be quoted and agreed separately before it begins. Submitting an enquiry or case does not, by itself, mean you have accepted a paid service.</p>
   </section>
 
   <section class="trust-card" aria-labelledby="limits-heading">
-    <h2 id="limits-heading">Recovery is not guaranteed</h2>
-    <p>We cannot guarantee the recovery of stolen money, cryptocurrency, digital assets, accounts or devices. Results may depend on evidence, time elapsed, account or platform policies, financial institutions, telecommunications providers, legal restrictions and other factors outside our control.</p>
-    <p>Tracing, reviewing evidence, sending a report or submitting a request to a provider does not mean that funds or assets have been recovered. We will not promise a result simply to persuade you to pay.</p>
+    <span class="trust-section-kicker">Realistic expectations</span>
+    <h2 id="limits-heading">Recovery is never guaranteed</h2>
+    <p>We cannot guarantee the recovery of stolen money, cryptocurrency, digital assets, accounts or devices. Outcomes may depend on the available evidence, time elapsed, provider policies, financial institutions, telecommunications providers, legal restrictions and factors outside our control.</p>
+    <p>Tracing information, reviewing evidence, preparing a report or submitting a request to a provider does not mean funds or assets have been recovered. We will not promise a result simply to persuade you to pay.</p>
   </section>
 
   <section class="trust-card" aria-labelledby="verify-heading">
-    <h2 id="verify-heading">Verify us and contact us safely</h2>
+    <span class="trust-section-kicker">Verify before paying</span>
+    <h2 id="verify-heading">Know who you are dealing with</h2>
+    <p class="trust-section-intro">Take time to check the details and understand the terms before making a payment.</p>
     <ul class="trust-list">
       <li><strong>Official website:</strong> <a href="https://manlungrecovery.manlungshop.co.ke/">manlungrecovery.manlungshop.co.ke</a></li>
-      <li><strong>Published business contact:</strong> <a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></li>
-      <li><strong>Business registration:</strong> We do not display a registration number on this page because the exact legal name and number must match the official record. Before paying, email us to request the legal business name and applicable registration details, then verify them independently through the relevant official Kenyan registry. Do not treat a website, social-media profile or screenshot alone as proof of registration.</li>
-      <li><strong>Payment verification:</strong> Confirm the payment recipient and agreed fee through the verified contact channel. Keep the written quotation and receipt.</li>
+      <li><strong>Business contact:</strong> <a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></li>
+      <li><strong>Business registration:</strong> We do not display a registration number here because the legal name and number must match the official record. Email us to request the applicable details, then verify them independently through the relevant official Kenyan registry. A website or social-media profile alone is not proof of registration.</li>
+      <li><strong>Payment checks:</strong> Confirm the recipient and agreed fee through a verified business contact channel. Keep your written quotation and payment receipt.</li>
     </ul>
-    <p class="muted trust-small">Business registration, where applicable and verified, does not itself guarantee a particular outcome or service quality.</p>
+    <p class="muted trust-small">Business registration, where applicable and verified, does not itself guarantee service quality or a particular outcome.</p>
   </section>
 
-  <section class="trust-card" aria-labelledby="security-heading">
-    <h2 id="security-heading">We do not need your secrets</h2>
-    <div class="trust-callout"><strong>Never share your password, M-Pesa PIN, banking PIN, one-time password (OTP), cryptocurrency seed phrase or private key.</strong> Do not give anyone remote access to your device or account just because they claim they can recover it.</div>
-    <p>Use the official portal for case-specific information and evidence. Share only information relevant to the case. If an account or payment method may be compromised, contact the provider through its official app, website or published support channel as soon as possible.</p>
+  <section class="trust-card trust-security" aria-labelledby="security-heading">
+    <span class="trust-section-kicker">Protect your information</span>
+    <h2 id="security-heading">We do not need your passwords or secret codes</h2>
+    <div class="trust-callout"><p><strong>Never share your password, M-Pesa PIN, banking PIN, one-time password (OTP), cryptocurrency seed phrase or private key.</strong> Do not give someone remote access to your device or account just because they claim they can recover it.</p></div>
+    <p>Use the official portal for case-specific information. Share only evidence relevant to your case, and remove unnecessary personal or financial details where possible. If an account or payment method may be compromised, contact the provider through its official app, website or published support channel promptly.</p>
   </section>
 
-  <section class="trust-card">
-    <h2>Questions before you proceed?</h2>
-    <p>Ask us to clarify the process, scope, fees or limits before you decide. You do not need to share a password, PIN, OTP or seed phrase to ask a question.</p>
+  <section class="trust-card trust-bottom-cta" aria-labelledby="questions-heading">
+    <div>
+      <span class="trust-section-kicker">Need clarification?</span>
+      <h2 id="questions-heading">Ask before you decide.</h2>
+      <p>We can clarify the process, proposed scope, fees and limitations. You never need to provide a password, PIN, OTP or seed phrase just to ask a question.</p>
+    </div>
     <div class="trust-actions">
-      <a class="trust-button primary" href="mailto:manlungrecovery@outlook.com?subject=Manlung%20Recovery%20service%20and%20verification%20question">Email Manlung Recovery</a>
-      <a class="trust-button" href="/terms.html">Read Terms &amp; Conditions</a>
-      <a class="trust-button" href="/privacy.html">Read Privacy Notice</a>
+      <a class="trust-button primary" href="mailto:manlungrecovery@outlook.com?subject=Manlung%20Recovery%20service%20and%20verification%20question">Email Manlung Recovery ↗</a>
+      <a class="trust-button" href="/terms.html">Terms &amp; Conditions</a>
+      <a class="trust-button" href="/privacy.html">Privacy Notice</a>
     </div>
   </section>
 </main>
