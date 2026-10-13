@@ -16,6 +16,7 @@ const configRoutes = require('./routes/config');
 const notificationRoutes = require('./routes/notifications');
 const adminDocumentRoutes = require('./routes/admin-documents');
 const messageRoutes = require('./routes/messages');
+const communityRoutes = require('./routes/community');
 const analyticsRoutes = require('./routes/analytics');
 const subscriptionRoutes = require('./routes/subscription');
 const callRoutes = require('./routes/calls');
@@ -479,6 +480,7 @@ app.use('/api/config', configRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin/documents', adminDocumentRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/community', communityRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 
