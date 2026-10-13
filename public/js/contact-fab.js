@@ -22,7 +22,7 @@
   async function boot() {
     // Load the original WebRTC stack first; do not replace it.
     await load('/js/call-webrtc.js?v=webrtc-20260920', 'manlungCallWebRTC');
-    await load('/js/call-widget.js?v=webrtc-20260920', 'manlungCallWidget');
+    await load('/js/call-widget.js?v=manlung-app-20261013', 'manlungCallWidget');
 
     // Restore the contact menu around the Call Admin control.
     await load('/js/support-fab.js?v=webrtc-20260920', 'manlung-support-fab');
