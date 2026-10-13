@@ -398,3 +398,26 @@ body.dark .brand-copy h1,body.dark .home-nav a{color:#f8fafc!important}.dark .br
   .home-hero-content{grid-template-columns:minmax(0,1fr)!important;gap:0!important;}
   .home-hero-content>.hero-copy{grid-column:1 / -1!important;}
 }
+
+
+/* 2026-10-13: Subtle scroll-reveal transitions for homepage sections and cards. */
+html.ml-reveal-ready .ml-scroll-reveal{
+  opacity:0;
+  transform:translate3d(0,26px,0);
+  transition:opacity .72s cubic-bezier(.22,.61,.36,1),transform .72s cubic-bezier(.22,.61,.36,1);
+  transition-delay:var(--ml-reveal-delay,0ms);
+  will-change:opacity,transform;
+}
+html.ml-reveal-ready .ml-scroll-reveal.is-visible{
+  opacity:1;
+  transform:translate3d(0,0,0);
+  will-change:auto;
+}
+.ml-scroll-reveal.ml-reveal-soft{transform:translate3d(0,14px,0)}
+.ml-scroll-reveal.ml-reveal-soft.is-visible{transform:translate3d(0,0,0)}
+@media(prefers-reduced-motion:reduce){
+  html.ml-reveal-ready .ml-scroll-reveal,
+  html.ml-reveal-ready .ml-scroll-reveal.is-visible{
+    opacity:1!important;transform:none!important;transition:none!important;will-change:auto!important;
+  }
+}
