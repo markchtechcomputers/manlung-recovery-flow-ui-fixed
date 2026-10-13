@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07152b">
+<title>Connect · Manlung Recovery</title>
+<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/theme.css">
+<link rel="stylesheet" href="/css/unified-ui.css">
+<style>
+:root{--cn-bg:#061326;--cn-panel:#0a1b33;--cn-panel2:#0d2342;--cn-line:rgba(128,171,225,.16);--cn-text:#eef5ff;--cn-muted:#91a8c7;--cn-blue:#1769f6;--cn-green:#18c989}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 40% -20%,#123668 0,transparent 55%),var(--cn-bg);color:var(--cn-text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+.cn-shell{max-width:1500px;margin:auto;padding:22px;display:grid;grid-template-columns:218px minmax(300px,390px) minmax(0,1fr);gap:14px;min-height:100vh}
+.cn-side,.cn-people,.cn-chat{border:1px solid var(--cn-line);background:rgba(7,22,43,.9);border-radius:20px;min-width:0;overflow:hidden}
+.cn-side{padding:20px 13px;display:flex;flex-direction:column}.cn-brand{display:flex;align-items:center;gap:10px;padding:0 8px 24px;font-weight:900;letter-spacing:.04em}.cn-brand-mark{display:grid;place-items:center;width:39px;height:39px;border-radius:12px;background:linear-gradient(145deg,#159cff,#1756ef);font-size:20px}.cn-brand small{display:block;color:#92aac9;font-size:10px;letter-spacing:.15em;margin-top:2px}
+.cn-nav{display:grid;gap:5px}.cn-nav a{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;color:#b9c9e1;text-decoration:none;font-size:13px;font-weight:650}.cn-nav a.active{background:linear-gradient(100deg,#1268f7,#174ac4);color:#fff;box-shadow:0 8px 22px #0752dd35}.cn-nav a:hover:not(.active){background:#102642;color:#fff}.cn-count{margin-left:auto;background:#e62f57;border-radius:20px;padding:2px 7px;font-size:10px}.cn-safety{margin-top:auto;border:1px solid #174477;background:#0a203c;border-radius:15px;padding:13px;color:#9eb5d2;font-size:11px;line-height:1.55}.cn-safety strong{display:block;color:#dceaff;margin-bottom:5px}.cn-profile{display:flex;gap:10px;align-items:center;padding:17px 6px 0;font-size:12px}.cn-avatar{width:39px;height:39px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;background:linear-gradient(135deg,#2563eb,#0d9488);font-weight:800;color:white;position:relative}.cn-avatar.online:after{content:"";position:absolute;right:0;bottom:0;width:10px;height:10px;border:2px solid #07152b;border-radius:50%;background:#18c989}.cn-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}.cn-profile small{display:block;color:var(--cn-muted);margin-top:3px}
+.cn-people{display:flex;flex-direction:column}.cn-people-head{padding:20px 18px 14px}.cn-eyebrow{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#6ca8ff;font-weight:850}.cn-people h1{font-size:24px;letter-spacing:-.04em;margin:5px 0}.cn-sub{color:var(--cn-muted);font-size:12px;line-height:1.5;margin:0}.cn-search{display:flex;align-items:center;gap:10px;border:1px solid #1b3c66;background:#0b2140;border-radius:12px;padding:0 12px;margin-top:17px}.cn-search i{color:#7f9cc1}.cn-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#fff;padding:13px 0;font:inherit;font-size:12px}.cn-search input::placeholder{color:#7791b5}
+.cn-tabs{display:flex;gap:7px;padding:0 16px 13px;overflow:auto}.cn-tab{border:1px solid #1b3557;background:#091a31;color:#b8c8df;border-radius:10px;padding:9px 12px;font-size:11px;font-weight:750;white-space:nowrap;cursor:pointer}.cn-tab.active{background:#125ff0;border-color:#125ff0;color:#fff}.cn-tab span{margin-left:5px;opacity:.8}
+.cn-list-title{padding:9px 18px 7px;color:#86a7d3;font-size:11px;font-weight:850;display:flex;align-items:center;justify-content:space-between}.cn-people-list{padding:0 8px 10px;overflow:auto}.cn-person{display:flex;align-items:center;gap:10px;width:100%;padding:11px 10px;border:1px solid transparent;border-radius:13px;background:transparent;color:inherit;text-align:left;cursor:pointer}.cn-person:hover{background:#0c2342}.cn-person.selected{background:linear-gradient(100deg,#0c3470,#0b2548);border-color:#205ab1}.cn-person-copy{min-width:0;flex:1}.cn-person-copy strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cn-person-copy small{display:block;color:var(--cn-muted);font-size:10px;margin-top:4px}.cn-status{display:inline-flex;align-items:center;gap:5px}.cn-dot{width:6px;height:6px;border-radius:50%;background:var(--cn-green);display:inline-block}.cn-person-action{border:1px solid #29496f;background:#102747;color:#c7ddff;border-radius:8px;padding:7px 9px;font-size:10px;cursor:pointer;white-space:nowrap}.cn-person-action:hover{background:#1756b8;color:#fff}.cn-divider{height:1px;background:var(--cn-line);margin:4px 8px}
+.cn-chat{display:flex;flex-direction:column;min-height:calc(100vh - 44px)}.cn-chat-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--cn-line);min-height:78px}.cn-chat-user{min-width:0;flex:1}.cn-chat-user strong{font-size:14px;display:block}.cn-chat-user small{display:block;color:#6adba8;font-size:11px;margin-top:5px}.cn-chat-actions{display:flex;gap:8px}.cn-icon-btn{width:38px;height:38px;display:grid;place-items:center;border:1px solid #203c61;border-radius:50%;background:#102849;color:#d8e8ff;cursor:pointer}.cn-icon-btn:hover{background:#1659bf;color:white}.cn-more{position:relative}.cn-menu{position:absolute;right:0;top:44px;z-index:5;width:190px;padding:6px;border:1px solid #284567;border-radius:12px;background:#0a1c34;box-shadow:0 15px 35px #0007}.cn-menu[hidden]{display:none}.cn-menu button{width:100%;text-align:left;padding:10px;border:0;border-radius:8px;background:transparent;color:#dceaff;font-size:12px;cursor:pointer}.cn-menu button:hover{background:#132d4d}.cn-menu button.danger{color:#ff929f}
+.cn-chat-body{flex:1;overflow:auto;padding:24px clamp(14px,3vw,40px);display:flex;flex-direction:column;gap:14px}.cn-day{align-self:center;border:1px solid #1a3556;background:#0b1f39;color:#91a8c7;border-radius:20px;padding:6px 11px;font-size:10px}.cn-empty-chat{margin:auto;text-align:center;max-width:350px;padding:30px 20px}.cn-empty-icon{width:70px;height:70px;margin:0 auto 16px;border-radius:22px;display:grid;place-items:center;background:#0d2c52;color:#6bb1ff;font-size:27px}.cn-empty-chat h2{margin:0 0 8px;font-size:19px}.cn-empty-chat p{color:var(--cn-muted);font-size:12px;line-height:1.7}.cn-message{max-width:min(76%,540px);padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.55;overflow-wrap:anywhere}.cn-message.in{align-self:flex-start;background:#10294b;border:1px solid #1a3a60;border-top-left-radius:5px}.cn-message.out{align-self:flex-end;background:linear-gradient(135deg,#126af7,#1454cf);border:1px solid #347df4;border-top-right-radius:5px}.cn-message time{display:block;text-align:right;font-size:9px;color:#c0d8ff;margin-top:6px}.cn-file{display:flex;align-items:center;gap:11px;border:1px solid #2b5079;border-radius:12px;padding:11px;margin-top:5px}.cn-file-icon{width:35px;height:40px;border-radius:8px;display:grid;place-items:center;background:#ef4444;color:white}.cn-file small{display:block;color:#b7cbe6;margin-top:3px}.cn-compose-wrap{padding:14px 18px 18px;border-top:1px solid var(--cn-line)}.cn-attach-note{font-size:10px;color:#8fa7c7;margin:0 0 8px}.cn-compose{display:flex;align-items:center;gap:9px;padding:8px 9px 8px 13px;border:1px solid #24466f;border-radius:15px;background:#091b32}.cn-compose input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#fff;font:inherit;font-size:12px;padding:9px 0}.cn-compose input::placeholder{color:#7891b5}.cn-send{width:39px;height:39px;border:0;border-radius:12px;background:#1266f5;color:#fff;cursor:pointer}.cn-send:hover{background:#2e7cff}.cn-attach{position:relative}.cn-attach input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}.cn-attach label{width:34px;height:34px;display:grid;place-items:center;color:#9db7da;cursor:pointer;border-radius:9px}.cn-attach label:hover{background:#142e4d;color:white}.cn-bottom-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;padding-top:12px}.cn-bottom-actions button{display:flex;align-items:center;gap:7px;border:1px solid #203c61;border-radius:10px;background:#0b1d35;color:#b7cbe6;padding:9px 12px;font-size:10px;cursor:pointer}.cn-bottom-actions button:hover{border-color:#3475cf;color:#fff}.cn-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99;background:#10294b;border:1px solid #37618d;border-radius:12px;padding:12px 16px;color:white;font-size:12px;box-shadow:0 12px 35px #0006;max-width:90vw}.cn-toast[hidden]{display:none}
+@media(max-width:1050px){.cn-shell{grid-template-columns:68px minmax(270px,340px) minmax(0,1fr);padding:12px;gap:9px}.cn-side{padding:15px 8px}.cn-brand{justify-content:center;padding:0 0 22px}.cn-brand-copy,.cn-nav-label,.cn-safety,.cn-profile-copy{display:none}.cn-nav a{justify-content:center;padding:13px 6px}.cn-count{position:absolute;transform:translate(13px,-12px);margin:0}.cn-nav a{position:relative}.cn-profile{justify-content:center}.cn-people h1{font-size:22px}}
+@media(max-width:700px){.cn-shell{display:flex;flex-direction:column;min-height:100dvh;padding:8px;gap:8px}.cn-side{order:3;padding:7px;border-radius:15px;position:sticky;bottom:5px;z-index:10;background:#07172cf2;backdrop-filter:blur(16px)}.cn-brand,.cn-safety,.cn-profile{display:none}.cn-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px}.cn-nav a{display:flex;flex-direction:column;gap:5px;padding:9px 2px;font-size:9px;border-radius:9px}.cn-nav a i{font-size:17px}.cn-nav-label{display:block;font-size:9px}.cn-count{transform:translate(12px,-9px);font-size:8px;padding:1px 5px}.cn-people{order:1;max-height:42dvh;border-radius:16px}.cn-people-head{padding:14px 14px 10px}.cn-people h1{font-size:21px}.cn-search{margin-top:11px}.cn-tabs{padding:0 12px 9px}.cn-list-title{padding:7px 14px}.cn-people-list{display:flex;gap:7px;padding:0 10px 10px;overflow-x:auto;overflow-y:hidden}.cn-person{min-width:190px;width:190px;padding:9px;border-color:#1b3557;background:#091b32}.cn-person-action{padding:6px}.cn-divider{display:none}.cn-chat{order:2;min-height:48dvh;flex:1;border-radius:16px}.cn-chat-head{padding:12px;min-height:65px}.cn-chat-body{padding:15px 12px;min-height:180px}.cn-message{max-width:90%;font-size:12px}.cn-compose-wrap{padding:10px}.cn-bottom-actions button{padding:8px 9px}.cn-chat-actions .desktop-only{display:none}}
+@media(max-width:380px){.cn-nav-label{font-size:8px}.cn-person{min-width:174px;width:174px}.cn-bottom-actions{gap:5px}.cn-bottom-actions button{font-size:9px;padding:8px}.cn-chat-user strong{font-size:12px}}
+</style>
+<script src="/js/client-session-guard.js"></script>
+</head>
+<body>
+<div class="cn-shell">
+<aside class="cn-side">
+  <div class="cn-brand"><div class="cn-brand-mark"><i class="fas fa-comments"></i></div><div class="cn-brand-copy">MANLUNG<small>RECOVERY</small></div></div>
+  <nav class="cn-nav" aria-label="Client navigation">
+    <a href="/client/dashboard.html"><i class="fas fa-house"></i><span class="cn-nav-label">Dashboard</span></a>
+    <a href="/client/request.html"><i class="fas fa-folder-open"></i><span class="cn-nav-label">My Cases</span></a>
+    <a class="active" href="/client/connect.html" aria-current="page"><i class="fas fa-user-group"></i><span class="cn-nav-label">Connect</span></a>
+    <a href="/client/connect.html#messages"><i class="fas fa-envelope"></i><span class="cn-nav-label">Messages</span></a>
+    <a href="/client/settings.html"><i class="fas fa-gear"></i><span class="cn-nav-label">Settings</span></a>
+  </nav>
+  <div class="cn-safety"><strong><i class="fas fa-shield-halved"></i> Stay safe</strong>Never share passwords, PINs, or sensitive recovery information with people you do not trust.</div>
+  <div class="cn-profile"><div class="cn-avatar" id="selfAvatar">M</div><div class="cn-profile-copy"><strong id="selfName">Your account</strong><small>Manlung client</small></div></div>
+</aside>
+<section class="cn-people" aria-label="People and connections">
+  <header class="cn-people-head"><div class="cn-eyebrow"><i class="fas fa-sparkles"></i> Manlung community</div><h1>Connect</h1><p class="cn-sub">Find people, build connections, and share ideas.</p>
+    <label class="cn-search"><i class="fas fa-search"></i><input id="peopleSearch" type="search" placeholder="Search by display name…" autocomplete="off" aria-label="Search clients by display name"><i class="fas fa-sliders-h"></i></label>
+  </header>
+  <div class="cn-tabs" role="tablist" aria-label="People filters">
+    <button class="cn-tab active" data-filter="all" role="tab" aria-selected="true">Discover</button>
+    <button class="cn-tab" data-filter="online" role="tab" aria-selected="false"><i class="fas fa-circle" style="font-size:8px;color:#18c989"></i> Online</button>
+    <button class="cn-tab" data-filter="requests" role="tab" aria-selected="false">Requests <span id="requestCount">0</span></button>
+    <button class="cn-tab" data-filter="contacts" role="tab" aria-selected="false">Connections</button>
+  </div>
+  <div class="cn-list-title"><span id="peopleListTitle">People you may know</span><span id="peopleCount">—</span></div>
+  <div class="cn-people-list" id="peopleList"><div class="cn-empty-chat" style="padding:30px 15px"><div class="cn-empty-icon"><i class="fas fa-users"></i></div><h2>Discover your community</h2><p>Member search and online presence will appear here when the secure community service is connected.</p></div></div>
+</section>
+<main class="cn-chat" id="messages">
+  <header class="cn-chat-head">
+    <button class="cn-icon-btn" id="backToPeople" aria-label="People list" style="display:none"><i class="fas fa-arrow-left"></i></button>
+    <div class="cn-avatar" id="chatAvatar"><i class="fas fa-user"></i></div>
+    <div class="cn-chat-user"><strong id="chatTitle">Your conversations</strong><small id="chatStatus">Choose a connection to start</small></div>
+    <div class="cn-chat-actions">
+      <button class="cn-icon-btn" id="voiceCall" aria-label="Voice call" title="Voice call"><i class="fas fa-phone"></i></button>
+      <button class="cn-icon-btn desktop-only" id="videoCall" aria-label="Video call" title="Video call"><i class="fas fa-video"></i></button>
+      <div class="cn-more"><button class="cn-icon-btn" id="moreMenuBtn" aria-label="Conversation options" title="Conversation options"><i class="fas fa-ellipsis-vertical"></i></button>
+      <div class="cn-menu" id="moreMenu" hidden><button id="viewProfile"><i class="fas fa-user"></i> View profile</button><button id="blockMember" class="danger"><i class="fas fa-ban"></i> Block member</button><button id="reportMember" class="danger"><i class="fas fa-flag"></i> Report member</button></div></div>
+    </div>
+  </header>
+  <div class="cn-chat-body" id="chatBody"><div class="cn-empty-chat"><div class="cn-empty-icon"><i class="fas fa-lock"></i></div><h2>Private conversations</h2><p>Your messages will live here. Connect with another client first, then open a private conversation. You stay in control of who can contact you.</p></div></div>
+  <div class="cn-compose-wrap"><p class="cn-attach-note"><i class="fas fa-shield-halved"></i> Share thoughtfully. Only send files you have permission to share.</p>
+    <form class="cn-compose" id="composeForm"><div class="cn-attach"><input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><label for="imageInput" title="Choose image" aria-label="Choose image"><i class="far fa-image"></i></label></div><div class="cn-attach"><input id="fileInput" type="file" accept=".pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx"><label for="fileInput" title="Attach a document" aria-label="Attach a document"><i class="fas fa-paperclip"></i></label></div><input id="messageInput" type="text" maxlength="5000" placeholder="Write a message…" aria-label="Message" autocomplete="off"><button class="cn-send" type="submit" aria-label="Send message"><i class="fas fa-paper-plane"></i></button></form>
+    <div class="cn-bottom-actions"><button id="bottomVoice"><i class="fas fa-phone"></i> Voice call</button><button id="bottomVideo"><i class="fas fa-video"></i> Video call</button><button id="bottomBlock"><i class="fas fa-ban"></i> Block</button><button id="bottomReport"><i class="fas fa-flag"></i> Report</button></div>
+  </div>
+</main>
+</div>
+<div class="cn-toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const toast=(msg)=>{const el=$('toast');el.textContent=msg;el.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.hidden=true,4200)};
+let currentMember=null, activeFilter='all';
+try{const u=JSON.parse(localStorage.getItem('clientUser')||'{}');const name=u.display_name||u.displayName||u.full_name||u.name||u.email?.split('@')[0]||'Your account';$('selfName').textContent=name;$('selfAvatar').textContent=name.slice(0,1).toUpperCase();if(u.profilePicture){$('selfAvatar').innerHTML='<img alt="" src="'+String(u.profilePicture).replace(/"/g,'&quot;')+'">'}}catch(_){}
+function selectMember(member){currentMember=member;$('chatTitle').textContent=member.name;$('chatStatus').textContent=member.online?'Online now':'Connection';$('chatAvatar').textContent=member.name.slice(0,1).toUpperCase();$('chatAvatar').classList.toggle('online',!!member.online);$('chatBody').innerHTML='<div class="cn-empty-chat"><div class="cn-empty-icon"><i class="fas fa-lock"></i></div><h2>Start a private chat</h2><p>Connect the secure messaging service to exchange private messages and files with '+escapeHtml(member.name)+'.</p></div>';$('backToPeople').style.display='grid';}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+document.querySelectorAll('.cn-tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.cn-tab').forEach(t=>{t.classList.toggle('active',t===b);t.setAttribute('aria-selected',String(t===b))});activeFilter=b.dataset.filter;$('peopleListTitle').textContent=({all:'People you may know',online:'Online now',requests:'Connection requests',contacts:'Your connections'})[activeFilter];renderPeople()}));
+function renderPeople(){const q=$('peopleSearch').value.trim();$('peopleCount').textContent='—';$('peopleList').innerHTML='<div class="cn-empty-chat" style="padding:30px 15px"><div class="cn-empty-icon"><i class="fas fa-user-group"></i></div><h2>'+ (q?'No matching members yet':'Community service not connected') +'</h2><p>'+(q?'Members will appear here when secure name search is enabled.':'This screen is ready for live member search, presence, connection requests and conversations. The secure API needs to be connected before real client profiles are shown.')+'</p></div>'}
+$('peopleSearch').addEventListener('input',renderPeople);
+$('moreMenuBtn').addEventListener('click',()=>{$('moreMenu').hidden=!$('moreMenu').hidden});
+document.addEventListener('click',e=>{if(!e.target.closest('.cn-more'))$('moreMenu').hidden=true});
+$('composeForm').addEventListener('submit',e=>{e.preventDefault();if(!$('messageInput').value.trim()){toast('Write a message first.');return}toast('Messaging is not connected yet. No message was sent.');});
+$('imageInput').addEventListener('change',()=>{if($('imageInput').files[0])toast('Image selected. Secure chat upload is not connected yet; nothing was uploaded.');});
+$('fileInput').addEventListener('change',()=>{if($('fileInput').files[0])toast('File selected. Secure chat upload is not connected yet; nothing was uploaded.');});
+function safeAction(action){if(!currentMember){toast('Choose a member first.');return}toast(action+' will be available when the secure community service is connected.');}
+['voiceCall','bottomVoice'].forEach(id=>$(id).addEventListener('click',()=>safeAction('Voice calling')));
+['videoCall','bottomVideo'].forEach(id=>$(id).addEventListener('click',()=>safeAction('Video calling')));
+['blockMember','bottomBlock'].forEach(id=>$(id).addEventListener('click',()=>safeAction('Blocking')));
+['reportMember','bottomReport'].forEach(id=>$(id).addEventListener('click',()=>safeAction('Reporting')));
+$('viewProfile').addEventListener('click',()=>safeAction('Member profiles'));
+$('backToPeople').addEventListener('click',()=>{$('chatBody').scrollTop=0;});
+renderPeople();
+})();
+</script>
+</body>
+</html>
