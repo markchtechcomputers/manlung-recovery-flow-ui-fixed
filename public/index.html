@@ -109,10 +109,19 @@
             z-index: 2;
         }
         @media (max-width: 600px) {
+            .hero {
+                background: linear-gradient(145deg, #08254a 0%, #0b4774 52%, #087f73 100%) !important;
+                min-height: 520px;
+            }
             .hero-video {
-        object-position: 50% 50%;
-        opacity: 0.65;
-    }
+                object-position: center center;
+                opacity: 0.32;
+                filter: saturate(1.05) contrast(0.96) brightness(1.12);
+            }
+            .hero-overlay {
+                background: linear-gradient(135deg, rgba(5,20,45,.18), rgba(5,20,45,.34));
+            }
+            .hero-content { min-height: inherit; }
         }
         @media (prefers-reduced-motion: reduce) {
             .hero-video { display: none; }
@@ -2191,13 +2200,15 @@ body.manlung-page-leaving{opacity:.96;transition:opacity .18s ease}
     <div class="manlung-footer-divider"></div>
     <div class="manlung-footer-contact-row">
       <div class="manlung-footer-contact">
-        <a href="mailto:manlungrecovery@outlook.com"><i class="fas fa-envelope" aria-hidden="true"></i><span>manlungrecovery@outlook.com</span></a>
-        
+        <a href="mailto:manlungrecovery@outlook.com" aria-label="Email Manlung Recovery"><i class="fas fa-envelope" aria-hidden="true"></i><span>manlungrecovery@outlook.com</span></a>
       </div>
-      <div class="manlung-footer-social" aria-label="Manlung Recovery social links">
-        <a class="footer-social-youtube" href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i><span>YouTube</span></a>
-        <a class="footer-social-linkedin" href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i><span>LinkedIn</span></a>
-        <a class="footer-social-github" href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub</span></a>
+      <div class="manlung-footer-social-wrap">
+        <h3 class="manlung-footer-social-title">Follow Us</h3>
+        <nav class="manlung-footer-social" aria-label="Manlung Recovery social links">
+          <a class="footer-social-youtube" href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i><span>YouTube</span></a>
+          <a class="footer-social-linkedin" href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i><span>LinkedIn</span></a>
+          <a class="footer-social-github" href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub</span></a>
+        </nav>
       </div>
     </div>
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
@@ -2290,3 +2301,29 @@ body.manlung-page-leaving{opacity:.96;transition:opacity .18s ease}
 <script src="/js/onboarding.js" defer></script>
 </body>
 </html>
+
+<style id="manlung-footer-follow-final">
+.manlung-footer{background:linear-gradient(145deg,#07111f 0%,#0b1728 58%,#101d30 100%)!important;border-top:3px solid #22c55e!important}
+.manlung-footer-social-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:.45rem;min-width:0}
+.manlung-footer-social-title{margin:0!important;color:#22c55e!important;font-size:.95rem!important;line-height:1.2;font-weight:850}
+.manlung-footer .manlung-footer-social{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:18px!important;flex-wrap:nowrap!important;width:auto!important}
+.manlung-footer .manlung-footer-social a{width:32px!important;min-width:32px!important;height:34px!important;min-height:34px!important;flex:0 0 32px!important;padding:0!important;border:0!important;border-radius:4px!important;background:transparent!important;box-shadow:none!important;color:#8fa6bd!important;font-size:0!important}
+.manlung-footer .manlung-footer-social a i{display:inline-block!important;color:currentColor!important;font-size:28px!important}
+.manlung-footer .manlung-footer-social a span{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important}
+.manlung-footer .manlung-footer-social a:hover{color:#c0d1e1!important;transform:translateY(-2px)!important;background:transparent!important}
+.manlung-footer .manlung-footer-contact a{max-width:100%;min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.manlung-footer a:focus-visible{outline:2px solid #86efac!important;outline-offset:5px!important}
+@media(max-width:900px){.manlung-footer-social-wrap{align-items:flex-start}.manlung-footer .manlung-footer-social{justify-content:flex-start!important}}
+@media(max-width:600px){
+.manlung-footer-inner{padding-top:1.65rem!important;padding-bottom:1rem!important}
+.manlung-footer-brand h2{font-size:1.06rem!important}.manlung-footer-brand-subtitle{font-size:.78rem!important}
+.manlung-footer-description,.manlung-footer-trust-text{font-size:.84rem!important;line-height:1.7!important}
+.manlung-footer-column h3{font-size:.86rem!important}.manlung-footer-links a{font-size:.82rem!important;line-height:1.5!important;min-height:40px}
+.manlung-footer-contact a{font-size:.82rem!important;line-height:1.45;min-height:46px!important;padding:.72rem .8rem!important}
+.manlung-footer-social-wrap{align-items:flex-start;gap:.55rem}.manlung-footer-social-title{font-size:1rem!important}
+.manlung-footer .manlung-footer-social{gap:20px!important}
+.manlung-footer .manlung-footer-social a{width:32px!important;min-width:32px!important;height:36px!important;min-height:36px!important;flex:0 0 32px!important}
+.manlung-footer .manlung-footer-social a i{font-size:28px!important}
+.manlung-footer-bottom{font-size:.76rem!important;line-height:1.55}.manlung-footer-legal a{font-size:.78rem!important}
+}
+</style>
