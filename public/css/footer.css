@@ -259,3 +259,35 @@ html body main :where(section + section, .section + .section, .panel + .panel, .
 @media(prefers-reduced-motion:reduce){
   .manlung-footer-links a,.manlung-footer-contact a,.manlung-footer-social a{transition:none!important}
 }
+
+
+/* Compact Follow Us row: flat, muted blue-grey icons with clear focus/hover states. */
+.manlung-footer-social-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:.45rem;min-width:0}
+.manlung-footer-social-title{margin:0;color:#22c55e;font-size:.95rem;line-height:1.2;font-weight:850;letter-spacing:.01em}
+.manlung-footer .manlung-footer-social{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:18px!important;flex-wrap:nowrap!important;width:auto!important}
+.manlung-footer .manlung-footer-social a{display:inline-flex!important;align-items:center!important;justify-content:center!important;position:relative;width:32px!important;min-width:32px!important;height:34px!important;min-height:34px!important;flex:0 0 32px!important;padding:0!important;margin:0!important;border:0!important;border-radius:4px!important;background:transparent!important;box-shadow:none!important;color:#8fa6bd!important;text-decoration:none!important;font-size:0!important;line-height:1!important;transition:color .18s ease,transform .18s ease!important}
+.manlung-footer .manlung-footer-social a i{display:inline-block!important;color:currentColor!important;font-size:28px!important;line-height:1!important}
+.manlung-footer .manlung-footer-social a span{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.manlung-footer .manlung-footer-social a:hover{color:#c0d1e1!important;background:transparent!important;border:0!important;box-shadow:none!important;transform:translateY(-2px)!important}
+.manlung-footer .manlung-footer-social a:focus-visible{outline:2px solid #86efac!important;outline-offset:5px!important}
+.manlung-footer .manlung-footer-contact a{min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+.manlung-footer .manlung-footer-contact a i{font-size:1rem;color:#8fa6bd}
+@media(max-width:900px){.manlung-footer-social-wrap{align-items:flex-start}.manlung-footer .manlung-footer-social{justify-content:flex-start!important}}
+@media(max-width:600px){
+ .manlung-footer-inner{padding-top:1.65rem;padding-bottom:1rem}
+ .manlung-footer-brand h2{font-size:1.06rem}
+ .manlung-footer-brand-subtitle{font-size:.78rem}
+ .manlung-footer-description{font-size:.84rem;line-height:1.7}
+ .manlung-footer-column h3{font-size:.86rem}
+ .manlung-footer-links a{font-size:.82rem;line-height:1.5;min-height:40px}
+ .manlung-footer-trust-text{font-size:.82rem;line-height:1.7}
+ .manlung-footer-contact a{font-size:.82rem!important;line-height:1.45;min-height:46px!important;padding:.72rem .8rem!important}
+ .manlung-footer-social-wrap{align-items:flex-start;gap:.55rem}
+ .manlung-footer-social-title{font-size:1rem}
+ .manlung-footer .manlung-footer-social{gap:20px!important}
+ .manlung-footer .manlung-footer-social a{width:32px!important;min-width:32px!important;height:36px!important;min-height:36px!important;flex:0 0 32px!important;padding:0!important}
+ .manlung-footer .manlung-footer-social a i{font-size:28px!important}
+ .manlung-footer-bottom{font-size:.76rem;line-height:1.55}
+ .manlung-footer-legal a{font-size:.78rem}
+}
+@media(max-width:380px){.manlung-footer .manlung-footer-social{gap:16px!important}.manlung-footer .manlung-footer-social a i{font-size:27px!important}}
