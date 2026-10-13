@@ -43,6 +43,15 @@
   border:1px solid rgba(220,38,38,.18);
   background:rgba(220,38,38,.025);
 }
+.client-photo-editor{display:flex;align-items:center;gap:1rem;margin:1rem 0 1.25rem;padding:1rem;border:1px solid var(--border,#dbe3ee);border-radius:14px;background:rgba(148,163,184,.06)}
+.client-photo-preview{width:76px;height:76px;flex:0 0 76px;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:linear-gradient(135deg,#2563eb,#0f766e);color:#fff;font-size:1.25rem;font-weight:800;border:3px solid rgba(37,99,235,.12)}
+.client-photo-preview img{width:100%;height:100%;object-fit:cover}
+.client-photo-controls{min-width:0;display:grid;gap:.45rem}
+.client-photo-controls label{font-size:.82rem;font-weight:800}
+.client-photo-controls input{max-width:100%;font-size:.78rem}
+.client-photo-controls small{color:var(--text-muted);font-size:.72rem;line-height:1.45}
+.client-photo-controls .btn{justify-self:start}
+@media(max-width:440px){.client-photo-editor{align-items:flex-start;padding:.8rem;gap:.75rem}.client-photo-preview{width:62px;height:62px;flex-basis:62px}}
 @media(max-width:700px){
   .settings-grid{
     grid-template-columns:1fr;
@@ -448,7 +457,18 @@
 
     <section class="card settings-card">
       <h2>Profile</h2>
-      <p>Update the name and phone number used on your Manlung Recovery account.</p>
+      <p>Update your account details and choose the photo shown beside your name on this device.</p>
+
+      <div class="client-photo-editor">
+        <div class="client-photo-preview" id="clientPhotoPreview" aria-label="Profile photo preview">MR</div>
+        <div class="client-photo-controls">
+          <label for="clientPhotoInput">Profile photo</label>
+          <input id="clientPhotoInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+          <small>Choose a JPG, PNG, WebP or GIF image. It will be resized before saving.</small>
+          <button class="btn btn-outline" id="removeClientPhoto" type="button">Remove photo</button>
+          <div id="photoStatus" class="settings-status" role="status" aria-live="polite"></div>
+        </div>
+      </div>
 
       <form id="profileForm">
         <div class="form-group">
@@ -679,6 +699,102 @@ function setStatus(id, message, ok=false){
   el.style.color = ok ? 'var(--success)' : 'var(--danger)';
 }
 
+const PHOTO_STORAGE_KEY = 'clientUser';
+const PHOTO_MAX_FILE_BYTES = 8 * 1024 * 1024;
+let selectedProfilePhoto = null;
+
+function getStoredClientUser(){
+  try { return JSON.parse(localStorage.getItem(PHOTO_STORAGE_KEY) || '{}') || {}; }
+  catch (_) { return {}; }
+}
+
+function initialsForProfile(value){
+  return String(value || 'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(part => part[0].toUpperCase()).join('') || 'MR';
+}
+
+function renderClientPhoto(photo, fallbackName){
+  const preview = document.getElementById('clientPhotoPreview');
+  if(!preview) return;
+  preview.replaceChildren();
+  if(photo && (/^https:\\/\\//i.test(photo) || /^data:image\\/(?:png|jpeg|webp|gif);base64,/i.test(photo))){
+    const image = document.createElement('img');
+    image.src = photo;
+    image.alt = 'Your selected profile photo';
+    image.referrerPolicy = 'no-referrer';
+    image.onerror = () => { preview.textContent = initialsForProfile(fallbackName); };
+    preview.appendChild(image);
+  } else {
+    preview.textContent = initialsForProfile(fallbackName);
+  }
+}
+
+function compressProfilePhoto(file){
+  return new Promise((resolve, reject) => {
+    if(!file || !/^image\\/(?:png|jpeg|webp|gif)$/i.test(file.type)){
+      reject(new Error('Choose a PNG, JPG, WebP or GIF image.'));
+      return;
+    }
+    if(file.size > PHOTO_MAX_FILE_BYTES){
+      reject(new Error('Please choose an image smaller than 8 MB.'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Could not read that image. Please try another one.'));
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = () => reject(new Error('That image could not be opened.'));
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDimension = 256;
+        const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+        canvas.width = Math.max(1, Math.round(image.width * scale));
+        canvas.height = Math.max(1, Math.round(image.height * scale));
+        const context = canvas.getContext('2d');
+        if(!context){ reject(new Error('Your browser could not process that image.')); return; }
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const compressed = canvas.toDataURL('image/jpeg', 0.82);
+        if(compressed.length > 350000){
+          reject(new Error('This image could not be compressed enough. Try a simpler photo.'));
+          return;
+        }
+        resolve(compressed);
+      };
+      image.src = String(reader.result || '');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById('clientPhotoInput')?.addEventListener('change', async (event) => {
+  const input = event.currentTarget;
+  const file = input.files && input.files[0];
+  if(!file) return;
+  setStatus('photoStatus', 'Preparing your photo…', true);
+  try{
+    selectedProfilePhoto = await compressProfilePhoto(file);
+    const user = getStoredClientUser();
+    renderClientPhoto(selectedProfilePhoto, user.username || user.email || 'MR');
+    user.profilePicture = selectedProfilePhoto;
+    localStorage.setItem(PHOTO_STORAGE_KEY, JSON.stringify(user));
+    setStatus('photoStatus', 'Photo updated on this device. It will appear on your client dashboard.', true);
+  }catch(error){
+    selectedProfilePhoto = null;
+    input.value = '';
+    setStatus('photoStatus', error.message || 'Could not update your photo.');
+  }
+});
+
+document.getElementById('removeClientPhoto')?.addEventListener('click', () => {
+  const user = getStoredClientUser();
+  user.profilePicture = null;
+  localStorage.setItem(PHOTO_STORAGE_KEY, JSON.stringify(user));
+  selectedProfilePhoto = null;
+  const input = document.getElementById('clientPhotoInput');
+  if(input) input.value = '';
+  renderClientPhoto(null, user.username || user.email || 'MR');
+  setStatus('photoStatus', 'Profile photo removed on this device.', true);
+});
+
 async function loadProfile(){
   try{
     const res = await fetch('/api/auth/client/me', {
@@ -706,10 +822,14 @@ async function loadProfile(){
     document.getElementById('profilePhone').value =
       data.user.phone || '';
 
-    localStorage.setItem(
-      'clientUser',
-      JSON.stringify(data.user)
-    );
+    let previousUser = {};
+    try { previousUser = JSON.parse(localStorage.getItem('clientUser') || '{}') || {}; } catch (_) {}
+    const currentUser = {
+      ...data.user,
+      profilePicture: previousUser.profilePicture || data.user.profilePicture || null
+    };
+    localStorage.setItem('clientUser', JSON.stringify(currentUser));
+    renderClientPhoto(currentUser.profilePicture, currentUser.username || currentUser.email || 'MR');
   }catch(error){
     setStatus(
       'profileStatus',
@@ -745,10 +865,12 @@ document.getElementById('profileForm').addEventListener('submit', async (event)=
       throw new Error(data.error || 'Could not update profile.');
     }
 
-    localStorage.setItem(
-      'clientUser',
-      JSON.stringify(data.user)
-    );
+    let previousUser = {};
+    try { previousUser = JSON.parse(localStorage.getItem('clientUser') || '{}') || {}; } catch (_) {}
+    localStorage.setItem('clientUser', JSON.stringify({
+      ...data.user,
+      profilePicture: previousUser.profilePicture || data.user.profilePicture || null
+    }));
 
     setStatus(
       'profileStatus',
