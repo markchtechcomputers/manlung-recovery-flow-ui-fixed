@@ -49,6 +49,80 @@ const signToken = (user) => {
 const hashToken = (token) =>
   crypto.createHash('sha256').update(token).digest('hex');
 
+function escapeEmailHtml(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function sendClientWelcomeEmail(client, req) {
+  if (!client?.email) return;
+  const displayName = escapeEmailHtml(client.username || client.full_name || 'there');
+  const accountEmail = escapeEmailHtml(client.email);
+  const baseUrl = String(
+    process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'
+  ).replace(/\\/$/, '');
+  const portalUrl = `${baseUrl}/client/dashboard.html`;
+  const supportEmail = 'manlungrecovery@outlook.com';
+
+  const html = `
+    <!doctype html>
+    <html lang="en">
+      <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+      <body style="margin:0;padding:0;background:#f3f6fb;font-family:Arial,Helvetica,sans-serif;color:#172033;">
+        <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Your Manlung Recovery account has been created successfully. Your Client Portal is ready.</div>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f6fb;padding:32px 12px;">
+          <tr><td align="center">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #e4eaf2;border-radius:16px;overflow:hidden;">
+              <tr><td style="background:#101b2d;padding:28px 32px;text-align:center;">
+                <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#9de7c1;font-weight:700;">MANLUNG RECOVERY</div>
+                <h1 style="margin:12px 0 0;color:#ffffff;font-size:27px;line-height:1.25;">Account created successfully</h1>
+                <p style="margin:10px 0 0;color:#d3dce9;font-size:15px;line-height:1.6;">Welcome to your secure Client Portal.</p>
+              </td></tr>
+              <tr><td style="padding:30px 32px;">
+                <p style="margin:0 0 16px;font-size:16px;line-height:1.7;">Hello ${displayName},</p>
+                <p style="margin:0 0 18px;font-size:15px;line-height:1.8;color:#435066;">Your Manlung Recovery account has been created successfully. You can now access your Client Portal to manage your recovery requests and follow updates related to your cases.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:22px 0;background:#f7f9fc;border:1px solid #e5ebf3;border-radius:10px;">
+                  <tr><td style="padding:16px 18px;">
+                    <div style="font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:#66758b;font-weight:700;">ACCOUNT EMAIL</div>
+                    <div style="margin-top:6px;font-size:15px;color:#172033;word-break:break-word;">${accountEmail}</div>
+                    <div style="margin-top:12px;font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:#66758b;font-weight:700;">ACCOUNT STATUS</div>
+                    <div style="margin-top:6px;font-size:14px;color:#137547;font-weight:700;">Created successfully</div>
+                  </td></tr>
+                </table>
+                <p style="margin:0 0 22px;font-size:15px;line-height:1.8;color:#435066;">From your portal, you can submit a recovery request, review case progress, and check messages or updates shared with you.</p>
+                <p style="margin:26px 0;text-align:center;">
+                  <a href="${portalUrl}" style="display:inline-block;padding:14px 24px;background:#157347;color:#ffffff;text-decoration:none;border-radius:8px;font-size:15px;font-weight:700;">Open My Client Portal</a>
+                </p>
+                <div style="border-top:1px solid #e7edf4;padding-top:18px;margin-top:24px;">
+                  <p style="margin:0 0 10px;font-size:13px;line-height:1.7;color:#66758b;"><strong>Security reminder:</strong> Keep your password private. Manlung Recovery will never ask you to send your password by email.</p>
+                  <p style="margin:0;font-size:13px;line-height:1.7;color:#66758b;">Need help? Contact <a href="mailto:${supportEmail}" style="color:#1769aa;text-decoration:none;">${supportEmail}</a>.</p>
+                </div>
+              </td></tr>
+              <tr><td style="padding:18px 28px;background:#f8fafc;border-top:1px solid #e7edf4;text-align:center;">
+                <p style="margin:0;font-size:12px;line-height:1.7;color:#8390a3;">© ${new Date().getFullYear()} Manlung Recovery. Please do not reply to this automated message.</p>
+              </td></tr>
+            </table>
+          </td></tr>
+        </table>
+      </body>
+    </html>
+  `;
+
+  try {
+    await sendEmail({
+      to: client.email,
+      subject: 'Your Manlung Recovery account was created successfully',
+      html,
+    });
+  } catch (error) {
+    console.error('Client welcome email could not be sent:', error?.message || error);
+  }
+}
+
 function normalizePhone(value) {
   const raw = String(value || '').trim();
   if (!raw) return '';
@@ -1242,7 +1316,11 @@ router.post(
         });
       }
 
+      const wasAlreadyVerified = Boolean(client.email_verified_at);
       const verified = await User.markEmailVerified(client.id);
+      if (!wasAlreadyVerified) {
+        await sendClientWelcomeEmail(verified || client, req);
+      }
 
       await supabase
         .from('recovery_users')
@@ -2198,10 +2276,7 @@ router.post(
           client.auth_provider = authProvider;
         }
 
-        sendEmail({
-          to: client.email,
-          subject: 'Welcome to Manlung Recovery — Account Created Successfully',
-        }).catch(() => {});
+        sendClientWelcomeEmail(client, req).catch(() => {});
       }
 
       // Social login follows the same single-browser session rule as password login.
