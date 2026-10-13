@@ -7,6 +7,7 @@
     <title>New Request · Manlung Recovery</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <style>
         .container-narrow { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
         .progress-bar-wrap { position: sticky; top: 0; z-index: 20; background: var(--page-bg); border-bottom: 1px solid var(--card-border); padding: 0.5rem 1.5rem; }
@@ -17,6 +18,7 @@
         .hp-field { display: none !important; }
         .draft-banner { background: var(--info-bg); color: var(--info-text); padding: 0.6rem 1rem; border-radius: 12px; margin-bottom: 1rem; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
         .file-thumb { width: 32px; height: 32px; object-fit: cover; border-radius: 6px; margin-right: 8px; vertical-align: middle; }
+        .case-turnstile{display:grid;gap:.5rem;margin:1rem 0;padding:1rem;border:1px solid var(--card-border);border-radius:12px}.case-turnstile small{color:var(--text-muted)}#caseTurnstileWidget{min-height:65px}
     </style>
 <style id="manlung-header-style">
 .site-header{
@@ -510,6 +512,7 @@
                     <div class="checkbox-group"><input type="checkbox" id="term2" required><label>I understand that submitting false information may result in my request being rejected.</label></div>
                 </div>
 
+                <div class="case-turnstile"><strong>Cloudflare security verification</strong><div id="caseTurnstileWidget" aria-label="Cloudflare security verification"></div><small id="caseTurnstileStatus" role="status" aria-live="polite">Loading verification…</small></div>
                 <div class="submit-progress-panel" id="submitProgressPanel" aria-live="polite">
   <div class="submit-progress-row"><span id="submitProgressState"><i class="fas fa-cloud-arrow-up"></i> Uploading</span><span id="submitProgressPct">0%</span></div>
   <div class="submit-progress-track"><div class="submit-progress-fill" id="submitProgressFill"></div></div>
@@ -690,8 +693,44 @@
         // Submits the whole form (fields + files) in one multipart request straight
         // to our own backend — the backend uploads files to Supabase Storage itself,
         // so no cloud SDK or API key is ever needed in the browser.
+        let caseTurnstileId = null;
+        let caseTurnstileToken = "";
+        let caseTurnstilePassed = false;
+        const caseTurnstileStatus = document.getElementById("caseTurnstileStatus");
+        const caseSubmitButton = document.getElementById("submitBtn");
+        caseSubmitButton.disabled = true;
+        async function initializeCaseTurnstile() {
+            try {
+                const response = await fetch("/api/cases/turnstile-config", { headers: { Accept: "application/json" } });
+                const config = await response.json();
+                if (!response.ok || !config.siteKey) throw new Error("Cloudflare verification is not configured. Please contact support.");
+                let attempts = 0;
+                await new Promise((resolve, reject) => {
+                    const wait = () => {
+                        if (window.turnstile && typeof window.turnstile.render === "function") return resolve();
+                        if (++attempts > 80) return reject(new Error("Cloudflare verification did not load. Refresh the page and try again."));
+                        setTimeout(wait, 150);
+                    };
+                    wait();
+                });
+                caseTurnstileId = window.turnstile.render("#caseTurnstileWidget", {
+                    sitekey: config.siteKey,
+                    callback: token => { caseTurnstileToken = token; caseTurnstilePassed = true; caseSubmitButton.disabled = false; caseTurnstileStatus.textContent = "Verification complete. You can submit your request."; },
+                    "expired-callback": () => { caseTurnstileToken = ""; caseTurnstilePassed = false; caseSubmitButton.disabled = true; caseTurnstileStatus.textContent = "Verification expired. Please verify again."; },
+                    "error-callback": () => { caseTurnstileToken = ""; caseTurnstilePassed = false; caseSubmitButton.disabled = true; caseTurnstileStatus.textContent = "Verification failed. Refresh the page and try again."; },
+                    theme: "auto"
+                });
+                caseTurnstileStatus.textContent = "Complete the Cloudflare check before submitting."; 
+            } catch (error) {
+                caseTurnstileStatus.textContent = error.message || "Cloudflare verification is unavailable.";
+                caseSubmitButton.disabled = true;
+            }
+        }
+        initializeCaseTurnstile();
+
         function handleSubmit(event) {
             event.preventDefault();
+            if (!caseTurnstilePassed || !caseTurnstileToken) { alert("Please complete the Cloudflare security verification first."); return; }
 
             if (!document.getElementById('term1').checked || !document.getElementById('term2').checked) {
                 alert('Please accept both terms to proceed.');
@@ -734,6 +773,7 @@
             for (const [formKey, elId] of Object.entries(fields)) {
                 fd.append(formKey, document.getElementById(elId).value || '');
             }
+            fd.append('cf-turnstile-response', caseTurnstileToken);
             fd.append('netAuth', document.getElementById('netAuth').checked ? 'true' : 'false');
             fd.append('hp_confirm', document.getElementById('hp_confirm').value || ''); // honeypot
             allFiles.forEach(file => fd.append('files', file));
@@ -774,7 +814,10 @@
 
             xhr.onerror = () => {
                 statusEl.textContent = '';
-                submitBtn.disabled = false;
+                submitBtn.disabled = true;
+                caseTurnstileToken = ""; caseTurnstilePassed = false;
+                if (window.turnstile && caseTurnstileId !== null) window.turnstile.reset(caseTurnstileId);
+                caseTurnstileStatus.textContent = "Please complete the Cloudflare check again before another submission.";
                 setFlowStep('failed',100,'Could not reach the server.');
                 if(typeof toast==='function') toast('Could not reach the server. Please check your connection and try again.','error');
                 alert('Could not reach the server. Is it running, and is the URL correct?');
