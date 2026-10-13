@@ -749,22 +749,37 @@ async function setupOfficialGoogleButtons(){
       auto_select:false,
       cancel_on_tap_outside:true,
       callback:async response=>{
+        const errorTarget=window.__manlungGoogleErrorTarget||'loginError';
+        const errorNode=document.getElementById(errorTarget);
+        const setGoogleStatus=(message,kind='info')=>{
+          if(errorNode){
+            showMessage(errorNode,message,kind);
+            errorNode.setAttribute('role','status');
+            errorNode.setAttribute('aria-live','polite');
+          }
+        };
         try{
-          if(!response?.credential)throw new Error('Google sign-in was cancelled.');
-          const errorTarget=window.__manlungGoogleErrorTarget||'loginError';
+          if(!response?.credential)throw new Error('Google did not return a sign-in credential. Please try again.');
+          setGoogleStatus('Google account confirmed. Signing you in…');
           const res=await fetch('/api/auth/google',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
+            cache:'no-store',
+            credentials:'same-origin',
             body:JSON.stringify({credential:response.credential})
           });
           const text=await res.text();
           let data;
-          try{data=JSON.parse(text);}catch(_){throw new Error('Google sign-in API returned an invalid response.');}
+          try{data=JSON.parse(text);}catch(_){throw new Error('The sign-in server returned an invalid response. Please try again.');}
           if(!res.ok||!data.success)throw new Error(data.error||'Google authentication failed. Please try again.');
-          localStorage.setItem('clientUser',JSON.stringify(data.user));
-          window.location.replace('/client/dashboard.html');
+          if(!data.user)throw new Error('Your account was verified, but the user profile was not returned. Please try again.');
+          try{localStorage.setItem('clientUser',JSON.stringify(data.user));}catch(storageError){console.warn('Could not cache client profile:',storageError);}
+          setGoogleStatus('Sign-in successful. Opening your dashboard…','success');
+          // Use an absolute same-origin URL to avoid relative-path or base-URL issues on mobile.
+          window.location.assign(new URL('/client/dashboard.html?session=1',window.location.origin).href);
         }catch(err){
-          showMessage(document.getElementById(window.__manlungGoogleErrorTarget||'loginError'),err.message||'Google authentication failed.');
+          console.error('Google sign-in callback failed:',err);
+          setGoogleStatus(err?.message||'Google authentication failed. Please try again.','error');
         }
       }
     });
