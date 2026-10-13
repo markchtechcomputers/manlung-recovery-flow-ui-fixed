@@ -35,6 +35,7 @@ function publicProfile(profile, user, presence) {
     lastSeenVisibility: profile?.last_seen_visibility || 'members',
     readReceiptsEnabled: profile?.read_receipts_enabled !== false,
     recentlyActive: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
+    online: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
     lastSeenAt: profile?.last_seen_visibility === 'nobody' ? null : last,
   };
 }
@@ -62,7 +63,7 @@ router.get('/members', async (req, res) => {
   try {
     const { data: users, error } = await supabase.from('recovery_users')
       .select('id,username,role,last_login_at,created_at,security_status')
-      .in('role', roles).eq('security_status', 'active').order('created_at', { ascending: false }).limit(500);
+      .in('role', roles).order('created_at', { ascending: false }).limit(500);
     if (error) throw error;
     const ids = (users || []).map(u => u.id);
     if (!ids.length) return res.json({ success: true, members: [] });
@@ -77,7 +78,7 @@ router.get('/members', async (req, res) => {
     (blocks || []).forEach(b => { blocked.add(b.blocker_user_id); blocked.add(b.blocked_user_id); });
     const pMap = new Map((profiles || []).map(p => [p.user_id, p]));
     const liveMap = new Map((presence || []).map(p => [p.user_id, p]));
-    const members = (users || []).filter(u => u.id !== req.user.id && !blocked.has(u.id))
+    const members = (users || []).filter(u => u.id !== req.user.id && !blocked.has(u.id) && (!u.security_status || u.security_status === 'active'))
       .map(u => ({ user: u, profile: pMap.get(u.id) }))
       .filter(x => x.profile?.discoverable !== false)
       .map(x => publicProfile(x.profile, x.user, liveMap.get(x.user.id)));
