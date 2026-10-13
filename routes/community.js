@@ -81,7 +81,7 @@ router.get('/members', async (req, res) => {
     const liveMap = new Map((presence || []).map(p => [p.user_id, p]));
     const members = (users || []).filter(u => u.id !== req.user.id && !blocked.has(u.id) && (!u.security_status || u.security_status === 'active') && (!u.security_status || u.security_status === 'active'))
       .map(u => ({ user: u, profile: pMap.get(u.id) }))
-      .filter(x => x.profile?.discoverable !== false)
+      .filter(x => x.profile?.discoverable !== false && x.profile?.profile_visibility !== 'nobody')
       .map(x => publicProfile(x.profile, x.user, liveMap.get(x.user.id)));
     res.set('Cache-Control', 'no-store');
     res.json({ success: true, members });
