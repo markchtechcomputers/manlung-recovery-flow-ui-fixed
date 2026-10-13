@@ -623,19 +623,33 @@
     let history=(historyOverride||window.__MANLUNG_AI_HISTORY||[]).slice(-14);
     if(history.length&&history[history.length-1].role==='user'&&history[history.length-1].content===message)history.pop();
     const lang=languageOverride||detectLanguage(message);
-    const res=await fetch('/api/ai-live/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify({message,history,language:lang,pagePath:location.pathname})});
-    if(!res.ok||!res.body)throw new Error('Live AI connection failed');
-    const reader=res.body.getReader(),decoder=new TextDecoder();let buf='',answer='';
-    const consume=raw=>{const part=parseAIChunk(raw);if(part){answer+=part;onText(part);}};
-    while(true){
-      const x=await reader.read(); if(x.done)break;
-      buf+=decoder.decode(x.value,{stream:true});
-      const packets=buf.split(/\n\n/);buf=packets.pop()||'';
-      packets.forEach(packet=>packet.split(/\n/).forEach(line=>{if(line.startsWith('data:'))consume(line.slice(5));}));
+    const payload={message,history,language:lang,pagePath:location.pathname};
+    // Prefer live streaming, then fall back to the stable JSON chat endpoint.
+    try{
+      const res=await fetch('/api/ai-live/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(payload)});
+      if(!res.ok||!res.body)throw new Error('Live AI connection failed');
+      const reader=res.body.getReader(),decoder=new TextDecoder();let buf='',answer='';
+      const consume=raw=>{const part=parseAIChunk(raw);if(part){answer+=part;onText(part);}};
+      while(true){
+        const x=await reader.read();if(x.done)break;
+        buf+=decoder.decode(x.value,{stream:true});
+        const packets=buf.split(/\r?\n\r?\n/);buf=packets.pop()||'';
+        packets.forEach(packet=>packet.split(/\r?\n/).forEach(line=>{if(line.startsWith('data:'))consume(line.slice(5));}));
+      }
+      if(buf.trim())buf.split(/\r?\n/).forEach(line=>{if(line.startsWith('data:'))consume(line.slice(5));});
+      if(answer.trim())return answer.trim();
+      throw new Error('Live AI returned an empty response');
+    }catch(liveError){
+      console.warn('Manlung live AI failed; trying standard chat API',liveError);
+      const fallback=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+      const data=await fallback.json().catch(()=>({}));
+      if(!fallback.ok||!data.success||!String(data.answer||'').trim())throw new Error(data.error||'Both AI endpoints failed');
+      const answer=String(data.answer).trim();
+      onText(answer);
+      return answer;
     }
-    if(buf.trim())buf.split(/\n/).forEach(line=>{if(line.startsWith('data:'))consume(line.slice(5));});
-    return answer.trim();
   }
+
   async function respond(displayText,forcedKey){
     const message=String(displayText||'').trim();
     if(!message)return;
@@ -758,8 +772,15 @@
       recognition.onstart=()=>setListening(true);
       setListening(true);
       recognition.onresult=e=>{
-        voiceFinal=Array.from(e.results).map(x=>x[0].transcript).join(' ').trim();
-        const input=document.getElementById('manlungAiInput');if(input){input.value=voiceFinal;input.scrollTop=input.scrollHeight;}
+        let transcript='';
+        for(let i=e.resultIndex;i<e.results.length;i++){
+          const result=e.results[i];
+          if(result&&result.isFinal&&result[0]?.transcript)transcript+=' '+result[0].transcript;
+        }
+        if(transcript.trim())voiceFinal=(voiceFinal+' '+transcript).trim();
+        const interim=Array.from(e.results).filter(x=>!x.isFinal).map(x=>x[0]?.transcript||'').join(' ').trim();
+        const input=document.getElementById('manlungAiInput');
+        if(input){input.value=(voiceFinal+' '+interim).trim();input.scrollTop=input.scrollHeight;}
       };
       recognition.onend=()=>{
         const t=voiceFinal.trim();
@@ -784,14 +805,24 @@
         }
       };
       recognition.onerror=e=>{
-        console.warn('Manlung AI voice input error',e?.error||e);
+        const code=e?.error||'unknown';
+        console.warn('Manlung AI voice input error',code);
         recognition=null;
         setListening(false);
-        resetComposer();
+        if(code==='not-allowed'||code==='service-not-allowed'){
+          voiceSession=false;voiceAutoResume=false;clearVoiceRestartTimer();
+          setVoiceState('waiting','Microphone permission blocked — allow microphone access in your browser settings');
+          return;
+        }
+        if(code==='audio-capture'){
+          voiceSession=false;voiceAutoResume=false;clearVoiceRestartTimer();
+          setVoiceState('waiting','No microphone detected. Check your device microphone and try again.');
+          return;
+        }
         if(voiceSession&&voiceAutoResume){
-          setVoiceState('waiting','Voice input paused — tap the mic to speak again');
+          setVoiceState('waiting','Voice input paused — tap the mic to try again');
           clearVoiceRestartTimer();
-          voiceRestartTimer=setTimeout(()=>{voiceRestartTimer=null;if(voiceSession&&voiceAutoResume&&!recognition)startListening();},1200);
+          if(code!=='aborted'&&code!=='network')voiceRestartTimer=setTimeout(()=>{voiceRestartTimer=null;if(voiceSession&&voiceAutoResume&&!recognition)startListening();},1600);
         }else setVoiceState('','');
       };
       try{recognition.start();return true;}catch(_){recognition=null;setListening(false);return false;}
