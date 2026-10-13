@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-  <script src="/js/theme.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Careers · Manlung Recovery</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"><style>
-.career-form{display:grid;gap:1rem}.career-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}@media(max-width:700px){.career-grid{grid-template-columns:1fr}}.career-form textarea{min-height:130px;resize:vertical}.career-note{padding:.9rem 1rem;border-radius:12px;background:var(--info-bg);color:var(--info-text)}
+  <script src="/js/theme.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Careers · Manlung Recovery</title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"><script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+<style>
+.career-form{display:grid;gap:1rem}.career-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}@media(max-width:700px){.career-grid{grid-template-columns:1fr}}.career-form textarea{min-height:130px;resize:vertical}.career-note{padding:.9rem 1rem;border-radius:12px;background:var(--info-bg);color:var(--info-text)}.turnstile-wrap{display:grid;gap:.5rem;padding:1rem;border:1px solid var(--card-border,#dbe3ee);border-radius:12px}.turnstile-help{font-size:.85rem;color:var(--text-muted,#64748b)}#turnstileWidget{min-height:65px}#careerSubmit:disabled{opacity:.6;cursor:not-allowed}
 </style>
 <style id="manlung-header-style">
 .site-header{
@@ -254,10 +255,45 @@
   src="/icons/icon-512.png"
   alt="Manlung Recovery"
 ></a>
-<h1> Careers</h1><span>Join Manlung Recovery</span></div><div class="header-actions"><a href="/" class="btn btn-outline"> Home</a><a href="/about.html" class="btn btn-outline">About</a></div></div></header><main class="container"><section class="hero" style="text-align:left"><h2>Work With Manlung Recovery</h2><p>We are building a practical cyber recovery and digital investigation service. Tell us about your education, experience, skills and the role you are interested in.</p></section><section class="card"><div class="card-title"><i class="fas fa-file-signature"></i> Career Application</div><div class="career-note">Submit accurate information. The Owner reviews applications through the private recruitment portal.</div><form id="careerForm" class="career-form" style="margin-top:1rem" enctype="multipart/form-data"><div class="career-grid"><div><label>Full name</label><input id="fullName" required maxlength="120"></div><div><label>Email</label><input id="email" type="email" required maxlength="160"></div><div><label>Phone</label><input id="phone" required maxlength="40"></div><div><label>Location</label><input id="location" required maxlength="160" placeholder="City / County / Country"></div><div><label>Role interested in</label><select id="roleInterested" required><option value="">Select a role</option><option>Cyber Recovery Investigator</option><option>Digital Forensics / Evidence Analyst</option><option>Scam Investigation Analyst</option><option>Identity Recovery Specialist</option><option>Software Security Engineer</option><option>Security Assessment Analyst</option><option>Call Support / Client Success</option><option>Admin / Case Management</option><option>Software / Web Engineer</option><option>Other</option></select></div><div><label>Years of experience</label><input id="experienceYears" type="number" min="0" max="60" placeholder="e.g. 3"></div></div><div><label>Education</label><textarea id="education" required maxlength="2000" placeholder="Qualifications, certifications, institutions and relevant training"></textarea></div><div><label>Career experience</label><textarea id="experience" required maxlength="4000" placeholder="Previous roles, responsibilities and relevant projects"></textarea></div><div><label>Skills</label><textarea id="skills" required maxlength="3000" placeholder="Technical, investigative, communication and other relevant skills"></textarea></div><div class="career-note"><strong>Software Security Engineer focus:</strong> Help develop security assessment tools, investigation tools, monitoring capabilities, and analyze how the Manlung Recovery platform works securely.</div><div class="career-grid"><div><label>CV / Resume (PDF)</label><input id="cv" name="cv" type="file" accept="application/pdf" required></div><div><label>Application Letter (PDF)</label><input id="coverLetter" name="coverLetter" type="file" accept="application/pdf" required></div></div><div><label>Why should we consider you?</label><textarea id="coverNote" required minlength="20" maxlength="5000" placeholder="Tell us briefly about your interest in Manlung Recovery and the value you can bring."></textarea></div><button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Submit Application</button><div id="careerStatus"></div></form></section></main><script>
+<h1> Careers</h1><span>Join Manlung Recovery</span></div><div class="header-actions"><a href="/" class="btn btn-outline"> Home</a><a href="/about.html" class="btn btn-outline">About</a></div></div></header><main class="container"><section class="hero" style="text-align:left"><h2>Work With Manlung Recovery</h2><p>We are building a practical cyber recovery and digital investigation service. Tell us about your education, experience, skills and the role you are interested in.</p></section><section class="card"><div class="card-title"><i class="fas fa-file-signature"></i> Career Application</div><div class="career-note">Submit accurate information. The Owner reviews applications through the private recruitment portal.</div><form id="careerForm" class="career-form" style="margin-top:1rem" enctype="multipart/form-data"><div class="career-grid"><div><label>Full name</label><input id="fullName" required maxlength="120"></div><div><label>Email</label><input id="email" type="email" required maxlength="160"></div><div><label>Phone</label><input id="phone" required maxlength="40"></div><div><label>Location</label><input id="location" required maxlength="160" placeholder="City / County / Country"></div><div><label>Role interested in</label><select id="roleInterested" required><option value="">Select a role</option><option>Cyber Recovery Investigator</option><option>Digital Forensics / Evidence Analyst</option><option>Scam Investigation Analyst</option><option>Identity Recovery Specialist</option><option>Software Security Engineer</option><option>Security Assessment Analyst</option><option>Call Support / Client Success</option><option>Admin / Case Management</option><option>Software / Web Engineer</option><option>Other</option></select></div><div><label>Years of experience</label><input id="experienceYears" type="number" min="0" max="60" placeholder="e.g. 3"></div></div><div><label>Education</label><textarea id="education" required maxlength="2000" placeholder="Qualifications, certifications, institutions and relevant training"></textarea></div><div><label>Career experience</label><textarea id="experience" required maxlength="4000" placeholder="Previous roles, responsibilities and relevant projects"></textarea></div><div><label>Skills</label><textarea id="skills" required maxlength="3000" placeholder="Technical, investigative, communication and other relevant skills"></textarea></div><div class="career-note"><strong>Software Security Engineer focus:</strong> Help develop security assessment tools, investigation tools, monitoring capabilities, and analyze how the Manlung Recovery platform works securely.</div><div class="career-grid"><div><label>CV / Resume (PDF)</label><input id="cv" name="cv" type="file" accept="application/pdf" required></div><div><label>Application Letter (PDF)</label><input id="coverLetter" name="coverLetter" type="file" accept="application/pdf" required></div></div><div><label>Why should we consider you?</label><textarea id="coverNote" required minlength="20" maxlength="5000" placeholder="Tell us briefly about your interest in Manlung Recovery and the value you can bring."></textarea></div><div class="turnstile-wrap"><strong>Security verification</strong><div id="turnstileWidget" aria-label="Cloudflare security verification"></div><div id="turnstileHelp" class="turnstile-help" role="status">Loading Cloudflare verification…</div></div><button id="careerSubmit" class="btn btn-primary" type="submit" disabled><i class="fas fa-paper-plane"></i> Submit Application</button><div id="careerStatus" role="status" aria-live="polite"></div></form></section></main><script>
+let turnstileWidgetId = null;
+let turnstileToken = '';
+let turnstileReady = false;
+const turnstileHelp = document.getElementById('turnstileHelp');
+const careerSubmit = document.getElementById('careerSubmit');
+async function setupTurnstile() {
+  try {
+    const configResponse = await fetch('/api/careers/turnstile-config', { headers: { Accept: 'application/json' } });
+    const config = await configResponse.json();
+    if (!configResponse.ok || !config.siteKey) throw new Error('Cloudflare verification is not configured yet. Please contact the site owner.');
+    const waitForApi = () => new Promise((resolve, reject) => {
+      let tries = 0;
+      const poll = () => {
+        if (window.turnstile && typeof window.turnstile.render === 'function') return resolve();
+        if (++tries > 80) return reject(new Error('Cloudflare verification could not load. Please refresh or try another browser.'));
+        setTimeout(poll, 150);
+      };
+      poll();
+    });
+    await waitForApi();
+    turnstileWidgetId = window.turnstile.render('#turnstileWidget', {
+      sitekey: config.siteKey,
+      callback: token => { turnstileToken = token; turnstileReady = true; careerSubmit.disabled = false; turnstileHelp.textContent = 'Verification complete. You can submit your application.'; },
+      'expired-callback': () => { turnstileToken = ''; turnstileReady = false; careerSubmit.disabled = true; turnstileHelp.textContent = 'Verification expired. Please verify again.'; },
+      'error-callback': () => { turnstileToken = ''; turnstileReady = false; careerSubmit.disabled = true; turnstileHelp.textContent = 'Verification failed to load. Refresh the page and try again.'; },
+      theme: 'auto',
+    });
+    turnstileHelp.textContent = 'Complete the Cloudflare check below before submitting.';
+  } catch (error) {
+    turnstileHelp.textContent = error.message || 'Cloudflare verification is unavailable.';
+    careerSubmit.disabled = true;
+  }
+}
+setupTurnstile();
 document.getElementById('careerForm').addEventListener('submit', async e => {
   e.preventDefault();
   const status = document.getElementById('careerStatus');
+  if (!turnstileReady || !turnstileToken) { status.textContent = 'Please complete the Cloudflare security verification first.'; return; }
   const form = e.target;
   const data = new FormData();
   ['fullName','email','phone','location','education','roleInterested','skills','coverNote'].forEach(id => data.append(id, document.getElementById(id).value));
@@ -271,6 +307,8 @@ document.getElementById('careerForm').addEventListener('submit', async e => {
   }
   data.append('cv', cv);
   data.append('coverLetter', coverLetter);
+  data.append('cf-turnstile-response', turnstileToken);
+  careerSubmit.disabled = true;
   status.textContent = 'Submitting…';
   try {
     const r = await fetch('/api/careers', { method: 'POST', body: data });
@@ -280,8 +318,16 @@ document.getElementById('careerForm').addEventListener('submit', async e => {
     document.getElementById('applicationSuccessModal').style.display='flex';
     document.body.style.overflow='hidden';
     form.reset();
+    turnstileToken = ''; turnstileReady = false;
+    if (window.turnstile && turnstileWidgetId !== null) window.turnstile.reset(turnstileWidgetId);
+    turnstileHelp.textContent = 'Complete the Cloudflare check below before submitting.';
   } catch (err) {
     status.textContent = err.message || 'Could not submit application.';
+    turnstileToken = ''; turnstileReady = false;
+    if (window.turnstile && turnstileWidgetId !== null) window.turnstile.reset(turnstileWidgetId);
+    turnstileHelp.textContent = 'Please complete the Cloudflare check again.';
+  } finally {
+    careerSubmit.disabled = !turnstileReady;
   }
 });
 function closeApplicationModal(){document.getElementById('applicationSuccessModal').style.display='none';document.body.style.overflow='';}
