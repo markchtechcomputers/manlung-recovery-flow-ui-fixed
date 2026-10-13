@@ -50,7 +50,13 @@ app.post('/',async(req,res)=>{
   let user=await User.findByEmail(email);
   if(user&&user.role!=='client')return res.status(409).json({success:false,error:'This email belongs to a staff account. Use staff login.'});
   if(!user)user=await User.create({username:(email.split('@')[0].replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,55)||'client')+'-'+crypto.randomBytes(3).toString('hex'),password:crypto.randomBytes(32).toString('base64url') + 'A!1',role:'client',email,phone:null});
-  const sessionToken=token(user);
+  // Create a fresh durable session version so the token and database agree.
+  // This is especially important for first-time Google users on mobile browsers.
+  const session = await User.bumpSessionVersion(user.id);
+  if (!session) {
+   return res.status(500).json({success:false,error:'Your Google account was verified, but a secure session could not be created. Please try again.'});
+  }
+  const sessionToken=token({...user,session_version:session.session_version});
   setClientCookie(res,sessionToken);
   const profilePicture = /^https:\/\/[^\s"'<>]+$/i.test(String(p.picture || '')) ? String(p.picture) : null;
   res.json({success:true,user:{id:user.id,email:user.email,username:user.username,role:user.role,profilePicture}});
