@@ -80,13 +80,13 @@
 const $=id=>document.getElementById(id);
 const toast=(msg)=>{const el=$('toast');el.textContent=msg;el.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.hidden=true,4200)};
 let currentMember=null, activeFilter='all';
-try{const u=JSON.parse(localStorage.getItem('clientUser')||'{}');const name=u.display_name||u.displayName||u.full_name||u.name||u.email?.split('@')[0]||'Your account';$('selfName').textContent=name;$('selfAvatar').textContent=name.slice(0,1).toUpperCase();if(u.profilePicture){$('selfAvatar').innerHTML='<img alt="" src="'+String(u.profilePicture).replace(/"/g,'&quot;')+'">'}}catch(_){}
+try{const u=JSON.parse(localStorage.getItem('clientUser')||'{}');const name=u.display_name||u.displayName||u.full_name||u.name||u.email?.split('@')[0]||'Your account';$('selfName').textContent=name;$('selfAvatar').textContent=name.slice(0,1).toUpperCase();if(u.profilePicture && typeof u.profilePicture==='string' && /^(https:\/\/|data:image\/(png|jpeg|webp);base64,)/i.test(u.profilePicture)){const avatarImage=document.createElement('img');avatarImage.alt='';avatarImage.referrerPolicy='no-referrer';avatarImage.src=u.profilePicture;$('selfAvatar').replaceChildren(avatarImage)}}catch(_){}
 function selectMember(member){currentMember=member;$('chatTitle').textContent=member.name;$('chatStatus').textContent=member.online?'Online now':'Connection';$('chatAvatar').textContent=member.name.slice(0,1).toUpperCase();$('chatAvatar').classList.toggle('online',!!member.online);$('chatBody').innerHTML='<div class="cn-empty-chat"><div class="cn-empty-icon"><i class="fas fa-lock"></i></div><h2>Start a private chat</h2><p>Connect the secure messaging service to exchange private messages and files with '+escapeHtml(member.name)+'.</p></div>';$('backToPeople').style.display='grid';}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 document.querySelectorAll('.cn-tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.cn-tab').forEach(t=>{t.classList.toggle('active',t===b);t.setAttribute('aria-selected',String(t===b))});activeFilter=b.dataset.filter;$('peopleListTitle').textContent=({all:'People you may know',online:'Online now',requests:'Connection requests',contacts:'Your connections'})[activeFilter];renderPeople()}));
 function renderPeople(){const q=$('peopleSearch').value.trim();$('peopleCount').textContent='—';$('peopleList').innerHTML='<div class="cn-empty-chat" style="padding:30px 15px"><div class="cn-empty-icon"><i class="fas fa-user-group"></i></div><h2>'+ (q?'No matching members yet':'Community service not connected') +'</h2><p>'+(q?'Members will appear here when secure name search is enabled.':'This screen is ready for live member search, presence, connection requests and conversations. The secure API needs to be connected before real client profiles are shown.')+'</p></div>'}
 $('peopleSearch').addEventListener('input',renderPeople);
-$('moreMenuBtn').addEventListener('click',()=>{$('moreMenu').hidden=!$('moreMenu').hidden});
+$('moreMenuBtn').addEventListener('click',()=>{const opening=$('moreMenu').hidden;$('moreMenu').hidden=!opening;$('moreMenuBtn').setAttribute('aria-expanded',String(opening))});
 document.addEventListener('click',e=>{if(!e.target.closest('.cn-more'))$('moreMenu').hidden=true});
 $('composeForm').addEventListener('submit',e=>{e.preventDefault();if(!$('messageInput').value.trim()){toast('Write a message first.');return}toast('Messaging is not connected yet. No message was sent.');});
 $('imageInput').addEventListener('change',()=>{if($('imageInput').files[0])toast('Image selected. Secure chat upload is not connected yet; nothing was uploaded.');});
@@ -97,7 +97,7 @@ function safeAction(action){if(!currentMember){toast('Choose a member first.');r
 ['blockMember','bottomBlock'].forEach(id=>$(id).addEventListener('click',()=>safeAction('Blocking')));
 ['reportMember','bottomReport'].forEach(id=>$(id).addEventListener('click',()=>safeAction('Reporting')));
 $('viewProfile').addEventListener('click',()=>safeAction('Member profiles'));
-$('backToPeople').addEventListener('click',()=>{$('chatBody').scrollTop=0;});
+$('backToPeople').addEventListener('click',()=>{$('chatBody').scrollTop=0;currentMember=null;$('chatTitle').textContent='Your conversations';$('chatStatus').textContent='Choose a connection to start';$('chatAvatar').classList.remove('online');$('chatAvatar').textContent='';$('chatAvatar').innerHTML='<i class="fas fa-user"></i>';$('backToPeople').style.display='none';$('chatBody').innerHTML='<div class="cn-empty-chat"><div class="cn-empty-icon"><i class="fas fa-lock"></i></div><h2>Private conversations</h2><p>Your messages will live here. Connect with another client first, then open a private conversation. You stay in control of who can contact you.</p></div>';});
 renderPeople();
 })();
 </script>
