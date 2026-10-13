@@ -906,3 +906,31 @@ html.dark .ml-security-item i, body.dark .ml-security-item i { color: #60a5fa !i
     transform: none !important;
   }
 }
+
+/* Final homepage hero: full-bleed rectangular panel, edge-to-edge on desktop and phones. */
+section.ml-image-slideshow-hero.home-hero {
+  box-sizing: border-box !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  border-radius: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  overflow: hidden !important;
+}
+section.ml-image-slideshow-hero.home-hero > .ml-hero-slideshow {
+  border-radius: 0 !important;
+}
+@media (max-width: 768px) {
+  section.ml-image-slideshow-hero.home-hero {
+    padding-top: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-radius: 0 !important;
+  }
+  section.ml-image-slideshow-hero.home-hero > .ml-hero-slideshow,
+  section.ml-image-slideshow-hero.home-hero > .ml-hero-slideshow-overlay {
+    border-radius: 0 !important;
+  }
+}
