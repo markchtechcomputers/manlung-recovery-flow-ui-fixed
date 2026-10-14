@@ -102,3 +102,15 @@
 .mr-case-flow-live i{font-size:.72rem;color:#a5f3e5}
 .mr-case-flow-step-icon{flex:0 0 25px}
 .mr-case-flow-step-icon i{font-size:.82rem}
+
+
+/* Larger icon that changes with each animated workflow transition. */
+.mr-case-flow-feature{display:grid;grid-template-columns:58px minmax(0,1fr);align-items:center;gap:15px;min-height:112px}
+.mr-case-flow-feature-icon{display:grid;place-items:center;width:58px;height:58px;border-radius:17px;border:1px solid rgba(125,211,252,.28);background:linear-gradient(145deg,rgba(56,189,248,.18),rgba(45,212,191,.12));color:#7dd3fc;box-shadow:0 8px 24px rgba(14,165,233,.12)}
+.mr-case-flow-feature-icon i{font-size:1.55rem;transition:transform .35s ease,opacity .35s ease}
+.mr-case-flow-stage.is-out .mr-case-flow-feature-icon i{opacity:0;transform:scale(.72) rotate(-8deg)}
+.mr-case-flow-feature h3{margin:0 0 8px!important;color:#fff!important;font-size:clamp(1.12rem,1.6vw,1.42rem)!important;line-height:1.25!important;letter-spacing:-.025em!important;font-weight:800!important}
+.mr-case-flow-feature p{margin:0!important;max-width:36ch;color:#c3d2e2!important;font-size:.84rem!important;line-height:1.65!important}
+.mr-case-flow-stage{min-height:166px}
+@media(max-width:600px){.mr-case-flow-feature{grid-template-columns:48px minmax(0,1fr);gap:12px}.mr-case-flow-feature-icon{width:48px;height:48px;border-radius:14px}.mr-case-flow-feature-icon i{font-size:1.3rem}.mr-case-flow-feature h3{font-size:1.12rem!important}.mr-case-flow-feature p{font-size:.82rem!important}}
+@media(prefers-reduced-motion:reduce){.mr-case-flow-feature-icon i{transition:none!important}}
