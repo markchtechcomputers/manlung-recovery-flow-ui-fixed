@@ -175,6 +175,16 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
       .select('id,role,security_status').eq('id', other).in('role', roles).maybeSingle();
     if (recipientError) throw recipientError;
     if (!recipient || recipient.security_status && recipient.security_status !== 'active') return fail(res, 404, 'Member not found.');
+    const { data: accepted, error: acceptedError } = await supabase.from('recovery_chat_friend_requests')
+      .select('id').eq('status','accepted')
+      .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')').limit(1);
+    if (acceptedError) throw acceptedError;
+    if (!accepted?.length) {
+      const { data: pass, error: passError } = await supabase.from('recovery_chat_plan_purchases')
+        .select('id').eq('user_id',req.user.id).eq('plan_code','chat_pass').eq('status','paid').gt('expires_at',new Date().toISOString()).limit(1);
+      if (passError) throw passError;
+      if (!pass?.length) return fail(res,403,'Accept the friend request or purchase an active Chat pass to message this member.');
+    }
     const { data, error } = await supabase.from('recovery_community_messages')
       .insert({ sender_user_id: req.user.id, recipient_user_id: other, message })
       .select('id,sender_user_id,recipient_user_id,message,created_at').single();
@@ -183,6 +193,142 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Community message send error:'); }
 });
 
+
+
+const COMMUNITY_PLANS = Object.freeze({
+  plus: { amountKes: 100, amountMinor: 10000, label: 'Plus' },
+  pro: { amountKes: 500, amountMinor: 50000, label: 'Pro' },
+  chat_pass: { amountKes: 100, amountMinor: 10000, label: 'Chat pass' },
+  call: { amountKes: 200, amountMinor: 20000, label: 'Call subscription' },
+});
+router.get('/plans/status', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('recovery_chat_plan_purchases')
+      .select('plan_code,status,starts_at,expires_at,paid_at,amount_kes')
+      .eq('user_id', req.user.id).eq('status','paid').gt('expires_at',new Date().toISOString())
+      .order('expires_at',{ascending:false}).limit(20);
+    if (error) throw error;
+    const active = data || [];
+    const chosen = code => active.find(p => p.plan_code === code) || null;
+    const tier = chosen('pro') ? 'pro' : chosen('plus') ? 'plus' : 'free';
+    res.set('Cache-Control','no-store');
+    res.json({success:true,plans:{status:tier,chatPass:!!chosen('chat_pass'),call:!!chosen('call')},
+      active:active.map(p=>({code:p.plan_code,expiresAt:p.expires_at,amountKes:p.amount_kes}))});
+  } catch (error) { return handleDbError(res,error,'Community plan status error:'); }
+});
+router.post('/plans/initialize', async (req, res) => {
+  try {
+    if (!process.env.PAYSTACK_SECRET_KEY) return fail(res,503,'Payment service is not configured.');
+    if (req.user.role !== 'client') return fail(res,403,'Client access required.');
+    const code=String(req.body?.plan_code||'');
+    const plan=COMMUNITY_PLANS[code];
+    if (!plan) return fail(res,400,'Choose a valid subscription.');
+    const email=cleanText(req.user.email,254).toLowerCase();
+    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return fail(res,400,'Add a valid email to your account before paying.');
+    const reference='MTC-PLAN-'+Date.now()+'-'+crypto.randomBytes(8).toString('hex');
+    const {data:purchase,error:pe}=await supabase.from('recovery_chat_plan_purchases')
+      .insert({user_id:req.user.id,provider_reference:reference,plan_code:code,amount_kes:plan.amountKes,currency:'KES',status:'pending'})
+      .select('id,provider_reference').single();
+    if(pe) throw pe;
+    try {
+      const init=await axios.post(PAYSTACK_URL+'/transaction/initialize',{
+        email,amount:plan.amountMinor,currency:'KES',reference,
+        callback_url:process.env.PAYSTACK_CHAT_PLAN_CALLBACK_URL||process.env.PUBLIC_APP_URL,
+        metadata:{product:'manlung_community_subscription',plan_code:code,user_id:req.user.id,purchase_id:purchase.id,amount_kes:plan.amountKes}
+      },{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:15000});
+      if(!init.data?.status||!init.data?.data?.authorization_url) throw new Error('Paystack did not return checkout URL.');
+      res.json({success:true,purchaseId:purchase.id,reference,authorizationUrl:init.data.data.authorization_url,amountKes:plan.amountKes,planCode:code});
+    } catch(e) {
+      await supabase.from('recovery_chat_plan_purchases').update({status:'failed'}).eq('id',purchase.id);
+      throw e;
+    }
+  } catch(error) {
+    console.error('Community plan initialization error:',error.response?.data||error.message);
+    return fail(res,error.response?.status>=400&&error.response?.status<500?400:500,'Could not start subscription checkout.');
+  }
+});
+router.post('/plans/verify', async (req, res) => {
+  try {
+    if (!process.env.PAYSTACK_SECRET_KEY) return fail(res,503,'Payment service is not configured.');
+    const reference=cleanText(req.body?.reference,150);
+    if(!/^MTC-PLAN-[A-Za-z0-9-]+$/.test(reference)) return fail(res,400,'Invalid payment reference.');
+    const {data:purchase,error:pe}=await supabase.from('recovery_chat_plan_purchases')
+      .select('id,user_id,provider_reference,plan_code,amount_kes,currency,status').eq('provider_reference',reference).maybeSingle();
+    if(pe) throw pe;
+    if(!purchase) return fail(res,404,'Payment record not found.');
+    if(purchase.user_id!==req.user.id&&!isAdmin(req.user)) return fail(res,403,'This payment belongs to another account.');
+    if(purchase.status==='paid') return res.json({success:true,alreadyFulfilled:true,planCode:purchase.plan_code});
+    const plan=COMMUNITY_PLANS[purchase.plan_code];
+    if(!plan||purchase.amount_kes!==plan.amountKes||purchase.currency!=='KES') return fail(res,400,'Stored purchase amount is invalid.');
+    const verify=await axios.get(PAYSTACK_URL+'/transaction/verify/'+encodeURIComponent(reference),{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:12000});
+    const tx=verify.data?.data;
+    if(!verify.data?.status||!tx||tx.reference!==reference) return fail(res,400,'Payment verification failed.');
+    if(String(tx.status).toLowerCase()!=='success') return res.status(202).json({success:false,pending:true,message:'Payment is not confirmed yet.'});
+    if(Number(tx.amount)!==plan.amountMinor||String(tx.currency).toUpperCase()!=='KES') return fail(res,400,'Verified amount or currency does not match the selected plan.');
+    if(tx.metadata?.user_id&&tx.metadata.user_id!==purchase.user_id) return fail(res,400,'Payment metadata does not match the purchase.');
+    const {data:fulfilled,error:fe}=await supabase.rpc('recovery_chat_fulfill_plan_purchase',{p_purchase_id:purchase.id,p_provider_transaction_id:String(tx.id)});
+    if(fe) throw fe;
+    res.json({success:true,alreadyFulfilled:fulfilled===false,planCode:purchase.plan_code,expiresInDays:30});
+  } catch(error) {
+    console.error('Community plan verification error:',error.response?.data||error.message);
+    return handleDbError(res,error,'Community plan verification error:');
+  }
+});
+router.get('/status/:statusId/comments', async (req,res) => {
+  try {
+    const id=String(req.params.statusId||'');
+    if(!validId(id)) return fail(res,400,'Invalid status ID.');
+    const {data:post,error:pe}=await supabase.from('recovery_chat_status_posts').select('id,user_id,expires_at').eq('id',id).maybeSingle();
+    if(pe) throw pe;
+    if(!post||new Date(post.expires_at)<=new Date()) return fail(res,404,'Status not found or expired.');
+    if(await blockedEitherWay(req.user.id,post.user_id)) return fail(res,403,'This status is unavailable.');
+    const {data,error}=await supabase.from('recovery_chat_status_comments').select('id,status_id,user_id,comment,created_at').eq('status_id',id).order('created_at',{ascending:true}).limit(100);
+    if(error) throw error;
+    const ids=[...new Set((data||[]).map(x=>x.user_id))];
+    const {data:users,error:ue}=ids.length?await supabase.from('recovery_users').select('id,username').in('id',ids):{data:[],error:null};
+    if(ue) throw ue;
+    const {data:profiles,error:pe2}=ids.length?await supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url').in('user_id',ids):{data:[],error:null};
+    if(pe2) throw pe2;
+    const um=new Map((users||[]).map(x=>[x.id,x])), pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
+    res.set('Cache-Control','no-store');
+    res.json({success:true,comments:(data||[]).map(x=>({id:x.id,comment:x.comment,createdAt:x.created_at,author:{id:x.user_id,name:pm.get(x.user_id)?.display_name||um.get(x.user_id)?.username||'Member',avatar:pm.get(x.user_id)?.avatar_url||null}}))});
+  } catch(error) { return handleDbError(res,error,'Status comments list error:'); }
+});
+router.post('/status/:statusId/comments', messageLimiter, async (req,res) => {
+  try {
+    const id=String(req.params.statusId||''), comment=cleanText(req.body?.comment,500);
+    if(!validId(id)||!comment) return fail(res,400,'Enter a comment of up to 500 characters.');
+    const {data:post,error:pe}=await supabase.from('recovery_chat_status_posts').select('id,user_id,expires_at').eq('id',id).maybeSingle();
+    if(pe) throw pe;
+    if(!post||new Date(post.expires_at)<=new Date()) return fail(res,404,'Status not found or expired.');
+    if(await blockedEitherWay(req.user.id,post.user_id)) return fail(res,403,'This status is unavailable.');
+    const {data,error}=await supabase.from('recovery_chat_status_comments').insert({status_id:id,user_id:req.user.id,comment}).select('id,status_id,user_id,comment,created_at').single();
+    if(error) throw error;
+    res.status(201).json({success:true,comment:data});
+  } catch(error) { return handleDbError(res,error,'Status comment create error:'); }
+});
+router.post('/status/:statusId/hide', async (req,res) => {
+  try {
+    const id=String(req.params.statusId||'');
+    if(!validId(id)) return fail(res,400,'Invalid status ID.');
+    const {error}=await supabase.from('recovery_chat_status_hides').upsert({user_id:req.user.id,status_id:id},{onConflict:'user_id,status_id'});
+    if(error) throw error;
+    res.json({success:true,hidden:true});
+  } catch(error) { return handleDbError(res,error,'Status hide error:'); }
+});
+router.post('/status/:statusId/view', async (req,res) => {
+  try {
+    const id=String(req.params.statusId||'');
+    if(!validId(id)) return fail(res,400,'Invalid status ID.');
+    const {data:post,error:pe}=await supabase.from('recovery_chat_status_posts').select('id,user_id,expires_at').eq('id',id).maybeSingle();
+    if(pe) throw pe;
+    if(!post||new Date(post.expires_at)<=new Date()) return fail(res,404,'Status not found or expired.');
+    if(post.user_id===req.user.id) return res.json({success:true,ownStatus:true});
+    const {error}=await supabase.from('recovery_chat_status_views').upsert({status_id:id,viewer_user_id:req.user.id,viewed_at:new Date().toISOString()},{onConflict:'status_id,viewer_user_id'});
+    if(error) throw error;
+    res.json({success:true,viewed:true});
+  } catch(error) { return handleDbError(res,error,'Status view error:'); }
+});
 
 router.get('/friend-requests', async (req, res) => {
   try {
@@ -379,6 +525,9 @@ router.get('/status', async (req, res) => {
       .select('id,user_id,status_type,text_content,media_path,caption,expires_at,created_at')
       .gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(300);
     if (error) throw error;
+    const { data: hiddenRows, error: he } = await supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id',req.user.id);
+    if (he) throw he;
+    const hiddenIds = new Set((hiddenRows || []).map(x => x.status_id));
     const users = [...new Set((posts || []).map(p => p.user_id))];
     const [{ data: profiles, error: pe }, { data: wallet, error: we }] = await Promise.all([
       users.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,status_visibility').in('user_id', users) : Promise.resolve({ data: [], error: null }),
@@ -386,7 +535,7 @@ router.get('/status', async (req, res) => {
     ]);
     if (pe) throw pe; if (we) throw we;
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-    const statuses = (posts || []).filter(p => p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody')
+    const statuses = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'))
       .map(p => ({ ...p, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } }));
     const last = wallet?.free_status_last_used_at ? new Date(wallet.free_status_last_used_at).getTime() : 0;
     res.json({ success: true, statuses, allowance: { freeAvailable: !last || Date.now() - last >= 86400000, freeLastUsedAt: wallet?.free_status_last_used_at || null, paidCredits: wallet?.paid_status_credits || 0 } });
