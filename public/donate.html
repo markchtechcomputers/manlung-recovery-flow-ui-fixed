@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script src="/js/theme.js?v=20261014-currency-live-fix2"></script>
+  <script src="/js/theme.js?v=20261014-currency-independent-fix3"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Support Manlung Recovery</title>
@@ -351,17 +351,21 @@ body:has(.donation-shell){background:linear-gradient(rgba(244,248,250,.58),rgba(
 <script src="https://js.paystack.co/v2/inline.js"></script>
 <script>
 const amountEl=document.getElementById('amount'), donorNameEl=document.getElementById('donorName'), emailEl=document.getElementById('email'), statusEl=document.getElementById('status'), btn=document.getElementById('donateBtn');
-const currencyApi=window.ManlungCurrency, currencySelect=document.getElementById('donationCurrency');
-function validCurrency(code){return Boolean(currencyApi&&currencyApi.rates&&currencyApi.rates[code])}
-function readApiCurrency(){try{const value=typeof currencyApi?.current==='function'?currencyApi.current():currencyApi?.current;return validCurrency(value)?value:'KES'}catch(_){return 'KES'}}
-let selectedCurrency=readApiCurrency();
-function activeCurrency(){return validCurrency(selectedCurrency)?selectedCurrency:readApiCurrency()}
-function fmtMoney(kes){return currencyApi?currencyApi.format(currencyApi.fromKes(Number(kes||0),activeCurrency()),activeCurrency()):'KES '+Number(kes||0).toLocaleString('en-KE')}
-function localToKes(value){return currencyApi?currencyApi.toKes(Number(value||0),activeCurrency()):Number(value||0)}
-const FALLBACK_CURRENCIES=[['KES','Kenyan shilling (KSh)'],['USD','US dollar ($)'],['EUR','Euro (€)'],['GBP','British pound (£)'],['UGX','Ugandan shilling'],['TZS','Tanzanian shilling'],['NGN','Nigerian naira (₦)'],['INR','Indian rupee (₹)'],['ZAR','South African rand'],['AED','UAE dirham'],['CAD','Canadian dollar'],['AUD','Australian dollar'],['JPY','Japanese yen'],['CNY','Chinese yuan'],['GHS','Ghanaian cedi'],['RUB','Russian ruble']];
+const currencySelect=document.getElementById('donationCurrency');
+const DISPLAY_RATES={KES:1,USD:130,EUR:150,GBP:175,UGX:0.034,TZS:0.05,NGN:0.085,INR:1.55,ZAR:7.1,AED:35.4,CAD:94,AUD:85,JPY:0.87,CNY:18,GHS:10.5,RUB:1.35};
+const DISPLAY_CURRENCIES=[['KES','Kenyan shilling (KSh)'],['USD','US dollar ($)'],['EUR','Euro (€)'],['GBP','British pound (£)'],['UGX','Ugandan shilling'],['TZS','Tanzanian shilling'],['NGN','Nigerian naira (₦)'],['INR','Indian rupee (₹)'],['ZAR','South African rand'],['AED','UAE dirham'],['CAD','Canadian dollar'],['AUD','Australian dollar'],['JPY','Japanese yen'],['CNY','Chinese yuan'],['GHS','Ghanaian cedi'],['RUB','Russian ruble']];
+function readSavedCurrency(){try{const c=localStorage.getItem('manlung-currency');if(c&&DISPLAY_RATES[c])return c}catch(_){}return 'KES'}
+let selectedCurrency=readSavedCurrency();
+function activeCurrency(){return DISPLAY_RATES[selectedCurrency]?selectedCurrency:'KES'}
+function fromKes(kes,currency=activeCurrency()){return Number(kes||0)/(DISPLAY_RATES[currency]||1)}
+function toKes(amount,currency=activeCurrency()){return Number(amount||0)*(DISPLAY_RATES[currency]||1)}
+function formatCurrency(amount,currency=activeCurrency()){try{return new Intl.NumberFormat(undefined,{style:'currency',currency,maximumFractionDigits:['KES','UGX','TZS','NGN','JPY'].includes(currency)?0:2}).format(Number(amount||0))}catch(_){return currency+' '+Number(amount||0).toLocaleString()}}
+function fmtMoney(kes){return formatCurrency(fromKes(Number(kes||0),activeCurrency()),activeCurrency())}
+function localToKes(value){return toKes(Number(value||0),activeCurrency())}
+const FALLBACK_CURRENCIES=DISPLAY_CURRENCIES;
 function populateCurrencies(){
  if(currencySelect){
-  const options=(currencyApi&&Array.isArray(currencyApi.options)&&currencyApi.options.length)?currencyApi.options:FALLBACK_CURRENCIES;
+  const options=(FALLBACK_CURRENCIES;
   if(currencySelect.options.length!==options.length){
    currencySelect.replaceChildren();
    options.forEach(([code,label])=>{const o=document.createElement('option');o.value=code;o.textContent=label;currencySelect.appendChild(o)});
@@ -371,16 +375,17 @@ function populateCurrencies(){
   if(!currencySelect.value)currencySelect.value='KES';
  }
  document.getElementById('customCurrencyCode').textContent=activeCurrency();
- document.querySelectorAll('.amount-btn').forEach(b=>{b.textContent=fmtMoney(Number(b.dataset.amount));if(b.classList.contains('active'))amountEl.value=currencyApi?currencyApi.fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):b.dataset.amount});
- amountEl.min=currencyApi?(activeCurrency()==='KES'?'50':(Math.ceil(currencyApi.fromKes(50,activeCurrency())*100)/100).toFixed(2)):'50';
- amountEl.max=currencyApi?currencyApi.fromKes(5700010,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):'5700010';
+ document.querySelectorAll('.amount-btn').forEach(b=>{b.textContent=fmtMoney(Number(b.dataset.amount));if(b.classList.contains('active'))amountEl.value=fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2)});
+ amountEl.min=(activeCurrency()==='KES'?'50':(Math.ceil(fromKes(50,activeCurrency())*100)/100).toFixed(2));
+ amountEl.max=fromKes(5700010,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2);
  amountEl.placeholder='Minimum '+fmtMoney(50);
  const amountHelp=document.getElementById('amount-help');if(amountHelp)amountHelp.textContent='Minimum equivalent of '+fmtMoney(50)+' (KES 50).';
 }
 function refreshCurrency(){populateCurrencies();loadTotal()}
-if(currencyApi){populateCurrencies();window.addEventListener('manlung:currencychange',event=>{if(event.detail&&validCurrency(event.detail.currency))selectedCurrency=event.detail.currency;else if(!(localStorage.getItem('manlung-currency-manual')==='true'))selectedCurrency=readApiCurrency();if(currencySelect)currencySelect.value=activeCurrency();populateCurrencies();loadTotal()});window.addEventListener('storage',e=>{if(e.key==='manlung-language'||e.key==='manlung-currency'||e.key==='manlung-currency-manual'){selectedCurrency=readApiCurrency();if(currencySelect)currencySelect.value=activeCurrency();populateCurrencies();loadTotal()}})}
-if(currencySelect)currencySelect.addEventListener('change',()=>{const previousKes=amountEl.dataset.selectedKes?Number(amountEl.dataset.selectedKes):localToKes(Number(amountEl.value||0));const next=currencySelect.value;if(validCurrency(next)){selectedCurrency=next;if(currencyApi)currencyApi.set(next,true)}populateCurrencies();if(amountEl.value&&!amountEl.dataset.selectedKes)amountEl.value=currencyApi?currencyApi.fromKes(previousKes,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):String(Math.round(previousKes));loadTotal()});
-document.querySelectorAll('.amount-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');amountEl.dataset.selectedKes=b.dataset.amount;amountEl.value=currencyApi?currencyApi.fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):b.dataset.amount;});
+populateCurrencies();
+window.addEventListener('storage',e=>{if(e.key==='manlung-currency'){selectedCurrency=readSavedCurrency();if(currencySelect)currencySelect.value=activeCurrency();populateCurrencies();loadTotal()}});
+if(currencySelect)currencySelect.addEventListener('change',()=>{const previousKes=amountEl.dataset.selectedKes?Number(amountEl.dataset.selectedKes):localToKes(Number(amountEl.value||0));const next=currencySelect.value;if(DISPLAY_RATES[next]){selectedCurrency=next;try{localStorage.setItem('manlung-currency',next);localStorage.setItem('manlung-currency-manual','true')}catch(_){}}populateCurrencies();if(amountEl.value&&!amountEl.dataset.selectedKes)amountEl.value=fromKes(previousKes,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2);loadTotal()});
+document.querySelectorAll('.amount-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');amountEl.dataset.selectedKes=b.dataset.amount;amountEl.value=fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2);});
 amountEl.addEventListener('input',()=>{delete amountEl.dataset.selectedKes;});
 async function loadTotal(){
  try{const r=await fetch('/api/donations/total',{cache:'no-store'});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Could not load donation total.');
