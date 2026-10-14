@@ -148,3 +148,11 @@ html,body{max-width:100%;overflow-x:hidden}
 
 /* Preserve the original full-motion background video on all devices. */
 .mr-home-hero.mr-video-hero .mr-hero-background-video{visibility:visible!important;display:block!important;opacity:.78!important;object-fit:cover!important;}
+
+
+/* Critical stacking fix: keep the original background video inside the hero's visible paint layer. */
+.mr-home-hero.mr-video-hero{position:relative!important;isolation:isolate!important;background:#071426!important;}
+.mr-home-hero.mr-video-hero .mr-hero-background-video{position:absolute!important;inset:0!important;z-index:0!important;display:block!important;visibility:visible!important;width:100%!important;height:100%!important;opacity:1!important;object-fit:cover!important;object-position:center!important;background:transparent!important;pointer-events:none!important;}
+.mr-home-hero.mr-video-hero .mr-hero-video-fallback{position:absolute!important;inset:0!important;z-index:-1!important;}
+.mr-home-hero.mr-video-hero .mr-hero-video-overlay{position:absolute!important;inset:0!important;z-index:1!important;}
+.mr-home-hero.mr-video-hero .mr-home-hero-inner{position:relative!important;z-index:2!important;}
