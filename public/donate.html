@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script src="/js/theme.js?v=20261014-currency-fix2"></script>
+  <script src="/js/theme.js?v=20261014-donation-layout3"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Support Manlung Recovery</title>
@@ -31,7 +31,7 @@ body:has(.donation-shell){background:linear-gradient(rgba(244,248,250,.58),rgba(
 .total-card strong{display:block;font-size:clamp(2rem,5vw,2.75rem);letter-spacing:-.04em;line-height:1.15;margin:.35rem 0}
 .total-card span{opacity:.88;font-size:.9rem}
 .donation-progress{margin-top:1.4rem;text-align:left}.donation-progress-track{height:11px;width:100%;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.17)}.donation-progress-bar{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#4ade80,#bbf7d0);box-shadow:0 0 14px rgba(74,222,128,.25);transition:width .7s ease}.donation-progress-meta{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:.65rem;font-size:.8rem;opacity:.9}.donation-progress-meta strong{display:inline;margin:0;font-size:inherit;letter-spacing:0}
-.currency-choice{display:flex;align-items:center;justify-content:center;gap:.65rem;flex-wrap:wrap;margin:1.15rem auto 0;padding:.7rem .9rem;border:1px solid #dbe7f1;border-radius:13px;background:rgba(255,255,255,.78);color:#203b59;font-size:.82rem;font-weight:800}.currency-choice select{width:auto;min-width:190px;max-width:100%;padding:.55rem .7rem;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#0f172a;font:inherit}.currency-note{margin:.6rem auto 0;max-width:650px;color:#64748b;font-size:.76rem;line-height:1.5;text-align:center}.donation-form-section{margin-top:1.6rem}.donation-section-heading{margin:0 0 .35rem;color:var(--donation-ink);font-size:1.12rem;font-weight:850}.donation-section-copy{margin:0;color:var(--donation-muted);font-size:.88rem;line-height:1.55}
+.currency-choice{display:flex;align-items:center;justify-content:space-between;gap:.85rem;flex-wrap:wrap;width:100%;max-width:520px;box-sizing:border-box;margin:1.25rem auto 0;padding:.9rem 1rem;border:1px solid #dbe7f1;border-radius:14px;background:#fff;color:#203b59;font-size:.9rem;font-weight:800;box-shadow:0 5px 18px rgba(15,39,72,.05)}.currency-choice label{display:block;flex:1 1 120px}.currency-choice select{box-sizing:border-box;width:100%;min-width:0;max-width:100%;flex:1 1 180px;min-height:44px;padding:.65rem .8rem;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#0f172a;font:inherit;font-weight:650}.currency-note{margin:.55rem auto 0;padding:0 .4rem;max-width:520px;color:#64748b;font-size:.76rem;line-height:1.55;text-align:center;overflow-wrap:anywhere}.donation-form-section{margin-top:1.6rem}.donation-section-heading{margin:0 0 .35rem;color:var(--donation-ink);font-size:1.12rem;font-weight:850}.donation-section-copy{margin:0;color:var(--donation-muted);font-size:.88rem;line-height:1.55}
 .amount-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin:1rem 0 1.3rem}
 .amount-btn{min-height:52px;padding:.75rem .55rem;border:1px solid #d7e2ed;border-radius:14px;background:#fff;color:#203b59;font:inherit;font-size:.9rem;font-weight:800;cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease}
 .amount-btn:hover{border-color:#16a34a;transform:translateY(-1px);box-shadow:0 5px 15px rgba(22,163,74,.08)}
@@ -44,7 +44,7 @@ body:has(.donation-shell){background:linear-gradient(rgba(244,248,250,.58),rgba(
 .notice{font-size:.86rem;color:#53667d;text-align:center;margin-top:1rem;line-height:1.6;overflow-wrap:anywhere}
 .donation-progress[aria-label]{display:block}
 .donation-card button:focus-visible{outline:3px solid #86efac;outline-offset:3px}
-@media(max-width:600px){.donation-shell{margin:.7rem auto;padding:.55rem}.donation-card{padding:1.15rem;border-radius:21px}.donation-head h1{font-size:1.7rem}.donation-head p{font-size:.92rem}.donation-heart{width:64px;height:64px;border-radius:19px}.total-card{margin:1.2rem 0;padding:1.15rem;border-radius:18px}.amount-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}.amount-btn{min-height:50px;font-size:.88rem}.donation-fields{grid-template-columns:1fr}.donation-fields .field:first-child{grid-column:auto}.donation-progress-meta{font-size:.74rem}.donate-action{min-height:54px}}
+@media(max-width:600px){.donation-shell{margin:.7rem auto;padding:.55rem}.donation-card{padding:1.15rem;border-radius:21px}.donation-head h1{font-size:1.7rem}.donation-head p{font-size:.92rem}.donation-heart{width:64px;height:64px;border-radius:19px}.currency-choice{align-items:stretch;gap:.45rem;margin-top:1rem;padding:.8rem}.currency-choice label{flex-basis:100%}.currency-choice select{flex-basis:100%;min-height:46px}.currency-note{font-size:.74rem;text-align:left;padding:0 .2rem}.total-card{margin:1.2rem 0;padding:1.15rem;border-radius:18px}.amount-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}.amount-btn{min-height:50px;font-size:.88rem}.donation-fields{grid-template-columns:1fr}.donation-fields .field:first-child{grid-column:auto}.donation-progress-meta{font-size:.74rem}.donate-action{min-height:54px}}
 @media(prefers-reduced-motion:reduce){.amount-btn,.donate-action,.field input,.donation-progress-bar{transition:none}}
 </style>
 <style id="manlung-header-style">
@@ -300,7 +300,7 @@ body:has(.donation-shell){background:linear-gradient(rgba(244,248,250,.58),rgba(
   <div class="donation-head">
     <div class="donation-heart"><img src="/images/donation.png" alt="" style="width:48px;height:48px;object-fit:contain;display:block" loading="lazy"></div>
     <h1 id="donation-title">Support Our Work</h1>
-    <p>Every confirmed donation helps us maintain the platform and provide recovery support. Every contribution makes a difference.</p>
+    <p>Your donation helps us maintain the Manlung Recovery platform and continue providing recovery support. Every contribution matters.</p>
   </div>
   <div class="currency-choice"><label for="donationCurrency">Display currency</label><select id="donationCurrency" aria-label="Choose display currency"></select></div><p class="currency-note">Amounts are approximate display conversions. Secure checkout and confirmed donations are processed in Kenyan shillings (KES); your bank or card provider may apply its own exchange rate.</p>
   <section class="total-card" aria-label="Donation progress">
