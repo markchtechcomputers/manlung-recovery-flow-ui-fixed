@@ -345,7 +345,8 @@
 
   function installGlobalLanguageSelector() {
     if (document.getElementById('manlungLanguageControl')) return;
-    const actions = document.querySelector('.home-header-container .header-actions') || document.querySelector('.site-header .header-actions');
+    const mobileActions = window.matchMedia('(max-width: 768px)').matches ? document.querySelector('.mobile-header-actions') : null;
+    const actions = mobileActions || document.querySelector('.home-header-container .header-actions') || document.querySelector('.site-header .header-actions');
     if (!actions) return;
 
     const control = document.createElement('div');
@@ -353,7 +354,7 @@
     control.className = 'manlung-language-control';
     control.innerHTML = `
       <button type="button" class="manlung-language-button" id="manlungLanguageButton" aria-label="Choose website language" title="Choose website language" aria-haspopup="dialog" aria-expanded="false">
-        <img src="https://i.postimg.cc/xCBk1RL2/icons8-language-94.png" alt="" aria-hidden="true">
+        <img src="https://i.postimg.cc/xCBk1RL2/icons8-language-94.png" alt="" aria-hidden="true" onerror="this.style.display='none';this.nextElementSibling.textContent='🌐';this.nextElementSibling.classList.add('manlung-language-fallback-icon')">
         <span class="manlung-language-short-label">Language</span>
       </button>
       <div class="manlung-language-popover" id="manlungLanguagePopover" role="dialog" aria-label="Website language" hidden>
@@ -376,7 +377,7 @@
     style.textContent = `
       .manlung-language-control{position:relative;display:inline-flex;align-items:center;flex:0 0 auto!important;min-width:0!important}
       .manlung-language-button{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;min-width:34px!important;min-height:34px!important;padding:4px 6px!important;border:0!important;border-radius:9px!important;background:transparent!important;color:inherit!important;cursor:pointer!important;font:inherit!important;font-size:.7rem!important;font-weight:800!important;white-space:nowrap!important}
-      .manlung-language-button img{display:block!important;width:25px!important;height:25px!important;object-fit:contain!important;background:transparent!important}
+      .manlung-language-button img{display:block!important;width:25px!important;height:25px!important;object-fit:contain!important;background:transparent!important}.manlung-language-fallback-icon{font-size:23px!important;line-height:1!important}.mobile-header-actions .manlung-language-control{display:inline-flex!important;align-items:center!important;justify-content:center!important;position:relative!important;z-index:10020!important}.mobile-header-actions .manlung-language-button{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;padding:4px!important;border:0!important;background:transparent!important;color:inherit!important}.mobile-header-actions .manlung-language-button img{width:26px!important;height:26px!important}
       .manlung-language-button:hover,.manlung-language-button:focus-visible{background:rgba(100,116,139,.13)!important;outline:2px solid rgba(59,130,246,.35)!important;outline-offset:2px}
       .manlung-language-popover{position:absolute;z-index:10050;top:calc(100% + 10px);right:0;width:min(310px,calc(100vw - 28px));padding:14px;border:1px solid #cbd5e1;border-radius:15px;background:#fff;color:#0f172a;box-shadow:0 18px 55px rgba(2,6,23,.24);text-align:left;white-space:normal}
       .manlung-language-popover[hidden]{display:none!important}
@@ -415,7 +416,7 @@
         const saved = localStorage.getItem('manlung-language');
         if (saved) return saved;
       } catch (_) {}
-      const match = document.cookie.match(/(?:^|;\\s*)googtrans=([^;]+)/);
+      const match = document.cookie.match(/(?:^|;\s*)googtrans=([^;]+)/);
       return match ? decodeURIComponent(match[1]).split('/').pop() : '';
     };
     const populate = () => {
