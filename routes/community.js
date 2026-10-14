@@ -626,4 +626,95 @@ router.post('/status/purchase/verify', async (req, res) => {
   }
 });
 
+
+const peerCallLimiter = rateLimit({windowMs:60*1000,max:20,standardHeaders:true,legacyHeaders:false});
+async function areAcceptedFriends(a,b) {
+ const {data,error}=await supabase.from('recovery_chat_friend_requests').select('id').eq('status','accepted')
+  .or('and(sender_user_id.eq.'+a+',recipient_user_id.eq.'+b+'),and(sender_user_id.eq.'+b+',recipient_user_id.eq.'+a+')').limit(1);
+ if(error) throw error; return Boolean(data?.length);
+}
+async function hasCallPlan(userId) {
+ const {data,error}=await supabase.from('recovery_chat_plan_purchases').select('id')
+  .eq('user_id',userId).eq('plan_code','call').eq('status','paid').gt('expires_at',new Date().toISOString()).limit(1);
+ if(error) throw error; return Boolean(data?.length);
+}
+async function peerParticipant(callId,userId) {
+ const {data,error}=await supabase.from('recovery_peer_calls').select('*').eq('id',callId).maybeSingle();
+ if(error) throw error;
+ if(!data) return {call:null,participant:false};
+ return {call:data,participant:data.caller_user_id===userId||data.callee_user_id===userId};
+}
+router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
+ try{
+  if(req.user.role!=='client') return fail(res,403,'Client account required.');
+  const other=String(req.body?.memberId||''),mode=req.body?.call_mode==='video'?'video':'audio';
+  if(!validId(other)||other===String(req.user.id)) return fail(res,400,'Choose a valid registered member.');
+  if(await blockedEitherWay(req.user.id,other)) return fail(res,403,'Calls are unavailable because one account has blocked the other.');
+  if(!await areAcceptedFriends(req.user.id,other)) return fail(res,403,'Accept the friend request before calling this member.');
+  if(!await hasCallPlan(req.user.id)) return fail(res,402,'An active KES 200/month call subscription is required.');
+  const {data:callee,error:ce}=await supabase.from('recovery_users').select('id,role,security_status').eq('id',other).maybeSingle();
+  if(ce) throw ce;
+  if(!callee||callee.role!=='client'||(callee.security_status&&callee.security_status!=='active')) return fail(res,404,'Member not found.');
+  const {data:busy,error:be}=await supabase.from('recovery_peer_calls').select('id').in('status',['ringing','accepted'])
+   .or('caller_user_id.eq.'+req.user.id+',callee_user_id.eq.'+req.user.id+',caller_user_id.eq.'+other+',callee_user_id.eq.'+other).limit(1);
+  if(be) throw be;
+  if(busy?.length) return fail(res,409,'One of these members is already in a call.');
+  const {data,error}=await supabase.from('recovery_peer_calls').insert({caller_user_id:req.user.id,callee_user_id:other,call_mode:mode,status:'ringing'})
+   .select('id,caller_user_id,callee_user_id,call_mode,status,created_at').single();
+  if(error) throw error;
+  res.status(201).json({success:true,call:data});
+ }catch(error){return handleDbError(res,error,'Peer call start error:');}
+});
+router.get('/peer-calls/incoming',async(req,res)=>{
+ try{
+  const {data,error}=await supabase.from('recovery_peer_calls').select('id,caller_user_id,callee_user_id,call_mode,status,created_at')
+   .eq('callee_user_id',req.user.id).eq('status','ringing').gt('created_at',new Date(Date.now()-120000).toISOString()).order('created_at',{ascending:false}).limit(5);
+  if(error) throw error;
+  const ids=[...new Set((data||[]).map(x=>x.caller_user_id))];
+  const {data:users,error:ue}=ids.length?await supabase.from('recovery_users').select('id,username').in('id',ids):{data:[],error:null};
+  if(ue) throw ue;
+  const {data:profiles,error:pe}=ids.length?await supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url').in('user_id',ids):{data:[],error:null};
+  if(pe) throw pe;
+  const um=new Map((users||[]).map(x=>[x.id,x])),pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
+  res.set('Cache-Control','no-store');
+  res.json({success:true,calls:(data||[]).map(c=>({...c,caller:{name:pm.get(c.caller_user_id)?.display_name||um.get(c.caller_user_id)?.username||'Member',avatar:pm.get(c.caller_user_id)?.avatar_url||null}}))});
+ }catch(error){return handleDbError(res,error,'Incoming peer calls error:');}
+});
+router.get('/peer-calls/:callId/signals',async(req,res)=>{
+ try{
+  const id=String(req.params.callId||'');
+  if(!validId(id)) return fail(res,400,'Invalid call ID.');
+  const {call,participant}=await peerParticipant(id,req.user.id);
+  if(!call) return fail(res,404,'Call not found.');
+  if(!participant) return fail(res,403,'You are not a participant in this call.');
+  const after=Math.max(0,Number.parseInt(req.query.after||'0',10)||0);
+  const {data:signals,error}=await supabase.from('recovery_peer_call_signals').select('id,sender_user_id,signal_type,payload,created_at')
+   .eq('call_id',id).neq('sender_user_id',req.user.id).gt('id',after).order('id',{ascending:true}).limit(100);
+  if(error) throw error;
+  res.set('Cache-Control','no-store');
+  res.json({success:true,call,signals:signals||[]});
+ }catch(error){return handleDbError(res,error,'Peer call signals read error:');}
+});
+router.post('/peer-calls/:callId/signals',peerCallLimiter,async(req,res)=>{
+ try{
+  const id=String(req.params.callId||''),type=String(req.body?.signal_type||'');
+  if(!validId(id)||!['offer','answer','ice','accept','reject','hangup'].includes(type)) return fail(res,400,'Invalid call signal.');
+  const {call,participant}=await peerParticipant(id,req.user.id);
+  if(!call) return fail(res,404,'Call not found.');
+  if(!participant) return fail(res,403,'You are not a participant in this call.');
+  if(['ended','rejected','missed'].includes(call.status)) return fail(res,409,'This call has already ended.');
+  const payload=req.body?.payload&&typeof req.body.payload==='object'&&!Array.isArray(req.body.payload)?req.body.payload:{};
+  if(JSON.stringify(payload).length>30000) return fail(res,413,'Call signal is too large.');
+  if(type==='offer'&&req.user.id!==call.caller_user_id) return fail(res,403,'Only the caller can send an offer.');
+  if(type==='answer'&&req.user.id!==call.callee_user_id) return fail(res,403,'Only the recipient can send an answer.');
+  if(type==='accept'&&req.user.id!==call.callee_user_id) return fail(res,403,'Only the recipient can accept this call.');
+  const {data,error}=await supabase.from('recovery_peer_call_signals').insert({call_id:id,sender_user_id:req.user.id,signal_type:type,payload})
+    .select('id,call_id,sender_user_id,signal_type,payload,created_at').single();
+  if(error) throw error;
+  if(type==='accept') {const u=await supabase.from('recovery_peer_calls').update({status:'accepted',accepted_at:new Date().toISOString()}).eq('id',id).eq('status','ringing');if(u.error) throw u.error;}
+  if(type==='reject'||type==='hangup') {const u=await supabase.from('recovery_peer_calls').update({status:type==='reject'?'rejected':'ended',ended_at:new Date().toISOString()}).eq('id',id).in('status',['ringing','accepted']);if(u.error) throw u.error;}
+  res.status(201).json({success:true,signal:data});
+ }catch(error){return handleDbError(res,error,'Peer call signal write error:');}
+});
+
 module.exports = router;
