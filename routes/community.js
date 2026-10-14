@@ -183,6 +183,90 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Community message send error:'); }
 });
 
+
+router.get('/friend-requests', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('recovery_chat_friend_requests')
+      .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at')
+      .or('sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + req.user.id)
+      .in('status', ['pending','accepted']).order('created_at', { ascending: false }).limit(200);
+    if (error) throw error;
+    const ids = [...new Set((data || []).map(x => x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id))];
+    const [{ data: users, error: ue }, { data: profiles, error: pe }] = await Promise.all([
+      ids.length ? supabase.from('recovery_users').select('id,username,role,security_status').in('id', ids) : Promise.resolve({ data: [], error: null }),
+      ids.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,bio').in('user_id', ids) : Promise.resolve({ data: [], error: null })
+    ]);
+    if (ue) throw ue; if (pe) throw pe;
+    const um = new Map((users || []).map(u => [u.id, u]));
+    const pm = new Map((profiles || []).map(p => [p.user_id, p]));
+    const requests = (data || []).filter(x => um.has(x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id))
+      .map(x => {
+        const otherId = x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id;
+        const u = um.get(otherId), p = pm.get(otherId) || {};
+        return { ...x, direction: x.sender_user_id === req.user.id ? 'sent' : 'received',
+          member: { id: otherId, name: cleanText(p.display_name, 80) || cleanText(u.username, 80) || 'Member', username: u.username || null, avatar: p.avatar_url || null, bio: p.bio || '' } };
+      });
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, requests });
+  } catch (error) { return handleDbError(res, error, 'Friend request list error:'); }
+});
+
+router.post('/friend-requests/:memberId', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid member.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This member is unavailable.');
+    const { data: recipient, error: re } = await supabase.from('recovery_users')
+      .select('id,role,security_status').eq('id', other).in('role', roles).maybeSingle();
+    if (re) throw re;
+    if (!recipient || (recipient.security_status && recipient.security_status !== 'active')) return fail(res, 404, 'Member not found.');
+    const { data: existing, error: ee } = await supabase.from('recovery_chat_friend_requests')
+      .select('id,sender_user_id,recipient_user_id,status')
+      .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
+      .in('status', ['pending','accepted']).limit(1).maybeSingle();
+    if (ee) throw ee;
+    if (existing?.status === 'accepted') return res.json({ success: true, alreadyFriends: true, request: existing });
+    if (existing?.status === 'pending') {
+      if (existing.sender_user_id === other && existing.recipient_user_id === req.user.id) {
+        const { data: accepted, error: ae } = await supabase.from('recovery_chat_friend_requests')
+          .update({ status: 'accepted', responded_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+          .eq('id', existing.id).eq('recipient_user_id', req.user.id).select('*').single();
+        if (ae) throw ae;
+        return res.json({ success: true, acceptedReciprocalRequest: true, request: accepted });
+      }
+      return res.json({ success: true, alreadyPending: true, request: existing });
+    }
+    const { data, error } = await supabase.from('recovery_chat_friend_requests')
+      .insert({ sender_user_id: req.user.id, recipient_user_id: other, status: 'pending' })
+      .select('id,sender_user_id,recipient_user_id,status,created_at').single();
+    if (error) throw error;
+    res.status(201).json({ success: true, request: data });
+  } catch (error) { return handleDbError(res, error, 'Friend request create error:'); }
+});
+
+router.patch('/friend-requests/:requestId', async (req, res) => {
+  try {
+    const id = String(req.params.requestId || '');
+    if (!validId(id)) return fail(res, 400, 'Invalid friend request.');
+    const action = String(req.body?.action || '').toLowerCase();
+    if (!['accept','decline','cancel'].includes(action)) return fail(res, 400, 'Choose accept, decline, or cancel.');
+    const { data: request, error: re } = await supabase.from('recovery_chat_friend_requests')
+      .select('id,sender_user_id,recipient_user_id,status').eq('id', id).maybeSingle();
+    if (re) throw re;
+    if (!request) return fail(res, 404, 'Friend request not found.');
+    const allowed = action === 'cancel' ? request.sender_user_id === req.user.id : request.recipient_user_id === req.user.id;
+    if (!allowed) return fail(res, 403, 'You cannot change this friend request.');
+    if (request.status !== 'pending') return res.json({ success: true, request, unchanged: true });
+    const status = action === 'accept' ? 'accepted' : action === 'decline' ? 'declined' : 'cancelled';
+    const now = new Date().toISOString();
+    const { data, error } = await supabase.from('recovery_chat_friend_requests')
+      .update({ status, responded_at: now, updated_at: now }).eq('id', id).eq('status', 'pending').select('id,sender_user_id,recipient_user_id,status,created_at,responded_at').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 409, 'This friend request has already been handled.');
+    res.json({ success: true, request: data });
+  } catch (error) { return handleDbError(res, error, 'Friend request update error:'); }
+});
+
 router.put('/preferences/:memberId', async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
