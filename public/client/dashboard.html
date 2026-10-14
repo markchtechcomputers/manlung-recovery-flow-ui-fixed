@@ -887,7 +887,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         <i class="fas fa-arrow-up-right-from-square overview-corner" aria-hidden="true"></i>
       </article>
       <article class="dashboard-overview-card overview-donations">
-        <div class="overview-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <div class="overview-icon community-grants-image-icon"><img src="https://i.postimg.cc/kGpGV5xb/icons8-community-grants-48.png" alt="" aria-hidden="true" loading="eager" decoding="async"></div>
         <div class="overview-copy"><span>Community Support</span><strong id="dashboardDonationMetric">KES 0</strong><small><span id="dashboardDonationCountMetric">0</span> confirmed donations</small></div>
         <i class="fas fa-heart overview-corner" aria-hidden="true"></i>
       </article>
@@ -2346,5 +2346,12 @@ body.dark .dashboard-notices-shortcut .notification-image-icon{background:#ede9f
 @media(max-width:560px){.notification-image-icon img{width:25px!important;height:25px!important;max-width:25px!important;max-height:25px!important}}
 </style>
 
+
+<style id="manlung-community-grants-icon-fix">
+.overview-donations .community-grants-image-icon{display:grid!important;place-items:center!important;background:#ecfdf5!important;color:inherit!important}
+.overview-donations .community-grants-image-icon img{display:block!important;width:30px!important;height:30px!important;max-width:30px!important;max-height:30px!important;object-fit:contain!important;flex:0 0 30px!important}
+body.dark .overview-donations .community-grants-image-icon{background:#12352b!important}
+@media(max-width:560px){.overview-donations .community-grants-image-icon img{width:28px!important;height:28px!important;max-width:28px!important;max-height:28px!important;flex-basis:28px!important}}
+</style>
 </body>
 </html>
