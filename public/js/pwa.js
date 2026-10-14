@@ -29,7 +29,44 @@
     });
   }
 
+
   installMobileBackNavigation();
+
+  // Handle the Android system Back button through Capacitor when the native
+  // App plugin is available. Prefer the WebView's real navigation history;
+  // only fall back to the homepage when there is no previous entry.
+  function installCapacitorBackButton() {
+    const appPlugin = window.Capacitor?.Plugins?.App;
+    if (!appPlugin || window.__manlungCapacitorBackInstalled) return;
+    window.__manlungCapacitorBackInstalled = true;
+
+    try {
+      appPlugin.addListener('backButton', ({ canGoBack } = {}) => {
+        const isHome = window.location.pathname === '/' ||
+          window.location.pathname === '/index.html';
+
+        if (canGoBack && window.history.length > 1) {
+          window.history.back();
+          return;
+        }
+
+        if (!isHome) {
+          window.location.replace('/');
+          return;
+        }
+
+        // At the homepage, consume Back rather than allowing the WebView to
+        // close the activity immediately.
+        try {
+          window.history.pushState({ manlungBackGuard: true }, '', window.location.href);
+        } catch (_) {}
+      });
+    } catch (error) {
+      console.warn('Manlung Android Back handler could not be installed:', error);
+    }
+  }
+
+  installCapacitorBackButton();
 
 
   // Prefer the browser's native PWA install prompt, with the existing APK page as fallback.
