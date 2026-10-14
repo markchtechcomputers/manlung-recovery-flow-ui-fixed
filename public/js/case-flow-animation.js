@@ -12,7 +12,7 @@
     const progress = [...root.querySelectorAll('[data-flow-dot]')];
     const stage = root.querySelector('.mr-case-flow-stage');
     const stages = [
-      { title: 'Case request submitted', desc: 'The client sends a recovery request with the details needed to begin.', label: '1 · Request received', icon: 'fa-inbox' },
+      { title: 'Case request submitted', desc: 'The client sends a recovery request with the details needed to begin.', label: '01 · Request received', icon: 'fa-inbox' },
       { title: 'Admin reviews the case', desc: 'The request appears in the admin queue for review and triage.', label: '02 · Admin review', icon: 'fa-user-shield' },
       { title: 'Case claimed for work', desc: 'An authorized admin claims the case and starts the next steps.', label: '03 · Work begins', icon: 'fa-briefcase' },
       { title: 'Chat and progress updates', desc: 'The client and admin exchange case-related messages and updates.', label: '04 · Communication', icon: 'fa-comments' },
