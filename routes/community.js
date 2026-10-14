@@ -53,7 +53,7 @@ async function requireGroupMember(groupId, userId) {
   return Boolean(data);
 }
 function handleDbError(res, error, context) {
-  if (error?.code === '42P01' || /recovery_chat_|recovery_community_messages/.test(error?.message || '')) {
+  if (error?.code === '42P01' || /recovery_chat_|recovery_community_messages|recovery_peer_calls|recovery_peer_call_signals/.test(error?.message || '')) {
     return fail(res, 503, 'Chat database SQL has not been applied yet. Run the supplied Manlung Chat SQL in Supabase.');
   }
   console.error(context, error?.message || error);
