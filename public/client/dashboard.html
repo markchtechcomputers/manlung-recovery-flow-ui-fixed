@@ -894,7 +894,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       <button type="button" class="dashboard-overview-card overview-notices dashboard-notices-shortcut"
         id="dashboardNotificationsShortcut" aria-label="Open notifications"
         onclick="document.getElementById('manlungNotifications')?.scrollIntoView({behavior:'smooth',block:'start'});">
-        <span class="overview-icon" aria-hidden="true"><i class="fas fa-bell"></i></span>
+        <span class="overview-icon notification-image-icon" aria-hidden="true"><img src="https://i.postimg.cc/k4JcnjJk/icons8-notification-50.png" alt="" loading="eager" decoding="async"></span>
         <span class="overview-copy"><span>Notifications</span><strong id="dashboardNoticeMetric">0</strong><small>Unread account updates</small></span>
         <i class="fas fa-chevron-right overview-corner" aria-hidden="true"></i>
       </button>
@@ -945,11 +945,11 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       <section class="card manlung-dashboard-card manlung-notifications-card" id="manlungNotifications">
         <div class="dashboard-section-head compact">
           <div class="dashboard-section-title">
-            <div class="dashboard-section-icon notice"><i class="fas fa-bell"></i></div>
+            <div class="dashboard-section-icon notice notification-image-icon" aria-hidden="true"><img src="https://i.postimg.cc/k4JcnjJk/icons8-notification-50.png" alt="" loading="eager" decoding="async"></div>
             <div><span class="dashboard-section-kicker">Stay informed</span><h2>Notifications <span class="manlung-notification-badge" id="manlungNotificationCount">0</span></h2></div>
           </div>
           <div class="dashboard-notification-actions">
-            <button type="button" class="dashboard-mini-link" id="enableBrowserNotifications" onclick="enableManlungBrowserNotifications()"><i class="fas fa-bell" aria-hidden="true"></i> Enable alerts</button>
+            <button type="button" class="dashboard-mini-link" id="enableBrowserNotifications" onclick="enableManlungBrowserNotifications()"><img class="notification-inline-image" src="https://i.postimg.cc/k4JcnjJk/icons8-notification-50.png" alt="" aria-hidden="true" loading="eager" decoding="async"> Enable alerts</button>
             <button type="button" class="dashboard-mini-link dashboard-mark-all" onclick="markAllManlungNotificationsRead()"><i class="fas fa-check-double" aria-hidden="true"></i> Mark all read</button>
           </div>
         </div>
@@ -2317,5 +2317,34 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
-<script id="client-security-enhancement">(function(){const q=id=>document.getElementById(id);function fmtClient(v){return v?new Date(v).toLocaleString():'—'}async function loadClientSecurity(){try{const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)return;const u=d.user||{};q('clientEmailSecurity').textContent=u.email_verified_at?'Verified':'Protected verification required';q('clientMfaSecurity').textContent=u.mfa_enabled?'Enabled':'Not enabled';q('clientAccountSecurity').textContent=u.security_status||'Active';q('clientLastLogin').textContent=fmtClient(u.last_login_at);const badge=q('clientSecurityBadge');if((u.security_status||'active')!=='active'){badge.textContent='Review account';badge.className='status-badge status-rejected'}else{badge.textContent='Account protected';badge.className='status-badge status-completed'}}catch(e){console.warn('Client security center',e)}}async function loadClientProgress(){try{const r=await fetch('/api/cases/client/me',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)return;const cases=Array.isArray(d.cases)?d.cases:[];q('clientCaseTotal').textContent=cases.length;q('clientCaseActive').textContent=cases.filter(x=>/progress|active|investigat/i.test(x.status||'')).length;q('clientCaseCompleted').textContent=cases.filter(x=>/completed|closed/i.test(x.status||'')).length;q('clientEvidenceTotal').textContent=cases.reduce((n,x)=>n+(Array.isArray(x.files)?x.files.length:0),0)}catch(e){console.warn('Client progress',e)}}document.addEventListener('DOMContentLoaded',()=>{loadClientSecurity();loadClientProgress();setInterval(loadClientSecurity,60000);setInterval(loadClientProgress,30000)})})();</script></body>
+<script id="client-security-enhancement">(function(){const q=id=>document.getElementById(id);function fmtClient(v){return v?new Date(v).toLocaleString():'—'}async function loadClientSecurity(){try{const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)return;const u=d.user||{};q('clientEmailSecurity').textContent=u.email_verified_at?'Verified':'Protected verification required';q('clientMfaSecurity').textContent=u.mfa_enabled?'Enabled':'Not enabled';q('clientAccountSecurity').textContent=u.security_status||'Active';q('clientLastLogin').textContent=fmtClient(u.last_login_at);const badge=q('clientSecurityBadge');if((u.security_status||'active')!=='active'){badge.textContent='Review account';badge.className='status-badge status-rejected'}else{badge.textContent='Account protected';badge.className='status-badge status-completed'}}catch(e){console.warn('Client security center',e)}}async function loadClientProgress(){try{const r=await fetch('/api/cases/client/me',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)return;const cases=Array.isArray(d.cases)?d.cases:[];q('clientCaseTotal').textContent=cases.length;q('clientCaseActive').textContent=cases.filter(x=>/progress|active|investigat/i.test(x.status||'')).length;q('clientCaseCompleted').textContent=cases.filter(x=>/completed|closed/i.test(x.status||'')).length;q('clientEvidenceTotal').textContent=cases.reduce((n,x)=>n+(Array.isArray(x.files)?x.files.length:0),0)}catch(e){console.warn('Client progress',e)}}document.addEventListener('DOMContentLoaded',()=>{loadClientSecurity();loadClientProgress();setInterval(loadClientSecurity,60000);setInterval(loadClientProgress,30000)})})();</script>
+<style id="manlung-notification-image-dark-mode-fix">
+/* Shared supplied notification artwork across the client portal */
+.notification-image-icon{display:grid!important;place-items:center!important}
+.notification-image-icon img{display:block!important;width:27px!important;height:27px!important;max-width:27px!important;max-height:27px!important;object-fit:contain!important;flex:0 0 27px!important}
+.notification-inline-image{display:inline-block!important;width:18px!important;height:18px!important;max-width:18px!important;max-height:18px!important;object-fit:contain!important;vertical-align:middle!important;flex:0 0 18px!important}
+.dashboard-notices-shortcut .notification-image-icon img{width:27px!important;height:27px!important}
+#manlungNotifications .dashboard-section-icon.notice{background:rgba(124,58,237,.10)!important}
+#manlungNotifications .dashboard-section-icon.notice img{width:26px!important;height:26px!important}
+#manlungNotifications{color:var(--text,#0f172a);background:var(--card-bg,#fff)!important;border-color:var(--border-color,#e2e8f0)!important}
+#manlungNotifications .dashboard-section-head{background:transparent!important;border-bottom-color:var(--border-color,#e2e8f0)!important}
+#manlungNotifications .dashboard-section-title h2{color:var(--text,#0f172a)!important}
+#manlungNotifications .dashboard-section-kicker,#manlungNotifications .manlung-empty{color:var(--text-muted,#64748b)!important}
+#manlungNotifications .dashboard-mini-link{background:var(--surface-bg,#f8fafc)!important;color:var(--text,#1e293b)!important;border-color:var(--border-color,#dbe3ee)!important}
+#manlungNotifications .manlung-notification-item{background:var(--surface-bg,#f8fafc)!important;color:var(--text,#1e293b)!important;border-color:var(--border-color,#e2e8f0)!important}
+#manlungNotifications .manlung-notification-item.unread{background:var(--surface-hover,rgba(37,99,235,.08))!important;border-color:rgba(96,165,250,.42)!important}
+#manlungNotifications .manlung-notification-item h4{color:var(--text,#0f172a)!important}
+#manlungNotifications .manlung-notification-item p,#manlungNotifications .manlung-notification-meta{color:var(--text-muted,#64748b)!important}
+body.dark #manlungNotifications{background:var(--card-bg,#111827)!important;border-color:rgba(148,163,184,.25)!important;color:var(--text,#f1f5f9)!important}
+body.dark #manlungNotifications .dashboard-section-head{border-bottom-color:rgba(148,163,184,.2)!important}
+body.dark #manlungNotifications .dashboard-section-title h2,body.dark #manlungNotifications .manlung-notification-item h4{color:var(--text,#f8fafc)!important}
+body.dark #manlungNotifications .dashboard-section-kicker,body.dark #manlungNotifications .manlung-empty,body.dark #manlungNotifications .manlung-notification-item p,body.dark #manlungNotifications .manlung-notification-meta{color:var(--text-muted,#cbd5e1)!important}
+body.dark #manlungNotifications .dashboard-mini-link{background:#1e293b!important;color:#e2e8f0!important;border-color:#475569!important}
+body.dark #manlungNotifications .manlung-notification-item{background:#111c2e!important;border-color:#334155!important}
+body.dark #manlungNotifications .manlung-notification-item.unread{background:#172a46!important;border-color:#3b82f6!important}
+body.dark .dashboard-notices-shortcut .notification-image-icon{background:#ede9fe!important}
+@media(max-width:560px){.notification-image-icon img{width:25px!important;height:25px!important;max-width:25px!important;max-height:25px!important}}
+</style>
+
+</body>
 </html>
