@@ -75,7 +75,7 @@
 
   function createThemeButton() {
     if (document.querySelector('[data-theme-toggle="true"]')) return;
-    const actions = document.querySelector('.site-header .header-actions');
+    const actions = document.querySelector('.home-header-container .header-actions') || document.querySelector('.site-header .header-actions');
     if (!actions) return;
     const button = document.createElement('button');
     button.type = 'button';
