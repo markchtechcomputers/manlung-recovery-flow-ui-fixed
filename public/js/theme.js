@@ -343,8 +343,200 @@
     }
   }
 
+  function installGlobalLanguageSelector() {
+    if (document.getElementById('manlungLanguageControl')) return;
+    const actions = document.querySelector('.site-header .header-actions');
+    if (!actions) return;
+
+    const control = document.createElement('div');
+    control.id = 'manlungLanguageControl';
+    control.className = 'manlung-language-control';
+    control.innerHTML = `
+      <button type="button" class="manlung-language-button" id="manlungLanguageButton" aria-label="Choose website language" title="Choose website language" aria-haspopup="dialog" aria-expanded="false">
+        <img src="https://i.postimg.cc/xCBk1RL2/icons8-language-94.png" alt="" aria-hidden="true">
+        <span class="manlung-language-short-label">Language</span>
+      </button>
+      <div class="manlung-language-popover" id="manlungLanguagePopover" role="dialog" aria-label="Website language" hidden>
+        <label for="manlungLanguageSearch">Choose your language</label>
+        <input id="manlungLanguageSearch" type="search" placeholder="Search languages…" autocomplete="off">
+        <select id="manlungLanguageSelect" size="8" aria-label="Available languages">
+          <option value="">Loading languages…</option>
+        </select>
+        <p id="manlungLanguageStatus" aria-live="polite">Translations are provided automatically.</p>
+        <button type="button" id="manlungLanguageReset">Show original language</button>
+      </div>
+    `;
+
+    const themeButton = actions.querySelector('[data-theme-toggle="true"]');
+    if (themeButton?.parentElement === actions) themeButton.insertAdjacentElement('afterend', control);
+    else actions.insertBefore(control, actions.firstChild);
+
+    const style = document.createElement('style');
+    style.id = 'manlung-language-selector-style';
+    style.textContent = `
+      .manlung-language-control{position:relative;display:inline-flex;align-items:center;flex:0 0 auto!important;min-width:0!important}
+      .manlung-language-button{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;min-width:34px!important;min-height:34px!important;padding:4px 6px!important;border:0!important;border-radius:9px!important;background:transparent!important;color:inherit!important;cursor:pointer!important;font:inherit!important;font-size:.7rem!important;font-weight:800!important;white-space:nowrap!important}
+      .manlung-language-button img{display:block!important;width:25px!important;height:25px!important;object-fit:contain!important;background:transparent!important}
+      .manlung-language-button:hover,.manlung-language-button:focus-visible{background:rgba(100,116,139,.13)!important;outline:2px solid rgba(59,130,246,.35)!important;outline-offset:2px}
+      .manlung-language-popover{position:absolute;z-index:10050;top:calc(100% + 10px);right:0;width:min(310px,calc(100vw - 28px));padding:14px;border:1px solid #cbd5e1;border-radius:15px;background:#fff;color:#0f172a;box-shadow:0 18px 55px rgba(2,6,23,.24);text-align:left;white-space:normal}
+      .manlung-language-popover[hidden]{display:none!important}
+      .manlung-language-popover label{display:block;margin:0 0 8px;font-size:.86rem;font-weight:850}
+      .manlung-language-popover input,.manlung-language-popover select{display:block;width:100%;max-width:100%;min-height:40px;margin:0 0 9px;padding:9px 10px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#0f172a;font:inherit;font-size:.82rem}
+      .manlung-language-popover select{height:220px;padding:4px}
+      .manlung-language-popover option{padding:6px}
+      .manlung-language-popover p{margin:7px 0;color:#475569;font-size:.72rem;line-height:1.5}
+      .manlung-language-popover #manlungLanguageReset{width:100%;min-height:38px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:9px;background:#f8fafc;color:#0f172a;font:inherit;font-size:.78rem;font-weight:750;cursor:pointer}
+      .goog-te-banner-frame{display:none!important}html{top:0!important}body{top:0!important}
+      @media(max-width:700px){.manlung-language-button{padding:3px!important}.manlung-language-button img{width:27px!important;height:27px!important}.manlung-language-short-label{display:none}.manlung-language-popover{position:fixed;top:75px;right:12px;width:min(330px,calc(100vw - 24px));max-height:calc(100dvh - 95px);overflow:auto}}
+      html.dark .manlung-language-popover,body.dark .manlung-language-popover{background:#111c2e;color:#f8fafc;border-color:#334155}
+      html.dark .manlung-language-popover input,html.dark .manlung-language-popover select,body.dark .manlung-language-popover input,body.dark .manlung-language-popover select{background:#0b1220;color:#f8fafc;border-color:#475569}
+      html.dark .manlung-language-popover p,body.dark .manlung-language-popover p{color:#cbd5e1}
+      html.dark .manlung-language-popover #manlungLanguageReset,body.dark .manlung-language-popover #manlungLanguageReset{background:#1e293b;color:#f8fafc;border-color:#475569}
+    `;
+    document.head.appendChild(style);
+
+    const search = control.querySelector('#manlungLanguageSearch');
+    const select = control.querySelector('#manlungLanguageSelect');
+    const popover = control.querySelector('#manlungLanguagePopover');
+    const button = control.querySelector('#manlungLanguageButton');
+    const status = control.querySelector('#manlungLanguageStatus');
+    const reset = control.querySelector('#manlungLanguageReset');
+    let allOptions = [];
+    let widgetReady = false;
+
+    const googleSelect = () => document.querySelector('.goog-te-combo');
+    const populate = () => {
+      const combo = googleSelect();
+      if (!combo || combo.options.length < 2) return false;
+      allOptions = Array.from(combo.options).filter(option => option.value).map(option => ({value:option.value,label:option.textContent.trim()}));
+      const current = (document.cookie.match(/(?:^|;\\s*)googtrans=([^;]+)/)||[])[1];
+      const activeCode = current ? decodeURIComponent(current).split('/').pop() : '';
+      select.innerHTML = '';
+      allOptions.forEach(option => {
+        const item = document.createElement('option');
+        item.value = option.value;
+        item.textContent = option.label;
+        item.selected = option.value === activeCode;
+        select.appendChild(item);
+      });
+      if (!activeCode) {
+        const original = document.createElement('option');
+        original.value = '';
+        original.textContent = 'English (original)';
+        original.selected = true;
+        select.insertBefore(original, select.firstChild);
+      }
+      widgetReady = true;
+      status.textContent = allOptions.length + ' languages available. Some wording may vary because translations are automatic.';
+      return true;
+    };
+
+    const openPopover = () => {
+      popover.hidden = false;
+      button.setAttribute('aria-expanded','true');
+      if (!populate()) {
+        select.innerHTML = '<option value="">Loading languages…</option>';
+        status.textContent = 'Connecting to translation service…';
+      }
+      search.focus();
+    };
+    button.addEventListener('click', () => popover.hidden ? openPopover() : (popover.hidden = true, button.setAttribute('aria-expanded','false')));
+    document.addEventListener('click', event => {
+      if (!control.contains(event.target)) {
+        popover.hidden = true;
+        button.setAttribute('aria-expanded','false');
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        popover.hidden = true;
+        button.setAttribute('aria-expanded','false');
+      }
+    });
+    search.addEventListener('input', () => {
+      const query = search.value.trim().toLocaleLowerCase();
+      const previous = select.value;
+      select.innerHTML = '';
+      allOptions.filter(option => option.label.toLocaleLowerCase().includes(query) || option.value.toLocaleLowerCase().includes(query)).forEach(option => {
+        const item = document.createElement('option');
+        item.value = option.value;
+        item.textContent = option.label;
+        item.selected = option.value === previous;
+        select.appendChild(item);
+      });
+      if (!select.options.length) {
+        const empty = document.createElement('option');
+        empty.textContent = 'No matching languages';
+        empty.disabled = true;
+        select.appendChild(empty);
+      }
+    });
+    select.addEventListener('change', () => {
+      if (!widgetReady) populate();
+      const combo = googleSelect();
+      if (!combo) {
+        status.textContent = 'The translation service is not ready yet. Please try again shortly.';
+        return;
+      }
+      if (!select.value) {
+        resetTranslation();
+        return;
+      }
+      combo.value = select.value;
+      combo.dispatchEvent(new Event('change',{bubbles:true}));
+      status.textContent = 'Applying translation…';
+      try { localStorage.setItem('manlung-language',select.value); } catch (_) {}
+      button.setAttribute('aria-label','Website language: '+(select.selectedOptions[0]?.textContent||select.value));
+    });
+    function resetTranslation() {
+      const combo = googleSelect();
+      try { localStorage.removeItem('manlung-language'); } catch (_) {}
+      document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+      document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=' + location.hostname;
+      if (combo) {
+        combo.value = '';
+        combo.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+      location.reload();
+    }
+    reset.addEventListener('click', resetTranslation);
+
+    window.googleTranslateElementInit = function() {
+      if (!window.google?.translate?.TranslateElement) return;
+      new window.google.translate.TranslateElement({pageLanguage:'en', autoDisplay:false, layout:window.google.translate.TranslateElement.InlineLayout.SIMPLE}, 'manlungGoogleTranslateElement');
+      const applySaved = () => {
+        if (!populate()) return false;
+        let saved = '';
+        try { saved = localStorage.getItem('manlung-language') || ''; } catch (_) {}
+        const combo = googleSelect();
+        if (saved && combo && Array.from(combo.options).some(option => option.value === saved)) {
+          combo.value = saved;
+          combo.dispatchEvent(new Event('change',{bubbles:true}));
+        }
+        return true;
+      };
+      let attempts = 0;
+      const timer = window.setInterval(() => {
+        attempts++;
+        if (applySaved() || attempts > 40) window.clearInterval(timer);
+      },250);
+    };
+
+    const hiddenWidget = document.createElement('div');
+    hiddenWidget.id = 'manlungGoogleTranslateElement';
+    hiddenWidget.setAttribute('aria-hidden','true');
+    hiddenWidget.style.cssText = 'position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;left:-10000px!important;top:auto!important';
+    document.body.appendChild(hiddenWidget);
+    const translateScript = document.createElement('script');
+    translateScript.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    translateScript.async = true;
+    translateScript.onerror = () => { status.textContent = 'Translation service could not load. Check your connection and try again.'; };
+    document.head.appendChild(translateScript);
+  }
+
   function boot() {
     installAndroidAppMode();
+    installGlobalLanguageSelector();
     removeLegacyNavigationColours();
     convertLegacyButtons();
     installHeaderPolish();
