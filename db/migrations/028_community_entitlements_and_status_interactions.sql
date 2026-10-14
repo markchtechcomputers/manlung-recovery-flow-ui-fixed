@@ -82,7 +82,11 @@ begin
     update public.recovery_chat_status_wallets set free_status_last_used_at=now(),updated_at=now() where user_id=new.user_id;
   end if;
  else
-  raise exception 'STATUS_ALLOWANCE_EXHAUSTED' using errcode='P0001';
+  if active_plan is null and w.paid_status_credits>0 then
+   update public.recovery_chat_status_wallets set paid_status_credits=paid_status_credits-1,updated_at=now() where user_id=new.user_id;
+  else
+   raise exception 'STATUS_ALLOWANCE_EXHAUSTED' using errcode='P0001';
+  end if;
  end if;
  new.expires_at:=now()+interval '24 hours';
  return new;
