@@ -1368,5 +1368,16 @@ loadProfile();
   document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.call-plan').forEach(card=>card.addEventListener('click',e=>{if(e.target.closest('button'))return;selectPlan(card.querySelector('input')?.value)}));document.querySelectorAll('.call-subscribe-button').forEach(btn=>btn.addEventListener('click',()=>subscribe(btn.dataset.plan)));loadStatus();verifyCallback()});
 })();
 </script>
+
+<style id="manlung-remove-photo-visibility-fix">
+/* Keep the photo-removal action clearly visible in both themes. */
+#removeClientPhoto{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:.45rem!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:2!important;min-height:40px!important;padding:.6rem .9rem!important;border:1px solid #dc2626!important;border-radius:10px!important;background:#fff1f2!important;color:#b91c1c!important;font-size:.82rem!important;font-weight:800!important;line-height:1.25!important;white-space:nowrap!important;cursor:pointer!important}
+#removeClientPhoto::before{content:"×";font-size:1.15rem;font-weight:900;line-height:1}
+#removeClientPhoto:hover{background:#ffe4e6!important;border-color:#b91c1c!important;color:#991b1b!important}
+body.dark #removeClientPhoto{background:#3b111b!important;color:#fecdd3!important;border-color:#fb7185!important}
+body.dark #removeClientPhoto:hover{background:#501522!important;color:#fff1f2!important}
+.client-photo-controls{align-content:start!important;justify-items:start!important;overflow:visible!important}
+.client-photo-editor{overflow:visible!important}
+</style>
 </body>
 </html>
