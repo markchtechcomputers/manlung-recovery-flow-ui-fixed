@@ -9,12 +9,12 @@
   ];
 
   // Shared display-currency helper. Display conversions are indicative; checkout remains KES.
-  const MANLUNG_CURRENCY_RATES = Object.freeze({KES:1,USD:130,EUR:150,GBP:175,UGX:0.034,TZS:0.05,NGN:0.085,INR:1.55,ZAR:7.1,AED:35.4,CAD:94,AUD:85,JPY:0.87,CNY:18,GHS:10.5});
-  const MANLUNG_LANGUAGE_CURRENCY = Object.freeze({en:'USD',es:'EUR',fr:'EUR',de:'EUR',it:'EUR',nl:'EUR',pt:'EUR',ja:'JPY','zh-CN':'CNY','zh-TW':'CNY',hi:'INR',ar:'AED',sw:'KES',so:'KES',am:'KES',af:'ZAR',zu:'ZAR',xh:'ZAR',yo:'NGN',ha:'NGN',ig:'NGN'});
+  const MANLUNG_CURRENCY_RATES = Object.freeze({KES:1,USD:130,EUR:150,GBP:175,UGX:0.034,TZS:0.05,NGN:0.085,INR:1.55,ZAR:7.1,AED:35.4,CAD:94,AUD:85,JPY:0.87,CNY:18,GHS:10.5,RUB:1.35});
+  const MANLUNG_LANGUAGE_CURRENCY = Object.freeze({en:'USD',es:'EUR',fr:'EUR',de:'EUR',it:'EUR',nl:'EUR',pt:'EUR',ru:'RUB',ja:'JPY','zh-CN':'CNY','zh-TW':'CNY',hi:'INR',ar:'AED',sw:'KES',so:'KES',am:'KES',af:'ZAR',zu:'ZAR',xh:'ZAR',yo:'NGN',ha:'NGN',ig:'NGN'});
   function manlungLanguageCode(){try{return localStorage.getItem('manlung-language')||''}catch(_){return ''}}
   function manlungCurrentCurrency(){try{if(localStorage.getItem('manlung-currency-manual')==='true'){const saved=localStorage.getItem('manlung-currency');if(saved&&MANLUNG_CURRENCY_RATES[saved])return saved}}catch(_){}return MANLUNG_LANGUAGE_CURRENCY[manlungLanguageCode()]||'KES'}
   function manlungSetCurrency(currency,manual=true){if(!MANLUNG_CURRENCY_RATES[currency])return;try{localStorage.setItem('manlung-currency',currency);localStorage.setItem('manlung-currency-manual',manual?'true':'false')}catch(_){}window.dispatchEvent(new CustomEvent('manlung:currencychange',{detail:{currency}}))}
-  window.ManlungCurrency={rates:MANLUNG_CURRENCY_RATES,options:[['KES','Kenyan shilling (KSh)'],['USD','US dollar ($)'],['EUR','Euro (€)'],['GBP','British pound (£)'],['UGX','Ugandan shilling'],['TZS','Tanzanian shilling'],['NGN','Nigerian naira (₦)'],['INR','Indian rupee (₹)'],['ZAR','South African rand'],['AED','UAE dirham'],['CAD','Canadian dollar'],['AUD','Australian dollar'],['JPY','Japanese yen'],['CNY','Chinese yuan'],['GHS','Ghanaian cedi']],current:manlungCurrentCurrency,set:manlungSetCurrency,toKes:(amount,currency=manlungCurrentCurrency)=>Number(amount||0)*(MANLUNG_CURRENCY_RATES[currency]||1),fromKes:(amount,currency=manlungCurrentCurrency)=>Number(amount||0)/(MANLUNG_CURRENCY_RATES[currency]||1),format:(amount,currency=manlungCurrentCurrency)=>{try{return new Intl.NumberFormat(undefined,{style:'currency',currency,maximumFractionDigits:['KES','UGX','TZS','NGN','JPY'].includes(currency)?0:2}).format(Number(amount||0))}catch(_){return currency+' '+Number(amount||0).toLocaleString()}}};
+  window.ManlungCurrency={rates:MANLUNG_CURRENCY_RATES,options:[['KES','Kenyan shilling (KSh)'],['USD','US dollar ($)'],['EUR','Euro (€)'],['GBP','British pound (£)'],['UGX','Ugandan shilling'],['TZS','Tanzanian shilling'],['NGN','Nigerian naira (₦)'],['INR','Indian rupee (₹)'],['ZAR','South African rand'],['AED','UAE dirham'],['CAD','Canadian dollar'],['AUD','Australian dollar'],['JPY','Japanese yen'],['CNY','Chinese yuan'],['GHS','Ghanaian cedi'],['RUB','Russian ruble']],current:manlungCurrentCurrency,set:manlungSetCurrency,toKes:(amount,currency=manlungCurrentCurrency)=>Number(amount||0)*(MANLUNG_CURRENCY_RATES[currency]||1),fromKes:(amount,currency=manlungCurrentCurrency)=>Number(amount||0)/(MANLUNG_CURRENCY_RATES[currency]||1),format:(amount,currency=manlungCurrentCurrency)=>{try{return new Intl.NumberFormat(undefined,{style:'currency',currency,maximumFractionDigits:['KES','UGX','TZS','NGN','JPY'].includes(currency)?0:2}).format(Number(amount||0))}catch(_){return currency+' '+Number(amount||0).toLocaleString()}}};
 
   function readTheme() {
     try { return localStorage.getItem(STORAGE_KEY) === DARK ? DARK : LIGHT; }
@@ -484,13 +484,23 @@
       }
     }
     select.addEventListener('change', () => {
-      const language = select.value;
-      if (!language || language === 'en') {
-        resetTranslation();
+      const language = select.value || 'en';
+      // A language change resets any old manual currency override so the new
+      // language's mapped display currency is applied consistently on every page.
+      try {
+        localStorage.setItem('manlung-language', language);
+        localStorage.removeItem('manlung-currency-manual');
+      } catch (_) {}
+      if (window.ManlungCurrency) {
+        const mapped = MANLUNG_LANGUAGE_CURRENCY[language] || 'KES';
+        window.ManlungCurrency.set(mapped, false);
+      }
+      if (language === 'en') {
+        setTranslationCookie('');
+        status.textContent = 'English selected. Updating currency…';
+        location.reload();
         return;
       }
-      try { localStorage.setItem('manlung-language',language); } catch (_) {}
-      if (window.ManlungCurrency) { try { if (localStorage.getItem('manlung-currency-manual') !== 'true') window.ManlungCurrency.set(window.ManlungCurrency.current(), false); } catch (_) {} }
       setTranslationCookie(language);
       const combo = googleSelect();
       if (combo && Array.from(combo.options).some(option => option.value === language)) {
@@ -504,7 +514,12 @@
       button.setAttribute('aria-label','Website language: '+(allOptions.find(option => option.value === language)?.label || language));
     });
     function resetTranslation() {
-      try { localStorage.removeItem('manlung-language'); } catch (_) {}
+      try {
+        localStorage.removeItem('manlung-language');
+        localStorage.removeItem('manlung-currency-manual');
+        localStorage.setItem('manlung-currency','KES');
+      } catch (_) {}
+      if (window.ManlungCurrency) window.ManlungCurrency.set('KES', false);
       setTranslationCookie('');
       location.reload();
     }
