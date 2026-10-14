@@ -347,12 +347,12 @@ function populateCurrencies(){
  if(currencySelect&&currencyApi){currencySelect.innerHTML='';currencyApi.options.forEach(([code,label])=>{const o=document.createElement('option');o.value=code;o.textContent=label;currencySelect.appendChild(o)});currencySelect.value=activeCurrency()}
  document.getElementById('customCurrencyCode').textContent=activeCurrency();
  document.querySelectorAll('.amount-btn').forEach(b=>{b.textContent=fmtMoney(Number(b.dataset.amount));if(b.classList.contains('active'))amountEl.value=currencyApi?currencyApi.fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):b.dataset.amount});
- amountEl.min=currencyApi?currencyApi.fromKes(50,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):'50';
+ amountEl.min=currencyApi?(activeCurrency()==='KES'?'50':(Math.ceil(currencyApi.fromKes(50,activeCurrency())*100)/100).toFixed(2)):'50';
  amountEl.placeholder='Minimum '+fmtMoney(50);
 }
 function refreshCurrency(){populateCurrencies();loadTotal()}
 if(currencyApi){populateCurrencies();window.addEventListener('manlung:currencychange',()=>{populateCurrencies();loadTotal()})}
-if(currencySelect)currencySelect.addEventListener('change',()=>{if(currencyApi)currencyApi.set(currencySelect.value,true);populateCurrencies();loadTotal()});
+if(currencySelect)currencySelect.addEventListener('change',()=>{const previousKes=amountEl.dataset.selectedKes?Number(amountEl.dataset.selectedKes):localToKes(Number(amountEl.value||0));if(currencyApi)currencyApi.set(currencySelect.value,true);populateCurrencies();if(amountEl.value&&!amountEl.dataset.selectedKes)amountEl.value=currencyApi?currencyApi.fromKes(previousKes,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):String(Math.round(previousKes));loadTotal()});
 document.querySelectorAll('.amount-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');amountEl.dataset.selectedKes=b.dataset.amount;amountEl.value=currencyApi?currencyApi.fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):b.dataset.amount;});
 amountEl.addEventListener('input',()=>{delete amountEl.dataset.selectedKes;});
 async function loadTotal(){
