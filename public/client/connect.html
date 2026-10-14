@@ -94,6 +94,47 @@ nav button span{display:grid;place-items:center;width:58px;height:30px;border-ra
 .po{position:relative;display:flex;justify-content:space-between;width:100%;padding:8px 10px;margin-top:6px;border-radius:8px;background:var(--sf2);overflow:hidden;text-align:left}.po .pbar{position:absolute;left:0;top:0;bottom:0;background:var(--out);opacity:.8}.po span:last-child,.po b{position:relative}
 .svv{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;font-size:14px;z-index:3;background:#0004;padding:8px}
 .flow{display:flex;gap:14px;overflow-x:auto;padding:10px 16px 4px;scrollbar-width:none}.flow::-webkit-scrollbar{display:none}.fl{display:flex;flex-direction:column;align-items:center;gap:3px;width:62px;flex:none}.fl .av{width:52px;height:52px}.fn{font-size:12px;max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fs{font-size:11px;color:var(--mu)}.fs.hot{color:var(--on);background:var(--ac);padding:0 8px;border-radius:8px;font-weight:700}
+
+/* Desktop: keep the chat list/navigation on the left and show an open chat on the right.
+   These rules are deliberately desktop-only so the phone layout stays unchanged. */
+@media (min-width: 900px) {
+  :root { --manlung-sidebar-width: 380px; }
+  body { overflow: hidden; }
+  #app {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    margin: 0;
+    display: grid;
+    grid-template-columns: var(--manlung-sidebar-width) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+  #hd { grid-column: 1; grid-row: 1; min-width: 0; }
+  #mn { grid-column: 1; grid-row: 2; min-width: 0; min-height: 0; }
+  #nv { grid-column: 1; grid-row: 3; min-width: 0; }
+  #chat {
+    position: absolute;
+    inset: 0 0 0 var(--manlung-sidebar-width);
+    min-width: 0;
+    width: auto;
+    height: auto;
+    z-index: 5;
+    border-left: 1px solid var(--bd);
+  }
+  #app:not(:has(#chat))::after {
+    content: "Select a chat to start messaging";
+    grid-column: 2;
+    grid-row: 1 / 4;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+    color: var(--mu);
+    background: var(--bg);
+    border-left: 1px solid var(--bd);
+    text-align: center;
+    font-size: 16px;
+  }
+}
 </style></head><body>
 <div id="app"><header id="hd"></header><main id="mn"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden></div>
 <script>
