@@ -1,5 +1,37 @@
 (() => {
   const DISMISS_KEY = 'manlung-app-install-dismissed-v2';
+
+  // Keep Android/mobile browser Back inside the website instead of closing
+  // the tab/app when a visitor opens a deep link or reaches the home page.
+  function installMobileBackNavigation() {
+    if (window.__manlungBackNavigationInstalled) return;
+    window.__manlungBackNavigationInstalled = true;
+
+    const homePath = '/';
+    const isHome = () => window.location.pathname === homePath ||
+      window.location.pathname === '/index.html';
+
+    function addBackGuard() {
+      try {
+        window.history.pushState({ manlungBackGuard: true }, '', window.location.href);
+      } catch (_) {}
+    }
+
+    addBackGuard();
+    window.addEventListener('popstate', () => {
+      if (!isHome()) {
+        window.location.replace(homePath);
+        return;
+      }
+      // At home, keep the user on the main page rather than letting Back close
+      // the browser tab or the installed PWA immediately.
+      addBackGuard();
+    });
+  }
+
+  installMobileBackNavigation();
+
+
   // Prefer the browser's native PWA install prompt, with the existing APK page as fallback.
   const DISMISS_DAYS = 0;
   const IS_HOME = window.location.pathname === '/' || window.location.pathname === '/index.html';
