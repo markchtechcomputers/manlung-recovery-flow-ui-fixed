@@ -386,7 +386,7 @@
       .manlung-language-popover option{padding:6px}
       .manlung-language-popover p{margin:7px 0;color:#475569;font-size:.72rem;line-height:1.5}
       .manlung-language-popover #manlungLanguageReset{width:100%;min-height:38px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:9px;background:#f8fafc;color:#0f172a;font:inherit;font-size:.78rem;font-weight:750;cursor:pointer}
-      .goog-te-banner-frame{display:none!important}html{top:0!important}body{top:0!important}
+      .goog-te-banner-frame,.goog-te-banner,.skiptranslate > iframe,.goog-te-balloon-frame{display:none!important;visibility:hidden!important}html{top:0!important}body{top:0!important}\n      body > .skiptranslate{display:none!important;height:0!important;overflow:hidden!important}\n      .goog-logo-link,.goog-te-gadget span{display:none!important}\n      .goog-te-gadget{font-size:0!important}\n      #goog-gt-tt,.goog-te-balloon-frame,.goog-text-highlight{display:none!important;background:transparent!important;box-shadow:none!important}
       @media(max-width:700px){.manlung-language-button{padding:3px!important}.manlung-language-button img{width:27px!important;height:27px!important}.manlung-language-short-label{display:none}.manlung-language-popover{position:fixed;top:75px;right:12px;width:min(330px,calc(100vw - 24px));max-height:calc(100dvh - 95px);overflow:auto}}
       html.dark .manlung-language-popover,body.dark .manlung-language-popover{background:#111c2e;color:#f8fafc;border-color:#334155}
       html.dark .manlung-language-popover input,html.dark .manlung-language-popover select,body.dark .manlung-language-popover input,body.dark .manlung-language-popover select{background:#0b1220;color:#f8fafc;border-color:#475569}
@@ -463,7 +463,7 @@
       const value = language ? '/en/' + language : '';
       const expires = language ? ';expires=' + new Date(Date.now() + 365*24*60*60*1000).toUTCString() : ';expires=Thu, 01 Jan 1970 00:00:00 GMT';
       document.cookie = 'googtrans=' + (value ? encodeURIComponent(value) : '') + expires + ';path=/;SameSite=Lax';
-      document.cookie = 'googtrans=' + (value ? encodeURIComponent(value) : '') + expires + ';path=/;domain=' + location.hostname + ';SameSite=Lax';
+      document.cookie = 'googtrans=' + (value ? encodeURIComponent(value) : '') + expires + ';path=/;domain=' + location.hostname + ';SameSite=Lax';\n      const hostParts = location.hostname.split('.');\n      if (hostParts.length > 2) {\n        const parentDomain = '.' + hostParts.slice(-2).join('.');\n        document.cookie = 'googtrans=' + (value ? encodeURIComponent(value) : '') + expires + ';path=/;domain=' + parentDomain + ';SameSite=Lax';\n      }
     }
     select.addEventListener('change', () => {
       const language = select.value;
