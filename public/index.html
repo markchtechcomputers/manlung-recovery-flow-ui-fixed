@@ -53,6 +53,13 @@
 <link rel="stylesheet" href="/css/onboarding.css">
 <link rel="stylesheet" href="/css/mobile-header.css">
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+
+    <style id="home-account-icon-single">
+      .home-header-container .home-account-icon{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border-radius:50%;font-size:1.35rem;line-height:1}
+      .home-header-container .home-account-icon i{margin:0}
+      .home-header-container .home-account-icon:hover{transform:translateY(-1px)}
+      @media(max-width:768px){.home-header-container .home-account-icon{width:40px;height:40px}}
+    </style>
     <link rel="stylesheet" href="/css/home-premium.css?v=scroll-reveal-20261013a">
     <script src="/js/home-premium.js?v=scroll-reveal-20261013a" defer></script>
     <style>
@@ -1592,8 +1599,7 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
                 <a href="/#case-tracker">Case Tracker</a>
                 <a href="/about.html">About</a>
                 <a href="/faq.html">FAQ</a>
-                <a class="home-auth-link" href="/login.html"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> Sign In</a>
-                <a class="home-auth-link home-auth-signup" href="/login.html?mode=register"><i class="fas fa-user-plus" aria-hidden="true"></i> Sign Up</a>
+                <a class="home-auth-link home-account-icon" href="/login.html" aria-label="Sign in or create an account" title="Account"><i class="fas fa-user-circle" aria-hidden="true"></i></a>
             </nav>
             <div class="header-actions">
                 <button class="btn btn-outline" data-theme-toggle="true" type="button" aria-label="Switch to dark mode"></button>
@@ -1609,8 +1615,7 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
             <a href="/#case-tracker">Case Tracker</a>
             <a href="/about.html">About</a>
             <a href="/faq.html">FAQ</a>
-            <a href="/login.html"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> Sign In</a>
-            <a href="/login.html?mode=register"><i class="fas fa-user-plus" aria-hidden="true"></i> Sign Up</a>
+            <a href="/login.html" aria-label="Sign in or create an account" title="Account"><i class="fas fa-user-circle" aria-hidden="true"></i> Account</a>
             <a class="mobile-nav-cta" href="/client/request.html"><i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Request</a>
         </div>
     </header>
