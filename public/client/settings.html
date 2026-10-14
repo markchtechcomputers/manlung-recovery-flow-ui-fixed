@@ -116,6 +116,28 @@
   }
 }
 
+
+/* Profile & security refinements */
+.settings-grid{align-items:start;gap:1.1rem;margin:1.25rem 0 2rem}
+.settings-card{border:1px solid var(--border,#dbe3ee);border-radius:18px;box-shadow:0 10px 28px rgba(15,23,42,.055);background:var(--card-bg,#fff);padding:1.25rem}
+.settings-card h2{display:flex;align-items:center;gap:.55rem;font-size:1.08rem;letter-spacing:-.02em;color:var(--text,#0f172a)}
+.settings-card h2 i{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:rgba(37,99,235,.10);color:#2563eb;font-size:.95rem}
+.settings-card>p{margin:.25rem 0 1rem;font-size:.86rem;line-height:1.65}
+.settings-card .form-group{margin-bottom:1rem}
+.settings-card .form-group label{display:block;margin-bottom:.42rem;font-size:.8rem;font-weight:800;color:var(--text,#334155)}
+.settings-card .form-group input{width:100%;min-height:44px;border-radius:11px}
+.settings-card .btn{min-height:42px;border-radius:10px}
+.client-photo-editor{align-items:center;gap:1rem;padding:1rem;border-radius:16px;background:var(--surface-bg,#f8fafc);border-color:var(--border,#dbe3ee)}
+.client-photo-preview{box-shadow:0 4px 14px rgba(15,23,42,.12);border:3px solid var(--card-bg,#fff)}
+.client-photo-controls small{max-width:380px;line-height:1.55}
+.settings-status{font-weight:700;line-height:1.45}
+.settings-danger{background:rgba(220,38,38,.035);border-color:rgba(220,38,38,.22)}
+.settings-danger h2 i{background:rgba(220,38,38,.10);color:#dc2626}
+body.dark .settings-card{background:var(--card-bg,#111827);border-color:rgba(148,163,184,.22);box-shadow:0 12px 30px rgba(0,0,0,.16)}
+body.dark .settings-card h2,body.dark .settings-card .form-group label{color:var(--text,#f1f5f9)}
+body.dark .client-photo-editor{background:rgba(15,23,42,.58);border-color:#334155}
+body.dark .client-photo-preview{border-color:#1e293b}
+@media(max-width:560px){.settings-card{padding:1rem;border-radius:15px}.client-photo-editor{align-items:flex-start}.client-photo-controls input{width:100%}}
 </style>
 
 <style id="manlung-site-logo-style">
@@ -456,15 +478,15 @@
   <div class="settings-grid">
 
     <section class="card settings-card">
-      <h2>Profile</h2>
-      <p>Update your account details and choose the photo shown beside your name on this device.</p>
+      <h2><i class="fas fa-user-circle" aria-hidden="true"></i> Profile</h2>
+      <p>Keep your contact details current and personalise your client portal. Your chosen photo is saved in this browser and reused on your client dashboard until you change or remove it.</p>
 
       <div class="client-photo-editor">
         <div class="client-photo-preview" id="clientPhotoPreview" aria-label="Profile photo preview">MR</div>
         <div class="client-photo-controls">
           <label for="clientPhotoInput">Profile photo</label>
           <input id="clientPhotoInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-          <small>Choose a JPG, PNG, WebP or GIF image. It will be resized before saving.</small>
+          <small>JPG, PNG, WebP or GIF · up to 8 MB. Your image is resized and saved in this browser, then shown beside your name in the client portal on this device. It remains until you replace or remove it. It is not synced to other devices.</small>
           <button class="btn btn-outline" id="removeClientPhoto" type="button">Remove photo</button>
           <div id="photoStatus" class="settings-status" role="status" aria-live="polite"></div>
         </div>
@@ -495,8 +517,8 @@
     </section>
 
     <section class="card settings-card">
-      <h2>Security</h2>
-      <p>Change your account password. Your current password is required.</p>
+      <h2><i class="fas fa-shield-halved" aria-hidden="true"></i> Security</h2>
+      <p>Protect your account with a strong password. You’ll need to confirm your current password before making a change.</p>
 
       <form id="passwordForm">
         <div class="form-group">
@@ -523,10 +545,9 @@
     </section>
 
     <section class="card settings-card settings-danger">
-      <h2>Account &amp; Privacy</h2>
+      <h2><i class="fas fa-user-shield" aria-hidden="true"></i> Account &amp; Privacy</h2>
       <p>
-        Account deletion is permanent and removes your account,
-        linked cases, and their uploaded evidence.
+        Deleting your account is permanent. Your account, linked recovery cases and uploaded case evidence will be removed. Save any information you need first.
       </p>
 
       <button class="btn btn-danger" type="button" onclick="deleteMyAccount()">
