@@ -302,6 +302,32 @@
 @media(max-width:700px){.request-toolbar{grid-template-columns:1fr}.request-meta{grid-template-columns:1fr 1fr}.upload-policy{grid-template-columns:1fr}.flow-steps{grid-template-columns:1fr 1fr}.flow-step:last-child{grid-column:1/-1}.request-card-top{flex-direction:column}.request-status{align-self:flex-start}}
 @media(max-width:430px){.container-narrow{padding:.9rem}.request-meta{grid-template-columns:1fr}.request-flow-card{padding:.85rem}.upload-zone-enhanced{padding:1rem}.request-actions a,.request-actions button{width:100%;justify-content:center}}
 </style>
+<style id="manlung-request-ux-polish">
+/* Calm, readable case-intake experience; keeps the existing form and submission flow intact. */
+.request-welcome{position:relative;display:flex;align-items:center;justify-content:space-between;gap:1.25rem;overflow:hidden;margin:1.1rem 0 1rem;padding:clamp(1.15rem,3vw,2rem);border:1px solid rgba(96,165,250,.25);border-radius:22px;background:linear-gradient(120deg,#0f1f38 0%,#142f52 58%,#174477 100%);color:#f8fafc;box-shadow:0 16px 38px rgba(15,23,42,.13)}
+.request-welcome:after{content:"";position:absolute;width:230px;height:230px;right:6%;top:-130px;border:1px solid rgba(191,219,254,.13);border-radius:50%;box-shadow:0 0 0 28px rgba(191,219,254,.035),0 0 0 58px rgba(191,219,254,.025);pointer-events:none}
+.request-welcome-copy{position:relative;z-index:1;max-width:650px}.request-eyebrow{display:inline-flex;align-items:center;gap:.45rem;color:#bfdbfe;font-size:.68rem;font-weight:900;letter-spacing:.12em}.request-welcome h2{margin:.65rem 0 .45rem;color:#fff;font-size:clamp(1.45rem,3vw,2rem);line-height:1.13;letter-spacing:-.035em}.request-welcome p{max-width:600px;margin:0;color:#dbeafe;font-size:.9rem;line-height:1.65}.request-benefits{display:flex;gap:.55rem 1rem;flex-wrap:wrap;margin-top:1.1rem}.request-benefits span{display:inline-flex;align-items:center;gap:.4rem;color:#e0f2fe;font-size:.72rem;font-weight:650}.request-benefits i{color:#93c5fd}.request-welcome-mark{position:relative;z-index:1;flex:0 0 112px;display:grid;justify-items:center;gap:.5rem;color:#bfdbfe;font-size:.58rem;font-weight:900;letter-spacing:.1em}.request-welcome-mark i{display:grid;place-items:center;width:76px;height:76px;border:1px solid rgba(191,219,254,.28);border-radius:23px;background:rgba(255,255,255,.07);font-size:2rem;box-shadow:inset 0 1px rgba(255,255,255,.12)}
+.progress-bar-wrap{padding:.7rem max(1rem,calc((100vw - 900px)/2));box-shadow:0 4px 14px rgba(15,23,42,.035);backdrop-filter:blur(12px)}.progress-bar-track{height:7px;background:var(--card-border);border-radius:99px}.progress-bar-fill{border-radius:99px;background:linear-gradient(90deg,#2563eb,#38bdf8)}.progress-bar-label{display:flex;justify-content:space-between;gap:.5rem;align-items:center;font-size:.72rem;margin-top:.45rem}.progress-bar-label strong{color:var(--text);font-weight:850}.progress-bar-label span{color:var(--text-muted);text-align:right}
+#incidentForm>.card{padding:clamp(1rem,2.5vw,1.45rem);margin:0 0 1rem;border:1px solid var(--card-border);border-radius:17px;box-shadow:0 5px 20px rgba(15,23,42,.035);transition:border-color .18s ease,box-shadow .18s ease}
+#incidentForm>.card:focus-within{border-color:rgba(59,130,246,.48);box-shadow:0 8px 26px rgba(37,99,235,.07)}
+#incidentForm .card-title{display:flex;align-items:center;gap:.6rem;font-size:1rem;font-weight:850;letter-spacing:-.015em;margin-bottom:1rem;padding-bottom:.8rem;border-bottom:1px solid var(--card-border)}
+#incidentForm .card-title>i{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:11px;background:var(--info-bg);color:var(--accent);font-size:.95rem}
+#incidentForm .form-group{margin-bottom:.9rem}#incidentForm .form-group:last-child{margin-bottom:0}
+#incidentForm .form-group label{display:block;margin-bottom:.4rem;font-size:.79rem;font-weight:750;color:var(--text)}
+#incidentForm input:not([type=checkbox]):not([type=file]),#incidentForm select,#incidentForm textarea{width:100%;min-height:44px;padding:.7rem .8rem;border:1px solid var(--card-border);border-radius:10px;background:var(--page-bg);color:var(--text);font:inherit;font-size:.86rem;transition:border-color .16s ease,box-shadow .16s ease}
+#incidentForm textarea{min-height:125px;resize:vertical;line-height:1.6}
+#incidentForm input:focus-visible,#incidentForm select:focus-visible,#incidentForm textarea:focus-visible{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.14)}
+#incidentForm .field-hint{display:block;margin-top:.35rem;color:var(--text-muted);font-size:.72rem;line-height:1.5}
+#incidentForm .checkbox-group{display:flex;align-items:flex-start;gap:.65rem;margin:.8rem 0;padding:.8rem;border:1px solid var(--card-border);border-radius:11px;background:var(--page-bg)}
+#incidentForm .checkbox-group input{flex:0 0 auto;width:17px;height:17px;margin:.15rem 0 0;accent-color:var(--accent)}#incidentForm .checkbox-group label{margin:0;font-size:.78rem;line-height:1.55;font-weight:550}
+#incidentForm .notice{padding:.8rem .9rem;border-radius:11px;line-height:1.5}
+#incidentForm #submitBtn{min-height:48px;border-radius:11px;font-weight:850;box-shadow:0 5px 14px rgba(22,163,74,.16)}#incidentForm button[type=reset]{min-height:44px;border-radius:10px}
+#incidentForm :disabled{cursor:not-allowed;opacity:.65}
+.request-dashboard-note{border-radius:15px}
+body.dark .request-welcome{border-color:rgba(96,165,250,.25);box-shadow:0 16px 38px rgba(0,0,0,.2)}
+@media(max-width:600px){.request-welcome{align-items:flex-start;padding:1.15rem;border-radius:17px}.request-welcome-mark{flex-basis:58px}.request-welcome-mark i{width:52px;height:52px;border-radius:16px;font-size:1.4rem}.request-welcome-mark span{display:none}.request-benefits{display:grid;gap:.55rem}.progress-bar-wrap{padding:.65rem .9rem}.progress-bar-label{align-items:flex-start}.progress-bar-label span{max-width:58%}#incidentForm>.card{border-radius:14px}#incidentForm .row-2,#incidentForm .row-3{gap:.1rem}}
+@media(prefers-reduced-motion:reduce){#incidentForm>.card,#incidentForm input,#incidentForm select,#incidentForm textarea,.progress-bar-fill{transition:none!important}}
+</style>
 </head>
 <body><div id="clientRequestToastStack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
 <div id="submissionModalOverlay" role="dialog" aria-modal="true" aria-labelledby="submissionModalTitle">
@@ -340,6 +366,15 @@
     </div>
 
     <div class="container-narrow">
+        <section class="request-welcome" aria-labelledby="requestWelcomeTitle">
+          <div class="request-welcome-copy">
+            <span class="request-eyebrow"><i class="fas fa-shield-halved"></i> PRIVATE · GUIDED · SECURE</span>
+            <h2 id="requestWelcomeTitle">Let’s get your case started.</h2>
+            <p>Tell us what happened. We’ll use the details you provide to understand your request and decide the next steps.</p>
+            <div class="request-benefits"><span><i class="fas fa-clock"></i> Usually 3–5 minutes</span><span><i class="fas fa-save"></i> Draft saved on this device</span><span><i class="fas fa-lock"></i> Never share passwords or OTPs</span></div>
+          </div>
+          <div class="request-welcome-mark" aria-hidden="true"><i class="fas fa-file-shield"></i><span>CASE INTAKE</span></div>
+        </section>
         
 <section class="request-flow-card request-dashboard-note" aria-label="Case tracking"><div class="request-flow-head"><div><h2><i class="fas fa-gauge-high"></i> Case Tracking</h2><p class="request-flow-sub">Your submitted and pending cases are managed from the Client Dashboard. This page is for creating a new recovery request and securely adding evidence.</p></div><a class="btn btn-primary" href="/client/dashboard.html"><i class="fas fa-folder-open"></i> Open My Cases</a></div></section><div id="formContainer">
             <div id="draftBanner" class="draft-banner" style="display:none;">
@@ -677,13 +712,29 @@
 
         const REQUIRED_FIELD_IDS = ['caseType', 'fullName', 'phone', 'email', 'country', 'incidentDesc'];
         function updateProgress() {
-            const filled = REQUIRED_FIELD_IDS.filter(id => {
+            const form = document.getElementById('incidentForm');
+            const completedFields = REQUIRED_FIELD_IDS.filter(id => {
                 const el = document.getElementById(id);
-                return el && el.value.trim().length > 0;
+                if (!el || !el.value.trim()) return false;
+                return typeof el.checkValidity !== 'function' || el.checkValidity();
             }).length;
-            const pct = Math.round((filled / REQUIRED_FIELD_IDS.length) * 100);
-            document.getElementById('progressFill').style.width = pct + '%';
-            document.getElementById('progressLabel').textContent = `${pct}% of required fields complete`;
+            const requiredChecks = ['term1', 'term2'];
+            const completedChecks = requiredChecks.filter(id => document.getElementById(id)?.checked).length;
+            const total = REQUIRED_FIELD_IDS.length + requiredChecks.length;
+            const completed = completedFields + completedChecks;
+            const pct = Math.round((completed / total) * 100);
+            const fill = document.getElementById('progressFill');
+            const label = document.getElementById('progressLabel');
+            if (fill) fill.style.width = pct + '%';
+            if (label) {
+                label.innerHTML = '';
+                const strong = document.createElement('strong');
+                strong.textContent = pct + '% complete';
+                const detail = document.createElement('span');
+                detail.textContent = pct === 100 ? ' · Required details and confirmations are complete' : ' · ' + (total - completed) + ' required item' + (total - completed === 1 ? '' : 's') + ' left';
+                label.append(strong, detail);
+            }
+            if (form) form.dataset.completion = String(pct);
         }
 
         document.getElementById('incidentForm').addEventListener('input', () => { saveDraft(); });
