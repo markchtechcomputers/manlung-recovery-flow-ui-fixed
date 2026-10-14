@@ -101,7 +101,7 @@ body.dark .mr-home-hero.mr-video-hero{background:#071426!important}
 body.dark .mr-video-hero .mr-hero-copy h1{color:#fff!important}
 @media(max-width:760px){.mr-home-hero.mr-video-hero{min-height:690px;min-height:76svh;border-radius:0 0 22px 22px!important}.mr-video-hero .mr-hero-background-video{object-position:center center}.mr-video-hero .mr-hero-video-overlay{background:linear-gradient(90deg,rgba(4,13,29,.78),rgba(5,19,39,.56)),linear-gradient(0deg,rgba(3,12,27,.55),rgba(3,12,27,.2))}.mr-video-hero .mr-home-hero-inner{min-height:inherit;padding:70px 23px 76px}.mr-video-hero .mr-hero-copy{width:100%}.mr-video-hero .mr-hero-copy h1{font-size:clamp(2.65rem,10.2vw,4.15rem)!important;line-height:1.04!important}.mr-video-hero .mr-hero-description{font-size:.96rem!important;line-height:1.75!important}.mr-video-hero .mr-hero-actions{display:flex;flex-direction:column;align-items:stretch}.mr-video-hero .mr-hero-actions a{width:100%;min-height:52px}.mr-video-hero .mr-hero-trust-row{display:grid;gap:10px;font-size:.7rem}}
 @media(max-width:420px){.mr-home-hero.mr-video-hero{min-height:720px;min-height:82svh}.mr-video-hero .mr-home-hero-inner{padding:56px 18px 62px}.mr-video-hero .mr-hero-copy h1{font-size:2.55rem!important}.mr-video-hero .mr-hero-eyebrow{font-size:.58rem}}
-@media(prefers-reduced-motion:reduce){.mr-video-hero .mr-hero-background-video{visibility:hidden}.mr-home-hero.mr-video-hero{background:#0a1930!important}}
+@media(prefers-reduced-motion:reduce){.mr-video-hero .mr-hero-background-video{visibility:visible!important;display:block!important;opacity:.78!important}.mr-home-hero.mr-video-hero{background:#0a1930!important}}
 
 
 /* Full-bleed video hero: remove edge gutters and rounded corners. */
@@ -150,3 +150,11 @@ html,body{max-width:100%;overflow-x:hidden}
 .mr-home-hero.mr-video-hero{background:#071426!important}
 .mr-video-hero .mr-hero-video-fallback{position:absolute;inset:0;z-index:-3;background:linear-gradient(115deg,#071426 0%,#102b49 55%,#071426 100%);pointer-events:none}
 .mr-video-hero .mr-hero-background-video{background:transparent!important;object-fit:cover!important;object-position:center!important}
+
+
+/* 2026-10-14: Ensure the original background video stays visible above its fallback, including reduced-motion devices. */
+.mr-home-hero.mr-video-hero{background:#071426!important;}
+.mr-home-hero.mr-video-hero .mr-hero-background-video{position:absolute!important;inset:0!important;z-index:0!important;display:block!important;visibility:visible!important;width:100%!important;height:100%!important;opacity:.78!important;object-fit:cover!important;object-position:center!important;background:transparent!important;}
+.mr-home-hero.mr-video-hero .mr-hero-video-fallback{z-index:-1!important;}
+.mr-home-hero.mr-video-hero .mr-hero-video-overlay{z-index:1!important;}
+.mr-home-hero.mr-video-hero .mr-home-hero-inner{position:relative!important;z-index:2!important;}
