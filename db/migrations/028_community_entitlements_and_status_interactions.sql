@@ -6,6 +6,8 @@ create table if not exists public.recovery_chat_plan_purchases (
  provider text not null default 'paystack' check(provider='paystack'),
  provider_reference text not null unique,
  provider_transaction_id text unique,
+ provider_plan_code text,
+ provider_subscription_code text unique,
  plan_code text not null check(plan_code in ('plus','pro','chat_pass','call')),
  amount_kes integer not null check(amount_kes in (100,200,500)),
  currency text not null default 'KES' check(currency='KES'),
