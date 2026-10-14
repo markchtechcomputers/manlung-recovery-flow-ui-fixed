@@ -1,6 +1,6 @@
 (() => {
-  const DISMISS_KEY = 'manlung-apk-banner-dismissed-v1';
-  // Promote the Android APK on the homepage; this is not a browser PWA install prompt.
+  const DISMISS_KEY = 'manlung-app-install-dismissed-v2';
+  // Prefer the browser's native PWA install prompt, with the existing APK page as fallback.
   const DISMISS_DAYS = 0;
   const IS_HOME = window.location.pathname === '/' || window.location.pathname === '/index.html';
 
@@ -258,14 +258,14 @@
       <div class="manlung-pwa-copy">
         <strong class="manlung-pwa-title">Manlung Recovery App</strong>
         <span class="manlung-pwa-text">
-          Install the Android app for quick access to Manlung Recovery.
+          Install Manlung Recovery for a faster, app-like experience.
         </span>
       </div>
 
       <button
         type="button"
         class="manlung-pwa-download"
-      >GET APK</button>
+      >INSTALL APP</button>
     `;
 
     document.body.appendChild(banner);
@@ -297,7 +297,17 @@
     });
   }
 
-  // Offer the Android APK download on the homepage. The APK opens the live website.
+  // Capture the browser-native PWA install prompt when the browser offers it.
+  let deferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    const button = document.querySelector('.manlung-pwa-download');
+    if (button) button.textContent = 'INSTALL APP';
+  });
+
+  // Offer installation on the homepage. If the browser has no native prompt,
+  // the existing app-download page remains available as a fallback.
   window.addEventListener('load', () => {
     if (isAndroidApp() || !IS_HOME || wasRecentlyDismissed()) return;
     const banner = createBanner();
@@ -305,6 +315,7 @@
   });
 
   window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
     const banner = document.getElementById('manlung-pwa-banner');
     if (banner) {
       banner.classList.remove('is-visible');
@@ -312,10 +323,25 @@
     }
   });
 
-  document.addEventListener('click', event => {
+  document.addEventListener('click', async event => {
     if (isAndroidApp()) return;
     const button = event.target.closest('.manlung-pwa-download');
     if (!button) return;
+
+    if (deferredInstallPrompt) {
+      const installPrompt = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      await installPrompt.prompt();
+      const choice = await installPrompt.userChoice;
+      if (choice?.outcome === 'accepted') {
+        const banner = document.getElementById('manlung-pwa-banner');
+        if (banner) banner.classList.remove('is-visible');
+      }
+      return;
+    }
+
+    // Browsers that do not expose beforeinstallprompt can still use the APK
+    // page or their browser's built-in "Install app / Add to Home Screen" menu.
     window.location.assign('/download-app.html');
   });
 
