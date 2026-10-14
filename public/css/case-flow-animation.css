@@ -106,7 +106,7 @@
 
 /* Larger icon that changes with each animated workflow transition. */
 .mr-case-flow-feature{display:grid;grid-template-columns:58px minmax(0,1fr);align-items:center;gap:15px;min-height:112px}
-.mr-case-flow-feature-icon{display:grid;place-items:center;width:58px;height:58px;border-radius:17px;border:1px solid rgba(125,211,252,.28);background:linear-gradient(145deg,rgba(56,189,248,.18),rgba(45,212,191,.12));color:#7dd3fc;box-shadow:0 8px 24px rgba(14,165,233,.12)}
+.mr-case-flow-feature-icon{display:grid;place-items:center;width:58px;height:58px;border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(56,189,248,.09);color:#7dd3fc;box-shadow:0 4px 14px rgba(2,8,23,.12)}
 .mr-case-flow-feature-icon i{font-size:1.55rem;transition:transform .35s ease,opacity .35s ease}
 .mr-case-flow-stage.is-out .mr-case-flow-feature-icon i{opacity:0;transform:scale(.72) rotate(-8deg)}
 .mr-case-flow-feature h3{margin:0 0 8px!important;color:#fff!important;font-size:clamp(1.12rem,1.6vw,1.42rem)!important;line-height:1.25!important;letter-spacing:-.025em!important;font-weight:800!important}
