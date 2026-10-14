@@ -233,7 +233,7 @@ router.post('/plans/initialize', async (req, res) => {
     try {
       const init=await axios.post(PAYSTACK_URL+'/transaction/initialize',{
         email,amount:plan.amountMinor,currency:'KES',reference,
-        callback_url:process.env.PAYSTACK_CHAT_PLAN_CALLBACK_URL||process.env.PUBLIC_APP_URL,
+        callback_url:process.env.PAYSTACK_CHAT_PLAN_CALLBACK_URL||(String(process.env.PUBLIC_APP_URL||'').replace(/\\/$/,'')+'/client/connect.html'),
         metadata:{product:'manlung_community_subscription',plan_code:code,user_id:req.user.id,purchase_id:purchase.id,amount_kes:plan.amountKes}
       },{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:15000});
       if(!init.data?.status||!init.data?.data?.authorization_url) throw new Error('Paystack did not return checkout URL.');
