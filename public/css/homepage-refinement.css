@@ -144,3 +144,9 @@ html,body{max-width:100%;overflow-x:hidden}
   height:100%!important;
   object-fit:cover!important;
 }
+
+
+/* Reliable background video: keep a dark fallback visible while video loads. */
+.mr-home-hero.mr-video-hero{background:#071426!important}
+.mr-video-hero .mr-hero-video-fallback{position:absolute;inset:0;z-index:-3;background:linear-gradient(115deg,#071426 0%,#102b49 55%,#071426 100%);pointer-events:none}
+.mr-video-hero .mr-hero-background-video{background:transparent!important;object-fit:cover!important;object-position:center!important}
