@@ -1594,7 +1594,7 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
                 <a href="/#case-tracker">Case Tracker</a>
                 <a href="/about.html">About</a>
                 <a href="/faq.html">FAQ</a>
-                <a class="home-auth-link home-account-icon" href="/login.html" aria-label="Sign in or create an account" title="Account"><img class="home-account-image-icon" src="https://i.postimg.cc/QCdzV8b7/icons8-login-100.png" alt="" aria-hidden="true" loading="eager" decoding="async"></a>
+                <a class="home-auth-link home-account-icon" href="/login.html" aria-label="Sign in or create an account" title="Account"><img class="home-account-image-icon home-account-image-icon-light" src="https://i.postimg.cc/RCGFYgnM/icons8-login-64.png" alt="" aria-hidden="true" loading="eager" decoding="async"><img class="home-account-image-icon home-account-image-icon-dark" src="https://i.postimg.cc/QCdzV8b7/icons8-login-100.png" alt="" aria-hidden="true" loading="eager" decoding="async"></a>
             </nav>
             <div class="header-actions">
                 <button class="btn btn-outline" data-theme-toggle="true" type="button" aria-label="Switch to dark mode"></button>
@@ -2280,6 +2280,10 @@ html body .site-header .home-header-container a.home-account-icon:focus-visible{
 <style id="home-account-custom-login-image-final">
 html body .site-header .home-header-container a.home-account-icon{background:transparent!important;background-color:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 html body .site-header .home-header-container a.home-account-icon .home-account-image-icon{display:block!important;width:30px!important;height:30px!important;max-width:30px!important;max-height:30px!important;object-fit:contain!important;flex:0 0 30px!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+html body .site-header .home-header-container a.home-account-icon .home-account-image-icon-light{display:block!important}
+html body.dark .site-header .home-header-container a.home-account-icon .home-account-image-icon-light{display:none!important}
+html body .site-header .home-header-container a.home-account-icon .home-account-image-icon-dark{display:none!important}
+html body.dark .site-header .home-header-container a.home-account-icon .home-account-image-icon-dark{display:block!important}
 html body .site-header .home-header-container a.home-account-icon:hover .home-account-image-icon{transform:scale(1.06)}
 html body .site-header .home-header-container a.home-account-icon .home-account-image-icon{transition:transform .18s ease}
 @media(max-width:768px){html body .site-header .home-header-container a.home-account-icon .home-account-image-icon{width:28px!important;height:28px!important;max-width:28px!important;max-height:28px!important;flex-basis:28px!important}}
