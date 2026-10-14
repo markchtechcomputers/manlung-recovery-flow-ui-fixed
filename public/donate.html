@@ -351,8 +351,8 @@ function populateCurrencies(){
  amountEl.placeholder='Minimum '+fmtMoney(50);
 }
 function refreshCurrency(){populateCurrencies();loadTotal()}
-if(currencyApi){populateCurrencies();window.addEventListener('manlung:currencychange',()=>{populateCurrencies();loadTotal()})}
-if(currencySelect)currencySelect.addEventListener('change',()=>{const previousKes=amountEl.dataset.selectedKes?Number(amountEl.dataset.selectedKes):localToKes(Number(amountEl.value||0));if(currencyApi)currencyApi.set(currencySelect.value,true);populateCurrencies();if(amountEl.value&&!amountEl.dataset.selectedKes)amountEl.value=currencyApi?currencyApi.fromKes(previousKes,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):String(Math.round(previousKes));loadTotal()});
+if(currencyApi){populateCurrencies();window.addEventListener('manlung:currencychange',()=>{if(currencySelect)currencySelect.value=currencyApi.current();populateCurrencies();loadTotal()});window.addEventListener('storage',e=>{if(e.key==='manlung-language'||e.key==='manlung-currency'||e.key==='manlung-currency-manual'){if(currencySelect)currencySelect.value=currencyApi.current();populateCurrencies();loadTotal()}})}
+if(currencySelect)currencySelect.addEventListener('change',()=>{const previousKes=amountEl.dataset.selectedKes?Number(amountEl.dataset.selectedKes):localToKes(Number(amountEl.value||0));if(currencyApi){currencyApi.set(currencySelect.value,true);currencySelect.value=currencyApi.current()}populateCurrencies();if(amountEl.value&&!amountEl.dataset.selectedKes)amountEl.value=currencyApi?currencyApi.fromKes(previousKes,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):String(Math.round(previousKes));loadTotal()});
 document.querySelectorAll('.amount-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');amountEl.dataset.selectedKes=b.dataset.amount;amountEl.value=currencyApi?currencyApi.fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):b.dataset.amount;});
 amountEl.addEventListener('input',()=>{delete amountEl.dataset.selectedKes;});
 async function loadTotal(){
