@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script src="/js/theme.js?v=20261014-currency-visibility7"></script>
+  <script src="/js/theme.js?v=20261014-currency-open-fix1"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Support Manlung Recovery</title>
@@ -29,7 +29,7 @@ body:has(.donation-shell){background:linear-gradient(rgba(244,248,250,.58),rgba(
 .donation-card .currency-choice,.donation-card .currency-choice *{visibility:visible!important;opacity:1!important}
 .donation-card .currency-choice{display:grid!important;grid-template-columns:1fr!important;gap:.55rem!important;max-width:100%!important;background:#fff!important;border:2px solid #64748b!important;box-shadow:0 0 0 3px rgba(22,163,74,.12),0 8px 20px rgba(15,39,72,.08)!important;padding:1rem!important}
 .donation-card .currency-choice label{display:block!important;position:static!important;margin:0!important;font-size:1rem!important;line-height:1.4!important;font-weight:900!important;color:#10213b!important;-webkit-text-fill-color:#10213b!important}
-.donation-card #donationCurrency{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;inset:auto!important;float:none!important;clear:both!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:52px!important;margin:0!important;padding:.7rem 2.5rem .7rem .85rem!important;transform:none!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;background:#fff!important;color:#10213b!important;-webkit-text-fill-color:#10213b!important;border:2px solid #475569!important;border-radius:10px!important;font-size:1rem!important;line-height:1.4!important;z-index:5!important;appearance:auto!important;-webkit-appearance:menulist!important;clip:auto!important;clip-path:none!important}
+.donation-card #donationCurrency{display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important;position:relative!important;inset:auto!important;float:none!important;clear:both!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:52px!important;margin:0!important;padding:.7rem 2.5rem .7rem .85rem!important;transform:none!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;background:#fff!important;color:#10213b!important;-webkit-text-fill-color:#10213b!important;border:2px solid #475569!important;border-radius:10px!important;font-size:1rem!important;line-height:1.4!important;z-index:5!important;appearance:auto!important;-webkit-appearance:menulist!important;clip:auto!important;clip-path:none!important}
 .donation-card .currency-note{display:block!important;position:static!important;visibility:visible!important;opacity:1!important;color:#334155!important;-webkit-text-fill-color:#334155!important;background:#f8fafc!important;border:1px solid #cbd5e1!important;border-radius:10px!important;padding:.75rem!important;margin:.65rem auto 0!important;max-width:100%!important;font-size:.82rem!important;line-height:1.6!important;text-align:left!important}
 .donation-card .total-card small{color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;font-size:.9rem!important;letter-spacing:.04em!important}
 .donation-card .total-card strong,.donation-card .total-card span,.donation-card .total-card .donation-progress-meta{color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}
@@ -355,8 +355,18 @@ const currencyApi=window.ManlungCurrency, currencySelect=document.getElementById
 function activeCurrency(){return currencyApi?currencyApi.current():'KES'}
 function fmtMoney(kes){return currencyApi?currencyApi.format(currencyApi.fromKes(Number(kes||0),activeCurrency()),activeCurrency()):'KES '+Number(kes||0).toLocaleString('en-KE')}
 function localToKes(value){return currencyApi?currencyApi.toKes(Number(value||0),activeCurrency()):Number(value||0)}
+const FALLBACK_CURRENCIES=[['KES','Kenyan shilling (KSh)'],['USD','US dollar ($)'],['EUR','Euro (€)'],['GBP','British pound (£)'],['UGX','Ugandan shilling'],['TZS','Tanzanian shilling'],['NGN','Nigerian naira (₦)'],['INR','Indian rupee (₹)'],['ZAR','South African rand'],['AED','UAE dirham'],['CAD','Canadian dollar'],['AUD','Australian dollar'],['JPY','Japanese yen'],['CNY','Chinese yuan'],['GHS','Ghanaian cedi'],['RUB','Russian ruble']];
 function populateCurrencies(){
- if(currencySelect&&currencyApi){currencySelect.innerHTML='';currencyApi.options.forEach(([code,label])=>{const o=document.createElement('option');o.value=code;o.textContent=label;currencySelect.appendChild(o)});currencySelect.value=activeCurrency()}
+ if(currencySelect){
+  const options=(currencyApi&&Array.isArray(currencyApi.options)&&currencyApi.options.length)?currencyApi.options:FALLBACK_CURRENCIES;
+  if(currencySelect.options.length!==options.length){
+   currencySelect.replaceChildren();
+   options.forEach(([code,label])=>{const o=document.createElement('option');o.value=code;o.textContent=label;currencySelect.appendChild(o)});
+  }
+  const current=activeCurrency();
+  currencySelect.value=Array.from(currencySelect.options).some(o=>o.value===current)?current:'KES';
+  if(!currencySelect.value)currencySelect.value='KES';
+ }
  document.getElementById('customCurrencyCode').textContent=activeCurrency();
  document.querySelectorAll('.amount-btn').forEach(b=>{b.textContent=fmtMoney(Number(b.dataset.amount));if(b.classList.contains('active'))amountEl.value=currencyApi?currencyApi.fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):b.dataset.amount});
  amountEl.min=currencyApi?(activeCurrency()==='KES'?'50':(Math.ceil(currencyApi.fromKes(50,activeCurrency())*100)/100).toFixed(2)):'50';
