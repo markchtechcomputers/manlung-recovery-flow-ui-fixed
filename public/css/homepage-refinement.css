@@ -146,15 +146,5 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 
 
-/* Reliable background video: keep a dark fallback visible while video loads. */
-.mr-home-hero.mr-video-hero{background:#071426!important}
-.mr-video-hero .mr-hero-video-fallback{position:absolute;inset:0;z-index:-3;background:linear-gradient(115deg,#071426 0%,#102b49 55%,#071426 100%);pointer-events:none}
-.mr-video-hero .mr-hero-background-video{background:transparent!important;object-fit:cover!important;object-position:center!important}
-
-
-/* 2026-10-14: Ensure the original background video stays visible above its fallback, including reduced-motion devices. */
-.mr-home-hero.mr-video-hero{background:#071426!important;}
-.mr-home-hero.mr-video-hero .mr-hero-background-video{position:absolute!important;inset:0!important;z-index:0!important;display:block!important;visibility:visible!important;width:100%!important;height:100%!important;opacity:.78!important;object-fit:cover!important;object-position:center!important;background:transparent!important;}
-.mr-home-hero.mr-video-hero .mr-hero-video-fallback{z-index:-1!important;}
-.mr-home-hero.mr-video-hero .mr-hero-video-overlay{z-index:1!important;}
-.mr-home-hero.mr-video-hero .mr-home-hero-inner{position:relative!important;z-index:2!important;}
+/* Preserve the original full-motion background video on all devices. */
+.mr-home-hero.mr-video-hero .mr-hero-background-video{visibility:visible!important;display:block!important;opacity:.78!important;object-fit:cover!important;}
