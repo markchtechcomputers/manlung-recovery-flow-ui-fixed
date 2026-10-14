@@ -1,6 +1,6 @@
 {
   "name": "manlung-tech-city-backend",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Manlung Recovery Portal — PWA and workflow refresh",
   "main": "server.js",
   "scripts": {
