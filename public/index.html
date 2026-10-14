@@ -1505,6 +1505,7 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
 
 <!-- Homepage hero label removed; badge styling is disabled in the hero stylesheet. -->
 
+  <link rel="stylesheet" href="/css/case-flow-animation.css?v=20261014">
 </head>
 <body>
 <div id="manlungStartupLoader" aria-label="Loading Manlung Recovery">
@@ -1629,6 +1630,25 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
         <span><i class="fas fa-list-check" aria-hidden="true"></i> Clear case steps</span>
       </div>
     </div>
+    <aside class="mr-case-flow" data-mr-case-flow aria-label="How a recovery case progresses">
+      <div class="mr-case-flow-card">
+        <div class="mr-case-flow-top">
+          <div class="mr-case-flow-brand"><i class="fas fa-route" aria-hidden="true"></i><span>Recovery workflow</span></div>
+          <span class="mr-case-flow-live">Process flow</span>
+        </div>
+        <div class="mr-case-flow-stage" aria-live="polite" aria-atomic="true">
+          <div class="mr-case-flow-step"><span><i class="fas fa-inbox" aria-hidden="true"></i></span><span data-flow-step>Request received</span></div>
+          <h3 data-flow-title>New case submitted</h3>
+          <p data-flow-desc>A client sends a recovery request and the case enters the queue.</p>
+        </div>
+        <div class="mr-case-flow-bottom">
+          <div class="mr-case-flow-progress" aria-label="Workflow stages">
+            <span class="active" data-flow-dot></span><span data-flow-dot></span><span data-flow-dot></span><span data-flow-dot></span><span data-flow-dot></span>
+          </div>
+          <span class="mr-case-flow-secure"><i class="fas fa-shield-halved" aria-hidden="true"></i> Case-linked updates</span>
+        </div>
+      </div>
+    </aside>
   </div>
 </section>
 
@@ -2250,6 +2270,7 @@ body.manlung-page-leaving{opacity:.96;transition:opacity .18s ease}
 </div>
 
 <script src="/js/onboarding.js" defer></script>
+  <script src="/js/case-flow-animation.js?v=20261014" defer></script>
 </body>
 </html>
 
