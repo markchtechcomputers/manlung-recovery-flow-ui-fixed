@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script src="/js/theme.js?v=20261014-currency-visibility4"></script>
+  <script src="/js/theme.js?v=20261014-currency-visibility5"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Support Manlung Recovery</title>
@@ -11,8 +11,10 @@
 :root{--donation-ink:#10213b;--donation-muted:#61738a;--donation-green:#16a34a;--donation-line:#dce6ef}
 /* Use the supplied donation-jar photo as the page background, not as another content block. */
 body:has(.donation-shell){background:linear-gradient(rgba(244,248,250,.58),rgba(244,248,250,.72)),url("/images/donation.png") center/cover fixed no-repeat}
-.donation-shell{max-width:920px}
-.donation-card{background:rgba(255,255,255,.88);backdrop-filter:blur(8px)}
+.donation-shell{max-width:920px;position:relative;z-index:1;isolation:isolate}
+.donation-card{background:#fff!important;background-image:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;opacity:1!important;filter:none!important;position:relative;z-index:1}
+.donation-card>*{position:relative;z-index:1}
+.donation-card:before{z-index:0;pointer-events:none}
 .manlung-footer .manlung-footer-social{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:16px!important;flex-wrap:wrap!important}
 .manlung-footer .manlung-footer-social a{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;flex:0 0 36px!important;padding:0!important;border:0!important;background:transparent!important;color:#a9bfd5!important;font-size:0!important}
 .manlung-footer .manlung-footer-social a i{display:inline-block!important;font-size:25px!important;color:currentColor!important}
