@@ -373,7 +373,9 @@ function populateCurrencies(){
  document.getElementById('customCurrencyCode').textContent=activeCurrency();
  document.querySelectorAll('.amount-btn').forEach(b=>{b.textContent=fmtMoney(Number(b.dataset.amount));if(b.classList.contains('active'))amountEl.value=currencyApi?currencyApi.fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):b.dataset.amount});
  amountEl.min=currencyApi?(activeCurrency()==='KES'?'50':(Math.ceil(currencyApi.fromKes(50,activeCurrency())*100)/100).toFixed(2)):'50';
+ amountEl.max=currencyApi?currencyApi.fromKes(5700010,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):'5700010';
  amountEl.placeholder='Minimum '+fmtMoney(50);
+ const amountHelp=document.getElementById('amount-help');if(amountHelp)amountHelp.textContent='Minimum equivalent of '+fmtMoney(50)+' (KES 50).';
 }
 function refreshCurrency(){populateCurrencies();loadTotal()}
 if(currencyApi){populateCurrencies();window.addEventListener('manlung:currencychange',event=>{if(event.detail&&validCurrency(event.detail.currency))selectedCurrency=event.detail.currency;else if(!(localStorage.getItem('manlung-currency-manual')==='true'))selectedCurrency=readApiCurrency();if(currencySelect)currencySelect.value=activeCurrency();populateCurrencies();loadTotal()});window.addEventListener('storage',e=>{if(e.key==='manlung-language'||e.key==='manlung-currency'||e.key==='manlung-currency-manual'){selectedCurrency=readApiCurrency();if(currencySelect)currencySelect.value=activeCurrency();populateCurrencies();loadTotal()}})}
