@@ -196,10 +196,10 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
 
 
 const COMMUNITY_PLANS = Object.freeze({
-  plus: { amountKes: 100, amountMinor: 10000, label: 'Plus' },
-  pro: { amountKes: 500, amountMinor: 50000, label: 'Pro' },
-  chat_pass: { amountKes: 100, amountMinor: 10000, label: 'Chat pass' },
-  call: { amountKes: 200, amountMinor: 20000, label: 'Call subscription' },
+  plus: { amountKes: 100, amountMinor: 10000, label: 'Plus', planEnv: 'PAYSTACK_PLAN_PLUS' },
+  pro: { amountKes: 500, amountMinor: 50000, label: 'Pro', planEnv: 'PAYSTACK_PLAN_PRO' },
+  chat_pass: { amountKes: 100, amountMinor: 10000, label: 'Chat pass', planEnv: 'PAYSTACK_PLAN_CHAT_PASS' },
+  call: { amountKes: 200, amountMinor: 20000, label: 'Call subscription', planEnv: 'PAYSTACK_PLAN_MONTHLY' },
 });
 router.get('/plans/status', async (req, res) => {
   try {
@@ -225,14 +225,20 @@ router.post('/plans/initialize', async (req, res) => {
     if (!plan) return fail(res,400,'Choose a valid subscription.');
     const email=cleanText(req.user.email,254).toLowerCase();
     if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return fail(res,400,'Add a valid email to your account before paying.');
+    const planCode=String(process.env[plan.planEnv]||'').trim();
+    if(!planCode) return fail(res,503,'The matching monthly Paystack plan is not configured: '+plan.planEnv+'.');
+    const remoteResponse=await axios.get(PAYSTACK_URL+'/plan/'+encodeURIComponent(planCode),{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:10000});
+    const remotePlan=remoteResponse.data?.data;
+    if(!remotePlan||Number(remotePlan.amount)!==plan.amountMinor||String(remotePlan.currency||'').toUpperCase()!=='KES'||String(remotePlan.interval||'').toLowerCase()!=='monthly')
+      return fail(res,503,'The configured Paystack plan must match the listed KES price and monthly billing interval.');
     const reference='MTC-PLAN-'+Date.now()+'-'+crypto.randomBytes(8).toString('hex');
     const {data:purchase,error:pe}=await supabase.from('recovery_chat_plan_purchases')
-      .insert({user_id:req.user.id,provider_reference:reference,plan_code:code,amount_kes:plan.amountKes,currency:'KES',status:'pending'})
+      .insert({user_id:req.user.id,provider_reference:reference,provider_plan_code:planCode,plan_code:code,amount_kes:plan.amountKes,currency:'KES',status:'pending'})
       .select('id,provider_reference').single();
     if(pe) throw pe;
     try {
       const init=await axios.post(PAYSTACK_URL+'/transaction/initialize',{
-        email,amount:plan.amountMinor,currency:'KES',reference,
+        email,amount:plan.amountMinor,currency:'KES',reference,plan:planCode,
         callback_url:process.env.PAYSTACK_CHAT_PLAN_CALLBACK_URL||(String(process.env.PUBLIC_APP_URL||'').replace(/\/+$/,'')+'/client/connect.html'),
         metadata:{product:'manlung_community_subscription',plan_code:code,user_id:req.user.id,purchase_id:purchase.id,amount_kes:plan.amountKes}
       },{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:15000});
@@ -268,12 +274,58 @@ router.post('/plans/verify', async (req, res) => {
     if(tx.metadata?.user_id&&tx.metadata.user_id!==purchase.user_id) return fail(res,400,'Payment metadata does not match the purchase.');
     const {data:fulfilled,error:fe}=await supabase.rpc('recovery_chat_fulfill_plan_purchase',{p_purchase_id:purchase.id,p_provider_transaction_id:String(tx.id)});
     if(fe) throw fe;
+    const subscriptionCode=String(tx.subscription?.subscription_code||tx.subscription_code||'').trim();
+    if(subscriptionCode){const upd=await supabase.from('recovery_chat_plan_purchases').update({provider_subscription_code:subscriptionCode}).eq('id',purchase.id);if(upd.error)throw upd.error;}
     res.json({success:true,alreadyFulfilled:fulfilled===false,planCode:purchase.plan_code,expiresInDays:30});
   } catch(error) {
     console.error('Community plan verification error:',error.response?.data||error.message);
     return handleDbError(res,error,'Community plan verification error:');
   }
 });
+
+router.post('/plans/webhook', async (req,res) => {
+  const secret=process.env.PAYSTACK_SECRET_KEY;
+  if(!secret) return res.status(503).send('Webhook not configured');
+  const signature=String(req.headers['x-paystack-signature']||'');
+  const raw=Buffer.isBuffer(req.rawBody)?req.rawBody:Buffer.from(JSON.stringify(req.body||{}));
+  const expected=crypto.createHmac('sha512',secret).update(raw).digest('hex');
+  let valid=false;
+  try{const a=Buffer.from(signature,'utf8'),b=Buffer.from(expected,'utf8');valid=!!signature&&a.length===b.length&&crypto.timingSafeEqual(a,b)}catch(_){}
+  if(!valid)return res.status(401).send('Invalid signature');
+  try{
+    const event=String(req.body?.event||'');
+    if(!['charge.success','invoice.payment_success'].includes(event))return res.status(200).send('Ignored');
+    const data=req.body?.data||{};
+    const reference=String(data.reference||'').trim();
+    const subscriptionCode=String(data.subscription?.subscription_code||data.subscription_code||'').trim();
+    let purchase=null;
+    if(reference&&/^MTC-PLAN-[A-Za-z0-9-]+$/.test(reference)){
+      const found=await supabase.from('recovery_chat_plan_purchases').select('*').eq('provider_reference',reference).maybeSingle();
+      if(found.error)throw found.error;purchase=found.data;
+    }
+    if(!purchase&&subscriptionCode){
+      const found=await supabase.from('recovery_chat_plan_purchases').select('*').eq('provider_subscription_code',subscriptionCode).eq('status','paid').order('expires_at',{ascending:false}).limit(1).maybeSingle();
+      if(found.error)throw found.error;purchase=found.data;
+    }
+    if(!purchase)return res.status(200).send('Unknown reference');
+    const plan=COMMUNITY_PLANS[purchase.plan_code];
+    if(!plan||Number(data.amount)!==plan.amountMinor||String(data.currency||'').toUpperCase()!=='KES')return res.status(400).send('Amount mismatch');
+    const verify=await axios.get(PAYSTACK_URL+'/transaction/verify/'+encodeURIComponent(reference||String(data.reference||'')),{headers:{Authorization:'Bearer '+secret},timeout:12000});
+    const tx=verify.data?.data;
+    if(!verify.data?.status||!tx||String(tx.status).toLowerCase()!=='success'||Number(tx.amount)!==plan.amountMinor||String(tx.currency).toUpperCase()!=='KES')return res.status(400).send('Payment not verified');
+    if(purchase.status==='pending'){
+      const result=await supabase.rpc('recovery_chat_fulfill_plan_purchase',{p_purchase_id:purchase.id,p_provider_transaction_id:String(tx.id)});
+      if(result.error)throw result.error;
+      const sub=String(tx.subscription?.subscription_code||subscriptionCode||'').trim();
+      if(sub){const upd=await supabase.from('recovery_chat_plan_purchases').update({provider_subscription_code:sub}).eq('id',purchase.id);if(upd.error)throw upd.error;}
+    }else if(subscriptionCode){
+      const upd=await supabase.from('recovery_chat_plan_purchases').update({provider_transaction_id:String(tx.id),starts_at:new Date().toISOString(),expires_at:new Date(Date.now()+30*86400000).toISOString(),paid_at:new Date().toISOString()}).eq('id',purchase.id);
+      if(upd.error)throw upd.error;
+    }
+    return res.status(200).send('OK');
+  }catch(error){console.error('Community plan webhook error:',error.response?.data||error.message);return res.status(500).send('Webhook error');}
+});
+
 router.get('/status/:statusId/comments', async (req,res) => {
   try {
     const id=String(req.params.statusId||'');
