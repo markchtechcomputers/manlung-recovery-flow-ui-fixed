@@ -345,7 +345,7 @@
 
   function installGlobalLanguageSelector() {
     if (document.getElementById('manlungLanguageControl')) return;
-    const actions = document.querySelector('.site-header .header-actions');
+    const actions = document.querySelector('.home-header-container .header-actions') || document.querySelector('.site-header .header-actions');
     if (!actions) return;
 
     const control = document.createElement('div');
