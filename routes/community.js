@@ -655,6 +655,8 @@ router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
   const {data:callee,error:ce}=await supabase.from('recovery_users').select('id,role,security_status').eq('id',other).maybeSingle();
   if(ce) throw ce;
   if(!callee||callee.role!=='client'||(callee.security_status&&callee.security_status!=='active')) return fail(res,404,'Member not found.');
+  const stale=await supabase.from('recovery_peer_calls').update({status:'missed',ended_at:new Date().toISOString()}).eq('status','ringing').lt('created_at',new Date(Date.now()-120000).toISOString());
+  if(stale.error) throw stale.error;
   const {data:busy,error:be}=await supabase.from('recovery_peer_calls').select('id').in('status',['ringing','accepted'])
    .or('caller_user_id.eq.'+req.user.id+',callee_user_id.eq.'+req.user.id+',caller_user_id.eq.'+other+',callee_user_id.eq.'+other).limit(1);
   if(be) throw be;
