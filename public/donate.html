@@ -352,7 +352,7 @@ body:has(.donation-shell){background:linear-gradient(rgba(244,248,250,.58),rgba(
 <script>
 const amountEl=document.getElementById('amount'), donorNameEl=document.getElementById('donorName'), emailEl=document.getElementById('email'), statusEl=document.getElementById('status'), btn=document.getElementById('donateBtn');
 const currencyApi=window.ManlungCurrency, currencySelect=document.getElementById('donationCurrency');
-function activeCurrency(){return currencyApi?currencyApi.current():'KES'}
+function activeCurrency(){try{const saved=localStorage.getItem('manlung-currency');if(currencyApi&&saved&&currencyApi.rates&&currencyApi.rates[saved])return saved}catch(_){}return 'KES'}
 function fmtMoney(kes){return currencyApi?currencyApi.format(currencyApi.fromKes(Number(kes||0),activeCurrency()),activeCurrency()):'KES '+Number(kes||0).toLocaleString('en-KE')}
 function localToKes(value){return currencyApi?currencyApi.toKes(Number(value||0),activeCurrency()):Number(value||0)}
 const FALLBACK_CURRENCIES=[['KES','Kenyan shilling (KSh)'],['USD','US dollar ($)'],['EUR','Euro (€)'],['GBP','British pound (£)'],['UGX','Ugandan shilling'],['TZS','Tanzanian shilling'],['NGN','Nigerian naira (₦)'],['INR','Indian rupee (₹)'],['ZAR','South African rand'],['AED','UAE dirham'],['CAD','Canadian dollar'],['AUD','Australian dollar'],['JPY','Japanese yen'],['CNY','Chinese yuan'],['GHS','Ghanaian cedi'],['RUB','Russian ruble']];
@@ -373,8 +373,8 @@ function populateCurrencies(){
  amountEl.placeholder='Minimum '+fmtMoney(50);
 }
 function refreshCurrency(){populateCurrencies();loadTotal()}
-if(currencyApi){populateCurrencies();window.addEventListener('manlung:currencychange',()=>{if(currencySelect)currencySelect.value=currencyApi.current();populateCurrencies();loadTotal()});window.addEventListener('storage',e=>{if(e.key==='manlung-language'||e.key==='manlung-currency'||e.key==='manlung-currency-manual'){if(currencySelect)currencySelect.value=currencyApi.current();populateCurrencies();loadTotal()}})}
-if(currencySelect)currencySelect.addEventListener('change',()=>{const previousKes=amountEl.dataset.selectedKes?Number(amountEl.dataset.selectedKes):localToKes(Number(amountEl.value||0));if(currencyApi){currencyApi.set(currencySelect.value,true);currencySelect.value=currencyApi.current()}populateCurrencies();if(amountEl.value&&!amountEl.dataset.selectedKes)amountEl.value=currencyApi?currencyApi.fromKes(previousKes,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):String(Math.round(previousKes));loadTotal()});
+if(currencyApi){populateCurrencies();window.addEventListener('manlung:currencychange',()=>{if(currencySelect)currencySelect.value=activeCurrency();populateCurrencies();loadTotal()});window.addEventListener('storage',e=>{if(e.key==='manlung-language'||e.key==='manlung-currency'||e.key==='manlung-currency-manual'){if(currencySelect)currencySelect.value=currencyApi.current();populateCurrencies();loadTotal()}})}
+if(currencySelect)currencySelect.addEventListener('change',()=>{const previousKes=amountEl.dataset.selectedKes?Number(amountEl.dataset.selectedKes):localToKes(Number(amountEl.value||0));if(currencyApi){currencyApi.set(currencySelect.value,true);currencySelect.value=activeCurrency()}populateCurrencies();if(amountEl.value&&!amountEl.dataset.selectedKes)amountEl.value=currencyApi?currencyApi.fromKes(previousKes,activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):String(Math.round(previousKes));loadTotal()});
 document.querySelectorAll('.amount-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');amountEl.dataset.selectedKes=b.dataset.amount;amountEl.value=currencyApi?currencyApi.fromKes(Number(b.dataset.amount),activeCurrency()).toFixed(activeCurrency()==='KES'?0:2):b.dataset.amount;});
 amountEl.addEventListener('input',()=>{delete amountEl.dataset.selectedKes;});
 async function loadTotal(){
