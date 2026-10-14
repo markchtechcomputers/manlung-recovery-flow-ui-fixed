@@ -365,7 +365,7 @@ function localToKes(value){return toKes(Number(value||0),activeCurrency())}
 const FALLBACK_CURRENCIES=DISPLAY_CURRENCIES;
 function populateCurrencies(){
  if(currencySelect){
-  const options=(FALLBACK_CURRENCIES;
+  const options=FALLBACK_CURRENCIES;
   if(currencySelect.options.length!==options.length){
    currencySelect.replaceChildren();
    options.forEach(([code,label])=>{const o=document.createElement('option');o.value=code;o.textContent=label;currencySelect.appendChild(o)});
