@@ -80,8 +80,9 @@ router.get('/members', async (req, res) => {
     (blocks || []).forEach(b => { blocked.add(b.blocker_user_id); blocked.add(b.blocked_user_id); });
     const pMap = new Map((profiles || []).map(p => [p.user_id, p]));
     const liveMap = new Map((presence || []).map(p => [p.user_id, p]));
-    const members = (users || []).filter(u => u.id !== req.user.id && !blocked.has(u.id) && (!u.security_status || u.security_status === 'active') && (!u.security_status || u.security_status === 'active'))
+    const members = (users || []).filter(u => u.id !== req.user.id && !blocked.has(u.id) && (!u.security_status || u.security_status === 'active'))
       .map(u => ({ user: u, profile: pMap.get(u.id) }))
+      // A missing chat profile must not make a registered account disappear. Only explicit privacy settings hide it.
       .filter(x => x.profile?.discoverable !== false && x.profile?.profile_visibility !== 'nobody')
       .map(x => publicProfile(x.profile, x.user, liveMap.get(x.user.id)));
     res.set('Cache-Control', 'no-store');
@@ -693,7 +694,7 @@ router.get('/groups', async (req, res) => {
     const joined=(groups||[]).filter(x=>x.recovery_chat_groups).map(x=>({ ...x.recovery_chat_groups, joined:true, archived:x.archived, muted:x.muted, unarchiveOnMention:x.unarchive_on_mention }));
     if(shared&&!joined.some(x=>x.id===shared.id)) joined.unshift(shared);
     const { data: official, error: officialError } = await supabase.from('recovery_chat_groups')
-      .select('id,slug,name,description,is_default,avatar_url').in('slug',['manlung-team','manlung-updates']);
+      .select('id,slug,name,description,is_default,avatar_url').order('created_at', { ascending: true }).limit(100);
     if (officialError) throw officialError;
     for (const group of (official || [])) {
       let { data: membership, error: membershipError } = await supabase.from('recovery_chat_group_members')
