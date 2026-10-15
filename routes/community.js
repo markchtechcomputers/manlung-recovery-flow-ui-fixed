@@ -473,10 +473,30 @@ router.patch('/friend-requests/:requestId', async (req, res) => {
     const status = action === 'accept' ? 'accepted' : action === 'decline' ? 'declined' : 'cancelled';
     const now = new Date().toISOString();
     const { data, error } = await supabase.from('recovery_chat_friend_requests')
-      .update({ status, responded_at: now, updated_at: now }).eq('id', id).eq('status', 'pending').select('id,sender_user_id,recipient_user_id,status,created_at,responded_at').maybeSingle();
+      .update({ status, responded_at: now, updated_at: now }).eq('id', id).eq('status', 'pending')
+      .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at').maybeSingle();
     if (error) throw error;
-    if (!data) return fail(res, 409, 'This friend request has already been handled.');
-    res.json({ success: true, request: data });
+    // If this request was already handled, return the current row instead of
+    // leaving the client with a stale pending state after refresh.
+    let result = data;
+    if (!result) {
+      const { data: current, error: currentError } = await supabase.from('recovery_chat_friend_requests')
+        .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at').eq('id', id).maybeSingle();
+      if (currentError) throw currentError;
+      if (!current) return fail(res, 404, 'Friend request not found.');
+      if (action === 'accept' && current.status === 'accepted') result = current;
+      else return res.json({ success: true, request: current, unchanged: true });
+    }
+    if (action === 'accept') {
+      // Accept every duplicate pending row for this same pair so a stale
+      // duplicate can never reappear as an incoming request after refresh.
+      const { error: duplicateError } = await supabase.from('recovery_chat_friend_requests')
+        .update({ status: 'accepted', responded_at: now, updated_at: now }).eq('status', 'pending')
+        .or('and(sender_user_id.eq.' + result.sender_user_id + ',recipient_user_id.eq.' + result.recipient_user_id + '),and(sender_user_id.eq.' + result.recipient_user_id + ',recipient_user_id.eq.' + result.sender_user_id + ')');
+      if (duplicateError) throw duplicateError;
+    }
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, request: result });
   } catch (error) { return handleDbError(res, error, 'Friend request update error:'); }
 });
 
