@@ -219,15 +219,29 @@ router.post('/webhook', async (req, res) => {
 // Public aggregate only. No donor PII is exposed.
 router.get('/total', async (_req, res) => {
   try {
-    const { data, error } = await supabase
-      .from(TABLE).select('amount_kes').eq('status', 'confirmed');
-    if (error) throw error;
-    const rows = data || [];
-    const totalKes = rows.reduce((sum, row) => sum + Number(row.amount_kes || 0), 0);
+    // Supabase/PostgREST limits a normal select to a page of rows. Page through
+    // every confirmed donation so neither the public count nor raised total is truncated.
+    const pageSize = 1000;
+    let offset = 0;
+    let totalKes = 0;
+    let donationCount = 0;
+    while (true) {
+      const { data, error } = await supabase
+        .from(TABLE).select('amount_kes')
+        .eq('status', 'confirmed')
+        .order('created_at', { ascending: true })
+        .range(offset, offset + pageSize - 1);
+      if (error) throw error;
+      const rows = data || [];
+      donationCount += rows.length;
+      totalKes += rows.reduce((sum, row) => sum + Number(row.amount_kes || 0), 0);
+      if (rows.length < pageSize) break;
+      offset += pageSize;
+    }
     const targetKes = donationTargetKes();
     const percentage = Math.min(100, Math.max(0, (totalKes / targetKes) * 100));
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.json({ success: true, totalKes, donationCount: rows.length, targetKes, percentage: Number(percentage.toFixed(2)) });
+    res.json({ success: true, totalKes, donationCount, targetKes, percentage: Number(percentage.toFixed(2)) });
   } catch (error) {
     console.error('Donation total error:', error);
     res.status(500).json({ error: 'Could not load donation total.' });
