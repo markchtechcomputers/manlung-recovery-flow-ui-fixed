@@ -717,6 +717,27 @@ router.get('/groups', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Group list error:'); }
 });
 
+router.post('/groups', async (req,res) => {
+  try {
+    const name=cleanText(req.body?.name,100);
+    const description=String(req.body?.description||'').trim();
+    if(name.length<2) return fail(res,400,'Group name must contain at least 2 characters.');
+    if(description.length>2000) return fail(res,400,'Group description must be 2000 characters or fewer.');
+    const slug='community-'+crypto.randomUUID();
+    const {data:group,error}=await supabase.from('recovery_chat_groups')
+      .insert({slug,name,description,created_by:req.user.id,is_default:false,allow_member_invites:true,admin_only_announcements:false})
+      .select('id,slug,name,description,is_default,avatar_url,created_at').single();
+    if(error) throw error;
+    const {error:memberError}=await supabase.from('recovery_chat_group_members')
+      .insert({group_id:group.id,user_id:req.user.id,archived:false});
+    if(memberError) {
+      await supabase.from('recovery_chat_groups').delete().eq('id',group.id);
+      throw memberError;
+    }
+    res.status(201).json({success:true,group:{...group,joined:true,archived:false}});
+  } catch(error) { return handleDbError(res,error,'Community group create error:'); }
+});
+
 router.post('/groups/:groupId/join', async (req,res) => {
   try {
     const gid=String(req.params.groupId||'');
