@@ -397,13 +397,19 @@ router.get('/friend-requests', async (req, res) => {
     if (ue) throw ue; if (pe) throw pe;
     const um = new Map((users || []).map(u => [u.id, u]));
     const pm = new Map((profiles || []).map(p => [p.user_id, p]));
-    const requests = (data || []).filter(x => um.has(x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id))
-      .map(x => {
-        const otherId = x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id;
-        const u = um.get(otherId), p = pm.get(otherId) || {};
-        return { ...x, direction: x.sender_user_id === req.user.id ? 'sent' : 'received',
-          member: { id: otherId, name: cleanText(p.display_name, 80) || cleanText(u.username, 80) || 'Member', username: u.username || null, avatar: p.avatar_url || null, bio: p.bio || '' } };
-      });
+    // If any request between these two accounts is accepted, treat them as friends
+    // and never expose a duplicate pending row for the same pair.
+    const acceptedOtherIds = new Set((data || []).filter(x => x.status === 'accepted')
+      .map(x => x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id));
+    const requests = (data || []).filter(x => {
+      const otherId = x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id;
+      return um.has(otherId) && (x.status !== 'pending' || !acceptedOtherIds.has(otherId));
+    }).map(x => {
+      const otherId = x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id;
+      const u = um.get(otherId), p = pm.get(otherId) || {};
+      return { ...x, direction: x.sender_user_id === req.user.id ? 'sent' : 'received',
+        member: { id: otherId, name: cleanText(p.display_name, 80) || cleanText(u.username, 80) || 'Member', username: u.username || null, avatar: p.avatar_url || null, bio: p.bio || '' } };
+    });
     res.set('Cache-Control', 'no-store');
     res.json({ success: true, requests });
   } catch (error) { return handleDbError(res, error, 'Friend request list error:'); }
