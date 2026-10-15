@@ -690,6 +690,16 @@ router.get('/groups', async (req, res) => {
     if (error) throw error;
     const joined=(groups||[]).filter(x=>x.recovery_chat_groups).map(x=>({ ...x.recovery_chat_groups, joined:true, archived:x.archived, muted:x.muted, unarchiveOnMention:x.unarchive_on_mention }));
     if(shared&&!joined.some(x=>x.id===shared.id)) joined.unshift(shared);
+    const { data: official, error: officialError } = await supabase.from('recovery_chat_groups')
+      .select('id,slug,name,description,is_default,avatar_url').in('slug',['manlung-team','manlung-updates']);
+    if (officialError) throw officialError;
+    for (const group of (official || [])) {
+      if (joined.some(x=>x.id===group.id)) continue;
+      const { data: membership, error: membershipError } = await supabase.from('recovery_chat_group_members')
+        .select('group_id,archived').eq('group_id',group.id).eq('user_id',req.user.id).maybeSingle();
+      if (membershipError) throw membershipError;
+      joined.push({ ...group, joined: Boolean(membership), archived: Boolean(membership?.archived) });
+    }
     res.json({ success: true, groups: joined });
   } catch (error) { return handleDbError(res, error, 'Group list error:'); }
 });
