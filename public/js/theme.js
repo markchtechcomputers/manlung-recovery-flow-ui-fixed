@@ -9,12 +9,36 @@
   ];
 
   // Shared display-currency helper. Display conversions are indicative; checkout remains KES.
-  const MANLUNG_CURRENCY_RATES = Object.freeze({KES:1,USD:130,EUR:150,GBP:175,UGX:0.034,TZS:0.05,NGN:0.085,INR:1.55,ZAR:7.1,AED:35.4,CAD:94,AUD:85,JPY:0.87,CNY:18,GHS:10.5,RUB:1.35});
+  const MANLUNG_CURRENCY_RATES = {KES:1,USD:130,EUR:150,GBP:175,UGX:0.034,TZS:0.05,NGN:0.085,INR:1.55,ZAR:7.1,AED:35.4,CAD:94,AUD:85,JPY:0.87,CNY:18,GHS:10.5,RUB:1.35};
+  // Refresh indicative display rates from a live KES-based feed. Static rates above
+  // remain a safe fallback when the exchange-rate service is unavailable.
+  async function manlungRefreshCurrencyRates(){
+    try{
+      const response=await fetch('https://open.er-api.com/v6/latest/KES',{cache:'no-store'});
+      if(!response.ok)return;
+      const payload=await response.json();
+      if(payload.result!=='success'||payload.base_code!=='KES'||!payload.rates)return;
+      let changed=false;
+      for(const code of Object.keys(MANLUNG_CURRENCY_RATES)){
+        const perKes=Number(payload.rates[code]);
+        if(code==='KES')continue;
+        if(Number.isFinite(perKes)&&perKes>0){
+          MANLUNG_CURRENCY_RATES[code]=1/perKes;
+          changed=true;
+        }
+      }
+      if(changed){
+        window.dispatchEvent(new CustomEvent('manlung:currencyratesupdated',{detail:{time_last_update_utc:payload.time_last_update_utc||null}}));
+        window.dispatchEvent(new CustomEvent('manlung:currencychange',{detail:{currency:manlungCurrentCurrency(),ratesUpdated:true}}));
+      }
+    }catch(_){/* Keep last known/fallback rates; donations still charge in KES. */}
+  }
   const MANLUNG_LANGUAGE_CURRENCY = Object.freeze({en:'USD',es:'EUR',fr:'EUR',de:'EUR',it:'EUR',nl:'EUR',pt:'EUR',ru:'RUB',ja:'JPY','zh-CN':'CNY','zh-TW':'CNY',hi:'INR',ar:'AED',sw:'KES',so:'KES',am:'KES',af:'ZAR',zu:'ZAR',xh:'ZAR',yo:'NGN',ha:'NGN',ig:'NGN'});
   function manlungLanguageCode(){try{return localStorage.getItem('manlung-language')||''}catch(_){return ''}}
   function manlungCurrentCurrency(){try{if(localStorage.getItem('manlung-currency-manual')==='true'){const saved=localStorage.getItem('manlung-currency');if(saved&&MANLUNG_CURRENCY_RATES[saved])return saved}}catch(_){}return MANLUNG_LANGUAGE_CURRENCY[manlungLanguageCode()]||'KES'}
   function manlungSetCurrency(currency,manual=true){if(!MANLUNG_CURRENCY_RATES[currency])return;try{localStorage.setItem('manlung-currency',currency);localStorage.setItem('manlung-currency-manual',manual?'true':'false')}catch(_){}window.dispatchEvent(new CustomEvent('manlung:currencychange',{detail:{currency}}))}
   window.ManlungCurrency={rates:MANLUNG_CURRENCY_RATES,options:[['KES','Kenyan shilling (KSh)'],['USD','US dollar ($)'],['EUR','Euro (€)'],['GBP','British pound (£)'],['UGX','Ugandan shilling'],['TZS','Tanzanian shilling'],['NGN','Nigerian naira (₦)'],['INR','Indian rupee (₹)'],['ZAR','South African rand'],['AED','UAE dirham'],['CAD','Canadian dollar'],['AUD','Australian dollar'],['JPY','Japanese yen'],['CNY','Chinese yuan'],['GHS','Ghanaian cedi'],['RUB','Russian ruble']],current:manlungCurrentCurrency,set:manlungSetCurrency,toKes:(amount,currency=manlungCurrentCurrency)=>Number(amount||0)*(MANLUNG_CURRENCY_RATES[currency]||1),fromKes:(amount,currency=manlungCurrentCurrency)=>Number(amount||0)/(MANLUNG_CURRENCY_RATES[currency]||1),format:(amount,currency=manlungCurrentCurrency)=>{try{return new Intl.NumberFormat(undefined,{style:'currency',currency,maximumFractionDigits:['KES','UGX','TZS','NGN','JPY'].includes(currency)?0:2}).format(Number(amount||0))}catch(_){return currency+' '+Number(amount||0).toLocaleString()}}};
+  manlungRefreshCurrencyRates();
 
   function readTheme() {
     try { return localStorage.getItem(STORAGE_KEY) === DARK ? DARK : LIGHT; }
