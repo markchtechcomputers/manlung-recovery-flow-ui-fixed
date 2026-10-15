@@ -636,9 +636,9 @@ router.get('/groups', async (req, res) => {
     let shared = defaults?.[0] || null;
     if (!shared) {
       const created = await supabase.from('recovery_chat_groups').insert({
-        slug: 'manlung-recovery-community', name: 'Manlung Recovery Community',
-        description: 'A shared support group for registered Manlung community members.',
-        is_default: true, avatar_url: '/icons/icon-512.png'
+        slug: 'manlung-members', name: 'Manlung Members',
+        description: 'For registered members: talk, love, and friendly chatter. No hate speech, harassment, threats, or discrimination. We build each other up. Main-app admins remain group admins and can remove members who break the rules.',
+        is_default: true, avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png'
       }).select('id,slug,name,description,is_default,avatar_url').single();
       if (created.error && created.error.code !== '23505') throw created.error;
       if (created.data) shared = created.data;
