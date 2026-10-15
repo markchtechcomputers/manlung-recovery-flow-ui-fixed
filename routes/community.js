@@ -700,6 +700,8 @@ router.get('/groups', async (req, res) => {
       let { data: membership, error: membershipError } = await supabase.from('recovery_chat_group_members')
         .select('group_id,archived').eq('group_id',group.id).eq('user_id',req.user.id).maybeSingle();
       if (membershipError) throw membershipError;
+      // The Team room is staff-only; Updates is readable by every registered account.
+      if (group.slug === 'manlung-team' && !isAdmin(req.user)) continue;
       // Every signed-in admin/owner gets the official team and Updates rooms automatically.
       // Updates is also readable by every authenticated client; main-app staff do not need client signup.
       const shouldAutoJoin = ['admin', 'owner'].includes(req.user.role) || group.slug === 'manlung-updates';
@@ -722,6 +724,9 @@ router.post('/groups/:groupId/join', async (req,res) => {
     const {data:group,error:ge}=await supabase.from('recovery_chat_groups').select('id,is_default').eq('id',gid).maybeSingle();
     if(ge) throw ge;
     if(!group) return fail(res,404,'Group not found.');
+    const {data:groupDetails,error:detailError}=await supabase.from('recovery_chat_groups').select('slug').eq('id',gid).maybeSingle();
+    if(detailError) throw detailError;
+    if(groupDetails?.slug==='manlung-team'&&!isAdmin(req.user)) return fail(res,403,'Manlung Team is available to admins and the owner only.');
     const {error}=await supabase.from('recovery_chat_group_members').upsert({group_id:gid,user_id:req.user.id,archived:false},{onConflict:'group_id,user_id'});
     if(error) throw error;
     res.status(201).json({success:true,joined:true});
@@ -767,6 +772,10 @@ router.get('/groups/:groupId/messages', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
+    const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups').select('id,slug').eq('id', gid).maybeSingle();
+    if (targetError) throw targetError;
+    if (!targetGroup) return fail(res, 404, 'Group not found.');
+    if (targetGroup.slug === 'manlung-team' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Team is available to admins and the owner only.');
     if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
     const { data, error } = await supabase.from('recovery_chat_group_messages')
       .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at')
