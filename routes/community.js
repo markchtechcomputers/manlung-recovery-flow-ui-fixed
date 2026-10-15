@@ -588,11 +588,34 @@ router.post('/reports', async (req, res) => {
 
 router.get('/groups', async (req, res) => {
   try {
+    // Ensure every authenticated community member is included in the shared recovery group.
+    let { data: defaults, error: defaultError } = await supabase.from('recovery_chat_groups')
+      .select('id,slug,name,description,is_default,avatar_url').eq('is_default', true).limit(1);
+    if (defaultError) throw defaultError;
+    let shared = defaults?.[0] || null;
+    if (!shared) {
+      const created = await supabase.from('recovery_chat_groups').insert({
+        slug: 'manlung-recovery-community', name: 'Manlung Recovery Community',
+        description: 'A shared support group for registered Manlung community members.',
+        is_default: true, avatar_url: '/icons/icon-512.png'
+      }).select('id,slug,name,description,is_default,avatar_url').single();
+      if (created.error && created.error.code !== '23505') throw created.error;
+      if (created.data) shared = created.data;
+      else {
+        const retry = await supabase.from('recovery_chat_groups').select('id,slug,name,description,is_default,avatar_url').eq('is_default', true).limit(1);
+        if (retry.error) throw retry.error;
+        shared = retry.data?.[0] || null;
+      }
+    }
+    if (shared) {
+      const membership = await supabase.from('recovery_chat_group_members').upsert({ group_id: shared.id, user_id: req.user.id }, { onConflict: 'group_id,user_id', ignoreDuplicates: true });
+      if (membership.error && membership.error.code !== '23505') throw membership.error;
+    }
     const { data: groups, error } = await supabase.from('recovery_chat_group_members')
       .select('group_id,archived,muted,unarchive_on_mention,recovery_chat_groups(id,slug,name,description,is_default,avatar_url)')
       .eq('user_id', req.user.id);
     if (error) throw error;
-    res.json({ success: true, groups: (groups || []).map(x => ({ ...x.recovery_chat_groups, archived: x.archived, muted: x.muted, unarchiveOnMention: x.unarchive_on_mention })) });
+    res.json({ success: true, groups: (groups || []).filter(x => x.recovery_chat_groups).map(x => ({ ...x.recovery_chat_groups, archived: x.archived, muted: x.muted, unarchiveOnMention: x.unarchive_on_mention })) });
   } catch (error) { return handleDbError(res, error, 'Group list error:'); }
 });
 
