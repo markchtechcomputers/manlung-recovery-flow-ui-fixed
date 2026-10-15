@@ -358,6 +358,20 @@ router.post('/status/:statusId/comments', messageLimiter, async (req,res) => {
     if(await blockedEitherWay(req.user.id,post.user_id)) return fail(res,403,'This status is unavailable.');
     const {data,error}=await supabase.from('recovery_chat_status_comments').insert({status_id:id,user_id:req.user.id,comment}).select('id,status_id,user_id,comment,created_at').single();
     if(error) throw error;
+    // Deliver the comment as an inbox message to the status owner.
+    if (post.user_id !== req.user.id) {
+      const [{data:author,error:ae},{data:authorUser,error:ue}] = await Promise.all([
+        supabase.from('recovery_chat_profiles').select('display_name').eq('user_id',req.user.id).maybeSingle(),
+        supabase.from('recovery_users').select('username').eq('id',req.user.id).maybeSingle()
+      ]);
+      if (ae) throw ae; if (ue) throw ue;
+      const authorName=cleanText(author?.display_name,80)||cleanText(authorUser?.username,80)||'A member';
+      const {error:me}=await supabase.from('recovery_community_messages').insert({
+        sender_user_id:req.user.id, recipient_user_id:post.user_id,
+        message:'💬 '+authorName+' commented on your status: '+comment
+      });
+      if(me) throw me;
+    }
     res.status(201).json({success:true,comment:data});
   } catch(error) { return handleDbError(res,error,'Status comment create error:'); }
 });
