@@ -384,12 +384,21 @@ router.post('/status/:statusId/view', async (req,res) => {
 
 router.get('/friend-requests', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('recovery_chat_friend_requests')
-      .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at')
-      .or('sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + req.user.id)
-      .in('status', ['pending','accepted']).order('created_at', { ascending: false }).limit(200);
-    if (error) throw error;
-    const ids = [...new Set((data || []).map(x => x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id))];
+    // Fetch accepted relationships independently so a busy account's newest pending
+    // requests cannot push an existing friendship out of the 200-row result window.
+    const relationFilter = 'sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + req.user.id;
+    const [{ data: acceptedRows, error: acceptedError }, { data: pendingRows, error: pendingError }] = await Promise.all([
+      supabase.from('recovery_chat_friend_requests')
+        .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at')
+        .or(relationFilter).eq('status', 'accepted').order('responded_at', { ascending: false }).limit(1000),
+      supabase.from('recovery_chat_friend_requests')
+        .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at')
+        .or(relationFilter).eq('status', 'pending').order('created_at', { ascending: false }).limit(200)
+    ]);
+    if (acceptedError) throw acceptedError;
+    if (pendingError) throw pendingError;
+    const data = [...(acceptedRows || []), ...(pendingRows || [])];
+    const ids = [...new Set(data.map(x => x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id))];
     const [{ data: users, error: ue }, { data: profiles, error: pe }] = await Promise.all([
       ids.length ? supabase.from('recovery_users').select('id,username,role,security_status').in('id', ids) : Promise.resolve({ data: [], error: null }),
       ids.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,bio').in('user_id', ids) : Promise.resolve({ data: [], error: null })
