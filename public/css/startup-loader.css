@@ -5,7 +5,9 @@ html.manlung-startup-loading body {
   overflow: hidden !important;
 }
 
+/* Fail-safe: if startup-loader.js fails to load or execute, never leave a full-screen blank overlay. */
 #manlungStartupLoader {
+  animation: manlungLoaderFailsafe 0s linear 4s forwards;
   position: fixed;
   inset: 0;
   z-index: 2147483647;
@@ -74,6 +76,15 @@ html.manlung-startup-loading body {
 
 html.manlung-startup-complete #manlungStartupLoader {
   display: none !important;
+}
+
+/* CSS-only fallback; JavaScript normally removes the loader sooner. */
+@keyframes manlungLoaderFailsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
 }
 
 @media (max-width:650px) {
