@@ -131,6 +131,8 @@ router.patch('/profile', async (req, res) => {
       if (raw.length > 180000) return fail(res, 413, 'Profile image is too large. Choose a smaller image.');
       if (raw && !isImageData && !(raw.startsWith('/') && !raw.startsWith('//')) && !/^https:\/\//i.test(raw)) return fail(res, 400, 'Avatar must be an image, secure HTTPS URL or same-site path.');
       patch.avatar_url = raw || null;
+      // A newly uploaded photo is public by default; members can explicitly switch it to private later.
+      if (raw) patch.avatar_visibility = 'public';
     }
     for (const field of ['discoverable', 'read_receipts_enabled']) {
       if (Object.hasOwn(body, field)) {
