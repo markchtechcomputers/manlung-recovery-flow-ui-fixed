@@ -463,41 +463,72 @@ router.patch('/friend-requests/:requestId', async (req, res) => {
     if (!validId(id)) return fail(res, 400, 'Invalid friend request.');
     const action = String(req.body?.action || '').toLowerCase();
     if (!['accept','decline','cancel'].includes(action)) return fail(res, 400, 'Choose accept, decline, or cancel.');
-    const { data: request, error: re } = await supabase.from('recovery_chat_friend_requests')
-      .select('id,sender_user_id,recipient_user_id,status').eq('id', id).maybeSingle();
-    if (re) throw re;
+
+    const { data: request, error: readError } = await supabase
+      .from('recovery_chat_friend_requests')
+      .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at')
+      .eq('id', id).maybeSingle();
+    if (readError) throw readError;
     if (!request) return fail(res, 404, 'Friend request not found.');
-    const allowed = action === 'cancel' ? request.sender_user_id === req.user.id : request.recipient_user_id === req.user.id;
+
+    const allowed = action === 'cancel'
+      ? request.sender_user_id === req.user.id
+      : request.recipient_user_id === req.user.id;
     if (!allowed) return fail(res, 403, 'You cannot change this friend request.');
-    if (request.status !== 'pending') return res.json({ success: true, request, unchanged: true });
+
+    if (request.status === 'accepted' && action === 'accept') {
+      res.set('Cache-Control', 'no-store');
+      return res.json({ success: true, request, unchanged: true });
+    }
+    if (request.status !== 'pending') {
+      return fail(res, 409, 'This friend request is no longer pending. Refresh and try again.');
+    }
+
     const status = action === 'accept' ? 'accepted' : action === 'decline' ? 'declined' : 'cancelled';
     const now = new Date().toISOString();
-    const { data, error } = await supabase.from('recovery_chat_friend_requests')
-      .update({ status, responded_at: now, updated_at: now }).eq('id', id).eq('status', 'pending')
-      .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at').maybeSingle();
-    if (error) throw error;
-    // If this request was already handled, return the current row instead of
-    // leaving the client with a stale pending state after refresh.
-    let result = data;
-    if (!result) {
-      const { data: current, error: currentError } = await supabase.from('recovery_chat_friend_requests')
-        .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at').eq('id', id).maybeSingle();
-      if (currentError) throw currentError;
-      if (!current) return fail(res, 404, 'Friend request not found.');
-      if (action === 'accept' && current.status === 'accepted') result = current;
-      else return res.json({ success: true, request: current, unchanged: true });
+
+    // Update first, then re-read the row to verify the database really saved it.
+    const { error: updateError } = await supabase
+      .from('recovery_chat_friend_requests')
+      .update({ status, responded_at: now, updated_at: now })
+      .eq('id', id).eq('status', 'pending');
+    if (updateError) throw updateError;
+
+    const { data: saved, error: verifyError } = await supabase
+      .from('recovery_chat_friend_requests')
+      .select('id,sender_user_id,recipient_user_id,status,created_at,responded_at')
+      .eq('id', id).maybeSingle();
+    if (verifyError) throw verifyError;
+    if (!saved || saved.status !== status) {
+      console.error('Friend request status verification failed', {
+        requestId: id, expectedStatus: status, actualStatus: saved?.status || null,
+        actingUserId: req.user.id
+      });
+      return fail(res, 500, 'The server could not confirm that the friend request was saved. Please try again.');
     }
+
+    // Duplicate cleanup is helpful, but must not turn a successfully saved
+    // acceptance into a failed response.
     if (action === 'accept') {
-      // Accept every duplicate pending row for this same pair so a stale
-      // duplicate can never reappear as an incoming request after refresh.
-      const { error: duplicateError } = await supabase.from('recovery_chat_friend_requests')
-        .update({ status: 'accepted', responded_at: now, updated_at: now }).eq('status', 'pending')
-        .or('and(sender_user_id.eq.' + result.sender_user_id + ',recipient_user_id.eq.' + result.recipient_user_id + '),and(sender_user_id.eq.' + result.recipient_user_id + ',recipient_user_id.eq.' + result.sender_user_id + ')');
-      if (duplicateError) throw duplicateError;
+      const { error: duplicateError } = await supabase
+        .from('recovery_chat_friend_requests')
+        .update({ status: 'accepted', responded_at: now, updated_at: now })
+        .eq('status', 'pending')
+        .or('and(sender_user_id.eq.' + saved.sender_user_id + ',recipient_user_id.eq.' + saved.recipient_user_id + '),and(sender_user_id.eq.' + saved.recipient_user_id + ',recipient_user_id.eq.' + saved.sender_user_id + ')');
+      if (duplicateError) console.error('Friend request duplicate cleanup failed:', duplicateError.message || duplicateError);
     }
+
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, request: result });
-  } catch (error) { return handleDbError(res, error, 'Friend request update error:'); }
+    return res.json({ success: true, request: saved });
+  } catch (error) {
+    console.error('Friend request update exception:', {
+      message: error?.message || String(error),
+      code: error?.code || null,
+      details: error?.details || null,
+      hint: error?.hint || null
+    });
+    return handleDbError(res, error, 'Friend request update error:');
+  }
 });
 
 router.put('/preferences/:memberId', async (req, res) => {
