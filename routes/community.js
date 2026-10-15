@@ -798,6 +798,55 @@ router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Group message send error:'); }
 });
 
+// Group reactions are available to every joined member, including read-only Manlung Updates readers.
+router.get('/groups/:groupId/reactions', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || '');
+    if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to view reactions.');
+    const { data: messages, error: me } = await supabase.from('recovery_chat_group_messages')
+      .select('id').eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+    if (me) throw me;
+    const ids = (messages || []).map(x => x.id);
+    if (!ids.length) return res.json({ success: true, reactions: [] });
+    const { data, error } = await supabase.from('recovery_chat_group_reactions')
+      .select('message_id,user_id,reaction,created_at').in('message_id', ids).order('created_at', { ascending: true });
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, reactions: data || [] });
+  } catch (error) { return handleDbError(res, error, 'Group reactions list error:'); }
+});
+
+router.post('/groups/:groupId/messages/:messageId/reactions', messageLimiter, async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), mid = String(req.params.messageId || '');
+    const reaction = cleanText(req.body?.reaction, 16);
+    if (!validId(gid) || !validId(mid)) return fail(res, 400, 'Invalid group or message ID.');
+    if (!['👍','❤️','😂','😮','😢','🙏','🔥','🎉','👏','💚'].includes(reaction)) return fail(res, 400, 'Choose a supported reaction.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to react.');
+    const { data: group, error: ge } = await supabase.from('recovery_chat_groups').select('id,slug').eq('id', gid).maybeSingle();
+    if (ge) throw ge;
+    if (!group) return fail(res, 404, 'Group not found.');
+    const { data: message, error: me } = await supabase.from('recovery_chat_group_messages')
+      .select('id,group_id').eq('id', mid).eq('group_id', gid).is('deleted_at', null).maybeSingle();
+    if (me) throw me;
+    if (!message) return fail(res, 404, 'Message not found.');
+    const { data: existing, error: ee } = await supabase.from('recovery_chat_group_reactions')
+      .select('message_id,user_id,reaction').eq('message_id', mid).eq('user_id', req.user.id).eq('reaction', reaction).maybeSingle();
+    if (ee) throw ee;
+    if (existing) {
+      const { error } = await supabase.from('recovery_chat_group_reactions').delete()
+        .eq('message_id', mid).eq('user_id', req.user.id).eq('reaction', reaction);
+      if (error) throw error;
+      return res.json({ success: true, reacted: false, reaction });
+    }
+    const { error } = await supabase.from('recovery_chat_group_reactions')
+      .insert({ message_id: mid, user_id: req.user.id, reaction });
+    if (error) throw error;
+    return res.status(201).json({ success: true, reacted: true, reaction });
+  } catch (error) { return handleDbError(res, error, 'Group reaction update error:'); }
+});
+
 router.put('/groups/:groupId/archive', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
