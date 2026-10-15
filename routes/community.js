@@ -398,6 +398,28 @@ router.post('/status/:statusId/view', async (req,res) => {
   } catch(error) { return handleDbError(res,error,'Status view error:'); }
 });
 
+router.get('/status/:statusId/views', async (req,res) => {
+  try {
+    const id=String(req.params.statusId||'');
+    if(!validId(id)) return fail(res,400,'Invalid status ID.');
+    const {data:post,error:pe}=await supabase.from('recovery_chat_status_posts').select('id,user_id').eq('id',id).maybeSingle();
+    if(pe) throw pe;
+    if(!post) return fail(res,404,'Status not found.');
+    if(post.user_id!==req.user.id&&!isAdmin(req.user)) return fail(res,403,'Only the status owner can view its viewers.');
+    const {data:views,error}=await supabase.from('recovery_chat_status_views').select('viewer_user_id,viewed_at').eq('status_id',id).order('viewed_at',{ascending:false}).limit(200);
+    if(error) throw error;
+    const ids=[...new Set((views||[]).map(x=>x.viewer_user_id))];
+    const [{data:users,error:ue},{data:profiles,error:pe2}]=await Promise.all([
+      ids.length?supabase.from('recovery_users').select('id,username').in('id',ids):Promise.resolve({data:[],error:null}),
+      ids.length?supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility').in('user_id',ids):Promise.resolve({data:[],error:null})
+    ]);
+    if(ue) throw ue; if(pe2) throw pe2;
+    const um=new Map((users||[]).map(x=>[x.id,x])),pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
+    res.set('Cache-Control','no-store');
+    res.json({success:true,views:(views||[]).map(x=>({viewedAt:x.viewed_at,viewer:{id:x.viewer_user_id,name:pm.get(x.viewer_user_id)?.display_name||um.get(x.viewer_user_id)?.username||'Member',avatar:pm.get(x.viewer_user_id)?.avatar_visibility==='private'?null:pm.get(x.viewer_user_id)?.avatar_url||null}}))});
+  } catch(error) { return handleDbError(res,error,'Status viewers list error:'); }
+});
+
 router.get('/friend-requests', async (req, res) => {
   try {
     // Fetch accepted relationships independently so a busy account's newest pending
