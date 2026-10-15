@@ -794,7 +794,6 @@ router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
   if(!validId(other)||other===String(req.user.id)) return fail(res,400,'Choose a valid registered member.');
   if(await blockedEitherWay(req.user.id,other)) return fail(res,403,'Calls are unavailable because one account has blocked the other.');
   if(!await areAcceptedFriends(req.user.id,other)) return fail(res,403,'Accept the friend request before calling this member.');
-  if(!await hasCallPlan(req.user.id)) return fail(res,402,'An active KES 200/month call subscription is required.');
   const {data:callee,error:ce}=await supabase.from('recovery_users').select('id,role,security_status').eq('id',other).maybeSingle();
   if(ce) throw ce;
   if(!callee||callee.role!=='client'||(callee.security_status&&callee.security_status!=='active')) return fail(res,404,'Member not found.');
