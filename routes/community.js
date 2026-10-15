@@ -349,7 +349,7 @@ router.get('/status/:statusId/comments', async (req,res) => {
     const ids=[...new Set((data||[]).map(x=>x.user_id))];
     const {data:users,error:ue}=ids.length?await supabase.from('recovery_users').select('id,username').in('id',ids):{data:[],error:null};
     if(ue) throw ue;
-    const {data:profiles,error:pe2}=ids.length?await supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url').in('user_id',ids):{data:[],error:null};
+    const {data:profiles,error:pe2}=ids.length?await supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility').in('user_id',ids):{data:[],error:null};
     if(pe2) throw pe2;
     const um=new Map((users||[]).map(x=>[x.id,x])), pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
     res.set('Cache-Control','no-store');
@@ -1028,7 +1028,7 @@ router.get('/peer-calls/incoming',async(req,res)=>{
   if(pe) throw pe;
   const um=new Map((users||[]).map(x=>[x.id,x])),pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
   res.set('Cache-Control','no-store');
-  res.json({success:true,calls:(data||[]).map(c=>({...c,caller:{name:pm.get(c.caller_user_id)?.display_name||um.get(c.caller_user_id)?.username||'Member',avatar:pm.get(c.caller_user_id)?.avatar_url||null}}))});
+  res.json({success:true,calls:(data||[]).map(c=>({...c,caller:{name:pm.get(c.caller_user_id)?.display_name||um.get(c.caller_user_id)?.username||'Member',avatar:pm.get(c.caller_user_id)?.avatar_visibility==='private'?null:(pm.get(c.caller_user_id)?.avatar_url||null)}}))});
  }catch(error){return handleDbError(res,error,'Incoming peer calls error:');}
 });
 router.get('/peer-calls/:callId/signals',async(req,res)=>{
