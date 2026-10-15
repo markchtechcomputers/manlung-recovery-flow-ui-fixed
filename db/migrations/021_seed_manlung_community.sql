@@ -1,3 +1,4 @@
+update public.recovery_chat_groups set is_default=false where slug<>'manlung-recovery-community' and is_default=true;
 -- Ensure the platform-wide Manlung Community exists and contains all active client accounts.
 insert into public.recovery_chat_groups (slug,name,description,is_default,avatar_url)
 values ('manlung-recovery-community','Manlung Community','One shared group for all registered Manlung Recovery members.',true,'/icons/icon-512.png')
