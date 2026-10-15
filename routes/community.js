@@ -700,8 +700,10 @@ router.get('/groups', async (req, res) => {
       let { data: membership, error: membershipError } = await supabase.from('recovery_chat_group_members')
         .select('group_id,archived').eq('group_id',group.id).eq('user_id',req.user.id).maybeSingle();
       if (membershipError) throw membershipError;
-      // The official Updates channel is automatically available to every authenticated member.
-      if (group.slug === 'manlung-updates' && !membership) {
+      // Every signed-in admin/owner gets the official team and Updates rooms automatically.
+      // Updates is also readable by every authenticated client; main-app staff do not need client signup.
+      const shouldAutoJoin = ['admin', 'owner'].includes(req.user.role) || group.slug === 'manlung-updates';
+      if (shouldAutoJoin && !membership) {
         const added = await supabase.from('recovery_chat_group_members')
           .upsert({ group_id: group.id, user_id: req.user.id, archived: false }, { onConflict: 'group_id,user_id' });
         if (added.error) throw added.error;
