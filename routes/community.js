@@ -125,9 +125,11 @@ router.patch('/profile', async (req, res) => {
       patch.bio = v;
     }
     if (Object.hasOwn(body, 'avatar_url')) {
-      const v = cleanText(body.avatar_url, 1000);
-      if (v && !(v.startsWith('/') && !v.startsWith('//')) && !/^https:\/\//i.test(v)) return fail(res, 400, 'Avatar must be a secure HTTPS URL or same-site path.');
-      patch.avatar_url = v || null;
+      const raw = String(body.avatar_url || '').trim();
+      const isImageData = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/i.test(raw);
+      if (raw.length > 180000) return fail(res, 413, 'Profile image is too large. Choose a smaller image.');
+      if (raw && !isImageData && !(raw.startsWith('/') && !raw.startsWith('//')) && !/^https:\/\//i.test(raw)) return fail(res, 400, 'Avatar must be an image, secure HTTPS URL or same-site path.');
+      patch.avatar_url = raw || null;
     }
     for (const field of ['discoverable', 'read_receipts_enabled']) {
       if (Object.hasOwn(body, field)) {
