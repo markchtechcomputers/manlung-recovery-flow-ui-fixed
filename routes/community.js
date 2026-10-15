@@ -27,7 +27,8 @@ function publicProfile(profile, user, presence) {
     name,
     username: user.username || null,
     role: user.role,
-    avatar: profile?.avatar_url || null,
+    avatar: profile?.avatar_visibility === 'private' ? null : (profile?.avatar_url || null),
+    avatarVisibility: profile?.avatar_visibility === 'private' ? 'private' : 'public',
     bio: profile?.bio || '',
     createdAt: user.created_at || null,
     discoverable: profile?.discoverable !== false,
@@ -136,6 +137,10 @@ router.patch('/profile', async (req, res) => {
         if (typeof body[field] !== 'boolean') return fail(res, 400, field + ' must be true or false.');
         patch[field] = body[field];
       }
+    }
+    if (Object.hasOwn(body, 'avatar_visibility')) {
+      if (!['public','private'].includes(body.avatar_visibility)) return fail(res,400,'Avatar visibility must be public or private.');
+      patch.avatar_visibility = body.avatar_visibility;
     }
     for (const field of ['profile_visibility', 'presence_visibility', 'last_seen_visibility', 'status_visibility']) {
       if (Object.hasOwn(body, field)) {
