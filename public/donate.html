@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script src="/js/theme.js?v=20261014-currency-independent-fix3"></script>
+  <script src="/js/theme.js?v=20261015-live-currency-fix1"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Support Manlung Recovery</title>
@@ -422,7 +422,7 @@ async function donate(){
   const r=await fetch('/api/donations/initialize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amountKes,email,donorName})}),init=await r.json();if(!r.ok||!init.success)throw new Error(init.error||'Could not start payment.');
   if(typeof PaystackPop==='undefined'){if(init.authorizationUrl){window.location.href=init.authorizationUrl;return}throw new Error('Payment service failed to load. Refresh and try again.')}
   const popup=new PaystackPop();
-  const verifyPaid=async(reference)=>{statusEl.textContent='Payment received. Verifying…';const vr=await fetch('/api/donations/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reference})}),vd=await vr.json();if(!vr.ok||!vd.success)throw new Error(vd.error||'Verification failed.');statusEl.innerHTML=`<strong>Thank you${vd.donorName?', '+escapeHtml(vd.donorName):(donorName?', '+escapeHtml(donorName):''}!</strong> Your ${fmtMoney(Number(vd.amountKes||amountKes))} donation has been confirmed (charged in KES). ❤️`;showDonationThankYou(vd.donorName||donorName||'Donor');amountEl.value='';delete amountEl.dataset.selectedKes;document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));await loadTotal();return true};
+  const verifyPaid=async(reference)=>{statusEl.textContent='Payment received. Verifying…';const vr=await fetch('/api/donations/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reference})}),vd=await vr.json();if(!vr.ok||!vd.success)throw new Error(vd.error||'Verification failed.');statusEl.innerHTML=`<strong>Thank you${vd.donorName?', '+escapeHtml(vd.donorName):(donorName?', '+escapeHtml(donorName):'')}!</strong> Your ${fmtMoney(Number(vd.amountKes||amountKes))} donation has been confirmed (charged in KES). ❤️`;showDonationThankYou(vd.donorName||donorName||'Donor');amountEl.value='';delete amountEl.dataset.selectedKes;document.querySelectorAll('.amount-btn').forEach(x=>x.classList.remove('active'));await loadTotal();return true};
   if(init.accessCode&&typeof popup.resumeTransaction==='function'){try{popup.resumeTransaction(init.accessCode)}catch(error){console.error('Donation resumeTransaction error:',error);if(init.authorizationUrl){statusEl.innerHTML='Checkout could not open here. <a href="'+init.authorizationUrl+'" style="color:#2451d6;font-weight:800;">Open secure payment page</a>.';btn.disabled=false;return}throw error}
    let attempts=0;const poll=async()=>{attempts++;try{if(await verifyPaid(init.reference))return}catch(e){console.warn('Donation verification poll:',e)}if(attempts<45)setTimeout(poll,2000);else statusEl.textContent='Payment is still being confirmed. If you were charged, refresh this page shortly.'};setTimeout(poll,2500);
   }else{popup.newTransaction({key:init.publicKey,email:init.email,amount:init.amountKobo,currency:'KES',reference:init.reference,onSuccess:transaction=>verifyPaid(transaction?.reference||init.reference).catch(e=>{console.error(e);statusEl.textContent=e.message||'Verification failed.'}),onCancel:()=>{statusEl.textContent='Payment cancelled.'},onError:error=>{statusEl.textContent=error?.message||'Payment checkout failed.'}})}
