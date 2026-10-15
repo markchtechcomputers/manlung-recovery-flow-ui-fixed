@@ -442,7 +442,7 @@ async function startPeerCall(name,video){
  
  rtc.closed=false;rtc.ending=false;rtc.connected=false;rtc.last=0;rtc.incoming=false;rtc.iceQueue=[];rtc.mode=video?'video':'audio';rtc.startedAt=Date.now();rtc.peerName=name;rtc.direction='outgoing';vibrate([180,80,180]);
  try{const d=await rq('/peer-calls',{method:'POST',body:JSON.stringify({memberId:m.id,call_mode:rtc.mode})});rtc.callId=d.call.id;callUI(name,rtc.mode,false);startRingtone();await setup(rtc.mode);const offer=await rtc.pc.createOffer();await rtc.pc.setLocalDescription(offer);await signal('offer',rtc.pc.localDescription.toJSON());state('Ringing…');beginPoll()}
- catch(e){note(e);await endCall(false)}
+ catch(e){note(e);await endCall(!!rtc.callId,'hangup')}
 }
 async function acceptIncoming(){
  stopRingtone();if(!rtc.callId||rtc.ending)return;
@@ -451,7 +451,7 @@ async function acceptIncoming(){
 }
 async function endCall(notify,kind){
  if(rtc.ending)return;rtc.ending=true;const id=rtc.callId;
- if(notify&&id&&!rtc.closed){try{await signal(kind||'hangup')}catch(_){}}
+ if(notify&&id&&(!rtc.closed||kind==='reject')){try{await signal(kind||'hangup')}catch(_){}}
  rtc.closed=true;stopRingtone();if(id&&rtc.startedAt)saveCallLog(kind==='reject'?'missed':(rtc.connected?'ended':'cancelled'));clearInterval(rtc.poll);rtc.poll=null;clearTimeout(rtc.timeout);rtc.timeout=null;
  if(rtc.pc){rtc.pc.ontrack=null;rtc.pc.onicecandidate=null;try{rtc.pc.close()}catch(_){}}
  if(rtc.stream)rtc.stream.getTracks().forEach(t=>t.stop());
