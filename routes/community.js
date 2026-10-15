@@ -648,6 +648,35 @@ router.get('/groups', async (req, res) => {
         shared = retry.data?.[0] || null;
       }
     }
+    // Bring forward older default-group rows to the current Manlung Members branding.
+    if (shared) {
+      const { data: updatedShared, error: updateSharedError } = await supabase.from('recovery_chat_groups')
+        .update({ slug: 'manlung-members', name: 'Manlung Members',
+          description: 'For registered members: talk, love, and friendly chatter. No hate speech, harassment, threats, or discrimination. We build each other up. Main-app admins remain group admins and can remove members who break the rules.',
+          avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png' })
+        .eq('id', shared.id).select('id,slug,name,description,is_default,avatar_url').single();
+      if (updateSharedError) throw updateSharedError;
+      shared = updatedShared || shared;
+    }
+    // Seed the official team room and read-only announcements channel once.
+    const officialGroups = [
+      { slug: 'manlung-team', name: 'Manlung Team', description: 'The official Manlung team room for registered members. Be respectful and build each other up.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false },
+      { slug: 'manlung-updates', name: 'Manlung Updates', description: 'Official news about new features and website updates. Members can read and react; comments and member posts are disabled.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false }
+    ];
+    for (const item of officialGroups) {
+      const { data: existing, error: findError } = await supabase.from('recovery_chat_groups')
+        .select('id,slug,name,description,is_default,avatar_url').eq('slug', item.slug).maybeSingle();
+      if (findError) throw findError;
+      if (existing) {
+        const { error: updateError } = await supabase.from('recovery_chat_groups').update({
+          name: item.name, description: item.description, avatar_url: item.avatar_url
+        }).eq('id', existing.id);
+        if (updateError) throw updateError;
+      } else {
+        const { error: insertError } = await supabase.from('recovery_chat_groups').insert(item);
+        if (insertError && insertError.code !== '23505') throw insertError;
+      }
+    }
     // Keep the default group discoverable without silently re-adding members who chose to leave.
     if (shared) {
       const { data: membership, error: membershipError } = await supabase.from('recovery_chat_group_members')
@@ -733,6 +762,11 @@ router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
     const replyTo = req.body?.reply_to_id ? String(req.body.reply_to_id) : null;
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
     if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
+    const { data: targetGroup, error: targetGroupError } = await supabase.from('recovery_chat_groups')
+      .select('id,slug').eq('id', gid).maybeSingle();
+    if (targetGroupError) throw targetGroupError;
+    if (!targetGroup) return fail(res, 404, 'Group not found.');
+    if (targetGroup.slug === 'manlung-updates' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Updates is an official read-only channel. Members can read updates; comments and posts are disabled.');
     if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
     if (replyTo && !validId(replyTo)) return fail(res, 400, 'Invalid reply target.');
     const { data, error } = await supabase.from('recovery_chat_group_messages')
