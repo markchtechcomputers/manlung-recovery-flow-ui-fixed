@@ -648,16 +648,69 @@ router.get('/groups', async (req, res) => {
         shared = retry.data?.[0] || null;
       }
     }
+    // Keep the default group discoverable without silently re-adding members who chose to leave.
     if (shared) {
-      const membership = await supabase.from('recovery_chat_group_members').upsert({ group_id: shared.id, user_id: req.user.id }, { onConflict: 'group_id,user_id', ignoreDuplicates: true });
-      if (membership.error && membership.error.code !== '23505') throw membership.error;
+      const { data: membership, error: membershipError } = await supabase.from('recovery_chat_group_members')
+        .select('group_id,archived,muted,unarchive_on_mention').eq('group_id',shared.id).eq('user_id',req.user.id).maybeSingle();
+      if (membershipError) throw membershipError;
+      shared = { ...shared, joined: Boolean(membership), archived: Boolean(membership?.archived) };
     }
     const { data: groups, error } = await supabase.from('recovery_chat_group_members')
       .select('group_id,archived,muted,unarchive_on_mention,recovery_chat_groups(id,slug,name,description,is_default,avatar_url)')
       .eq('user_id', req.user.id);
     if (error) throw error;
-    res.json({ success: true, groups: (groups || []).filter(x => x.recovery_chat_groups).map(x => ({ ...x.recovery_chat_groups, archived: x.archived, muted: x.muted, unarchiveOnMention: x.unarchive_on_mention })) });
+    const joined=(groups||[]).filter(x=>x.recovery_chat_groups).map(x=>({ ...x.recovery_chat_groups, joined:true, archived:x.archived, muted:x.muted, unarchiveOnMention:x.unarchive_on_mention }));
+    if(shared&&!joined.some(x=>x.id===shared.id)) joined.unshift(shared);
+    res.json({ success: true, groups: joined });
   } catch (error) { return handleDbError(res, error, 'Group list error:'); }
+});
+
+router.post('/groups/:groupId/join', async (req,res) => {
+  try {
+    const gid=String(req.params.groupId||'');
+    if(!validId(gid)) return fail(res,400,'Invalid group ID.');
+    const {data:group,error:ge}=await supabase.from('recovery_chat_groups').select('id,is_default').eq('id',gid).maybeSingle();
+    if(ge) throw ge;
+    if(!group) return fail(res,404,'Group not found.');
+    const {error}=await supabase.from('recovery_chat_group_members').upsert({group_id:gid,user_id:req.user.id,archived:false},{onConflict:'group_id,user_id'});
+    if(error) throw error;
+    res.status(201).json({success:true,joined:true});
+  } catch(error) { return handleDbError(res,error,'Group join error:'); }
+});
+router.delete('/groups/:groupId/membership', async (req,res) => {
+  try {
+    const gid=String(req.params.groupId||'');
+    if(!validId(gid)) return fail(res,400,'Invalid group ID.');
+    const {data:group,error:ge}=await supabase.from('recovery_chat_groups').select('id,is_default').eq('id',gid).maybeSingle();
+    if(ge) throw ge;
+    if(!group) return fail(res,404,'Group not found.');
+    const {error}=await supabase.from('recovery_chat_group_members').delete().eq('group_id',gid).eq('user_id',req.user.id);
+    if(error) throw error;
+    res.json({success:true,left:true});
+  } catch(error) { return handleDbError(res,error,'Group leave error:'); }
+});
+router.post('/groups/:groupId/members/:memberId', async (req,res) => {
+  try {
+    if(!isAdmin(req.user)) return fail(res,403,'Only main-app admins can add group members.');
+    const gid=String(req.params.groupId||''),uid=String(req.params.memberId||'');
+    if(!validId(gid)||!validId(uid)) return fail(res,400,'Invalid group or member ID.');
+    const {data:user,error:ue}=await supabase.from('recovery_users').select('id').eq('id',uid).maybeSingle();
+    if(ue) throw ue;
+    if(!user) return fail(res,404,'Registered member not found.');
+    const {error}=await supabase.from('recovery_chat_group_members').upsert({group_id:gid,user_id:uid,archived:false},{onConflict:'group_id,user_id'});
+    if(error) throw error;
+    res.json({success:true,added:true});
+  } catch(error) { return handleDbError(res,error,'Admin group add error:'); }
+});
+router.delete('/groups/:groupId/members/:memberId', async (req,res) => {
+  try {
+    if(!isAdmin(req.user)) return fail(res,403,'Only main-app admins can remove group members.');
+    const gid=String(req.params.groupId||''),uid=String(req.params.memberId||'');
+    if(!validId(gid)||!validId(uid)) return fail(res,400,'Invalid group or member ID.');
+    const {error}=await supabase.from('recovery_chat_group_members').delete().eq('group_id',gid).eq('user_id',uid);
+    if(error) throw error;
+    res.json({success:true,removed:true});
+  } catch(error) { return handleDbError(res,error,'Admin group remove error:'); }
 });
 
 router.get('/groups/:groupId/messages', async (req, res) => {
