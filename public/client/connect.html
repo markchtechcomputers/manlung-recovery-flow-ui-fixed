@@ -449,7 +449,12 @@ window.openChat=async function(id){
  let c=S.chats.find(x=>String(x.id)===String(id));
  if(!c)c=S.chats.find(x=>String(x.n||'').toLowerCase()===key);
  if(!c)return toast('This chat is still loading. Tap Refresh and try again.');
- if(c.groupId){await window.openSharedGroup(c.groupId);return}
+ if(c.groupId||c.g||c.ch){
+   const gid=c.groupId||((ML.groups||[]).find(g=>String(g.name||'').toLowerCase()===String(c.n||'').toLowerCase())||{}).id;
+   if(gid){await window.openSharedGroup(gid);return}
+   if(c.ch||c.official){const special=ensureSpecialChatRecords();open=special.updates.id;c.un=0;save();render();await window.refreshOfficialUpdates(true);if(String(open)===String(special.updates.id))render();return}
+   return toast('This group is still loading. Refresh Community and try again.');
+ }
  if(c.memberId&&!ML.requests.some(x=>x.status==='accepted'&&x.member&&String(x.member.id)===String(c.memberId))&&!ML.plans.chatPass)return toast('Friend acceptance or a Chat pass is required.');
  open=c.id;c.un=0;save();render();if(c.memberId)loadMsgs(c.memberId,false)
 };
