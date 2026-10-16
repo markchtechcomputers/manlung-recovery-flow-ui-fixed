@@ -507,6 +507,57 @@ html body.manlung-auth-page .manlung-auth-form {
     max-width: 100% !important;
   }
 }
+
+/* Correct position without enlarging the login card. */
+html body.manlung-auth-page .manlung-auth-wrap {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: calc(100vh - 90px) !important;
+  min-height: calc(100dvh - 90px) !important;
+  margin: 0 auto !important;
+  padding: 24px 16px !important;
+  box-sizing: border-box !important;
+}
+html body.manlung-auth-page .manlung-auth-shell {
+  flex: 0 1 470px !important;
+  width: 100% !important;
+  max-width: 470px !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+html body.manlung-auth-page .manlung-auth-form {
+  width: 100% !important;
+  max-width: 470px !important;
+  margin: 0 auto !important;
+  padding: 30px !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 640px) {
+  html body.manlung-auth-page .manlung-auth-wrap {
+    min-height: calc(100vh - 60px) !important;
+    min-height: calc(100dvh - 60px) !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 18px 12px 24px !important;
+  }
+  html body.manlung-auth-page .manlung-auth-shell,
+  html body.manlung-auth-page .manlung-auth-form {
+    flex: 0 1 430px !important;
+    width: 100% !important;
+    max-width: 430px !important;
+  }
+  html body.manlung-auth-page .manlung-auth-form {
+    padding: 22px 18px !important;
+  }
+}
+
 </style>
 
 </head>
