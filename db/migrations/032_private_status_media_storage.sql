@@ -15,14 +15,6 @@ set public = false,
     file_size_limit = 1048576,
     allowed_mime_types = array['image/jpeg','image/png','image/webp'];
 
--- Prevent direct client access; server-side service-role operations bypass these client policies.
-drop policy if exists "status media client read" on storage.objects;
-drop policy if exists "status media client write" on storage.objects;
-create policy "status media client read" on storage.objects
-  for select to authenticated
-  using (bucket_id <> 'recovery-chat-status-media');
-create policy "status media client write" on storage.objects
-  for insert to authenticated
-  with check (bucket_id <> 'recovery-chat-status-media');
-
+-- Keep this bucket private. Do not add authenticated/anon object policies for this bucket;
+-- the server's service-role client uploads files and issues signed URLs.
 notify pgrst, 'reload schema';
