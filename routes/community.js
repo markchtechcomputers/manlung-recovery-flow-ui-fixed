@@ -217,10 +217,10 @@ router.get('/messages/:memberId', async (req, res) => {
     const { data, error } = await supabase.from('recovery_community_messages')
       .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
-      .is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages: data || [] });
+    res.json({ success: true, messages: (data || []).reverse() });
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
 });
 
@@ -240,7 +240,7 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
       .select('id').eq('status','accepted')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')').limit(1);
     if (acceptedError) throw acceptedError;
-    if (!accepted?.length) {
+    if (!accepted?.length && !isAdmin(req.user)) {
       const { data: pass, error: passError } = await supabase.from('recovery_chat_plan_purchases')
         .select('id').eq('user_id',req.user.id).eq('plan_code','chat_pass').eq('status','paid').gt('expires_at',new Date().toISOString()).limit(1);
       if (passError) throw passError;
