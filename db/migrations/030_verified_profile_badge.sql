@@ -45,8 +45,19 @@ end $$;
 revoke all on function public.recovery_chat_fulfill_verification_purchase(uuid,text) from public,anon,authenticated;
 grant execute on function public.recovery_chat_fulfill_verification_purchase(uuid,text) to service_role;
 
--- Mark the requested official account as verified, whether its name is in username or profile display name.
-update public.recovery_chat_profiles p set is_verified=true,verified_at=coalesce(p.verified_at,now()),verification_source='official',updated_at=now()
+-- Mark Eng Mark as officially verified, even if no chat profile row exists yet.
+-- Resolve by either profile display name or registered username, then upsert the profile.
+insert into public.recovery_chat_profiles
+  (user_id,display_name,is_verified,verified_at,verification_source,updated_at)
+select u.id,coalesce(nullif(trim(p.display_name),''),nullif(trim(u.username),''),'Eng Mark'),
+       true,now(),'official',now()
+from public.recovery_users u
+left join public.recovery_chat_profiles p on p.user_id=u.id
 where lower(trim(coalesce(p.display_name,'')))='eng mark'
-   or p.user_id in (select u.id from public.recovery_users u where lower(trim(coalesce(u.username,'')))='eng mark');
+   or lower(trim(coalesce(u.username,'')))='eng mark'
+on conflict (user_id) do update
+set is_verified=true,
+    verified_at=coalesce(public.recovery_chat_profiles.verified_at,now()),
+    verification_source='official',
+    updated_at=now();
 notify pgrst,'reload schema';
