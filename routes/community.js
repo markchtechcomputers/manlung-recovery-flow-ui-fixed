@@ -39,6 +39,8 @@ function publicProfile(profile, user, presence) {
     online: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
     online: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
     lastSeenAt: profile?.last_seen_visibility === 'nobody' ? null : last,
+    verified: Boolean(profile?.is_verified),
+    verifiedAt: profile?.verified_at || null,
   };
 }
 async function blockedEitherWay(a, b) {
@@ -888,6 +890,45 @@ router.put('/groups/:groupId/archive', async (req, res) => {
     if (!data) return fail(res, 404, 'Group membership not found.');
     res.json({ success: true, membership: data });
   } catch (error) { return handleDbError(res, error, 'Group archive error:'); }
+});
+
+
+/* Paid blue verified profile badge. The badge is only granted after Paystack verification. */
+router.get('/verification/status', async (req,res) => {
+ try { const {data,error}=await supabase.from('recovery_chat_profiles').select('is_verified,verified_at,verification_source').eq('user_id',req.user.id).maybeSingle(); if(error) throw error; res.set('Cache-Control','no-store'); return res.json({success:true,verified:Boolean(data?.is_verified),verifiedAt:data?.verified_at||null,source:data?.verification_source||null,priceKes:100}); }
+ catch(error){return handleDbError(res,error,'Verification status error:');}
+});
+router.post('/verification/initialize', statusLimiter, async (req,res) => {
+ try {
+  if(!process.env.PAYSTACK_SECRET_KEY)return fail(res,503,'Payment service is not configured.');
+  if(req.user.role!=='client')return fail(res,403,'Client account required.');
+  const email=cleanText(req.user.email,254).toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail(res,400,'Add a valid email to your account before purchasing verification.');
+  const {data:profile,error:pe0}=await supabase.from('recovery_chat_profiles').select('is_verified').eq('user_id',req.user.id).maybeSingle(); if(pe0)throw pe0;
+  if(profile?.is_verified)return res.json({success:true,alreadyVerified:true,verified:true});
+  const reference='MTC-VERIFY-'+Date.now()+'-'+crypto.randomBytes(8).toString('hex');
+  const {data:purchase,error:pe}=await supabase.from('recovery_chat_verification_purchases').insert({user_id:req.user.id,provider_reference:reference,amount_kes:100,currency:'KES',status:'pending'}).select('id,provider_reference').single(); if(pe)throw pe;
+  try {
+   const init=await axios.post(PAYSTACK_URL+'/transaction/initialize',{email,amount:10000,currency:'KES',reference,callback_url:process.env.PAYSTACK_CHAT_VERIFICATION_CALLBACK_URL||(String(process.env.PUBLIC_APP_URL||'https://manlungrecovery.manlungshop.co.ke').replace(/\/+$/,'')+'/client/connect.html?verification=1'),metadata:{product:'manlung_verified_badge',user_id:req.user.id,purchase_id:purchase.id,amount_kes:100}},{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:15000});
+   if(!init.data?.status||!init.data?.data?.authorization_url)throw new Error('Paystack did not return a checkout URL.');
+   return res.json({success:true,purchaseId:purchase.id,reference,authorizationUrl:init.data.data.authorization_url,amountKes:100});
+  } catch(e){await supabase.from('recovery_chat_verification_purchases').update({status:'failed'}).eq('id',purchase.id);throw e;}
+ } catch(error){console.error('Verification initialize error:',error.response?.data||error.message);return fail(res,error.response?.status>=400&&error.response?.status<500?400:500,'Could not start verified-badge checkout.');}
+});
+router.post('/verification/verify', async (req,res) => {
+ try {
+  if(!process.env.PAYSTACK_SECRET_KEY)return fail(res,503,'Payment service is not configured.');
+  const reference=cleanText(req.body?.reference,150); if(!/^MTC-VERIFY-[A-Za-z0-9-]+$/.test(reference))return fail(res,400,'Invalid payment reference.');
+  const {data:p,error:pe}=await supabase.from('recovery_chat_verification_purchases').select('id,user_id,provider_reference,amount_kes,currency,status').eq('provider_reference',reference).maybeSingle(); if(pe)throw pe;
+  if(!p)return fail(res,404,'Payment record not found.'); if(p.user_id!==req.user.id&&!isAdmin(req.user))return fail(res,403,'This payment belongs to another account.');
+  if(p.status==='paid')return res.json({success:true,alreadyFulfilled:true,verified:true});
+  const vr=await axios.get(PAYSTACK_URL+'/transaction/verify/'+encodeURIComponent(reference),{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:12000}),tx=vr.data?.data;
+  if(!vr.data?.status||!tx||tx.reference!==reference)return fail(res,400,'Payment verification failed.');
+  if(String(tx.status).toLowerCase()!=='success')return res.status(202).json({success:false,pending:true,message:'Payment is not confirmed yet.'});
+  if(Number(tx.amount)!==10000||String(tx.currency).toUpperCase()!=='KES')return fail(res,400,'Verified amount or currency does not match KES 100.');
+  const {data:fulfilled,error:fe}=await supabase.rpc('recovery_chat_fulfill_verification_purchase',{p_purchase_id:p.id,p_provider_transaction_id:String(tx.id)});if(fe)throw fe;
+  return res.json({success:true,alreadyFulfilled:fulfilled===false,verified:true});
+ }catch(error){return handleDbError(res,error,'Verification payment verification error:');}
 });
 
 router.get('/status', async (req, res) => {
