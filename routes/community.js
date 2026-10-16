@@ -131,11 +131,23 @@ router.delete('/updates/:updateId', async (req,res) => {
 router.get('/updates', async (req,res) => {
   try {
     const {data,error}=await supabase.from('recovery_chat_announcements')
-      .select('id,title,body,created_at,pinned').eq('is_published',true)
+      .select('id,title,body,created_at,pinned,created_by').eq('is_published',true)
       .order('pinned',{ascending:false}).order('created_at',{ascending:false}).limit(100);
     if(error) throw error;
+    const rows=data||[], ids=[...new Set(rows.map(x=>x.created_by).filter(Boolean))];
+    let authors={};
+    if(ids.length){
+      const [{data:users,error:ue},{data:profiles,error:pe}]=await Promise.all([
+        supabase.from('recovery_users').select('id,username').in('id',ids),
+        supabase.from('recovery_chat_profiles').select('user_id,display_name').in('user_id',ids)
+      ]);
+      if(ue) throw ue;if(pe) throw pe;
+      const names={};(users||[]).forEach(u=>{names[u.id]=cleanText(u.username,80)});
+      (profiles||[]).forEach(p=>{if(cleanText(p.display_name,80))names[p.user_id]=cleanText(p.display_name,80)});
+      authors=names;
+    }
     res.set('Cache-Control','no-store');
-    res.json({success:true,updates:data||[]});
+    res.json({success:true,updates:rows.map(x=>({...x,author_name:authors[x.created_by]||'Manlung Admin'}))});
   } catch(error) { return handleDbError(res,error,'Official updates list error:'); }
 });
 
