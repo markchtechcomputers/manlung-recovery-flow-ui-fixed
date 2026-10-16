@@ -985,8 +985,15 @@ router.get('/status', async (req, res) => {
     ]);
     if (pe) throw pe; if (we) throw we;
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-    const statuses = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'))
-      .map(p => ({ ...p, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } }));
+    const visiblePosts = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'));
+    const statuses = await Promise.all(visiblePosts.map(async p => {
+      let media_url = null;
+      if (p.media_path) {
+        const { data: signed, error: signedError } = await supabase.storage.from('recovery-chat-status-media').createSignedUrl(p.media_path, 60 * 60 * 24);
+        if (!signedError) media_url = signed?.signedUrl || null;
+      }
+      return { ...p, media_url, own: p.user_id === req.user.id, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } };
+    }));
     const last = wallet?.free_status_last_used_at ? new Date(wallet.free_status_last_used_at).getTime() : 0;
     res.json({ success: true, statuses, allowance: { freeAvailable: !last || Date.now() - last >= 86400000, freeLastUsedAt: wallet?.free_status_last_used_at || null, paidCredits: wallet?.paid_status_credits || 0 } });
   } catch (error) { return handleDbError(res, error, 'Status list error:'); }
@@ -995,12 +1002,25 @@ router.get('/status', async (req, res) => {
 router.post('/status', statusLimiter, async (req, res) => {
   try {
     const type = req.body?.status_type || 'text';
-    if (type !== 'text') return fail(res, 400, 'Image and video status uploads are not enabled until secure private storage is configured.');
     const text = cleanText(req.body?.text_content, 2000);
-    if (!text) return fail(res, 400, 'Text status cannot be empty.');
+    let mediaPath = null;
+    if (type === 'image') {
+      const raw = String(req.body?.media_data || '');
+      const match = raw.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/);
+      if (!match) return fail(res, 400, 'Choose a valid JPEG, PNG, or WebP image.');
+      const mime = match[1] === 'jpeg' ? 'image/jpeg' : 'image/' + match[1];
+      const bytes = Buffer.from(match[2], 'base64');
+      if (!bytes.length || bytes.length > 1024 * 1024) return fail(res, 413, 'Status images must be no larger than 1 MB after compression.');
+      const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+      mediaPath = req.user.id + '/' + crypto.randomUUID() + '.' + ext;
+      const { error: uploadError } = await supabase.storage.from('recovery-chat-status-media').upload(mediaPath, bytes, { contentType: mime, upsert: false, cacheControl: '3600' });
+      if (uploadError) throw uploadError;
+    } else if (type !== 'text') {
+      return fail(res, 400, 'Only text and image statuses are currently supported.');
+    } else if (!text) return fail(res, 400, 'Text status cannot be empty.');
     const { data, error } = await supabase.from('recovery_chat_status_posts')
-      .insert({ user_id: req.user.id, status_type: 'text', text_content: text, caption: cleanText(req.body?.caption, 1000) })
-      .select('id,user_id,status_type,text_content,caption,expires_at,created_at').single();
+      .insert({ user_id: req.user.id, status_type: type, text_content: type === 'text' ? text : null, media_path: mediaPath, caption: cleanText(req.body?.caption || text, 1000) })
+      .select('id,user_id,status_type,text_content,media_path,caption,expires_at,created_at').single();
     if (error) {
       if (String(error.message || '').includes('STATUS_ALLOWANCE_EXHAUSTED')) return fail(res, 402, 'Your free status has been used in the last 24 hours. Purchase two extra status posts for KES 100.');
       throw error;
