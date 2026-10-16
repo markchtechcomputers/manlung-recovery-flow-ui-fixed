@@ -1602,9 +1602,19 @@ async function handleSocialCallback(){
   if(!window.supabase?.createClient)return;
 
   try{
-    const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
-
-    if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)return;
+    const configResponse = await fetch('/api/config/public',{cache:'no-store'});
+    const configRaw = await configResponse.text();
+    let cfg = {};
+    try { cfg = configRaw ? JSON.parse(configRaw) : {}; }
+    catch (_) {
+      throw new Error('The server could not load sign-in configuration (HTTP ' + configResponse.status + '). Please contact the site administrator.');
+    }
+    if (!configResponse.ok) {
+      throw new Error(cfg.error || 'Sign-in configuration failed (HTTP ' + configResponse.status + ').');
+    }
+    if(!cfg.supabaseUrl||!cfg.supabaseAnonKey) {
+      throw new Error('Social sign-in is not configured on the server.');
+    }
 
     const supabase=window.supabase.createClient(
       cfg.supabaseUrl,
@@ -1623,7 +1633,20 @@ async function handleSocialCallback(){
       })
     });
 
-    const result=await res.json();
+    const responseText = await res.text();
+    let result = {};
+    try { result = responseText ? JSON.parse(responseText) : {}; }
+    catch (_) {
+      console.error('Social sign-in endpoint returned non-JSON:', {
+        status: res.status,
+        contentType: res.headers.get('content-type'),
+        body: responseText.slice(0, 250)
+      });
+      throw new Error('The sign-in server returned an invalid response (HTTP ' + res.status + '). Please try again later.');
+    }
+    if (!res.ok && !result.error) {
+      result.error = 'Social sign-in failed (HTTP ' + res.status + ').';
+    }
 
     if(result.success){
       localStorage.setItem('clientUser',JSON.stringify(result.user));
