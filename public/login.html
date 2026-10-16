@@ -287,6 +287,38 @@ html body.manlung-auth-page .manlung-auth-shell {
     min-height: calc(100vh - 40px) !important;
   }
 }
+
+/* Keep the auth card centered in the visible screen on phones and laptops. */
+html body.manlung-auth-page {
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+}
+html body.manlung-auth-page .manlung-auth-wrap {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+}
+html body.manlung-auth-page .manlung-auth-shell {
+  margin: auto !important;
+}
+@media (max-width: 640px) {
+  html body.manlung-auth-page .manlung-auth-wrap {
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    padding: 16px 10px !important;
+    justify-content: center !important;
+  }
+  html body.manlung-auth-page .manlung-auth-shell {
+    margin-top: auto !important;
+    margin-bottom: auto !important;
+  }
+}
 </style>
 
 </head>
