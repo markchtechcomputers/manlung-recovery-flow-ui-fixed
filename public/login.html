@@ -362,6 +362,27 @@ body.manlung-auth-page .manlung-auth-shell {
     max-width: 100% !important;
   }
 }
+
+/* Shift the login card toward the right on both desktop and mobile. */
+body.manlung-auth-page .manlung-auth-wrap {
+  align-items: flex-end !important;
+  padding-right: clamp(18px, 5vw, 64px) !important;
+  padding-left: 12px !important;
+}
+body.manlung-auth-page .manlung-auth-shell {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+@media (max-width: 640px) {
+  body.manlung-auth-page .manlung-auth-wrap {
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+  }
+  body.manlung-auth-page .manlung-auth-shell {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+}
 </style>
 
 </head>
