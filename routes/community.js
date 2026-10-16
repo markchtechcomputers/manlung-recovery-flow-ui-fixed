@@ -103,6 +103,17 @@ router.post('/presence/heartbeat', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Presence heartbeat error:'); }
 });
 
+router.get('/updates', async (req,res) => {
+  try {
+    const {data,error}=await supabase.from('recovery_chat_announcements')
+      .select('id,title,body,created_at,pinned').eq('is_published',true)
+      .order('pinned',{ascending:false}).order('created_at',{ascending:false}).limit(100);
+    if(error) throw error;
+    res.set('Cache-Control','no-store');
+    res.json({success:true,updates:data||[]});
+  } catch(error) { return handleDbError(res,error,'Official updates list error:'); }
+});
+
 router.get('/profile', async (req, res) => {
   try {
     const [{ data: profile, error: pe }, { data: user, error: ue }] = await Promise.all([
