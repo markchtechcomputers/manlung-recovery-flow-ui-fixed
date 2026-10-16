@@ -97,55 +97,68 @@
 .dark.manlung-auth-page .manlung-turnstile-box{border-color:#334155;background:#0b1220}
 @media(max-width:640px){.manlung-auth-page .manlung-auth-wrap{min-height:calc(100svh - 60px);align-items:flex-start;padding:22px 12px 30px}.manlung-auth-page .manlung-auth-form{padding:28px 22px;border-radius:18px}.manlung-auth-page .manlung-auth-form:before{inset:74px 0 0;border-radius:0 0 15px 15px}.manlung-auth-page .manlung-auth-tabs{margin-bottom:20px}.manlung-auth-page .manlung-social-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.manlung-auth-page *{transition:none!important;scroll-behavior:auto!important}}
-/* Final width override: win against legacy auth stylesheets using !important. */
-html body.manlung-auth-page main.manlung-auth-wrap{
-  box-sizing:border-box!important;
-  display:flex!important;
-  justify-content:center!important;
-  align-items:flex-start!important;
-  width:100%!important;
-  max-width:none!important;
-  min-width:0!important;
-  margin:0!important;
-  padding:clamp(24px,4vw,56px) 16px 64px!important;
+/* Refined auth layout: compact, balanced, responsive, with subtle motion. */
+html body.manlung-auth-page .manlung-auth-wrap{
+  width:100%!important;max-width:none!important;min-height:calc(100vh - 90px)!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;padding:38px 20px 48px!important;
 }
-html body.manlung-auth-page main.manlung-auth-wrap > .manlung-auth-shell{
-  display:block!important;
-  box-sizing:border-box!important;
-  width:min(1100px,100%)!important;
-  max-width:1100px!important;
-  min-width:0!important;
-  margin:0 auto!important;
-  overflow:visible!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
+html body.manlung-auth-page .manlung-auth-shell{
+  width:100%!important;max-width:470px!important;min-width:0!important;
+  margin:0 auto!important;overflow:visible!important;border:0!important;
+  border-radius:0!important;background:transparent!important;box-shadow:none!important;
 }
 html body.manlung-auth-page .manlung-auth-form{
-  box-sizing:border-box!important;
-  width:100%!important;
-  max-width:none!important;
-  padding:clamp(28px,5vw,64px)!important;
-  border:1px solid #dce4ef!important;
-  border-radius:26px!important;
-  background:#fff!important;
-  box-shadow:0 22px 60px rgba(15,23,42,.13)!important;
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  box-sizing:border-box!important;width:100%!important;max-width:470px!important;
+  margin:0 auto!important;padding:30px!important;border:1px solid #e2e8f0!important;
+  border-radius:20px!important;background:rgba(255,255,255,.97)!important;
+  box-shadow:0 14px 38px rgba(15,23,42,.09)!important;
+  animation:manlung-card-in .55s cubic-bezier(.2,.7,.2,1) both;
 }
-html body.manlung-auth-page .manlung-auth-heading h2{font-size:clamp(2.25rem,4vw,3.25rem)!important}
-html body.manlung-auth-page .manlung-auth-heading p{font-size:clamp(1rem,1.5vw,1.2rem)!important}
-html body.manlung-auth-page .manlung-auth-form label{font-size:1.05rem!important}
-html body.manlung-auth-page .manlung-auth-form input{width:100%!important;max-width:none!important;min-height:62px!important;font-size:1.1rem!important}
-html body.manlung-auth-page .manlung-social-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-html body.manlung-auth-page .manlung-social-btn,
-html body.manlung-auth-page .manlung-google-btn{min-height:60px!important;height:60px!important;font-size:1rem!important}
-html body.manlung-auth-page .manlung-auth-primary{min-height:64px!important;font-size:1.1rem!important}
+html body.manlung-auth-page .manlung-auth-form:before{
+  content:""!important;position:absolute!important;z-index:0!important;inset:66px 0 0!important;
+  pointer-events:none!important;border-radius:0 0 18px 18px!important;
+  background:linear-gradient(rgba(255,255,255,.96),rgba(255,255,255,.985)),url("https://i.postimg.cc/sXwHVX60/50478972f7fe927c9169c2d8071c1b6d.jpg") center/cover no-repeat!important;
+}
+html body.manlung-auth-page .manlung-auth-form>*{position:relative;z-index:1}
+html body.manlung-auth-page .manlung-auth-tabs{margin:0 0 22px!important;gap:4px!important}
+html body.manlung-auth-page .manlung-auth-tabs button{min-height:38px!important;padding:8px 10px!important;font-size:.88rem!important}
+html body.manlung-auth-page .manlung-auth-heading{margin-bottom:18px!important}
+html body.manlung-auth-page .manlung-auth-heading h2{font-size:clamp(1.8rem,3vw,2.15rem)!important;line-height:1.2!important;letter-spacing:-.04em!important}
+html body.manlung-auth-page .manlung-auth-heading p{font-size:.94rem!important;line-height:1.55!important}
+html body.manlung-auth-page .manlung-social-grid{gap:9px!important;margin-bottom:14px!important}
+html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .manlung-google-btn{
+  min-height:44px!important;height:44px!important;padding:10px 12px!important;
+  border-radius:10px!important;font-size:.88rem!important;transition:transform .18s,box-shadow .18s,border-color .18s!important;
+}
+html body.manlung-auth-page .manlung-social-btn:hover,html body.manlung-auth-page .manlung-google-btn:hover{
+  transform:translateY(-1px);box-shadow:0 5px 14px rgba(37,99,235,.09);border-color:#b7c8e8!important;
+}
+html body.manlung-auth-page .manlung-auth-divider{margin:16px 0!important;font-size:.72rem!important;letter-spacing:.03em!important}
+html body.manlung-auth-page .manlung-auth-form .form-group{margin-bottom:13px!important}
+html body.manlung-auth-page .manlung-auth-form label{margin-bottom:6px!important;font-size:.88rem!important;font-weight:650!important}
+html body.manlung-auth-page .manlung-auth-form input{min-height:46px!important;padding:12px 14px!important;border-radius:10px!important;font-size:1rem!important}
+html body.manlung-auth-page .manlung-password-field input{padding-right:48px!important}
+html body.manlung-auth-page .manlung-auth-links{margin-bottom:14px!important;font-size:.86rem!important}
+html body.manlung-auth-page .manlung-auth-primary{
+  min-height:47px!important;margin-top:10px!important;padding:12px 16px!important;
+  border-radius:10px!important;font-size:.96rem!important;
+  box-shadow:0 4px 12px rgba(37,99,235,.16)!important;
+  transition:transform .18s,box-shadow .18s,filter .18s!important;
+}
+html body.manlung-auth-page .manlung-auth-primary:hover{transform:translateY(-1px)!important;filter:brightness(1.04)}
+html body.manlung-auth-page .manlung-auth-message{font-size:.88rem!important}
+@keyframes manlung-card-in{from{opacity:0;transform:translateY(9px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:640px){
- html body.manlung-auth-page main.manlung-auth-wrap{padding:18px 10px 32px!important}
- html body.manlung-auth-page main.manlung-auth-wrap > .manlung-auth-shell{width:100%!important;max-width:none!important}
- html body.manlung-auth-page .manlung-auth-form{padding:28px 20px!important;border-radius:20px!important}
+ html body.manlung-auth-page .manlung-auth-wrap{min-height:calc(100svh - 60px)!important;align-items:flex-start!important;padding:22px 14px 32px!important}
+ html body.manlung-auth-page .manlung-auth-shell,html body.manlung-auth-page .manlung-auth-form{width:100%!important;max-width:430px!important}
+ html body.manlung-auth-page .manlung-auth-form{padding:24px 20px!important;border-radius:17px!important}
+ html body.manlung-auth-page .manlung-auth-form:before{inset:62px 0 0!important;border-radius:0 0 15px 15px!important}
+ html body.manlung-auth-page .manlung-auth-tabs{margin-bottom:19px!important}
  html body.manlung-auth-page .manlung-social-grid{grid-template-columns:1fr!important}
 }
+@media(prefers-reduced-motion:reduce){html body.manlung-auth-page .manlung-auth-form{animation:none!important}html body.manlung-auth-page .manlung-auth-primary,html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .manlung-google-btn{transition:none!important}}
 </style>
 
 </head>
