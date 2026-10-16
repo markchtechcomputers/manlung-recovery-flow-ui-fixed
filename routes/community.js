@@ -749,11 +749,15 @@ router.post('/groups', async (req,res) => {
   try {
     const name=cleanText(req.body?.name,100);
     const description=String(req.body?.description||'').trim();
+    const avatar=String(req.body?.avatar_url||'').trim();
+    const isImageData=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/i.test(avatar);
     if(name.length<2) return fail(res,400,'Group name must contain at least 2 characters.');
     if(description.length>2000) return fail(res,400,'Group description must be 2000 characters or fewer.');
+    if(avatar.length>180000) return fail(res,413,'Group photo is too large. Choose a smaller image.');
+    if(avatar && !isImageData && !(avatar.startsWith('/')&&!avatar.startsWith('//')) && !/^https:\/\//i.test(avatar)) return fail(res,400,'Group photo must be an image, secure HTTPS URL or same-site path.');
     const slug='community-'+crypto.randomUUID();
     const {data:group,error}=await supabase.from('recovery_chat_groups')
-      .insert({slug,name,description,created_by:req.user.id,is_default:false,allow_member_invites:true,admin_only_announcements:false})
+      .insert({slug,name,description,avatar_url:avatar||null,created_by:req.user.id,is_default:false,allow_member_invites:true,admin_only_announcements:false})
       .select('id,slug,name,description,is_default,avatar_url,created_at').single();
     if(error) throw error;
     const {error:memberError}=await supabase.from('recovery_chat_group_members')
