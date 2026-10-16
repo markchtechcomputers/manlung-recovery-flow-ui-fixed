@@ -159,6 +159,81 @@ html body.manlung-auth-page .manlung-auth-message{font-size:.88rem!important}
  html body.manlung-auth-page .manlung-social-grid{grid-template-columns:1fr!important}
 }
 @media(prefers-reduced-motion:reduce){html body.manlung-auth-page .manlung-auth-form{animation:none!important}html body.manlung-auth-page .manlung-auth-primary,html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .manlung-google-btn{transition:none!important}}
+
+/* Emergency responsive repair: prevent global styles from stacking login text vertically. */
+html body.manlung-auth-page,
+html body.manlung-auth-page * {
+  writing-mode: horizontal-tb;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+html body.manlung-auth-page .manlung-auth-shell,
+html body.manlung-auth-page .manlung-auth-form,
+html body.manlung-auth-page #loginPanel,
+html body.manlung-auth-page #registerPanel,
+html body.manlung-auth-page form,
+html body.manlung-auth-page .form-group,
+html body.manlung-auth-page .manlung-auth-heading {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+html body.manlung-auth-page .manlung-auth-tabs {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  width: 100% !important;
+}
+html body.manlung-auth-page .manlung-auth-tabs button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+  line-height: 1.25 !important;
+  text-align: center !important;
+  writing-mode: horizontal-tb !important;
+  transform: none !important;
+}
+html body.manlung-auth-page .manlung-auth-heading h2,
+html body.manlung-auth-page .manlung-auth-heading p,
+html body.manlung-auth-page .manlung-auth-divider,
+html body.manlung-auth-page .manlung-auth-primary,
+html body.manlung-auth-page .manlung-social-btn,
+html body.manlung-auth-page .manlung-auth-form label {
+  max-width: 100% !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+  writing-mode: horizontal-tb !important;
+}
+html body.manlung-auth-page .manlung-auth-primary,
+html body.manlung-auth-page .manlung-social-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: normal !important;
+  line-height: 1.35 !important;
+}
+html body.manlung-auth-page .manlung-auth-form input {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+@media (max-width: 480px) {
+  html body.manlung-auth-page .manlung-auth-wrap {
+    padding: 16px 10px 28px !important;
+  }
+  html body.manlung-auth-page .manlung-auth-form {
+    padding: 20px 14px !important;
+  }
+  html body.manlung-auth-page .manlung-auth-heading h2 {
+    font-size: clamp(1.45rem, 7vw, 2rem) !important;
+  }
+  html body.manlung-auth-page .manlung-auth-tabs button {
+    padding: 9px 5px !important;
+    font-size: .82rem !important;
+  }
+}
+
 </style>
 
 </head>
