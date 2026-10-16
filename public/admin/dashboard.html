@@ -2563,5 +2563,54 @@ async function sendAdminCaseMessage(caseId) {
   document.addEventListener('pointerdown',()=>{try{const C=window.AudioContext||window.webkitAudioContext;if(C){audioCtx=audioCtx||new C();if(audioCtx.state==='suspended')audioCtx.resume();}}catch(_){}},{once:true,passive:true});
   document.addEventListener('DOMContentLoaded',()=>{poll();setInterval(poll,8000);});
 })();
-</script></body>
+</script>
+<style>
+#ml-community-admin{position:fixed;right:18px;bottom:18px;z-index:9998;width:min(420px,calc(100vw - 28px));max-height:min(78vh,720px);overflow:auto;background:#101820;color:#f4f7fb;border:1px solid #3a4a59;border-radius:16px;box-shadow:0 18px 60px #0008;font:14px/1.45 system-ui,sans-serif}
+#ml-community-admin summary{cursor:pointer;font-weight:800;padding:14px 16px;background:#172633;border-radius:15px}
+#ml-community-admin .mlca-body{padding:14px;display:grid;gap:10px}
+#ml-community-admin input,#ml-community-admin textarea{box-sizing:border-box;width:100%;padding:10px 11px;border-radius:9px;border:1px solid #526273;background:#0c131a;color:#fff;font:inherit}
+#ml-community-admin textarea{min-height:100px;resize:vertical}
+#ml-community-admin button{border:0;border-radius:9px;padding:9px 12px;background:#37b978;color:#06160e;font-weight:750;cursor:pointer}
+#ml-community-admin button[disabled]{opacity:.55;cursor:wait}
+#ml-community-admin .mlca-row{display:flex;gap:8px;align-items:flex-start;justify-content:space-between;border-top:1px solid #344250;padding:10px 0}
+#ml-community-admin .mlca-row button{background:#9d3038;color:white;flex:none}
+#ml-community-admin .mlca-muted{color:#b5c2cf;font-size:12px;white-space:pre-wrap}
+#ml-community-admin [hidden]{display:none!important}
+</style>
+<details id="ml-community-admin">
+ <summary>📢 Manlung Community · Admin announcements</summary>
+ <div class="mlca-body">
+  <div class="mlca-muted">Only authenticated accounts with the registered admin/owner role can publish or remove official announcements.</div>
+  <form id="mlca-form">
+   <label for="mlca-title">Title</label><input id="mlca-title" maxlength="120" placeholder="Announcement title">
+   <label for="mlca-body-input">Message</label><textarea id="mlca-body-input" maxlength="5000" required placeholder="Write the official update…"></textarea>
+   <label><input id="mlca-pin" type="checkbox" style="width:auto"> Pin this announcement</label>
+   <button id="mlca-publish" type="submit">Publish announcement</button>
+  </form>
+  <div id="mlca-status" class="mlca-muted" role="status" aria-live="polite">Loading announcements…</div>
+  <div id="mlca-list"></div>
+ </div>
+</details>
+<script>
+(function(){
+ const root=document.getElementById('ml-community-admin');if(!root)return;
+ const form=document.getElementById('mlca-form'),status=document.getElementById('mlca-status'),list=document.getElementById('mlca-list'),publish=document.getElementById('mlca-publish');
+ const csrf=()=>{const m=document.cookie.match(/(?:^|;\\s*)(?:__Host-mlc_csrf|mlc_csrf)=([^;]+)/);try{return m?decodeURIComponent(m[1]):''}catch(_){return ''}};
+ async function request(path,options={}){
+  const headers={'Content-Type':'application/json',...(options.headers||{})};const token=csrf();if(token)headers['X-CSRF-Token']=token;
+  const res=await fetch('/api/community'+path,{credentials:'same-origin',cache:'no-store',...options,headers});
+  let data={};try{data=await res.json()}catch(_){}
+  if(!res.ok||data.success===false)throw new Error(data.error||('Request failed ('+res.status+')'));
+  return data;
+ }
+ function escapeHtml(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+ async function load(){
+  try{const d=await request('/updates');list.innerHTML=(d.updates||[]).map(x=>'<div class="mlca-row"><div><b>'+escapeHtml(x.title||'Manlung Updates')+'</b><div class="mlca-muted">'+escapeHtml(x.body||'')+'</div><div class="mlca-muted">'+(x.pinned?'📌 Pinned · ':'')+escapeHtml(x.created_at?new Date(x.created_at).toLocaleString():'')+'</div></div><button type="button" data-remove="'+escapeHtml(x.id)+'" aria-label="Remove announcement">Remove</button></div>').join('')||'<div class="mlca-muted">No announcements yet.</div>';status.textContent='Loaded '+(d.updates||[]).length+' announcements.';list.querySelectorAll('[data-remove]').forEach(b=>b.onclick=async()=>{if(!confirm('Remove this announcement for everyone?'))return;b.disabled=true;try{await request('/updates/'+encodeURIComponent(b.dataset.remove),{method:'DELETE'});await load()}catch(e){status.textContent=e.message;b.disabled=false}})}
+  catch(e){status.textContent=e.message||'Could not load announcements.';if(/403|forbidden|admin/i.test(status.textContent))root.hidden=true}
+ }
+ form.addEventListener('submit',async e=>{e.preventDefault();const title=document.getElementById('mlca-title').value.trim(),body=document.getElementById('mlca-body-input').value.trim();if(!body&&!title){status.textContent='Enter a title or message.';return}publish.disabled=true;status.textContent='Publishing…';try{await request('/updates',{method:'POST',body:JSON.stringify({title,body,pinned:document.getElementById('mlca-pin').checked})});form.reset();await load();status.textContent='Announcement published.'}catch(err){status.textContent=err.message||'Could not publish announcement.'}finally{publish.disabled=false}});
+ load();
+})();
+</script>
+</body>
 </html>
