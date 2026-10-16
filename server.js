@@ -240,11 +240,8 @@ app.use('/api/notifications', notificationLimiter);
 // LOGIN RATE LIMITER
 // ============================================================
 
-// Login lockout is enforced per account in recovery_users.
-// Do not use a short in-memory IP limiter here: it can block a valid
-// owner/admin login and incorrectly present the account as locked.
-// User.comparePassword records failures and applies a temporary 30-minute
-// account lock after the third failed password attempt.
+// Persistent per-account lockout is enforced by the database. The shared
+// limiter below also applies across Vercel instances, unlike memory-only limits.
 
 // ============================================================
  // AUTH LOGIN / MFA BRUTE-FORCE PROTECTION
@@ -310,9 +307,6 @@ const mfaLimiter = rateLimit({
   },
 });
 
-app.use('/api/auth/admin/login', loginLimiter, sharedLoginLimiter);
-app.use('/api/auth/client/login', loginLimiter, sharedLoginLimiter);
-app.use('/api/auth/admin/mfa/login', mfaLimiter, sharedLoginLimiter);
 
 // ============================================================
 // AUTH ACTION RATE LIMITER
@@ -425,6 +419,12 @@ app.use(express.urlencoded({
   extended: false,
   limit: '1mb',
 }));
+
+// Register login limits after parsing so the shared limiter can hash the
+// submitted account identifier without logging or storing it in plain text.
+app.use('/api/auth/admin/login', loginLimiter, sharedLoginLimiter);
+app.use('/api/auth/client/login', loginLimiter, sharedLoginLimiter);
+app.use('/api/auth/admin/mfa/login', mfaLimiter, sharedLoginLimiter);
 
 // Validate API input before it reaches route handlers.
 app.use('/api/', inputSecurity);
