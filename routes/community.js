@@ -22,6 +22,8 @@ function publicProfile(profile, user, presence) {
   const name = cleanText(profile?.display_name, 80) || cleanText(user.username, 80) || 'Member';
   const last = presence?.last_seen_at || null;
   const isVisible = profile?.presence_visibility !== 'nobody';
+  // Presence is live only while a recent heartbeat is arriving (20s heartbeat, 60s expiry).
+  const isOnline = Boolean(isVisible && last && Number.isFinite(new Date(last).getTime()) && Date.now() - new Date(last).getTime() >= 0 && Date.now() - new Date(last).getTime() < 60 * 1000);
   return {
     id: user.id,
     name,
@@ -35,9 +37,8 @@ function publicProfile(profile, user, presence) {
     presenceVisibility: profile?.presence_visibility || 'members',
     lastSeenVisibility: profile?.last_seen_visibility || 'members',
     readReceiptsEnabled: profile?.read_receipts_enabled !== false,
-    recentlyActive: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
-    online: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
-    online: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 2 * 60 * 1000),
+    recentlyActive: Boolean(isVisible && last && Date.now() - new Date(last).getTime() < 5 * 60 * 1000),
+    online: isOnline,
     lastSeenAt: profile?.last_seen_visibility === 'nobody' ? null : last,
     verified: Boolean(profile?.is_verified),
     verifiedAt: profile?.verified_at || null,
