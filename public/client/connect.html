@@ -367,7 +367,7 @@ async function addStatus(){try{const credits=await window.apiReq('/status/credit
 function viewS(i){const s=S.stat[i];s.s=1;save();const v=document.createElement('div');v.className='sv';v.style.background=cols[s.n.length%cols.length];v.setAttribute('role','dialog');v.innerHTML=`<div style="position:absolute;top:20px;left:20px;font-size:14px">${esc(s.n)}</div>${esc(s.t)}`;
  v.onclick=()=>{v.remove();render()};$('#app').append(v);setTimeout(()=>{v.isConnected&&v.click()},4000)}
 // Render only after the authenticated community API has been checked.
-function back(){const z=document.querySelector('.zm:not([data-lock])');if(z){z.remove();return 1}
+function back(){const groupPanel=document.getElementById('ml-shared-group-chat');if(groupPanel){groupPanel.remove();return 1}const z=document.querySelector('.zm:not([data-lock])');if(z){z.remove();return 1}
 const v=document.querySelector('.sv');if(v){clearTimeout(vt);v.remove();render();return 1}
 if(document.querySelector('.pop,#sheet')){document.querySelectorAll('.pop,#sheet').forEach(x=>x.remove());pop=0;return 1}
 if(isRec){recStop(0);return 1}
