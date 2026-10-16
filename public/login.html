@@ -1081,6 +1081,11 @@ async function handleLogin(event) {
   const password=document.getElementById('loginPassword').value;
   const errorEl=document.getElementById('loginError');
   showMessage(errorEl,'');
+  const turnstileContainer = document.getElementById('clientTurnstile');
+  if (turnstileContainer && turnstileContainer.dataset.turnstileStatus === 'error') {
+    showMessage(errorEl,'Cloudflare security verification is unavailable. Please refresh the page; if it continues, the site administrator must fix the production deployment.');
+    return;
+  }
   if(password.length < 8 || password.length > 72){
     showMessage(errorEl,'Password must be between 8 and 72 characters.');
     return;
