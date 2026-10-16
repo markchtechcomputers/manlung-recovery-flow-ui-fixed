@@ -290,6 +290,24 @@ nav button span{display:grid;place-items:center;width:58px;height:30px;border-ra
 .ml-group-reaction-picker button:hover{background:var(--sf2)}
 @media(min-width:700px){.ml-group-fullscreen #ml-group-messages{padding:22px max(24px,calc((100% - 900px)/2))!important}.ml-group-message-row{max-width:min(80%,760px)}.ml-group-fullscreen .ml-group-header{padding-left:max(18px,calc((100% - 980px)/2))!important;padding-right:max(18px,calc((100% - 980px)/2))!important}.ml-group-fullscreen .ml-group-description{padding-left:max(18px,calc((100% - 980px)/2))!important;padding-right:max(18px,calc((100% - 980px)/2))!important}.ml-group-fullscreen .ml-group-compose{padding-left:max(14px,calc((100% - 980px)/2))!important;padding-right:max(14px,calc((100% - 980px)/2))!important}}
 @media(max-width:420px){.ml-group-message-row{max-width:100%}.ml-group-message-content{padding:8px 10px 6px}.ml-group-message-body{font-size:15px}.ml-group-fullscreen #ml-group-messages{padding:14px 9px 20px!important}}
+
+/* Community member rows: keep names, handles and actions aligned and readable. */
+.ml-member-list{grid-template-columns:minmax(0,1fr)!important;gap:8px!important;padding:0 16px 20px!important}
+.ml-member-card{grid-template-columns:48px minmax(0,1fr) auto!important;gap:12px!important;padding:12px 14px!important;min-height:76px}
+.ml-member-card .ml-member-name-button{display:block;width:100%;padding:0;min-width:0;overflow:hidden;text-align:left}
+.ml-member-card .ml-member-name{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;overflow-wrap:normal;word-break:normal;line-height:1.35}
+.ml-member-card .ml-member-handle{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;overflow-wrap:normal;word-break:normal;margin-top:3px;line-height:1.3}
+.ml-member-card .ml-member-avatar{width:48px;height:48px}
+.ml-member-card .ml-member-action{justify-self:end;min-width:78px;max-width:100%;padding:8px 12px;white-space:nowrap}
+.ml-community-section-head{align-items:flex-start}
+.ml-community-section-head>div{min-width:0}
+.ml-community-section-head h3{line-height:1.35}
+.ml-community-room{min-width:0}
+.ml-room-copy{min-width:0;overflow:hidden}
+.ml-room-title{overflow-wrap:anywhere;line-height:1.35}
+.ml-room-description{overflow-wrap:anywhere}
+@media(min-width:900px){.ml-member-list{max-width:900px;margin:0 auto}.ml-community-section{max-width:932px;margin-left:auto;margin-right:auto}}
+@media(max-width:380px){.ml-member-card{grid-template-columns:42px minmax(0,1fr) auto!important;gap:8px!important;padding:10px!important}.ml-member-card .ml-member-avatar{width:42px;height:42px}.ml-member-card .ml-member-action{min-width:66px;padding:7px 8px;font-size:12px}}
 </style></head><body>
 <div id="app"><header id="hd"><div class="logo">M</div><h1>Manlung Community</h1></header><main id="mn" aria-live="polite"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden><input type="file" id="status-media" accept="image/*,video/*" hidden></div>
 <script>
