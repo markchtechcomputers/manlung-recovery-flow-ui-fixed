@@ -383,6 +383,30 @@ body.manlung-auth-page .manlung-auth-shell {
     margin-right: 0 !important;
   }
 }
+
+/* Hard override: visibly offset the entire login card to the right. */
+body.manlung-auth-page .manlung-auth-wrap {
+  justify-content: flex-end !important;
+  align-items: center !important;
+  padding-left: 12px !important;
+  padding-right: clamp(24px, 7vw, 100px) !important;
+}
+body.manlung-auth-page .manlung-auth-shell {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  transform: translateX(0) !important;
+}
+@media (max-width: 640px) {
+  body.manlung-auth-page .manlung-auth-wrap {
+    justify-content: flex-end !important;
+    padding-left: 12px !important;
+    padding-right: 18px !important;
+  }
+  body.manlung-auth-page .manlung-auth-shell {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+}
 </style>
 
 </head>
