@@ -457,6 +457,56 @@ html body.manlung-auth-page .manlung-auth-form {
     max-width: 100% !important;
   }
 }
+
+/* Desktop and mobile: center the login card within the space below the site header. */
+html body.manlung-auth-page .manlung-auth-wrap {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: calc(100vh - 90px) !important;
+  min-height: calc(100dvh - 90px) !important;
+  margin: 0 auto !important;
+  padding: 24px 16px !important;
+  box-sizing: border-box !important;
+}
+html body.manlung-auth-page .manlung-auth-shell {
+  display: block !important;
+  float: none !important;
+  position: static !important;
+  inset: auto !important;
+  flex: 0 1 960px !important;
+  width: 100% !important;
+  max-width: 960px !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+  transform: none !important;
+}
+html body.manlung-auth-page .manlung-auth-form {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+}
+@media (max-width: 640px) {
+  html body.manlung-auth-page .manlung-auth-wrap {
+    min-height: calc(100vh - 60px) !important;
+    min-height: calc(100dvh - 60px) !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 18px 12px 24px !important;
+  }
+  html body.manlung-auth-page .manlung-auth-shell {
+    flex: 0 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+  html body.manlung-auth-page .manlung-auth-form {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
 </style>
 
 </head>
