@@ -1052,7 +1052,152 @@ router.post('/status/purchase/initialize', async (req, res) => {
     try {
       const init = await axios.post(PAYSTACK_URL + '/transaction/initialize', {
         email, amount: 10000, currency: 'KES', reference,
-        callback_url: process.env.PAYSTACK_CHAT_STATUS_CALLBACK_URL || (String(process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke').replace(/\/+$/, '') + '/client/connect.html'),
+        callback_url: process.env.PAYSTACK_CHAT_STATUS_CALLBACK_URL || (String(process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke').replace(new RegExp('/+
+        metadata: { product: 'manlung_chat_status_credits', user_id: req.user.id, purchase_id: purchase.id, credits: 2, amount_kes: 100 },
+      }, { headers: { Authorization: 'Bearer ' + process.env.PAYSTACK_SECRET_KEY }, timeout: 15000 });
+      if (!init.data?.status || !init.data?.data?.authorization_url) throw new Error('Paystack did not return a checkout URL.');
+      res.json({ success: true, purchaseId: purchase.id, reference, authorizationUrl: init.data.data.authorization_url, amountKes: 100, credits: 2 });
+    } catch (e) {
+      await supabase.from('recovery_chat_status_purchases').update({ status: 'failed' }).eq('id', purchase.id);
+      throw e;
+    }
+  } catch (error) {
+    console.error('Status purchase initialize error:', error.response?.data || error.message);
+    return fail(res, error.response?.status >= 400 && error.response?.status < 500 ? 400 : 500, 'Could not start status-credit checkout.');
+  }
+});
+
+router.post('/status/purchase/verify', async (req, res) => {
+  try {
+    if (!process.env.PAYSTACK_SECRET_KEY) return fail(res, 503, 'Payment service is not configured.');
+    const reference = cleanText(req.body?.reference, 150);
+    if (!/^MTC-STATUS-[A-Za-z0-9-]+$/.test(reference)) return fail(res, 400, 'Invalid payment reference.');
+    const { data: purchase, error: pe } = await supabase.from('recovery_chat_status_purchases')
+      .select('id,user_id,provider_reference,amount_kes,currency,credits,status').eq('provider_reference', reference).maybeSingle();
+    if (pe) throw pe;
+    if (!purchase) return fail(res, 404, 'Payment record not found.');
+    if (purchase.user_id !== req.user.id && !isAdmin(req.user)) return fail(res, 403, 'This payment belongs to another account.');
+    if (purchase.status === 'paid') return res.json({ success: true, alreadyFulfilled: true });
+    const verify = await axios.get(PAYSTACK_URL + '/transaction/verify/' + encodeURIComponent(reference), {
+      headers: { Authorization: 'Bearer ' + process.env.PAYSTACK_SECRET_KEY }, timeout: 12000,
+    });
+    const tx = verify.data?.data;
+    if (!verify.data?.status || !tx || tx.reference !== reference) return fail(res, 400, 'Payment verification failed.');
+    if (String(tx.status).toLowerCase() !== 'success') return res.status(202).json({ success: false, pending: true, message: 'Payment is not confirmed yet.' });
+    if (Number(tx.amount) !== 10000 || String(tx.currency).toUpperCase() !== 'KES') return fail(res, 400, 'Verified amount or currency does not match KES 100.');
+    const { data: fulfilled, error: fe } = await supabase.rpc('recovery_chat_fulfill_status_purchase', {
+      p_purchase_id: purchase.id, p_provider_transaction_id: String(tx.id),
+    });
+    if (fe) throw fe;
+    res.json({ success: true, alreadyFulfilled: fulfilled === false, creditsGranted: fulfilled === true ? 2 : 0 });
+  } catch (error) {
+    console.error('Status purchase verification error:', error.response?.data || error.message);
+    return handleDbError(res, error, 'Status purchase verification error:');
+  }
+});
+
+
+const peerCallLimiter = rateLimit({windowMs:60*1000,max:20,standardHeaders:true,legacyHeaders:false});
+async function areAcceptedFriends(a,b) {
+ const {data,error}=await supabase.from('recovery_chat_friend_requests').select('id').eq('status','accepted')
+  .or('and(sender_user_id.eq.'+a+',recipient_user_id.eq.'+b+'),and(sender_user_id.eq.'+b+',recipient_user_id.eq.'+a+')').limit(1);
+ if(error) throw error; return Boolean(data?.length);
+}
+async function hasCallPlan(userId) {
+ const {data,error}=await supabase.from('recovery_chat_plan_purchases').select('id')
+  .eq('user_id',userId).eq('plan_code','call').eq('status','paid').gt('expires_at',new Date().toISOString()).limit(1);
+ if(error) throw error; return Boolean(data?.length);
+}
+async function peerParticipant(callId,userId) {
+ const {data,error}=await supabase.from('recovery_peer_calls').select('*').eq('id',callId).maybeSingle();
+ if(error) throw error;
+ if(!data) return {call:null,participant:false};
+ return {call:data,participant:data.caller_user_id===userId||data.callee_user_id===userId};
+}
+router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
+ try{
+  if(req.user.role!=='client') return fail(res,403,'Client account required.');
+  const other=String(req.body?.memberId||''),mode=req.body?.call_mode==='video'?'video':'audio';
+  if(!validId(other)||other===String(req.user.id)) return fail(res,400,'Choose a valid registered member.');
+  if(await blockedEitherWay(req.user.id,other)) return fail(res,403,'Calls are unavailable because one account has blocked the other.');
+  if(!await areAcceptedFriends(req.user.id,other)) return fail(res,403,'Accept the friend request before calling this member.');
+  const {data:callee,error:ce}=await supabase.from('recovery_users').select('id,role,security_status').eq('id',other).maybeSingle();
+  if(ce) throw ce;
+  if(!callee||callee.role!=='client'||(callee.security_status&&callee.security_status!=='active')) return fail(res,404,'Member not found.');
+  // Treat a member as online only when their authenticated client has sent a fresh heartbeat.
+  // This server-side check prevents stale/fake client UI from starting calls to offline members.
+  const {data:presence,error:presenceError}=await supabase.from('recovery_chat_presence')
+   .select('last_seen_at').eq('user_id',other).maybeSingle();
+  if(presenceError) throw presenceError;
+  const lastSeen=presence?.last_seen_at ? new Date(presence.last_seen_at).getTime() : NaN;
+  const age=Date.now()-lastSeen;
+  if(!Number.isFinite(lastSeen)||age<0||age>=60000) return fail(res,409,'This member is offline. You can call when they come online.');
+  const stale=await supabase.from('recovery_peer_calls').update({status:'missed',ended_at:new Date().toISOString()}).eq('status','ringing').lt('created_at',new Date(Date.now()-120000).toISOString());
+  if(stale.error) throw stale.error;
+  const {data:busy,error:be}=await supabase.from('recovery_peer_calls').select('id').in('status',['ringing','accepted'])
+   .or('caller_user_id.eq.'+req.user.id+',callee_user_id.eq.'+req.user.id+',caller_user_id.eq.'+other+',callee_user_id.eq.'+other).limit(1);
+  if(be) throw be;
+  if(busy?.length) return fail(res,409,'One of these members is already in a call.');
+  const {data,error}=await supabase.from('recovery_peer_calls').insert({caller_user_id:req.user.id,callee_user_id:other,call_mode:mode,status:'ringing'})
+   .select('id,caller_user_id,callee_user_id,call_mode,status,created_at').single();
+  if(error) throw error;
+  res.status(201).json({success:true,call:data});
+ }catch(error){return handleDbError(res,error,'Peer call start error:');}
+});
+router.get('/peer-calls/incoming',async(req,res)=>{
+ try{
+  const {data,error}=await supabase.from('recovery_peer_calls').select('id,caller_user_id,callee_user_id,call_mode,status,created_at')
+   .eq('callee_user_id',req.user.id).eq('status','ringing').gt('created_at',new Date(Date.now()-120000).toISOString()).order('created_at',{ascending:false}).limit(5);
+  if(error) throw error;
+  const ids=[...new Set((data||[]).map(x=>x.caller_user_id))];
+  const {data:users,error:ue}=ids.length?await supabase.from('recovery_users').select('id,username').in('id',ids):{data:[],error:null};
+  if(ue) throw ue;
+  const {data:profiles,error:pe}=ids.length?await supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url').in('user_id',ids):{data:[],error:null};
+  if(pe) throw pe;
+  const um=new Map((users||[]).map(x=>[x.id,x])),pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
+  res.set('Cache-Control','no-store');
+  res.json({success:true,calls:(data||[]).map(c=>({...c,caller:{name:pm.get(c.caller_user_id)?.display_name||um.get(c.caller_user_id)?.username||'Member',avatar:pm.get(c.caller_user_id)?.avatar_visibility==='private'?null:(pm.get(c.caller_user_id)?.avatar_url||null)}}))});
+ }catch(error){return handleDbError(res,error,'Incoming peer calls error:');}
+});
+router.get('/peer-calls/:callId/signals',async(req,res)=>{
+ try{
+  const id=String(req.params.callId||'');
+  if(!validId(id)) return fail(res,400,'Invalid call ID.');
+  const {call,participant}=await peerParticipant(id,req.user.id);
+  if(!call) return fail(res,404,'Call not found.');
+  if(!participant) return fail(res,403,'You are not a participant in this call.');
+  const after=Math.max(0,Number.parseInt(req.query.after||'0',10)||0);
+  const {data:signals,error}=await supabase.from('recovery_peer_call_signals').select('id,sender_user_id,signal_type,payload,created_at')
+   .eq('call_id',id).neq('sender_user_id',req.user.id).gt('id',after).order('id',{ascending:true}).limit(100);
+  if(error) throw error;
+  res.set('Cache-Control','no-store');
+  res.json({success:true,call,signals:signals||[]});
+ }catch(error){return handleDbError(res,error,'Peer call signals read error:');}
+});
+router.post('/peer-calls/:callId/signals',peerCallLimiter,async(req,res)=>{
+ try{
+  const id=String(req.params.callId||''),type=String(req.body?.signal_type||'');
+  if(!validId(id)||!['offer','answer','ice','accept','reject','hangup'].includes(type)) return fail(res,400,'Invalid call signal.');
+  const {call,participant}=await peerParticipant(id,req.user.id);
+  if(!call) return fail(res,404,'Call not found.');
+  if(!participant) return fail(res,403,'You are not a participant in this call.');
+  if(['ended','rejected','missed'].includes(call.status)) return fail(res,409,'This call has already ended.');
+  const payload=req.body?.payload&&typeof req.body.payload==='object'&&!Array.isArray(req.body.payload)?req.body.payload:{};
+  if(JSON.stringify(payload).length>30000) return fail(res,413,'Call signal is too large.');
+  if(type==='offer'&&req.user.id!==call.caller_user_id) return fail(res,403,'Only the caller can send an offer.');
+  if(type==='answer'&&req.user.id!==call.callee_user_id) return fail(res,403,'Only the recipient can send an answer.');
+  if(type==='accept'&&req.user.id!==call.callee_user_id) return fail(res,403,'Only the recipient can accept this call.');
+  const {data,error}=await supabase.from('recovery_peer_call_signals').insert({call_id:id,sender_user_id:req.user.id,signal_type:type,payload})
+    .select('id,call_id,sender_user_id,signal_type,payload,created_at').single();
+  if(error) throw error;
+  if(type==='accept') {const u=await supabase.from('recovery_peer_calls').update({status:'accepted',accepted_at:new Date().toISOString()}).eq('id',id).eq('status','ringing');if(u.error) throw u.error;}
+  if(type==='reject'||type==='hangup') {const u=await supabase.from('recovery_peer_calls').update({status:type==='reject'?'rejected':'ended',ended_at:new Date().toISOString()}).eq('id',id).in('status',['ringing','accepted']);if(u.error) throw u.error;}
+  res.status(201).json({success:true,signal:data});
+ }catch(error){return handleDbError(res,error,'Peer call signal write error:');}
+});
+
+module.exports = router;
+), '') + '/client/connect.html'),
         metadata: { product: 'manlung_chat_status_credits', user_id: req.user.id, purchase_id: purchase.id, credits: 2, amount_kes: 100 },
       }, { headers: { Authorization: 'Bearer ' + process.env.PAYSTACK_SECRET_KEY }, timeout: 15000 });
       if (!init.data?.status || !init.data?.data?.authorization_url) throw new Error('Paystack did not return a checkout URL.');
