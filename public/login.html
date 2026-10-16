@@ -1037,24 +1037,40 @@ async function handleForgot(event) {
 let clientTurnstileEnabled = false;
 let clientTurnstileWidget = null;
 async function setupClientTurnstile() {
+  const widget = document.getElementById('clientTurnstile');
+  const errorEl = document.getElementById('loginError');
   try {
-    const response = await fetch('/api/config/public', {cache:'no-store'});
+    const response = await fetch('/api/config/public', {cache:'no-store', credentials:'same-origin'});
+    if (!response.ok) throw new Error('Login security configuration could not be loaded (HTTP ' + response.status + ').');
     const config = await response.json();
-    clientTurnstileEnabled = Boolean(config.turnstileEnabled && config.turnstileSiteKey);
-    if (!clientTurnstileEnabled) return;
+    clientTurnstileEnabled = Boolean(config.turnstileEnabled);
+    if (!clientTurnstileEnabled) {
+      if (config.turnstileSiteKey) {
+        throw new Error('Cloudflare verification is configured but disabled by the server. Check TURNSTILE_ENFORCE and the production deployment.');
+      }
+      throw new Error('Cloudflare verification is not configured on the running server. Check the production environment variables and redeploy.');
+    }
+    if (!config.turnstileSiteKey) throw new Error('Cloudflare site key is missing from the public configuration.');
     if (!window.turnstile) {
       await new Promise((resolve,reject) => {
         const start=Date.now();
         const timer=setInterval(() => {
           if(window.turnstile){clearInterval(timer);resolve();}
-          else if(Date.now()-start>10000){clearInterval(timer);reject(new Error('Cloudflare Turnstile did not load.'));}
+          else if(Date.now()-start>12000){clearInterval(timer);reject(new Error('Cloudflare script did not load. Check network access, browser extensions, and the script URL.'));}
         },100);
       });
     }
     clientTurnstileWidget = window.turnstile.render('#clientTurnstile',{
-      sitekey:config.turnstileSiteKey, theme:'auto', size:'normal', appearance:'always'
+      sitekey:config.turnstileSiteKey, theme:'auto', size:'normal', appearance:'always',
+      'error-callback': () => showMessage(errorEl,'Cloudflare verification could not load. Refresh the page and try again.'),
+      'expired-callback': () => showMessage(errorEl,'Cloudflare verification expired. Please verify again.')
     });
-  } catch(error) { console.error('Turnstile setup failed:', error); }
+    widget.dataset.turnstileStatus = 'ready';
+  } catch(error) {
+    widget.dataset.turnstileStatus = 'error';
+    console.error('Turnstile setup failed:', error);
+    showMessage(errorEl, 'Security verification unavailable: ' + (error && error.message ? error.message : 'unknown error') + ' Refresh after the server deployment is corrected.');
+  }
 }
 document.addEventListener('DOMContentLoaded', setupClientTurnstile);
 
