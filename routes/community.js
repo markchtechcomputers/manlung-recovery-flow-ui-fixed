@@ -397,6 +397,20 @@ router.post('/status/:statusId/comments', messageLimiter, async (req,res) => {
     res.status(201).json({success:true,comment:data});
   } catch(error) { return handleDbError(res,error,'Status comment create error:'); }
 });
+router.delete('/status/:statusId', async (req,res) => {
+  try {
+    const id=String(req.params.statusId||'');
+    if(!validId(id)) return fail(res,400,'Invalid status ID.');
+    const {data:post,error:pe}=await supabase.from('recovery_chat_status_posts').select('id,user_id').eq('id',id).maybeSingle();
+    if(pe) throw pe;
+    if(!post) return fail(res,404,'Status not found.');
+    if(post.user_id!==req.user.id&&!isAdmin(req.user)) return fail(res,403,'You can only delete your own status.');
+    const {error}=await supabase.from('recovery_chat_status_posts').delete().eq('id',id);
+    if(error) throw error;
+    res.json({success:true,deleted:true,id});
+  } catch(error) { return handleDbError(res,error,'Status delete error:'); }
+});
+
 router.post('/status/:statusId/hide', async (req,res) => {
   try {
     const id=String(req.params.statusId||'');
