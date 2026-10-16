@@ -4,10 +4,17 @@ const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const TURNSTILE_SECRET_KEY =
   process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY ||
   process.env.TURNSTILE_SECRET_KEY;
+const TURNSTILE_SITE_KEY =
+  process.env.CLOUDFLARE_TURNSTILE_SITE_KEY ||
+  process.env.TURNSTILE_SITE_KEY;
 
+// Only enforce Turnstile when both halves of the integration are configured.
+// Otherwise the browser cannot render a challenge and users would be locked out.
 function isEnabled() {
+  const configured = Boolean(TURNSTILE_SECRET_KEY && TURNSTILE_SITE_KEY);
+  if (!configured) return false;
   if (String(process.env.TURNSTILE_ENFORCE || '').toLowerCase() === 'true') return true;
-  return process.env.NODE_ENV === 'production' && Boolean(TURNSTILE_SECRET_KEY);
+  return process.env.NODE_ENV === 'production';
 }
 
 function verifyTurnstile(token, remoteip) {
