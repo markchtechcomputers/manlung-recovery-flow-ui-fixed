@@ -629,6 +629,24 @@ html body.manlung-auth-page .manlung-footer-contact a[href^="mailto:"]::before{
 
 
 
+
+/* Red rotating accent ring for Create Account; Sign In keeps its blue ring. */
+body.manlung-auth-page .manlung-auth-tabs button#tabRegister::before {
+  background: conic-gradient(from 0deg, transparent 0 62%, #fca5a5 72%, #ef4444 79%, #b91c1c 86%, transparent 96% 100%) !important;
+}
+body.manlung-auth-page .manlung-auth-tabs button#tabRegister.active {
+  border-color: rgba(239,68,68,.28) !important;
+  color: #b91c1c !important;
+  box-shadow: 0 3px 10px rgba(239,68,68,.12), inset 0 1px 0 rgba(255,255,255,.9) !important;
+}
+.dark.manlung-auth-page .manlung-auth-tabs button#tabRegister::before {
+  background: conic-gradient(from 0deg, transparent 0 62%, #fca5a5 72%, #ef4444 79%, #dc2626 86%, transparent 96% 100%) !important;
+}
+.dark.manlung-auth-page .manlung-auth-tabs button#tabRegister.active {
+  border-color: rgba(248,113,113,.34) !important;
+  color: #fca5a5 !important;
+}
+
 /* Refined account switcher with subtle rotating accent rings. */
 body.manlung-auth-page .manlung-auth-tabs {
   position: relative !important;
