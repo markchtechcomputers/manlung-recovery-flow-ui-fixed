@@ -279,8 +279,11 @@ async function sharedLoginLimiter(req, res, next) {
         p_window_seconds: 900,
       });
       if (error) {
-        console.error('Shared login limiter unavailable:', error.code || error.message);
-        return res.status(503).json({ success: false, error: 'Sign-in is temporarily unavailable. Please try again shortly.' });
+        // Keep the endpoint available if the shared limiter migration has not
+        // reached this database yet; the per-instance loginLimiter still runs.
+        // Alert through server logs so the shared limiter can be restored.
+        console.error('Shared login limiter unavailable; using local limiter fallback:', error.code || error.message);
+        return next();
       }
       if (data !== true) {
         res.setHeader('Retry-After', '900');
@@ -289,8 +292,8 @@ async function sharedLoginLimiter(req, res, next) {
     }
     return next();
   } catch (error) {
-    console.error('Shared login limiter failed:', error?.code || error?.message);
-    return res.status(503).json({ success: false, error: 'Sign-in is temporarily unavailable. Please try again shortly.' });
+    console.error('Shared login limiter failed; using local limiter fallback:', error?.code || error?.message);
+    return next();
   }
 }
 
