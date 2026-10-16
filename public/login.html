@@ -980,8 +980,22 @@ function showForgot(event) {
   document.getElementById('tabRegister').classList.remove('active');
 }
 function showMessage(el, text, type='error') {
-  el.textContent = text || '';
-  el.className = 'manlung-auth-message ' + type + (text ? ' show' : '');
+  // API errors may be structured objects; assigning one directly to textContent
+  // renders the unhelpful string "[object Object]".
+  let displayText = '';
+  if (typeof text === 'string') {
+    displayText = text;
+  } else if (text && typeof text === 'object') {
+    displayText = [text.message, text.error, text.details, text.hint]
+      .find(value => typeof value === 'string' && value.trim()) || '';
+    if (!displayText) {
+      try { displayText = JSON.stringify(text); } catch (_) { displayText = ''; }
+    }
+  } else if (text !== null && text !== undefined) {
+    displayText = String(text);
+  }
+  el.textContent = displayText;
+  el.className = 'manlung-auth-message ' + type + (displayText ? ' show' : '');
 }
 
 function handleEmailVerificationResult(){
