@@ -627,6 +627,48 @@ html body.manlung-auth-page .manlung-footer-contact a[href^="mailto:"]::before{
   html body.manlung-auth-page .manlung-social-grid .manlung-google-btn::before{animation:none!important}
 }
 
+
+/* Login-only chrome: keep the authentication screen focused. */
+body.manlung-auth-page > header.site-header,
+body.manlung-auth-page > footer.manlung-footer {
+  display: none !important;
+}
+body.manlung-auth-page .manlung-login-back {
+  position: fixed;
+  z-index: 1000;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(148,163,184,.42);
+  border-radius: 50%;
+  background: rgba(255,255,255,.88);
+  color: #334155;
+  box-shadow: 0 3px 12px rgba(15,23,42,.08);
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+body.manlung-auth-page .manlung-login-back:hover {
+  transform: translateX(-2px);
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(15,23,42,.13);
+}
+body.manlung-auth-page .manlung-login-back i { font-size: 13px; }
+.dark.manlung-auth-page .manlung-login-back {
+  border-color: rgba(148,163,184,.35);
+  background: rgba(15,23,42,.88);
+  color: #e2e8f0;
+}
+.dark.manlung-auth-page .manlung-login-back:hover { background: #1e293b; }
+@media (prefers-reduced-motion: reduce) {
+  body.manlung-auth-page .manlung-login-back { transition: none; }
+}
+
 </style>
 
 </head>
@@ -646,6 +688,8 @@ html body.manlung-auth-page .manlung-footer-contact a[href^="mailto:"]::before{
     </div>
   </div>
 </header>
+
+<a class="manlung-login-back" href="/" aria-label="Go back" title="Go back" onclick="if (window.history.length > 1 && document.referrer && new URL(document.referrer).origin === window.location.origin) { event.preventDefault(); window.history.back(); }"><i class="fas fa-arrow-left" aria-hidden="true"></i></a>
 
 <main class="manlung-auth-wrap">
   <section class="manlung-auth-shell" aria-label="Manlung Recovery account access">
