@@ -1079,6 +1079,14 @@ router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
   const {data:callee,error:ce}=await supabase.from('recovery_users').select('id,role,security_status').eq('id',other).maybeSingle();
   if(ce) throw ce;
   if(!callee||callee.role!=='client'||(callee.security_status&&callee.security_status!=='active')) return fail(res,404,'Member not found.');
+  // Treat a member as online only when their authenticated client has sent a fresh heartbeat.
+  // This server-side check prevents stale/fake client UI from starting calls to offline members.
+  const {data:presence,error:presenceError}=await supabase.from('recovery_chat_presence')
+   .select('last_seen_at').eq('user_id',other).maybeSingle();
+  if(presenceError) throw presenceError;
+  const lastSeen=presence?.last_seen_at ? new Date(presence.last_seen_at).getTime() : NaN;
+  const age=Date.now()-lastSeen;
+  if(!Number.isFinite(lastSeen)||age<0||age>=60000) return fail(res,409,'This member is offline. You can call when they come online.');
   const stale=await supabase.from('recovery_peer_calls').update({status:'missed',ended_at:new Date().toISOString()}).eq('status','ringing').lt('created_at',new Date(Date.now()-120000).toISOString());
   if(stale.error) throw stale.error;
   const {data:busy,error:be}=await supabase.from('recovery_peer_calls').select('id').in('status',['ringing','accepted'])
