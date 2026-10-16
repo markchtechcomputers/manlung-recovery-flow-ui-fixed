@@ -8,6 +8,7 @@ const http = require('http');
 const net = require('net');
 const { URL } = require('url');
 const path = require('path');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -249,6 +250,8 @@ app.use('/api/notifications', notificationLimiter);
  // AUTH LOGIN / MFA BRUTE-FORCE PROTECTION
  // ============================================================
 
+// This local limiter is a quick first line of defense. A shared Supabase-backed
+// limiter below enforces limits consistently across serverless instances.
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 30,
@@ -261,6 +264,38 @@ const loginLimiter = rateLimit({
     });
   },
 });
+
+async function sharedLoginLimiter(req, res, next) {
+  const ip = String(req.ip || req.socket?.remoteAddress || 'unknown').slice(0, 128);
+  const identifier = String(req.body?.username || req.body?.email || '').trim().toLowerCase().slice(0, 254);
+  const keys = [
+    { raw: `ip:${ip}`, limit: 30 },
+    ...(identifier ? [{ raw: `account:${identifier}`, limit: 10 }] : []),
+  ];
+
+  try {
+    for (const item of keys) {
+      const keyHash = crypto.createHash('sha256').update(item.raw).digest('hex');
+      const { data, error } = await supabase.rpc('allow_recovery_login_rate', {
+        p_key_hash: keyHash,
+        p_limit: item.limit,
+        p_window_seconds: 900,
+      });
+      if (error) {
+        console.error('Shared login limiter unavailable:', error.code || error.message);
+        return res.status(503).json({ success: false, error: 'Sign-in is temporarily unavailable. Please try again shortly.' });
+      }
+      if (data !== true) {
+        res.setHeader('Retry-After', '900');
+        return res.status(429).json({ success: false, error: 'Too many sign-in attempts. Please wait before trying again.' });
+      }
+    }
+    return next();
+  } catch (error) {
+    console.error('Shared login limiter failed:', error?.code || error?.message);
+    return res.status(503).json({ success: false, error: 'Sign-in is temporarily unavailable. Please try again shortly.' });
+  }
+}
 
 const mfaLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -275,9 +310,9 @@ const mfaLimiter = rateLimit({
   },
 });
 
-app.use('/api/auth/admin/login', loginLimiter);
-app.use('/api/auth/client/login', loginLimiter);
-app.use('/api/auth/admin/mfa/login', mfaLimiter);
+app.use('/api/auth/admin/login', loginLimiter, sharedLoginLimiter);
+app.use('/api/auth/client/login', loginLimiter, sharedLoginLimiter);
+app.use('/api/auth/admin/mfa/login', mfaLimiter, sharedLoginLimiter);
 
 // ============================================================
 // AUTH ACTION RATE LIMITER
