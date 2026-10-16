@@ -103,6 +103,31 @@ router.post('/presence/heartbeat', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Presence heartbeat error:'); }
 });
 
+router.post('/updates', async (req,res) => {
+  try {
+    if (!isAdmin(req.user)) return fail(res, 403, 'Only registered admins can publish official updates.');
+    const title = cleanText(req.body?.title, 120);
+    const body = cleanText(req.body?.body, 5000);
+    if (!title && !body) return fail(res, 400, 'Add a title or announcement message.');
+    const payload = { title, body, is_published: req.body?.is_published !== false, pinned: req.body?.pinned === true, created_by: req.user.id };
+    const { data, error } = await supabase.from('recovery_chat_announcements').insert(payload).select('id,title,body,created_at,pinned,is_published').single();
+    if (error) throw error;
+    res.status(201).json({ success: true, update: data });
+  } catch (error) { return handleDbError(res,error,'Official update publish error:'); }
+});
+
+router.delete('/updates/:updateId', async (req,res) => {
+  try {
+    if (!isAdmin(req.user)) return fail(res, 403, 'Only registered admins can remove official updates.');
+    const id = String(req.params.updateId || '');
+    if (!validId(id)) return fail(res, 400, 'Invalid announcement ID.');
+    const { data, error } = await supabase.from('recovery_chat_announcements').delete().eq('id',id).select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Announcement not found.');
+    res.json({ success: true, deleted: data.id });
+  } catch (error) { return handleDbError(res,error,'Official update delete error:'); }
+});
+
 router.get('/updates', async (req,res) => {
   try {
     const {data,error}=await supabase.from('recovery_chat_announcements')
