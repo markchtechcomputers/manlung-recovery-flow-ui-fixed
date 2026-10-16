@@ -324,7 +324,7 @@ function render(){theme();const h=$('#hd'),m=$('#mn');
  const tt={chats:'Chats',groups:'Groups',channels:'Channels',status:'Status',calls:'Calls',comm:'Community',set:'Settings'}[tab];
  h.innerHTML=`<div class="logo" role="img" aria-label="Manlung app"></div><h1>${tt}</h1>`;
  $('#nv').innerHTML=[['chats',ic(I.chat),'Chats'],['groups',ic(I.users),'Groups'],['channels',ic(I.status),'Channels'],['status',ic(I.status),'Status'],['calls',ic(I.phone),'Calls'],['comm',ic(I.users),'Community'],['set',ic(I.gear),'Settings']].map(([k,i,l])=>{const count=k==='chats'?S.chats.reduce((n,c)=>n+(Number(c.un)||0),0):k==='comm'?S.inc.length:0;return `<button class="${tab===k?'on':''}" onclick="go('${k}')"><span>${i}</span>${l}${count?` <span class="badge">${count>99?'99+':count}</span>`:''}</button>`}).join('');
- m.innerHTML=({chats:vChats,groups:vGroups,channels:vChannels,status:vStatus,calls:vCalls,comm:vHub,set:vSet})[tab]();
+ const views={chats:vChats,groups:window.vGroups,channels:window.vChannels,status:vStatus,calls:vCalls,comm:window.vHub||vHub,set:vSet};const view=views[tab];m.innerHTML=typeof view==='function'?view():'<div class="empty">This section is still loading. Refresh the page and try again.</div>';
  const c=$('#chat');if(c)c.remove();if(open)drawChat()}
 const go=k=>{tab=k;open=null;showAr=false;render()};
 function vChats(){const list=S.chats.filter(c=>!S.blocked.includes(c.n)&&(flt==='all'||(flt==='unread'&&c.un)||(flt==='groups'&&c.g)||(flt==='channels'&&c.ch))&&(showAr?c.ar:!c.ar)&&c.n.toLowerCase().includes(q.toLowerCase()))
