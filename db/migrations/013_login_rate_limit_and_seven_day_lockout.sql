@@ -1,6 +1,20 @@
 -- Manlung Recovery login hardening.
 -- Apply this migration to Supabase before deploying the matching backend code.
 
+alter table public.recovery_users
+  add column if not exists failed_login_attempts integer not null default 0,
+  add column if not exists login_locked_until timestamptz,
+  add column if not exists last_login_at timestamptz;
+
+alter table public.recovery_users
+  drop constraint if exists recovery_users_failed_login_attempts_check;
+alter table public.recovery_users
+  add constraint recovery_users_failed_login_attempts_check
+  check (failed_login_attempts between 0 and 3);
+create index if not exists recovery_users_login_locked_until_idx
+  on public.recovery_users (login_locked_until)
+  where login_locked_until is not null;
+
 -- Serialize failed-login increments in PostgreSQL so parallel requests cannot
 -- bypass the per-account threshold.
 create or replace function public.record_recovery_login_failure(p_user_id uuid)
