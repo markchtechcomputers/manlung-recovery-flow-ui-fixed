@@ -1454,9 +1454,29 @@ async function setupOfficialGoogleButtons(){
           if(!res.ok||!data.success)throw new Error(data.error||'Google authentication failed. Please try again.');
           if(!data.user)throw new Error('Your account was verified, but the user profile was not returned. Please try again.');
           try{localStorage.setItem('clientUser',JSON.stringify(data.user));}catch(storageError){console.warn('Could not cache client profile:',storageError);}
+          // Confirm the server actually recognizes the HttpOnly session cookie before
+          // navigating. This prevents a mobile browser from appearing to sign in and
+          // then landing on a blank/redirecting dashboard when cookie storage fails.
+          let sessionResponse;
+          try{
+            sessionResponse=await fetch('/api/auth/verify',{
+              method:'GET',
+              credentials:'include',
+              cache:'no-store',
+              headers:{'Accept':'application/json'}
+            });
+          }catch(sessionError){
+            throw new Error('Google verified your account, but your phone could not confirm the secure session. Open this site in your phone browser (not an in-app browser) and try again.');
+          }
+          const sessionText=await sessionResponse.text();
+          let sessionData={};
+          try{sessionData=sessionText?JSON.parse(sessionText):{};}catch(_){}
+          if(!sessionResponse.ok||!sessionData.success||!sessionData.user||sessionData.user.role!=='client'){
+            throw new Error(sessionData.error||'Google sign-in completed, but the secure session was not saved. Please allow cookies for this site and try again.');
+          }
           setGoogleStatus('Sign-in successful. Opening your dashboard…','success');
           // Use an absolute same-origin URL to avoid relative-path or base-URL issues on mobile.
-          window.location.assign(new URL('/client/dashboard.html?session=1',window.location.origin).href);
+          window.location.replace(new URL('/client/dashboard.html?session=1',window.location.origin).href);
         }catch(err){
           console.error('Google sign-in callback failed:',err);
           setGoogleStatus(err?.message||'Google authentication failed. Please try again.','error');
