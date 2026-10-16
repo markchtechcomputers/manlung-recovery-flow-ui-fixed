@@ -913,7 +913,19 @@ router.post('/verification/initialize', statusLimiter, async (req,res) => {
    if(!init.data?.status||!init.data?.data?.authorization_url)throw new Error('Paystack did not return a checkout URL.');
    return res.json({success:true,purchaseId:purchase.id,reference,authorizationUrl:init.data.data.authorization_url,amountKes:100});
   } catch(e){await supabase.from('recovery_chat_verification_purchases').update({status:'failed'}).eq('id',purchase.id);throw e;}
- } catch(error){console.error('Verification initialize error:',error.response?.data||error.message);return fail(res,error.response?.status>=400&&error.response?.status<500?400:500,'Could not start verified-badge checkout.');}
+ } catch(error){
+  const dbMessage=String(error?.message||'');
+  console.error('Verification initialize error:',{code:error?.code,status:error?.response?.status,message:dbMessage,paystack:error?.response?.data?.message||null});
+  // Do not mask missing migrations/schema as a generic checkout failure.
+  if(error?.code==='42P01'||error?.code==='42703'||/^PGRST20[245]$/.test(String(error?.code||''))||/recovery_chat_(profiles|verification_purchases)|schema cache|column .* does not exist|relation .* does not exist/i.test(dbMessage)){
+   return handleDbError(res,error,'Verification initialize database error:');
+  }
+  const paystackMessage=cleanText(error?.response?.data?.message,180);
+  if(error?.response?.status>=400&&error?.response?.status<500){
+   return fail(res,400,paystackMessage||'Paystack rejected the checkout request. Check the payment configuration and account email.');
+  }
+  return fail(res,500,'Could not start verified-badge checkout. Check the backend logs for “Verification initialize error”.');
+ }
 });
 router.post('/verification/verify', async (req,res) => {
  try {
