@@ -265,6 +265,28 @@ html body.manlung-auth-page .manlung-auth-form {
   }
 }
 
+
+/* Center the widened authentication panel horizontally and vertically on desktop. */
+html body.manlung-auth-page {
+  min-height: 100vh !important;
+}
+html body.manlung-auth-page .manlung-auth-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+html body.manlung-auth-page .manlung-auth-shell {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+@media (min-width: 641px) {
+  html body.manlung-auth-page .manlung-auth-wrap {
+    min-height: calc(100vh - 40px) !important;
+  }
+}
 </style>
 
 </head>
