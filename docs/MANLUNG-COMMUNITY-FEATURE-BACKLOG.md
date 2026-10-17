@@ -5,7 +5,7 @@ This is the working checklist for the remaining community/chat requests. Do not 
 ## Requested feature backlog
 
 - [ ] Real-time delivery across client/admin and across devices; verify server persistence and polling/realtime behavior.
-- [x] Direct-message receipt backend and UI wiring added: GET marks incoming messages delivered, active open chat posts a read receipt, and ticks render gray for delivered/unread and blue for read. Requires migration `032_message_receipts.sql`; end-to-end behavior is not yet browser-tested. Existing simulated local receipt logic still needs removal/verification.
+- [x] Direct-message receipt backend and UI wiring added: GET marks incoming messages delivered, active open chat posts a read receipt, and ticks render gray for delivered/unread and blue for read. Requires migration `032_message_receipts.sql`; end-to-end behavior is not yet browser-tested. Simulated local receipt timers have now been removed. End-to-end behavior still needs browser verification.
 - [ ] **Partially implemented:** direct chat headers now show online or last-seen time when the profile API exposes it. Group presence and full privacy/receipt verification remain pending.
 - [x] Added direct/group sticker picker (emoji stickers), Tenor search launch plus direct HTTPS GIF URL sharing, and host/path allowlisted rendering in client/admin pages. Browser send/receive verification remains pending; the GIF flow currently requires pasting a direct .gif URL.
 - [ ] **Code updated:** Status/blue-badge checkout accepts a valid payment email when the account email is missing/invalid and keeps KSh 100 pricing. Still needs a live Paystack test.
@@ -28,7 +28,7 @@ This is the working checklist for the remaining community/chat requests. Do not 
 ## Latest branch changes
 
 - Text theme controls and Google Fonts CSS loader committed in both client/admin pages; inline JavaScript syntax checks passed.
-- Sticker/GIF controls and safe message rendering added to direct and group composers on both client/admin pages; inline JavaScript syntax checks passed. End-to-end sending and external GIF loading are not yet browser-tested.
+- Sticker/GIF controls and safe message rendering added to direct and group composers on both client/admin pages; inline JavaScript syntax checks passed. Simulated local receipt timers removed; receipt UI now depends on server timestamps. End-to-end sending and external GIF loading are not yet browser-tested.
 - Checkout email fallback committed in client page and backend route; syntax checks passed. Live Paystack checkout has not been tested.
 - Username, birthday and language preference controls committed in both pages; backend validation and migration file added. The migration has **not** been applied because the currently connected Supabase project has not been verified as the Manlung Recovery production database.
 - Direct chat header now displays online/last-seen from the existing profile presence API when permitted by profile privacy settings.
