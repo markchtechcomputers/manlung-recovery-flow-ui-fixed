@@ -339,10 +339,10 @@ function play(k,loop){try{ac=ac||new(window.AudioContext||window.webkitAudioCont
 function ding(){if(S.notif)play(S.tone)}
 // render
 function render(){theme();const h=$('#hd'),m=$('#mn');
- const tt={chats:'Chats',groups:'Groups',channels:'Channels',status:'Status',calls:'Calls',comm:'Community',set:'Settings'}[tab];
+ const tt={chats:'Chats',groups:'Groups',channels:'Channels',status:'Status',calls:'Calls',comm:'Community',set:'Settings',adminmsg:'Admin Messages'}[tab];
  h.innerHTML=`<div class="logo" role="img" aria-label="Manlung app"></div><h1>${tt}</h1>`;
- $('#nv').innerHTML=[['chats',ic(I.chat),'Chats'],['groups',ic(I.users),'Groups'],['channels',ic(I.status),'Channels'],['status',ic(I.status),'Status'],['calls',ic(I.phone),'Calls'],['comm',ic(I.users),'Community'],['set',ic(I.gear),'Settings']].map(([k,i,l])=>{const count=k==='chats'?S.chats.reduce((n,c)=>n+(Number(c.un)||0),0):k==='comm'?S.inc.length:0;return `<button class="${tab===k?'on':''}" onclick="go('${k}')"><span>${i}</span>${l}${count?` <span class="badge">${count>99?'99+':count}</span>`:''}</button>`}).join('');
- const views={chats:vChats,groups:window.vGroups||vGroups,channels:window.vChannels||vChannels,status:vStatus,calls:vCalls,comm:window.vHub||vHub,set:vSet};const view=views[tab];try{m.innerHTML=typeof view==='function'?view():'<div class="empty">This section is still loading. Refresh the page and try again.</div>'}catch(viewError){console.error('Manlung Community section render failed:',tab,viewError);m.innerHTML='<div class="empty"><b>'+esc(tt||'Community')+' could not load.</b><p>Please refresh and try again. If this continues, check the page console for the section error.</p></div>'}
+ const navItems=[['chats',ic(I.chat),'Chats'],['groups',ic(I.users),'Groups'],['channels',ic(I.status),'Channels'],['status',ic(I.status),'Status'],['calls',ic(I.phone),'Calls'],['comm',ic(I.users),'Community'],['set',ic(I.gear),'Settings']];if(['admin','owner'].includes(ML.role)||['admin','owner'].includes(window.__mlRole))navItems.splice(3,0,['adminmsg',ic(I.chat),'Admin Messages']);$('#nv').innerHTML=navItems.map(([k,i,l])=>{const count=k==='chats'?S.chats.reduce((n,c)=>n+(Number(c.un)||0),0):k==='comm'?S.inc.length:0;return `<button class="${tab===k?'on':''}" onclick="go('${k}')"><span>${i}</span>${l}${count?` <span class="badge">${count>99?'99+':count}</span>`:''}</button>`}).join('');
+ const views={chats:vChats,groups:window.vGroups||vGroups,channels:window.vChannels||vChannels,status:vStatus,calls:vCalls,comm:window.vHub||vHub,set:vSet,adminmsg:window.vAdminMessages};const view=views[tab];try{m.innerHTML=typeof view==='function'?view():'<div class="empty">This section is still loading. Refresh the page and try again.</div>'}catch(viewError){console.error('Manlung Community section render failed:',tab,viewError);m.innerHTML='<div class="empty"><b>'+esc(tt||'Community')+' could not load.</b><p>Please refresh and try again. If this continues, check the page console for the section error.</p></div>'}
  const c=$('#chat');if(c)c.remove();if(open)drawChat()}
 const go=k=>{tab=k;open=null;showAr=false;render()};
 function vChats(){const list=S.chats.filter(c=>!S.blocked.includes(c.n)&&(flt==='all'||(flt==='unread'&&c.un)||(flt==='groups'&&c.g)||(flt==='channels'&&c.ch))&&(showAr?c.ar:!c.ar)&&c.n.toLowerCase().includes(q.toLowerCase()))
@@ -654,6 +654,48 @@ function vGroups(){
  const cards=groups.map(g=>'<article class="ml-community-room"><div class="ml-room-icon">'+(g.avatar_url?'<img src="'+esc(g.avatar_url)+'" alt="">':'<span>👥</span>')+'</div><div class="ml-room-copy"><div class="ml-room-title">'+esc(g.name||'Group chat')+'</div><div class="ml-room-status">'+(g.joined?'JOINED GROUP':'GROUP · JOIN TO CHAT')+'</div>'+(g.slug==='manlung-members'?'':'<div class="sub ml-room-description">'+esc(g.description||'')+'</div>')+'</div><button class="btn" onclick="openSharedGroup(\''+esc(g.id)+'\')">'+(g.joined?'Open':'View')+'</button></article>').join('');
  return '<section class="ml-community-hero"><img src="/icons/icon-512.png" alt="Manlung"><div><h2>Groups</h2><p>Group conversations live here, separate from Community and official Channels.</p></div></section><div class="ml-community-actions">'+(isStaff?'<button class="btn" onclick="window.createCommunityGroup()">＋ Create a group</button>':'')+'<button class="btn ghost" onclick="refresh(false)">↻ Refresh</button></div><section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Your group chats</h3><p>Open a group to message, reply, and react.</p></div><span class="ml-section-symbol">👥</span></div>'+(cards||'<div class="empty">No groups available yet.</div>')+'</section>';
 }
+
+window.vAdminMessages=function(){
+ if(!['admin','owner'].includes(ML.role||window.__mlRole))return '<div class="empty">Admin access required.</div>';
+ const groups=(ML.groups||[]).filter(g=>g.slug!=='manlung-updates'&&g.slug!=='manlung-official-updates');
+ const clients=(ML.members||[]).filter(m=>String(m.id)!==String(ML.me));
+ return '<section class="ml-community-hero"><img src="/icons/icon-512.png" alt="Manlung"><div><h2>Admin Messages</h2><p>Use your registered admin account to contact clients, message groups, and publish official channel updates.</p></div></section>'+
+ '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Message a client</h3><p>Private one-to-one support conversations.</p></div></div><label for="ml-admin-client">Registered client</label><select id="ml-admin-client" class="input" style="width:100%;margin:8px 0"><option value="">Choose a client</option>'+clients.map(m=>'<option value="'+esc(m.id)+'">'+esc(nm(m))+(m.username?' · @'+esc(m.username):'')+'</option>').join('')+'</select><div id="ml-admin-dm" class="sub">Choose a client to load the conversation.</div><textarea id="ml-admin-dm-text" class="input" rows="3" maxlength="5000" placeholder="Write a private message..." style="width:100%;margin-top:8px"></textarea><button class="btn" onclick="window.mlAdminSendDM()">Send private message</button></section>'+
+ '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Group messages</h3><p>Open a group and send a message as an admin.</p></div></div><label for="ml-admin-group">Group</label><select id="ml-admin-group" class="input" style="width:100%;margin:8px 0"><option value="">Choose a group</option>'+groups.map(g=>'<option value="'+esc(g.id)+'">'+esc(g.name)+'</option>').join('')+'</select><div id="ml-admin-group-history" class="sub">Choose a group to load recent messages.</div><textarea id="ml-admin-group-text" class="input" rows="3" maxlength="5000" placeholder="Write to this group..." style="width:100%;margin-top:8px"></textarea><button class="btn" onclick="window.mlAdminSendGroup()">Send to group</button></section>'+
+ '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Official channel update</h3><p>Publish a notice to the Manlung Updates channel.</p></div></div><input id="ml-admin-update-title" class="input" maxlength="120" placeholder="Announcement title" style="width:100%;margin:8px 0"><textarea id="ml-admin-update-body" class="input" rows="4" maxlength="5000" placeholder="Write the official announcement..." style="width:100%"></textarea><label style="display:block;margin:8px 0"><input id="ml-admin-update-pinned" type="checkbox"> Pin this update</label><button class="btn" onclick="window.mlAdminPublishUpdate()">Publish official update</button></section>';
+};
+window.mlAdminLoadDM=async function(){
+ const id=document.getElementById('ml-admin-client')?.value,box=document.getElementById('ml-admin-dm');if(!box)return;
+ if(!id){box.textContent='Choose a client to load the conversation.';return}
+ box.textContent='Loading conversation…';
+ try{const d=await apiReq('/messages/'+encodeURIComponent(id));box.innerHTML=(d.messages||[]).map(m=>'<div style="padding:8px;margin:6px 0;border-radius:10px;background:var(--sf)"><b>'+((String(m.sender_user_id)===String(ML.me))?'You':'Client')+'</b><div>'+esc(m.message)+'</div><div class="sub">'+esc(m.created_at||'')+'</div></div>').join('')||'<div class="sub">No messages yet. Send the first message below.</div>'}
+ catch(e){box.textContent=e.message||'Could not load messages.'}
+};
+window.mlAdminSendDM=async function(){
+ if(!['admin','owner'].includes(ML.role||window.__mlRole))return toast('Admin access required.');
+ const id=document.getElementById('ml-admin-client')?.value,field=document.getElementById('ml-admin-dm-text'),message=String(field?.value||'').trim();if(!id)return toast('Choose a client first.');if(!message)return toast('Write a message first.');
+ try{await apiReq('/messages/'+encodeURIComponent(id),{method:'POST',body:JSON.stringify({message})});field.value='';await window.mlAdminLoadDM();toast('Private message sent.')}catch(e){toast(e.message||'Message could not be sent.')}
+};
+window.mlAdminLoadGroup=async function(){
+ const id=document.getElementById('ml-admin-group')?.value,box=document.getElementById('ml-admin-group-history');if(!box)return;
+ if(!id){box.textContent='Choose a group to load recent messages.';return}
+ box.textContent='Loading group messages…';
+ try{const d=await apiReq('/groups/'+encodeURIComponent(id)+'/messages');box.innerHTML=(d.messages||[]).map(m=>'<div style="padding:8px;margin:6px 0;border-radius:10px;background:var(--sf)"><b>'+esc(m.sender_user_id===ML.me?'You':((ML.members||[]).find(x=>String(x.id)===String(m.sender_user_id))?nm((ML.members||[]).find(x=>String(x.id)===String(m.sender_user_id))):'Member'))+'</b><div>'+esc(m.message)+'</div><div class="sub">'+esc(m.created_at||'')+'</div></div>').join('')||'<div class="sub">No messages yet.</div>'}
+ catch(e){box.textContent=e.message||'Could not load group messages.'}
+};
+window.mlAdminSendGroup=async function(){
+ if(!['admin','owner'].includes(ML.role||window.__mlRole))return toast('Admin access required.');
+ const id=document.getElementById('ml-admin-group')?.value,field=document.getElementById('ml-admin-group-text'),message=String(field?.value||'').trim();if(!id)return toast('Choose a group first.');if(!message)return toast('Write a message first.');
+ try{await apiReq('/groups/'+encodeURIComponent(id)+'/messages',{method:'POST',body:JSON.stringify({message})});field.value='';await window.mlAdminLoadGroup();toast('Group message sent.')}catch(e){toast(e.message||'Group message could not be sent.')}
+};
+window.mlAdminPublishUpdate=async function(){
+ if(!['admin','owner'].includes(ML.role||window.__mlRole))return toast('Admin access required.');
+ const title=String(document.getElementById('ml-admin-update-title')?.value||'').trim(),body=String(document.getElementById('ml-admin-update-body')?.value||'').trim(),pinned=!!document.getElementById('ml-admin-update-pinned')?.checked;if(!title&&!body)return toast('Enter a title or announcement.');
+ try{await apiReq('/updates',{method:'POST',body:JSON.stringify({title,body,pinned,is_published:true})});document.getElementById('ml-admin-update-title').value='';document.getElementById('ml-admin-update-body').value='';document.getElementById('ml-admin-update-pinned').checked=false;toast('Official update published.');try{await refresh(true)}catch(_){}}
+ catch(e){toast(e.message||'Announcement could not be published.')}
+};
+document.addEventListener('change',function(e){if(e.target?.id==='ml-admin-client')window.mlAdminLoadDM();if(e.target?.id==='ml-admin-group')window.mlAdminLoadGroup()});
+
 function vChannels(){
  const channels=(ML.groups||[]).filter(g=>g.slug==='manlung-updates'||g.slug==='manlung-official-updates'||g.admin_only_announcements||g.read_only||g.is_read_only);
  const cards=channels.map(g=>'<article class="ml-community-room"><div class="ml-room-icon">'+(g.avatar_url?'<img src="'+esc(g.avatar_url)+'" alt="">':'<span>📢</span>')+'</div><div class="ml-room-copy"><div class="ml-room-title">'+esc(g.name||'Official channel')+'</div><div class="ml-room-status">OFFICIAL CHANNEL · READ ONLY</div><div class="sub ml-room-description">'+esc(g.description||'Official announcements from Manlung.')+'</div></div><button class="btn ghost" onclick="openSharedGroup(\''+esc(g.id)+'\')">Open channel</button></article>').join('');
