@@ -717,8 +717,8 @@ router.get('/groups', async (req, res) => {
     if (!shared) {
       const created = await supabase.from('recovery_chat_groups').insert({
         slug: 'manlung-members', name: 'Manlung Members',
-        description: '',
-        is_default: true, avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png'
+        description: 'The shared space for Manlung community members.',
+        is_default: true, avatar_url: 'https://i.postimg.cc/rwLXmS7X/icons8-people-100.png'
       }).select('id,slug,name,description,is_default,avatar_url').single();
       if (created.error && created.error.code !== '23505') throw created.error;
       if (created.data) shared = created.data;
@@ -732,16 +732,16 @@ router.get('/groups', async (req, res) => {
     if (shared) {
       const { data: updatedShared, error: updateSharedError } = await supabase.from('recovery_chat_groups')
         .update({ slug: 'manlung-members', name: 'Manlung Members',
-          description: '',
-          avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png' })
+          description: 'The shared space for Manlung community members.',
+          avatar_url: 'https://i.postimg.cc/rwLXmS7X/icons8-people-100.png' })
         .eq('id', shared.id).select('id,slug,name,description,is_default,avatar_url').single();
       if (updateSharedError) throw updateSharedError;
       shared = updatedShared || shared;
     }
     // Seed the official team room and read-only announcements channel once.
     const officialGroups = [
-      { slug: 'manlung-team', name: 'Manlung Team', description: 'The official Manlung team room for registered members. Be respectful and build each other up.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false },
-      { slug: 'manlung-updates', name: 'Manlung Updates', description: 'Official news about new features and website updates. Members can read and react; comments and member posts are disabled.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false }
+      { slug: 'manlung-team', name: 'Tech Team', description: 'The official Manlung technical support team room for admins and owners.', avatar_url: 'https://i.postimg.cc/TYvfLMDx/icons8-technical-support-48.png', is_default: false },
+      { slug: 'manlung-updates', name: 'Manlung Updates', description: 'Official news about new features and website updates. Members can read and react; comments and member posts are disabled.', avatar_url: 'https://i.postimg.cc/jqzhTP65/icons8-update-48.png', is_default: false }
     ];
     for (const item of officialGroups) {
       const { data: existing, error: findError } = await supabase.from('recovery_chat_groups')
@@ -790,7 +790,14 @@ router.get('/groups', async (req, res) => {
       }
       if (!joined.some(x=>x.id===group.id)) joined.push({ ...group, joined: Boolean(membership), archived: Boolean(membership?.archived) });
     }
-    res.json({ success: true, groups: joined });
+    const groupsWithCounts = await Promise.all(joined.map(async group => {
+      const { count, error: countError } = await supabase.from('recovery_chat_group_members')
+        .select('user_id', { count: 'exact', head: true }).eq('group_id', group.id);
+      if (countError) throw countError;
+      return { ...group, member_count: Number(count) || 0 };
+    }));
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, groups: groupsWithCounts });
   } catch (error) { return handleDbError(res, error, 'Group list error:'); }
 });
 
