@@ -172,11 +172,13 @@ router.patch('/profile', async (req, res) => {
     let updatedUsername = null;
     if (Object.hasOwn(body, 'username')) {
       const username = cleanText(body.username, 24);
-      if (!/^[A-Za-z0-9_]{3,24}$/.test(username)) return fail(res, 400, 'Username must be 3–24 characters and use only letters, numbers or underscores.');
-      const { data: existing, error: existingError } = await supabase.from('recovery_users').select('id').ilike('username', username).neq('id', req.user.id).limit(1);
-      if (existingError) throw existingError;
-      if (existing?.length) return fail(res, 409, 'That username is already taken.');
-      updatedUsername = username;
+      if (username) {
+        if (!/^[A-Za-z0-9_]{3,24}$/.test(username)) return fail(res, 400, 'Username must be 3–24 characters and use only letters, numbers or underscores.');
+        const { data: existing, error: existingError } = await supabase.from('recovery_users').select('id').ilike('username', username).neq('id', req.user.id).limit(1);
+        if (existingError) throw existingError;
+        if (existing?.length) return fail(res, 409, 'That username is already taken.');
+        updatedUsername = username;
+      }
     }
     if (Object.hasOwn(body, 'birthday')) {
       const value = cleanText(body.birthday, 10);
