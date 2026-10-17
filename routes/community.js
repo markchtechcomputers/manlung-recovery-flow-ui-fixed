@@ -182,7 +182,7 @@ router.patch('/profile', async (req, res) => {
     }
     if (Object.hasOwn(body, 'birthday')) {
       const value = cleanText(body.birthday, 10);
-      if (value && !/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return fail(res, 400, 'Birthday must be a valid date.');
+      if (value && !/^\d{4}-\d{2}-\d{2}$/.test(value)) return fail(res, 400, 'Birthday must be a valid date.');
       if (value) {
         const date = new Date(value + 'T00:00:00Z');
         const ageLimit = new Date(); ageLimit.setUTCFullYear(ageLimit.getUTCFullYear() - 120);
@@ -356,7 +356,7 @@ router.post('/plans/initialize', async (req, res) => {
     const plan=COMMUNITY_PLANS[code];
     if (!plan) return fail(res,400,'Choose a valid subscription.');
     const email=cleanText(req.user.email,254).toLowerCase();
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return fail(res,400,'Add a valid email to your account before paying.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res,400,'Add a valid email to your account before paying.');
     const planCode=String(process.env[plan.planEnv]||'').trim();
     if(!planCode) return fail(res,503,'The matching monthly Paystack plan is not configured: '+plan.planEnv+'.');
     const remoteResponse=await axios.get(PAYSTACK_URL+'/plan/'+encodeURIComponent(planCode),{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:10000});
