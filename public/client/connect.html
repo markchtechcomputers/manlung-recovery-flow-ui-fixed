@@ -661,21 +661,86 @@ window.vAdminMessages=function(){
  const clients=(ML.members||[]).filter(m=>String(m.id)!==String(ML.me));
  return '<style>.ml-admin-chat{border:1px solid var(--bd);border-radius:14px;overflow:hidden;background:var(--sf);margin-top:10px}.ml-admin-chatlog{max-height:320px;overflow:auto;padding:12px;background:var(--bg);display:flex;flex-direction:column;gap:8px}.ml-admin-bubble{max-width:86%;padding:9px 12px;border-radius:14px;background:var(--sf);border:1px solid var(--bd);align-self:flex-start;overflow-wrap:anywhere}.ml-admin-bubble.mine{align-self:flex-end;background:var(--out);border-color:transparent}.ml-admin-bubble .who{font-size:11px;font-weight:800;color:var(--ac2);margin-bottom:3px}.ml-admin-bubble .when{font-size:10px;color:var(--mu);margin-top:4px;text-align:right}.ml-admin-replyhint{font-size:12px;color:var(--mu);padding:8px 10px;background:var(--sf2);border-radius:9px;margin:8px 0;display:none}.ml-admin-search{width:100%;margin:8px 0;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--sf2);color:var(--tx);font:inherit}.ml-admin-compose{display:flex;gap:8px;align-items:flex-end;padding:10px;border-top:1px solid var(--bd)}.ml-admin-compose textarea{flex:1;min-width:0}</style>'+
  '<section class="ml-community-hero"><img src="/icons/icon-512.png" alt="Manlung"><div><h2>Admin Messages</h2><p>Official admin workspace · messages show your registered name and ADMIN identity.</p></div></section>'+
- '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Client conversations</h3><p>Search registered clients, open a chat, and reply to messages.</p></div></div><input id="ml-admin-search" class="ml-admin-search" placeholder="Search clients, groups or channels…" oninput="window.mlAdminFilterOptions(this.value)" aria-label="Search clients, groups or channels">'+
+ '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Client conversations</h3><p>Search registered clients, open a chat, and reply to messages.</p></div></div><input id="ml-admin-search" class="ml-admin-search" placeholder="Search clients, groups and official updates…" oninput="window.mlAdminFilterOptions(this.value)" aria-label="Search clients, groups and official updates">'+
  '<label for="ml-admin-client">Registered client</label><select id="ml-admin-client" class="input" style="width:100%;margin:8px 0" onchange="window.mlAdminLoadDM()"><option value="">Choose a client</option>'+clients.map(m=>'<option data-search="'+esc((nm(m)+' '+(m.username||'')).toLowerCase())+'" value="'+esc(m.id)+'">'+esc(nm(m))+(m.username?' · @'+esc(m.username):'')+'</option>').join('')+'</select>'+
  '<div class="ml-admin-chat"><div id="ml-admin-dm" class="ml-admin-chatlog" aria-live="polite">Choose a client to load the conversation.</div><div id="ml-admin-dm-reply" class="ml-admin-replyhint"></div><div class="ml-admin-compose"><textarea id="ml-admin-dm-text" class="input" rows="2" maxlength="5000" placeholder="Message as admin…" style="width:100%"></textarea><button class="btn" onclick="window.mlAdminSendDM()">Send</button></div></div></section>'+
  '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Group conversations</h3><p>Admin messages appear on the right; member messages appear on the left. Swipe a message to reply.</p></div></div><label for="ml-admin-group">Group</label><select id="ml-admin-group" class="input" style="width:100%;margin:8px 0" onchange="window.mlAdminLoadGroup()"><option value="">Choose a group</option>'+groups.map(g=>'<option data-search="'+esc((g.name+' '+(g.slug||'')).toLowerCase())+'" value="'+esc(g.id)+'">'+esc(g.name)+'</option>').join('')+'</select>'+
  '<div class="ml-admin-chat"><div id="ml-admin-group-history" class="ml-admin-chatlog" aria-live="polite">Choose a group to load recent messages.</div><div id="ml-admin-group-reply" class="ml-admin-replyhint"></div><div class="ml-admin-compose"><textarea id="ml-admin-group-text" class="input" rows="2" maxlength="5000" placeholder="Message this group as admin…" style="width:100%"></textarea><button class="btn" onclick="window.mlAdminSendGroup()">Send</button></div></div></section>'+
  '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Official channel update</h3><p>Publish a notice to the Manlung Updates channel.</p></div></div><input id="ml-admin-update-title" class="input" maxlength="120" placeholder="Announcement title" style="width:100%;margin:8px 0"><textarea id="ml-admin-update-body" class="input" rows="4" maxlength="5000" placeholder="Write the official announcement..." style="width:100%"></textarea><label style="display:block;margin:8px 0"><input id="ml-admin-update-pinned" type="checkbox"> Pin this update</label><button class="btn" onclick="window.mlAdminPublishUpdate()">Publish official update</button></section>';
 };
-window.mlAdminFilterOptions=function(query){const q=String(query||'').trim().toLowerCase();['ml-admin-client','ml-admin-group'].forEach(id=>{const sel=document.getElementById(id);if(!sel)return;Array.from(sel.options).forEach((opt,i)=>{opt.hidden=i!==0&&!!q&&!String(opt.dataset.search||opt.textContent).toLowerCase().includes(q)});if(sel.selectedOptions[0]?.hidden)sel.value=''});};
-window.mlAdminRenderMessages=function(boxId,messages,kind){const box=document.getElementById(boxId);if(!box)return;const rows=(messages||[]).map((m,i)=>{const mine=String(m.sender_user_id)===String(ML.me),profile=(ML.members||[]).find(x=>String(x.id)===String(m.sender_user_id)),myProfile=(ML.members||[]).find(x=>String(x.id)===String(ML.me));const name=mine?((myProfile?nm(myProfile):(ML.name||'Admin'))+' · ADMIN'):(profile?nm(profile):'Member');return '<div class="ml-admin-bubble '+(mine?'mine':'')+'" data-admin-msg="'+i+'" data-admin-kind="'+kind+'" data-admin-text="'+esc(m.message||'')+'" role="button" tabindex="0" title="Swipe or select to reply"><div class="who">'+esc(name)+'</div><div>'+esc(m.message||'')+'</div><div class="when">'+esc(m.created_at||'')+'</div></div>'}).join('');box.innerHTML=rows||'<div class="sub">No messages yet. Send the first message below.</div>';box.scrollTop=box.scrollHeight;};
-(function(){let start=null;document.addEventListener('pointerdown',e=>{const b=e.target.closest?.('[data-admin-msg]');if(b)start={x:e.clientX,y:e.clientY,el:b}});document.addEventListener('pointerup',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y,b=start.el;start=null;if(Math.abs(dx)>55&&Math.abs(dy)<60)window.mlAdminSetReply(b)});document.addEventListener('click',e=>{const b=e.target.closest?.('[data-admin-msg]');if(b)window.mlAdminSetReply(b)});document.addEventListener('keydown',e=>{const b=e.target.closest?.('[data-admin-msg]');if(b&&(e.key==='Enter'||e.key===' ')){e.preventDefault();window.mlAdminSetReply(b)}})})();
-window.mlAdminSetReply=function(b){const kind=b.dataset.adminKind,text=b.dataset.adminText||'',target=document.getElementById(kind==='dm'?'ml-admin-dm-reply':'ml-admin-group-reply'),field=document.getElementById(kind==='dm'?'ml-admin-dm-text':'ml-admin-group-text');if(kind==='dm')window.mlAdminReplyDM=text;else window.mlAdminReplyGroup=text;if(target){target.style.display='block';target.textContent='Replying to: '+text;target.onclick=()=>{target.style.display='none';if(kind==='dm')window.mlAdminReplyDM='';else window.mlAdminReplyGroup='';}}if(field){field.focus();if(!field.value.startsWith('↪ '))field.value='↪ '+text+'\n';}};
-window.mlAdminLoadDM=async function(){const id=document.getElementById('ml-admin-client')?.value,box=document.getElementById('ml-admin-dm');if(!box)return;if(!id){box.textContent='Choose a client to load the conversation.';return}box.textContent='Loading conversation…';try{const d=await apiReq('/messages/'+encodeURIComponent(id));window.mlAdminRenderMessages('ml-admin-dm',d.messages||[],'dm')}catch(e){box.textContent=e.message||'Could not load messages.'}};
-window.mlAdminSendDM=async function(){if(!['admin','owner'].includes(ML.role||window.__mlRole))return toast('Admin access required.');const id=document.getElementById('ml-admin-client')?.value,field=document.getElementById('ml-admin-dm-text'),message=String(field?.value||'').trim();if(!id)return toast('Choose a client first.');if(!message)return toast('Write a message first.');try{await apiReq('/messages/'+encodeURIComponent(id),{method:'POST',body:JSON.stringify({message})});field.value='';window.mlAdminReplyDM='';const hint=document.getElementById('ml-admin-dm-reply');if(hint)hint.style.display='none';await window.mlAdminLoadDM();toast('Private message sent.')}catch(e){toast(e.message||'Message could not be sent.')}};
-window.mlAdminLoadGroup=async function(){const id=document.getElementById('ml-admin-group')?.value,box=document.getElementById('ml-admin-group-history');if(!box)return;if(!id){box.textContent='Choose a group to load recent messages.';return}box.textContent='Loading group messages…';try{const d=await apiReq('/groups/'+encodeURIComponent(id)+'/messages');window.mlAdminRenderMessages('ml-admin-group-history',d.messages||[],'group')}catch(e){box.textContent=e.message||'Could not load group messages.'}};
-window.mlAdminSendGroup=async function(){if(!['admin','owner'].includes(ML.role||window.__mlRole))return toast('Admin access required.');const id=document.getElementById('ml-admin-group')?.value,field=document.getElementById('ml-admin-group-text'),message=String(field?.value||'').trim();if(!id)return toast('Choose a group first.');if(!message)return toast('Write a message first.');try{await apiReq('/groups/'+encodeURIComponent(id)+'/messages',{method:'POST',body:JSON.stringify({message})});field.value='';window.mlAdminReplyGroup='';const hint=document.getElementById('ml-admin-group-reply');if(hint)hint.style.display='none';await window.mlAdminLoadGroup();toast('Group message sent.')}catch(e){toast(e.message||'Group message could not be sent.')}};
+window.mlAdminMessages={dm:[],group:[]};
+window.mlAdminFilterOptions=function(query){
+ const q=String(query||'').trim().toLowerCase();
+ ['ml-admin-client','ml-admin-group'].forEach(id=>{
+  const sel=document.getElementById(id);if(!sel)return;
+  Array.from(sel.options).forEach((opt,i)=>{opt.hidden=i!==0&&!!q&&!String(opt.dataset.search||opt.textContent).toLowerCase().includes(q)});
+  if(sel.selectedOptions[0]?.hidden){sel.value='';if(id==='ml-admin-client')window.mlAdminLoadDM();else window.mlAdminLoadGroup();}
+ });
+ const channelSection=document.getElementById('ml-admin-update-title')?.closest('.ml-community-section');
+ if(channelSection){const terms='official channel update manlung updates announcements publish notice';channelSection.hidden=!!q&&!terms.includes(q)&&!q.split(/\s+/).some(t=>terms.includes(t));}
+};
+window.mlAdminRenderMessages=function(boxId,messages,kind){
+ const box=document.getElementById(boxId);if(!box)return;
+ const rows=(messages||[]).map((m,i)=>{
+  const mine=String(m.sender_user_id)===String(ML.me),profile=(ML.members||[]).find(x=>String(x.id)===String(m.sender_user_id)),myProfile=(ML.members||[]).find(x=>String(x.id)===String(ML.me));
+  const name=mine?((myProfile?nm(myProfile):(ML.name||'Admin'))+' · ADMIN'):(profile?nm(profile):'Member');
+  const quoted=(messages||[]).find(x=>String(x.id)===String(m.reply_to_id));
+  const quote=quoted?'<div class="qt"><b>'+esc(String(quoted.sender_user_id)===String(ML.me)?(ML.name||'Admin'):(nm((ML.members||[]).find(x=>String(x.id)===String(quoted.sender_user_id)))||'Member'))+'</b><div>'+esc(quoted.message||'')+'</div></div>':'';
+  return '<div class="ml-admin-bubble '+(mine?'mine':'')+(m.pending?' pending':'')+'" data-admin-msg="'+i+'" data-admin-id="'+esc(m.id||'')+'" data-admin-kind="'+kind+'" data-admin-text="'+esc(m.message||'')+'" role="button" tabindex="0" title="Swipe or select to reply">'+quote+'<div class="who">'+esc(name)+'</div><div>'+esc(m.message||'')+'</div><div class="when">'+(m.pending?'Sending…':esc(m.created_at?time(m.created_at):''))+'</div></div>';
+ }).join('');
+ const nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<100;
+ box.innerHTML=rows||'<div class="sub">No messages yet. Send the first message below.</div>';
+ if(nearBottom)box.scrollTop=box.scrollHeight;
+};
+(function(){let start=null;document.addEventListener('pointerdown',e=>{const b=e.target.closest?.('[data-admin-msg]');if(b)start={x:e.clientX,y:e.clientY,el:b}});document.addEventListener('pointerup',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y,b=start.el;start=null;if(Math.abs(dx)>45&&Math.abs(dy)<70)window.mlAdminSetReply(b)});document.addEventListener('click',e=>{const b=e.target.closest?.('[data-admin-msg]');if(b)window.mlAdminSetReply(b)});document.addEventListener('keydown',e=>{const b=e.target.closest?.('[data-admin-msg]');if(b&&(e.key==='Enter'||e.key===' ')){e.preventDefault();window.mlAdminSetReply(b)}})})();
+window.mlAdminSetReply=function(b){
+ const kind=b.dataset.adminKind,text=b.dataset.adminText||'',id=b.dataset.adminId||'',target=document.getElementById(kind==='dm'?'ml-admin-dm-reply':'ml-admin-group-reply'),field=document.getElementById(kind==='dm'?'ml-admin-dm-text':'ml-admin-group-text');
+ if(kind==='dm')window.mlAdminReplyDM={id,text};else window.mlAdminReplyGroup={id,text};
+ if(target){target.style.display='block';target.textContent='Replying to: '+text;target.onclick=()=>{target.style.display='none';if(kind==='dm')window.mlAdminReplyDM=null;else window.mlAdminReplyGroup=null;};}
+ if(field){field.focus();}
+};
+window.mlAdminLoadDM=async function(){
+ const id=document.getElementById('ml-admin-client')?.value,box=document.getElementById('ml-admin-dm');if(!box)return;
+ if(!id){window.mlAdminMessages.dm=[];box.textContent='Choose a client to load the conversation.';return}
+ box.textContent='Loading conversation…';
+ try{const d=await apiReq('/messages/'+encodeURIComponent(id));window.mlAdminMessages.dm=d.messages||[];window.mlAdminRenderMessages('ml-admin-dm',window.mlAdminMessages.dm,'dm')}
+ catch(e){box.textContent=e.message||'Could not load messages.'}
+};
+window.mlAdminSendDM=async function(){
+ if(!['admin','owner'].includes(ML.role||window.__mlRole))return toast('Admin access required.');
+ const id=document.getElementById('ml-admin-client')?.value,field=document.getElementById('ml-admin-dm-text'),message=String(field?.value||'').trim(),sendButton=field?.parentElement?.querySelector('button');
+ if(!id)return toast('Choose a client first.');if(!message)return toast('Write a message first.');
+ const reply=window.mlAdminReplyDM,box=document.getElementById('ml-admin-dm'),tempId='pending-'+Date.now(),optimistic={id:tempId,sender_user_id:ML.me,message,created_at:new Date().toISOString(),reply_to_id:reply?.id||null,pending:true};
+ window.mlAdminMessages.dm=[...(window.mlAdminMessages.dm||[]),optimistic];window.mlAdminRenderMessages('ml-admin-dm',window.mlAdminMessages.dm,'dm');field.value='';window.mlAdminReplyDM=null;
+ const hint=document.getElementById('ml-admin-dm-reply');if(hint)hint.style.display='none';if(sendButton)sendButton.disabled=true;
+ try{
+  const d=await apiReq('/messages/'+encodeURIComponent(id),{method:'POST',body:JSON.stringify({message,reply_to_id:reply?.id||null})});
+  window.mlAdminMessages.dm=(window.mlAdminMessages.dm||[]).map(m=>m.id===tempId?d.message:m);window.mlAdminRenderMessages('ml-admin-dm',window.mlAdminMessages.dm,'dm');
+ }catch(e){
+  window.mlAdminMessages.dm=(window.mlAdminMessages.dm||[]).filter(m=>m.id!==tempId);window.mlAdminRenderMessages('ml-admin-dm',window.mlAdminMessages.dm,'dm');field.value=message;toast(e.message||'Message could not be sent.');
+ }finally{if(sendButton)sendButton.disabled=false;field.focus();}
+};
+window.mlAdminLoadGroup=async function(){
+ const id=document.getElementById('ml-admin-group')?.value,box=document.getElementById('ml-admin-group-history');if(!box)return;
+ if(!id){window.mlAdminMessages.group=[];box.textContent='Choose a group to load recent messages.';return}
+ box.textContent='Loading group messages…';
+ try{const d=await apiReq('/groups/'+encodeURIComponent(id)+'/messages');window.mlAdminMessages.group=d.messages||[];window.mlAdminRenderMessages('ml-admin-group-history',window.mlAdminMessages.group,'group')}
+ catch(e){box.textContent=e.message||'Could not load group messages.'}
+};
+window.mlAdminSendGroup=async function(){
+ if(!['admin','owner'].includes(ML.role||window.__mlRole))return toast('Admin access required.');
+ const id=document.getElementById('ml-admin-group')?.value,field=document.getElementById('ml-admin-group-text'),message=String(field?.value||'').trim(),sendButton=field?.parentElement?.querySelector('button');
+ if(!id)return toast('Choose a group first.');if(!message)return toast('Write a message first.');
+ const reply=window.mlAdminReplyGroup,tempId='pending-'+Date.now(),optimistic={id:tempId,group_id:id,sender_user_id:ML.me,message,created_at:new Date().toISOString(),reply_to_id:reply?.id||null,pending:true};
+ window.mlAdminMessages.group=[...(window.mlAdminMessages.group||[]),optimistic];window.mlAdminRenderMessages('ml-admin-group-history',window.mlAdminMessages.group,'group');field.value='';window.mlAdminReplyGroup=null;
+ const hint=document.getElementById('ml-admin-group-reply');if(hint)hint.style.display='none';if(sendButton)sendButton.disabled=true;
+ try{
+  const d=await apiReq('/groups/'+encodeURIComponent(id)+'/messages',{method:'POST',body:JSON.stringify({message,reply_to_id:reply?.id||null})});
+  window.mlAdminMessages.group=(window.mlAdminMessages.group||[]).map(m=>m.id===tempId?d.message:m);window.mlAdminRenderMessages('ml-admin-group-history',window.mlAdminMessages.group,'group');
+ }catch(e){
+  window.mlAdminMessages.group=(window.mlAdminMessages.group||[]).filter(m=>m.id!==tempId);window.mlAdminRenderMessages('ml-admin-group-history',window.mlAdminMessages.group,'group');field.value=message;toast(e.message||'Group message could not be sent.');
+ }finally{if(sendButton)sendButton.disabled=false;field.focus();}
+};
 window.mlAdminPublishUpdate=async function(){
  if(!['admin','owner'].includes(ML.role||window.__mlRole))return toast('Admin access required.');
  const title=String(document.getElementById('ml-admin-update-title')?.value||'').trim(),body=String(document.getElementById('ml-admin-update-body')?.value||'').trim(),pinned=!!document.getElementById('ml-admin-update-pinned')?.checked;if(!title&&!body)return toast('Enter a title or announcement.');
