@@ -716,13 +716,14 @@ router.get('/groups', async (req, res) => {
       }
       if (!joined.some(x=>x.id===group.id)) joined.push({ ...group, joined: Boolean(membership), archived: Boolean(membership?.archived) });
     }
-    // Return real active-member totals for each group; the Community UI displays member_count.
+    // Count memberships that are not archived. Older membership rows may have
+    // archived=NULL, so filtering only archived=false incorrectly reports zero.
     const groupsWithCounts = await Promise.all(joined.map(async (group) => {
       const { count, error: countError } = await supabase
         .from('recovery_chat_group_members')
         .select('user_id', { count: 'exact', head: true })
         .eq('group_id', group.id)
-        .eq('archived', false);
+        .or('archived.is.null,archived.eq.false');
       if (countError) throw countError;
       return { ...group, member_count: count || 0 };
     }));
