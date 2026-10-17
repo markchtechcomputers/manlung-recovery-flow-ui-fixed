@@ -716,9 +716,20 @@ router.get('/groups', async (req, res) => {
       }
       if (!joined.some(x=>x.id===group.id)) joined.push({ ...group, joined: Boolean(membership), archived: Boolean(membership?.archived) });
     }
-    // Count memberships that are not archived. Older membership rows may have
-    // archived=NULL, so filtering only archived=false incorrectly reports zero.
+    // "Manlung Members" represents all registered community accounts, not
+    // just accounts that have already opened the group. Count those directly
+    // so its total stays accurate even for legacy users without a membership row.
     const groupsWithCounts = await Promise.all(joined.map(async (group) => {
+      if (group.is_default || group.slug === 'manlung-members' || group.slug === 'manlung-community') {
+        const { count, error: usersCountError } = await supabase
+          .from('recovery_users')
+          .select('id', { count: 'exact', head: true });
+        if (usersCountError) throw usersCountError;
+        return { ...group, member_count: count || 0 };
+      }
+
+      // For custom/team groups, count actual active membership rows. Include
+      // legacy rows where archived is NULL, as well as archived=false rows.
       const { count, error: countError } = await supabase
         .from('recovery_chat_group_members')
         .select('user_id', { count: 'exact', head: true })
