@@ -412,7 +412,7 @@ app.post('/api/careers', careerSubmissionLimiter);
 // ============================================================
 
 app.use(express.json({
-  limit: '2mb',
+  limit: '12mb',
   verify: (req, _res, buf) => {
     req.rawBody = buf;
   },
