@@ -6,7 +6,7 @@ This is the working checklist for the remaining community/chat requests. Do not 
 
 - [ ] Real-time delivery across client/admin and across devices; verify server persistence and polling/realtime behavior.
 - [ ] Accurate delivered/read receipts (gray double tick when delivered/unread, blue double tick only after the recipient reads); remove simulated local receipts.
-- [ ] Online/last-seen presence in direct and group chats, respecting privacy settings.
+- [ ] **Partially implemented:** direct chat headers now show online or last-seen time when the profile API exposes it. Group presence and full privacy/receipt verification remain pending.
 - [ ] Sticker and GIF search/send/receive, with safe rendering and upload limits.
 - [ ] **Code updated:** Status/blue-badge checkout accepts a valid payment email when the account email is missing/invalid and keeps KSh 100 pricing. Still needs a live Paystack test.
 - [ ] Verify official-channel/admin blue ticks and paid member badge behavior from the server-authenticated role/profile state.
@@ -30,5 +30,6 @@ This is the working checklist for the remaining community/chat requests. Do not 
 - Text theme controls and Google Fonts CSS loader committed in both client/admin pages; inline JavaScript syntax checks passed.
 - Checkout email fallback committed in client page and backend route; syntax checks passed. Live Paystack checkout has not been tested.
 - Username, birthday and language preference controls committed in both pages; backend validation and migration file added. The migration has **not** been applied because the currently connected Supabase project has not been verified as the Manlung Recovery production database.
+- Direct chat header now displays online/last-seen from the existing profile presence API when permitted by profile privacy settings.
 - Privacy policy link added to Settings and points to the repository's existing `/privacy.html` page.
 - Do not mark any of the above production-complete until browser and backend checks pass.
