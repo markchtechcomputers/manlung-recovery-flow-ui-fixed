@@ -283,6 +283,32 @@ router.post('/messages/:memberId/read', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Community message read receipt error:'); }
 });
 
+router.patch('/messages/:memberId/:messageId', messageLimiter, async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    const messageId = String(req.params.messageId || '');
+    const message = String(req.body?.message || '').trim();
+    if (!validId(other) || !validId(messageId) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message ID.');
+    if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const { data: existing, error: existingError } = await supabase.from('recovery_community_messages')
+      .select('id,sender_user_id,recipient_user_id,created_at,deleted_at')
+      .eq('id', messageId).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null).maybeSingle();
+    if (existingError) throw existingError;
+    if (!existing) return fail(res, 404, 'Message not found or you do not have permission to edit it.');
+    const createdAt = new Date(existing.created_at).getTime();
+    if (!Number.isFinite(createdAt) || Date.now() - createdAt > 15 * 60 * 1000) return fail(res, 403, 'Messages can only be edited within 15 minutes of sending.');
+    const { data, error } = await supabase.from('recovery_community_messages')
+      .update({ message, edited_at: new Date().toISOString() })
+      .eq('id', messageId).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null)
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,delivered_at,read_at').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 409, 'Message could not be edited. Refresh and try again.');
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, message: data });
+  } catch (error) { return handleDbError(res, error, 'Community message edit error:'); }
+});
+
 router.post('/messages/:memberId', messageLimiter, async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
