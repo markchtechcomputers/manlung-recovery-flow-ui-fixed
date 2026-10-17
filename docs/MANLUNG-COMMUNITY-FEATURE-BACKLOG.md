@@ -14,6 +14,7 @@ This is the working checklist for the remaining community/chat requests. Do not 
 - [ ] **Partially implemented:** username, birthday and preferred-language fields added to Settings and profile route; privacy policy link added. Apply `db/migrations/031_account_preferences.sql` and `db/migrations/032_message_receipts.sql` to the correct Manlung app database, then test updates and receipts. Language is stored but the whole UI is not yet translated. Notifications/privacy controls still need a complete audit.
 - [ ] **Code updated:** Settings can open Google Fonts search, apply a named font through Google Fonts CSS, adjust text size, and reset. Browser/device verification remains pending.
 - [ ] Verify camera-to-Status capture on mobile and desktop fallback.
+- [x] Video status upload and playback added for MP4, WebM, and MOV files (8 MB max) using the existing private signed-URL bucket. The bucket migration now allows those MIME types and 10 MiB objects; the JSON body limit was raised to accommodate base64 payloads. Still requires the matching SQL migration and browser/device testing.
 - [ ] Improve signup and initial load performance; measure before/after.
 - [ ] Test mobile/desktop, client/admin, group/direct, failure/retry, permissions, database migration, and live production deployment.
 - [ ] Verify every pending feature in the browser and record the results here.
@@ -35,4 +36,6 @@ This is the working checklist for the remaining community/chat requests. Do not 
 - Direct message API now returns `delivered_at`/`read_at`, records delivery on message fetch, and has an authenticated read-receipt endpoint. Client/admin message mapping renders receipt states from server timestamps. SQL migration 032 is required before these API changes can work.
 - Fixed double-escaped birthday-date and checkout-email validation patterns found during code review.
 - Privacy policy link added to Settings and points to the repository's existing `/privacy.html` page.
+
+- Added a video option to the status composer in client and admin views, maps server status types, and renders uploaded videos in the status viewer. Backend validates supported video MIME types and an 8 MiB payload cap before private upload. This is code-complete but not browser-tested; apply `db/migrations/032_private_status_media_storage.sql` to the correct Manlung app database first.
 - Do not mark any of the above production-complete until browser and backend checks pass.
