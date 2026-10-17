@@ -799,7 +799,7 @@ router.post('/groups', async (req,res) => {
       .select('id,slug,name,description,is_default,avatar_url,created_at').single();
     if(error) throw error;
     const {error:memberError}=await supabase.from('recovery_chat_group_members')
-      .insert({group_id:group.id,user_id:req.user.id,archived:false});
+      .insert({group_id:group.id,user_id:req.user.id,archived:false,member_role:'admin'});
     if(memberError) {
       await supabase.from('recovery_chat_groups').delete().eq('id',group.id);
       throw memberError;
@@ -871,6 +871,40 @@ router.delete('/groups/:groupId/members/:memberId', async (req,res) => {
     if(error) throw error;
     res.json({success:true,removed:true});
   } catch(error) { return handleDbError(res,error,'Admin group remove error:'); }
+});
+
+router.get('/groups/:groupId/members', async (req,res) => {
+  try {
+    const gid=String(req.params.groupId||'');
+    if(!validId(gid)) return fail(res,400,'Invalid group ID.');
+    const {data:group,error:ge}=await supabase.from('recovery_chat_groups').select('id').eq('id',gid).maybeSingle();
+    if(ge) throw ge;
+    if(!group) return fail(res,404,'Group not found.');
+    if(!isAdmin(req.user)) {
+      const {data:membership,error:me}=await supabase.from('recovery_chat_group_members').select('member_role').eq('group_id',gid).eq('user_id',req.user.id).maybeSingle();
+      if(me) throw me;
+      if(!membership || membership.member_role!=='admin') return fail(res,403,'Only group admins can manage group members.');
+    }
+    const {data:members,error}=await supabase.from('recovery_chat_group_members').select('user_id,member_role,joined_at,recovery_users(id,username,role),recovery_chat_profiles(display_name,avatar_url)').eq('group_id',gid).order('joined_at',{ascending:true});
+    if(error) throw error;
+    res.set('Cache-Control','no-store');
+    res.json({success:true,members:(members||[]).map(m=>({id:m.user_id,role:m.member_role||'member',joinedAt:m.joined_at,name:m.recovery_chat_profiles?.display_name||m.recovery_users?.username||'Member',avatar:m.recovery_chat_profiles?.avatar_url||null,appRole:m.recovery_users?.role||'client'}))});
+  } catch(error) { return handleDbError(res,error,'Group member list error:'); }
+});
+
+router.patch('/groups/:groupId/members/:memberId/role', async (req,res) => {
+  try {
+    if(!isAdmin(req.user)) return fail(res,403,'Only Manlung main-app admins can appoint group admins.');
+    const gid=String(req.params.groupId||''),uid=String(req.params.memberId||''),role=String(req.body?.role||'');
+    if(!validId(gid)||!validId(uid)) return fail(res,400,'Invalid group or member ID.');
+    if(!['member','admin'].includes(role)) return fail(res,400,'Role must be member or admin.');
+    const {data:membership,error:me}=await supabase.from('recovery_chat_group_members').select('group_id,user_id').eq('group_id',gid).eq('user_id',uid).maybeSingle();
+    if(me) throw me;
+    if(!membership) return fail(res,404,'Add this member to the group before changing their role.');
+    const {data,error}=await supabase.from('recovery_chat_group_members').update({member_role:role}).eq('group_id',gid).eq('user_id',uid).select('group_id,user_id,member_role').single();
+    if(error) throw error;
+    res.json({success:true,membership:data});
+  } catch(error) { return handleDbError(res,error,'Group role update error:'); }
 });
 
 router.get('/groups/:groupId/messages', async (req, res) => {
