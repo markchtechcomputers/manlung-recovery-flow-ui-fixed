@@ -32,6 +32,8 @@ function publicProfile(profile, user, presence) {
     avatar: profile?.avatar_visibility === 'private' ? null : (profile?.avatar_url || null),
     avatarVisibility: profile?.avatar_visibility === 'private' ? 'private' : 'public',
     bio: profile?.bio || '',
+    birthday: profile?.birthday || null,
+    language: profile?.language || 'en',
     createdAt: user.created_at || null,
     discoverable: profile?.discoverable !== false,
     presenceVisibility: profile?.presence_visibility || 'members',
@@ -167,6 +169,29 @@ router.patch('/profile', async (req, res) => {
   try {
     const body = req.body || {};
     const patch = { updated_at: new Date().toISOString() };
+    let updatedUsername = null;
+    if (Object.hasOwn(body, 'username')) {
+      const username = cleanText(body.username, 24);
+      if (!/^[A-Za-z0-9_]{3,24}$/.test(username)) return fail(res, 400, 'Username must be 3–24 characters and use only letters, numbers or underscores.');
+      const { data: existing, error: existingError } = await supabase.from('recovery_users').select('id').ilike('username', username).neq('id', req.user.id).limit(1);
+      if (existingError) throw existingError;
+      if (existing?.length) return fail(res, 409, 'That username is already taken.');
+      updatedUsername = username;
+    }
+    if (Object.hasOwn(body, 'birthday')) {
+      const value = cleanText(body.birthday, 10);
+      if (value && !/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return fail(res, 400, 'Birthday must be a valid date.');
+      if (value) {
+        const date = new Date(value + 'T00:00:00Z');
+        const ageLimit = new Date(); ageLimit.setUTCFullYear(ageLimit.getUTCFullYear() - 120);
+        if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0,10) !== value || date > new Date() || date < ageLimit) return fail(res, 400, 'Birthday must be a real date within the last 120 years.');
+      }
+      patch.birthday = value || null;
+    }
+    if (Object.hasOwn(body, 'language')) {
+      if (!['en','sw','fr','es','ar'].includes(body.language)) return fail(res, 400, 'Choose a supported language.');
+      patch.language = body.language;
+    }
     if (Object.hasOwn(body, 'display_name')) {
       const v = cleanText(body.display_name, 80);
       if (v.length < 1) return fail(res, 400, 'Display name must contain 1–80 characters.');
@@ -204,7 +229,14 @@ router.patch('/profile', async (req, res) => {
     }
     const { data, error } = await supabase.from('recovery_chat_profiles').upsert({ user_id: req.user.id, ...patch }, { onConflict: 'user_id' }).select('*').single();
     if (error) throw error;
-    res.json({ success: true, profile: data });
+    if (updatedUsername) {
+      const { error: usernameError } = await supabase.from('recovery_users').update({ username: updatedUsername }).eq('id', req.user.id);
+      if (usernameError) {
+        if (usernameError.code === '23505') return fail(res, 409, 'That username is already taken.');
+        throw usernameError;
+      }
+    }
+    res.json({ success: true, profile: { ...data, ...(updatedUsername ? { username: updatedUsername } : {}) } });
   } catch (error) { return handleDbError(res, error, 'Profile update error:'); }
 });
 
