@@ -7,7 +7,7 @@
     "start": "node server.js",
     "dev": "node server.js",
     "test": "node --test tests/*.test.js",
-    "build": "node -e \"const fs=require('fs'); for (const f of ['server.js','public/index.html']) { if (!fs.existsSync(f)) throw new Error('Missing '+f); } console.log('Manlung Recovery build validation passed.');\""
+    "build": "node -e \"const fs=require('fs'),path=require('path'),cp=require('child_process');const skip=new Set(['node_modules','.git','.vercel']);function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(skip.has(e.name))continue;const p=path.join(dir,e.name);if(e.isDirectory())walk(p);else if(e.isFile()&&p.endsWith('.js')){const r=cp.spawnSync(process.execPath,['--check',p],{stdio:'inherit'});if(r.status!==0)process.exit(r.status||1)}}}walk('.');for(const f of ['server.js','public/index.html'])if(!fs.existsSync(f))throw new Error('Missing '+f);console.log('Syntax and build validation passed.');\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",

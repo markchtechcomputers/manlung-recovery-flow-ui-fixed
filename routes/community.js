@@ -32,6 +32,8 @@ function publicProfile(profile, user, presence) {
     avatar: profile?.avatar_visibility === 'private' ? null : (profile?.avatar_url || null),
     avatarVisibility: profile?.avatar_visibility === 'private' ? 'private' : 'public',
     bio: profile?.bio || '',
+    birthday: profile?.birthday || null,
+    language: profile?.language || 'en',
     createdAt: user.created_at || null,
     discoverable: profile?.discoverable !== false,
     presenceVisibility: profile?.presence_visibility || 'members',
@@ -103,6 +105,54 @@ router.post('/presence/heartbeat', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Presence heartbeat error:'); }
 });
 
+router.post('/updates', async (req,res) => {
+  try {
+    if (!isAdmin(req.user)) return fail(res, 403, 'Only registered admins can publish official updates.');
+    const title = cleanText(req.body?.title, 120);
+    const body = cleanText(req.body?.body, 5000);
+    if (!title && !body) return fail(res, 400, 'Add a title or announcement message.');
+    const payload = { title, body, is_published: req.body?.is_published !== false, pinned: req.body?.pinned === true, created_by: req.user.id };
+    const { data, error } = await supabase.from('recovery_chat_announcements').insert(payload).select('id,title,body,created_at,pinned,is_published').single();
+    if (error) throw error;
+    res.status(201).json({ success: true, update: data });
+  } catch (error) { return handleDbError(res,error,'Official update publish error:'); }
+});
+
+router.delete('/updates/:updateId', async (req,res) => {
+  try {
+    if (!isAdmin(req.user)) return fail(res, 403, 'Only registered admins can remove official updates.');
+    const id = String(req.params.updateId || '');
+    if (!validId(id)) return fail(res, 400, 'Invalid announcement ID.');
+    const { data, error } = await supabase.from('recovery_chat_announcements').delete().eq('id',id).select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Announcement not found.');
+    res.json({ success: true, deleted: data.id });
+  } catch (error) { return handleDbError(res,error,'Official update delete error:'); }
+});
+
+router.get('/updates', async (req,res) => {
+  try {
+    const {data,error}=await supabase.from('recovery_chat_announcements')
+      .select('id,title,body,created_at,pinned,created_by').eq('is_published',true)
+      .order('pinned',{ascending:false}).order('created_at',{ascending:false}).limit(100);
+    if(error) throw error;
+    const rows=data||[], ids=[...new Set(rows.map(x=>x.created_by).filter(Boolean))];
+    let authors={};
+    if(ids.length){
+      const [{data:users,error:ue},{data:profiles,error:pe}]=await Promise.all([
+        supabase.from('recovery_users').select('id,username').in('id',ids),
+        supabase.from('recovery_chat_profiles').select('user_id,display_name').in('user_id',ids)
+      ]);
+      if(ue) throw ue;if(pe) throw pe;
+      const names={};(users||[]).forEach(u=>{names[u.id]=cleanText(u.username,80)});
+      (profiles||[]).forEach(p=>{if(cleanText(p.display_name,80))names[p.user_id]=cleanText(p.display_name,80)});
+      authors=names;
+    }
+    res.set('Cache-Control','no-store');
+    res.json({success:true,updates:rows.map(x=>({...x,author_name:authors[x.created_by]||'Manlung Admin'}))});
+  } catch(error) { return handleDbError(res,error,'Official updates list error:'); }
+});
+
 router.get('/profile', async (req, res) => {
   try {
     const [{ data: profile, error: pe }, { data: user, error: ue }] = await Promise.all([
@@ -119,6 +169,31 @@ router.patch('/profile', async (req, res) => {
   try {
     const body = req.body || {};
     const patch = { updated_at: new Date().toISOString() };
+    let updatedUsername = null;
+    if (Object.hasOwn(body, 'username')) {
+      const username = cleanText(body.username, 24);
+      if (username) {
+        if (!/^[A-Za-z0-9_]{3,24}$/.test(username)) return fail(res, 400, 'Username must be 3–24 characters and use only letters, numbers or underscores.');
+        const { data: existing, error: existingError } = await supabase.from('recovery_users').select('id').ilike('username', username).neq('id', req.user.id).limit(1);
+        if (existingError) throw existingError;
+        if (existing?.length) return fail(res, 409, 'That username is already taken.');
+        updatedUsername = username;
+      }
+    }
+    if (Object.hasOwn(body, 'birthday')) {
+      const value = cleanText(body.birthday, 10);
+      if (value && !/^\d{4}-\d{2}-\d{2}$/.test(value)) return fail(res, 400, 'Birthday must be a valid date.');
+      if (value) {
+        const date = new Date(value + 'T00:00:00Z');
+        const ageLimit = new Date(); ageLimit.setUTCFullYear(ageLimit.getUTCFullYear() - 120);
+        if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0,10) !== value || date > new Date() || date < ageLimit) return fail(res, 400, 'Birthday must be a real date within the last 120 years.');
+      }
+      patch.birthday = value || null;
+    }
+    if (Object.hasOwn(body, 'language')) {
+      if (!['en','sw','fr','es','ar'].includes(body.language)) return fail(res, 400, 'Choose a supported language.');
+      patch.language = body.language;
+    }
     if (Object.hasOwn(body, 'display_name')) {
       const v = cleanText(body.display_name, 80);
       if (v.length < 1) return fail(res, 400, 'Display name must contain 1–80 characters.');
@@ -156,7 +231,14 @@ router.patch('/profile', async (req, res) => {
     }
     const { data, error } = await supabase.from('recovery_chat_profiles').upsert({ user_id: req.user.id, ...patch }, { onConflict: 'user_id' }).select('*').single();
     if (error) throw error;
-    res.json({ success: true, profile: data });
+    if (updatedUsername) {
+      const { error: usernameError } = await supabase.from('recovery_users').update({ username: updatedUsername }).eq('id', req.user.id);
+      if (usernameError) {
+        if (usernameError.code === '23505') return fail(res, 409, 'That username is already taken.');
+        throw usernameError;
+      }
+    }
+    res.json({ success: true, profile: { ...data, ...(updatedUsername ? { username: updatedUsername } : {}) } });
   } catch (error) { return handleDbError(res, error, 'Profile update error:'); }
 });
 
@@ -167,22 +249,49 @@ router.get('/messages/:memberId', async (req, res) => {
     if (other === String(req.user.id)) return fail(res, 400, 'Choose another member.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
     const { data, error } = await supabase.from('recovery_community_messages')
-      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id')
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
-      .is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+    if (error) throw error;
+    const incomingIds = (data || []).filter(m => m.recipient_user_id === req.user.id && !m.delivered_at).map(m => m.id);
+    if (incomingIds.length) {
+      const { error: deliveryError } = await supabase.from('recovery_community_messages')
+        .update({ delivered_at: new Date().toISOString() }).in('id', incomingIds).eq('recipient_user_id', req.user.id).is('delivered_at', null);
+      if (deliveryError) throw deliveryError;
+    }
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, messages: (data || []).reverse() });
+  } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
+});
+
+router.post('/messages/:memberId/read', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Invalid member ID.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const { data: profile, error: profileError } = await supabase.from('recovery_chat_profiles')
+      .select('read_receipts_enabled').eq('user_id', req.user.id).maybeSingle();
+    if (profileError) throw profileError;
+    if (profile?.read_receipts_enabled === false) return res.json({ success: true, readReceipts: false });
+    const now = new Date().toISOString();
+    const { error } = await supabase.from('recovery_community_messages')
+      .update({ delivered_at: now, read_at: now })
+      .eq('sender_user_id', other).eq('recipient_user_id', req.user.id).is('read_at', null);
     if (error) throw error;
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages: data || [] });
-  } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
+    res.json({ success: true, readReceipts: true, readAt: now });
+  } catch (error) { return handleDbError(res, error, 'Community message read receipt error:'); }
 });
 
 router.post('/messages/:memberId', messageLimiter, async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
     const message = String(req.body?.message || '').trim();
+    const replyTo = req.body?.reply_to_id ? String(req.body.reply_to_id) : null;
     if (!validId(other)) return fail(res, 400, 'Invalid member ID.');
     if (other === String(req.user.id)) return fail(res, 400, 'Choose another member.');
     if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
+    if (replyTo && !validId(replyTo)) return fail(res, 400, 'Invalid reply target.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
     const { data: recipient, error: recipientError } = await supabase.from('recovery_users')
       .select('id,role,security_status').eq('id', other).in('role', roles).maybeSingle();
@@ -192,20 +301,30 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
       .select('id').eq('status','accepted')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')').limit(1);
     if (acceptedError) throw acceptedError;
-    if (!accepted?.length) {
+    if (!accepted?.length && !isAdmin(req.user)) {
       const { data: pass, error: passError } = await supabase.from('recovery_chat_plan_purchases')
         .select('id').eq('user_id',req.user.id).eq('plan_code','chat_pass').eq('status','paid').gt('expires_at',new Date().toISOString()).limit(1);
       if (passError) throw passError;
       if (!pass?.length) return fail(res,403,'Accept the friend request or purchase an active Chat pass to message this member.');
     }
+    let payload = { sender_user_id: req.user.id, recipient_user_id: other, message };
+    if (replyTo) {
+      const { data: target, error: targetError } = await supabase.from('recovery_community_messages')
+        .select('id,sender_user_id,recipient_user_id').eq('id', replyTo).is('deleted_at', null).maybeSingle();
+      if (targetError) throw targetError;
+      if (!target || !(
+        (String(target.sender_user_id) === String(req.user.id) && String(target.recipient_user_id) === other) ||
+        (String(target.sender_user_id) === other && String(target.recipient_user_id) === String(req.user.id))
+      )) return fail(res, 400, 'Reply target must belong to this conversation.');
+      payload.reply_to_id = replyTo;
+    }
     const { data, error } = await supabase.from('recovery_community_messages')
-      .insert({ sender_user_id: req.user.id, recipient_user_id: other, message })
-      .select('id,sender_user_id,recipient_user_id,message,created_at').single();
+      .insert(payload)
+      .select('id,sender_user_id,recipient_user_id,message,reply_to_id,created_at').single();
     if (error) throw error;
     res.status(201).json({ success: true, message: data });
   } catch (error) { return handleDbError(res, error, 'Community message send error:'); }
 });
-
 
 
 const COMMUNITY_PLANS = Object.freeze({
@@ -237,7 +356,7 @@ router.post('/plans/initialize', async (req, res) => {
     const plan=COMMUNITY_PLANS[code];
     if (!plan) return fail(res,400,'Choose a valid subscription.');
     const email=cleanText(req.user.email,254).toLowerCase();
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return fail(res,400,'Add a valid email to your account before paying.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res,400,'Add a valid email to your account before paying.');
     const planCode=String(process.env[plan.planEnv]||'').trim();
     if(!planCode) return fail(res,503,'The matching monthly Paystack plan is not configured: '+plan.planEnv+'.');
     const remoteResponse=await axios.get(PAYSTACK_URL+'/plan/'+encodeURIComponent(planCode),{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:10000});
@@ -386,6 +505,20 @@ router.post('/status/:statusId/comments', messageLimiter, async (req,res) => {
     res.status(201).json({success:true,comment:data});
   } catch(error) { return handleDbError(res,error,'Status comment create error:'); }
 });
+router.delete('/status/:statusId', async (req,res) => {
+  try {
+    const id=String(req.params.statusId||'');
+    if(!validId(id)) return fail(res,400,'Invalid status ID.');
+    const {data:post,error:pe}=await supabase.from('recovery_chat_status_posts').select('id,user_id').eq('id',id).maybeSingle();
+    if(pe) throw pe;
+    if(!post) return fail(res,404,'Status not found.');
+    if(post.user_id!==req.user.id&&!isAdmin(req.user)) return fail(res,403,'You can only delete your own status.');
+    const {error}=await supabase.from('recovery_chat_status_posts').delete().eq('id',id);
+    if(error) throw error;
+    res.json({success:true,deleted:true,id});
+  } catch(error) { return handleDbError(res,error,'Status delete error:'); }
+});
+
 router.post('/status/:statusId/hide', async (req,res) => {
   try {
     const id=String(req.params.statusId||'');
@@ -643,8 +776,8 @@ router.get('/groups', async (req, res) => {
     if (!shared) {
       const created = await supabase.from('recovery_chat_groups').insert({
         slug: 'manlung-members', name: 'Manlung Members',
-        description: 'For registered members: talk, love, and friendly chatter. No hate speech, harassment, threats, or discrimination. We build each other up. Main-app admins remain group admins and can remove members who break the rules.',
-        is_default: true, avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png'
+        description: 'The shared space for Manlung community members.',
+        is_default: true, avatar_url: 'https://i.postimg.cc/rwLXmS7X/icons8-people-100.png'
       }).select('id,slug,name,description,is_default,avatar_url').single();
       if (created.error && created.error.code !== '23505') throw created.error;
       if (created.data) shared = created.data;
@@ -658,16 +791,16 @@ router.get('/groups', async (req, res) => {
     if (shared) {
       const { data: updatedShared, error: updateSharedError } = await supabase.from('recovery_chat_groups')
         .update({ slug: 'manlung-members', name: 'Manlung Members',
-          description: 'For registered members: talk, love, and friendly chatter. No hate speech, harassment, threats, or discrimination. We build each other up. Main-app admins remain group admins and can remove members who break the rules.',
-          avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png' })
+          description: 'The shared space for Manlung community members.',
+          avatar_url: 'https://i.postimg.cc/rwLXmS7X/icons8-people-100.png' })
         .eq('id', shared.id).select('id,slug,name,description,is_default,avatar_url').single();
       if (updateSharedError) throw updateSharedError;
       shared = updatedShared || shared;
     }
     // Seed the official team room and read-only announcements channel once.
     const officialGroups = [
-      { slug: 'manlung-team', name: 'Manlung Team', description: 'The official Manlung team room for registered members. Be respectful and build each other up.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false },
-      { slug: 'manlung-updates', name: 'Manlung Updates', description: 'Official news about new features and website updates. Members can read and react; comments and member posts are disabled.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false }
+      { slug: 'manlung-team', name: 'Tech Team', description: 'The official Manlung technical support team room for admins and owners.', avatar_url: 'https://i.postimg.cc/TYvfLMDx/icons8-technical-support-48.png', is_default: false },
+      { slug: 'manlung-updates', name: 'Manlung Updates', description: 'Official news about new features and website updates. Members can read and react; comments and member posts are disabled.', avatar_url: 'https://i.postimg.cc/jqzhTP65/icons8-update-48.png', is_default: false }
     ];
     for (const item of officialGroups) {
       const { data: existing, error: findError } = await supabase.from('recovery_chat_groups')
@@ -716,29 +849,55 @@ router.get('/groups', async (req, res) => {
       }
       if (!joined.some(x=>x.id===group.id)) joined.push({ ...group, joined: Boolean(membership), archived: Boolean(membership?.archived) });
     }
-    res.json({ success: true, groups: joined });
+    const groupsWithCounts = await Promise.all(joined.map(async group => {
+      const { count, error: countError } = await supabase.from('recovery_chat_group_members')
+        .select('user_id', { count: 'exact', head: true }).eq('group_id', group.id);
+      if (countError) throw countError;
+      return { ...group, member_count: Number(count) || 0 };
+    }));
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, groups: groupsWithCounts });
   } catch (error) { return handleDbError(res, error, 'Group list error:'); }
 });
 
 router.post('/groups', async (req,res) => {
   try {
+    if (!isAdmin(req.user)) return fail(res,403,'Only Manlung admins can create groups.');
     const name=cleanText(req.body?.name,100);
     const description=String(req.body?.description||'').trim();
+    const avatar=String(req.body?.avatar_url||'').trim();
+    const isImageData=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/i.test(avatar);
     if(name.length<2) return fail(res,400,'Group name must contain at least 2 characters.');
     if(description.length>2000) return fail(res,400,'Group description must be 2000 characters or fewer.');
+    if(avatar.length>180000) return fail(res,413,'Group photo is too large. Choose a smaller image.');
+    if(avatar && !isImageData && !(avatar.startsWith('/')&&!avatar.startsWith('//')) && !/^https:\/\//i.test(avatar)) return fail(res,400,'Group photo must be an image, secure HTTPS URL or same-site path.');
     const slug='community-'+crypto.randomUUID();
     const {data:group,error}=await supabase.from('recovery_chat_groups')
-      .insert({slug,name,description,created_by:req.user.id,is_default:false,allow_member_invites:true,admin_only_announcements:false})
+      .insert({slug,name,description,avatar_url:avatar||null,created_by:req.user.id,is_default:false,allow_member_invites:true,admin_only_announcements:false})
       .select('id,slug,name,description,is_default,avatar_url,created_at').single();
     if(error) throw error;
     const {error:memberError}=await supabase.from('recovery_chat_group_members')
-      .insert({group_id:group.id,user_id:req.user.id,archived:false});
+      .insert({group_id:group.id,user_id:req.user.id,archived:false,member_role:'admin'});
     if(memberError) {
       await supabase.from('recovery_chat_groups').delete().eq('id',group.id);
       throw memberError;
     }
     res.status(201).json({success:true,group:{...group,joined:true,archived:false}});
   } catch(error) { return handleDbError(res,error,'Community group create error:'); }
+});
+
+router.patch('/groups/:groupId', async (req,res) => {
+  try {
+    if (!isAdmin(req.user)) return fail(res,403,'Only Manlung admins can update group details.');
+    const avatar=String(req.body?.avatar_url||'').trim();
+    const isImageData=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/i.test(avatar);
+    if(avatar.length>180000) return fail(res,413,'Group photo is too large. Choose a smaller image.');
+    if(avatar && !isImageData && !(avatar.startsWith('/')&&!avatar.startsWith('//')) && !/^https:\/\//i.test(avatar)) return fail(res,400,'Group photo must be an image, secure HTTPS URL or same-site path.');
+    const {data:group,error}=await supabase.from('recovery_chat_groups').update({avatar_url:avatar||null}).eq('id',req.params.groupId).select('id,slug,name,description,is_default,avatar_url').maybeSingle();
+    if(error) throw error;
+    if(!group) return fail(res,404,'Group not found.');
+    res.json({success:true,group});
+  } catch(error) { return handleDbError(res,error,'Group update error:'); }
 });
 
 router.post('/groups/:groupId/join', async (req,res) => {
@@ -792,6 +951,40 @@ router.delete('/groups/:groupId/members/:memberId', async (req,res) => {
   } catch(error) { return handleDbError(res,error,'Admin group remove error:'); }
 });
 
+router.get('/groups/:groupId/members', async (req,res) => {
+  try {
+    const gid=String(req.params.groupId||'');
+    if(!validId(gid)) return fail(res,400,'Invalid group ID.');
+    const {data:group,error:ge}=await supabase.from('recovery_chat_groups').select('id').eq('id',gid).maybeSingle();
+    if(ge) throw ge;
+    if(!group) return fail(res,404,'Group not found.');
+    if(!isAdmin(req.user)) {
+      const {data:membership,error:me}=await supabase.from('recovery_chat_group_members').select('member_role').eq('group_id',gid).eq('user_id',req.user.id).maybeSingle();
+      if(me) throw me;
+      if(!membership || membership.member_role!=='admin') return fail(res,403,'Only group admins can manage group members.');
+    }
+    const {data:members,error}=await supabase.from('recovery_chat_group_members').select('user_id,member_role,joined_at,recovery_users(id,username,role),recovery_chat_profiles(display_name,avatar_url)').eq('group_id',gid).order('joined_at',{ascending:true});
+    if(error) throw error;
+    res.set('Cache-Control','no-store');
+    res.json({success:true,members:(members||[]).map(m=>({id:m.user_id,role:m.member_role||'member',joinedAt:m.joined_at,name:m.recovery_chat_profiles?.display_name||m.recovery_users?.username||'Member',avatar:m.recovery_chat_profiles?.avatar_url||null,appRole:m.recovery_users?.role||'client'}))});
+  } catch(error) { return handleDbError(res,error,'Group member list error:'); }
+});
+
+router.patch('/groups/:groupId/members/:memberId/role', async (req,res) => {
+  try {
+    if(!isAdmin(req.user)) return fail(res,403,'Only Manlung main-app admins can appoint group admins.');
+    const gid=String(req.params.groupId||''),uid=String(req.params.memberId||''),role=String(req.body?.role||'');
+    if(!validId(gid)||!validId(uid)) return fail(res,400,'Invalid group or member ID.');
+    if(!['member','admin'].includes(role)) return fail(res,400,'Role must be member or admin.');
+    const {data:membership,error:me}=await supabase.from('recovery_chat_group_members').select('group_id,user_id').eq('group_id',gid).eq('user_id',uid).maybeSingle();
+    if(me) throw me;
+    if(!membership) return fail(res,404,'Add this member to the group before changing their role.');
+    const {data,error}=await supabase.from('recovery_chat_group_members').update({member_role:role}).eq('group_id',gid).eq('user_id',uid).select('group_id,user_id,member_role').single();
+    if(error) throw error;
+    res.json({success:true,membership:data});
+  } catch(error) { return handleDbError(res,error,'Group role update error:'); }
+});
+
 router.get('/groups/:groupId/messages', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
@@ -803,9 +996,10 @@ router.get('/groups/:groupId/messages', async (req, res) => {
     if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
     const { data, error } = await supabase.from('recovery_chat_group_messages')
       .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at')
-      .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
+      .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
-    res.json({ success: true, messages: data || [] });
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, messages: (data || []).reverse() });
   } catch (error) { return handleDbError(res, error, 'Group message list error:'); }
 });
 
@@ -903,8 +1097,8 @@ router.post('/verification/initialize', statusLimiter, async (req,res) => {
  try {
   if(!process.env.PAYSTACK_SECRET_KEY)return fail(res,503,'Payment service is not configured.');
   if(req.user.role!=='client')return fail(res,403,'Client account required.');
-  const email=cleanText(req.user.email,254).toLowerCase();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail(res,400,'Add a valid email to your account before purchasing verification.');
+  const email=cleanText(req.body?.email || req.user.email,254).toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail(res,400,'Enter a valid email address for Paystack checkout.');
   const {data:profile,error:pe0}=await supabase.from('recovery_chat_profiles').select('is_verified').eq('user_id',req.user.id).maybeSingle(); if(pe0)throw pe0;
   if(profile?.is_verified)return res.json({success:true,alreadyVerified:true,verified:true});
   const reference='MTC-VERIFY-'+Date.now()+'-'+crypto.randomBytes(8).toString('hex');
@@ -960,8 +1154,15 @@ router.get('/status', async (req, res) => {
     ]);
     if (pe) throw pe; if (we) throw we;
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-    const statuses = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'))
-      .map(p => ({ ...p, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } }));
+    const visiblePosts = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'));
+    const statuses = await Promise.all(visiblePosts.map(async p => {
+      let media_url = null;
+      if (p.media_path) {
+        const { data: signed, error: signedError } = await supabase.storage.from('recovery-chat-status-media').createSignedUrl(p.media_path, 60 * 60 * 24);
+        if (!signedError) media_url = signed?.signedUrl || null;
+      }
+      return { ...p, media_url, own: p.user_id === req.user.id, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } };
+    }));
     const last = wallet?.free_status_last_used_at ? new Date(wallet.free_status_last_used_at).getTime() : 0;
     res.json({ success: true, statuses, allowance: { freeAvailable: !last || Date.now() - last >= 86400000, freeLastUsedAt: wallet?.free_status_last_used_at || null, paidCredits: wallet?.paid_status_credits || 0 } });
   } catch (error) { return handleDbError(res, error, 'Status list error:'); }
@@ -970,12 +1171,25 @@ router.get('/status', async (req, res) => {
 router.post('/status', statusLimiter, async (req, res) => {
   try {
     const type = req.body?.status_type || 'text';
-    if (type !== 'text') return fail(res, 400, 'Image and video status uploads are not enabled until secure private storage is configured.');
     const text = cleanText(req.body?.text_content, 2000);
-    if (!text) return fail(res, 400, 'Text status cannot be empty.');
+    let mediaPath = null;
+    if (type === 'image') {
+      const raw = String(req.body?.media_data || '');
+      const match = raw.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/);
+      if (!match) return fail(res, 400, 'Choose a valid JPEG, PNG, or WebP image.');
+      const mime = match[1] === 'jpeg' ? 'image/jpeg' : 'image/' + match[1];
+      const bytes = Buffer.from(match[2], 'base64');
+      if (!bytes.length || bytes.length > 1024 * 1024) return fail(res, 413, 'Status images must be no larger than 1 MB after compression.');
+      const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+      mediaPath = req.user.id + '/' + crypto.randomUUID() + '.' + ext;
+      const { error: uploadError } = await supabase.storage.from('recovery-chat-status-media').upload(mediaPath, bytes, { contentType: mime, upsert: false, cacheControl: '3600' });
+      if (uploadError) throw uploadError;
+    } else if (type !== 'text') {
+      return fail(res, 400, 'Only text and image statuses are currently supported.');
+    } else if (!text) return fail(res, 400, 'Text status cannot be empty.');
     const { data, error } = await supabase.from('recovery_chat_status_posts')
-      .insert({ user_id: req.user.id, status_type: 'text', text_content: text, caption: cleanText(req.body?.caption, 1000) })
-      .select('id,user_id,status_type,text_content,caption,expires_at,created_at').single();
+      .insert({ user_id: req.user.id, status_type: type, text_content: type === 'text' ? text : null, media_path: mediaPath, caption: cleanText(req.body?.caption || text, 1000) })
+      .select('id,user_id,status_type,text_content,media_path,caption,expires_at,created_at').single();
     if (error) {
       if (String(error.message || '').includes('STATUS_ALLOWANCE_EXHAUSTED')) return fail(res, 402, 'Your free status has been used in the last 24 hours. Purchase two extra status posts for KES 100.');
       throw error;
@@ -1007,7 +1221,7 @@ router.post('/status/purchase/initialize', async (req, res) => {
     try {
       const init = await axios.post(PAYSTACK_URL + '/transaction/initialize', {
         email, amount: 10000, currency: 'KES', reference,
-        callback_url: process.env.PAYSTACK_CHAT_STATUS_CALLBACK_URL || process.env.PUBLIC_APP_URL,
+        callback_url: process.env.PAYSTACK_CHAT_STATUS_CALLBACK_URL || new URL('/client/connect.html', process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke').toString(),
         metadata: { product: 'manlung_chat_status_credits', user_id: req.user.id, purchase_id: purchase.id, credits: 2, amount_kes: 100 },
       }, { headers: { Authorization: 'Bearer ' + process.env.PAYSTACK_SECRET_KEY }, timeout: 15000 });
       if (!init.data?.status || !init.data?.data?.authorization_url) throw new Error('Paystack did not return a checkout URL.');
@@ -1152,3 +1366,4 @@ router.post('/peer-calls/:callId/signals',peerCallLimiter,async(req,res)=>{
 });
 
 module.exports = router;
+// Keep the export at the end of this module so no stray code runs after it.

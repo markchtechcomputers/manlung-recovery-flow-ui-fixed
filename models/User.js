@@ -5,7 +5,6 @@ const TABLE = 'recovery_users';
 const BCRYPT_ROUNDS = 12;
 const MAX_PASSWORD_BYTES = 72;
 const MAX_LOGIN_FAILURES = 3;
-const LOCKOUT_MINUTES = 30;
 const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,72}$/;
 
 function assertStrongPassword(password) {
@@ -15,10 +14,6 @@ function assertStrongPassword(password) {
   }
 }
 
-
-function addMinutes(date, minutes) {
-  return new Date(date.getTime() + minutes * 60 * 1000);
-}
 
 async function findByUsername(username) {
   const { data, error } = await supabase.from(TABLE).select('*').eq('username', username).maybeSingle();
@@ -61,33 +56,53 @@ async function verifyPassword(user, candidatePassword) {
   return bcrypt.compare(String(candidatePassword), user.password);
 }
 
+async function recordFailedLogin(user) {
+  const { error: rpcError } = await supabase.rpc('record_recovery_login_failure', { p_user_id: user.id });
+  if (!rpcError) return;
+
+  // Compatibility fallback while the SQL migration is rolling out. The
+  // server-side IP limiter remains active; install migration 013 for atomic
+  // cross-request account counters.
+  console.error('Atomic login lockout RPC unavailable; using compatibility fallback:', rpcError.code || rpcError.message);
+  const lockedUntil = user.login_locked_until ? new Date(user.login_locked_until).getTime() : 0;
+  const failures = lockedUntil && lockedUntil <= Date.now()
+    ? 1
+    : Math.min(Number(user.failed_login_attempts || 0) + 1, MAX_LOGIN_FAILURES);
+  const lock = failures >= MAX_LOGIN_FAILURES
+    ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+    : null;
+  const { error } = await supabase.from(TABLE)
+    .update({ failed_login_attempts: failures, login_locked_until: lock })
+    .eq('id', user.id);
+  if (error) throw error;
+}
+
 async function comparePassword(user, candidatePassword) {
   if (!user || !user.password) return false;
 
   const lockedUntil = user.login_locked_until ? new Date(user.login_locked_until).getTime() : 0;
   if (lockedUntil && lockedUntil > Date.now()) return false;
 
-  if (Buffer.byteLength(String(candidatePassword || ''), 'utf8') > MAX_PASSWORD_BYTES) return false;
-  const isMatch = await bcrypt.compare(candidatePassword, user.password);
+  const candidate = String(candidatePassword || '');
+  if (Buffer.byteLength(candidate, 'utf8') > MAX_PASSWORD_BYTES) {
+    await supabase.rpc('record_recovery_login_failure', { p_user_id: user.id });
+    return false;
+  }
+
+  const isMatch = await bcrypt.compare(candidate, user.password);
 
   if (isMatch) {
-    await supabase
+    const { error } = await supabase
       .from(TABLE)
       .update({ failed_login_attempts: 0, login_locked_until: null, last_login_at: new Date().toISOString() })
       .eq('id', user.id);
+    if (error) throw error;
     return true;
   }
 
-  const failures = Number(user.failed_login_attempts || 0) + 1;
-  const locked = failures >= MAX_LOGIN_FAILURES;
-  await supabase
-    .from(TABLE)
-    .update({
-      failed_login_attempts: locked ? MAX_LOGIN_FAILURES : failures,
-      login_locked_until: locked ? addMinutes(new Date(), LOCKOUT_MINUTES).toISOString() : null,
-    })
-    .eq('id', user.id);
-
+  // The database function serializes concurrent failures so parallel requests
+  // cannot race the counter and bypass the three-attempt account lockout.
+  await recordFailedLogin(user);
   return false;
 }
 
