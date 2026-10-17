@@ -357,7 +357,7 @@ function render(){theme();const h=$('#hd'),m=$('#mn');
  const c=$('#chat');if(c)c.remove();if(open)drawChat()}
 const go=k=>{tab=k;open=null;showAr=false;render()};
 function vChats(){const list=S.chats.filter(c=>!S.blocked.includes(c.n)&&(flt==='all'||(flt==='unread'&&c.un)||(flt==='groups'&&c.g)||(flt==='channels'&&c.ch))&&(showAr?c.ar:!c.ar)&&c.n.toLowerCase().includes(q.toLowerCase()))
- .sort((a,b)=>Number(b.n==='Manlung Updates'||b.official)-Number(a.n==='Manlung Updates'||a.official)||b.pin-a.pin);const na=S.chats.filter(c=>c.ar).length;
+ .sort((a,b)=>Number(b.n==='Manlung Updates'||b.official)-Number(a.n==='Manlung Updates'||a.official)||b.pin-a.pin||Number((b.m&&b.m.length&&b.m[b.m.length-1][9])||0)-Number((a.m&&a.m.length&&a.m[a.m.length-1][9])||0));const na=S.chats.filter(c=>c.ar).length;
  return `<div class="ml-chat-search-row"><input class="search" placeholder="Search chats" value="${esc(q)}" oninput="q=this.value;render();const s=document.querySelector('.ml-chat-search-row .search');if(s){s.focus();s.setSelectionRange(99,99)}"><button class="ib ml-search-camera" onclick="window.captureStatusFromCamera()" aria-label="Take a photo for Status" title="Take a photo for Status"><img src="https://i.postimg.cc/0QWq42GC/icons8-camera-50-(1).png" alt="" loading="eager"></button><button class="ib" onclick="window.openHomeMoreMenu()" aria-label="More options" title="More options">${ic(I.more)}</button></div>`+
  flowRow()+chips()+(na&&!showAr?`<button class="row" onclick="showAr=true;render()"><span class="ib">${ic(I.archive)}</span><b class="grow">Archived</b><span class="meta">${na}</span></button>`:'')+
  (showAr?`<button class="row" onclick="back()"><span class="ib">${ic(I.back)}</span><b>Archived chats</b></button>`:'')+
