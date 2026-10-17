@@ -1038,8 +1038,8 @@ router.post('/verification/initialize', statusLimiter, async (req,res) => {
  try {
   if(!process.env.PAYSTACK_SECRET_KEY)return fail(res,503,'Payment service is not configured.');
   if(req.user.role!=='client')return fail(res,403,'Client account required.');
-  const email=cleanText(req.user.email,254).toLowerCase();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail(res,400,'Add a valid email to your account before purchasing verification.');
+  const email=cleanText(req.body?.email || req.user.email,254).toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fail(res,400,'Enter a valid email address for Paystack checkout.');
   const {data:profile,error:pe0}=await supabase.from('recovery_chat_profiles').select('is_verified').eq('user_id',req.user.id).maybeSingle(); if(pe0)throw pe0;
   if(profile?.is_verified)return res.json({success:true,alreadyVerified:true,verified:true});
   const reference='MTC-VERIFY-'+Date.now()+'-'+crypto.randomBytes(8).toString('hex');
