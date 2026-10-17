@@ -1144,9 +1144,14 @@ router.get('/status', async (req, res) => {
       .select('id,user_id,status_type,text_content,media_path,caption,expires_at,created_at')
       .gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(300);
     if (error) throw error;
-    const { data: hiddenRows, error: he } = await supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id',req.user.id);
+    const [{ data: hiddenRows, error: he }, { data: viewedRows, error: ve }] = await Promise.all([
+      supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id', req.user.id),
+      supabase.from('recovery_chat_status_views').select('status_id').eq('viewer_user_id', req.user.id),
+    ]);
     if (he) throw he;
+    if (ve) throw ve;
     const hiddenIds = new Set((hiddenRows || []).map(x => x.status_id));
+    const viewedIds = new Set((viewedRows || []).map(x => x.status_id));
     const users = [...new Set((posts || []).map(p => p.user_id))];
     const [{ data: profiles, error: pe }, { data: wallet, error: we }] = await Promise.all([
       users.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,status_visibility').in('user_id', users) : Promise.resolve({ data: [], error: null }),
@@ -1154,7 +1159,7 @@ router.get('/status', async (req, res) => {
     ]);
     if (pe) throw pe; if (we) throw we;
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-    const visiblePosts = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'));
+    const visiblePosts = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || (!viewedIds.has(p.id) && profileMap.get(p.user_id)?.status_visibility !== 'nobody')));
     const statuses = await Promise.all(visiblePosts.map(async p => {
       let media_url = null;
       if (p.media_path) {
