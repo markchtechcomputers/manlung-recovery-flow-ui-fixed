@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Manlung Community</title>
+<title>Admin Messages · Manlung Recovery</title>
 <!-- Production restore: preserve complete community experience; expose section renderers safely and force a clean Vercel build. -->
 <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
 <link rel="shortcut icon" type="image/png" href="/icons/icon-512.png">
@@ -308,8 +308,49 @@ nav button span{display:grid;place-items:center;width:58px;height:30px;border-ra
 .ml-room-description{overflow-wrap:anywhere}
 @media(min-width:900px){.ml-member-list{max-width:900px;margin:0 auto}.ml-community-section{max-width:932px;margin-left:auto;margin-right:auto}}
 @media(max-width:380px){.ml-member-card{grid-template-columns:42px minmax(0,1fr) auto!important;gap:8px!important;padding:10px!important}.ml-member-card .ml-member-avatar{width:42px;height:42px}.ml-member-card .ml-member-action{min-width:66px;padding:7px 8px;font-size:12px}}
+</style><style id="manlung-admin-workspace-polish">
+/* Admin-only layout: spacious on desktop, comfortable on phones. */
+html,body{min-height:100%;height:100%;overflow:hidden}
+body{padding:0;background:var(--bg)}
+#app{width:100%;max-width:1120px;height:100dvh;min-height:0;margin:0 auto;box-shadow:0 0 36px rgba(15,23,42,.08)}
+#app>header{position:sticky;top:0;z-index:12;flex:none;padding:13px clamp(14px,2.5vw,28px);background:var(--sf);gap:12px}
+#app>header .logo{width:42px;height:42px;border-radius:12px;flex:none}
+#app>header h1{font-size:clamp(18px,2vw,24px);color:var(--tx);line-height:1.2}
+#app>main{min-height:0;padding:clamp(10px,2vw,22px);background:var(--bg);overscroll-behavior:contain}
+#app>nav{flex:none;position:sticky;bottom:0;z-index:11;padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -5px 18px rgba(15,23,42,.05)}
+#app>nav button{flex:1 1 0;min-width:54px;padding:9px 5px;font-size:11px}
+.ml-community-hero{display:flex;align-items:center;gap:16px;padding:clamp(16px,3vw,26px);margin:0 0 16px;border:1px solid var(--bd);border-radius:20px;background:linear-gradient(125deg,var(--sf),var(--sf2));box-shadow:0 8px 24px rgba(15,23,42,.04)}
+.ml-community-hero>img{width:58px;height:58px;flex:0 0 58px;object-fit:cover;border-radius:16px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.12)}
+.ml-community-hero h2{margin:0 0 4px;font-size:clamp(20px,2.6vw,28px);line-height:1.2;color:var(--tx)}
+.ml-community-hero p{margin:0;color:var(--mu);line-height:1.55;font-size:14px}
+.ml-community-section{margin:0 0 16px;padding:clamp(14px,2vw,22px);border:1px solid var(--bd);border-radius:18px;background:var(--sf);box-shadow:0 5px 18px rgba(15,23,42,.035)}
+.ml-community-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:0 0 14px}
+.ml-community-section-head h3{margin:0 0 4px;font-size:17px;line-height:1.3;color:var(--tx)}
+.ml-community-section-head p{margin:0;color:var(--mu);font-size:13px;line-height:1.5}
+.ml-community-section>label{display:block;margin:12px 0 6px;font-size:13px;font-weight:750;color:var(--tx)}
+.ml-community-section .input,.ml-admin-search{min-height:44px;border:1px solid var(--bd)!important;border-radius:11px!important;background:var(--sf2)!important;color:var(--tx)!important;padding:10px 12px!important;font:inherit;max-width:100%}
+.ml-community-section textarea.input{min-height:74px;resize:vertical}
+.ml-admin-search{margin:0 0 10px!important;width:100%;display:block}
+.ml-admin-chat{margin-top:12px;border:1px solid var(--bd);border-radius:15px;background:var(--sf);overflow:hidden}
+.ml-admin-chatlog{height:clamp(220px,34vh,420px);max-height:none;overflow:auto;padding:14px;background:var(--bg);display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
+.ml-admin-bubble{max-width:min(78%,680px);padding:10px 13px;border-radius:15px;line-height:1.5;font-size:14px;box-shadow:0 2px 5px rgba(15,23,42,.045);cursor:pointer;white-space:pre-wrap}
+.ml-admin-bubble.mine{align-self:flex-end;border-bottom-right-radius:5px;background:var(--out)}
+.ml-admin-bubble:not(.mine){align-self:flex-start;border-bottom-left-radius:5px;background:var(--sf);border-color:var(--bd)}
+.ml-admin-bubble .who{font-size:11px;font-weight:850;letter-spacing:.02em;color:var(--ac2);margin-bottom:4px}
+.ml-admin-bubble.mine .who{color:var(--ac2)}
+.ml-admin-bubble .when{font-size:10px;color:var(--mu);margin-top:5px}
+.ml-admin-bubble.pending{opacity:.7}
+.ml-admin-compose{display:flex;gap:10px;align-items:flex-end;padding:12px;background:var(--sf);border-top:1px solid var(--bd)}
+.ml-admin-compose textarea{flex:1;min-width:0;min-height:48px;max-height:140px;resize:vertical}
+.ml-admin-compose .btn,.ml-community-section>.btn{min-height:44px;padding:10px 18px;border-radius:11px;font-weight:800;white-space:nowrap}
+.ml-admin-replyhint{margin:10px 12px 0;border-left:3px solid var(--ac);cursor:pointer}
+#ml-admin-update-pinned{width:18px;height:18px;vertical-align:middle;accent-color:var(--ac)}
+.ml-community-section [hidden]{display:none!important}
+@media(min-width:760px){#app{max-width:1280px}#app>main{padding:24px clamp(22px,4vw,56px)}.ml-community-section{margin-bottom:20px}.ml-admin-chatlog{height:clamp(260px,38vh,460px)}}
+@media(max-width:600px){#app>header{padding:10px 12px}#app>header .logo{width:36px;height:36px}.ml-community-hero{gap:12px;border-radius:16px}.ml-community-hero>img{width:46px;height:46px;flex-basis:46px;border-radius:12px}.ml-community-section{border-radius:15px;padding:14px;margin-bottom:12px}.ml-admin-chatlog{height:34vh;min-height:210px;padding:10px}.ml-admin-bubble{max-width:90%;font-size:13px}.ml-admin-compose{gap:7px;padding:9px}.ml-admin-compose .btn{padding:10px 13px}#app>nav button{font-size:10px;min-width:50px}}
+@media(max-width:370px){#app>header h1{font-size:17px}.ml-admin-compose{flex-wrap:wrap}.ml-admin-compose textarea{flex-basis:100%}.ml-admin-compose .btn{width:100%}}
 </style></head><body>
-<div id="app"><header id="hd"><div class="logo">M</div><h1>Manlung Community</h1></header><main id="mn" aria-live="polite"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden><input type="file" id="status-media" accept="image/*,video/*" hidden></div>
+<div id="app"><header id="hd"><img class="logo" src="/icons/icon-512.png" alt="Manlung" style="object-fit:cover;background:#fff"><h1>Admin Messages</h1></header><main id="mn" aria-live="polite"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden><input type="file" id="status-media" accept="image/*,video/*" hidden></div>
 <script>
 const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ic=(p,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
