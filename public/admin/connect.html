@@ -387,6 +387,89 @@ body{padding:0;background:var(--bg)}
  .ml-admin-compose textarea{grid-column:1;grid-row:1}
  .ml-admin-compose .btn{grid-column:2;grid-row:1;min-width:68px}
 }
+
+/* Admin chat final layout corrections */
+html,body{width:100%;min-width:0;overflow-x:hidden}
+body{padding:0!important}
+#app{width:100%;max-width:1280px;height:100dvh;min-height:0;overflow:hidden;margin:0 auto;display:flex;flex-direction:column}
+#hd{position:relative;z-index:20;flex:0 0 auto;min-width:0;display:flex;align-items:center;gap:12px;padding:12px clamp(12px,2vw,24px)}
+#hd .logo{display:block;width:42px;height:42px;min-width:42px;flex:0 0 42px;object-fit:cover;border-radius:12px}
+#hd h1{min-width:0;flex:1;font-size:clamp(18px,2vw,24px);line-height:1.2;overflow-wrap:anywhere}
+#app>main{display:block;flex:1 1 auto;width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;padding:clamp(12px,2vw,24px);overscroll-behavior:contain}
+#app>nav{display:flex;flex:0 0 auto;width:100%;min-height:58px;overflow-x:auto;overflow-y:hidden;gap:2px;padding:4px 6px env(safe-area-inset-bottom,0px);align-items:stretch}
+#app>nav button{display:flex;flex:1 0 68px;min-width:68px;min-height:48px;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:6px 5px;white-space:nowrap;line-height:1.15;font-size:11px}
+#app>nav button span{display:block;flex:0 0 auto;font-size:19px;line-height:1.1}
+#app button,#app .btn{box-sizing:border-box;flex-shrink:0;line-height:1.25}
+#app svg,#app img,#app .fa,#app [class^=icon-],#app [class*=icon-]{flex-shrink:0}
+.ml-community-hero{display:flex;align-items:center;gap:14px;min-width:0;padding:clamp(15px,2.5vw,24px);margin:0 0 16px;border:1px solid var(--bd);border-radius:18px;background:var(--sf)}
+.ml-community-hero>img{display:block;width:54px;height:54px;min-width:54px;flex:0 0 54px;object-fit:cover;border-radius:14px}
+.ml-community-hero>div{min-width:0}
+.ml-community-hero h2{margin:0 0 4px;font-size:clamp(20px,2.5vw,27px);line-height:1.2}
+.ml-community-hero p{margin:0;color:var(--mu);font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.ml-community-section{width:100%;min-width:0;margin:0 0 16px;padding:clamp(14px,2vw,22px);border:1px solid var(--bd);border-radius:16px;background:var(--sf);box-shadow:0 3px 14px rgba(15,23,42,.035);overflow:visible}
+.ml-community-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;margin:0 0 14px}
+.ml-community-section-head>div{min-width:0;flex:1}
+.ml-community-section-head h3{margin:0 0 4px;font-size:17px;line-height:1.3;overflow-wrap:anywhere}
+.ml-community-section-head p{margin:0;color:var(--mu);font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.ml-community-section-head .ml-section-symbol{display:grid;place-items:center;width:42px;height:42px;min-width:42px;flex:0 0 42px;border-radius:12px;background:var(--sf2);font-size:21px;line-height:1}
+.ml-community-section input:not([type=checkbox]),.ml-community-section select,.ml-community-section textarea{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;margin:8px 0;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--sf2);color:var(--tx);font:inherit}
+.ml-community-section textarea{resize:vertical;min-height:76px}
+.ml-community-section label{display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.4}
+.ml-community-section input[type=checkbox]{width:18px;height:18px;min-width:18px;flex:0 0 18px;margin:0;accent-color:var(--ac)}
+.ml-community-section .btn{min-height:42px;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.ml-community-room{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:12px;width:100%;min-width:0;margin:9px 0;padding:12px;border:1px solid var(--bd);border-radius:14px;background:var(--sf)}
+.ml-room-icon{display:block;width:48px;height:48px;min-width:48px;min-height:48px;flex:0 0 48px;overflow:hidden;border-radius:13px}
+.ml-room-icon img{display:block;width:100%;height:100%;object-fit:cover}
+.ml-room-copy{min-width:0;overflow-wrap:anywhere}
+.ml-room-title{font-size:14px;font-weight:800;line-height:1.35}
+.ml-room-status{margin-top:3px;color:var(--mu);font-size:10px;line-height:1.4;overflow-wrap:anywhere}
+.ml-room-description{margin-top:4px;font-size:12px;line-height:1.45;white-space:normal;overflow-wrap:anywhere}
+.ml-community-room>.btn{justify-self:end;max-width:100%;white-space:nowrap}
+.ml-admin-chat{width:100%;min-width:0;margin-top:12px;overflow:hidden;border:1px solid var(--bd);border-radius:14px;background:var(--sf)}
+.ml-admin-chatlog{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;width:100%;height:clamp(240px,38vh,480px);min-height:220px;max-height:none;overflow-y:auto;overflow-x:hidden;padding:14px;background:var(--bg);overscroll-behavior:contain}
+.ml-admin-chatlog>.ml-admin-bubble{display:block;position:relative;flex:0 0 auto;width:fit-content;min-width:0;max-width:min(78%,680px);margin:0;white-space:normal;overflow-wrap:anywhere;word-break:break-word}
+.ml-admin-chatlog>.ml-admin-bubble.mine{align-self:flex-end;margin-left:auto;margin-right:1px}
+.ml-admin-chatlog>.ml-admin-bubble:not(.mine){align-self:flex-start;margin-right:auto;margin-left:1px}
+.ml-admin-bubble .who{font-size:11px;font-weight:850;line-height:1.35;overflow-wrap:anywhere}
+.ml-admin-bubble>div:not(.who):not(.when),.ml-admin-bubble .qt{max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+.ml-admin-bubble .when{font-size:10px;line-height:1.4;margin-top:6px}
+.ml-admin-replyhint:empty{display:none}
+.ml-admin-replyhint:not(:empty){margin:0;padding:10px 12px;border-top:1px solid var(--bd);background:var(--sf2);overflow-wrap:anywhere}
+.ml-admin-compose{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px;width:100%;min-width:0;padding:10px;background:var(--sf);border-top:1px solid var(--bd)}
+.ml-admin-compose textarea{display:block;grid-column:1;grid-row:1;width:100%;min-width:0;max-width:100%;min-height:48px;max-height:140px;resize:vertical;margin:0;padding:10px 12px;border:1px solid var(--bd);border-radius:11px;background:var(--sf2);color:var(--tx);font:inherit}
+.ml-admin-compose .btn{grid-column:2;grid-row:1;align-self:stretch;min-width:72px;min-height:44px;padding:10px 14px;border-radius:11px}
+#ml-admin-search{display:block;width:100%;min-width:0;margin:0 0 12px}
+#ml-admin-update-title,#ml-admin-update-body{display:block;width:100%;min-width:0;box-sizing:border-box;margin:8px 0}
+#ml-admin-update-pinned-label{display:flex;align-items:center;gap:9px;min-height:40px;margin:8px 0}
+#ml-admin-update-pinned{display:block;width:18px;height:18px;min-width:18px;flex:0 0 18px;margin:0;accent-color:var(--ac)}
+#ml-community-admin{display:none!important;visibility:hidden!important;pointer-events:none!important}
+@media(min-width:760px){#app>main{padding:24px clamp(22px,4vw,48px)}.ml-admin-chatlog{height:clamp(280px,42vh,520px)}}
+@media(max-width:600px){
+ #hd{gap:9px;padding:10px 12px}
+ #hd .logo{width:36px;height:36px;min-width:36px;flex-basis:36px}
+ #app>main{padding:12px}
+ #app>nav{min-height:56px}
+ #app>nav button{flex:1 0 60px;min-width:60px;padding:5px 3px;font-size:10px}
+ #app>nav button span{font-size:18px}
+ .ml-community-hero{gap:11px;padding:15px;border-radius:14px}
+ .ml-community-hero>img{width:44px;height:44px;min-width:44px;flex-basis:44px}
+ .ml-community-section{padding:14px;margin-bottom:12px;border-radius:14px}
+ .ml-community-section-head .ml-section-symbol{width:36px;height:36px;min-width:36px;flex-basis:36px;font-size:18px}
+ .ml-community-room{grid-template-columns:42px minmax(0,1fr);gap:10px;padding:10px}
+ .ml-room-icon{width:42px;height:42px;min-width:42px;min-height:42px;flex-basis:42px}
+ .ml-community-room>.btn{grid-column:2;justify-self:start}
+ .ml-admin-chatlog{height:35vh;min-height:210px;padding:10px;gap:8px!important}
+ .ml-admin-chatlog>.ml-admin-bubble{max-width:91%;padding:9px 11px;font-size:13px}
+ .ml-admin-compose{grid-template-columns:minmax(0,1fr) 68px;gap:7px;padding:8px}
+ .ml-admin-compose .btn{min-width:68px;padding:9px 10px}
+}
+@media(max-width:360px){
+ #hd h1{font-size:17px}
+ .ml-admin-compose{grid-template-columns:minmax(0,1fr)}
+ .ml-admin-compose textarea{grid-column:1;grid-row:1}
+ .ml-admin-compose .btn{grid-column:1;grid-row:2;width:100%}
+ .ml-community-room>.btn{white-space:normal;text-align:center}
+}
 </style></head><body>
 <div id="app"><header id="hd"><img class="logo" src="/icons/icon-512.png" alt="Manlung" style="object-fit:cover;background:#fff"><h1>Admin Messages</h1></header><main id="mn" aria-live="polite"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden><input type="file" id="status-media" accept="image/*,video/*" hidden></div>
 <script>
