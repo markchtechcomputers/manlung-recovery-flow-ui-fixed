@@ -1173,19 +1173,31 @@ router.post('/status', statusLimiter, async (req, res) => {
     const type = req.body?.status_type || 'text';
     const text = cleanText(req.body?.text_content, 2000);
     let mediaPath = null;
-    if (type === 'image') {
+    if (type === 'image' || type === 'video') {
       const raw = String(req.body?.media_data || '');
-      const match = raw.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/);
-      if (!match) return fail(res, 400, 'Choose a valid JPEG, PNG, or WebP image.');
-      const mime = match[1] === 'jpeg' ? 'image/jpeg' : 'image/' + match[1];
+      const match = type === 'image'
+        ? raw.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/i)
+        : raw.match(/^data:video\/(mp4|webm|quicktime);base64,([A-Za-z0-9+/=]+)$/i);
+      if (!match) return fail(res, 400, type === 'image'
+        ? 'Choose a valid JPEG, PNG, or WebP image.'
+        : 'Choose an MP4, WebM, or MOV video.');
+      const subtype = match[1].toLowerCase();
+      const mime = type === 'image'
+        ? (subtype === 'jpeg' ? 'image/jpeg' : 'image/' + subtype)
+        : (subtype === 'quicktime' ? 'video/quicktime' : 'video/' + subtype);
       const bytes = Buffer.from(match[2], 'base64');
-      if (!bytes.length || bytes.length > 1024 * 1024) return fail(res, 413, 'Status images must be no larger than 1 MB after compression.');
-      const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+      const maxBytes = type === 'image' ? 1024 * 1024 : 8 * 1024 * 1024;
+      if (!bytes.length || bytes.length > maxBytes) return fail(res, 413, type === 'image'
+        ? 'Status images must be no larger than 1 MB after compression.'
+        : 'Status videos must be no larger than 8 MB.');
+      const ext = type === 'image'
+        ? (subtype === 'jpeg' ? 'jpg' : subtype)
+        : (subtype === 'quicktime' ? 'mov' : subtype);
       mediaPath = req.user.id + '/' + crypto.randomUUID() + '.' + ext;
       const { error: uploadError } = await supabase.storage.from('recovery-chat-status-media').upload(mediaPath, bytes, { contentType: mime, upsert: false, cacheControl: '3600' });
       if (uploadError) throw uploadError;
     } else if (type !== 'text') {
-      return fail(res, 400, 'Only text and image statuses are currently supported.');
+      return fail(res, 400, 'Only text, image, and video statuses are supported.');
     } else if (!text) return fail(res, 400, 'Text status cannot be empty.');
     const { data, error } = await supabase.from('recovery_chat_status_posts')
       .insert({ user_id: req.user.id, status_type: type, text_content: type === 'text' ? text : null, media_path: mediaPath, caption: cleanText(req.body?.caption || text, 1000) })
