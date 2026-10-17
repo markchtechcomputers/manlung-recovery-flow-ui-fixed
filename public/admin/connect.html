@@ -349,6 +349,44 @@ body{padding:0;background:var(--bg)}
 @media(min-width:760px){#app{max-width:1280px}#app>main{padding:24px clamp(22px,4vw,56px)}.ml-community-section{margin-bottom:20px}.ml-admin-chatlog{height:clamp(260px,38vh,460px)}}
 @media(max-width:600px){#app>header{padding:10px 12px}#app>header .logo{width:36px;height:36px}.ml-community-hero{gap:12px;border-radius:16px}.ml-community-hero>img{width:46px;height:46px;flex-basis:46px;border-radius:12px}.ml-community-section{border-radius:15px;padding:14px;margin-bottom:12px}.ml-admin-chatlog{height:34vh;min-height:210px;padding:10px}.ml-admin-bubble{max-width:90%;font-size:13px}.ml-admin-compose{gap:7px;padding:9px}.ml-admin-compose .btn{padding:10px 13px}#app>nav button{font-size:10px;min-width:50px}}
 @media(max-width:370px){#app>header h1{font-size:17px}.ml-admin-compose{flex-wrap:wrap}.ml-admin-compose textarea{flex-basis:100%}.ml-admin-compose .btn{width:100%}}
+
+/* Final admin chat cleanup: prevent compressed controls and keep timelines readable. */
+#app>header>*{flex-shrink:0}
+#app>header>div{min-width:0}
+#app>header h1{overflow-wrap:anywhere}
+#app button,#app .btn,#app nav button{flex-shrink:0}
+#app svg,#app .fa,#app [class*="icon"],#app .ml-section-symbol{flex-shrink:0}
+.ml-community-section-head .ml-section-symbol{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:var(--sf2);font-size:21px;line-height:1}
+.ml-community-room{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px;border:1px solid var(--bd);border-radius:14px;background:var(--sf);margin:9px 0}
+.ml-room-icon{width:48px;height:48px;min-width:48px;flex:0 0 48px;display:grid;place-items:center;overflow:hidden;border-radius:13px}
+.ml-room-icon img{width:100%;height:100%;object-fit:cover}
+.ml-room-copy{min-width:0;overflow-wrap:anywhere}
+.ml-room-title{font-size:14px;font-weight:800;line-height:1.35}
+.ml-room-status{font-size:10px;line-height:1.4;letter-spacing:.04em;margin-top:3px;overflow-wrap:anywhere}
+.ml-room-description{font-size:12px;line-height:1.45;margin-top:4px}
+.ml-community-room>.btn{max-width:100%;white-space:nowrap}
+.ml-admin-chatlog{flex-direction:column!important;align-items:stretch!important}
+.ml-admin-chatlog>.ml-admin-bubble{display:block;position:relative;flex:0 0 auto;width:fit-content;max-width:min(78%,680px);min-width:0;margin:0;overflow-wrap:anywhere;word-break:break-word}
+.ml-admin-chatlog>.ml-admin-bubble.mine{margin-left:auto;margin-right:2px}
+.ml-admin-chatlog>.ml-admin-bubble:not(.mine){margin-right:auto;margin-left:2px}
+.ml-admin-chatlog .qt{max-width:100%;overflow-wrap:anywhere}
+.ml-admin-chatlog .who{display:flex;align-items:center;gap:5px;line-height:1.35;overflow-wrap:anywhere}
+.ml-admin-compose textarea{display:block;width:100%;min-width:0;box-sizing:border-box}
+.ml-admin-compose .btn{flex:0 0 auto;min-width:76px}
+#ml-admin-update-pinned{flex:0 0 18px;min-width:18px;min-height:18px;margin:0 7px 0 0}
+#ml-admin-update-title,#ml-admin-update-body{display:block;box-sizing:border-box;width:100%;margin:8px 0}
+#ml-admin-update-pinned-label{display:flex;align-items:center;gap:8px;min-height:40px}
+#ml-community-admin{display:none!important}
+@media(max-width:600px){
+ .ml-community-room{grid-template-columns:44px minmax(0,1fr);gap:10px;padding:11px}
+ .ml-room-icon{width:42px;height:42px;min-width:42px;flex-basis:42px}
+ .ml-community-room>.btn{grid-column:2;justify-self:start}
+ .ml-community-section-head .ml-section-symbol{flex-basis:36px;width:36px;height:36px;font-size:18px}
+ .ml-admin-chatlog>.ml-admin-bubble{max-width:90%}
+ .ml-admin-compose{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end}
+ .ml-admin-compose textarea{grid-column:1;grid-row:1}
+ .ml-admin-compose .btn{grid-column:2;grid-row:1;min-width:68px}
+}
 </style></head><body>
 <div id="app"><header id="hd"><img class="logo" src="/icons/icon-512.png" alt="Manlung" style="object-fit:cover;background:#fff"><h1>Admin Messages</h1></header><main id="mn" aria-live="polite"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden><input type="file" id="status-media" accept="image/*,video/*" hidden></div>
 <script>
@@ -707,7 +745,7 @@ window.vAdminMessages=function(){
  '<div class="ml-admin-chat"><div id="ml-admin-dm" class="ml-admin-chatlog" aria-live="polite">Choose a client to load the conversation.</div><div id="ml-admin-dm-reply" class="ml-admin-replyhint"></div><div class="ml-admin-compose"><textarea id="ml-admin-dm-text" class="input" rows="2" maxlength="5000" placeholder="Message as admin…" style="width:100%"></textarea><button class="btn" onclick="window.mlAdminSendDM()">Send</button></div></div></section>'+
  '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Group conversations</h3><p>Admin messages appear on the right; member messages appear on the left. Swipe a message to reply.</p></div></div><label for="ml-admin-group">Group</label><select id="ml-admin-group" class="input" style="width:100%;margin:8px 0" onchange="window.mlAdminLoadGroup()"><option value="">Choose a group</option>'+groups.map(g=>'<option data-search="'+esc((g.name+' '+(g.slug||'')).toLowerCase())+'" value="'+esc(g.id)+'">'+esc(g.name)+'</option>').join('')+'</select>'+
  '<div class="ml-admin-chat"><div id="ml-admin-group-history" class="ml-admin-chatlog" aria-live="polite">Choose a group to load recent messages.</div><div id="ml-admin-group-reply" class="ml-admin-replyhint"></div><div class="ml-admin-compose"><textarea id="ml-admin-group-text" class="input" rows="2" maxlength="5000" placeholder="Message this group as admin…" style="width:100%"></textarea><button class="btn" onclick="window.mlAdminSendGroup()">Send</button></div></div></section>'+
- '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Official channel update</h3><p>Publish a notice to the Manlung Updates channel.</p></div></div><input id="ml-admin-update-title" class="input" maxlength="120" placeholder="Announcement title" style="width:100%;margin:8px 0"><textarea id="ml-admin-update-body" class="input" rows="4" maxlength="5000" placeholder="Write the official announcement..." style="width:100%"></textarea><label style="display:block;margin:8px 0"><input id="ml-admin-update-pinned" type="checkbox"> Pin this update</label><button class="btn" onclick="window.mlAdminPublishUpdate()">Publish official update</button></section>';
+ '<section class="ml-community-section"><div class="ml-community-section-head"><div><h3>Official channel update</h3><p>Publish a notice to the Manlung Updates channel.</p></div></div><input id="ml-admin-update-title" class="input" maxlength="120" placeholder="Announcement title" style="width:100%;margin:8px 0"><textarea id="ml-admin-update-body" class="input" rows="4" maxlength="5000" placeholder="Write the official announcement..." style="width:100%"></textarea><label id="ml-admin-update-pinned-label" style="display:flex;align-items:center;gap:8px;margin:10px 0"><input id="ml-admin-update-pinned" type="checkbox"> <span>Pin this update</span></label><button class="btn" onclick="window.mlAdminPublishUpdate()">Publish official update</button></section>';
 };
 window.mlAdminMessages={dm:[],group:[]};
 window.mlAdminFilterOptions=function(query){
