@@ -2578,6 +2578,11 @@ async function sendAdminCaseMessage(caseId) {
 #ml-community-admin .mlca-muted{color:#b5c2cf;font-size:12px;white-space:pre-wrap}
 #ml-community-admin [hidden]{display:none!important}
 </style>
+<style id="hide-floating-admin-announcements">
+/* The floating publisher obscures the Contact link on the admin portal.
+   Announcement publishing remains available from the admin messaging workspace. */
+#ml-community-admin{display:none!important;visibility:hidden!important;pointer-events:none!important}
+</style>
 <details id="ml-community-admin">
  <summary>📢 Manlung Community · Admin announcements</summary>
  <div class="mlca-body">
