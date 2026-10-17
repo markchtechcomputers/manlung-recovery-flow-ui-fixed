@@ -808,6 +808,20 @@ router.post('/groups', async (req,res) => {
   } catch(error) { return handleDbError(res,error,'Community group create error:'); }
 });
 
+router.patch('/groups/:groupId', async (req,res) => {
+  try {
+    if (!isAdmin(req.user)) return fail(res,403,'Only Manlung admins can update group details.');
+    const avatar=String(req.body?.avatar_url||'').trim();
+    const isImageData=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/i.test(avatar);
+    if(avatar.length>180000) return fail(res,413,'Group photo is too large. Choose a smaller image.');
+    if(avatar && !isImageData && !(avatar.startsWith('/')&&!avatar.startsWith('//')) && !/^https:\/\//i.test(avatar)) return fail(res,400,'Group photo must be an image, secure HTTPS URL or same-site path.');
+    const {data:group,error}=await supabase.from('recovery_chat_groups').update({avatar_url:avatar||null}).eq('id',req.params.groupId).select('id,slug,name,description,is_default,avatar_url').maybeSingle();
+    if(error) throw error;
+    if(!group) return fail(res,404,'Group not found.');
+    res.json({success:true,group});
+  } catch(error) { return handleDbError(res,error,'Group update error:'); }
+});
+
 router.post('/groups/:groupId/join', async (req,res) => {
   try {
     const gid=String(req.params.groupId||'');
