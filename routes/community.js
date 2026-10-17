@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const crypto = require('crypto');
+const multer = require('multer');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
@@ -13,6 +14,19 @@ const PAYSTACK_URL = 'https://api.paystack.co';
 const roles = ['client', 'admin', 'owner'];
 const messageLimiter = rateLimit({ windowMs: 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });
 const statusLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, standardHeaders: true, legacyHeaders: false });
+const CHAT_ATTACHMENT_BUCKET = 'recovery-chat-attachments';
+const CHAT_ATTACHMENT_MAX = 20 * 1024 * 1024;
+const chatAttachmentUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: CHAT_ATTACHMENT_MAX, files: 1, fields: 4, parts: 6 } });
+const CHAT_FILE_TYPES = { '.pdf': ['application/pdf'], '.doc': ['application/msword','application/octet-stream'], '.docx': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/zip','application/octet-stream'], '.xls': ['application/vnd.ms-excel','application/octet-stream'], '.xlsx': ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/zip','application/octet-stream'], '.png': ['image/png'], '.jpg': ['image/jpeg'], '.jpeg': ['image/jpeg'] };
+function chatFileExt(name) { const n=String(name||'').toLowerCase(); return Object.keys(CHAT_FILE_TYPES).find(ext=>n.endsWith(ext))||''; }
+function chatFileValid(file) { const ext=chatFileExt(file?.originalname); if(!ext || !CHAT_FILE_TYPES[ext].includes(String(file.mimetype||'').toLowerCase())) return false; const b=file.buffer; if(!b?.length || b.length>CHAT_ATTACHMENT_MAX) return false; if(ext==='.pdf') return b.subarray(0,5).toString('ascii')==='%PDF-'; if(ext==='.png') return b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])); if(ext==='.jpg'||ext==='.jpeg') return b[0]===255&&b[1]===216&&b[2]===255; if(ext==='.doc'||ext==='.xls') return b.subarray(0,8).equals(Buffer.from([208,207,17,224,161,177,26,225])); if(ext==='.docx'||ext==='.xlsx') return b[0]===80&&b[1]===75&&b[2]===3&&b[3]===4; return false; }
+function chatSafeName(name) { return String(name||'attachment').replace(/[\\/\\\\\x00-\x1f\x7f]/g,'_').replace(/[^\w.() -]/g,'_').slice(0,180)||'attachment'; }
+async function ensureChatAttachmentBucket() { const {data,error}=await supabase.storage.getBucket(CHAT_ATTACHMENT_BUCKET); if(data&&!error) return; const {error:createError}=await supabase.storage.createBucket(CHAT_ATTACHMENT_BUCKET,{public:false,fileSizeLimit:CHAT_ATTACHMENT_MAX,allowedMimeTypes:Object.values(CHAT_FILE_TYPES).flat()}); if(createError&&!/already exists/i.test(createError.message||'')) throw createError; }
+async function signedChatAttachments(messages, key, value) { const ids=(messages||[]).map(m=>m.id); if(!ids.length)return messages; const {data,error}=await supabase.from('recovery_chat_attachments').select('id,owner_user_id,direct_message_id,group_message_id,storage_path,original_name,mime_type,size_bytes').in(key,ids); if(error)throw error; const byId=new Map(); for(const a of data||[]){const {data:signed,error:se}=await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrl(a.storage_path,300,{download:a.original_name}); if(se)throw se;byId.set(a[key],{id:a.id,name:a.original_name,mimeType:a.mime_type,size:Number(a.size_bytes),url:signed.signedUrl,isImage:a.mime_type.startsWith('image/')});} return (messages||[]).map(m=>({...m,attachment:byId.get(m.id)||null})); }
+async function uploadChatAttachment(req,res,kind,id) { const file=req.file; if(!file)return fail(res,400,'Choose a file to send.'); if(!chatFileValid(file))return fail(res,400,'Allowed files: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG and JPEG. The file must be valid and no larger than 20 MB.'); const name=chatSafeName(file.originalname),ext=chatFileExt(name),mime=ext==='.jpg'||ext==='.jpeg'?'image/jpeg':ext==='.png'?'image/png':ext==='.pdf'?'application/pdf':ext==='.doc'?'application/msword':ext==='.docx'?'application/vnd.openxmlformats-officedocument.wordprocessingml.document':ext==='.xls'?'application/vnd.ms-excel':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'; let messageId=null,path=null; try { if(kind==='direct'){ const other=id;if(!validId(other)||other===String(req.user.id))return fail(res,400,'Invalid conversation.');if(await blockedEitherWay(req.user.id,other))return fail(res,403,'This conversation is unavailable because one account has blocked the other.');const {data:recipient,error:re}=await supabase.from('recovery_users').select('id,role,security_status').eq('id',other).in('role',roles).maybeSingle();if(re)throw re;if(!recipient||recipient.security_status&&recipient.security_status!=='active')return fail(res,404,'Member not found.');const {data:friend,error:fe}=await supabase.from('recovery_chat_friend_requests').select('id').eq('status','accepted').or('and(sender_user_id.eq.'+req.user.id+',recipient_user_id.eq.'+other+'),and(sender_user_id.eq.'+other+',recipient_user_id.eq.'+req.user.id+')').limit(1);if(fe)throw fe;if(!friend?.length&&!isAdmin(req.user)){const {data:pass,error:pe}=await supabase.from('recovery_chat_plan_purchases').select('id').eq('user_id',req.user.id).eq('plan_code','chat_pass').eq('status','paid').gt('expires_at',new Date().toISOString()).limit(1);if(pe)throw pe;if(!pass?.length)return fail(res,403,'Accept the friend request or purchase an active Chat pass to message this member.');}const {data:msg,error:me}=await supabase.from('recovery_community_messages').insert({sender_user_id:req.user.id,recipient_user_id:other,message:'📎 '+name}).select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at').single();if(me)throw me;messageId=msg.id; } else { const gid=id;if(!validId(gid))return fail(res,400,'Invalid group ID.');const {data:g,error:ge}=await supabase.from('recovery_chat_groups').select('id,slug').eq('id',gid).maybeSingle();if(ge)throw ge;if(!g)return fail(res,404,'Group not found.');if(g.slug==='manlung-updates'&&!isAdmin(req.user))return fail(res,403,'This official channel is read-only.');if(!await requireGroupMember(gid,req.user.id))return fail(res,403,'You are not a member of this group.');const {data:msg,error:me}=await supabase.from('recovery_chat_group_messages').insert({group_id:gid,sender_user_id:req.user.id,message:'📎 '+name}).select('id,group_id,sender_user_id,message,reply_to_id,created_at,edited_at,deleted_at').single();if(me)throw me;messageId=msg.id; }
+ await ensureChatAttachmentBucket();path=req.user.id+'/'+crypto.randomUUID()+ext;const {error:up}=await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).upload(path,file.buffer,{contentType:mime,upsert:false,cacheControl:'0'});if(up)throw up;const row={owner_user_id:req.user.id,storage_path:path,original_name:name,mime_type:mime,size_bytes:file.size,...(kind==='direct'?{direct_message_id:messageId}:{group_message_id:messageId})};const {data:a,error:ae}=await supabase.from('recovery_chat_attachments').insert(row).select('id,original_name,mime_type,size_bytes,storage_path').single();if(ae)throw ae;const {data:signed,error:se}=await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrl(path,300,{download:name});if(se)throw se;const msg={id:messageId,message:'📎 '+name,attachment:{id:a.id,name:a.original_name,mimeType:a.mime_type,size:Number(a.size_bytes),url:signed.signedUrl,isImage:a.mime_type.startsWith('image/')}};res.status(201).json({success:true,message:msg}); } catch(error) { if(path)await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).remove([path]).catch(()=>{});if(messageId){const table=kind==='direct'?'recovery_community_messages':'recovery_chat_group_messages';await supabase.from(table).delete().eq('id',messageId).catch(()=>{});}return handleDbError(res,error,'Chat attachment upload error:'); } }
+router.post('/attachments/direct/:memberId',messageLimiter,chatAttachmentUpload.single('file'),(req,res)=>uploadChatAttachment(req,res,'direct',String(req.params.memberId||'')));
+router.post('/attachments/groups/:groupId',messageLimiter,chatAttachmentUpload.single('file'),(req,res)=>uploadChatAttachment(req,res,'group',String(req.params.groupId||'')));
 
 function fail(res, status, error) { return res.status(status).json({ success: false, error }); }
 function cleanText(value, max) { return String(value == null ? '' : value).trim().slice(0, max); }
@@ -260,8 +274,41 @@ router.get('/messages/:memberId', async (req, res) => {
       if (deliveryError) throw deliveryError;
     }
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages: (data || []).reverse() });
+    res.json({ success: true, messages: await signedChatAttachments((data || []).reverse(), 'direct_message_id', 'direct_message_id') });
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
+});
+
+// Edit or unsend a direct message for both participants. Only its sender may change it.
+router.patch('/messages/:memberId/:messageId', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || ''), id = String(req.params.messageId || '');
+    const message = String(req.body?.message || '').trim();
+    if (!validId(other) || !validId(id) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message ID.');
+    if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const { data, error } = await supabase.from('recovery_community_messages')
+      .update({ message, edited_at: new Date().toISOString() })
+      .eq('id', id).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null)
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,delivered_at,read_at').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot edit it.');
+    res.set('Cache-Control', 'no-store'); return res.json({ success: true, message: data });
+  } catch (error) { return handleDbError(res, error, 'Direct message edit error:'); }
+});
+
+router.delete('/messages/:memberId/:messageId', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || ''), id = String(req.params.messageId || '');
+    if (!validId(other) || !validId(id) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message ID.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const { data, error } = await supabase.from('recovery_community_messages')
+      .update({ message: 'This message was unsent.', deleted_at: new Date().toISOString() })
+      .eq('id', id).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null)
+      .select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot unsend it.');
+    res.set('Cache-Control', 'no-store'); return res.json({ success: true, unsent: data.id });
+  } catch (error) { return handleDbError(res, error, 'Direct message unsend error:'); }
 });
 
 router.post('/messages/:memberId/read', async (req, res) => {
@@ -999,7 +1046,7 @@ router.get('/groups/:groupId/messages', async (req, res) => {
       .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages: (data || []).reverse() });
+    res.json({ success: true, messages: await signedChatAttachments((data || []).reverse(), 'group_message_id', 'group_message_id') });
   } catch (error) { return handleDbError(res, error, 'Group message list error:'); }
 });
 
@@ -1026,6 +1073,39 @@ router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
 });
 
 // Group reactions are available to every joined member, including read-only Manlung Updates readers.
+// Sender-only group message edit and unsend, reflected for every group member.
+router.patch('/groups/:groupId/messages/:messageId', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), id = String(req.params.messageId || '');
+    const message = String(req.body?.message || '').trim();
+    if (!validId(gid) || !validId(id)) return fail(res, 400, 'Invalid group or message ID.');
+    if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to edit messages.');
+    const { data, error } = await supabase.from('recovery_chat_group_messages')
+      .update({ message, edited_at: new Date().toISOString() })
+      .eq('id', id).eq('group_id', gid).eq('sender_user_id', req.user.id).is('deleted_at', null)
+      .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot edit it.');
+    res.set('Cache-Control', 'no-store'); return res.json({ success: true, message: data });
+  } catch (error) { return handleDbError(res, error, 'Group message edit error:'); }
+});
+
+router.delete('/groups/:groupId/messages/:messageId', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), id = String(req.params.messageId || '');
+    if (!validId(gid) || !validId(id)) return fail(res, 400, 'Invalid group or message ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to unsend messages.');
+    const { data, error } = await supabase.from('recovery_chat_group_messages')
+      .update({ message: 'This message was unsent.', deleted_at: new Date().toISOString() })
+      .eq('id', id).eq('group_id', gid).eq('sender_user_id', req.user.id).is('deleted_at', null)
+      .select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot unsend it.');
+    res.set('Cache-Control', 'no-store'); return res.json({ success: true, unsent: data.id });
+  } catch (error) { return handleDbError(res, error, 'Group message unsend error:'); }
+});
+
 router.get('/groups/:groupId/reactions', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
@@ -1144,9 +1224,13 @@ router.get('/status', async (req, res) => {
       .select('id,user_id,status_type,text_content,media_path,caption,expires_at,created_at')
       .gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(300);
     if (error) throw error;
-    const { data: hiddenRows, error: he } = await supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id',req.user.id);
-    if (he) throw he;
+    const [{ data: hiddenRows, error: he }, { data: viewedRows, error: ve }] = await Promise.all([
+      supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id',req.user.id),
+      supabase.from('recovery_chat_status_views').select('status_id').eq('viewer_user_id',req.user.id)
+    ]);
+    if (he) throw he; if (ve) throw ve;
     const hiddenIds = new Set((hiddenRows || []).map(x => x.status_id));
+    const viewedIds = new Set((viewedRows || []).map(x => x.status_id));
     const users = [...new Set((posts || []).map(p => p.user_id))];
     const [{ data: profiles, error: pe }, { data: wallet, error: we }] = await Promise.all([
       users.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,status_visibility').in('user_id', users) : Promise.resolve({ data: [], error: null }),
@@ -1161,7 +1245,7 @@ router.get('/status', async (req, res) => {
         const { data: signed, error: signedError } = await supabase.storage.from('recovery-chat-status-media').createSignedUrl(p.media_path, 60 * 60 * 24);
         if (!signedError) media_url = signed?.signedUrl || null;
       }
-      return { ...p, media_url, own: p.user_id === req.user.id, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } };
+      return { ...p, media_url, viewed_by_me: viewedIds.has(p.id), own: p.user_id === req.user.id, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } };
     }));
     const last = wallet?.free_status_last_used_at ? new Date(wallet.free_status_last_used_at).getTime() : 0;
     res.json({ success: true, statuses, allowance: { freeAvailable: !last || Date.now() - last >= 86400000, freeLastUsedAt: wallet?.free_status_last_used_at || null, paidCredits: wallet?.paid_status_credits || 0 } });
