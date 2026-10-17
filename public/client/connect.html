@@ -457,7 +457,7 @@ function vHub(){
 }
 const planOf=()=>S.planEnd>Date.now()?S.plan:'free',lim=()=>({free:1,plus:3,pro:99})[planOf()],passOn=()=>S.passEnd>Date.now();
 const planInfo=()=>planOf()==='free'?'Free · 1 status per day':(planOf()==='plus'?'Plus · 3 statuses per day':'Pro · 4 or more statuses per day')+' · renews '+new Date(S.planEnd).toLocaleDateString();
-const acceptedFriendForChat=c=>{if(!c||!c.memberId)return false;const rows=[...(Array.isArray(ML.requests)?ML.requests:[]),...(Array.isArray(window.__mlRequests)?window.__mlRequests:[])];return rows.some(x=>x&&x.status==='accepted'&&x.member&&(String(x.member.id)===String(c.memberId)||String(x.member.username||'')===String(c.n||'')||String(x.member.name||'')===String(c.n||'')))};
+const acceptedFriendId=id=>{if(id==null)return false;const rows=[...(Array.isArray(ML.requests)?ML.requests:[]),...(Array.isArray(window.__mlRequests)?window.__mlRequests:[])];return rows.some(x=>{if(!x||String(x.status||'').toLowerCase()!=='accepted')return false;const other=x.member&&x.member.id!=null?x.member.id:(x.member_id!=null?x.member_id:(String(x.requester_id)===String(ML.me)?x.receiver_id:x.requester_id));return other!=null&&String(other)===String(id)})};const acceptedFriendForChat=c=>!!(c&&c.memberId!=null&&acceptedFriendId(c.memberId));
 const canChat=c=>!c.ch&&!c.official&&!c.saved&&c.n!=='Saved messages'&&(['admin','owner'].includes(window.__mlRole)||c.g||S.friends.includes(c.n)||acceptedFriendForChat(c)||passOn());
 function purge(c){if(c.dm)c.m=c.m.filter(m=>!m[9]||Date.now()-m[9]<c.dm)}
 function dis(){const c=S.chats.find(c=>c.id===open);c.dm=!c.dm?864e5:c.dm===864e5?6048e5:0;pop=0;save();toast('Disappearing messages: '+(c.dm?(c.dm===864e5?'24 hours':'7 days'):'off'));drawPop()}
@@ -546,7 +546,7 @@ window.chatWith=async function(target){
  if(!m)m=(ML.requests||[]).find(x=>x.member&&(String(x.member.id)===key||nm(x.member)===key||String(x.member.username||'')===key))?.member||null;
  if(!m){try{await refresh(true);m=(ML.members||[]).find(x=>String(x.id)===key||nm(x)===key||String(x.username||'')===key)||(ML.requests||[]).find(x=>x.member&&(String(x.member.id)===key||nm(x.member)===key||String(x.member.username||'')===key))?.member||null}catch(_){}}
  if(!m||!m.id)return toast('Member not found. Refresh the page and try again.');
- const isFriend=(ML.requests||[]).some(x=>x.status==='accepted'&&x.member&&String(x.member.id)===String(m.id));
+ const isFriend=acceptedFriendId(m.id);
  if(!isFriend&&!ML.plans.chatPass&&!['admin','owner'].includes(ML.role))return toast('Accept the friend request first, or buy a Chat pass.');
  const c=chat(m);tab='chats';open=c.id;c.un=0;save();render();
  try{await loadMsgs(c.id,false);render()}catch(e){err(e)}
