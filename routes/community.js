@@ -249,13 +249,38 @@ router.get('/messages/:memberId', async (req, res) => {
     if (other === String(req.user.id)) return fail(res, 400, 'Choose another member.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
     const { data, error } = await supabase.from('recovery_community_messages')
-      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id')
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
       .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
+    const incomingIds = (data || []).filter(m => m.recipient_user_id === req.user.id && !m.delivered_at).map(m => m.id);
+    if (incomingIds.length) {
+      const { error: deliveryError } = await supabase.from('recovery_community_messages')
+        .update({ delivered_at: new Date().toISOString() }).in('id', incomingIds).eq('recipient_user_id', req.user.id).is('delivered_at', null);
+      if (deliveryError) throw deliveryError;
+    }
     res.set('Cache-Control', 'no-store');
     res.json({ success: true, messages: (data || []).reverse() });
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
+});
+
+router.post('/messages/:memberId/read', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Invalid member ID.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const { data: profile, error: profileError } = await supabase.from('recovery_chat_profiles')
+      .select('read_receipts_enabled').eq('user_id', req.user.id).maybeSingle();
+    if (profileError) throw profileError;
+    if (profile?.read_receipts_enabled === false) return res.json({ success: true, readReceipts: false });
+    const now = new Date().toISOString();
+    const { error } = await supabase.from('recovery_community_messages')
+      .update({ delivered_at: now, read_at: now })
+      .eq('sender_user_id', other).eq('recipient_user_id', req.user.id).is('read_at', null);
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, readReceipts: true, readAt: now });
+  } catch (error) { return handleDbError(res, error, 'Community message read receipt error:'); }
 });
 
 router.post('/messages/:memberId', messageLimiter, async (req, res) => {
