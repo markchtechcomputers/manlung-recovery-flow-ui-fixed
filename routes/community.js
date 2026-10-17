@@ -264,6 +264,39 @@ router.get('/messages/:memberId', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
 });
 
+// Edit or unsend a direct message for both participants. Only its sender may change it.
+router.patch('/messages/:memberId/:messageId', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || ''), id = String(req.params.messageId || '');
+    const message = String(req.body?.message || '').trim();
+    if (!validId(other) || !validId(id) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message ID.');
+    if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const { data, error } = await supabase.from('recovery_community_messages')
+      .update({ message, edited_at: new Date().toISOString() })
+      .eq('id', id).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null)
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,delivered_at,read_at').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot edit it.');
+    res.set('Cache-Control', 'no-store'); return res.json({ success: true, message: data });
+  } catch (error) { return handleDbError(res, error, 'Direct message edit error:'); }
+});
+
+router.delete('/messages/:memberId/:messageId', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || ''), id = String(req.params.messageId || '');
+    if (!validId(other) || !validId(id) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message ID.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const { data, error } = await supabase.from('recovery_community_messages')
+      .update({ message: 'This message was unsent.', deleted_at: new Date().toISOString() })
+      .eq('id', id).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null)
+      .select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot unsend it.');
+    res.set('Cache-Control', 'no-store'); return res.json({ success: true, unsent: data.id });
+  } catch (error) { return handleDbError(res, error, 'Direct message unsend error:'); }
+});
+
 router.post('/messages/:memberId/read', async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
@@ -1026,6 +1059,39 @@ router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
 });
 
 // Group reactions are available to every joined member, including read-only Manlung Updates readers.
+// Sender-only group message edit and unsend, reflected for every group member.
+router.patch('/groups/:groupId/messages/:messageId', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), id = String(req.params.messageId || '');
+    const message = String(req.body?.message || '').trim();
+    if (!validId(gid) || !validId(id)) return fail(res, 400, 'Invalid group or message ID.');
+    if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to edit messages.');
+    const { data, error } = await supabase.from('recovery_chat_group_messages')
+      .update({ message, edited_at: new Date().toISOString() })
+      .eq('id', id).eq('group_id', gid).eq('sender_user_id', req.user.id).is('deleted_at', null)
+      .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot edit it.');
+    res.set('Cache-Control', 'no-store'); return res.json({ success: true, message: data });
+  } catch (error) { return handleDbError(res, error, 'Group message edit error:'); }
+});
+
+router.delete('/groups/:groupId/messages/:messageId', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), id = String(req.params.messageId || '');
+    if (!validId(gid) || !validId(id)) return fail(res, 400, 'Invalid group or message ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to unsend messages.');
+    const { data, error } = await supabase.from('recovery_chat_group_messages')
+      .update({ message: 'This message was unsent.', deleted_at: new Date().toISOString() })
+      .eq('id', id).eq('group_id', gid).eq('sender_user_id', req.user.id).is('deleted_at', null)
+      .select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot unsend it.');
+    res.set('Cache-Control', 'no-store'); return res.json({ success: true, unsent: data.id });
+  } catch (error) { return handleDbError(res, error, 'Group message unsend error:'); }
+});
+
 router.get('/groups/:groupId/reactions', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
