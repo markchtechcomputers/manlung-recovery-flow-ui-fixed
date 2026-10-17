@@ -14,6 +14,7 @@ This is the working checklist for the remaining community/chat requests. Do not 
 - [ ] **Partially implemented:** username, birthday and preferred-language fields added to Settings and profile route; privacy policy link added. Apply `db/migrations/031_account_preferences.sql` and `db/migrations/032_message_receipts.sql` to the correct Manlung app database, then test updates and receipts. Language is stored but the whole UI is not yet translated. Notifications/privacy controls still need a complete audit.
 - [ ] **Code updated:** Settings can open Google Fonts search, apply a named font through Google Fonts CSS, adjust text size, and reset. Browser/device verification remains pending.
 - [ ] Verify camera-to-Status capture on mobile and desktop fallback.
+- [x] Video status upload and playback added for MP4, WebM, and MOV files (8 MB max) using the existing private signed-URL bucket. The bucket migration now allows those MIME types and 10 MiB objects; the JSON body limit was raised to accommodate base64 payloads. Still requires the matching SQL migration and browser/device testing.
 - [ ] Improve signup and initial load performance; measure before/after.
 - [ ] Test mobile/desktop, client/admin, group/direct, failure/retry, permissions, database migration, and live production deployment.
 - [ ] Verify every pending feature in the browser and record the results here.
@@ -35,4 +36,30 @@ This is the working checklist for the remaining community/chat requests. Do not 
 - Direct message API now returns `delivered_at`/`read_at`, records delivery on message fetch, and has an authenticated read-receipt endpoint. Client/admin message mapping renders receipt states from server timestamps. SQL migration 032 is required before these API changes can work.
 - Fixed double-escaped birthday-date and checkout-email validation patterns found during code review.
 - Privacy policy link added to Settings and points to the repository's existing `/privacy.html` page.
+
+- Added a video option to the status composer in client and admin views, maps server status types, and renders uploaded videos in the status viewer. Backend validates supported video MIME types and an 8 MiB payload cap before private upload. This is code-complete but not browser-tested; apply `db/migrations/032_private_status_media_storage.sql` to the correct Manlung app database first.
 - Do not mark any of the above production-complete until browser and backend checks pass.
+
+
+## New requests from 2026-10-17
+
+- [x] Keep Manlung Updates at the top of the chat list regardless of manual pin state.
+- [x] Hide statuses from the feed after they have been viewed, using the existing status-view records.
+- [x] Add a reply action in the status viewer that sends a status comment/reply.
+- [x] Add the requested Manlung Community card/icon, joined-group label, description, and member-count display.
+- [x] Compact settings row spacing and improve admin chat layout isolation/scrolling; Enter sends in admin direct/group composer while Shift+Enter adds a newline.
+- [ ] Message receipts must be verified end-to-end: one tick after send, two gray ticks after delivery, two blue ticks after read; verify offline recipient behavior on real accounts.
+- [ ] Enable editing sent direct messages and confirm authorization/window rules server-side.
+- [ ] Ensure admin and verified-client names/badges render consistently beside every direct/group message.
+- [ ] Confirm admin/client chat layout, last-seen presence, realtime message arrival, status reply delivery, and settings on mobile/desktop.
+- [ ] Run browser tests, apply any required migrations to the verified production database, and confirm deployment.
+
+
+## Follow-up implementation — message editing and sender badges
+
+- [x] Add an authenticated PATCH route for editing a member's own direct message only, with a 15-minute edit window and message/conversation ownership checks.
+- [x] Wire the client/admin direct-message Edit action to the server for remote conversations.
+- [x] Render sender verification badges beside message author names using current member/profile role data.
+- [ ] Confirm receipt state with the production schema and real two-account test (sent, delivered, read).
+- [ ] Confirm last-seen privacy behavior and that heartbeat/member refresh keeps it current.
+- [ ] Run browser/device tests for admin/client UI, status replies, edit permissions, and realtime updates before merge/deploy.

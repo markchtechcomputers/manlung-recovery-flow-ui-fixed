@@ -283,6 +283,32 @@ router.post('/messages/:memberId/read', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Community message read receipt error:'); }
 });
 
+router.patch('/messages/:memberId/:messageId', messageLimiter, async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    const messageId = String(req.params.messageId || '');
+    const message = String(req.body?.message || '').trim();
+    if (!validId(other) || !validId(messageId) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message ID.');
+    if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const { data: existing, error: existingError } = await supabase.from('recovery_community_messages')
+      .select('id,sender_user_id,recipient_user_id,created_at,deleted_at')
+      .eq('id', messageId).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null).maybeSingle();
+    if (existingError) throw existingError;
+    if (!existing) return fail(res, 404, 'Message not found or you do not have permission to edit it.');
+    const createdAt = new Date(existing.created_at).getTime();
+    if (!Number.isFinite(createdAt) || Date.now() - createdAt > 15 * 60 * 1000) return fail(res, 403, 'Messages can only be edited within 15 minutes of sending.');
+    const { data, error } = await supabase.from('recovery_community_messages')
+      .update({ message, edited_at: new Date().toISOString() })
+      .eq('id', messageId).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null)
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,delivered_at,read_at').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 409, 'Message could not be edited. Refresh and try again.');
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, message: data });
+  } catch (error) { return handleDbError(res, error, 'Community message edit error:'); }
+});
+
 router.post('/messages/:memberId', messageLimiter, async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
@@ -1144,9 +1170,14 @@ router.get('/status', async (req, res) => {
       .select('id,user_id,status_type,text_content,media_path,caption,expires_at,created_at')
       .gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(300);
     if (error) throw error;
-    const { data: hiddenRows, error: he } = await supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id',req.user.id);
+    const [{ data: hiddenRows, error: he }, { data: viewedRows, error: ve }] = await Promise.all([
+      supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id', req.user.id),
+      supabase.from('recovery_chat_status_views').select('status_id').eq('viewer_user_id', req.user.id),
+    ]);
     if (he) throw he;
+    if (ve) throw ve;
     const hiddenIds = new Set((hiddenRows || []).map(x => x.status_id));
+    const viewedIds = new Set((viewedRows || []).map(x => x.status_id));
     const users = [...new Set((posts || []).map(p => p.user_id))];
     const [{ data: profiles, error: pe }, { data: wallet, error: we }] = await Promise.all([
       users.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,status_visibility').in('user_id', users) : Promise.resolve({ data: [], error: null }),
@@ -1154,7 +1185,7 @@ router.get('/status', async (req, res) => {
     ]);
     if (pe) throw pe; if (we) throw we;
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-    const visiblePosts = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'));
+    const visiblePosts = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || (!viewedIds.has(p.id) && profileMap.get(p.user_id)?.status_visibility !== 'nobody')));
     const statuses = await Promise.all(visiblePosts.map(async p => {
       let media_url = null;
       if (p.media_path) {
@@ -1173,19 +1204,31 @@ router.post('/status', statusLimiter, async (req, res) => {
     const type = req.body?.status_type || 'text';
     const text = cleanText(req.body?.text_content, 2000);
     let mediaPath = null;
-    if (type === 'image') {
+    if (type === 'image' || type === 'video') {
       const raw = String(req.body?.media_data || '');
-      const match = raw.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/);
-      if (!match) return fail(res, 400, 'Choose a valid JPEG, PNG, or WebP image.');
-      const mime = match[1] === 'jpeg' ? 'image/jpeg' : 'image/' + match[1];
+      const match = type === 'image'
+        ? raw.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/i)
+        : raw.match(/^data:video\/(mp4|webm|quicktime);base64,([A-Za-z0-9+/=]+)$/i);
+      if (!match) return fail(res, 400, type === 'image'
+        ? 'Choose a valid JPEG, PNG, or WebP image.'
+        : 'Choose an MP4, WebM, or MOV video.');
+      const subtype = match[1].toLowerCase();
+      const mime = type === 'image'
+        ? (subtype === 'jpeg' ? 'image/jpeg' : 'image/' + subtype)
+        : (subtype === 'quicktime' ? 'video/quicktime' : 'video/' + subtype);
       const bytes = Buffer.from(match[2], 'base64');
-      if (!bytes.length || bytes.length > 1024 * 1024) return fail(res, 413, 'Status images must be no larger than 1 MB after compression.');
-      const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+      const maxBytes = type === 'image' ? 1024 * 1024 : 8 * 1024 * 1024;
+      if (!bytes.length || bytes.length > maxBytes) return fail(res, 413, type === 'image'
+        ? 'Status images must be no larger than 1 MB after compression.'
+        : 'Status videos must be no larger than 8 MB.');
+      const ext = type === 'image'
+        ? (subtype === 'jpeg' ? 'jpg' : subtype)
+        : (subtype === 'quicktime' ? 'mov' : subtype);
       mediaPath = req.user.id + '/' + crypto.randomUUID() + '.' + ext;
       const { error: uploadError } = await supabase.storage.from('recovery-chat-status-media').upload(mediaPath, bytes, { contentType: mime, upsert: false, cacheControl: '3600' });
       if (uploadError) throw uploadError;
     } else if (type !== 'text') {
-      return fail(res, 400, 'Only text and image statuses are currently supported.');
+      return fail(res, 400, 'Only text, image, and video statuses are supported.');
     } else if (!text) return fail(res, 400, 'Text status cannot be empty.');
     const { data, error } = await supabase.from('recovery_chat_status_posts')
       .insert({ user_id: req.user.id, status_type: type, text_content: type === 'text' ? text : null, media_path: mediaPath, caption: cleanText(req.body?.caption || text, 1000) })
