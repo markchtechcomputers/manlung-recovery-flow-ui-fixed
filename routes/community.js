@@ -228,9 +228,11 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
     const message = String(req.body?.message || '').trim();
+    const replyTo = req.body?.reply_to_id ? String(req.body.reply_to_id) : null;
     if (!validId(other)) return fail(res, 400, 'Invalid member ID.');
     if (other === String(req.user.id)) return fail(res, 400, 'Choose another member.');
     if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
+    if (replyTo && !validId(replyTo)) return fail(res, 400, 'Invalid reply target.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
     const { data: recipient, error: recipientError } = await supabase.from('recovery_users')
       .select('id,role,security_status').eq('id', other).in('role', roles).maybeSingle();
@@ -246,14 +248,24 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
       if (passError) throw passError;
       if (!pass?.length) return fail(res,403,'Accept the friend request or purchase an active Chat pass to message this member.');
     }
+    let payload = { sender_user_id: req.user.id, recipient_user_id: other, message };
+    if (replyTo) {
+      const { data: target, error: targetError } = await supabase.from('recovery_community_messages')
+        .select('id,sender_user_id,recipient_user_id').eq('id', replyTo).is('deleted_at', null).maybeSingle();
+      if (targetError) throw targetError;
+      if (!target || !(
+        (String(target.sender_user_id) === String(req.user.id) && String(target.recipient_user_id) === other) ||
+        (String(target.sender_user_id) === other && String(target.recipient_user_id) === String(req.user.id))
+      )) return fail(res, 400, 'Reply target must belong to this conversation.');
+      payload.reply_to_id = replyTo;
+    }
     const { data, error } = await supabase.from('recovery_community_messages')
-      .insert({ sender_user_id: req.user.id, recipient_user_id: other, message })
-      .select('id,sender_user_id,recipient_user_id,message,created_at').single();
+      .insert(payload)
+      .select('id,sender_user_id,recipient_user_id,message,reply_to_id,created_at').single();
     if (error) throw error;
     res.status(201).json({ success: true, message: data });
   } catch (error) { return handleDbError(res, error, 'Community message send error:'); }
 });
-
 
 
 const COMMUNITY_PLANS = Object.freeze({
