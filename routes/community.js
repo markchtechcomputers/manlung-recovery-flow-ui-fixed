@@ -705,7 +705,7 @@ router.get('/groups', async (req, res) => {
     if (!shared) {
       const created = await supabase.from('recovery_chat_groups').insert({
         slug: 'manlung-members', name: 'Manlung Members',
-        description: 'For registered members: talk, love, and friendly chatter. No hate speech, harassment, threats, or discrimination. We build each other up. Main-app admins remain group admins and can remove members who break the rules.',
+        description: '',
         is_default: true, avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png'
       }).select('id,slug,name,description,is_default,avatar_url').single();
       if (created.error && created.error.code !== '23505') throw created.error;
@@ -720,7 +720,7 @@ router.get('/groups', async (req, res) => {
     if (shared) {
       const { data: updatedShared, error: updateSharedError } = await supabase.from('recovery_chat_groups')
         .update({ slug: 'manlung-members', name: 'Manlung Members',
-          description: 'For registered members: talk, love, and friendly chatter. No hate speech, harassment, threats, or discrimination. We build each other up. Main-app admins remain group admins and can remove members who break the rules.',
+          description: '',
           avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png' })
         .eq('id', shared.id).select('id,slug,name,description,is_default,avatar_url').single();
       if (updateSharedError) throw updateSharedError;
@@ -784,6 +784,7 @@ router.get('/groups', async (req, res) => {
 
 router.post('/groups', async (req,res) => {
   try {
+    if (!isAdmin(req.user)) return fail(res,403,'Only Manlung admins can create groups.');
     const name=cleanText(req.body?.name,100);
     const description=String(req.body?.description||'').trim();
     const avatar=String(req.body?.avatar_url||'').trim();
