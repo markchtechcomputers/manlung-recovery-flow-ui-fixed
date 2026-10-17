@@ -784,9 +784,10 @@ window.mlAdminLoadDM=async function(){
  const id=document.getElementById('ml-admin-client')?.value,box=document.getElementById('ml-admin-dm');if(!box)return;window.mlAdminUpdatePresence();
  if(!id){window.mlAdminMessages.dm=[];box.textContent='Choose a client to load the conversation.';return}
  box.textContent='Loading conversation…';
- try{const d=await apiReq('/messages/'+encodeURIComponent(id));window.mlAdminMessages.dm=d.messages||[];window.mlAdminRenderMessages('ml-admin-dm',window.mlAdminMessages.dm,'dm')}
+ try{const d=await apiReq('/messages/'+encodeURIComponent(id));window.mlAdminMessages.dm=d.messages||[];window.mlAdminRenderMessages('ml-admin-dm',window.mlAdminMessages.dm,'dm');if(document.visibilityState==='visible')await apiReq('/messages/'+encodeURIComponent(id)+'/read',{method:'POST',body:'{}'}).catch(()=>{})}
  catch(e){box.textContent=e.message||'Could not load messages.'}
 };
+if(!window.__mlAdminDmPoll){window.__mlAdminDmPoll=setInterval(()=>{if(document.visibilityState==='visible'&&document.getElementById('ml-admin-client')?.value)window.mlAdminLoadDM()},3000)}
 window.mlAdminSendDM=async function(){
  if(!['admin','owner'].includes(ML.role||window.__mlRole))return toast('Admin access required.');
  const id=document.getElementById('ml-admin-client')?.value,field=document.getElementById('ml-admin-dm-text'),message=String(field?.value||'').trim(),sendButton=field?.parentElement?.querySelector('button');
