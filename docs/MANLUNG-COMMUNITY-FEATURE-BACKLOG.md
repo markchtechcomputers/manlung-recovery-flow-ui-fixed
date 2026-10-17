@@ -53,3 +53,13 @@ This is the working checklist for the remaining community/chat requests. Do not 
 - [ ] Ensure admin and verified-client names/badges render consistently beside every direct/group message.
 - [ ] Confirm admin/client chat layout, last-seen presence, realtime message arrival, status reply delivery, and settings on mobile/desktop.
 - [ ] Run browser tests, apply any required migrations to the verified production database, and confirm deployment.
+
+
+## Follow-up implementation — message editing and sender badges
+
+- [x] Add an authenticated PATCH route for editing a member's own direct message only, with a 15-minute edit window and message/conversation ownership checks.
+- [x] Wire the client/admin direct-message Edit action to the server for remote conversations.
+- [x] Render sender verification badges beside message author names using current member/profile role data.
+- [ ] Confirm receipt state with the production schema and real two-account test (sent, delivered, read).
+- [ ] Confirm last-seen privacy behavior and that heartbeat/member refresh keeps it current.
+- [ ] Run browser/device tests for admin/client UI, status replies, edit permissions, and realtime updates before merge/deploy.
