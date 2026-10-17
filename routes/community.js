@@ -1224,9 +1224,13 @@ router.get('/status', async (req, res) => {
       .select('id,user_id,status_type,text_content,media_path,caption,expires_at,created_at')
       .gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(300);
     if (error) throw error;
-    const { data: hiddenRows, error: he } = await supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id',req.user.id);
-    if (he) throw he;
+    const [{ data: hiddenRows, error: he }, { data: viewedRows, error: ve }] = await Promise.all([
+      supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id',req.user.id),
+      supabase.from('recovery_chat_status_views').select('status_id').eq('viewer_user_id',req.user.id)
+    ]);
+    if (he) throw he; if (ve) throw ve;
     const hiddenIds = new Set((hiddenRows || []).map(x => x.status_id));
+    const viewedIds = new Set((viewedRows || []).map(x => x.status_id));
     const users = [...new Set((posts || []).map(p => p.user_id))];
     const [{ data: profiles, error: pe }, { data: wallet, error: we }] = await Promise.all([
       users.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,status_visibility').in('user_id', users) : Promise.resolve({ data: [], error: null }),
@@ -1241,7 +1245,7 @@ router.get('/status', async (req, res) => {
         const { data: signed, error: signedError } = await supabase.storage.from('recovery-chat-status-media').createSignedUrl(p.media_path, 60 * 60 * 24);
         if (!signedError) media_url = signed?.signedUrl || null;
       }
-      return { ...p, media_url, own: p.user_id === req.user.id, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } };
+      return { ...p, media_url, viewed_by_me: viewedIds.has(p.id), own: p.user_id === req.user.id, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } };
     }));
     const last = wallet?.free_status_last_used_at ? new Date(wallet.free_status_last_used_at).getTime() : 0;
     res.json({ success: true, statuses, allowance: { freeAvailable: !last || Date.now() - last >= 86400000, freeLastUsedAt: wallet?.free_status_last_used_at || null, paidCredits: wallet?.paid_status_credits || 0 } });
