@@ -421,11 +421,14 @@ function openCaseFromForm(event){
             document.getElementById('caseIdHeading').textContent = caseId;
 
             try {
-                const res = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`, { credentials: 'include', cache: 'no-store' });
-                const data = await res.json();
+                const authToken = localStorage.getItem('token') || localStorage.getItem('authToken');
+                const res = await fetch(`/api/cases/track/${encodeURIComponent(caseId)}`, { credentials: 'include', cache: 'no-store', headers: authToken ? { Authorization: `Bearer ${authToken}` } : {} });
+                const contentType = res.headers.get('content-type') || '';
+                const data = contentType.includes('application/json') ? await res.json() : {};
 
-                if (!data.success) {
-                    content.innerHTML = `<div class="card"><p class="error-text">${data.error || 'Case not found'}</p></div>`;
+                if (!res.ok || !data.success || !data.case) {
+                    const message = data.error || (res.status === 401 ? 'Please sign in to your Client Portal using the account that submitted this case, then try again.' : res.status === 404 ? 'This case was not found for your account. Check the case reference and sign in with the original account.' : `Case tracking is temporarily unavailable (HTTP ${res.status}). Please try again shortly.`);
+                    content.innerHTML = `<div class="card"><p class="error-text">${message}</p><p><a class="btn btn-primary" href="/client/dashboard.html">Open Client Portal</a> <a href="/contact.html">Contact support</a></p></div>`;
                     return;
                 }
 
