@@ -291,3 +291,13 @@ html body main :where(section + section, .section + .section, .panel + .panel, .
  .manlung-footer-legal a{font-size:.78rem}
 }
 @media(max-width:380px){.manlung-footer .manlung-footer-social{gap:16px!important}.manlung-footer .manlung-footer-social a i{font-size:27px!important}}
+
+/* Warm table-wood footer finish — consistent across every shared footer. */
+.manlung-footer{background-color:#4b2615!important;background-image:linear-gradient(180deg,rgba(35,15,7,.18),rgba(25,10,4,.52)),repeating-linear-gradient(0deg,rgba(255,207,145,.045) 0,rgba(255,207,145,.045) 1px,transparent 1px,transparent 5px),repeating-linear-gradient(2deg,#5a2d18 0,#5a2d18 18px,#67371e 19px,#3e1c10 38px,#512715 55px)!important;color:#fff!important;border-top:4px solid #8b542f!important;box-shadow:0 -10px 30px rgba(38,17,8,.22)!important}
+.manlung-footer .manlung-footer-brand h2,.manlung-footer .manlung-footer-column h3{color:#fff!important}
+.manlung-footer .manlung-footer-brand-subtitle,.manlung-footer .manlung-footer-description,.manlung-footer .manlung-footer-trust-text{color:#f0dfd2!important}
+.manlung-footer .manlung-footer-links a,.manlung-footer .manlung-footer-bottom,.manlung-footer .manlung-footer-bottom a{color:#f5e7dc!important}
+.manlung-footer .manlung-footer-links a:hover,.manlung-footer .manlung-footer-bottom a:hover{color:#ffc078!important}
+.manlung-footer .manlung-footer-divider{background:linear-gradient(90deg,transparent,rgba(255,220,190,.36),transparent)!important}
+.manlung-footer .manlung-footer-bottom{border-top-color:rgba(255,220,190,.22)!important}
+@media(prefers-reduced-motion:reduce){.manlung-pwa-download{animation:none!important}}
