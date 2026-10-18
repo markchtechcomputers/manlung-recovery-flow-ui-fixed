@@ -2,7 +2,7 @@ const CALL_SUBSCRIPTION_PLANS = Object.freeze({
   monthly: Object.freeze({
     code: 'monthly',
     label: 'MONTHLY',
-    amountKes: 200,
+    amountKes: 300,
     billingLabel: 'per month',
     interval: 'monthly',
     months: 1,
