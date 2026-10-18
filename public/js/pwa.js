@@ -1,5 +1,5 @@
 (() => {
-  const DISMISS_KEY = 'manlung-app-install-dismissed-v2';
+  const DISMISS_KEY = 'manlung-app-install-dismissed-v3';
 
   // Keep Android/mobile browser Back inside the website instead of closing
   // the tab/app when a visitor opens a deep link or reaches the home page.
@@ -70,7 +70,7 @@
 
 
   // Prefer the browser's native PWA install prompt, with the existing APK page as fallback.
-  const DISMISS_DAYS = 0;
+  const DISMISS_DAYS = 7;
   const IS_HOME = window.location.pathname === '/' || window.location.pathname === '/index.html';
 
   function isAndroidApp() {
@@ -93,7 +93,7 @@
       if (!value) return false;
 
       const dismissedAt = Number(value);
-      return Number.isFinite(dismissedAt);
+      return Number.isFinite(dismissedAt) && (Date.now() - dismissedAt) < DISMISS_DAYS * 24 * 60 * 60 * 1000;
     } catch {
       return false;
     }
@@ -124,8 +124,8 @@
         min-height: 78px;
         padding: .6rem .65rem;
         padding-top: calc(.6rem + env(safe-area-inset-top));
-        background: linear-gradient(135deg, #ffffff, #f8fbff);
-        color: #172033;
+        background: radial-gradient(ellipse at top right, rgba(249,115,22,.18), transparent 48%), linear-gradient(135deg, #071629, #102b49);
+        color: #f8fafc;
         border-bottom: 1px solid rgba(15,23,42,.12);
         box-shadow: 0 8px 24px rgba(15,23,42,.18);
         transform: translateY(-110%);
@@ -149,7 +149,7 @@
         flex: 0 0 32px;
         border: 0;
         background: transparent;
-        color: #64748b;
+        color: #cbd5e1;
         font-size: 1.8rem;
         line-height: 1;
         cursor: pointer;
@@ -197,13 +197,13 @@
         padding: .55rem .8rem;
         border: 0;
         border-radius: 10px;
-        background: linear-gradient(135deg, #0ea5e9, #2563eb);
+        background: linear-gradient(135deg, #f97316, #ea580c);
         color: #fff;
         font-size: .8rem;
         font-weight: 900;
         letter-spacing: .02em;
         cursor: pointer;
-        box-shadow: 0 5px 14px rgba(37,99,235,.25);
+        box-shadow: 0 5px 16px rgba(234,88,12,.3);
       }
 
       .manlung-pwa-download:active {
@@ -327,7 +327,7 @@
       <div class="manlung-pwa-copy">
         <strong class="manlung-pwa-title">Manlung Recovery App</strong>
         <span class="manlung-pwa-text">
-          Install Manlung Recovery for a faster, app-like experience.
+          Quick access to case tracking and secure support.
         </span>
       </div>
 
@@ -372,13 +372,13 @@
     event.preventDefault();
     deferredInstallPrompt = event;
     const button = document.querySelector('.manlung-pwa-download');
-    if (button) button.textContent = 'INSTALL APP';
+    if (button) button.textContent = 'INSTALL';
   });
 
   // Offer installation on the homepage. If the browser has no native prompt,
   // the existing app-download page remains available as a fallback.
   window.addEventListener('load', () => {
-    if (isAndroidApp() || !IS_HOME || wasRecentlyDismissed()) return;
+    if (isAndroidApp() || isStandalone() || !IS_HOME || wasRecentlyDismissed()) return;
     const banner = createBanner();
     window.requestAnimationFrame(() => banner.classList.add('is-visible'));
   });
