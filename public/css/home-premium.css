@@ -421,3 +421,40 @@ html.ml-reveal-ready .ml-scroll-reveal.is-visible{
     opacity:1!important;transform:none!important;transition:none!important;will-change:auto!important;
   }
 }
+
+
+/* Scam safety and reporting section — accessible, responsive, and action-first. */
+.scam-help-section{scroll-margin-top:96px;padding:clamp(34px,5vw,68px);border:1px solid var(--mr-line);border-radius:28px;background:linear-gradient(145deg,rgba(239,246,255,.92),rgba(248,250,252,.96));margin:34px auto}
+body.dark .scam-help-section{background:linear-gradient(145deg,#101c31,#0d1728);border-color:#29384f}
+.scam-help-header{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:26px;align-items:start}
+.scam-help-header h2{font-size:clamp(1.8rem,3.2vw,2.8rem);line-height:1.12;letter-spacing:-.04em;margin:10px 0 14px}
+.scam-help-header>div:first-child>p{color:var(--mr-muted);font-size:1.05rem;line-height:1.75;max-width:760px}
+.scam-help-alert{display:flex;gap:14px;padding:20px;border:1px solid #fecaca;background:#fff1f2;color:#881337;border-radius:18px}
+.scam-help-alert>i{font-size:1.5rem;flex:none;margin-top:2px}
+.scam-help-alert p{margin:7px 0 0;line-height:1.6}
+.scam-help-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:28px 0}
+.scam-help-card{position:relative;padding:22px 18px;border:1px solid var(--mr-line);border-radius:18px;background:var(--mr-card);box-shadow:0 8px 24px rgba(15,23,42,.04)}
+.scam-help-card>i{font-size:1.45rem;color:var(--mr-blue);margin:4px 0 14px}
+.scam-help-number{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:27px;padding:0 8px;border-radius:8px;background:#dbeafe;color:#1d4ed8;font-size:.78rem;font-weight:800}
+.scam-help-card h3{font-size:1.05rem;line-height:1.35;margin:0 0 9px}
+.scam-help-card p{color:var(--mr-muted);font-size:.93rem;line-height:1.65;margin:0}
+.scam-warning-list{padding:24px 26px;border-radius:18px;background:var(--mr-soft);border:1px solid var(--mr-line)}
+.scam-warning-list h3{margin:0 0 12px;font-size:1.2rem}
+.scam-warning-list ul{padding-left:1.25rem;margin:0;display:grid;gap:9px;color:var(--mr-muted);line-height:1.6}
+.scam-warning-list li::marker{color:#dc2626}
+.scam-official-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.scam-official-links>a{display:flex;align-items:center;gap:12px;min-width:0;padding:16px;border:1px solid var(--mr-line);border-radius:15px;background:var(--mr-card);color:var(--mr-ink);text-decoration:none;transition:transform .18s,border-color .18s}
+.scam-official-links>a:hover{transform:translateY(-2px);border-color:var(--mr-blue)}
+.scam-official-links>a>i:first-child{font-size:1.3rem;color:var(--mr-blue);flex:none}
+.scam-official-links>a>i:last-child{font-size:.8rem;color:var(--mr-muted);flex:none;margin-left:auto}
+.scam-official-links a span{display:grid;gap:5px;min-width:0}
+.scam-official-links strong{font-size:.94rem}
+.scam-official-links small{font-size:.78rem;color:var(--mr-muted);line-height:1.45}
+.scam-help-footer{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:22px;padding:24px;border-radius:18px;background:#0f2340;color:#f8fafc}
+.scam-help-footer h3{margin:0 0 8px;font-size:1.2rem}
+.scam-help-footer p{margin:0;color:#d1dced;line-height:1.65;max-width:780px;font-size:.92rem}
+.scam-help-actions{display:flex;flex-wrap:wrap;gap:10px;flex:none}
+.scam-help-actions .btn{white-space:normal;text-align:center}
+@media(max-width:980px){.scam-help-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.scam-official-links{grid-template-columns:1fr}.scam-help-header{grid-template-columns:1fr}.scam-help-footer{align-items:flex-start;flex-direction:column}}
+@media(max-width:600px){.scam-help-section{padding:24px 16px;border-radius:20px;margin:22px auto}.scam-help-grid{grid-template-columns:1fr;gap:10px}.scam-help-card{padding:18px}.scam-warning-list{padding:19px 18px}.scam-help-footer{padding:19px}.scam-help-actions{width:100%;flex-direction:column}.scam-help-actions .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){.scam-official-links>a{transition:none}.scam-official-links>a:hover{transform:none}}
