@@ -2315,9 +2315,6 @@ body.manlung-page-leaving{opacity:.96;transition:opacity .18s ease}
     </div>
     <div class="manlung-footer-divider"></div>
     <div class="manlung-footer-contact-row">
-      <div class="manlung-footer-contact">
-        <a href="mailto:manlungrecovery@outlook.com" aria-label="Email Manlung Recovery"><i class="fas fa-envelope" aria-hidden="true"></i><span>manlungrecovery@outlook.com</span></a>
-      </div>
       <div class="manlung-footer-social-wrap">
         <h3 class="manlung-footer-social-title">Follow Us</h3>
         <nav class="manlung-footer-social" aria-label="Manlung Recovery social links">
@@ -2600,6 +2597,65 @@ html.dark .home-page-container .btn:not(.btn-primary),body.dark .home-page-conta
 html.dark .home-page-container a:not(.btn):not(.service-learn),body.dark .home-page-container a:not(.btn):not(.service-learn){color:#ff9a5e}
 html.dark .home-page-container .site-header,body.dark .home-page-container .site-header{background:#101927!important;color:#f1f5f9!important;border-color:#263449!important}
 html.dark .home-page-container .manlung-footer,body.dark .home-page-container .manlung-footer{background:#08111f!important;color:#e5eaf1!important}
+</style>
+
+
+<style id="manlung-footer-professional-fix">
+/* Warm espresso footer palette, white typography, stronger headings and readable sizing */
+.manlung-footer{
+ background:radial-gradient(circle at 50% 30%,#3a2818 0%,#281a10 48%,#1c120a 80%)!important;
+ background-color:#1c120a!important;color:#fff!important;border-top:3px solid #5b3a22!important;
+}
+.manlung-footer,.manlung-footer *{box-sizing:border-box}
+.manlung-footer h2,.manlung-footer h3,.manlung-footer .manlung-footer-column h3,
+.manlung-footer .manlung-footer-bottom strong{color:#fff!important}
+.manlung-footer .manlung-footer-column h3{font-size:clamp(.9rem,1vw,1rem)!important;font-weight:800!important;line-height:1.3!important;letter-spacing:.025em!important}
+.manlung-footer .manlung-footer-column h3:after{background:#b98a5a!important;width:30px!important;height:3px!important;margin-top:.45rem!important}
+.manlung-footer .manlung-footer-brand-subtitle,
+.manlung-footer .manlung-footer-description,
+.manlung-footer .manlung-footer-trust-text,
+.manlung-footer .manlung-footer-links a,
+.manlung-footer .manlung-footer-bottom,
+.manlung-footer .manlung-footer-bottom a{color:#fff!important}
+.manlung-footer .manlung-footer-brand-subtitle{font-size:.82rem!important;line-height:1.5!important}
+.manlung-footer .manlung-footer-description,.manlung-footer .manlung-footer-trust-text{font-size:.88rem!important;line-height:1.75!important;color:#f5eee8!important}
+.manlung-footer .manlung-footer-links{gap:.28rem!important}
+.manlung-footer .manlung-footer-links a{font-size:.86rem!important;font-weight:600!important;line-height:1.5!important;min-height:36px!important;padding:.35rem .1rem!important;overflow-wrap:anywhere}
+.manlung-footer .manlung-footer-links a:hover,.manlung-footer .manlung-footer-bottom a:hover{color:#e9c49e!important}
+.manlung-footer .manlung-footer-links .footer-important{color:#fff!important;font-weight:850!important}
+.manlung-footer .manlung-footer-divider{background:rgba(255,255,255,.22)!important;margin:1.5rem 0 1rem!important}
+.manlung-footer .manlung-footer-contact-row{justify-content:flex-end!important;align-items:center!important}
+.manlung-footer .manlung-footer-social-wrap{min-width:0!important;width:100%!important}
+.manlung-footer .manlung-footer-social-title{color:#fff!important;font-size:.95rem!important;font-weight:800!important;margin:0 0 .7rem!important}
+.manlung-footer .manlung-footer-social-title:after{content:"";display:block;width:30px;height:3px;margin-top:.4rem;border-radius:99px;background:#b98a5a}
+.manlung-footer .manlung-footer-social{justify-content:flex-start!important;gap:.65rem!important}
+.manlung-footer .manlung-footer-social a{min-width:105px!important;min-height:42px!important;height:auto!important;padding:.7rem 1rem!important;border:1px solid rgba(255,255,255,.25)!important;border-radius:9px!important;background:rgba(255,255,255,.07)!important;color:#fff!important;font-size:.82rem!important;font-weight:750!important;text-decoration:none!important;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.manlung-footer .manlung-footer-social a span{color:#fff!important}
+.manlung-footer .manlung-footer-social a i{display:inline-block!important;color:#fff!important;font-size:1rem!important}
+.manlung-footer .manlung-footer-social a img{width:16px;height:16px;object-fit:contain;filter:brightness(0) invert(1)}
+.manlung-footer .manlung-footer-social a:hover{background:rgba(255,255,255,.15)!important;border-color:rgba(255,255,255,.55)!important;transform:translateY(-2px)}
+.manlung-footer .manlung-footer-bottom{font-size:.76rem!important;line-height:1.6!important;border-top:1px solid rgba(255,255,255,.2)!important;padding-top:1rem!important;margin-top:1rem!important}
+.manlung-footer .manlung-footer-bottom a{font-weight:600!important}
+@media(max-width:900px){
+ .manlung-footer .manlung-footer-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:1.5rem 1.25rem!important}
+ .manlung-footer .manlung-footer-brand{grid-column:1/-1!important}
+}
+@media(max-width:600px){
+ .manlung-footer .manlung-footer-inner{width:calc(100% - 32px)!important;padding:1.5rem 0 .85rem!important}
+ .manlung-footer .manlung-footer-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:1.35rem 1rem!important}
+ .manlung-footer .manlung-footer-brand{grid-column:1/-1!important}
+ .manlung-footer .manlung-footer-column h3{font-size:.85rem!important}
+ .manlung-footer .manlung-footer-links a{font-size:.8rem!important;min-height:38px!important}
+ .manlung-footer .manlung-footer-description,.manlung-footer .manlung-footer-trust-text{font-size:.8rem!important}
+ .manlung-footer .manlung-footer-social a{min-width:0!important;flex:1 1 auto!important;padding:.7rem .8rem!important;font-size:.78rem!important}
+ .manlung-footer .manlung-footer-bottom{align-items:flex-start!important;text-align:left!important;font-size:.72rem!important}
+ .manlung-footer .manlung-footer-legal{justify-content:flex-start!important}
+}
+@media(max-width:380px){
+ .manlung-footer .manlung-footer-grid{grid-template-columns:1fr!important}
+ .manlung-footer .manlung-footer-brand{grid-column:auto!important}
+}
+@media(prefers-reduced-motion:reduce){.manlung-footer .manlung-footer-social a{transition:none!important}}
 </style>
 
 </body>
