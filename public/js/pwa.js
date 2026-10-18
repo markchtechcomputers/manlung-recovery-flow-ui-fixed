@@ -320,7 +320,7 @@
 
       <img
         class="manlung-pwa-icon"
-        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAABi0lEQVR4nO2YX0rDQBCHPx/aO6g5kPVBgyh98AKV9nTWK6jFth5B5F0VTBP0+tbwqRwATCkrab3SSb6P5goAk7M78vpNlMwMvLy+uvKgTegTfgiBbqBYglFrRQsRKtU+wBHMsDuJYHcC0PUJa6wAiYAF+KqUegZwFwKDWy65Iet8BQeltpD7jPMZONyAJgsaX2HNg1Nd/VMG8LEGnUnwEdE4CRRvEH4MACoCc1tvW5MAGYKEUu5Zaq+k+8D4yV3BsD/6yUIknhup5CgZK7LJhvbaAJ+egWOAM+ZYAJNfKP5dH5LL+dAuwAH5k130B/Q35f1qTnXl0DIDNvnAOh5qvmk3hqAsBJjjH1OO9ccuz8Fkp1usb0uvgBzkvsX0oBXQgd804AdCB0zTsD2ARRxLxTgDyIouadAyCbWiQbVuigP9YFLBX/e4Cl5duojYIy3kbVeWBcE0QAXJUxDwwL7KxVx8B0Jp43wPyd6UyMfBGYOTQ/tfkqkaojQ/V1zphZRayk18Dmynt5eXlRi34B18r0aIBm4vwAAAAASUVORK5CYII="
+        src="/icons/icon-192.png"
         alt="Manlung Recovery App"
       >
 
