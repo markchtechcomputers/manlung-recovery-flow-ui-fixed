@@ -1,8 +1,8 @@
 {
   "id": "/",
   "name": "Manlung Recovery",
-  "short_name": "Manlung Recovery",
-  "description": "Manlung Recovery — digital recovery assistance and secure client support",
+  "short_name": "Manlung",
+  "description": "Install Manlung Recovery for quick access to digital recovery assistance, secure case tracking, and client support.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -28,5 +28,33 @@
     }
   ],
   "prefer_related_applications": false,
-  "version": "1.0.3"
+  "version": "1.0.4",
+  "shortcuts": [
+    {
+      "name": "Track a case",
+      "short_name": "Track case",
+      "description": "Open secure case tracking",
+      "url": "/client/track.html",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Request recovery help",
+      "short_name": "Request help",
+      "description": "Submit a recovery request",
+      "url": "/client/request.html",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }
