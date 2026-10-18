@@ -1526,9 +1526,9 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
 
 <style id="mr-hero-video-replacement">
 /* Keep the video above its fallback, with the overlay and copy above both. */
-.mr-home-hero.mr-video-hero{position:relative;isolation:isolate;overflow:hidden;background:#071629}
+.mr-home-hero.mr-video-hero{position:relative;isolation:isolate;overflow:hidden;background:#071629;min-height:560px}
 .mr-home-hero.mr-video-hero .mr-hero-video-fallback{position:absolute;inset:0;z-index:0;background:linear-gradient(135deg,#071629,#123d68 55%,#071629)}
-.mr-home-hero.mr-video-hero .mr-hero-background-video{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;z-index:1;pointer-events:none;background:transparent;opacity:1;visibility:visible}
+.mr-home-hero.mr-video-hero .mr-hero-background-video{position:absolute;inset:0;display:block!important;width:100%;height:100%;min-height:100%;max-width:none;object-fit:cover;object-position:center;z-index:1;pointer-events:none;background:#071629;opacity:1!important;visibility:visible!important}
 .mr-home-hero.mr-video-hero .mr-hero-video-overlay{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,rgba(3,12,27,.76) 0%,rgba(3,12,27,.48) 55%,rgba(3,12,27,.34) 100%)}
 .mr-home-hero.mr-video-hero .mr-home-hero-inner{position:relative;z-index:3}
 .mr-home-hero.mr-video-hero .mr-hero-copy h1{color:#fff!important}
@@ -1553,8 +1553,17 @@ document.addEventListener('DOMContentLoaded',function(){
   video.setAttribute('webkit-playsinline','');
   video.setAttribute('autoplay','');
   video.setAttribute('loop','');
-  video.addEventListener('error',function(){video.style.visibility='hidden';});
-  var attemptPlay=function(){var result=video.play();if(result&&typeof result.catch==='function'){result.catch(function(){});}};
+  video.addEventListener('error',function(){
+    /* Keep the hero and its fallback visible if the browser rejects the video URL. */
+    video.style.visibility='visible';
+    console.warn('Manlung hero video failed to load; showing fallback background.');
+  });
+  var attemptPlay=function(){
+    var result=video.play();
+    if(result&&typeof result.catch==='function'){
+      result.catch(function(){ /* Autoplay may be blocked by browser settings. */ });
+    }
+  };
   if(video.readyState>=2)attemptPlay();
   else{video.addEventListener('loadeddata',attemptPlay,{once:true});video.load();attemptPlay();}
 });
@@ -1669,8 +1678,8 @@ document.addEventListener('DOMContentLoaded',function(){
     <main>
         <div class="container home-page-container">
             <section class="mr-home-hero mr-video-hero" aria-labelledby="hero-title">
-  <video class="mr-hero-background-video" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-hidden="true" tabindex="-1">
-    <source src="https://raw.githubusercontent.com/markchtechcomputers/galary-/main/Blue%20and%20White%20Modern%20Security%20Awareness%20Video.mp4" type="video/mp4">
+  <video class="mr-hero-background-video" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true" tabindex="-1">
+    <source src="https://github.com/markchtechcomputers/galary-/raw/refs/heads/main/Blue%20and%20White%20Modern%20Security%20Awareness%20Video.mp4" type="video/mp4">
   </video>
   <div class="mr-hero-video-fallback" aria-hidden="true"></div>
   <div class="mr-hero-video-overlay" aria-hidden="true"></div>
