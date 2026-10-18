@@ -489,3 +489,15 @@ html.dark body .site-header .brand span{color:var(--text-muted)!important;-webki
  html body .site-header .header-actions button,
  html body .site-header .header-actions .btn{flex:0 0 auto!important;font-size:.7rem!important;min-height:34px!important;padding:6px 8px!important}
 }
+
+/* Global light/dark theme support for shared site components. */
+html.dark,html.dark body,body.dark{background:#0b1220!important;color:#e5eaf1!important;color-scheme:dark}
+html.dark .site-header,body.dark .site-header{background:#101927!important;color:#f1f5f9!important;border-color:#263449!important}
+html.dark .site-header .brand h1,html.dark .site-header .brand span,
+html.dark .site-header .header-actions a,html.dark .site-header .header-actions button,
+html.dark .site-header .header-actions .btn,body.dark .site-header .brand h1,
+body.dark .site-header .brand span,body.dark .site-header .header-actions a,
+body.dark .site-header .header-actions button,body.dark .site-header .header-actions .btn{color:#f1f5f9!important;-webkit-text-fill-color:#f1f5f9!important}
+html.dark .manlung-language-popover,body.dark .manlung-language-popover{background:#111c2e!important;color:#f8fafc!important;border-color:#334155!important}
+html.dark .manlung-language-popover input,html.dark .manlung-language-popover select,
+body.dark .manlung-language-popover input,body.dark .manlung-language-popover select{background:#0b1220!important;color:#f8fafc!important;border-color:#475569!important}
