@@ -309,6 +309,44 @@ function openCaseFromForm(event){
 }
 </style>
 
+
+<style id="manlung-compact-case-sections">
+#content>.card{margin:.65rem 0;padding: .85rem 1rem;border-radius:14px}
+#content>.card:first-child .case-summary-top{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;margin-bottom:.3rem}
+#content>.card:first-child .case-summary-id{font-size:1.02rem;font-weight:850;letter-spacing:-.02em;color:var(--text)}
+#content>.card:first-child .case-summary-type{margin:.1rem 0 .6rem;color:var(--text-muted);font-size:.86rem}
+#content>.card:first-child .case-summary-meta{display:flex;gap:.45rem .9rem;flex-wrap:wrap;font-size:.78rem;color:var(--text-muted)}
+#content>.card:first-child .case-summary-meta strong{color:var(--text);font-weight:750}
+#content>.card .card-title{display:flex;align-items:center;gap:.45rem;margin:0 0 .55rem;font-size:.96rem}
+#content>.card .card-title i{color:#f97316}
+#content>.card .file-list{font-size:.82rem}
+#content>.card .file-list p{margin:.15rem 0;color:var(--text-muted)!important;font-size:.8rem!important}
+#content>.card .status-badge{padding:.25rem .55rem;border-radius:999px;font-size:.7rem;line-height:1.2}
+#content>.card.manlung-message-card{padding:.85rem 1rem;border:1px solid rgba(249,115,22,.25);background:linear-gradient(145deg,rgba(249,115,22,.055),transparent 70%)}
+#caseMessagesCard .card-title{margin-bottom:.25rem}
+#caseMessagesCard .message-subtitle{font-size:.75rem;color:var(--text-muted);margin:0 0 .55rem}
+#caseMessagesCard .message-live-label{display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .45rem;border-radius:999px;background:rgba(22,163,74,.1);color:#16a34a;font-size:.64rem;font-weight:800;letter-spacing:.04em}
+#caseMessagesCard .message-live-label:before{content:"";width:6px;height:6px;border-radius:50%;background:#22c55e}
+#caseMessagesCard .manlung-message-list{max-height:250px;min-height:58px;padding:.15rem}
+#caseMessagesCard .manlung-message-empty{padding:.65rem;font-size:.76rem}
+#caseMessagesCard .manlung-message{padding:.55rem .65rem;border-radius:10px}
+#caseMessagesCard .manlung-message-text{font-size:.79rem}
+#caseMessagesCard .manlung-message-compose{align-items:flex-end;gap:.45rem;margin-top:.5rem}
+#caseMessagesCard .manlung-message-compose textarea{min-height:44px;height:44px;max-height:130px;padding:.65rem .7rem;border-radius:10px;font-size:.8rem}
+#caseMessagesCard .manlung-message-compose .btn{min-height:44px;padding:.55rem .85rem;background:#f97316;border-color:#f97316;color:#fff}
+#caseMessagesCard .manlung-message-compose .btn:hover{background:#ea580c;border-color:#ea580c}
+#caseMessagesCard #caseMessageStatus{font-size:.68rem!important;margin-top:.25rem!important}
+#caseMessagesCard .message-compose-hint{display:flex;justify-content:space-between;gap:.5rem;margin-top:.25rem;font-size:.65rem;color:var(--text-muted)}
+#content>.card:nth-child(2) div[style*="white-space:pre-line"]{font-size:.8rem;line-height:1.45}
+@media(max-width:600px){
+ #content>.card{padding:.75rem .8rem;margin:.55rem 0}
+ #content>.card:first-child .case-summary-meta{display:grid;grid-template-columns:1fr;gap:.25rem}
+ #caseMessagesCard .manlung-message-compose{flex-direction:row}
+ #caseMessagesCard .manlung-message-compose textarea{min-width:0;flex:1}
+ #caseMessagesCard .manlung-message-compose .btn{width:auto;flex:0 0 auto}
+}
+</style>
+
   <link rel="stylesheet" href="/css/theme.css">
 
     <meta name="description" content="Cyber Recovery & Digital Investigation Portal">
@@ -443,15 +481,17 @@ function openCaseFromForm(event){
 
                 content.innerHTML = `
                     <div class="card">
-                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
-                            <strong style="font-size:1.3rem;">${c.caseId}</strong>
+                        <div class="case-summary-top">
+                            <strong class="case-summary-id">${c.caseId}</strong>
                             <span class="status-badge ${getStatusClass(c.status)}">${c.status}</span>
                         </div>
-                        <p style="color:var(--text-muted); margin-bottom:1rem;">${c.caseType || ''}</p>
-                        <div><strong>Investigator:</strong> ${c.investigator || 'Not assigned'}</div>
-                        <div><strong>Last Updated:</strong> ${c.lastUpdated || 'N/A'}</div>
-                        ${c.recoveryLoc ? `<div><strong>Recovery Location:</strong> ${c.recoveryLoc}</div>` : ''}
-                        ${c.publicNotes ? `<div style="margin-top:.8rem;padding:.8rem;border-radius:10px;background:var(--info-bg);"><strong>Admin feedback:</strong><div style="margin-top:.35rem;white-space:pre-wrap;">${c.publicNotes}</div></div>` : ''}
+                        <p class="case-summary-type">${c.caseType || ''}</p>
+                        <div class="case-summary-meta">
+                            <span><strong>Investigator:</strong> ${c.investigator || 'Not assigned'}</span>
+                            <span><strong>Last updated:</strong> ${c.lastUpdated || 'N/A'}</span>
+                            ${c.recoveryLoc ? `<span><strong>Recovery location:</strong> ${c.recoveryLoc}</span>` : ''}
+                        </div>
+                        ${c.publicNotes ? `<div style="margin-top:.6rem;padding:.6rem .7rem;border-radius:9px;background:var(--info-bg);font-size:.8rem;"><strong>Admin feedback:</strong><div style="margin-top:.2rem;white-space:pre-wrap;">${c.publicNotes}</div></div>` : ''}
                     </div>
 
                     <div class="card">
@@ -461,7 +501,8 @@ function openCaseFromForm(event){
 
 
                     <div class="card manlung-message-card" id="caseMessagesCard">
-                        <div class="card-title"><i class="fas fa-comments"></i> Case Messages</div>
+                        <div class="card-title"><i class="fas fa-comments"></i> Secure Case Messages <span class="message-live-label">LIVE</span></div>
+                        <p class="message-subtitle">Private conversation with your recovery team</p>
                         <div id="caseMessagesList" class="manlung-message-list">
                             <div class="manlung-message-empty">Loading messages…</div>
                         </div>
@@ -471,6 +512,7 @@ function openCaseFromForm(event){
                                 <i class="fas fa-paper-plane"></i> Send
                             </button>
                         </div>
+                        <div class="message-compose-hint"><span>Enter to send · Shift+Enter for a new line</span><span id="caseMessageCount">0 / 5000</span></div>
                         <div id="caseMessageStatus" style="margin-top:.4rem;color:var(--text-muted);font-size:.72rem;"></div>
                     </div>
 
@@ -711,7 +753,22 @@ async function sendClientCaseMessage() {
 }
 </script>
 
-  <script src="/js/call-widget.js"></script>
+  <script id="manlung-compact-message-controls">
+document.addEventListener('input',function(e){
+  if(e.target && e.target.id==='caseMessageInput'){
+    const count=document.getElementById('caseMessageCount');
+    if(count) count.textContent=(e.target.value||'').length+' / 5000';
+  }
+});
+document.addEventListener('keydown',function(e){
+  if(e.target && e.target.id==='caseMessageInput' && e.key==='Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendClientCaseMessage();
+  }
+});
+</script>
+
+<script src="/js/call-widget.js"></script>
 <script src="/js/pwa.js" defer></script>
 <footer class="manlung-footer" aria-label="Manlung Recovery footer">
   <div class="manlung-footer-inner">
