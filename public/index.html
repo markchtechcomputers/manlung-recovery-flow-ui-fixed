@@ -2448,74 +2448,91 @@ html body .site-header .home-header-container a.home-account-icon .home-account-
 </style>
 
 <style id="manlung-wood-board-orange-refresh">
-/* Professional, restrained service-card system: white surfaces, charcoal type, orange accents */
-:root{--mr-board-orange:#e87519;--mr-board-orange-dark:#b95613;--mr-board-ink:#202b36;--mr-board-muted:#647180;--mr-board-line:#e1e6eb;--mr-board-surface:#fff}
-.home-page-container{--mr-board-shadow:0 8px 24px rgba(27,39,51,.055)}
+/* Clean professional visual system: neutral surfaces, consistent typography, restrained orange */
+:root{
+ --mr-board-orange:#f05a0a;--mr-board-orange-dark:#c74708;
+ --mr-board-ink:#14263b;--mr-board-muted:#59697b;
+ --mr-board-line:#e2e8ef;--mr-board-surface:#fff;
+ --mr-board-shadow:0 3px 14px rgba(20,38,59,.045);
+}
+html{scroll-behavior:smooth}
+body,.home-page-container,.home-page-container button,.home-page-container input,
+.home-page-container textarea,.home-page-container select{
+ font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif!important;
+ -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+.home-page-container{color:var(--mr-board-ink)!important;background:#fff}
+.home-page-container h1,.home-page-container h2,.home-page-container h3,
+.home-page-container h4,.home-page-container p,.home-page-container li,
+.home-page-container label{font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif!important}
+.home-page-container h1,.home-page-container h2,.home-page-container h3,.home-page-container h4{
+ color:var(--mr-board-ink)!important;letter-spacing:-.025em;line-height:1.2;font-weight:750;
+}
+.home-page-container p,.home-page-container li{color:var(--mr-board-muted);line-height:1.7}
 .intro-strip,.premium-service-card,.process-step,.demo-copy,.demo-window,.tracker-card,
 .trust-grid>div,.scam-help-card,.scam-warning-list,.scam-official-links>a,.scam-help-footer,
 .support-section,.final-cta,.recovery-journey-card{
- position:relative;overflow:hidden;border:1px solid var(--mr-board-line)!important;border-radius:14px!important;
- background:#fff!important;box-shadow:0 5px 18px rgba(27,39,51,.045)!important;
+ position:relative;overflow:hidden;border:1px solid var(--mr-board-line)!important;
+ border-radius:12px!important;background:#fff!important;box-shadow:var(--mr-board-shadow)!important;
 }
 .intro-strip:before,.premium-service-card:before,.process-step:before,.demo-copy:before,.demo-window:before,
 .tracker-card:before,.trust-grid>div:before,.scam-help-card:before,.scam-warning-list:before,
 .scam-official-links>a:before,.scam-help-footer:before,.support-section:before,.final-cta:before,
-.recovery-journey-card:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:#e87519;pointer-events:none}
-.intro-strip,.tracker-card,.support-section,.final-cta{padding:clamp(1.25rem,2.8vw,2rem)!important;gap:1.4rem;background:#fff!important}
-.section-heading{margin-bottom:1.25rem}
-.section-heading .eyebrow,.eyebrow{color:var(--mr-board-orange-dark)}
-.premium-service-grid{gap:1rem!important}
-.premium-service-card{padding:1.35rem!important;min-height:100%;display:flex;flex-direction:column;align-items:flex-start;transition:transform .18s ease,box-shadow .18s ease}
-.premium-service-card:hover,.process-step:hover,.scam-help-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(27,39,51,.09)!important}
-.service-card-top{width:100%;padding-top:.15rem}
-.service-number,.process-index,.scam-help-number{display:inline-flex!important;align-items:center;justify-content:center;min-width:39px;height:39px;border-radius:10px!important;background:#fff3e9!important;color:#c65d12!important;border:1px solid #f2d0b5;box-shadow:none!important;font-weight:750}
-.service-icon-wrap{background:#f7f8fa!important;border:1px solid #e7ebef!important;border-radius:12px!important}
-.premium-service-card h3,.process-step h3,.scam-help-card h3,.recovery-journey-card h3{color:var(--mr-board-ink)!important}
-.premium-service-card p,.process-step p,.scam-help-card p,.intro-strip p{color:var(--mr-board-muted)!important;line-height:1.7}
-.service-learn,.show-more-btn,.btn.btn-primary{background:#e87519!important;border-color:#d96512!important;color:#fff!important;box-shadow:none!important}
+.recovery-journey-card:before{content:none!important;display:none!important}
+.intro-strip,.tracker-card,.support-section,.final-cta{padding:clamp(1.2rem,2.6vw,1.8rem)!important;gap:1.25rem;background:#fff!important}
+.section-heading{margin-bottom:1.4rem}
+.section-heading .eyebrow,.eyebrow{color:var(--mr-board-orange-dark)!important;letter-spacing:.09em;font-weight:750}
+.premium-service-grid,.process-flow,.scam-help-grid,.recovery-journey-grid{gap:1rem!important}
+.premium-service-card{padding:1.25rem!important;min-height:100%;display:flex;flex-direction:column;align-items:flex-start;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.premium-service-card:hover,.process-step:hover,.scam-help-card:hover{transform:translateY(-2px);border-color:#cbd5e1!important;box-shadow:0 9px 24px rgba(20,38,59,.08)!important}
+.service-card-top{width:100%;padding-top:.1rem}
+.service-number,.process-index,.scam-help-number{display:inline-flex!important;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:50%!important;background:var(--mr-board-orange)!important;color:#fff!important;border:0!important;box-shadow:none!important;font-weight:750}
+.service-icon-wrap{background:#f8fafc!important;border:1px solid var(--mr-board-line)!important;border-radius:10px!important;color:#233b55!important}
+.premium-service-card h3,.process-step h3,.scam-help-card h3,.recovery-journey-card h3{color:var(--mr-board-ink)!important;font-weight:700!important;letter-spacing:-.015em}
+.premium-service-card p,.process-step p,.scam-help-card p,.intro-strip p{color:var(--mr-board-muted)!important;line-height:1.65}
+.service-learn,.show-more-btn,.btn.btn-primary{background:var(--mr-board-orange)!important;border-color:var(--mr-board-orange)!important;color:#fff!important;box-shadow:none!important;border-radius:8px!important;font-weight:650!important}
 .service-learn{margin-top:auto}
-.service-transition-rail{border:1px solid var(--mr-board-line)!important;border-radius:12px!important;background:#f8fafc!important;padding:.75rem!important}
-.service-transition-rail span{background:#fff!important;border:1px solid #e5e9ee;border-radius:9px;padding:.6rem}
-.service-transition-rail b{color:#c65d12!important}
-.process-flow{gap:1rem!important}
-.process-step{padding:1.35rem 1.2rem!important;text-align:left!important}
-.process-step .process-icon{width:46px;height:46px;border-radius:12px;background:#fff3e9;border:1px solid #f2d0b5;color:#c65d12;display:grid;place-items:center}
-.demo-section{gap:1.2rem!important}
-.demo-copy{padding:1.4rem!important}
+.service-transition-rail{border:1px solid var(--mr-board-line)!important;border-radius:10px!important;background:#f8fafc!important;padding:.75rem!important}
+.service-transition-rail span{background:#fff!important;border:1px solid var(--mr-board-line)!important;border-radius:8px;padding:.6rem}
+.service-transition-rail b{color:var(--mr-board-orange-dark)!important}
+.process-step{padding:1.25rem 1.1rem!important;text-align:left!important}
+.process-step .process-icon{width:42px;height:42px;border-radius:10px;background:#f8fafc;border:1px solid var(--mr-board-line);color:#233b55;display:grid;place-items:center}
+.demo-section{gap:1.1rem!important}
+.demo-copy{padding:1.3rem!important}
 .demo-window{background:#fff!important}
-.demo-window-bar{background:#f7f8fa!important;border-bottom:1px solid #e5e9ee!important}
-.tracker-form{background:#fff!important;border:1px solid #dce2e8!important;border-radius:11px!important}
+.demo-window-bar{background:#f8fafc!important;border-bottom:1px solid var(--mr-board-line)!important}
+.tracker-form{background:#fff!important;border:1px solid #d5dee8!important;border-radius:9px!important}
 .tracker-form input{background:transparent!important;color:var(--mr-board-ink)!important}
-.trust-grid{gap:.85rem!important}
-.trust-grid>div{padding:1.2rem!important;display:flex;flex-direction:column;gap:.5rem}
-.trust-grid>div>i{display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:#fff3e9;color:#c65d12}
-.trust-grid strong{color:var(--mr-board-ink)}
+.tracker-form:focus-within{border-color:#f5a477!important;box-shadow:0 0 0 3px rgba(240,90,10,.08)!important}
+.trust-grid{gap:.8rem!important}
+.trust-grid>div{padding:1.1rem!important;display:flex;flex-direction:column;gap:.5rem}
+.trust-grid>div>i{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:#f8fafc;color:var(--mr-board-orange-dark);border:1px solid var(--mr-board-line)}
+.trust-grid strong{color:var(--mr-board-ink)!important}
 .scam-help-header{gap:1rem!important}
-.scam-help-alert{border:1px solid #f0c7a8!important;border-radius:13px!important;background:#fff8f2!important;box-shadow:none!important}
-.scam-help-alert>i{color:#c65d12!important}
-.scam-help-grid{gap:1rem!important}
-.scam-help-card{padding:1.3rem!important}
-.scam-help-card>i{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:11px;background:#f7f8fa;color:#c65d12;border:1px solid #e7ebef;margin:.7rem 0}
-.scam-warning-list{padding:1.35rem!important;background:#fff!important}
+.scam-help-alert{border:1px solid #f2d5c6!important;border-radius:11px!important;background:#fffaf7!important;box-shadow:none!important}
+.scam-help-alert>i{color:var(--mr-board-orange-dark)!important}
+.scam-help-card{padding:1.2rem!important}
+.scam-help-card>i{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;background:#f8fafc;color:#233b55;border:1px solid var(--mr-board-line);margin:.6rem 0}
+.scam-warning-list{padding:1.2rem!important;background:#fff!important}
 .scam-warning-list h3{color:var(--mr-board-ink)!important}
-.scam-warning-list li::marker{color:#e87519}
-.scam-official-links{gap:.75rem!important}
+.scam-warning-list li::marker{color:var(--mr-board-orange)}
+.scam-official-links{gap:.7rem!important}
 .scam-official-links>a{padding:1rem!important;display:flex;align-items:center;text-decoration:none!important}
-.scam-official-links>a>i:first-child{color:#c65d12!important;background:#fff3e9;border-radius:10px;padding:.7rem}
-.scam-help-footer{padding:1.35rem!important}
-.support-target{border:1px solid var(--mr-board-line)!important;border-radius:12px!important;background:#f8fafc!important;padding:1rem!important;box-shadow:none!important}
-.support-target strong{color:#c65d12!important}
-.recovery-journey-grid{gap:1rem!important}
+.scam-official-links>a>i:first-child{color:var(--mr-board-orange-dark)!important;background:#f8fafc;border:1px solid var(--mr-board-line);border-radius:9px;padding:.65rem}
+.scam-help-footer{padding:1.2rem!important}
+.support-target{border:1px solid var(--mr-board-line)!important;border-radius:10px!important;background:#f8fafc!important;padding:1rem!important;box-shadow:none!important}
+.support-target strong{color:var(--mr-board-orange-dark)!important}
 .recovery-journey-card{background:#fff!important}
-.recovery-journey-card img{border-bottom:3px solid #e87519!important}
-.recovery-journey-card>div{padding:1.1rem!important;background:#fff}
-.recovery-journey-card>div>span{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#fff3e9;color:#c65d12;font-weight:750}
+.recovery-journey-card img{border-bottom:1px solid var(--mr-board-line)!important}
+.recovery-journey-card>div{padding:1.1rem!important;background:#fff!important}
+.recovery-journey-card>div>span{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--mr-board-orange);color:#fff;font-weight:750}
+.home-page-container a:focus-visible,.home-page-container button:focus-visible,.home-page-container input:focus-visible{outline:3px solid rgba(240,90,10,.35)!important;outline-offset:3px}
 @media(max-width:700px){
- .intro-strip,.tracker-card,.support-section,.final-cta{border-radius:12px!important}
- .premium-service-card,.process-step,.scam-help-card{padding:1.1rem!important}
+ .intro-strip,.tracker-card,.support-section,.final-cta{border-radius:10px!important}
+ .premium-service-card,.process-step,.scam-help-card{padding:1rem!important}
  .service-transition-rail{grid-template-columns:1fr 1fr!important}
  .scam-help-header{display:grid!important}
- .scam-help-actions,.final-cta-actions{display:flex;flex-wrap:wrap;gap:.7rem}
+ .scam-help-actions,.final-cta-actions{display:flex;flex-wrap:wrap;gap:.65rem}
  .scam-help-actions .btn,.final-cta-actions .btn{width:100%;justify-content:center}
 }
 @media(prefers-reduced-motion:reduce){.premium-service-card,.process-step,.scam-help-card{transition:none!important}}
