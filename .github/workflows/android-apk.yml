@@ -54,7 +54,7 @@ jobs:
           mkdir -p android-wrapper/www
           cd android-wrapper
           npm init -y
-          npm install @capacitor/core@^7 @capacitor/cli@^7 @capacitor/android@^7 @capacitor/assets@^3 sharp
+          npm install @capacitor/core@^7 @capacitor/cli@^7 @capacitor/android@^7 @capacitor/app@^7 @capacitor/status-bar@^7 @capacitor/splash-screen@^7 @capacitor/keyboard@^7 @capacitor/assets@^3 sharp
           cat > www/index.html <<'HTML'
           <!doctype html>
           <html lang="en">
@@ -81,7 +81,27 @@ jobs:
               ]
             },
             "android": {
-              "allowMixedContent": false
+              "allowMixedContent": false,
+              "backgroundColor": "#071629"
+            },
+            "plugins": {
+              "SplashScreen": {
+                "launchShowDuration": 1800,
+                "launchAutoHide": true,
+                "backgroundColor": "#071629",
+                "showSpinner": true,
+                "spinnerColor": "#38bdf8",
+                "androidScaleType": "CENTER_CROP"
+              },
+              "StatusBar": {
+                "style": "LIGHT",
+                "backgroundColor": "#071629",
+                "overlaysWebView": false
+              },
+              "Keyboard": {
+                "resize": "native",
+                "style": "DARK"
+              }
             }
           }
           JSON
@@ -96,6 +116,7 @@ jobs:
           NODE
           npx cap add android
           npx capacitor-assets generate --android
+          npx cap sync android
           cd android
           ./gradlew --no-daemon assembleDebug
           cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/ManlungRecovery.apk"
