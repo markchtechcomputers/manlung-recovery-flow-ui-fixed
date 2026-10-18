@@ -2536,6 +2536,70 @@ body,.home-page-container,.home-page-container button,.home-page-container input
  .scam-help-actions .btn,.final-cta-actions .btn{width:100%;justify-content:center}
 }
 @media(prefers-reduced-motion:reduce){.premium-service-card,.process-step,.scam-help-card{transition:none!important}}
+
+/* Theme-aware surfaces: the toggle must update the whole homepage, not only the body class. */
+html.dark,html.dark body,body.dark{background:#0b1220!important;color:#e5eaf1!important;color-scheme:dark}
+html.dark body .home-page-container,body.dark .home-page-container,
+html.dark .home-page-container main,body.dark .home-page-container main,
+html.dark .home-page-container section,body.dark .home-page-container section{background-color:transparent!important;color:#e5eaf1!important}
+html.dark .home-page-container .intro-strip,html.dark .home-page-container .premium-service-card,
+html.dark .home-page-container .process-step,html.dark .home-page-container .demo-copy,
+html.dark .home-page-container .demo-window,html.dark .home-page-container .tracker-card,
+html.dark .home-page-container .trust-grid>div,html.dark .home-page-container .scam-help-card,
+html.dark .home-page-container .scam-warning-list,html.dark .home-page-container .scam-official-links>a,
+html.dark .home-page-container .scam-help-footer,html.dark .home-page-container .support-section,
+html.dark .home-page-container .final-cta,html.dark .home-page-container .recovery-journey-card,
+body.dark .home-page-container .intro-strip,body.dark .home-page-container .premium-service-card,
+body.dark .home-page-container .process-step,body.dark .home-page-container .demo-copy,
+body.dark .home-page-container .demo-window,body.dark .home-page-container .tracker-card,
+body.dark .home-page-container .trust-grid>div,body.dark .home-page-container .scam-help-card,
+body.dark .home-page-container .scam-warning-list,body.dark .home-page-container .scam-official-links>a,
+body.dark .home-page-container .scam-help-footer,body.dark .home-page-container .support-section,
+body.dark .home-page-container .final-cta,body.dark .home-page-container .recovery-journey-card{
+ background:#141e2d!important;background-color:#141e2d!important;border-color:#2a384b!important;
+ color:#e5eaf1!important;box-shadow:0 5px 18px rgba(0,0,0,.18)!important
+}
+html.dark .home-page-container h1,html.dark .home-page-container h2,html.dark .home-page-container h3,
+html.dark .home-page-container h4,html.dark .home-page-container strong,html.dark .home-page-container label,
+body.dark .home-page-container h1,body.dark .home-page-container h2,body.dark .home-page-container h3,
+body.dark .home-page-container h4,body.dark .home-page-container strong,body.dark .home-page-container label{color:#f1f5f9!important}
+html.dark .home-page-container p,html.dark .home-page-container li,html.dark .home-page-container small,
+body.dark .home-page-container p,body.dark .home-page-container li,body.dark .home-page-container small{color:#b8c4d4!important}
+html.dark .home-page-container .service-icon-wrap,html.dark .home-page-container .process-step .process-icon,
+html.dark .home-page-container .trust-grid>div>i,html.dark .home-page-container .scam-help-card>i,
+html.dark .home-page-container .scam-official-links>a>i:first-child,
+html.dark .home-page-container .support-target,
+body.dark .home-page-container .service-icon-wrap,body.dark .home-page-container .process-step .process-icon,
+body.dark .home-page-container .trust-grid>div>i,body.dark .home-page-container .scam-help-card>i,
+body.dark .home-page-container .scam-official-links>a>i:first-child,
+body.dark .home-page-container .support-target{background:#1b293b!important;border-color:#33445a!important;color:#ff9a5e!important}
+html.dark .home-page-container .service-number,html.dark .home-page-container .process-index,
+html.dark .home-page-container .scam-help-number,body.dark .home-page-container .service-number,
+body.dark .home-page-container .process-index,body.dark .home-page-container .scam-help-number{
+ background:#f05a0a!important;color:#fff!important;border-color:#f05a0a!important
+}
+html.dark .home-page-container .demo-window-bar,html.dark .home-page-container .service-transition-rail,
+html.dark .home-page-container .service-transition-rail span,html.dark .home-page-container .tracker-form,
+html.dark .home-page-container .recovery-journey-card>div,
+body.dark .home-page-container .demo-window-bar,body.dark .home-page-container .service-transition-rail,
+body.dark .home-page-container .service-transition-rail span,body.dark .home-page-container .tracker-form,
+body.dark .home-page-container .recovery-journey-card>div{
+ background:#101927!important;background-color:#101927!important;border-color:#334155!important;color:#e5eaf1!important
+}
+html.dark .home-page-container input,html.dark .home-page-container textarea,html.dark .home-page-container select,
+body.dark .home-page-container input,body.dark .home-page-container textarea,body.dark .home-page-container select{
+ background:#101927!important;color:#f1f5f9!important;border-color:#3a4a60!important
+}
+html.dark .home-page-container input::placeholder,html.dark .home-page-container textarea::placeholder,
+body.dark .home-page-container input::placeholder,body.dark .home-page-container textarea::placeholder{color:#91a0b4!important}
+html.dark .home-page-container .scam-help-alert,body.dark .home-page-container .scam-help-alert{
+ background:#2a201c!important;border-color:#63412e!important;color:#f7d9c7!important
+}
+html.dark .home-page-container .scam-help-alert *,body.dark .home-page-container .scam-help-alert *{color:#f7d9c7}
+html.dark .home-page-container .btn:not(.btn-primary),body.dark .home-page-container .btn:not(.btn-primary){color:#e5eaf1!important;border-color:#43536a!important}
+html.dark .home-page-container a:not(.btn):not(.service-learn),body.dark .home-page-container a:not(.btn):not(.service-learn){color:#ff9a5e}
+html.dark .home-page-container .site-header,body.dark .home-page-container .site-header{background:#101927!important;color:#f1f5f9!important;border-color:#263449!important}
+html.dark .home-page-container .manlung-footer,body.dark .home-page-container .manlung-footer{background:#08111f!important;color:#e5eaf1!important}
 </style>
 
 </body>
