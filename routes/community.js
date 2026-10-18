@@ -856,6 +856,59 @@ router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Group message send error:'); }
 });
 
+// Edit or unsend a group message. Only its sender (or an admin moderating the Updates channel) may change it.
+router.patch('/groups/:groupId/messages/:messageId', messageLimiter, async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), mid = String(req.params.messageId || '');
+    const message = cleanText(req.body?.message, 5000);
+    if (!validId(gid) || !validId(mid)) return fail(res, 400, 'Invalid group or message ID.');
+    if (!message) return fail(res, 400, 'Message cannot be empty.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to edit messages.');
+    const { data: group, error: ge } = await supabase.from('recovery_chat_groups').select('id,slug').eq('id', gid).maybeSingle();
+    if (ge) throw ge;
+    if (!group) return fail(res, 404, 'Group not found.');
+    if (group.slug === 'manlung-updates' && !isAdmin(req.user)) return fail(res, 403, 'Only admins can manage official updates.');
+    const { data: existing, error: me } = await supabase.from('recovery_chat_group_messages')
+      .select('id,sender_user_id,deleted_at').eq('id', mid).eq('group_id', gid).maybeSingle();
+    if (me) throw me;
+    if (!existing || existing.deleted_at) return fail(res, 404, 'Message not found.');
+    if (String(existing.sender_user_id) !== String(req.user.id) && !isAdmin(req.user)) return fail(res, 403, 'You can only edit your own messages.');
+    const { data, error } = await supabase.from('recovery_chat_group_messages')
+      .update({ message, edited_at: new Date().toISOString() }).eq('id', mid).eq('group_id', gid).is('deleted_at', null)
+      .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found.');
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, message: data });
+  } catch (error) { return handleDbError(res, error, 'Group message edit error:'); }
+});
+
+router.delete('/groups/:groupId/messages/:messageId', messageLimiter, async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), mid = String(req.params.messageId || '');
+    if (!validId(gid) || !validId(mid)) return fail(res, 400, 'Invalid group or message ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to unsend messages.');
+    const { data: group, error: ge } = await supabase.from('recovery_chat_groups').select('id,slug').eq('id', gid).maybeSingle();
+    if (ge) throw ge;
+    if (!group) return fail(res, 404, 'Group not found.');
+    if (group.slug === 'manlung-updates' && !isAdmin(req.user)) return fail(res, 403, 'Only admins can manage official updates.');
+    const { data: existing, error: me } = await supabase.from('recovery_chat_group_messages')
+      .select('id,sender_user_id,deleted_at').eq('id', mid).eq('group_id', gid).maybeSingle();
+    if (me) throw me;
+    if (!existing || existing.deleted_at) return fail(res, 404, 'Message not found.');
+    if (String(existing.sender_user_id) !== String(req.user.id) && !isAdmin(req.user)) return fail(res, 403, 'You can only unsend your own messages.');
+    const { data, error } = await supabase.from('recovery_chat_group_messages')
+      .update({ deleted_at: new Date().toISOString() }).eq('id', mid).eq('group_id', gid).is('deleted_at', null)
+      .select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found.');
+    const { error: reactionError } = await supabase.from('recovery_chat_group_reactions').delete().eq('message_id', mid);
+    if (reactionError) throw reactionError;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, unsent: true, messageId: mid });
+  } catch (error) { return handleDbError(res, error, 'Group message unsend error:'); }
+});
+
 // Group reactions are available to every joined member, including read-only Manlung Updates readers.
 router.get('/groups/:groupId/reactions', async (req, res) => {
   try {
