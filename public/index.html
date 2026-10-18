@@ -1548,6 +1548,7 @@ document.addEventListener('DOMContentLoaded',function(){
   video.muted=true;
   video.defaultMuted=true;
   video.playsInline=true;
+  video.loop=true;
   video.setAttribute('muted','');
   video.setAttribute('playsinline','');
   video.setAttribute('webkit-playsinline','');
@@ -1555,23 +1556,44 @@ document.addEventListener('DOMContentLoaded',function(){
   video.setAttribute('loop','');
   var fallback=video.parentElement.querySelector('.mr-hero-video-fallback');
   var showFallback=function(){
-    /* A failed media element can paint solid black over the fallback. */
     video.style.display='none';
     if(fallback)fallback.style.zIndex='1';
     console.warn('Manlung hero video failed to load; showing fallback background.');
   };
   video.addEventListener('error',showFallback);
-  video.addEventListener('stalled',function(){
-    if(video.readyState===0 && video.networkState===3)showFallback();
-  });
-  var attemptPlay=function(){
+  var playVideo=function(){
+    if(video.style.display==='none')return;
+    video.muted=true;
     var result=video.play();
     if(result&&typeof result.catch==='function'){
-      result.catch(function(){ /* Autoplay may be blocked by browser settings. */ });
+      result.catch(function(){ /* Browser autoplay policy may reject background playback. */ });
     }
   };
-  if(video.readyState>=2)attemptPlay();
-  else{video.addEventListener('loadeddata',attemptPlay,{once:true});video.load();attemptPlay();}
+  /* Recover if the media reaches its end or the browser pauses it unexpectedly. */
+  video.addEventListener('ended',function(){
+    try{video.currentTime=0;}catch(e){}
+    playVideo();
+  });
+  video.addEventListener('pause',function(){
+    if(!video.ended && !document.hidden){
+      window.setTimeout(function(){
+        if(video.paused && !video.ended && !document.hidden)playVideo();
+      },1200);
+    }
+  });
+  /* Retry playback after transient buffering without repeatedly reloading the file. */
+  video.addEventListener('canplay',playVideo);
+  video.addEventListener('stalled',function(){
+    window.setTimeout(function(){
+      if(video.readyState>=2 && video.paused && !document.hidden)playVideo();
+      else if(video.readyState===0 && video.networkState===3)showFallback();
+    },2500);
+  });
+  document.addEventListener('visibilitychange',function(){
+    if(!document.hidden)playVideo();
+  });
+  video.load();
+  playVideo();
 });
 </script>
 
