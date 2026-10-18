@@ -1022,6 +1022,24 @@ router.post('/verification/verify', async (req,res) => {
  }catch(error){return handleDbError(res,error,'Verification payment verification error:');}
 });
 
+const STATUS_MEDIA_BUCKET = 'recovery-status-media';
+const STATUS_MEDIA_TYPES = new Set(['image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm','video/quicktime']);
+const STATUS_MEDIA_EXT = {'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'};
+
+// Upload bytes through the authenticated API so the private service-role key never reaches the browser.
+router.post('/status/media', statusLimiter, express.raw({ type: ['image/*','video/*'], limit: '20mb' }), async (req,res) => {
+  try {
+    const mime = String(req.headers['content-type'] || '').split(';')[0].trim().toLowerCase();
+    if (!STATUS_MEDIA_TYPES.has(mime)) return fail(res,400,'Unsupported image or video format.');
+    if (!Buffer.isBuffer(req.body) || !req.body.length) return fail(res,400,'Choose a photo or video first.');
+    if (req.body.length > 20 * 1024 * 1024) return fail(res,413,'Media must be 20 MB or smaller.');
+    const path = req.user.id + '/' + crypto.randomUUID() + '.' + STATUS_MEDIA_EXT[mime];
+    const { error } = await supabase.storage.from(STATUS_MEDIA_BUCKET).upload(path, req.body, { contentType:mime, upsert:false });
+    if (error) throw error;
+    res.status(201).json({ success:true, media_path:path, status_type:mime.startsWith('video/')?'video':'image', content_type:mime });
+  } catch (error) { return handleDbError(res,error,'Status media upload error:'); }
+});
+
 router.get('/status', async (req, res) => {
   try {
     const { data: posts, error } = await supabase.from('recovery_chat_status_posts')
@@ -1038,8 +1056,16 @@ router.get('/status', async (req, res) => {
     ]);
     if (pe) throw pe; if (we) throw we;
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-    const statuses = (posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'))
-      .map(p => ({ ...p, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } }));
+    const statuses = await Promise.all((posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'))
+      .map(async p => {
+        let media_url = null;
+        if (p.media_path && (p.status_type === 'image' || p.status_type === 'video')) {
+          const { data: signed, error: se } = await supabase.storage.from(STATUS_MEDIA_BUCKET).createSignedUrl(p.media_path, 300);
+          if (se) console.error('Could not sign status media URL:', se.message);
+          else media_url = signed?.signedUrl || null;
+        }
+        return { ...p, media_url, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } };
+      }));
     const last = wallet?.free_status_last_used_at ? new Date(wallet.free_status_last_used_at).getTime() : 0;
     res.json({ success: true, statuses, allowance: { freeAvailable: !last || Date.now() - last >= 86400000, freeLastUsedAt: wallet?.free_status_last_used_at || null, paidCredits: wallet?.paid_status_credits || 0 } });
   } catch (error) { return handleDbError(res, error, 'Status list error:'); }
@@ -1048,18 +1074,27 @@ router.get('/status', async (req, res) => {
 router.post('/status', statusLimiter, async (req, res) => {
   try {
     const type = req.body?.status_type || 'text';
-    if (type !== 'text') return fail(res, 400, 'Image and video status uploads are not enabled until secure private storage is configured.');
-    const text = cleanText(req.body?.text_content, 2000);
-    if (!text) return fail(res, 400, 'Text status cannot be empty.');
+    const caption = cleanText(req.body?.caption, 1000);
+    let record;
+    if (type === 'text') {
+      const text = cleanText(req.body?.text_content, 2000);
+      if (!text) return fail(res, 400, 'Text status cannot be empty.');
+      record = { user_id:req.user.id, status_type:'text', text_content:text, caption };
+    } else if (type === 'image' || type === 'video') {
+      const path = cleanText(req.body?.media_path, 500);
+      if (!path || !path.startsWith(req.user.id + '/') || path.includes('..') || path.startsWith('/')) return fail(res,400,'Upload your media before posting the status.');
+      const { data: signed, error: se } = await supabase.storage.from(STATUS_MEDIA_BUCKET).createSignedUrl(path,60);
+      if (se || !signed?.signedUrl) return fail(res,400,'Uploaded media was not found. Please upload it again.');
+      record = { user_id:req.user.id, status_type:type, media_path:path, caption };
+    } else return fail(res,400,'Unsupported status type.');
     const { data, error } = await supabase.from('recovery_chat_status_posts')
-      .insert({ user_id: req.user.id, status_type: 'text', text_content: text, caption: cleanText(req.body?.caption, 1000) })
-      .select('id,user_id,status_type,text_content,caption,expires_at,created_at').single();
+      .insert(record).select('id,user_id,status_type,text_content,media_path,caption,expires_at,created_at').single();
     if (error) {
       if (String(error.message || '').includes('STATUS_ALLOWANCE_EXHAUSTED')) return fail(res, 402, 'Your free status has been used in the last 24 hours. Purchase two extra status posts for KES 100.');
       throw error;
     }
-    res.status(201).json({ success: true, status: data });
-  } catch (error) { return handleDbError(res, error, 'Create status error:'); }
+    res.status(201).json({ success:true, status:data });
+  } catch (error) { return handleDbError(res,error,'Create status error:'); }
 });
 
 router.get('/status/credits', async (req, res) => {
