@@ -1525,25 +1525,40 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
 </style>
 
 <style id="mr-hero-video-replacement">
-/* Homepage hero background video: responsive, autoplay-safe and behind readable content. */
+/* Keep the video above its fallback, with the overlay and copy above both. */
 .mr-home-hero.mr-video-hero{position:relative;isolation:isolate;overflow:hidden;background:#071629}
-.mr-home-hero.mr-video-hero .mr-hero-background-video{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;z-index:0;pointer-events:none;background:#071629}
 .mr-home-hero.mr-video-hero .mr-hero-video-fallback{position:absolute;inset:0;z-index:0;background:linear-gradient(135deg,#071629,#123d68 55%,#071629)}
-.mr-home-hero.mr-video-hero .mr-hero-video-overlay{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(3,12,27,.88) 0%,rgba(3,12,27,.64) 55%,rgba(3,12,27,.40) 100%)}
-.mr-home-hero.mr-video-hero .mr-home-hero-inner{position:relative;z-index:2}
+.mr-home-hero.mr-video-hero .mr-hero-background-video{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;z-index:1;pointer-events:none;background:transparent;opacity:1;visibility:visible}
+.mr-home-hero.mr-video-hero .mr-hero-video-overlay{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,rgba(3,12,27,.76) 0%,rgba(3,12,27,.48) 55%,rgba(3,12,27,.34) 100%)}
+.mr-home-hero.mr-video-hero .mr-home-hero-inner{position:relative;z-index:3}
 .mr-home-hero.mr-video-hero .mr-hero-copy h1{color:#fff!important}
 .mr-home-hero.mr-video-hero .mr-hero-copy h1 span{color:#93c5fd!important}
 .mr-home-hero.mr-video-hero .mr-hero-description{color:#e2e8f0!important}
 .mr-home-hero.mr-video-hero .mr-hero-trust-row{color:#e2e8f0!important}
 .mr-home-hero.mr-video-hero .mr-hero-trust-row i{color:#93c5fd!important}
 @media(max-width:780px){
-  .mr-home-hero.mr-video-hero .mr-hero-background-video{object-position:center;opacity:.78}
-  .mr-home-hero.mr-video-hero .mr-hero-video-overlay{background:linear-gradient(180deg,rgba(3,12,27,.64),rgba(3,12,27,.82))}
-}
-@media(prefers-reduced-motion:reduce){
-  .mr-home-hero.mr-video-hero .mr-hero-background-video{visibility:hidden}
+  .mr-home-hero.mr-video-hero .mr-hero-background-video{object-position:center;opacity:1}
+  .mr-home-hero.mr-video-hero .mr-hero-video-overlay{background:linear-gradient(180deg,rgba(3,12,27,.58),rgba(3,12,27,.76))}
 }
 </style>
+<script id="mr-hero-video-autoplay-fix">
+document.addEventListener('DOMContentLoaded',function(){
+  var video=document.querySelector('.mr-home-hero.mr-video-hero .mr-hero-background-video');
+  if(!video)return;
+  video.muted=true;
+  video.defaultMuted=true;
+  video.playsInline=true;
+  video.setAttribute('muted','');
+  video.setAttribute('playsinline','');
+  video.setAttribute('webkit-playsinline','');
+  video.setAttribute('autoplay','');
+  video.setAttribute('loop','');
+  video.addEventListener('error',function(){video.style.visibility='hidden';});
+  var attemptPlay=function(){var result=video.play();if(result&&typeof result.catch==='function'){result.catch(function(){});}};
+  if(video.readyState>=2)attemptPlay();
+  else{video.addEventListener('loadeddata',attemptPlay,{once:true});video.load();attemptPlay();}
+});
+</script>
 
 </head>
 <body>
