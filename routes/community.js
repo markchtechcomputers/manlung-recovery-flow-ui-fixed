@@ -823,11 +823,14 @@ router.get('/groups/:groupId/messages', async (req, res) => {
     if (!targetGroup) return fail(res, 404, 'Group not found.');
     if (targetGroup.slug === 'manlung-team' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Team is available to admins and the owner only.');
     if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
+    // Fetch the newest 100 messages first, then return them oldest-to-newest for the chat UI.
+    // An ascending query with limit(100) would permanently hide every message after the first 100.
     const { data, error } = await supabase.from('recovery_chat_group_messages')
       .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at')
-      .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
+      .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
-    res.json({ success: true, messages: data || [] });
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, messages: (data || []).reverse() });
   } catch (error) { return handleDbError(res, error, 'Group message list error:'); }
 });
 
