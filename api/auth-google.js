@@ -11,7 +11,10 @@ app.use((req,_res,next)=>{
  req.url=String(req.url||'/').replace(/^\/api\/auth\/google(?=\/|\?|$)/,'')||'/';
  next();
 });
-function token(user){return jwt.sign({id:user.id,role:user.role,sessionVersion:Number(user.session_version||0)},process.env.JWT_SECRET,{expiresIn:'7d'});}
+function token(user){
+ if(!process.env.JWT_SECRET)throw new Error('Authentication is not configured on the server: JWT_SECRET is missing.');
+ return jwt.sign({id:user.id,role:user.role,sessionVersion:Number(user.session_version||0)},process.env.JWT_SECRET,{expiresIn:'7d'});
+}
 function setClientCookie(res, value){res.cookie('manlung_client_session',value,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:7*24*60*60*1000});}
 app.get('*',(_req,res)=>res.status(200).set('Cache-Control','no-store').json({success:true,clientId:GOOGLE_CLIENT_ID}));
 app.post('*',async(req,res)=>{
@@ -60,6 +63,12 @@ app.post('*',async(req,res)=>{
   setClientCookie(res,sessionToken);
   const profilePicture = /^https:\/\/[^\s"'<>]+$/i.test(String(p.picture || '')) ? String(p.picture) : null;
   res.json({success:true,user:{id:user.id,email:user.email,username:user.username,role:user.role,profilePicture}});
- }catch(e){console.error('Google Cloud auth error:',e.response?.data||e.message);res.status(502).json({success:false,error:'Google authentication service is temporarily unavailable.'});}
+ }catch(e){
+  console.error('Google Cloud auth error:',e.response?.data||e.message);
+  const message = !process.env.JWT_SECRET
+    ? 'Authentication is not configured on the server (JWT_SECRET is missing). Please contact support.'
+    : (e?.message === 'JWT_SECRET is required' ? 'Authentication is not configured on the server. Please contact support.' : 'Google authentication could not complete. Please try again.');
+  res.status(!process.env.JWT_SECRET ? 503 : 502).json({success:false,error:message});
+}
 });
 module.exports=app;
