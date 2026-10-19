@@ -394,11 +394,9 @@ async function setupOfficialGoogleButtons(){
       () => true,
       error => error
     );
-    const cfgRes=await fetch('/api/auth/google',{cache:'force-cache'});
-    const cfgText=await cfgRes.text();
-    let cfg;
-    try{cfg=JSON.parse(cfgText);}catch(_){throw new Error('Google sign-in configuration endpoint returned HTTP '+cfgResponse.status+' instead of JSON.');}
-    if(!cfgRes.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
+    // Google OAuth client IDs are public identifiers; avoid an API round trip
+    // before rendering the sign-in button.
+    const cfg = {clientId:'750848085828-t1uo1rljsmkkmlv3sqiv13tjrb7j1a9f.apps.googleusercontent.com'};
     const googleReady = await googleLibraryReady;
     if(googleReady instanceof Error) throw googleReady;
     if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh and try again.');
