@@ -979,8 +979,18 @@ function showForgot(event) {
   document.getElementById('tabLogin').classList.remove('active');
   document.getElementById('tabRegister').classList.remove('active');
 }
-function showMessage(el, text, type='error') {
-  el.textContent = text || '';
+function showMessage(el, message, type='error') {
+  if (!el) return;
+  let text = '';
+  if (typeof message === 'string') text = message;
+  else if (message instanceof Error) text = message.message || 'Something went wrong. Please try again.';
+  else if (message && typeof message === 'object') {
+    text = (typeof message.error === 'string' && message.error) ||
+      (typeof message.message === 'string' && message.message) ||
+      (typeof message.details === 'string' && message.details) ||
+      'Sign-in could not be completed. Please refresh and try again.';
+  } else if (message != null) text = String(message);
+  el.textContent = text;
   el.className = 'manlung-auth-message ' + type + (text ? ' show' : '');
 }
 
