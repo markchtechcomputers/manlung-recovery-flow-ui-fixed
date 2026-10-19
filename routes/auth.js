@@ -237,18 +237,35 @@ function issueAdminSession(res, user) {
 }
 
 async function requireTurnstile(req, res) {
-  const result = await verifyTurnstile(req.body?.turnstileToken, req.ip);
-  if (!result.success) {
-    await SecurityMonitoring.recordEvent({
-      eventType: 'AUTH_FAILED',
-      severity: 'medium',
-      ipAddress: req.ip,
-      userAgent: req.get('user-agent'),
-      loginIdentifier: req.body?.email || req.body?.username || null,
-      path: req.path,
-      httpStatus: 403,
-      details: { reason: 'turnstile_rejected', error_codes: result.errorCodes },
-    }).catch(() => {});
+  let result;
+  try {
+    result = await verifyTurnstile(req.body?.turnstileToken, req.ip);
+  } catch (error) {
+    // A Turnstile/network failure must produce a controlled JSON response,
+    // not bubble up as a generic server error from the login route.
+    console.error('Cloudflare Turnstile verification failed:', error?.message || error);
+    res.status(503).json({
+      success: false,
+      error: 'Cloudflare security verification is temporarily unavailable. Please refresh and try again.',
+    });
+    return false;
+  }
+
+  if (!result || !result.success) {
+    try {
+      await SecurityMonitoring.recordEvent({
+        eventType: 'AUTH_FAILED',
+        severity: 'medium',
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+        loginIdentifier: req.body?.email || req.body?.username || null,
+        path: req.path,
+        httpStatus: 403,
+        details: { reason: 'turnstile_rejected', error_codes: result?.errorCodes || ['verification-failed'] },
+      });
+    } catch (error) {
+      console.error('Could not record Turnstile rejection:', error?.message || error);
+    }
     res.status(403).json({
       success: false,
       error: 'Security verification failed. Please complete the Cloudflare verification and try again.',
