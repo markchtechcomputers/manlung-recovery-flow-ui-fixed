@@ -44,7 +44,19 @@ async function findByEmail(email) {
   return data;
 }
 
-async function create({ username, password, role = 'client', email, phone }) {
+async function findByPhoneAndRole(phone, role) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select('*')
+    .eq('phone', phone)
+    .eq('role', role)
+    .limit(2);
+  if (error) throw error;
+  // Never authenticate an ambiguous phone number shared by multiple accounts.
+  return Array.isArray(data) && data.length === 1 ? data[0] : null;
+}
+
+async function create({ username, password, role = 'client', email, phone })
   assertStrongPassword(password);
   const hashed = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const { data, error } = await supabase
@@ -385,7 +397,7 @@ async function consumeRecoveryCode(userId, remainingHashes) {
 }
 
 module.exports = {
-  findByUsername, findByEmailAndRole, findById, findByEmail, create, comparePassword, verifyPassword, bumpSessionVersion,
+  findByUsername, findByEmailAndRole, findByPhoneAndRole, findById, findByEmail, create, comparePassword, verifyPassword, bumpSessionVersion,
   setEmailVerificationToken, findByValidEmailVerificationToken, markEmailVerified, markPhoneVerified,
   setResetToken, findByValidResetToken, resetPassword, updateProfile, updatePassword, deleteById, createAdminFromInvitation,
   listAdminsAndOwner, searchPromotableUsers, promoteToAdmin, convertClientToPendingAdmin, setAdminStatus, removeAdminPrivileges,
