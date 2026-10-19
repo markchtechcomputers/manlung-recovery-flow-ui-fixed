@@ -13,7 +13,7 @@ app.use((req,_res,next)=>{
 });
 function token(user){return jwt.sign({id:user.id,role:user.role,sessionVersion:Number(user.session_version||0)},process.env.JWT_SECRET,{expiresIn:'7d'});}
 function setClientCookie(res, value){res.cookie('manlung_client_session',value,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:7*24*60*60*1000});}
-app.get('/',(_req,res)=>res.json({success:true,clientId:GOOGLE_CLIENT_ID}));
+app.get('/',(_req,res)=>res.status(200).set('Cache-Control','no-store').json({success:true,clientId:GOOGLE_CLIENT_ID}));
 app.post('/',async(req,res)=>{
  try{
   const credential=String(req.body?.credential||'').trim();
