@@ -28,9 +28,9 @@ const OFFICIAL_WEBSITES = require('./config/official-websites');
 
 const app = express();
 
-if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET must be configured in production.');
-}
+// Do not crash the entire serverless function during module loading when a
+// deployment secret is missing. Auth routes validate JWT_SECRET at token
+// issuance and return a controlled JSON error; non-auth routes can still boot.
 
 // Vercel sits behind a trusted reverse proxy. This lets Express apply
 // client-aware rate limits using the forwarded address.
