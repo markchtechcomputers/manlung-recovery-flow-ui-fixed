@@ -394,12 +394,29 @@ async function setupOfficialGoogleButtons(){
       () => true,
       error => error
     );
-    // Google OAuth client IDs are public identifiers; avoid an API round trip
-    // before rendering the sign-in button.
-    const cfg = {clientId:'750848085828-t1uo1rljsmkkmlv3sqiv13tjrb7j1a9f.apps.googleusercontent.com'};
-    const googleReady = await googleLibraryReady;
+    // Load the server's authoritative OAuth client ID while Google GIS downloads.
+    // Running both requests together keeps the fast page load without risking an
+    // audience mismatch between the browser button and the server verifier.
+    const configPromise = fetch('/api/auth/google', {
+      method: 'GET',
+      cache: 'no-store',
+      credentials: 'same-origin'
+    }).then(async response => {
+      const raw = await response.text();
+      let config = {};
+      try { config = raw ? JSON.parse(raw) : {}; }
+      catch (_) { throw new Error('Google sign-in configuration returned an invalid response.'); }
+      if (!response.ok || !config.clientId) {
+        throw new Error('Google sign-in is not configured correctly. Please contact support.');
+      }
+      return config;
+    });
+    const [cfg, googleReady] = await Promise.all([
+      configPromise,
+      googleLibraryReady
+    ]);
     if(googleReady instanceof Error) throw googleReady;
-    if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh and try again.');
+    if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh the page.');
 
     google.accounts.id.initialize({
       client_id:cfg.clientId,
