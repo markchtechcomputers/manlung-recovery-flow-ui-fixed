@@ -865,7 +865,7 @@ body.manlung-auth-page .manlung-login-back i { font-size: 13px; }
         </div>
         <div class="manlung-auth-divider">or continue with email</div>
         <form id="loginForm" onsubmit="handleLogin(event)">
-          <div class="form-group"><label for="loginEmail">Email address</label><input type="email" id="loginEmail" autocomplete="email" placeholder="you@example.com" required></div>
+          <div class="form-group"><label for="loginEmail">Email address or phone number</label><input type="text" id="loginEmail" autocomplete="username" inputmode="text" placeholder="you@example.com or +254 7XX XXX XXX" required></div>
           <div class="form-group"><label for="loginPassword">Password</label><div class="manlung-password-field"><input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter your password" required><button type="button" class="manlung-password-toggle" data-password-target="loginPassword" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button></div></div>
           <div class="manlung-auth-links"><span></span><a href="#" onclick="showForgot(event)">Forgot password?</a></div>
           <div id="clientTurnstile" class="manlung-turnstile-widget"></div>
@@ -1061,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', setupClientTurnstile);
 async function handleLogin(event) {
   event.preventDefault();
 
-  const email=document.getElementById('loginEmail').value.trim();
+  const identifier=document.getElementById('loginEmail').value.trim();
   const password=document.getElementById('loginPassword').value;
   const errorEl=document.getElementById('loginError');
   showMessage(errorEl,'');
@@ -1088,7 +1088,7 @@ async function handleLogin(event) {
       headers:{'Content-Type':'application/json'},
       credentials:'include',
       cache:'no-store',
-      body:JSON.stringify({email,password,turnstileToken})
+      body:JSON.stringify({email:identifier,password,turnstileToken})
     });
 
     const raw=await res.text();
@@ -1119,10 +1119,10 @@ async function handleLogin(event) {
     if(data.code==='ACCOUNT_NOT_FOUND'){
       showMessage(
         errorEl,
-        'No account exists for this email. Please create your account first.'
+        'No account exists for this email address or phone number. Please create your account first.'
       );
       showTab('register');
-      document.getElementById('regEmail').value=email;
+      if (identifier.includes('@')) document.getElementById('regEmail').value=identifier;
       return;
     }
 
