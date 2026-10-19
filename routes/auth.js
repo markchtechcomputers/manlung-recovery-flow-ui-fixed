@@ -1381,9 +1381,9 @@ router.post(
   [
     body('email')
       .trim()
-      .isEmail()
-      .withMessage('A valid email is required')
-      .normalizeEmail(),
+      .notEmpty()
+      .isLength({ max: 254 })
+      .withMessage('Email address or phone number is required'),
 
     body('password')
       .notEmpty()
@@ -1394,13 +1394,22 @@ router.post(
     if (!(await requireTurnstile(req, res))) return;
 
     try {
-      const {
-        email,
-        password,
-      } = req.body;
+      const identifier = String(req.body.email || '').trim();
+      const password = req.body.password;
+      let client = null;
 
-      const client =
-        await User.findByEmailAndRole(email, 'client');
+      if (identifier.includes('@')) {
+        client = await User.findByEmailAndRole(identifier.toLowerCase(), 'client');
+      } else {
+        const phone = normalizePhone(identifier);
+        if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Enter a valid email address or phone number, such as +254 7XX XXX XXX.',
+          });
+        }
+        client = await User.findByPhoneAndRole(phone, 'client');
+      }
 
       if (!client) {
         return res.status(401).json({
