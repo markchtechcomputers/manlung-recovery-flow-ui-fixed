@@ -388,12 +388,18 @@ async function ensureGoogleGIS(){
 
 async function setupOfficialGoogleButtons(){
   try{
-    const cfgRes=await fetch('/api/auth/google',{cache:'no-store'});
+    // Load the Google SDK in parallel with the public client configuration.
+    const googleLibraryReady = ensureGoogleGIS().then(
+      () => true,
+      error => error
+    );
+    const cfgRes=await fetch('/api/auth/google',{cache:'force-cache'});
     const cfgText=await cfgRes.text();
     let cfg;
     try{cfg=JSON.parse(cfgText);}catch(_){throw new Error('Google sign-in configuration endpoint returned HTTP '+cfgResponse.status+' instead of JSON.');}
     if(!cfgRes.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
-    await ensureGoogleGIS();
+    const googleReady = await googleLibraryReady;
+    if(googleReady instanceof Error) throw googleReady;
     if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh and try again.');
 
     google.accounts.id.initialize({
