@@ -56,7 +56,7 @@ async function findByPhoneAndRole(phone, role) {
   return Array.isArray(data) && data.length === 1 ? data[0] : null;
 }
 
-async function create({ username, password, role = 'client', email, phone })
+async function create({ username, password, role = 'client', email, phone }) {
   assertStrongPassword(password);
   const hashed = await bcrypt.hash(password, BCRYPT_ROUNDS);
   const { data, error } = await supabase
