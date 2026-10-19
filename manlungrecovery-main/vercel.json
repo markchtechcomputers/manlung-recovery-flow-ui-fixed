@@ -6,6 +6,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/auth-google.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/auth-github.js",
       "use": "@vercel/node"
     },
@@ -104,6 +108,10 @@
     {
       "src": "/api/auth/github(?:/(.*))?",
       "dest": "/api/auth-github.js"
+    },
+    {
+      "src": "/api/auth/google(?:/(.*))?",
+      "dest": "/api/auth-google.js"
     },
     {
       "src": "/api/(.*)",
