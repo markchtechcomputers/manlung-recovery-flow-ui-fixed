@@ -2,7 +2,6 @@ const express=require('express');
 const axios=require('axios');
 const jwt=require('jsonwebtoken');
 const crypto=require('crypto');
-const User=require('../models/User');
 const app=express();
 const GOOGLE_CLIENT_ID=process.env.GOOGLE_CLIENT_ID||'750848085828-t1uo1rljsmkkmlv3sqiv13tjrb7j1a9f.apps.googleusercontent.com';
 const GOOGLE_CLIENT_SECRET=process.env.GOOGLE_CLIENT_SECRET||'';
@@ -47,6 +46,9 @@ app.post('*',async(req,res)=>{
   if(p.aud!==GOOGLE_CLIENT_ID||p.iss!=='https://accounts.google.com')return res.status(401).json({success:false,error:'Invalid Google authentication audience.'});
   if(p.email_verified!=='true')return res.status(403).json({success:false,error:'Your Google email is not verified.'});
   const email=String(p.email||'').trim().toLowerCase();if(!email)return res.status(400).json({success:false,error:'Google did not provide an email address.'});
+  // Load database-backed user logic only for sign-in POSTs. The public GET
+  // config endpoint should remain available even if a database module fails.
+  const User=require('../models/User');
   let user=await User.findByEmail(email);
   if(user&&user.role!=='client')return res.status(409).json({success:false,error:'This email belongs to a staff account. Use staff login.'});
   if(!user)user=await User.create({username:(email.split('@')[0].replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,55)||'client')+'-'+crypto.randomBytes(3).toString('hex'),password:crypto.randomBytes(32).toString('base64url') + 'A!1',role:'client',email,phone:null});
