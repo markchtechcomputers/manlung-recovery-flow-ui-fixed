@@ -1414,14 +1414,15 @@ async function ensureGoogleGIS(){
 async function setupOfficialGoogleButtons(){
   try{
     // Fetch the public client ID and wait for Google's library at the same time.
-    const [cfgResponse] = await Promise.all([
-      fetch('/api/auth/google',{cache:'no-store'}),
-      ensureGoogleGIS()
-    ]);
-    const cfgText=await cfgResponse.text();
+    const cfgResponse = await fetch('/api/auth/google',{cache:'no-store',headers:{'Accept':'application/json'}});
+    const cfgText = await cfgResponse.text();
     let cfg;
-    try{cfg=JSON.parse(cfgText);}catch(_){throw new Error('Google authentication API returned an invalid response.');}
+    try{cfg=JSON.parse(cfgText);}catch(_){
+      console.error('Google public config endpoint returned non-JSON:',cfgResponse.status,cfgResponse.url,cfgText.slice(0,180));
+      throw new Error('Google sign-in setup could not be loaded. Please refresh and try again.');
+    }
     if(!cfgResponse.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
+    await ensureGoogleGIS();
     if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh and try again.');
 
     google.accounts.id.initialize({
