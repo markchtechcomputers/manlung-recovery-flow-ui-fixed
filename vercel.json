@@ -6,6 +6,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/config-public.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/ai.js",
       "use": "@vercel/node"
     },
@@ -106,6 +110,10 @@
     {
       "src": "/api/ai(?:/(.*))?",
       "dest": "/api/ai.js"
+    },
+    {
+      "src": "/api/config/public",
+      "dest": "/api/config-public.js"
     },
     {
       "src": "/api/(.*)",
