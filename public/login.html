@@ -1051,8 +1051,12 @@ async function handleForgot(event) {
 let clientTurnstileEnabled = false;
 let clientTurnstileWidget = null;
 async function setupClientTurnstile() {
-  try {
-    const response = await fetch('/api/config/public', {cache:'no-store', credentials:'same-origin'});
+  // Start the public-config request and Cloudflare SDK readiness check together.
+  // We only wait for Cloudflare if the server confirms Turnstile is enabled.
+  const configPromise = fetch('/api/config/public', {
+    cache: 'no-store',
+    credentials: 'same-origin'
+  }).then(async response => {
     const raw = await response.text();
     let config = {};
     try { config = raw ? JSON.parse(raw) : {}; }
@@ -1062,25 +1066,42 @@ async function setupClientTurnstile() {
     if (!response.ok) {
       throw new Error(typeof config.error === 'string' ? config.error : 'Security verification configuration failed (HTTP '+response.status+').');
     }
+    return config;
+  });
+
+  const turnstileApiPromise = (async () => {
+    if (window.turnstile) return window.turnstile;
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const timer = setInterval(() => {
+        if (window.turnstile) {
+          clearInterval(timer);
+          resolve(window.turnstile);
+        } else if (Date.now() - start > 10000) {
+          clearInterval(timer);
+          reject(new Error('Cloudflare Turnstile did not load. Check that challenges.cloudflare.com is allowed by your browser or network.'));
+        }
+      }, 100);
+    });
+  })();
+
+  try {
+    const config = await configPromise;
     clientTurnstileEnabled = Boolean(config.turnstileEnabled && config.turnstileSiteKey);
     if (!clientTurnstileEnabled) return;
-    if (!window.turnstile) {
-      await new Promise((resolve,reject) => {
-        const start=Date.now();
-        const timer=setInterval(() => {
-          if(window.turnstile){clearInterval(timer);resolve();}
-          else if(Date.now()-start>10000){clearInterval(timer);reject(new Error('Cloudflare Turnstile did not load. Check that challenges.cloudflare.com is allowed by your browser or network.'));}
-        },100);
-      });
-    }
-    clientTurnstileWidget = window.turnstile.render('#clientTurnstile',{
-      sitekey:config.turnstileSiteKey, theme:'auto', size:'normal', appearance:'always',
-      'error-callback': () => showMessage(document.getElementById('loginError'),'Cloudflare security verification could not load. Refresh the page and try again.'),
-      'expired-callback': () => showMessage(document.getElementById('loginError'),'Security verification expired. Please complete it again.')
+
+    const turnstileApi = await turnstileApiPromise;
+    clientTurnstileWidget = turnstileApi.render('#clientTurnstile', {
+      sitekey: config.turnstileSiteKey,
+      theme: 'auto',
+      size: 'normal',
+      appearance: 'always',
+      'error-callback': () => showMessage(document.getElementById('loginError'), 'Cloudflare security verification could not load. Refresh the page and try again.'),
+      'expired-callback': () => showMessage(document.getElementById('loginError'), 'Security verification expired. Please complete it again.')
     });
-  } catch(error) {
+  } catch (error) {
     console.error('Turnstile setup failed:', error);
-    showMessage(document.getElementById('loginError'),error?.message || 'Cloudflare security verification could not be initialized.');
+    showMessage(document.getElementById('loginError'), error?.message || 'Cloudflare security verification could not be initialized.');
   }
 }
 document.addEventListener('DOMContentLoaded', setupClientTurnstile);
