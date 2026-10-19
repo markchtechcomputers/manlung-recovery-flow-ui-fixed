@@ -1447,8 +1447,16 @@ function readableAuthError(value, fallback='Authentication could not be complete
 
 async function setupOfficialGoogleButtons(){
   try{
-    // Fetch the public client ID and wait for Google's library at the same time.
-    const cfgResponse = await fetch('/api/auth/google',{cache:'no-store',headers:{'Accept':'application/json'}});
+    // Start loading Google's library and the lightweight config endpoint concurrently.
+    // This avoids waiting for the config request before even checking the Google SDK.
+    const googleLibraryReady = ensureGoogleGIS().then(
+      () => true,
+      error => error
+    );
+    const cfgResponse = await fetch('/api/auth/google',{
+      cache:'force-cache',
+      headers:{'Accept':'application/json'}
+    });
     const cfgText = await cfgResponse.text();
     let cfg;
     try{cfg=JSON.parse(cfgText);}catch(_){
@@ -1456,7 +1464,8 @@ async function setupOfficialGoogleButtons(){
       throw new Error('Google sign-in setup could not be loaded. Please refresh and try again.');
     }
     if(!cfgResponse.ok||!cfg.clientId)throw new Error(readableAuthError(cfg.error,'Google sign-in configuration is unavailable (HTTP '+cfgResponse.status+').'));
-    await ensureGoogleGIS();
+    const googleReady = await googleLibraryReady;
+    if(googleReady instanceof Error) throw googleReady;
     if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh and try again.');
 
     google.accounts.id.initialize({
