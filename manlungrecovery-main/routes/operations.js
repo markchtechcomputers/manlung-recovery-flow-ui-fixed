@@ -81,7 +81,7 @@ router.get('/queue', adminAuth, async (req, res) => {
 
 router.get('/workload', adminAuth, async (req, res) => {
   try {
-    const { data: admins, error: ae } = await supabase.from('recovery_users').select('id,username,email,full_name,role,admin_status').in('role',['admin','owner']);
+    const { data: admins, error: ae } = await supabase.from('recovery_users').select('id,username,email,role,admin_status').in('role',['admin','owner']);
     if (ae) throw ae;
     const { data: cases, error: ce } = await supabase.from('recovery_cases').select('assigned_admin_id,status,priority,sla_due_at');
     if (ce) throw ce;
@@ -89,7 +89,7 @@ router.get('/workload', adminAuth, async (req, res) => {
       const mine = (cases || []).filter(c => c.assigned_admin_id === a.id);
       const active = mine.filter(c => ACTIVE.includes(c.status));
       const overdue = active.filter(c => c.sla_due_at && new Date(c.sla_due_at) < new Date()).length;
-      return { ...a, total: mine.length, active: active.length, overdue, urgent: active.filter(c=>c.priority==='urgent').length };
+      return { ...a, full_name: a.username || a.email || 'Unknown user', total: mine.length, active: active.length, overdue, urgent: active.filter(c=>c.priority==='urgent').length };
     });
     res.json({ success:true, admins: rows });
   } catch (e) { res.status(500).json({success:false,error:'Could not load workload.'}); }
