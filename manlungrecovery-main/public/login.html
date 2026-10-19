@@ -222,7 +222,24 @@ async function handleLogin(event) {
       body:JSON.stringify({email,password})
     });
 
-    const data=await res.json();
+    const raw=await res.text();
+    let data={};
+    try {
+      data=raw ? JSON.parse(raw) : {};
+    } catch (_) {
+      console.error('Client login returned a non-JSON response:', {
+        status:res.status,
+        contentType:res.headers.get('content-type'),
+        body:raw.slice(0,300)
+      });
+      const detail=raw.trim().slice(0,180);
+      showMessage(errorEl, 'Sign-in service error (HTTP '+res.status+'). '+(detail || 'The server returned an unreadable response.'));
+      return;
+    }
+
+    if(!res.ok && !data.error) {
+      data.error='Sign-in failed (HTTP '+res.status+'). Please try again.';
+    }
 
     if(data.success){
       localStorage.setItem('clientToken',data.token);
