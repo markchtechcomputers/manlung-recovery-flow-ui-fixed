@@ -37,6 +37,11 @@ const SESSION_EXPIRES_IN = {
 };
 
 const signToken = (user) => {
+  if (!process.env.JWT_SECRET) {
+    const error = new Error('Authentication is not configured on the server: JWT_SECRET is missing.');
+    error.code = 'AUTH_CONFIG_MISSING';
+    throw error;
+  }
   const role = ['admin', 'owner', 'client'].includes(user?.role) ? user.role : 'client';
   return jwt.sign(
     { id: user.id, role, sessionVersion: Number(user.session_version || 0), mfa: ['admin', 'owner'].includes(role) ? Boolean(user.mfa_enabled) : undefined },
