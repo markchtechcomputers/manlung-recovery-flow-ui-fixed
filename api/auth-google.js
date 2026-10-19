@@ -1,5 +1,6 @@
 const express=require('express');
 const axios=require('axios');
+const {OAuth2Client}=require('google-auth-library');
 const jwt=require('jsonwebtoken');
 const crypto=require('crypto');
 const app=express();
@@ -42,9 +43,14 @@ app.post('*',async(req,res)=>{
     if(u.status!==200)return res.status(401).json({success:false,error:'Google account could not be verified.'});
     p={...u.data,email_verified:u.data.email_verified?'true':'false',iss:'https://accounts.google.com',aud:GOOGLE_CLIENT_ID};
   }else{
-    const v=await axios.get('https://oauth2.googleapis.com/tokeninfo',{params:{id_token:credential},timeout:10000,validateStatus:()=>true});
-    if(v.status!==200)return res.status(401).json({success:false,error:'Google authentication could not be verified.'});
-    p=v.data;
+    // Verify the Google ID token cryptographically instead of making a slow
+    // tokeninfo HTTP request on every sign-in. Google public keys are cached
+    // by google-auth-library, reducing latency and avoiding tokeninfo timeouts.
+    const googleClient=new OAuth2Client(GOOGLE_CLIENT_ID);
+    const ticket=await googleClient.verifyIdToken({idToken:credential,audience:GOOGLE_CLIENT_ID});
+    const payload=ticket.getPayload();
+    if(!payload)return res.status(401).json({success:false,error:'Google authentication could not be verified.'});
+    p={...payload,email_verified:String(payload.email_verified),iss:payload.iss,aud:payload.aud};
   }
   if(p.aud!==GOOGLE_CLIENT_ID||p.iss!=='https://accounts.google.com')return res.status(401).json({success:false,error:'Invalid Google authentication audience.'});
   if(p.email_verified!=='true')return res.status(403).json({success:false,error:'Your Google email is not verified.'});
