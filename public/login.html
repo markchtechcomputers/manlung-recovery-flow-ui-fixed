@@ -1421,6 +1421,17 @@ async function ensureGoogleGIS(){
   });
 }
 
+function readableAuthError(value, fallback='Authentication could not be completed. Please try again.') {
+  if (typeof value === 'string' && value.trim()) return value.trim();
+  if (value instanceof Error && value.message) return value.message;
+  if (value && typeof value === 'object') {
+    for (const key of ['error','message','details','hint']) {
+      if (typeof value[key] === 'string' && value[key].trim()) return value[key].trim();
+    }
+  }
+  return fallback;
+}
+
 async function setupOfficialGoogleButtons(){
   try{
     // Fetch the public client ID and wait for Google's library at the same time.
@@ -1431,7 +1442,7 @@ async function setupOfficialGoogleButtons(){
       console.error('Google public config endpoint returned non-JSON:',cfgResponse.status,cfgResponse.url,cfgText.slice(0,180));
       throw new Error('Google sign-in setup could not be loaded. Please refresh and try again.');
     }
-    if(!cfgResponse.ok||!cfg.clientId)throw new Error(cfg.error||'Google Cloud authentication is not configured yet.');
+    if(!cfgResponse.ok||!cfg.clientId)throw new Error(readableAuthError(cfg.error,'Google sign-in configuration is unavailable (HTTP '+cfgResponse.status+').'));
     await ensureGoogleGIS();
     if(!window.google?.accounts?.id)throw new Error('Google authentication could not load. Please refresh and try again.');
 
@@ -1462,7 +1473,7 @@ async function setupOfficialGoogleButtons(){
           const text=await res.text();
           let data;
           try{data=JSON.parse(text);}catch(_){throw new Error('The sign-in server returned an invalid response. Please try again.');}
-          if(!res.ok||!data.success)throw new Error(data.error||'Google authentication failed. Please try again.');
+          if(!res.ok||!data.success)throw new Error(readableAuthError(data.error,'Google authentication failed (HTTP '+res.status+').'));
           if(!data.user)throw new Error('Your account was verified, but the user profile was not returned. Please try again.');
           try{localStorage.setItem('clientUser',JSON.stringify(data.user));}catch(storageError){console.warn('Could not cache client profile:',storageError);}
           // Confirm the server actually recognizes the HttpOnly session cookie before
@@ -1483,7 +1494,7 @@ async function setupOfficialGoogleButtons(){
           let sessionData={};
           try{sessionData=sessionText?JSON.parse(sessionText):{};}catch(_){}
           if(!sessionResponse.ok||!sessionData.success||!sessionData.user||sessionData.user.role!=='client'){
-            throw new Error(sessionData.error||'Google sign-in completed, but the secure session was not saved. Please allow cookies for this site and try again.');
+            throw new Error(readableAuthError(sessionData.error,'Google sign-in completed, but the secure session was not saved. Please allow cookies for this site and try again.'));
           }
           setGoogleStatus('Sign-in successful. Opening your dashboard…','success');
           // Use an absolute same-origin URL to avoid relative-path or base-URL issues on mobile.
@@ -1523,7 +1534,7 @@ async function setupOfficialGoogleButtons(){
       });
     });
   }catch(err){
-    showMessage(document.getElementById('loginError'),err.message||'Google authentication could not be loaded.');
+    showMessage(document.getElementById('loginError'),readableAuthError(err,'Google authentication could not be loaded.'));
   }
 }
 
