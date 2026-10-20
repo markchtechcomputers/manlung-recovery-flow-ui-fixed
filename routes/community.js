@@ -171,7 +171,7 @@ router.post('/voice/upload-url', messageLimiter, async (req, res) => {
     const { data, error } = await supabase.storage.from(VOICE_MEDIA_BUCKET).createSignedUploadUrl(path, { upsert: false });
     if (error) throw error;
     const signed = String(data.signedUrl || '');
-    const signedUrl = /^https?:\\/\\//i.test(signed) ? signed : String(process.env.SUPABASE_URL || '').replace(/\\/+$/, '') + '/storage/v1' + (signed.startsWith('/') ? signed : '/' + signed);
+    const signedUrl = /^https?:\/\//i.test(signed) ? signed : String(process.env.SUPABASE_URL || '').replace(/\/+$/, '') + '/storage/v1' + (signed.startsWith('/') ? signed : '/' + signed);
     return res.status(201).json({ success: true, media_path: path, signed_url: signedUrl, content_type: mime });
   } catch (error) { return handleDbError(res, error, 'Voice upload URL error:'); }
 });
