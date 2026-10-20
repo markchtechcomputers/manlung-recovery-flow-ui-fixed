@@ -2722,6 +2722,24 @@ html body footer.manlung-footer .manlung-footer-social a span{
 }
 </style>
 
+
+<style id="manlung-footer-x-icon-visibility-fix">
+/* Ensure the X/Twitter icon has a high-contrast tile and a reliable visible fallback. */
+html body footer.manlung-footer .manlung-footer-social a[href="https://x.com/"]{
+  background:#000!important;border:1px solid rgba(255,255,255,.65)!important;
+  width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+}
+html body footer.manlung-footer .manlung-footer-social a[href="https://x.com/"] img{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;
+  filter:none!important;-webkit-filter:none!important;object-fit:contain!important;
+}
+html body footer.manlung-footer .manlung-footer-social a[href="https://x.com/"] span{
+  display:none!important;
+}
+</style>
+
 </body>
 </html>
 
