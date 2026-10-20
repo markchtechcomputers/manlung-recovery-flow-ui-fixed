@@ -521,6 +521,25 @@
     }
   }
 
+  // The APK loads the live website, so refresh its web UI after a long
+  // background period. Never auto-reload after the user edits a form on this
+  // page; that avoids discarding unsaved work. Native APK updates are checked
+  // separately below because Android package changes still require approval.
+  let nativePageEdited = false;
+  let nativeHiddenAt = 0;
+  const NATIVE_REFRESH_AFTER = 2 * 60 * 1000;
+
+  document.addEventListener('input', event => {
+    if (isAndroidApp() && event.target?.matches?.('input, textarea, select, [contenteditable="true"]')) {
+      nativePageEdited = true;
+    }
+  }, true);
+  document.addEventListener('change', event => {
+    if (isAndroidApp() && event.target?.matches?.('input, textarea, select, [contenteditable="true"]')) {
+      nativePageEdited = true;
+    }
+  }, true);
+
   setupPwaAutoUpdates();
   window.addEventListener('load', () => {
     if (!isAndroidApp()) return;
@@ -528,7 +547,20 @@
     window.setInterval(() => checkNativeApkUpdate(false), APK_CHECK_INTERVAL);
   });
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && isAndroidApp()) checkNativeApkUpdate(false);
+    if (!isAndroidApp()) return;
+    if (document.hidden) {
+      nativeHiddenAt = Date.now();
+      return;
+    }
+
+    checkNativeApkUpdate(false);
+    const wasAwayLongEnough = nativeHiddenAt && Date.now() - nativeHiddenAt >= NATIVE_REFRESH_AFTER;
+    nativeHiddenAt = 0;
+    if (wasAwayLongEnough && !nativePageEdited) {
+      // HTML and scripts are configured on the server to revalidate; this
+      // reload gets the newest deployed website without needing a new APK.
+      window.location.reload();
+    }
   });
 
   // Capture the browser-native PWA install prompt when the browser offers it.
