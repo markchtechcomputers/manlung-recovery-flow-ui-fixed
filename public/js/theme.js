@@ -337,6 +337,50 @@
             min-width: 0;
           }
         }
+        /* Native-app polish: consistent spacing, readable surfaces and touch targets. */
+        html.manlung-android-app body {
+          -webkit-tap-highlight-color: transparent;
+          text-rendering: optimizeLegibility;
+          -webkit-font-smoothing: antialiased;
+        }
+        html.manlung-android-app body button,
+        html.manlung-android-app body .btn,
+        html.manlung-android-app body [role="button"],
+        html.manlung-android-app body input[type="submit"] {
+          min-height: 44px;
+          border-radius: 12px;
+          touch-action: manipulation;
+        }
+        html.manlung-android-app body input:not([type="checkbox"]):not([type="radio"]),
+        html.manlung-android-app body select,
+        html.manlung-android-app body textarea {
+          min-height: 44px;
+          border-radius: 10px;
+          font-size: 16px;
+        }
+        html.manlung-android-app body .card,
+        html.manlung-android-app body .panel,
+        html.manlung-android-app body .service-card {
+          border-radius: 16px;
+        }
+        html.manlung-android-app body a {
+          overflow-wrap: anywhere;
+          -webkit-tap-highlight-color: transparent;
+        }
+        html.manlung-android-app body :focus-visible {
+          outline: 2px solid #38bdf8;
+          outline-offset: 3px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          html.manlung-android-app body *,
+          html.manlung-android-app body *::before,
+          html.manlung-android-app body *::after {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
         html.manlung-android-app body footer,
         html.manlung-android-app body [role="contentinfo"],
         html.manlung-android-app body .site-footer,
