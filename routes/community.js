@@ -913,8 +913,8 @@ router.get('/updates', async (req, res) => {
       .order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
     const updates = (data || []).reverse().map(row => {
-      const split = String(row.message || '').split('\\n\\n');
-      return { id: row.id, title: split.length > 1 ? split.shift().replace(/^\\[PINNED\\]\\s*/, '') : '', body: split.join('\\n\\n') || row.message, message: row.message, created_at: row.created_at, edited_at: row.edited_at, pinned: /^\\[PINNED\\]/.test(String(row.message || '')) };
+      const split = String(row.message || '').split(String.fromCharCode(10, 10));
+      return { id: row.id, title: split.length > 1 ? split.shift().replace(/^\[PINNED\]\s*/, '') : '', body: split.join(String.fromCharCode(10, 10)) || row.message, message: row.message, created_at: row.created_at, edited_at: row.edited_at, pinned: /^\[PINNED\]/.test(String(row.message || '')) };
     });
     res.set('Cache-Control', 'no-store');
     return res.json({ success: true, updates });
@@ -937,7 +937,7 @@ router.post('/updates', messageLimiter, async (req, res) => {
     const { error: membershipError } = await supabase.from('recovery_chat_group_members')
       .upsert({ group_id: channel.id, user_id: req.user.id, archived: false }, { onConflict: 'group_id,user_id' });
     if (membershipError) throw membershipError;
-    const message = (pinned ? '[PINNED] ' : '') + (title ? title + (body ? '\\n\\n' : '') : '') + body;
+    const message = (pinned ? '[PINNED] ' : '') + (title ? title + (body ? String.fromCharCode(10, 10) : '') : '') + body;
     const { data, error } = await supabase.from('recovery_chat_group_messages')
       .insert({ group_id: channel.id, sender_user_id: req.user.id, message })
       .select('id,group_id,sender_user_id,message,created_at').single();
