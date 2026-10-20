@@ -176,6 +176,18 @@ router.post('/voice/upload-url', messageLimiter, async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Voice upload URL error:'); }
 });
 
+router.get('/inbox', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('recovery_community_messages')
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
+      .or('sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + req.user.id)
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(500);
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, messages: (data || []).reverse() });
+  } catch (error) { return handleDbError(res, error, 'Community inbox error:'); }
+});
+
 router.get('/messages/:memberId', async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
