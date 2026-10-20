@@ -483,7 +483,7 @@ let vt,vtPaused=false;function viewer(list,i){if(!list.length||i<0||i>=list.leng
 const fmt=s=>(s/60|0)+':'+String(s%60).padStart(2,'0');
 const att=(a,i)=>!a?'':a.k==='img'?(a.src?`<img class="ph" src="${a.src}" alt="Photo" onclick="event.stopPropagation();zoom(this.src)">`:'<div class="doc">Photo not stored in this demo after reload</div>'):a.k==='poll'?`<div style="min-width:210px"><b>${esc(a.q)}</b>${a.o.map((o,j)=>{const t=a.o.reduce((s,x)=>s+x.v,0)||1;return `<button class="po" onclick="event.stopPropagation();vote(${i},${j})"><span class="pbar" style="width:${o.v/t*100}%"></span><span>${a.my===j?'✓ ':''}${esc(o.t)}</span><b>${o.v}</b></button>`}).join('')}</div>`:a.k==='doc'?`<div class="doc"><span class="di">${ic(I.file)}</span><div><b>${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">${esc(a.name)}</a>`:esc(a.name)}</b><div class="sub">${a.size}</div></div></div>`:`<div class="vn"><button class="ib" onclick="event.stopPropagation();pv(this)" aria-label="Play voice message">${ic(I.play,20)}</button><span class="wf">${'<i></i>'.repeat(18)}</span><span class="sub">${a.dur}</span>${a.src?`<audio preload="metadata" src="${esc(a.src)}"></audio>`:'' }</div>`;
 function zoom(s){const z=document.createElement('div');z.className='zm';z.innerHTML=`<img src="${s}" alt="Photo">`;z.onclick=()=>z.remove();$('#app').append(z)}
-function pv(b){const a=b.parentNode.querySelector('audio');if(!a)return toast('Demo voice note: no audio recorded');a.onplay=()=>b.innerHTML=ic(I.pause,20);a.onpause=a.onended=()=>b.innerHTML=ic(I.play,20);a.paused?a.play():a.pause()}
+async function pv(b){const a=b.parentNode.querySelector('audio');if(!a||!a.src)return toast('This voice message has no playable audio file.');a.onplay=()=>b.innerHTML=ic(I.pause,20);a.onpause=a.onended=()=>b.innerHTML=ic(I.play,20);a.onerror=async()=>{b.innerHTML=ic(I.play,20);const c=S.chats.find(x=>String(x.id)===String(open));if(c&&c.memberId){try{await loadMsgs(c.memberId,true);toast('Voice link refreshed. Tap play again.');return}catch(_){}}toast('Voice message could not be played. Check your connection and try again.')};if(a.paused){try{await a.play()}catch(e){toast('Playback was blocked or the audio format is unsupported. Tap play again, or reopen the chat to refresh the voice file.')}}else a.pause()}
 function bm(e,i){e.stopPropagation();document.querySelectorAll('.pop').forEach(p=>p.remove());const c=S.chats.find(c=>c.id===open),m=c.m[i],a=$('#app').getBoundingClientRect(),p=document.createElement('div');p.className='pop bm';p.style.top=Math.min(e.clientY-a.top,a.height-430)+'px';p.style.right='auto';p.style.left=Math.max(8,Math.min(e.clientX-a.left,a.width-190))+'px';
  const b1=document.createElement('button');b1.textContent='Copy';b1.onclick=()=>{try{navigator.clipboard.writeText(m[1]||'')}catch(x){}p.remove();toast('Copied')};
  const b2=document.createElement('button');b2.textContent='Delete message';b2.style.color='var(--rd)';b2.onclick=async()=>{try{if(c.remote&&c.memberId&&m[12]){await apiReq('/messages/'+encodeURIComponent(c.memberId)+'/'+encodeURIComponent(m[12]),{method:'DELETE'});await loadMsgs(c.memberId,true);toast('Message unsent for everyone')}else{c.m.splice(i,1);save();paint(c);toast('Message deleted from this device')}}catch(e){if(/404|not found|does not exist/i.test(e.message||'')){await loadMsgs(c.memberId,true).catch(()=>{});toast('That message is no longer available. Chat refreshed.')}else toast(e.message||'Could not delete message')}p.remove()};const mk=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{p.remove();f()};return b};
@@ -948,10 +948,20 @@ async function setup(mode){
 }
 async function poll(){
  if(!rtc.callId||rtc.closed||rtc.polling)return;rtc.polling=true;
+ const pollCallId=rtc.callId;
  try{
-  const d=await rq('/peer-calls/'+encodeURIComponent(rtc.callId)+'/signals?after='+rtc.last);
+  const d=await rq('/peer-calls/'+encodeURIComponent(pollCallId)+'/signals?after='+rtc.last);
+  if(rtc.callId!==pollCallId)return;
+  if(d.call&&['ended','rejected','missed'].includes(d.call.status)){
+   state(d.call.status==='rejected'?'Call declined':d.call.status==='missed'?'Missed call':'Call ended');
+   setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false)},100);return;
+  }
   for(const s of d.signals||[]){
    rtc.last=Math.max(rtc.last,Number(s.id)||0);
+   if(s.signal_type==='reject'||s.signal_type==='hangup'){
+    state(s.signal_type==='reject'?'Call declined':'Call ended');
+    setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false)},100);return;
+   }
    if(!rtc.pc)continue;
    if(s.signal_type==='offer'&&rtc.incoming){
     await rtc.pc.setRemoteDescription(s.payload);
@@ -961,12 +971,9 @@ async function poll(){
     await rtc.pc.setRemoteDescription(s.payload);for(const c of rtc.iceQueue.splice(0)){try{await rtc.pc.addIceCandidate(c)}catch(_){}}
    }else if(s.signal_type==='ice'&&s.payload){
     if(!rtc.pc.remoteDescription)rtc.iceQueue.push(s.payload);else try{await rtc.pc.addIceCandidate(s.payload)}catch(_){}
-   }else if(s.signal_type==='reject'||s.signal_type==='hangup'){
-    state(s.signal_type==='reject'?'Call declined':'Call ended');setTimeout(()=>endCall(false),500);return
    }
   }
-  if(d.call&&['ended','rejected','missed'].includes(d.call.status)){state(d.call.status==='missed'?'Missed call':'Call ended');setTimeout(()=>endCall(false),500)}
- }catch(e){if(e.status===404||e.status===409){state(e.message);setTimeout(()=>endCall(false),500)}}
+ }catch(e){if(e.status===404||e.status===409){state(e.message);setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false)},100)}}
  finally{rtc.polling=false}
 }
 function beginPoll(){clearInterval(rtc.poll);rtc.poll=setInterval(poll,500);poll()}
@@ -996,7 +1003,7 @@ async function endCall(notify,kind){
 window.call=function(name,video){startPeerCall(name,!!video)};
 async function incomingCheck(){
  if(!window.__mlMe||rtc.callId||document.querySelector('#ml-peer-call'))return;
- try{const d=await rq('/peer-calls/incoming');const c=(d.calls||[]).find(x=>!rtc.seen.has(x.id));if(!c)return;rtc.seen.add(c.id);rtc.callId=c.id;rtc.closed=true;rtc.last=0;rtc.mode=c.call_mode;rtc.incoming=true;rtc.startedAt=Date.now();rtc.peerName=c.caller&&c.caller.name||'Manlung member';rtc.direction='incoming';lastCallState='';vibrate([300,120,300,120,500]);callUI(c.caller&&c.caller.name||'Manlung member',rtc.mode,true,c.caller&&c.caller.avatar||null);notifyCall('Incoming '+(rtc.mode==='video'?'video':'voice')+' call',rtc.peerName+' is calling you. Open Manlung Community to answer.','ml-incoming-'+c.id);startRingtone()}
+ try{const d=await rq('/peer-calls/incoming');const c=(d.calls||[]).find(x=>!rtc.seen.has(x.id));if(!c)return;rtc.seen.add(c.id);rtc.callId=c.id;rtc.closed=false;rtc.ending=false;rtc.last=0;rtc.mode=c.call_mode;rtc.incoming=true;rtc.startedAt=Date.now();rtc.peerName=c.caller&&c.caller.name||'Manlung member';rtc.direction='incoming';rtc.connected=false;rtc.iceQueue=[];lastCallState='';vibrate([300,120,300,120,500]);callUI(c.caller&&c.caller.name||'Manlung member',rtc.mode,true,c.caller&&c.caller.avatar||null);notifyCall('Incoming '+(rtc.mode==='video'?'video':'voice')+' call',rtc.peerName+' is calling you. Open Manlung Community to answer.','ml-incoming-'+c.id);startRingtone();beginPoll()}
  catch(e){if(e.status===401)state('Sign in again to receive calls')}
 }
 rtc.incomingTimer=setInterval(()=>{if(window.__mlMe)incomingCheck()},2500);
