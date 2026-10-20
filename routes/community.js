@@ -304,8 +304,13 @@ router.post('/plans/initialize', async (req, res) => {
     const code=String(req.body?.plan_code||'');
     const plan=COMMUNITY_PLANS[code];
     if (!plan) return fail(res,400,'Choose a valid subscription.');
-    const email=cleanText(req.user.email,254).toLowerCase();
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return fail(res,400,'Add a valid email to your account before paying.');
+    let email=cleanText(req.user.email,254).toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      const {data:account,error:accountError}=await supabase.from('recovery_users').select('email').eq('id',req.user.id).maybeSingle();
+      if(accountError) throw accountError;
+      email=cleanText(account?.email,254).toLowerCase();
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res,400,'Your sign-in email could not be found. Please update your account email before paying.');
     const planCode=String(process.env[plan.planEnv]||'').trim();
     if(!planCode) return fail(res,503,'The matching monthly Paystack plan is not configured: '+plan.planEnv+'.');
     const remoteResponse=await axios.get(PAYSTACK_URL+'/plan/'+encodeURIComponent(planCode),{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:10000});
@@ -1210,8 +1215,13 @@ router.post('/status/purchase/initialize', async (req, res) => {
   try {
     if (!process.env.PAYSTACK_SECRET_KEY) return fail(res, 503, 'Payment service is not configured.');
     if (req.user.role !== 'client') return fail(res, 403, 'Client access required.');
-    const email = cleanText(req.user.email, 254).toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res, 400, 'Add a valid email to your account before purchasing credits.');
+    let email = cleanText(req.user.email, 254).toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      const { data: account, error: accountError } = await supabase.from('recovery_users').select('email').eq('id', req.user.id).maybeSingle();
+      if (accountError) throw accountError;
+      email = cleanText(account?.email, 254).toLowerCase();
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res, 400, 'Your sign-in email could not be found. Please update your account email before paying.');
     const reference = 'MTC-STATUS-' + Date.now() + '-' + crypto.randomBytes(8).toString('hex');
     const { data: purchase, error: pe } = await supabase.from('recovery_chat_status_purchases')
       .insert({ user_id: req.user.id, provider_reference: reference, amount_kes: 100, currency: 'KES', credits: 2, status: 'pending' })
