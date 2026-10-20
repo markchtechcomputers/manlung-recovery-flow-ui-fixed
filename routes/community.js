@@ -912,9 +912,24 @@ router.get('/updates', async (req, res) => {
       .eq('group_id', channel.id).is('deleted_at', null)
       .order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
-    const updates = (data || []).reverse().map(row => {
-      const split = String(row.message || '').split(String.fromCharCode(10, 10));
-      return { id: row.id, title: split.length > 1 ? split.shift().replace(/^\[PINNED\]\s*/, '') : '', body: split.join(String.fromCharCode(10, 10)) || row.message, message: row.message, created_at: row.created_at, edited_at: row.edited_at, pinned: /^\[PINNED\]/.test(String(row.message || '')) };
+    const rows = (data || []).reverse();
+    const senderIds = [...new Set(rows.map(row => row.sender_user_id).filter(Boolean))];
+    let senderNames = new Map();
+    if (senderIds.length) {
+      const [{ data: users, error: usersError }, { data: profiles, error: profilesError }] = await Promise.all([
+        supabase.from('recovery_users').select('id,username').in('id', senderIds),
+        supabase.from('recovery_chat_profiles').select('user_id,display_name').in('user_id', senderIds)
+      ]);
+      if (usersError) throw usersError;
+      if (profilesError) throw profilesError;
+      const usernames = new Map((users || []).map(user => [String(user.id), user.username || '']));
+      const displayNames = new Map((profiles || []).map(profile => [String(profile.user_id), profile.display_name || '']));
+      senderNames = new Map(senderIds.map(id => [String(id), displayNames.get(String(id)) || usernames.get(String(id)) || 'Manlung Admin']));
+    }
+    const updates = rows.map(row => {
+      const raw = String(row.message || '').replace(/^\\[PINNED\\]\\s*/, '');
+      const split = raw.split(String.fromCharCode(10, 10));
+      return { id: row.id, sender_user_id: row.sender_user_id, author_name: senderNames.get(String(row.sender_user_id)) || 'Manlung Admin', title: split.length > 1 ? split.shift() : '', body: split.join(String.fromCharCode(10, 10)) || raw, message: row.message, created_at: row.created_at, edited_at: row.edited_at, pinned: /^\\[PINNED\\]/.test(String(row.message || '')) };
     });
     res.set('Cache-Control', 'no-store');
     return res.json({ success: true, updates });
@@ -955,7 +970,7 @@ router.get('/groups/:groupId/messages', async (req, res) => {
     if (targetError) throw targetError;
     if (!targetGroup) return fail(res, 404, 'Group not found.');
     if (targetGroup.slug === 'manlung-team' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Team is available to admins and the owner only.');
-    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
+    if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
     // Fetch the newest 100 messages first, then return them oldest-to-newest for the chat UI.
     // An ascending query with limit(100) would permanently hide every message after the first 100.
     const { data, error } = await supabase.from('recovery_chat_group_messages')
