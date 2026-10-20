@@ -1027,6 +1027,24 @@ const STATUS_MEDIA_TYPES = new Set(['image/jpeg','image/png','image/webp','image
 const STATUS_MEDIA_EXT = {'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'};
 
 // Upload bytes through the authenticated API so the private service-role key never reaches the browser.
+// Create a short-lived signed upload URL so large phone videos upload directly to Storage
+// instead of passing through a serverless request body limit.
+router.post('/status/media/upload-url', statusLimiter, async (req,res) => {
+  try {
+    const mime = String(req.body?.content_type || '').split(';')[0].trim().toLowerCase();
+    if (!STATUS_MEDIA_TYPES.has(mime)) return fail(res,400,'This photo or video format is not supported.');
+    const path = req.user.id + '/' + crypto.randomUUID() + '.' + STATUS_MEDIA_EXT[mime];
+    const { data, error } = await supabase.storage.from(STATUS_MEDIA_BUCKET).createSignedUploadUrl(path, { upsert:false });
+    if (error) throw error;
+    return res.status(201).json({ success:true, media_path:path, signed_url:data.signedUrl, token:data.token, content_type:mime, status_type:mime.startsWith('video/')?'video':'image' });
+  } catch (error) {
+    console.error('Status media upload URL error:', error?.message || error);
+    const msg=String(error?.message||'');
+    if (/bucket.*not found|not found.*bucket/i.test(msg)) return fail(res,503,'Status media storage is not available yet. Check the recovery-status-media bucket in Supabase Storage.');
+    return fail(res,502,'Could not prepare the media upload. Please try again.');
+  }
+});
+
 router.post('/status/media', statusLimiter, express.raw({ type: ['image/*','video/*'], limit: '20mb' }), async (req,res) => {
   try {
     const mime = String(req.headers['content-type'] || '').split(';')[0].trim().toLowerCase();
