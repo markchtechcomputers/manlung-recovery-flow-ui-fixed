@@ -217,6 +217,57 @@ router.get('/messages/:memberId', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
 });
 
+
+ // Direct-message reactions: counts and individual member reactions are visible to both participants.
+ router.get('/messages/:memberId/reactions', async (req, res) => {
+   try {
+     const other = String(req.params.memberId || '');
+     if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Invalid member ID.');
+     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
+     const { data: messages, error: me } = await supabase.from('recovery_community_messages')
+       .select('id').or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
+       .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+     if (me) throw me;
+     const ids = (messages || []).map(x => x.id);
+     if (!ids.length) return res.json({ success: true, reactions: [] });
+     const { data, error } = await supabase.from('recovery_chat_message_reactions')
+       .select('message_id,user_id,reaction,created_at').in('message_id', ids).order('created_at', { ascending: true });
+     if (error) throw error;
+     res.set('Cache-Control', 'no-store');
+     return res.json({ success: true, reactions: data || [] });
+   } catch (error) { return handleDbError(res, error, 'Direct message reactions list error:'); }
+ });
+
+ router.post('/messages/:memberId/:messageId/reactions', messageLimiter, async (req, res) => {
+   try {
+     const other = String(req.params.memberId || ''), mid = String(req.params.messageId || '');
+     const reaction = cleanText(req.body?.reaction, 16);
+     const supported = ['👍','❤️','😂','😮','😢','🙏','🔥','🎉','👏','💚'];
+     if (!validId(other) || !validId(mid)) return fail(res, 400, 'Invalid member or message ID.');
+     if (!supported.includes(reaction)) return fail(res, 400, 'Choose a supported reaction.');
+     if (other === String(req.user.id)) return fail(res, 400, 'Choose another member.');
+     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
+     const { data: message, error: me } = await supabase.from('recovery_community_messages')
+       .select('id,sender_user_id,recipient_user_id').eq('id', mid).is('deleted_at', null)
+       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')').maybeSingle();
+     if (me) throw me;
+     if (!message) return fail(res, 404, 'Message not found in this conversation.');
+     const { data: existing, error: ee } = await supabase.from('recovery_chat_message_reactions')
+       .select('message_id,user_id,reaction').eq('message_id', mid).eq('user_id', req.user.id).eq('reaction', reaction).maybeSingle();
+     if (ee) throw ee;
+     if (existing) {
+       const { error } = await supabase.from('recovery_chat_message_reactions').delete()
+         .eq('message_id', mid).eq('user_id', req.user.id).eq('reaction', reaction);
+       if (error) throw error;
+       return res.json({ success: true, reacted: false, reaction });
+     }
+     const { error } = await supabase.from('recovery_chat_message_reactions')
+       .insert({ message_id: mid, user_id: req.user.id, reaction });
+     if (error) throw error;
+     return res.json({ success: true, reacted: true, reaction });
+   } catch (error) { return handleDbError(res, error, 'Direct message reaction error:'); }
+ });
+
 router.patch('/messages/:memberId/:messageId', messageLimiter, async (req, res) => {
   try {
     const other = String(req.params.memberId || ''), id = String(req.params.messageId || ''), message = String(req.body?.message || '').trim();
