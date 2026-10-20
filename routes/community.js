@@ -442,6 +442,18 @@ router.post('/status/:statusId/comments', messageLimiter, async (req,res) => {
     res.status(201).json({success:true,comment:data});
   } catch(error) { return handleDbError(res,error,'Status comment create error:'); }
 });
+router.delete('/status/:statusId', async (req,res) => {
+  try {
+    const id = String(req.params.statusId || '');
+    if (!validId(id)) return fail(res, 400, 'Invalid status ID.');
+    const { data, error } = await supabase.from('recovery_chat_status_posts').delete()
+      .eq('id', id).eq('user_id', req.user.id).select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Status not found or you are not its owner.');
+    return res.json({ success: true, deleted: true });
+  } catch (error) { return handleDbError(res, error, 'Status delete error:'); }
+});
+
 router.post('/status/:statusId/hide', async (req,res) => {
   try {
     const id=String(req.params.statusId||'');
