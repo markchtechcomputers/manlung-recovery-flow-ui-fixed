@@ -2799,3 +2799,51 @@ html body .manlung-footer .manlung-footer-social{
 }
 </style>
 
+<style id="manlung-follow-row-layout-fix-v2">
+/* Put the Follow Us label and its social icons together in one left-aligned row. */
+html body .manlung-footer .manlung-footer-contact-row{
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:flex-start!important;
+}
+html body .manlung-footer .manlung-footer-social-wrap{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:14px!important;
+  width:100%!important;
+  min-width:0!important;
+  text-align:left!important;
+}
+html body .manlung-footer .manlung-footer-social-title{
+  display:block!important;
+  flex:0 0 auto!important;
+  align-self:center!important;
+  margin:0!important;
+  white-space:nowrap!important;
+}
+html body .manlung-footer .manlung-footer-social{
+  display:flex!important;
+  flex:0 1 auto!important;
+  align-self:center!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  margin:0!important;
+  min-width:0!important;
+}
+@media(max-width:600px){
+  html body .manlung-footer .manlung-footer-social-wrap{
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    gap:10px!important;
+  }
+  html body .manlung-footer .manlung-footer-social-title{
+    align-self:flex-start!important;
+  }
+  html body .manlung-footer .manlung-footer-social{
+    align-self:flex-start!important;
+  }
+}
+</style>
+
