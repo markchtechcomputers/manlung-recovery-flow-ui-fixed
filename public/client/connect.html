@@ -859,7 +859,7 @@ window.openSharedGroup=async function(groupId){
  if(!group){try{const data=await apiReq('/groups');ML.groups=data.groups||[];group=ML.groups.find(g=>String(g.id)===gid)}catch(e){return toast(e.message||'Could not load groups. Refresh and try again.')}}
  if(!group)return toast('This group is no longer available. Refresh Community and try again.');
  if(group.slug==='manlung-updates'||group.slug==='manlung-official-updates'){const special=ensureSpecialChatRecords();open=special.updates.id;special.updates.un=0;save();tab='chats';render();await window.refreshOfficialUpdates(true);if(String(open)===String(special.updates.id))render();return}
- const readOnly=!!(group.admin_only_announcements||group.read_only||group.is_read_only);
+ const readOnly=!!(group.admin_only_announcements||group.read_only||group.is_read_only||group.slug==='manlung-updates'||group.slug==='manlung-official-updates')&&!['admin','owner'].includes(ML.role);
  let joined=!!group.joined;
  document.getElementById('ml-shared-group-chat')?.remove();
  const panel=document.createElement('section');panel.id='ml-shared-group-chat';panel.className='ml-group-fullscreen';panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');
