@@ -312,6 +312,36 @@ nav button span{display:grid;place-items:center;width:58px;height:30px;border-ra
 .ml-room-description{overflow-wrap:anywhere}
 @media(min-width:900px){.ml-member-list{max-width:900px;margin:0 auto}.ml-community-section{max-width:932px;margin-left:auto;margin-right:auto}}
 @media(max-width:380px){.ml-member-card{grid-template-columns:42px minmax(0,1fr) auto!important;gap:8px!important;padding:10px!important}.ml-member-card .ml-member-avatar{width:42px;height:42px}.ml-member-card .ml-member-action{min-width:66px;padding:7px 8px;font-size:12px}}
+
+/* Premium WhatsApp-inspired messaging polish */
+:root{--chat-bg:#0b141a;--incoming-bg:#202c33;--outgoing-bg:#075e49;--chat-text:#f1f5f7;--chat-muted:#aab4ba;--chat-accent:#25d366}
+#chat{background:var(--chat-bg);font-family:Roboto,"Arial Narrow",Arial,sans-serif}
+#chat header{gap:8px;padding:10px 12px;min-height:64px;background:var(--sf);flex:none}
+#chat header .nm{font-size:clamp(19px,2.6vw,22px);font-weight:500;letter-spacing:-.2px;line-height:1.25}
+#chat header .sub{font-size:12px;font-weight:400}
+#msgs{background-color:var(--chat-bg);background-image:radial-gradient(rgba(255,255,255,.025) .7px,transparent .7px);background-size:7px 7px;padding:14px clamp(10px,3vw,24px);gap:7px;overscroll-behavior:contain;scrollbar-gutter:stable}
+.b{max-width:min(85%,680px);padding:10px 13px;border-radius:12px;background:var(--incoming-bg);color:var(--chat-text);font-family:Roboto,"Arial Narrow",Arial,sans-serif;font-size:clamp(1rem,2.2vw,1.125rem);font-weight:400;line-height:1.45;overflow-wrap:anywhere;word-break:normal;box-shadow:0 1px 1px #0002;animation:ml-message-in .16s ease-out}
+.b.me{background:var(--outgoing-bg);color:#f1f5f7;border-bottom-right-radius:4px}
+.b.th{background:var(--incoming-bg);border-bottom-left-radius:4px}
+.b small{display:flex;justify-content:flex-end;align-items:center;gap:4px;margin-top:5px;color:var(--chat-muted);font-size:11px;line-height:1.2;white-space:nowrap}
+.qt{background:rgba(0,0,0,.18);border-left:3px solid #b28aff;padding:7px 10px;margin-bottom:7px;border-radius:5px;color:var(--chat-muted);font-size:14px;line-height:1.4}
+.dsep{background:#18252c;color:#d5dee2;font-size:12px;padding:5px 12px;border-radius:9px}
+.ml-compose-tools{display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:8px 14px 2px;background:var(--chat-bg);border-top:1px solid rgba(170,180,186,.12);flex:none}
+.ml-tool{display:flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:7px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--sf);color:var(--tx);font-size:13px;font-weight:500}
+.ml-tool>span{display:inline;font-size:12px}.ml-tool:hover{border-color:var(--ac);background:var(--sf2)}.ml-gif-tool{font-weight:800;letter-spacing:.3px}
+.compose{display:flex;align-items:center;gap:8px;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));background:var(--chat-bg);border:0;flex:none}
+.compose .ml-emoji-button{flex:0 0 42px;width:42px;height:42px;color:var(--chat-muted)}
+.compose input{min-width:0;min-height:46px;max-height:140px;align-self:center;flex:1;border:1px solid transparent;background:#202c33;color:var(--chat-text);border-radius:24px;padding:12px 17px;font-family:Roboto,"Arial Narrow",Arial,sans-serif;font-size:clamp(1rem,2.2vw,1.1rem);line-height:1.4;outline-offset:1px}
+.compose input::placeholder{color:var(--chat-muted);opacity:1}
+.compose input:focus{border-color:rgba(37,211,102,.45)}
+.compose .sendb{width:46px;height:46px;min-width:46px;min-height:46px}
+#qb{flex:none;background:var(--sf);color:var(--tx)}
+#rec{flex:none}
+@keyframes ml-message-in{from{opacity:.35;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:768px){.b{max-width:min(72%,680px)}#msgs{padding-left:clamp(20px,4vw,54px);padding-right:clamp(20px,4vw,54px)}.ml-compose-tools,.compose{padding-left:clamp(14px,3vw,30px);padding-right:clamp(14px,3vw,30px)}}
+@media(max-width:420px){.ml-compose-tools{gap:7px;padding:7px 10px 1px}.ml-tool{min-height:36px;padding:6px 10px}.ml-tool>span{font-size:11px}.compose{gap:5px;padding-left:8px;padding-right:8px}.compose .ml-emoji-button{flex-basis:36px;width:36px}.compose input{padding:11px 13px}}
+@media(prefers-reduced-motion:reduce){.b{animation:none!important}}
+
 </style></head><body>
 <div id="app"><header id="hd"><div class="logo">M</div><h1>Manlung Community</h1></header><main id="mn" aria-live="polite"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden><input type="file" id="status-media" accept="image/*,video/*" hidden></div>
 <script>
@@ -399,7 +429,7 @@ function drawChat(){const c=S.chats.find(c=>c.id===open);const d=document.create
  if(!c)return;const readOnlyOfficial=!!(c.official||c.id==='manlung-official-updates');
  d.innerHTML=`<header><button class="backb" onclick="back()" aria-label="Back to chats">${ic(I.back)}${(u=>u?`<span class="badge">${u}</span>`:'')(S.chats.reduce((a,x)=>a+(x.id!==open?x.un:0),0))}</button>${c.remote?communityAvatar(c):sav(c.n)}<div class="grow"><div class="nm">${esc(c.n)}${window.verifiedBadge(window.chatMember(c)||c)}</div><div class="sub" id="pst">${sub()}</div></div>${c.g||c.ch?'':`<button class="ib" onclick="call('${esc(c.n)}',1)" aria-label="Video call">${ic(I.video)}</button><button class="ib" onclick="call('${esc(c.n)}',0)" aria-label="Voice call">${ic(I.phone)}</button>`}<button class="ib" onclick="pop=!pop;drawPop()" aria-label="More">${ic(I.more)}</button></header>
  <div id="msgs"><div class="dsep"><span>Today</span></div>${c.m.map(bub).join('')}</div>
- <div id="qb" class="qb" hidden></div><div id="rec" class="rec" hidden></div>${readOnlyOfficial?`<div class="ml-announcement-footer"><span>◉</span><div><b>Official announcements</b><small>Read-only · New updates appear automatically</small></div></div>`:`<div class="compose"><button class="ib" onclick="tog('att')" aria-label="Attach">${ic(I.clip)}</button><button class="ib" onclick="tog('emo')" aria-label="Emoji">${ic(I.smile)}</button><button class="ib" type="button" onclick="window.mlPickSticker(false)" aria-label="Send sticker">🎭</button><button class="ib" type="button" onclick="window.mlFindGif(false)" aria-label="Search GIFs">GIF</button><input id="in" placeholder="${c.n==='Saved messages'?'Note to yourself':'Message'}" aria-label="Message" oninput="typ()" onkeydown="if(event.key==='Enter')send()"><button class="sendb" id="sb" onclick="sendOrRec()" aria-label="Send or record voice">${ic(I.mic)}</button></div>`}<input type="file" id="fi" hidden>`;
+ <div id="qb" class="qb" hidden></div><div id="rec" class="rec" hidden></div>${readOnlyOfficial?`<div class="ml-announcement-footer"><span>◉</span><div><b>Official announcements</b><small>Read-only · New updates appear automatically</small></div></div>`:`<div class="ml-compose-tools" role="toolbar" aria-label="Message attachments"><button class="ml-tool" type="button" onclick="tog('att')" aria-label="Attach document or media" title="Attach document or media">${ic(I.clip,22)}<span>Attach</span></button><button class="ml-tool" type="button" onclick="window.mlPickSticker(false)" aria-label="Open stickers" title="Stickers">🎭<span>Stickers</span></button><button class="ml-tool ml-gif-tool" type="button" onclick="window.mlFindGif(false)" aria-label="Search GIFs" title="GIFs">GIF<span>GIFs</span></button></div><div class="compose"><button class="ib ml-emoji-button" onclick="tog('emo')" aria-label="Emoji" title="Emoji">${ic(I.smile,23)}</button><input id="in" placeholder="${c.n==='Saved messages'?'Note to yourself':'Message'}" aria-label="Message" oninput="typ()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"><button class="sendb" id="sb" onclick="sendOrRec()" aria-label="Send or record voice">${ic(I.mic)}</button></div>`}<input type="file" id="fi" hidden>`;
  $('#app').append(d);const ms=$('#msgs');ms.scrollTop=ms.scrollHeight;drawPop();lockUI(c);paint(c)}
 // Mobile gestures: hold a message for actions, or swipe it right to reply.
 (function(){let timer=null,start=null,handled=false;function target(e){return e.target&&e.target.closest?e.target.closest('.b[data-msg-index]'):null}function cancel(){if(timer)clearTimeout(timer);timer=null}
