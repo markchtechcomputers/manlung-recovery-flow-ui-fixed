@@ -1598,7 +1598,25 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 </script>
 
-</head>
+
+<style id="manlung-home-service-icons-recovery-fix">
+/* Homepage service icons only: ensure image icons render and show a local Font Awesome fallback if an image fails. */
+html body .home-page-container .premium-service-card .service-card-top .service-icon-wrap{
+  display:grid!important;place-items:center!important;visibility:visible!important;opacity:1!important;
+}
+html body .home-page-container .premium-service-card img.service-icon-image{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
+  max-width:38px!important;max-height:38px!important;object-fit:contain!important;
+}
+html body .home-page-container .premium-service-card .service-icon-fallback{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:38px;height:38px;font-size:30px;line-height:1;color:#2563eb;
+}
+html body .home-page-container .premium-service-card .service-icon-fallback[hidden]{display:none!important}
+html body .home-page-container .premium-service-card img.service-icon-image[hidden]{display:none!important}
+</style>
+\n</head>
 <body>
 <div id="manlungStartupLoader" aria-label="Loading Manlung Recovery">
   <div class="startup-inner">
@@ -1751,25 +1769,25 @@ document.addEventListener('DOMContentLoaded',function(){
 </div>
 <div class="features premium-service-grid">
                     <article class="feature-card premium-service-card" data-service="device">
-                        <div class="service-card-top"><span class="service-number">01</span><span class="service-icon-wrap"><img src="/images/device-recovery.png" alt="" class="service-icon-image"></span></div>
+                        <div class="service-card-top"><span class="service-number">01</span><span class="service-icon-wrap"><img src="/images/device-recovery.png?v=service-icons-20261020" alt="" class="service-icon-image" loading="eager" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><i class="service-icon-fallback fas fa-mobile-screen-button" aria-hidden="true" hidden></i></span></div>
                         <h3>Device Recovery</h3>
                         <p>Lost phone, laptop, tablet or smartwatch? We'll help you understand recovery options and guide you through the appropriate next steps.</p>
                         <button class="service-learn" type="button" onclick="openServiceModal('device')">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
                     </article>
                     <article class="feature-card premium-service-card" data-service="identity">
-                        <div class="service-card-top"><span class="service-number">02</span><span class="service-icon-wrap"><img src="/images/identity-theft.png" alt="" class="service-icon-image"></span></div>
+                        <div class="service-card-top"><span class="service-number">02</span><span class="service-icon-wrap"><img src="/images/identity-theft.png?v=service-icons-20261020" alt="" class="service-icon-image" loading="eager" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><i class="service-icon-fallback fas fa-user-shield" aria-hidden="true" hidden></i></span></div>
                         <h3>Identity Theft &amp; Account Recovery</h3>
                         <p>Protect your identity and recover compromised accounts with structured assistance and security guidance.</p>
                         <button class="service-learn" type="button" onclick="openServiceModal('identity')">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
                     </article>
                     <article class="feature-card premium-service-card" data-service="scam">
-                        <div class="service-card-top"><span class="service-number">03</span><span class="service-icon-wrap"><img src="/images/scam-investigation.png" alt="" class="service-icon-image"></span></div>
+                        <div class="service-card-top"><span class="service-number">03</span><span class="service-icon-wrap"><img src="/images/scam-investigation.png?v=service-icons-20261020" alt="" class="service-icon-image" loading="eager" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><i class="service-icon-fallback fas fa-magnifying-glass-chart" aria-hidden="true" hidden></i></span></div>
                         <h3>Scam &amp; Fraud Investigation</h3>
                         <p>Online scams, fraud, and phishing — we help organize digital evidence and guide investigation and reporting steps.</p>
                         <button class="service-learn" type="button" onclick="openServiceModal('scam')">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
                     </article>
                     <article class="feature-card premium-service-card" data-service="security">
-                        <div class="service-card-top"><span class="service-number">04</span><span class="service-icon-wrap"><img src="/images/security-assessment.png" alt="" class="service-icon-image"></span></div>
+                        <div class="service-card-top"><span class="service-number">04</span><span class="service-icon-wrap"><img src="/images/security-assessment.png?v=service-icons-20261020" alt="" class="service-icon-image" loading="eager" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><i class="service-icon-fallback fas fa-shield-halved" aria-hidden="true" hidden></i></span></div>
                         <h3>Security Assessment &amp; Audit</h3>
                         <p>Security reviews, vulnerability awareness, and practical recommendations to help organizations improve their digital security posture.</p>
                         <button class="service-learn" type="button" onclick="openServiceModal('security')">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
