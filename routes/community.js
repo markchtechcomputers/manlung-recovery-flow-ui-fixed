@@ -975,7 +975,7 @@ router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
     if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
     const { data: targetGroup, error: targetGroupError } = await supabase.from('recovery_chat_groups')
-      .select('id,slug').eq('id', gid).maybeSingle();
+      .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
     if (targetGroupError) throw targetGroupError;
     if (!targetGroup) return fail(res, 404, 'Group not found.');
     if ((targetGroup.slug === 'manlung-updates' || targetGroup.slug === 'manlung-official-updates' || targetGroup.admin_only_announcements) && !isAdmin(req.user)) return fail(res, 403, 'This is an official read-only channel. Only admins can publish announcements.');
