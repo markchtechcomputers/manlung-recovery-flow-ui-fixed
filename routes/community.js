@@ -1037,7 +1037,7 @@ router.post('/status/media', statusLimiter, express.raw({ type: ['image/*','vide
     const { error } = await supabase.storage.from(STATUS_MEDIA_BUCKET).upload(path, req.body, { contentType:mime, upsert:false });
     if (error) throw error;
     res.status(201).json({ success:true, media_path:path, status_type:mime.startsWith('video/')?'video':'image', content_type:mime });
-  } catch (error) { return handleDbError(res,error,'Status media upload error:'); }
+  } catch (error) { console.error('Status media upload error:', error?.message || error, error?.statusCode || error?.status || ''); const msg=String(error?.message||''); if (/bucket.*not found|not found.*bucket/i.test(msg)) return fail(res,503,'Status media storage is not available yet. Check the recovery-status-media bucket in Supabase Storage.'); if (/payload too large|entity too large/i.test(msg)) return fail(res,413,'Media must be 20 MB or smaller.'); if (/mime|content.?type|unsupported/i.test(msg)) return fail(res,415,'This photo or video format is not supported. Try JPG, PNG, WebP, GIF, MP4, WebM, or MOV.'); return fail(res,502,'Media storage upload failed. Please try again. If it keeps failing, check the server storage connection.'); }
 });
 
 router.get('/status', async (req, res) => {
