@@ -1009,4 +1009,27 @@ rtc.incomingTimer=setInterval(()=>{if(window.__mlMe)incomingCheck()},2500);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&activeCallNotification){try{activeCallNotification.close()}catch(_){}activeCallNotification=null}if(document.hidden&&rtc.callId)notifyCall('Manlung call',rtc.peerName+' · Call continues in background','ml-call-'+rtc.callId)});
 })();
 </script>
+
+<script>
+/* Last-resort boot guard: never leave the app on a blank Community shell if the main renderer fails. */
+(function(){
+  function restoreChatsIfBlank(){
+    var main=document.getElementById('mn'),nav=document.getElementById('nv'),head=document.getElementById('hd');
+    if(!main||!nav||!head)return;
+    if(nav.children.length && main.innerHTML.trim())return;
+    try{
+      var data={};try{data=JSON.parse(localStorage.getItem('mlg5')||'{}')||{}}catch(_){}
+      var chats=Array.isArray(data.chats)?data.chats.slice():[];
+      if(!chats.some(function(c){return c&&c.saved;}))chats.unshift({id:102,n:'Saved Messages',m:[],pin:1});
+      chats=chats.filter(function(c){return c&&c.n&&!c.ar;}).sort(function(a,b){return (Number(b.pin)||0)-(Number(a.pin)||0);});
+      head.innerHTML='<div class="logo" role="img" aria-label="Manlung app"></div><h1>Chats</h1>';
+      nav.innerHTML='<button class="on" type="button" onclick="window.location.reload()"><span>💬</span>Chats</button><button type="button" onclick="document.getElementById(\'mn\').innerHTML=\'<div class=&quot;empty&quot;>Community is temporarily unavailable. Your Chats remain accessible.</div>\'"><span>👥</span>Community</button>';
+      main.innerHTML='<div class="ml-chat-search-row"><input class="search" id="ml-rescue-search" placeholder="Search chats" aria-label="Search chats"></div>'+chats.map(function(c){var name=String(c.n||'Chat');var last=Array.isArray(c.m)&&c.m.length?String(c.m[c.m.length-1][1]||''):'No messages yet';return '<button class="row" type="button" style="text-align:left" data-chat-name="'+name.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"><span class="av" style="background:#087f5b">💬</span><span class="grow"><span class="nm">'+name.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span><span class="sub">'+last.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span></span></button>';}).join('')||'<div class="empty">No chats yet.</div>';
+      var search=document.getElementById('ml-rescue-search');if(search)search.addEventListener('input',function(){var q=this.value.toLowerCase();main.querySelectorAll('[data-chat-name]').forEach(function(row){row.hidden=!row.getAttribute('data-chat-name').toLowerCase().includes(q);});});
+      console.error('Main Manlung renderer did not initialize; displayed local Chats recovery view.');
+    }catch(e){console.error('Chats recovery view failed',e);main.innerHTML='<div class="empty"><b>Chats are temporarily unavailable.</b><p>Please try again shortly.</p></div>';}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(restoreChatsIfBlank,1200)});else setTimeout(restoreChatsIfBlank,1200);
+})();
+</script>
 </body></html>
