@@ -2895,3 +2895,47 @@ html body .manlung-footer .manlung-footer-social a:hover{transform:translateY(-2
 }
 </style>
 
+
+<style id="manlung-user-provided-icons-force">
+/* Explicitly render the exact user-provided Postimages social icons above older footer rules. */
+html body footer.manlung-footer .manlung-footer-social,
+html body .manlung-footer .manlung-footer-social {
+  display:flex!important; visibility:visible!important; opacity:1!important;
+  align-items:center!important; justify-content:flex-start!important;
+  flex-wrap:wrap!important; gap:12px!important; width:100%!important;
+}
+html body footer.manlung-footer .manlung-footer-social a,
+html body .manlung-footer .manlung-footer-social a {
+  display:inline-flex!important; visibility:visible!important; opacity:1!important;
+  align-items:center!important; justify-content:center!important;
+  width:48px!important; min-width:48px!important; height:48px!important; min-height:48px!important;
+  flex:0 0 48px!important; padding:4px!important; margin:0!important;
+  position:relative!important; box-sizing:border-box!important;
+  background:#fff!important; border:1px solid #d1d5db!important; border-radius:10px!important;
+  overflow:visible!important; font-size:0!important; line-height:0!important;
+}
+html body footer.manlung-footer .manlung-footer-social a img,
+html body .manlung-footer .manlung-footer-social a img {
+  display:block!important; visibility:visible!important; opacity:1!important;
+  width:40px!important; min-width:40px!important; max-width:40px!important;
+  height:40px!important; min-height:40px!important; max-height:40px!important;
+  object-fit:contain!important; flex:0 0 40px!important; position:static!important;
+}
+html body .manlung-footer .manlung-footer-social a span {
+  position:absolute!important; width:1px!important; height:1px!important;
+  padding:0!important; margin:-1px!important; overflow:hidden!important;
+  clip:rect(0,0,0,0)!important; white-space:nowrap!important;
+}
+html body .manlung-footer .manlung-footer-social a i,
+html body .manlung-footer .manlung-footer-social a svg { display:none!important; }
+@media(max-width:600px) {
+  html body .manlung-footer .manlung-footer-social { gap:10px!important; }
+  html body .manlung-footer .manlung-footer-social a {
+    width:46px!important; min-width:46px!important; height:46px!important; min-height:46px!important; flex-basis:46px!important;
+  }
+  html body .manlung-footer .manlung-footer-social a img {
+    width:38px!important; min-width:38px!important; max-width:38px!important;
+    height:38px!important; min-height:38px!important; max-height:38px!important; flex-basis:38px!important;
+  }
+}
+</style>
