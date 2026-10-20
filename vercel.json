@@ -10,6 +10,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/app-version.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/ai.js",
       "use": "@vercel/node"
     },
@@ -31,6 +35,60 @@
     }
   ],
   "headers": [
+    {
+      "source": "/css/(.*\\.css)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/js/(.*\\.js)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/service-worker.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
@@ -88,6 +146,15 @@
           "value": "0"
         }
       ]
+    },
+    {
+      "source": "/api/app-version",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=300, stale-while-revalidate=600"
+        }
+      ]
     }
   ],
   "routes": [
@@ -114,6 +181,10 @@
     {
       "src": "/api/config/public",
       "dest": "/api/config-public.js"
+    },
+    {
+      "src": "/api/app-version",
+      "dest": "/api/app-version.js"
     },
     {
       "src": "/api/(.*)",

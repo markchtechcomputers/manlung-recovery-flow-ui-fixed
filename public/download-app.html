@@ -33,8 +33,9 @@
       <img src="/icons/icon-192.png" alt="Manlung Recovery app icon">
       <div><strong>Manlung Recovery</strong><span>Android app</span></div>
     </div>
-    <h1>Get the Android app</h1>
-    <p>Download the APK and install Manlung Recovery directly on your Android phone. The app connects to the live Manlung Recovery website, so online website updates appear without needing a new APK for every content change.</p>
+    <h1 id="download-title">Get the Android app</h1>
+    <div id="update-instructions" class="status" hidden role="status"></div>
+    <p>Download the latest published APK and install Manlung Recovery directly on your Android phone. The app connects to the live website, so online website updates arrive without reinstalling the APK. A new APK is needed only for native Android wrapper changes. Android requires your approval to install it.</p>
     <a class="download" href="https://github.com/markchtechcomputers/manlung-recovery-flow-ui-fixed/releases/download/android-latest/ManlungRecovery.apk">
       <span aria-hidden="true">↓</span> Download Android APK
     </a>
@@ -49,6 +50,24 @@
     </div>
     <p class="note">Only install APK files from a source you trust. This direct-download build is not distributed through Google Play.</p>
     <a class="back" href="/">← Back to Manlung Recovery website</a>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('update') !== 'available') return;
+        const title = document.getElementById('download-title');
+        const note = document.getElementById('update-instructions');
+        const link = document.querySelector('.download');
+        const mustReinstall = params.get('reinstall') === '1';
+        if (title) title.textContent = 'Update Manlung Recovery';
+        if (link) link.textContent = 'Download latest Android update';
+        if (note) {
+          note.hidden = false;
+          note.textContent = mustReinstall
+            ? 'This first permanently signed update may not install over the older app. If Android says “App not installed”, save your login details, uninstall the old app, then download and install this APK. Online case/account records remain on your account; local preferences may reset.'
+            : 'Download the APK, open it from your Downloads folder, and approve the Android installation. If Android offers Update, choose it. Do not uninstall the existing app unless Android requires it.';
+        }
+      })();
+    </script>
   </main>
 </body>
 </html>

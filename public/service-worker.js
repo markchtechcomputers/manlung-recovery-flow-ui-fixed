@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v27';
+const CACHE_NAME = 'manlung-recovery-static-v28';
 
 // Only public/static pages are cached. Authenticated dashboards, settings,
 // admin pages, API responses, evidence, and other private data stay network-only.
@@ -18,7 +18,7 @@ self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS)).catch(() => {}).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim()));
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('manlung-recovery-static-') && key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', event => {
   const request = event.request;
@@ -30,13 +30,13 @@ self.addEventListener('fetch', event => {
       event.respondWith(fetch(request).catch(() => new Response(OFFLINE_PAGE, {status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}})));
       return;
     }
-    event.respondWith(caches.match(request).then(cached => fetch(request).then(response => {
+    event.respondWith(caches.match(request).then(cached => fetch(request, { cache: 'no-cache' }).then(response => {
       if (response && response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone())).catch(() => {});
       return response;
     }).catch(() => cached || new Response(OFFLINE_PAGE, {status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}}))));
     return;
   }
-  if (STATIC_ASSETS.includes(url.pathname)) event.respondWith(fetch(request).then(response => {
+  if (STATIC_ASSETS.includes(url.pathname)) event.respondWith(fetch(request, { cache: 'no-cache' }).then(response => {
     if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone())).catch(() => {});
     return response;
   }).catch(() => caches.match(request)));

@@ -47,14 +47,21 @@ jobs:
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Generate Android wrapper with the official Manlung icon
+      - name: Generate Android wrapper and version the package
+        id: apk
+        env:
+          APP_BUILD_NUMBER: ${{ github.run_number }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p android-wrapper/www
           cd android-wrapper
           npm init -y
-          npm install @capacitor/core@^7 @capacitor/cli@^7 @capacitor/android@^7 @capacitor/app@^7 @capacitor/status-bar@^7 @capacitor/splash-screen@^7 @capacitor/keyboard@^7 @capacitor/assets@^3 sharp
+          npm install @capacitor/core@^7 @capacitor/cli@^7 @capacitor/android@^7 @capacitor/app@^7 @capacitor/browser@^7 @capacitor/status-bar@^7 @capacitor/splash-screen@^7 @capacitor/keyboard@^7 @capacitor/assets@^3 sharp
           cat > www/index.html <<'HTML'
           <!doctype html>
           <html lang="en">
@@ -106,7 +113,9 @@ jobs:
           }
           JSON
           mkdir -p assets
-          curl --fail --silent --show-error --location             "https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png"             --output /tmp/manlung-icon.png
+          curl --fail --silent --show-error --location \
+            "https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png" \
+            --output /tmp/manlung-icon.png
           node --input-type=module <<'NODE'
           import sharp from 'sharp';
           await sharp('/tmp/manlung-icon.png')
@@ -117,19 +126,105 @@ jobs:
           npx cap add android
           npx capacitor-assets generate --android
           npx cap sync android
-          cd android
-          ./gradlew --no-daemon assembleDebug
-          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/ManlungRecovery.apk"
+          python3 - <<'PY'
+          import os, re
+          from pathlib import Path
+          build = int(os.environ["APP_BUILD_NUMBER"])
+          gradle = Path("android/app/build.gradle")
+          source = gradle.read_text()
+          source, code_count = re.subn(r"(?m)^(\s*)versionCode\s+\d+", lambda m: m.group(1) + "versionCode " + str(build), source, count=1)
+          source, name_count = re.subn(r"(?m)^(\s*)versionName\s+[\"'][^\"']+[\"']", lambda m: m.group(1) + 'versionName "1.0.' + str(build) + '"', source, count=1)
+          if code_count != 1 or name_count != 1:
+              raise SystemExit("Could not safely set Android versionCode/versionName in generated Gradle file")
+          gradle.write_text(source)
+          PY
+          if [ -n "${ANDROID_KEYSTORE_BASE64:-}" ] && [ -n "${ANDROID_KEYSTORE_PASSWORD:-}" ] && [ -n "${ANDROID_KEY_ALIAS:-}" ] && [ -n "${ANDROID_KEY_PASSWORD:-}" ]; then
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
+            python3 - <<'PY'
+          from pathlib import Path
+          gradle = Path("android/app/build.gradle")
+          source = gradle.read_text()
+          marker = "    buildTypes {"
+          if marker not in source:
+              raise SystemExit("Could not locate Android buildTypes block")
+          signing = '''    signingConfigs {
+                  release {
+                      storeFile file("release.keystore")
+                      storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                      keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+                  }
+              }
 
-      - name: Publish latest APK download
+          '''
+          source = source.replace(marker, signing + marker, 1)
+          marker = "        release {"
+          start = source.index("    buildTypes {")
+          pos = source.find(marker, start)
+          if pos < 0:
+              raise SystemExit("Could not locate release build type")
+          source = source[:pos] + source[pos:].replace(marker, marker + "\n            signingConfig signingConfigs.release", 1)
+          gradle.write_text(source)
+          PY
+            (cd android && ./gradlew --no-daemon assembleRelease)
+            cp android/app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/ManlungRecovery.apk"
+            echo "signed_release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Stable APK signing secrets are missing. This run will create a test APK artifact only and will NOT replace the published Android APK."
+            (cd android && ./gradlew --no-daemon assembleDebug)
+            cp android/app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/ManlungRecovery.apk"
+            echo "signed_release=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish latest stable-signed APK
+        if: steps.apk.outputs.signed_release == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          APP_BUILD_NUMBER: ${{ github.run_number }}
+          APP_VERSION_NAME: 1.0.${{ github.run_number }}
         shell: bash
         run: |
           set -euo pipefail
+          OLD_NOTES=""
+          if gh release view android-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            OLD_NOTES="$(gh release view android-latest --repo "$GITHUB_REPOSITORY" --json body --jq .body)"
+          fi
+          MIGRATION_REQUIRED=false
+          if ! grep -qi '^Signing-Key: stable$' <<< "$OLD_NOTES"; then
+            MIGRATION_REQUIRED=true
+          fi
+          APK_SHA256="$(sha256sum ManlungRecovery.apk | cut -d ' ' -f 1)"
+          NOTES="Latest stable-signed Android package for Manlung Recovery.
+          Version-Name: $APP_VERSION_NAME
+          Version-Code: $APP_BUILD_NUMBER
+          Signing-Key: stable
+          Signing-Migration: $MIGRATION_REQUIRED
+          APK-SHA256: $APK_SHA256
+          Built from commit: $GITHUB_SHA
+
+          Website features are delivered live while online. Native Android package updates are published here; Android always requires user approval. The first stable-signed release may require uninstalling an older APK that was signed with a different temporary key. This direct-download APK is not distributed through Google Play."
           if gh release view android-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload android-latest ManlungRecovery.apk --clobber --repo "$GITHUB_REPOSITORY"
-            gh release edit android-latest --title "Manlung Recovery Android APK" --notes "Latest installable Android package for Manlung Recovery. Automatically rebuilt from main-branch updates. Uses the official Manlung Recovery icon and opens the live website, so web content updates appear when the device is online. APK replacement is published here; Android may still require the user to approve installation. This direct-download APK is not Play Store verified." --repo "$GITHUB_REPOSITORY"
+            gh release edit android-latest --title "Manlung Recovery Android APK" --notes "$NOTES" --repo "$GITHUB_REPOSITORY"
           else
-            gh release create android-latest ManlungRecovery.apk --title "Manlung Recovery Android APK" --notes "Installable Android package for Manlung Recovery. Automatically rebuilt from main-branch updates. Uses the official Manlung Recovery icon and opens the live website, so web content updates appear when the device is online. APK replacement is published here; Android may still require the user to approve installation. This direct-download APK is not Play Store verified." --repo "$GITHUB_REPOSITORY"
+            gh release create android-latest ManlungRecovery.apk --title "Manlung Recovery Android APK" --notes "$NOTES" --repo "$GITHUB_REPOSITORY"
           fi
+
+      - name: Upload test APK when stable signing is not configured
+        if: steps.apk.outputs.signed_release != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ManlungRecovery-test-apk-${{ github.run_number }}
+          path: ManlungRecovery.apk
+          retention-days: 7
+
+      - name: Record APK signing requirement
+        if: steps.apk.outputs.signed_release != 'true'
+        shell: bash
+        run: |
+          {
+            echo "### Android APK release not published"
+            echo ""
+            echo "The package was built for validation, but the published APK was left unchanged because permanent signing is not configured."
+            echo "Add the four `ANDROID_KEYSTORE_*` / alias secrets before publishing a replacement APK. See `APK_UPDATE_SETUP.md`."
+          } >> "$GITHUB_STEP_SUMMARY"

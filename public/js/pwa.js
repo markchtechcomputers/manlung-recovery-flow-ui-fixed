@@ -347,24 +347,189 @@
     return banner;
   }
 
-  // The Android APK is a native Capacitor wrapper, not a second PWA.
-  // Keep browser PWA/offline support on the website, but never register or retain
-  // a service worker inside the APK's WebView.
-  if (isAndroidApp()) {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations()
-        .then(registrations => Promise.all(registrations.map(registration => registration.unregister())))
-        .catch(() => {});
+  // Keep browser PWA files fresh, but never run a service worker inside the remote-site Android WebView.
+  const UPDATE_NOTICE_ID = 'manlung-runtime-update-notice';
+  const APK_CHECK_KEY = 'manlung-apk-update-check-at-v1';
+  const APK_CHECK_INTERVAL = 6 * 60 * 60 * 1000;
+  let pwaRegistration = null;
+  let pwaHadController = Boolean(navigator.serviceWorker && navigator.serviceWorker.controller);
+
+  function showRuntimeUpdateNotice(options) {
+    let notice = document.getElementById(UPDATE_NOTICE_ID);
+    if (notice) notice.remove();
+
+    if (!document.getElementById('manlung-runtime-update-style')) {
+      const style = document.createElement('style');
+      style.id = 'manlung-runtime-update-style';
+      style.textContent = `
+        #manlung-runtime-update-notice {
+          position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));
+          transform:translateX(-50%);z-index:2147483646;
+          width:min(560px,calc(100vw - 24px));display:flex;align-items:center;gap:12px;
+          padding:14px;border:1px solid #334155;border-radius:16px;
+          background:#071629;color:#f8fafc;box-shadow:0 14px 42px #0007;
+          font:14px/1.4 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        }
+        #manlung-runtime-update-notice .ml-update-copy{min-width:0;flex:1}
+        #manlung-runtime-update-notice .ml-update-title{display:block;font-weight:800;margin-bottom:3px}
+        #manlung-runtime-update-notice .ml-update-message{display:block;color:#cbd5e1;font-size:12px}
+        #manlung-runtime-update-notice .ml-update-action{
+          flex:0 0 auto;border:0;border-radius:10px;padding:10px 12px;background:#2563eb;
+          color:#fff;font-weight:800;cursor:pointer;max-width:145px
+        }
+        #manlung-runtime-update-notice .ml-update-close{
+          align-self:flex-start;border:0;background:transparent;color:#cbd5e1;
+          font-size:20px;line-height:1;cursor:pointer;padding:0 2px
+        }
+        #manlung-runtime-update-notice button:focus-visible{outline:2px solid #93c5fd;outline-offset:2px}
+      `;
+      document.head.appendChild(style);
     }
-  } else if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker
-        .register('/service-worker.js', { scope: '/' })
-        .catch(error => {
-          console.warn('PWA service worker registration failed:', error);
-        });
+
+    notice = document.createElement('section');
+    notice.id = UPDATE_NOTICE_ID;
+    notice.setAttribute('role', 'status');
+    notice.setAttribute('aria-live', 'polite');
+
+    const copy = document.createElement('div');
+    copy.className = 'ml-update-copy';
+    const title = document.createElement('strong');
+    title.className = 'ml-update-title';
+    title.textContent = options.title || 'Manlung Recovery update';
+    const message = document.createElement('span');
+    message.className = 'ml-update-message';
+    message.textContent = options.message || 'A newer version is available.';
+    copy.append(title, message);
+
+    const action = document.createElement('button');
+    action.type = 'button';
+    action.className = 'ml-update-action';
+    action.textContent = options.actionLabel || 'Update';
+    action.addEventListener('click', async () => {
+      action.disabled = true;
+      try {
+        await options.onAction?.();
+      } catch (error) {
+        console.warn('Manlung update action failed:', error);
+        action.disabled = false;
+      }
+    });
+
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'ml-update-close';
+    close.setAttribute('aria-label', 'Dismiss update notice');
+    close.textContent = '×';
+    close.addEventListener('click', () => notice?.remove());
+
+    notice.append(copy, action, close);
+    document.body.appendChild(notice);
+  }
+
+  function offerPwaRefresh() {
+    showRuntimeUpdateNotice({
+      title: 'Manlung Recovery has an update',
+      message: 'Refresh now to load the latest app files. Your account data stays on your account.',
+      actionLabel: 'Refresh now',
+      onAction: () => window.location.reload()
     });
   }
+
+  async function updatePwaRegistration() {
+    if (!pwaRegistration || document.hidden) return;
+    try {
+      await pwaRegistration.update();
+      if (pwaRegistration.waiting && navigator.serviceWorker?.controller) offerPwaRefresh();
+    } catch (_) {}
+  }
+
+  function setupPwaAutoUpdates() {
+    if (isAndroidApp() || !('serviceWorker' in navigator)) return;
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (pwaHadController) offerPwaRefresh();
+      pwaHadController = true;
+    });
+
+    window.addEventListener('load', async () => {
+      try {
+        pwaRegistration = await navigator.serviceWorker.register('/service-worker.js', {
+          scope: '/',
+          updateViaCache: 'none'
+        });
+        await updatePwaRegistration();
+        if (pwaRegistration.waiting && navigator.serviceWorker.controller) offerPwaRefresh();
+      } catch (error) {
+        console.warn('PWA service worker registration/update check failed:', error);
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) updatePwaRegistration();
+    });
+    window.setInterval(updatePwaRegistration, 15 * 60 * 1000);
+  }
+
+  async function checkNativeApkUpdate(force = false) {
+    if (!isAndroidApp()) return;
+
+    const appPlugin = window.Capacitor?.Plugins?.App;
+    if (!appPlugin || typeof appPlugin.getInfo !== 'function') return;
+
+    let checkedAt = 0;
+    try { checkedAt = Number(localStorage.getItem(APK_CHECK_KEY) || 0); } catch (_) {}
+    if (!force && Date.now() - checkedAt < APK_CHECK_INTERVAL) return;
+
+    try {
+      const appInfo = await appPlugin.getInfo();
+      const currentCode = Number.parseInt(String(appInfo?.build || ''), 10);
+      if (!Number.isFinite(currentCode) || currentCode < 1) return;
+
+      const response = await fetch('/api/app-version', {
+        method: 'GET',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { Accept: 'application/json' }
+      });
+      if (!response.ok) return;
+      const release = await response.json();
+      const latestCode = Number.parseInt(String(release?.versionCode || ''), 10);
+      if (!Number.isFinite(latestCode) || latestCode <= currentCode || !release?.downloadUrl) {
+        try { localStorage.setItem(APK_CHECK_KEY, String(Date.now())); } catch (_) {}
+        return;
+      }
+
+      try { localStorage.setItem(APK_CHECK_KEY, String(Date.now())); } catch (_) {}
+      const reinstallNote = release.requiresReinstall
+        ? ' This first permanently signed APK cannot replace older copies signed with a different key. You may need to uninstall the old app before installing it; your online account records remain on the server, but local preferences may reset.'
+        : ' Android will ask you to approve installation; the app cannot install an APK silently.';
+      showRuntimeUpdateNotice({
+        title: 'A new Android app update is available',
+        message: 'Installed ' + String(appInfo.version || 'current version') + '; latest ' + String(release.versionName || ('build ' + latestCode)) + '.' + reinstallNote,
+        actionLabel: 'Get update',
+        onAction: async () => {
+          const browserPlugin = window.Capacitor?.Plugins?.Browser;
+          if (browserPlugin && typeof browserPlugin.open === 'function') {
+            await browserPlugin.open({ url: release.downloadUrl });
+            return;
+          }
+          window.location.assign('/download-app.html?update=available&reinstall=' + (release.requiresReinstall ? '1' : '0'));
+        }
+      });
+    } catch (error) {
+      console.warn('Manlung Android update check failed:', error);
+    }
+  }
+
+  setupPwaAutoUpdates();
+  window.addEventListener('load', () => {
+    if (!isAndroidApp()) return;
+    checkNativeApkUpdate(false);
+    window.setInterval(() => checkNativeApkUpdate(false), APK_CHECK_INTERVAL);
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && isAndroidApp()) checkNativeApkUpdate(false);
+  });
 
   // Capture the browser-native PWA install prompt when the browser offers it.
   let deferredInstallPrompt = null;
