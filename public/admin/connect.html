@@ -662,7 +662,7 @@ window.openSharedGroup=async function(groupId){
  let group=(ML.groups||[]).find(g=>String(g.id)===gid);
  if(!group){try{const data=await apiReq('/groups');ML.groups=data.groups||[];group=ML.groups.find(g=>String(g.id)===gid)}catch(e){return toast(e.message||'Could not load community groups. Refresh and try again.')}}
  if(!group)return toast('This group is no longer available. Refresh Community and try again.');
- if(group.slug==='manlung-updates'||group.slug==='manlung-official-updates'){const special=ensureSpecialChatRecords();open=special.updates.id;special.updates.un=0;save();render();await window.refreshOfficialUpdates(true);if(String(open)===String(special.updates.id))render();return}
+ if(group.slug==='manlung-updates'||group.slug==='manlung-official-updates'){const special=ensureSpecialChatRecords();open=special.updates.id;special.updates.un=0;save();render();await window.refreshOfficialUpdates(true);if(String(open)===String(special.updates.id)){render();window.decorateAdminUpdates&&window.decorateAdminUpdates()}return}
  const isReadOnly=!!(group.admin_only_announcements||group.read_only||group.is_read_only||group.slug==='manlung-updates')&&!['admin','owner'].includes(ML.role);
  let panel=document.getElementById('ml-shared-group-chat');if(panel)panel.remove();
  panel=document.createElement('section');panel.id='ml-shared-group-chat';panel.className='ml-group-fullscreen';
