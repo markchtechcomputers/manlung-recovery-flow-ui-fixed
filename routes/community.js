@@ -899,6 +899,54 @@ router.delete('/groups/:groupId/members/:memberId', async (req,res) => {
   } catch(error) { return handleDbError(res,error,'Admin group remove error:'); }
 });
 
+// Official announcements API used by the Community channel UI. Backed by the
+// shared Manlung Updates group so admin posts appear in both admin and client views.
+router.get('/updates', async (req, res) => {
+  try {
+    const { data: channel, error: channelError } = await supabase.from('recovery_chat_groups')
+      .select('id,slug,name').eq('slug', 'manlung-updates').maybeSingle();
+    if (channelError) throw channelError;
+    if (!channel) return res.json({ success: true, updates: [] });
+    const { data, error } = await supabase.from('recovery_chat_group_messages')
+      .select('id,group_id,sender_user_id,message,created_at,edited_at')
+      .eq('group_id', channel.id).is('deleted_at', null)
+      .order('created_at', { ascending: false }).limit(100);
+    if (error) throw error;
+    const updates = (data || []).reverse().map(row => {
+      const split = String(row.message || '').split('\\n\\n');
+      return { id: row.id, title: split.length > 1 ? split.shift().replace(/^\\[PINNED\\]\\s*/, '') : '', body: split.join('\\n\\n') || row.message, message: row.message, created_at: row.created_at, edited_at: row.edited_at, pinned: /^\\[PINNED\\]/.test(String(row.message || '')) };
+    });
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, updates });
+  } catch (error) { return handleDbError(res, error, 'Official updates list error:'); }
+});
+
+router.post('/updates', messageLimiter, async (req, res) => {
+  try {
+    if (!isAdmin(req.user)) return fail(res, 403, 'Only admins and the owner can publish official updates.');
+    const title = cleanText(req.body?.title, 120);
+    const body = cleanText(req.body?.body || req.body?.message, 5000);
+    const pinned = req.body?.pinned === true;
+    if (!title && !body) return fail(res, 400, 'Enter a title or announcement message.');
+    const { data: channel, error: channelError } = await supabase.from('recovery_chat_groups')
+      .select('id,slug').eq('slug', 'manlung-updates').maybeSingle();
+    if (channelError) throw channelError;
+    if (!channel) return fail(res, 503, 'The Manlung Updates channel is not ready yet. Refresh Community and try again.');
+    // Staff are normally auto-joined by GET /groups, but posting must not fail
+    // just because an admin has not opened the channel on this device yet.
+    const { error: membershipError } = await supabase.from('recovery_chat_group_members')
+      .upsert({ group_id: channel.id, user_id: req.user.id, archived: false }, { onConflict: 'group_id,user_id' });
+    if (membershipError) throw membershipError;
+    const message = (pinned ? '[PINNED] ' : '') + (title ? title + (body ? '\\n\\n' : '') : '') + body;
+    const { data, error } = await supabase.from('recovery_chat_group_messages')
+      .insert({ group_id: channel.id, sender_user_id: req.user.id, message })
+      .select('id,group_id,sender_user_id,message,created_at').single();
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.status(201).json({ success: true, update: { id: data.id, title, body, message: data.message, created_at: data.created_at, pinned } });
+  } catch (error) { return handleDbError(res, error, 'Official update publish error:'); }
+});
+
 router.get('/groups/:groupId/messages', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
@@ -930,8 +978,8 @@ router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
       .select('id,slug').eq('id', gid).maybeSingle();
     if (targetGroupError) throw targetGroupError;
     if (!targetGroup) return fail(res, 404, 'Group not found.');
-    if (targetGroup.slug === 'manlung-updates' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Updates is an official read-only channel. Members can read updates; comments and posts are disabled.');
-    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
+    if ((targetGroup.slug === 'manlung-updates' || targetGroup.slug === 'manlung-official-updates' || targetGroup.admin_only_announcements) && !isAdmin(req.user)) return fail(res, 403, 'This is an official read-only channel. Only admins can publish announcements.');
+    if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
     if (replyTo && !validId(replyTo)) return fail(res, 400, 'Invalid reply target.');
     const { data, error } = await supabase.from('recovery_chat_group_messages')
       .insert({ group_id: gid, sender_user_id: req.user.id, message, reply_to_id: replyTo })
