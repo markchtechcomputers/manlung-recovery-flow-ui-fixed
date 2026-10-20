@@ -1036,7 +1036,9 @@ router.post('/status/media/upload-url', statusLimiter, async (req,res) => {
     const path = req.user.id + '/' + crypto.randomUUID() + '.' + STATUS_MEDIA_EXT[mime];
     const { data, error } = await supabase.storage.from(STATUS_MEDIA_BUCKET).createSignedUploadUrl(path, { upsert:false });
     if (error) throw error;
-    const signed = String(data.signedUrl || ''); const signedUrl = /^https?:\\/\\//i.test(signed) ? signed : String(process.env.SUPABASE_URL || '').replace(/\\/+$/, '') + '/storage/v1' + (signed.startsWith('/') ? signed : '/' + signed);\n    return res.status(201).json({ success:true, media_path:path, signed_url:signedUrl, token:data.token, content_type:mime, status_type:mime.startsWith('video/')?'video':'image' });
+    const signed = String(data.signedUrl || '');
+    const signedUrl = /^https?:\/\//i.test(signed) ? signed : String(process.env.SUPABASE_URL || '').replace(/\/+$/, '') + '/storage/v1' + (signed.startsWith('/') ? signed : '/' + signed);
+    return res.status(201).json({ success:true, media_path:path, signed_url:signedUrl, token:data.token, content_type:mime, status_type:mime.startsWith('video/')?'video':'image' });
   } catch (error) {
     console.error('Status media upload URL error:', error?.message || error);
     const msg=String(error?.message||'');
