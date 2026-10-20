@@ -337,8 +337,8 @@
             min-width: 0;
           }
         }
+        html.manlung-android-app body.manlung-android-app footer,
         html.manlung-android-app body.manlung-android-app .site-footer,
-        html.manlung-android-app body.manlung-android-app footer.site-footer,
         html.manlung-android-app body.manlung-android-app .manlung-footer,
         html.manlung-android-app body.manlung-android-app [data-desktop-only],
         html.manlung-android-app body.manlung-android-app .desktop-only,
