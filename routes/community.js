@@ -160,6 +160,22 @@ router.patch('/profile', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Profile update error:'); }
 });
 
+const VOICE_MEDIA_BUCKET = 'recovery-chat-media';
+const VOICE_MEDIA_TYPES = new Set(['audio/webm','audio/mp4','audio/aac','audio/ogg','audio/mpeg','audio/wav','audio/x-wav']);
+const VOICE_MEDIA_EXT = {'audio/webm':'webm','audio/mp4':'m4a','audio/aac':'aac','audio/ogg':'ogg','audio/mpeg':'mp3','audio/wav':'wav','audio/x-wav':'wav'};
+router.post('/voice/upload-url', messageLimiter, async (req, res) => {
+  try {
+    const mime = String(req.body?.content_type || '').split(';')[0].trim().toLowerCase();
+    if (!VOICE_MEDIA_TYPES.has(mime)) return fail(res, 400, 'This voice recording format is not supported.');
+    const path = String(req.user.id) + '/' + crypto.randomUUID() + '.' + VOICE_MEDIA_EXT[mime];
+    const { data, error } = await supabase.storage.from(VOICE_MEDIA_BUCKET).createSignedUploadUrl(path, { upsert: false });
+    if (error) throw error;
+    const signed = String(data.signedUrl || '');
+    const signedUrl = /^https?:\\/\\//i.test(signed) ? signed : String(process.env.SUPABASE_URL || '').replace(/\\/+$/, '') + '/storage/v1' + (signed.startsWith('/') ? signed : '/' + signed);
+    return res.status(201).json({ success: true, media_path: path, signed_url: signedUrl, content_type: mime });
+  } catch (error) { return handleDbError(res, error, 'Voice upload URL error:'); }
+});
+
 router.get('/messages/:memberId', async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
@@ -171,9 +187,49 @@ router.get('/messages/:memberId', async (req, res) => {
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
       .is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
     if (error) throw error;
+    const messages = await Promise.all((data || []).map(async row => {
+      const raw = String(row.message || '');
+      if (!raw.startsWith('VOICE::')) return row;
+      const parts = raw.slice(7).split('|');
+      const path = String(parts[0] || '');
+      const duration = Math.max(1, Math.min(3600, Number.parseInt(parts[1] || '1', 10) || 1));
+      const mime = String(parts[2] || 'audio/webm');
+      // Only issue signed links for voice objects owned by the original sender.
+      if (!path.startsWith(String(row.sender_user_id) + '/') || path.includes('..') || path.startsWith('/')) return { ...row, message: '[Voice message unavailable]' };
+      const { data: signed, error: signedError } = await supabase.storage.from(VOICE_MEDIA_BUCKET).createSignedUrl(path, 3600);
+      if (signedError || !signed?.signedUrl) return { ...row, message: '[Voice message unavailable]' };
+      return { ...row, message: '', attachment: { isVoice: true, url: signed.signedUrl, duration, mime } };
+    }));
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages: data || [] });
+    res.json({ success: true, messages });
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
+});
+
+router.patch('/messages/:memberId/:messageId', messageLimiter, async (req, res) => {
+  try {
+    const other = String(req.params.memberId || ''), id = String(req.params.messageId || ''), message = String(req.body?.message || '').trim();
+    if (!validId(other) || !validId(id)) return fail(res, 400, 'Invalid member or message ID.');
+    if (!message || message.length > 5000 || message.startsWith('VOICE::')) return fail(res, 400, 'Messages must contain 1–5000 characters.');
+    const { data, error } = await supabase.from('recovery_community_messages').update({ message, edited_at: new Date().toISOString() })
+      .eq('id', id).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null)
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot edit it.');
+    return res.json({ success: true, message: data });
+  } catch (error) { return handleDbError(res, error, 'Community message edit error:'); }
+});
+
+router.delete('/messages/:memberId/:messageId', messageLimiter, async (req, res) => {
+  try {
+    const other = String(req.params.memberId || ''), id = String(req.params.messageId || '');
+    if (!validId(other) || !validId(id)) return fail(res, 400, 'Invalid member or message ID.');
+    const { data, error } = await supabase.from('recovery_community_messages').update({ deleted_at: new Date().toISOString() })
+      .eq('id', id).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null)
+      .select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Message not found or you cannot unsend it.');
+    return res.json({ success: true, deleted: true });
+  } catch (error) { return handleDbError(res, error, 'Community message unsend error:'); }
 });
 
 router.post('/messages/:memberId', messageLimiter, async (req, res) => {
