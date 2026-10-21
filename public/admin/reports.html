@@ -2863,6 +2863,16 @@ a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="l
  }
 }
 
+
+/* Keep reports page header actions aligned in a stable row */
+.site-header .header-actions,.header-actions{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%!important}
+.site-header .header-actions>* ,.header-actions>*{position:static!important;float:none!important;margin:0!important}
+.site-header .header-actions a[href="/admin/dashboard.html"]{order:1!important}
+.site-header .header-actions a[href="/admin/reports.html"]{order:2!important}
+.site-header .header-actions a[href="/admin/tools.html"]{order:3!important}
+.site-header .header-actions a[href="/"]{order:4!important}
+.site-header .header-actions button[onclick*="logout"],.header-actions button[onclick*="logout"]{order:5!important;background:#dc3545!important;color:#fff!important;border-color:#c82333!important}
+
 </style>
 <script id="manlung-admin-sidebar-nav-script">
 (function(){
