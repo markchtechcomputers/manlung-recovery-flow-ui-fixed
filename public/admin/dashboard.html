@@ -2613,123 +2613,73 @@ body.ml-admin-menu-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){.ml-admin-menu-overlay,.ml-admin-sidebar{transition:none}}
 
-/* Theme-aware admin menu contrast and compact icons */
-.ml-admin-menu-toggle{color:#0f172a!important;background:#fff!important;border-color:#cbd5e1!important}
-.ml-admin-menu-toggle i{color:#0f172a!important;font-size:15px!important}
-.ml-admin-sidebar{background:#fff!important;color:#0f172a!important}
-.ml-admin-sidebar .ml-admin-sidebar-title,.ml-admin-sidebar .header-actions a,.ml-admin-sidebar .header-actions button{color:#0f172a!important}
-.ml-admin-sidebar .header-actions a{background:#fff!important;border-color:#e2e8f0!important}
-.ml-admin-sidebar .header-actions a i,.ml-admin-sidebar .header-actions button i{font-size:15px!important}
-body.dark .ml-admin-menu-toggle{color:#f8fafc!important;background:#111827!important;border-color:#475569!important}
-body.dark .ml-admin-menu-toggle i{color:#f8fafc!important}
-body.dark .ml-admin-sidebar{background:#0f172a!important;color:#f8fafc!important;border-left-color:#334155!important}
-body.dark .ml-admin-sidebar .ml-admin-sidebar-title,body.dark .ml-admin-sidebar .header-actions a,body.dark .ml-admin-sidebar .header-actions button{color:#f8fafc!important}
-body.dark .ml-admin-sidebar .header-actions a{background:#111827!important;border-color:#334155!important}
-body.dark .ml-admin-sidebar .header-actions a i,body.dark .ml-admin-sidebar .header-actions button i{color:#f8fafc!important}
-body.dark .ml-admin-sidebar-subtitle{color:#cbd5e1!important}
-.op-menu-toggle,.music-menu-toggle{color:#0f172a!important;background:#fff!important;border-color:#cbd5e1!important}
-.op-menu-toggle i,.music-menu-toggle i{color:#0f172a!important;font-size:15px!important}
-.op-nav-drawer,.music-nav-drawer{background:#fff!important;color:#0f172a!important;border-color:#e2e8f0!important}
-.op-nav-head,.music-nav-head{color:#0f172a!important;border-bottom-color:#e2e8f0!important}
-.op-nav-close,.music-nav-close{background:#f1f5f9!important;color:#0f172a!important;border:1px solid #cbd5e1!important}
-.op-nav-links a,.music-nav-drawer nav a{color:#0f172a!important;background:#fff!important;border-color:#e2e8f0!important}
-.op-nav-links a i,.music-nav-drawer nav a i{color:#475569!important;font-size:15px!important}
-body.dark .op-menu-toggle,body.dark .music-menu-toggle{color:#f8fafc!important;background:#111827!important;border-color:#475569!important}
-body.dark .op-menu-toggle i,body.dark .music-menu-toggle i{color:#f8fafc!important}
-body.dark .op-nav-drawer,body.dark .music-nav-drawer{background:#0f172a!important;color:#f8fafc!important;border-color:#334155!important}
-body.dark .op-nav-head,body.dark .music-nav-head{color:#f8fafc!important;border-bottom-color:#334155!important}
-body.dark .op-nav-close,body.dark .music-nav-close{background:#1e293b!important;color:#f8fafc!important;border-color:#475569!important}
-body.dark .op-nav-links a,body.dark .music-nav-drawer nav a{color:#f8fafc!important;background:#111827!important;border-color:#334155!important}
-body.dark .op-nav-links a i,body.dark .music-nav-drawer nav a i{color:#cbd5e1!important}
 
-
-/* Softer dark theme and balanced theme-toggle icon */
-.ml-admin-menu-toggle i,.op-menu-toggle i,.music-menu-toggle i{font-size:14px!important;line-height:1!important}
-.ml-admin-menu-toggle, .op-menu-toggle, .music-menu-toggle{min-width:38px}
-.ml-admin-sidebar{background:#ffffff!important}
-.ml-admin-sidebar .header-actions a{background:#fff!important;color:#1f2937!important}
-body.dark .ml-admin-sidebar{background:#202b3b!important;color:#f1f5f9!important;border-left-color:#3b4759!important}
-body.dark .ml-admin-sidebar .header-actions a{background:#293548!important;color:#f1f5f9!important;border-color:#435066!important}
-body.dark .ml-admin-sidebar .header-actions a:hover{background:#344258!important}
-body.dark .ml-admin-sidebar .header-actions a i{color:#e2e8f0!important}
-body.dark .ml-admin-sidebar-title{color:#f8fafc!important}
-body.dark .ml-admin-sidebar-subtitle{color:#cbd5e1!important}
-body.dark .ml-admin-sidebar-close{background:#344258!important;color:#f1f5f9!important;border-color:#4b5b72!important}
-body.dark .ml-admin-menu-toggle{background:#293548!important;color:#f1f5f9!important;border-color:#435066!important}
-body.dark .ml-admin-menu-toggle i{color:#e2e8f0!important}
-body.dark .op-nav-drawer,body.dark .music-nav-drawer{background:#202b3b!important;color:#f1f5f9!important;border-color:#3b4759!important}
-body.dark .op-nav-head,body.dark .music-nav-head{color:#f8fafc!important;border-bottom-color:#3b4759!important}
-body.dark .op-nav-links a,body.dark .music-nav-drawer nav a{background:#293548!important;color:#f1f5f9!important;border-color:#435066!important}
-body.dark .op-nav-links a:hover,body.dark .music-nav-drawer nav a:hover{background:#344258!important}
-body.dark .op-nav-links a i,body.dark .music-nav-drawer nav a i{color:#cbd5e1!important}
-body.dark .op-menu-toggle,body.dark .music-menu-toggle{background:#293548!important;color:#f1f5f9!important;border-color:#435066!important}
-body.dark .op-menu-toggle i,body.dark .music-menu-toggle i{color:#e2e8f0!important}
-
-
-/* FINAL hard cap: theme glyph itself, not just its button */
-button[data-theme-toggle="true"]{width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;min-height:34px!important;max-height:34px!important;padding:0!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;line-height:1!important}
-button[data-theme-toggle="true"] i,button[data-theme-toggle="true"] svg{display:block!important;width:14px!important;min-width:14px!important;max-width:14px!important;height:14px!important;min-height:14px!important;max-height:14px!important;font-size:14px!important;line-height:14px!important;transform:none!important}
-.ml-admin-menu-toggle i,.op-menu-toggle i,.music-menu-toggle i{width:14px!important;min-width:14px!important;max-width:14px!important;height:14px!important;font-size:14px!important;line-height:14px!important;transform:none!important}
-.ml-admin-menu-toggle,.op-menu-toggle,.music-menu-toggle{min-height:34px!important;padding:7px 9px!important}
-
-
-/* Header navigation alignment: even spacing, no centered stray links, clear red logout */
+/* Manlung Recovery admin layout — consolidated responsive header rules */
+*,*::before,*::after{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:clip}
+body{margin:0}
+img,svg,video,canvas{max-width:100%}
+.site-header{width:100%;padding:12px max(16px,env(safe-area-inset-left)) 16px max(16px,env(safe-area-inset-right))}
+.site-header>.container{width:100%;max-width:1440px;margin-inline:auto;padding:0;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.site-header .brand{min-width:0;max-width:100%;flex:0 1 auto}
+.site-header .brand h1{margin:0}
 .site-header .header-actions,.header-actions,.top .actions,.music-nav{
- display:flex!important;align-items:center!important;justify-content:flex-end!important;
- gap:8px!important;flex-wrap:wrap!important;row-gap:8px!important;
-}
-.site-header .header-actions>* ,.header-actions>* ,.top .actions>*{flex:0 0 auto!important;margin:0!important}
-.site-header .header-actions .btn,.header-actions .btn,.top .actions a,.music-nav a{
- display:inline-flex!important;align-items:center!important;justify-content:center!important;
- white-space:nowrap!important;min-height:36px!important;padding:8px 11px!important;
- line-height:1.2!important;border-radius:9px!important;
-}
-.site-header .header-actions a[href*="music"],.header-actions a[href*="music"],.top .actions a[href*="music"],.music-nav a[href*="music"]{margin:0!important;align-self:auto!important;justify-self:auto!important}
-.site-header .header-actions button.btn-danger,.site-header .header-actions a.btn-danger,
-.header-actions button.btn-danger,.header-actions a.btn-danger,.top .actions .btn-danger,
-a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="logout"]{
- background:#dc2626!important;background-image:none!important;color:#fff!important;
- border:1px solid #b91c1c!important;box-shadow:0 2px 5px #991b1b22!important;
-}
-.site-header .header-actions button.btn-danger:hover,.site-header .header-actions a.btn-danger:hover,
-.header-actions .btn-danger:hover,.top .actions .btn-danger:hover,a#ownerLogoutBtn:hover{background:#b91c1c!important;color:#fff!important}
-@media(max-width:760px){
- .site-header .header-actions,.header-actions,.top .actions,.music-nav{justify-content:flex-start!important;gap:6px!important}
- .site-header .header-actions .btn,.header-actions .btn,.top .actions a,.music-nav a{min-height:34px!important;padding:7px 9px!important;font-size:.78rem!important}
-}
-
-
-/* Final header row normalization: all navigation controls stay in one tidy flow */
-.site-header .container,.site-header>div,.music-header-inner,.top{
- box-sizing:border-box!important;max-width:100%!important;
-}
-.site-header .container{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;flex-wrap:wrap!important}
-.site-header .header-actions,.header-actions,.top .actions,.music-nav{
- display:flex!important;align-items:center!important;justify-content:flex-start!important;
- align-content:center!important;gap:8px!important;row-gap:8px!important;column-gap:8px!important;
- flex-wrap:wrap!important;float:none!important;position:static!important;transform:none!important;
+ min-width:0;max-width:100%;display:flex;flex:1 1 100%;align-items:center;justify-content:flex-start;
+ align-content:center;flex-wrap:wrap;gap:8px;margin:0;padding:0;float:none;position:static;transform:none
 }
 .site-header .header-actions>* ,.header-actions>* ,.top .actions>* ,.music-nav>*{
- flex:0 0 auto!important;align-self:center!important;justify-self:auto!important;
- margin:0!important;float:none!important;position:static!important;transform:none!important;
+ flex:0 0 auto;min-width:0;max-width:100%;margin:0!important;float:none;position:static;transform:none;align-self:center
 }
-.site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,.top .actions a,.top .actions button,.music-nav a{
- box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
- min-height:36px!important;height:auto!important;padding:8px 11px!important;line-height:1.2!important;
- white-space:nowrap!important;text-align:center!important;border-radius:9px!important;
+.site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,
+.top .actions a,.top .actions button,.music-nav a{
+ box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ min-height:36px;height:auto;max-width:100%;padding:8px 12px;line-height:1.2;white-space:normal;
+ text-align:center;text-decoration:none;border-radius:9px;vertical-align:middle
+}
+.site-header .header-actions i,.header-actions i,.top .actions i,.music-nav i{font-size:14px;line-height:1;flex:0 0 auto}
+.site-header .header-actions [data-theme-toggle="true"],.header-actions [data-theme-toggle="true"]{
+ width:36px;min-width:36px;max-width:36px;height:36px;min-height:36px;max-height:36px;padding:0;
+ display:inline-flex;align-items:center;justify-content:center;overflow:hidden
+}
+.site-header .header-actions [data-theme-toggle="true"] i,.site-header .header-actions [data-theme-toggle="true"] svg,
+.header-actions [data-theme-toggle="true"] i,.header-actions [data-theme-toggle="true"] svg{
+ width:14px;min-width:14px;max-width:14px;height:14px;min-height:14px;max-height:14px;font-size:14px;line-height:14px
 }
 .site-header .header-actions .btn-danger,.header-actions .btn-danger,.top .actions .btn-danger,.music-nav .btn-danger,
 a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="logout"]{
- background:#dc2626!important;color:#fff!important;border:1px solid #b91c1c!important;
+ background:#dc3545;color:#fff;border:1px solid #c82333
 }
 .site-header .header-actions .btn-danger:hover,.header-actions .btn-danger:hover,.top .actions .btn-danger:hover,a#ownerLogoutBtn:hover{
- background:#b91c1c!important;color:#fff!important;
+ background:#c82333;color:#fff
+}
+.music-header{width:100%;padding:12px max(16px,env(safe-area-inset-left)) 16px max(16px,env(safe-area-inset-right))}
+.music-header-inner{width:100%;max-width:1440px;margin-inline:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
+.music-brand{min-width:0;max-width:100%}
+.music-nav{flex:1 1 100%;width:100%;justify-content:flex-start}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;max-width:100%;min-width:0}
+.top>div{min-width:0;max-width:100%}
+@media(min-width:900px){
+ .site-header .header-actions,.header-actions,.top .actions,.music-nav{flex:1 1 100%}
 }
 @media(max-width:760px){
- .site-header .container{align-items:flex-start!important}
- .site-header .header-actions,.header-actions,.top .actions,.music-nav{width:100%!important;justify-content:flex-start!important;gap:6px!important}
- .site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,.top .actions a,.music-nav a{
-  min-height:34px!important;padding:7px 9px!important;font-size:.78rem!important
+ .site-header{padding:12px max(12px,env(safe-area-inset-left)) 14px max(12px,env(safe-area-inset-right))}
+ .site-header>.container,.music-header-inner{align-items:flex-start;gap:12px}
+ .site-header .brand{width:100%}
+ .site-header .header-actions,.header-actions,.top .actions,.music-nav{width:100%;justify-content:flex-start;gap:8px}
+ .site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,.top .actions a,.top .actions button,.music-nav a{
+  min-height:36px;padding:8px 10px;font-size:.82rem
+ }
+ .top{align-items:flex-start}
+}
+@media(max-width:430px){
+ .site-header .header-actions,.header-actions,.top .actions,.music-nav{gap:8px}
+ .site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,.top .actions a,.top .actions button,.music-nav a{
+  min-height:36px;padding:8px 10px;font-size:.8rem
+ }
+}
+@media(max-width:340px){
+ .site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,.top .actions a,.top .actions button,.music-nav a{
+  padding:7px 8px;font-size:.76rem
  }
 }
 
