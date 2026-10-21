@@ -356,7 +356,131 @@
   let pwaRegistration = null;
   let pwaHadController = Boolean(navigator.serviceWorker && navigator.serviceWorker.controller);
 
+  // Persistent update bell: clients can reopen the update action after dismissing the popup.
+  const UPDATE_BELL_ID = 'manlung-update-bell';
+  let updateBellState = null;
+  let updateBellPanel = null;
+
+  function addUpdateBellStyles() {
+    if (document.getElementById('manlung-update-bell-style')) return;
+    const style = document.createElement('style');
+    style.id = 'manlung-update-bell-style';
+    style.textContent = `
+      #manlung-update-bell{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:2147483000}
+      #manlung-update-bell .mlub-trigger{position:relative;width:52px;height:52px;border:1px solid #334155;border-radius:50%;display:grid;place-items:center;background:#0b1b30;color:#f8fafc;box-shadow:0 8px 24px #0005;cursor:pointer}
+      #manlung-update-bell .mlub-trigger svg{width:23px;height:23px}
+      #manlung-update-bell .mlub-badge{position:absolute;right:-2px;top:-3px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#ef4444;color:#fff;font:800 11px/19px system-ui,sans-serif;text-align:center;border:2px solid #0b1b30}
+      #manlung-update-bell .mlub-panel{position:absolute;right:0;bottom:62px;width:min(340px,calc(100vw - 32px));padding:16px;border:1px solid #334155;border-radius:16px;background:#071629;color:#f8fafc;box-shadow:0 14px 42px #0007;font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      #manlung-update-bell .mlub-panel[hidden]{display:none}
+      #manlung-update-bell .mlub-title{display:block;font-weight:850;font-size:15px;margin-bottom:5px}
+      #manlung-update-bell .mlub-copy{display:block;color:#cbd5e1;font-size:12px;margin-bottom:13px;overflow-wrap:anywhere}
+      #manlung-update-bell .mlub-actions{display:flex;gap:8px;flex-wrap:wrap}
+      #manlung-update-bell .mlub-action{border:0;border-radius:9px;padding:10px 12px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer}
+      #manlung-update-bell .mlub-secondary{background:#1e293b;color:#e2e8f0}
+      #manlung-update-bell button:focus-visible{outline:2px solid #93c5fd;outline-offset:3px}
+      @media(max-width:420px){#manlung-update-bell{right:12px;bottom:calc(14px + env(safe-area-inset-bottom))}#manlung-update-bell .mlub-trigger{width:48px;height:48px}}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function setupUpdateBell() {
+    if (document.getElementById(UPDATE_BELL_ID)) return;
+    addUpdateBellStyles();
+    const root = document.createElement('div');
+    root.id = UPDATE_BELL_ID;
+    root.innerHTML = `
+      <section class="mlub-panel" hidden aria-live="polite">
+        <strong class="mlub-title">Manlung Recovery updates</strong>
+        <span class="mlub-copy">Check here for app update notices.</span>
+        <div class="mlub-actions">
+          <button type="button" class="mlub-action mlub-primary">Check updates</button>
+          <button type="button" class="mlub-action mlub-secondary mlub-close">Close</button>
+        </div>
+      </section>
+      <button type="button" class="mlub-trigger" aria-label="App updates" aria-expanded="false" title="App updates">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+        <span class="mlub-badge" hidden>!</span>
+      </button>`;
+    document.body.appendChild(root);
+    updateBellPanel = root.querySelector('.mlub-panel');
+    const trigger = root.querySelector('.mlub-trigger');
+    const badge = root.querySelector('.mlub-badge');
+    const copy = root.querySelector('.mlub-copy');
+    const title = root.querySelector('.mlub-title');
+    const primary = root.querySelector('.mlub-primary');
+
+    function renderBell() {
+      const available = Boolean(updateBellState);
+      badge.hidden = !available;
+      badge.textContent = available ? '1' : '';
+      trigger.setAttribute('aria-label', available ? 'App update available' : 'App updates');
+      title.textContent = updateBellState?.title || 'Manlung Recovery updates';
+      copy.textContent = updateBellState?.message || (isAndroidApp()
+        ? 'No update notice yet. Tap Check updates to check for the latest Android app.'
+        : 'Website refresh notices and app update information will appear here.');
+      primary.textContent = updateBellState?.actionLabel || 'Check updates';
+    }
+
+    trigger.addEventListener('click', () => {
+      const willOpen = updateBellPanel.hidden;
+      updateBellPanel.hidden = !willOpen;
+      trigger.setAttribute('aria-expanded', String(willOpen));
+      renderBell();
+    });
+    root.querySelector('.mlub-close').addEventListener('click', () => {
+      updateBellPanel.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+    });
+    primary.addEventListener('click', async () => {
+      if (updateBellState?.onAction) {
+        try { await updateBellState.onAction(); } catch (error) {
+          console.warn('Manlung update bell action failed:', error);
+          primary.disabled = false;
+        }
+        return;
+      }
+      primary.disabled = true;
+      primary.textContent = 'Checking…';
+      try {
+        if (isAndroidApp()) {
+          await checkNativeApkUpdate(true);
+        } else {
+          await updatePwaRegistration();
+        }
+        if (!updateBellState) {
+          copy.textContent = isAndroidApp()
+            ? 'No newer Android APK was detected. Try again when you are online.'
+            : 'Website update check completed. Reload the page if you notice outdated content.';
+        }
+      } finally {
+        primary.disabled = false;
+        renderBell();
+      }
+    });
+    renderBell();
+  }
+
+  function setUpdateBellState(options) {
+    updateBellState = options || null;
+    if (!document.getElementById(UPDATE_BELL_ID)) {
+      setupUpdateBell();
+    }
+    const root = document.getElementById(UPDATE_BELL_ID);
+    if (!root) return;
+    const badge = root.querySelector('.mlub-badge');
+    const trigger = root.querySelector('.mlub-trigger');
+    const title = root.querySelector('.mlub-title');
+    const copy = root.querySelector('.mlub-copy');
+    const primary = root.querySelector('.mlub-primary');
+    if (badge) { badge.hidden = !updateBellState; badge.textContent = updateBellState ? '1' : ''; }
+    if (trigger) trigger.setAttribute('aria-label', updateBellState ? 'App update available' : 'App updates');
+    if (title) title.textContent = updateBellState?.title || 'Manlung Recovery updates';
+    if (copy) copy.textContent = updateBellState?.message || 'No update notice yet. Tap Check updates to check for the latest version.';
+    if (primary) primary.textContent = updateBellState?.actionLabel || 'Check updates';
+  }
+
   function showRuntimeUpdateNotice(options) {
+    setUpdateBellState(options);
     let notice = document.getElementById(UPDATE_NOTICE_ID);
     if (notice) notice.remove();
 
@@ -545,6 +669,7 @@
     }
   }, true);
 
+  setupUpdateBell();
   setupPwaAutoUpdates();
   function startNativeApkUpdateChecks() {
     if (!isAndroidApp()) return;
