@@ -2566,6 +2566,21 @@ async function sendAdminCaseMessage(caseId) {
 })();
 </script>
 <style id="manlung-admin-sidebar-nav">
+
+/* UI refinement: white navigation drawer and compact icons */
+.ml-admin-sidebar{background:#fff!important;color:#0f172a!important;border-left:1px solid #e2e8f0!important;box-shadow:-18px 0 48px #0f172a24!important}
+.ml-admin-sidebar-head{border-bottom-color:#e2e8f0!important}
+.ml-admin-sidebar-title{color:#0f172a!important}
+.ml-admin-sidebar-subtitle{color:#64748b!important}
+.ml-admin-sidebar-close{background:#f1f5f9!important;border-color:#cbd5e1!important;color:#334155!important;font-size:20px!important}
+.ml-admin-sidebar .header-actions a,.ml-admin-sidebar .header-actions button{background:#fff!important;border-color:#e2e8f0!important;color:#1e293b!important;min-height:44px!important;padding:10px 12px!important;font-size:.84rem!important;box-shadow:0 1px 2px rgba(15,23,42,.04)!important}
+.ml-admin-sidebar .header-actions a:hover,.ml-admin-sidebar .header-actions button:hover{background:#f1f5f9!important;border-color:#cbd5e1!important;color:#0f172a!important}
+.ml-admin-sidebar .header-actions a i,.ml-admin-sidebar .header-actions button i{font-size:15px!important;width:20px!important;color:#475569!important}
+.ml-admin-sidebar .header-actions a[href*="reports"] i{color:#16a34a!important}.ml-admin-sidebar .header-actions a[href*="music"] i{color:#9333ea!important}.ml-admin-sidebar .header-actions a[href*="connect"] i{color:#0891b2!important}
+.ml-admin-menu-toggle{min-height:38px!important;padding:8px 11px!important;border-radius:10px!important;font-size:12px!important;box-shadow:none!important}
+.ml-admin-menu-toggle i{font-size:15px!important}
+@media(max-width:650px){.ml-admin-menu-toggle{min-height:38px!important;padding:8px 10px!important}.ml-admin-menu-toggle i{font-size:16px!important}}
+
 .site-header .container{position:relative;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;min-height:68px!important}
 .site-header .header-actions{display:none!important}
 .ml-admin-menu-toggle{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:none;min-height:42px;padding:10px 14px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:#12345a;color:#fff;font:800 14px/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 5px 16px #02061733}
