@@ -1805,6 +1805,21 @@ html.dark .ml-admin-sidebar .header-actions a[href^="#"]:hover,body.dark .ml-adm
   sidebar.innerHTML='<div class="ml-admin-sidebar-head"><div><div class="ml-admin-sidebar-title">Manlung Recovery</div><div class="ml-admin-sidebar-subtitle">'+title.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})+'</div></div><button type="button" class="ml-admin-sidebar-close" aria-label="Close navigation">×</button></div>';
 
   var extraNav=[['/admin/operations.html','fa-list-check','Operations'],['/admin/music.html','fa-music','Music'],['/admin/connect.html','fa-users','Community'],['/','fa-house','Home']];
+  var languageControl=actions.querySelector('.language-control,[aria-label*="Language"],[title*="Language"],select[name*="language" i]');
+  if(languageControl && !languageControl.matches('a,button')){
+   var languageLink=document.createElement('a');
+   languageLink.href='#language';
+   languageLink.innerHTML='<i class="fas fa-language" aria-hidden="true"></i><span>Language</span>';
+   languageLink.addEventListener('click',function(e){
+    e.preventDefault();
+    var target=header.querySelector('.language-control,[aria-label*="Language"],[title*="Language"],select[name*="language" i]');
+    if(target){target.scrollIntoView({behavior:'smooth',block:'center'});target.focus({preventScroll:true});}
+    else {var toggle=header.querySelector('[aria-label*="language" i],[title*="language" i],.language-control');if(toggle)toggle.click();}
+   });
+   extraNav.unshift(['#language','fa-language','Language']);
+  } else {
+   extraNav.unshift(['#language','fa-language','Language']);
+  }
   if(/(?:^|\/)owner\.html$/.test(location.pathname)){
    extraNav=extraNav.concat([
     ['#ownerApprovalQueue','fa-user-shield','Owner Approval Queue'],
