@@ -1,20 +1,4 @@
 (() => {
-  // Hard-disable the retired on-screen update bell, including copies left by older cached scripts.
-  const removeRetiredUpdateBell = () => {
-    document.getElementById('manlung-update-bell')?.remove();
-    document.getElementById('manlung-update-bell-style')?.remove();
-    document.getElementById('manlung-runtime-update-notice')?.remove();
-    document.getElementById('manlung-runtime-update-style')?.remove();
-  };
-  removeRetiredUpdateBell();
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', removeRetiredUpdateBell, { once: true });
-  }
-  const retiredBellObserver = new MutationObserver(removeRetiredUpdateBell);
-  retiredBellObserver.observe(document.documentElement, { childList: true, subtree: true });
-  window.setTimeout(() => retiredBellObserver.disconnect(), 15000);
-})();
-(() => {
   const DISMISS_KEY = 'manlung-app-install-dismissed-v3';
 
   // Keep Android/mobile browser Back inside the website instead of closing
