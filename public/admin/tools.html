@@ -364,6 +364,9 @@ body.ml-admin-menu-open{overflow:hidden}
   var brand=header.querySelector('.brand h1');
   var title=brand?brand.textContent.trim():'Manlung Recovery';
   sidebar.innerHTML='<div class="ml-admin-sidebar-head"><div><div class="ml-admin-sidebar-title">Manlung Recovery</div><div class="ml-admin-sidebar-subtitle">'+title.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})+'</div></div><button type="button" class="ml-admin-sidebar-close" aria-label="Close navigation">×</button></div>';
+
+  var extraNav=[['/admin/operations.html','fa-list-check','Operations'],['/admin/music.html','fa-music','Music'],['/admin/connect.html','fa-users','Community'],['/','fa-house','Home']];
+  extraNav.forEach(function(item){if(!Array.prototype.some.call(actions.querySelectorAll('a'),function(a){return a.getAttribute('href')===item[0]})){var a=document.createElement('a');a.href=item[0];a.innerHTML='<i class="fas '+item[1]+'" aria-hidden="true"></i><span>'+item[2]+'</span>';actions.appendChild(a)}});
   sidebar.appendChild(actions);document.body.append(overlay,sidebar);
   var close=sidebar.querySelector('.ml-admin-sidebar-close');
   function setOpen(open){
