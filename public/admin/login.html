@@ -48,7 +48,42 @@
     <link rel="stylesheet" href="/css/footer.css">
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script><style>.manlung-turnstile-box{margin:.9rem 0 1rem;padding:.85rem;border:1px solid #223257;border-radius:12px;background:#0b1730}.manlung-turnstile-title{font-weight:700;font-size:.9rem;color:#e6ecf5;display:flex;gap:.45rem;align-items:center;margin-bottom:.2rem}.manlung-turnstile-help{font-size:.78rem;color:#a9c0ec;margin-bottom:.55rem}.manlung-turnstile-widget{min-height:65px;display:flex;align-items:center}</style></head>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script><style>.manlung-turnstile-box{margin:.9rem 0 1rem;padding:.85rem;border:1px solid #223257;border-radius:12px;background:#0b1730}.manlung-turnstile-title{font-weight:700;font-size:.9rem;color:#e6ecf5;display:flex;gap:.45rem;align-items:center;margin-bottom:.2rem}.manlung-turnstile-help{font-size:.78rem;color:#a9c0ec;margin-bottom:.55rem}.manlung-turnstile-widget{min-height:65px;display:flex;align-items:center}</style>
+<style id="manlung-admin-login-professional">
+:root{--admin-ink:#14213d;--admin-muted:#64748b;--admin-brand:#0f766e;--admin-line:#dbe4ee}
+html,body{min-height:100%;margin:0}
+body:has(.center-wrap){background:radial-gradient(ellipse at 12% 8%,rgba(20,184,166,.16),transparent 34%),radial-gradient(ellipse at 90% 92%,rgba(59,130,246,.13),transparent 36%),linear-gradient(135deg,#f5f9ff,#eef5f8)!important;color:var(--admin-ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.center-wrap{min-height:100svh!important;box-sizing:border-box;padding:28px 16px!important}
+.login-container{box-sizing:border-box;width:min(100%,460px)!important;padding:clamp(24px,5vw,40px)!important;border:1px solid rgba(203,213,225,.85)!important;border-radius:24px!important;background:rgba(255,255,255,.97)!important;color:var(--admin-ink)!important;box-shadow:0 26px 70px rgba(15,23,42,.13),0 4px 12px rgba(15,23,42,.04)!important;position:relative;overflow:hidden}
+.login-container:before{content:"";position:absolute;inset:0 0 auto;height:5px;background:linear-gradient(90deg,#0f766e,#14b8a6,#60a5fa)}
+.login-container .logo{text-align:center;margin-bottom:26px}
+.login-container .logo>i{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 15px;border-radius:18px;background:linear-gradient(135deg,#ccfbf1,#dbeafe);color:#0f766e;font-size:27px}
+.login-container .logo h1{margin:0 0 6px!important;color:#0f172a!important;font-size:clamp(1.5rem,4vw,1.8rem)!important;font-weight:850;letter-spacing:-.04em}
+.login-container .logo>span{display:block;color:#64748b!important;font-size:.9rem;line-height:1.5}
+.login-container .admin-badge{display:inline-flex;align-items:center;gap:6px;margin-top:13px;padding:6px 11px;border:1px solid #fecaca;border-radius:999px;background:#fff1f2;color:#b91c1c;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.login-container .form-group{margin:0 0 18px}
+.login-container label{display:block;margin:0 0 8px;color:#334155!important;font-size:.86rem;font-weight:750}
+.login-container label i{color:#64748b}
+.login-container input{display:block;width:100%;min-height:49px;box-sizing:border-box;padding:12px 14px;border:1px solid #d7e0eb!important;border-radius:12px!important;background:#fff!important;color:#0f172a!important;font:inherit;transition:border-color .18s,box-shadow .18s}
+.login-container input::placeholder{color:#94a3b8}
+.login-container input:focus{outline:0;border-color:#0d9488!important;box-shadow:0 0 0 4px rgba(13,148,136,.13)!important}
+.manlung-turnstile-box{margin:2px 0 18px!important;padding:12px!important;border:1px solid #e2e8f0!important;border-radius:13px!important;background:#f8fafc!important}
+.manlung-turnstile-title,.manlung-turnstile-help{color:#475569!important}
+.manlung-turnstile-widget{justify-content:center;overflow-x:auto}
+.login-container .btn-primary{min-height:49px;padding:13px 16px;border:0!important;border-radius:12px!important;background:linear-gradient(135deg,#0f766e,#0d9488)!important;color:#fff!important;font-size:.95rem;font-weight:800;box-shadow:0 7px 16px rgba(15,118,110,.22);transition:transform .15s,box-shadow .15s}
+.login-container .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(15,118,110,.28)}
+.login-container a{color:#0f766e!important;font-weight:700;text-decoration:none}
+.login-container a:hover{text-decoration:underline}
+.login-container .error-text{margin-top:10px;color:#b91c1c}
+#adminMfaEnroll>div{border-color:#dbe4ee!important;background:#f8fafc!important;color:#14213d}
+#adminMfaEnroll h3{color:#14213d}
+#adminMfaEnroll p,#adminMfaForm p{color:#64748b!important}
+#adminForgotBox{padding:14px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc}
+.footer-text,footer,.site-footer,.manlung-footer,.manlung-footer-bottom{display:none!important}
+@media(max-width:480px){.center-wrap{align-items:flex-start;padding:18px 12px!important}.login-container{padding:25px 20px!important;border-radius:20px!important}.login-container .logo{margin-bottom:22px}}
+@media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
+</style>
+</head>
 <body>
     <div class="center-wrap">
         <div class="login-container">
