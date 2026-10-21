@@ -87,6 +87,13 @@ body.dark .op-nav-links a i,body.dark .music-nav-drawer nav a i{color:#cbd5e1!im
 body.dark .op-menu-toggle,body.dark .music-menu-toggle{background:#293548!important;color:#f1f5f9!important;border-color:#435066!important}
 body.dark .op-menu-toggle i,body.dark .music-menu-toggle i{color:#e2e8f0!important}
 
+
+/* FINAL hard cap: theme glyph itself, not just its button */
+button[data-theme-toggle="true"]{width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;min-height:34px!important;max-height:34px!important;padding:0!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;line-height:1!important}
+button[data-theme-toggle="true"] i,button[data-theme-toggle="true"] svg{display:block!important;width:14px!important;min-width:14px!important;max-width:14px!important;height:14px!important;min-height:14px!important;max-height:14px!important;font-size:14px!important;line-height:14px!important;transform:none!important}
+.ml-admin-menu-toggle i,.op-menu-toggle i,.music-menu-toggle i{width:14px!important;min-width:14px!important;max-width:14px!important;height:14px!important;font-size:14px!important;line-height:14px!important;transform:none!important}
+.ml-admin-menu-toggle,.op-menu-toggle,.music-menu-toggle{min-height:34px!important;padding:7px 9px!important}
+
 </style>
 </head>
 <body>
