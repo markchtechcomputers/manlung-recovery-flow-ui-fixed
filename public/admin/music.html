@@ -173,6 +173,82 @@ body[data-theme="dark"] .ml-admin-sidebar .header-actions a:hover,body[data-them
 .music-nav a{justify-content:flex-start!important;text-align:left!important}
 @media(max-width:700px){.music-header-inner{align-items:center!important}.music-nav{margin-inline:0!important}}
 
+
+/* FINAL ADMIN NAV THEME + LEFT EDGE FIX */
+.ml-admin-sidebar .header-actions,
+.ml-admin-sidebar .header-actions > * {
+  box-sizing:border-box!important;
+}
+.ml-admin-sidebar .header-actions {
+  display:flex!important; flex-direction:column!important; align-items:stretch!important;
+  justify-content:flex-start!important; gap:8px!important; width:100%!important;
+  margin:0!important; padding:0!important; text-align:left!important;
+}
+.ml-admin-sidebar .header-actions a,
+.ml-admin-sidebar .header-actions button,
+.ml-admin-sidebar .header-actions select,
+.ml-admin-sidebar .header-actions [role="button"],
+.ml-admin-sidebar .header-actions .language-control,
+.ml-admin-sidebar .header-actions [aria-label*="Language"],
+.ml-admin-sidebar .header-actions [title*="Language"] {
+  display:flex!important; align-items:center!important; justify-content:flex-start!important;
+  align-self:stretch!important; width:100%!important; max-width:100%!important; min-width:0!important;
+  margin:0!important; margin-inline:0!important; padding:10px 12px!important;
+  text-align:left!important; text-indent:0!important; color:#111827!important;
+  background:#fff!important; border-color:#e2e8f0!important;
+}
+.ml-admin-sidebar .header-actions a span,
+.ml-admin-sidebar .header-actions button span,
+.ml-admin-sidebar .header-actions select,
+.ml-admin-sidebar .header-actions [aria-label*="Language"] * {
+  text-align:left!important; color:inherit!important;
+}
+.ml-admin-sidebar .header-actions a i,
+.ml-admin-sidebar .header-actions button i { color:#475569!important; }
+html.dark .ml-admin-sidebar .header-actions a,
+html.dark .ml-admin-sidebar .header-actions button,
+html.dark .ml-admin-sidebar .header-actions select,
+html.dark .ml-admin-sidebar .header-actions [role="button"],
+html.dark .ml-admin-sidebar .header-actions .language-control,
+html.dark .ml-admin-sidebar .header-actions [aria-label*="Language"],
+html.dark .ml-admin-sidebar .header-actions [title*="Language"],
+body.dark .ml-admin-sidebar .header-actions a,
+body.dark .ml-admin-sidebar .header-actions button,
+body.dark .ml-admin-sidebar .header-actions select,
+body.dark .ml-admin-sidebar .header-actions [role="button"],
+body.dark .ml-admin-sidebar .header-actions .language-control,
+body.dark .ml-admin-sidebar .header-actions [aria-label*="Language"],
+body.dark .ml-admin-sidebar .header-actions [title*="Language"],
+html[data-theme="dark"] .ml-admin-sidebar .header-actions a,
+html[data-theme="dark"] .ml-admin-sidebar .header-actions button,
+html[data-theme="dark"] .ml-admin-sidebar .header-actions select,
+html[data-theme="dark"] .ml-admin-sidebar .header-actions [role="button"],
+html[data-theme="dark"] .ml-admin-sidebar .header-actions .language-control,
+html[data-theme="dark"] .ml-admin-sidebar .header-actions [aria-label*="Language"],
+html[data-theme="dark"] .ml-admin-sidebar .header-actions [title*="Language"] {
+  color:#fff!important; background:#111f33!important; border-color:#334155!important;
+}
+html.dark .ml-admin-sidebar .header-actions a *,
+html.dark .ml-admin-sidebar .header-actions button *,
+html.dark .ml-admin-sidebar .header-actions select *,
+html[data-theme="dark"] .ml-admin-sidebar .header-actions a *,
+html[data-theme="dark"] .ml-admin-sidebar .header-actions button *,
+html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!important; }
+.ml-admin-sidebar .header-actions a[href*="logout"],
+.ml-admin-sidebar .header-actions button[onclick*="logout"],
+.ml-admin-sidebar .header-actions button[id*="Logout"],
+.ml-admin-sidebar .header-actions .btn-danger {
+  color:#fff!important; background:#dc2626!important; border-color:#b91c1c!important;
+}
+.ml-admin-sidebar .header-actions a[href*="logout"] *,
+.ml-admin-sidebar .header-actions button[onclick*="logout"] *,
+.ml-admin-sidebar .header-actions button[id*="Logout"] * { color:#fff!important; }
+.music-nav { margin-left:0!important; margin-right:auto!important; padding-left:0!important;
+  width:100%!important; justify-content:flex-start!important; align-items:flex-start!important;
+  text-align:left!important; }
+.music-nav > * { margin-left:0!important; margin-right:0!important; }
+.music-nav a { justify-content:flex-start!important; text-align:left!important; }
+
 </style>
 </head>
 <body>
