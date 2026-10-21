@@ -366,11 +366,16 @@
     const style = document.createElement('style');
     style.id = 'manlung-update-bell-style';
     style.textContent = `
-      #manlung-update-bell{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:2147483000}
-      #manlung-update-bell .mlub-trigger{position:relative;width:52px;height:52px;border:1px solid #334155;border-radius:50%;display:grid;place-items:center;background:#0b1b30;color:#f8fafc;box-shadow:0 8px 24px #0005;cursor:pointer}
+      #manlung-update-bell{position:fixed;left:16px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:2147483000}
+      #manlung-update-bell[hidden]{display:none!important}
+      #manlung-update-bell .mlub-trigger{position:relative;width:52px;height:52px;border:1px solid #ef4444;border-radius:50%;display:grid;place-items:center;background:#b91c1c;color:#fff;box-shadow:0 8px 24px #0005;cursor:pointer}
+      #manlung-update-bell .mlub-trigger.mlub-ringing{animation:mlub-ring 1.15s ease-in-out infinite}
+      #manlung-update-bell .mlub-trigger.mlub-ringing:before{content:"";position:absolute;inset:-5px;border:2px solid #ef4444;border-radius:50%;animation:mlub-pulse 1.15s ease-out infinite}
+      @keyframes mlub-ring{0%,100%{transform:rotate(0)}10%,30%,50%,70%{transform:rotate(-12deg)}20%,40%,60%,80%{transform:rotate(12deg)}90%{transform:rotate(0)}}
+      @keyframes mlub-pulse{0%{transform:scale(.85);opacity:.9}100%{transform:scale(1.5);opacity:0}}
       #manlung-update-bell .mlub-trigger svg{width:23px;height:23px}
       #manlung-update-bell .mlub-badge{position:absolute;right:-2px;top:-3px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#ef4444;color:#fff;font:800 11px/19px system-ui,sans-serif;text-align:center;border:2px solid #0b1b30}
-      #manlung-update-bell .mlub-panel{position:absolute;right:0;bottom:62px;width:min(340px,calc(100vw - 32px));padding:16px;border:1px solid #334155;border-radius:16px;background:#071629;color:#f8fafc;box-shadow:0 14px 42px #0007;font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      #manlung-update-bell .mlub-panel{position:absolute;left:0;bottom:62px;width:min(340px,calc(100vw - 32px));padding:16px;border:1px solid #334155;border-radius:16px;background:#071629;color:#f8fafc;box-shadow:0 14px 42px #0007;font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
       #manlung-update-bell .mlub-panel[hidden]{display:none}
       #manlung-update-bell .mlub-title{display:block;font-weight:850;font-size:15px;margin-bottom:5px}
       #manlung-update-bell .mlub-copy{display:block;color:#cbd5e1;font-size:12px;margin-bottom:13px;overflow-wrap:anywhere}
@@ -378,7 +383,7 @@
       #manlung-update-bell .mlub-action{border:0;border-radius:9px;padding:10px 12px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer}
       #manlung-update-bell .mlub-secondary{background:#1e293b;color:#e2e8f0}
       #manlung-update-bell button:focus-visible{outline:2px solid #93c5fd;outline-offset:3px}
-      @media(max-width:420px){#manlung-update-bell{right:12px;bottom:calc(14px + env(safe-area-inset-bottom))}#manlung-update-bell .mlub-trigger{width:48px;height:48px}}
+      @media(max-width:420px){#manlung-update-bell{left:12px;bottom:calc(14px + env(safe-area-inset-bottom))}#manlung-update-bell .mlub-trigger{width:48px;height:48px}}
     `;
     document.head.appendChild(style);
   }
@@ -388,6 +393,7 @@
     addUpdateBellStyles();
     const root = document.createElement('div');
     root.id = UPDATE_BELL_ID;
+    root.hidden = true;
     root.innerHTML = `
       <section class="mlub-panel" hidden aria-live="polite">
         <strong class="mlub-title">Manlung Recovery updates</strong>
@@ -411,6 +417,8 @@
 
     function renderBell() {
       const available = Boolean(updateBellState);
+      root.hidden = !available;
+      trigger.classList.toggle('mlub-ringing', available);
       badge.hidden = !available;
       badge.textContent = available ? '1' : '';
       trigger.setAttribute('aria-label', available ? 'App update available' : 'App updates');
@@ -472,14 +480,25 @@
     const title = root.querySelector('.mlub-title');
     const copy = root.querySelector('.mlub-copy');
     const primary = root.querySelector('.mlub-primary');
+    root.hidden = !updateBellState;
     if (badge) { badge.hidden = !updateBellState; badge.textContent = updateBellState ? '1' : ''; }
-    if (trigger) trigger.setAttribute('aria-label', updateBellState ? 'App update available' : 'App updates');
+    if (trigger) {
+      trigger.setAttribute('aria-label', updateBellState ? 'App update available' : 'App updates');
+      trigger.classList.toggle('mlub-ringing', Boolean(updateBellState));
+    }
     if (title) title.textContent = updateBellState?.title || 'Manlung Recovery updates';
-    if (copy) copy.textContent = updateBellState?.message || 'No update notice yet. Tap Check updates to check for the latest version.';
-    if (primary) primary.textContent = updateBellState?.actionLabel || 'Check updates';
+    if (copy) copy.textContent = updateBellState?.message || '';
+    if (primary) primary.textContent = updateBellState?.actionLabel || 'Update now';
+    if (updateBellState && updateBellState.autoOpen) {
+      if (updateBellPanel) updateBellPanel.hidden = false;
+      if (trigger) trigger.setAttribute('aria-expanded', 'true');
+    } else if (!updateBellState && updateBellPanel) {
+      updateBellPanel.hidden = true;
+    }
   }
 
   function showRuntimeUpdateNotice(options) {
+    options = { ...options, autoOpen: true };
     setUpdateBellState(options);
     let notice = document.getElementById(UPDATE_NOTICE_ID);
     if (notice) notice.remove();
