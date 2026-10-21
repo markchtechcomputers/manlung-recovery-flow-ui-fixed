@@ -2744,5 +2744,79 @@ function logout() {
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 </footer>
+
+<style id="manlung-admin-sidebar-nav">
+.site-header .container{position:relative;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;min-height:68px!important}
+.site-header .header-actions{display:none!important}
+.ml-admin-menu-toggle{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:none;min-height:42px;padding:10px 14px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:#12345a;color:#fff;font:800 14px/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 5px 16px #02061733}
+.ml-admin-menu-toggle i{font-size:16px;color:#93c5fd}
+.ml-admin-menu-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(2,6,23,.58);opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s ease}
+.ml-admin-menu-overlay.is-open{opacity:1;visibility:visible}
+.ml-admin-sidebar{position:fixed;z-index:2147483001;top:0;right:0;bottom:0;width:min(340px,88vw);padding:calc(16px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;background:linear-gradient(160deg,#071525,#10233b 70%,#0b1727);color:#f8fafc;border-left:1px solid rgba(148,163,184,.22);box-shadow:-18px 0 48px #02061755;transform:translateX(105%);transition:transform .24s ease}
+.ml-admin-sidebar.is-open{transform:translateX(0)}
+.ml-admin-sidebar-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 2px 18px;margin-bottom:12px;border-bottom:1px solid #ffffff20}
+.ml-admin-sidebar-title{font-size:1rem;font-weight:900;letter-spacing:.01em}
+.ml-admin-sidebar-subtitle{margin-top:4px;color:#94a3b8;font-size:.72rem}
+.ml-admin-sidebar-close{width:40px;height:40px;border:1px solid #ffffff25;border-radius:10px;background:#ffffff0c;color:#fff;font-size:25px;cursor:pointer}
+.ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column;align-items:stretch;gap:8px;width:100%;padding:0}
+.ml-admin-sidebar .header-actions a,.ml-admin-sidebar .header-actions button{display:flex!important;align-items:center;justify-content:flex-start!important;gap:12px;width:100%;min-height:48px;padding:12px 14px!important;border:1px solid #ffffff1c!important;border-radius:12px!important;background:#ffffff08!important;color:#e5edf8!important;text-decoration:none;font-size:.88rem!important;font-weight:750!important;text-align:left;white-space:normal}
+.ml-admin-sidebar .header-actions a:hover,.ml-admin-sidebar .header-actions button:hover{background:#2563eb33!important;border-color:#60a5fa77!important;color:#fff!important}
+.ml-admin-sidebar .header-actions a i,.ml-admin-sidebar .header-actions button i{display:inline-block!important;width:22px!important;text-align:center;color:#93c5fd!important;font-size:1rem!important}
+.ml-admin-sidebar .header-actions a[href*="reports"] i{color:#4ade80!important}
+.ml-admin-sidebar .header-actions a[href*="music"] i{color:#f0abfc!important}
+.ml-admin-sidebar .header-actions a[href*="connect"] i{color:#67e8f9!important}
+.ml-admin-sidebar .header-actions .btn-danger{background:#7f1d1d44!important;border-color:#f8717144!important}
+body.ml-admin-menu-open{overflow:hidden}
+@media(max-width:650px){
+ .site-header .container{padding:.55rem .7rem!important;gap:.6rem!important}
+ .site-header .brand{flex:1;min-width:0;width:auto!important}
+ .site-header .brand h1{font-size:.9rem!important}
+ .site-header .brand span{white-space:normal!important;line-height:1.25}
+ .site-header .manlung-site-logo{width:38px;height:38px;flex-basis:38px}
+ .ml-admin-menu-toggle{min-height:40px;padding:9px 11px;font-size:0;gap:0}
+ .ml-admin-menu-toggle i{font-size:19px}
+}
+@media(prefers-reduced-motion:reduce){.ml-admin-menu-overlay,.ml-admin-sidebar{transition:none}}
+</style>
+<script id="manlung-admin-sidebar-nav-script">
+(function(){
+ if(window.__manlungAdminSidebarNavInstalled)return;
+ window.__manlungAdminSidebarNavInstalled=true;
+ function init(){
+  var header=document.querySelector('.site-header');
+  var actions=header&&header.querySelector('.header-actions');
+  var container=header&&header.querySelector('.container');
+  if(!header||!actions||!container||document.querySelector('.ml-admin-menu-toggle'))return;
+  var toggle=document.createElement('button');
+  toggle.type='button';toggle.className='ml-admin-menu-toggle';
+  toggle.setAttribute('aria-label','Open admin navigation');toggle.setAttribute('aria-expanded','false');
+  toggle.innerHTML='<i class="fas fa-bars" aria-hidden="true"></i><span>MENU</span>';
+  container.appendChild(toggle);
+  var overlay=document.createElement('div');overlay.className='ml-admin-menu-overlay';
+  overlay.setAttribute('aria-hidden','true');
+  var sidebar=document.createElement('aside');sidebar.className='ml-admin-sidebar';
+  sidebar.setAttribute('aria-label','Admin navigation');sidebar.setAttribute('aria-hidden','true');
+  var brand=header.querySelector('.brand h1');
+  var title=brand?brand.textContent.trim():'Manlung Recovery';
+  sidebar.innerHTML='<div class="ml-admin-sidebar-head"><div><div class="ml-admin-sidebar-title">Manlung Recovery</div><div class="ml-admin-sidebar-subtitle">'+title.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})+'</div></div><button type="button" class="ml-admin-sidebar-close" aria-label="Close navigation">×</button></div>';
+  sidebar.appendChild(actions);document.body.append(overlay,sidebar);
+  var close=sidebar.querySelector('.ml-admin-sidebar-close');
+  function setOpen(open){
+   overlay.classList.toggle('is-open',open);sidebar.classList.toggle('is-open',open);
+   document.body.classList.toggle('ml-admin-menu-open',open);
+   toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close admin navigation':'Open admin navigation');
+   sidebar.setAttribute('aria-hidden',String(!open));overlay.setAttribute('aria-hidden',String(!open));
+   if(open)close.focus();else toggle.focus();
+  }
+  toggle.addEventListener('click',function(){setOpen(!sidebar.classList.contains('is-open'))});
+  close.addEventListener('click',function(){setOpen(false)});
+  overlay.addEventListener('click',function(){setOpen(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sidebar.classList.contains('is-open'))setOpen(false)});
+  sidebar.addEventListener('click',function(e){if(e.target.closest('a'))setOpen(false)});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
 </body>
 </html>
