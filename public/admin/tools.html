@@ -428,6 +428,12 @@ a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="l
  }
 }
 
+
+/* Stable five-column nav on wide screens; natural wrap on small screens */
+.header-actions{display:flex!important;grid-template-columns:none!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%!important}
+.header-actions>*{position:static!important;float:none!important;margin:0!important;flex:0 1 auto!important}
+.header-actions .btn-danger{background:#dc3545!important;color:#fff!important;border-color:#c82333!important}
+
 </style>
 <script id="manlung-admin-sidebar-nav-script">
 (function(){
