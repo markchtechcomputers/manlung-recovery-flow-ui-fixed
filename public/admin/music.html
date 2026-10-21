@@ -249,6 +249,38 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .music-nav > * { margin-left:0!important; margin-right:0!important; }
 .music-nav a { justify-content:flex-start!important; text-align:left!important; }
 
+
+/* NAV ITEMS MUST SHARE THE SAME LEFT EDGE — INCLUDING MUSIC AND LANGUAGE */
+.ml-admin-sidebar .header-actions { display:flex!important; flex-direction:column!important; align-items:stretch!important; justify-content:flex-start!important; }
+.ml-admin-sidebar .header-actions > * { align-self:stretch!important; justify-self:start!important; float:none!important; position:static!important; inset-inline:auto!important; transform:none!important; margin-inline:0!important; }
+.ml-admin-sidebar .header-actions a,
+.ml-admin-sidebar .header-actions button,
+.ml-admin-sidebar .header-actions select,
+.ml-admin-sidebar .header-actions [role="button"],
+.ml-admin-sidebar .header-actions .language-control,
+.ml-admin-sidebar .header-actions [aria-label*="Language"],
+.ml-admin-sidebar .header-actions [title*="Language"] {
+ display:flex!important; flex-direction:row!important; align-items:center!important; justify-content:flex-start!important;
+ align-self:stretch!important; text-align:left!important; text-indent:0!important; padding-left:12px!important;
+ margin-left:0!important; margin-right:0!important; width:100%!important; max-width:100%!important;
+}
+.ml-admin-sidebar .header-actions a > *,
+.ml-admin-sidebar .header-actions button > *,
+.ml-admin-sidebar .header-actions [aria-label*="Language"] > *,
+.ml-admin-sidebar .header-actions [title*="Language"] > * {
+ text-align:left!important; justify-self:start!important; margin-left:0!important; margin-right:auto!important;
+}
+.ml-admin-sidebar .header-actions a span,
+.ml-admin-sidebar .header-actions button span { flex:1 1 auto!important; text-align:left!important; }
+.ml-admin-sidebar .header-actions a[href*="music"],
+.ml-admin-sidebar .header-actions a[href*="connect"],
+.ml-admin-sidebar .header-actions a[href*="reports"],
+.ml-admin-sidebar .header-actions a[href*="operations"],
+.ml-admin-sidebar .header-actions a[href*="tools"] { justify-content:flex-start!important; text-align:left!important; }
+.ml-admin-sidebar .header-actions .language-control *,
+.ml-admin-sidebar .header-actions [aria-label*="Language"] *,
+.ml-admin-sidebar .header-actions [title*="Language"] * { text-align:left!important; justify-content:flex-start!important; }
+
 </style>
 </head>
 <body>
