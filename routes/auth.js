@@ -327,6 +327,8 @@ router.post(
     body('password')
       .isLength({ min: 8, max: 72 })
       .withMessage('Password must be between 8 and 72 characters')
+      .custom((value) => Buffer.byteLength(value, 'utf8') <= 72)
+      .withMessage('Password must be no more than 72 UTF-8 bytes')
       .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
       .withMessage('Password must include uppercase, lowercase, number, and special character'),
 
