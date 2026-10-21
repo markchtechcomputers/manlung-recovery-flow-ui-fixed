@@ -2683,6 +2683,21 @@ a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="l
  }
 }
 
+
+/* Correct ordered navigation and theme-aware contrast */
+.site-header .header-actions{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%!important}
+.site-header .header-actions>*{order:initial!important;position:static!important;float:none!important;margin:0!important}
+.site-header .header-actions [data-theme-toggle="true"]{order:0!important}
+.site-header .header-actions a[href="/admin/reports.html"]{order:1!important}
+.site-header .header-actions a[href="/admin/operations.html"]{order:2!important}
+.site-header .header-actions a[href="/admin/music.html"]{order:3!important}
+.site-header .header-actions a[href="/admin/tools.html"]{order:4!important}
+.site-header .header-actions a[href="/admin/connect.html"]{order:5!important}
+.site-header .header-actions a[href="/"]{order:6!important}
+.site-header .header-actions button[onclick*="handleLogout"]{order:7!important;background:#dc3545!important;color:#fff!important;border-color:#c82333!important}
+.site-header .header-actions a,.site-header .header-actions button{flex:0 1 auto!important;min-height:38px!important;padding:8px 12px!important;gap:7px!important}
+@media(max-width:430px){.site-header .header-actions{gap:8px!important}.site-header .header-actions a,.site-header .header-actions button{font-size:.78rem!important;padding:8px 10px!important}}
+
 </style>
 <script id="manlung-admin-sidebar-nav-script">
 (function(){
