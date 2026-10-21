@@ -350,7 +350,9 @@
   // Keep browser PWA files fresh, but never run a service worker inside the remote-site Android WebView.
   const UPDATE_NOTICE_ID = 'manlung-runtime-update-notice';
   const APK_CHECK_KEY = 'manlung-apk-update-check-at-v1';
-  const APK_CHECK_INTERVAL = 6 * 60 * 60 * 1000;
+  // Check frequently, and always check again when the Android app returns to the foreground.
+  const APK_CHECK_INTERVAL = 5 * 60 * 1000;
+  let nativeApkCheckInFlight = false;
   let pwaRegistration = null;
   let pwaHadController = Boolean(navigator.serviceWorker && navigator.serviceWorker.controller);
 
@@ -471,7 +473,7 @@
   }
 
   async function checkNativeApkUpdate(force = false) {
-    if (!isAndroidApp()) return;
+    if (!isAndroidApp() || nativeApkCheckInFlight) return;
 
     const appPlugin = window.Capacitor?.Plugins?.App;
     if (!appPlugin || typeof appPlugin.getInfo !== 'function') return;
@@ -480,9 +482,10 @@
     try { checkedAt = Number(localStorage.getItem(APK_CHECK_KEY) || 0); } catch (_) {}
     if (!force && Date.now() - checkedAt < APK_CHECK_INTERVAL) return;
 
+    nativeApkCheckInFlight = true;
     try {
       const appInfo = await appPlugin.getInfo();
-      const currentCode = Number.parseInt(String(appInfo?.build || ''), 10);
+      const currentCode = Number.parseInt(String(appInfo?.build || appInfo?.versionCode || ''), 10);
       if (!Number.isFinite(currentCode) || currentCode < 1) return;
 
       const response = await fetch('/api/app-version', {
@@ -518,6 +521,8 @@
       });
     } catch (error) {
       console.warn('Manlung Android update check failed:', error);
+    } finally {
+      nativeApkCheckInFlight = false;
     }
   }
 
@@ -541,11 +546,18 @@
   }, true);
 
   setupPwaAutoUpdates();
-  window.addEventListener('load', () => {
+  function startNativeApkUpdateChecks() {
     if (!isAndroidApp()) return;
-    checkNativeApkUpdate(false);
+    // Force a fresh check on each app startup; don't wait for the old six-hour cache window.
+    checkNativeApkUpdate(true);
     window.setInterval(() => checkNativeApkUpdate(false), APK_CHECK_INTERVAL);
-  });
+  }
+
+  if (document.readyState === 'complete') {
+    startNativeApkUpdateChecks();
+  } else {
+    window.addEventListener('load', startNativeApkUpdateChecks, { once: true });
+  }
   document.addEventListener('visibilitychange', () => {
     if (!isAndroidApp()) return;
     if (document.hidden) {
@@ -553,7 +565,8 @@
       return;
     }
 
-    checkNativeApkUpdate(false);
+    // Always re-check when the Android app returns to the foreground.
+    checkNativeApkUpdate(true);
     const wasAwayLongEnough = nativeHiddenAt && Date.now() - nativeHiddenAt >= NATIVE_REFRESH_AFTER;
     nativeHiddenAt = 0;
     if (wasAwayLongEnough && !nativePageEdited) {
