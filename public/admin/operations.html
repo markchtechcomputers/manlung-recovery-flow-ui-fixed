@@ -83,6 +83,13 @@ a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="l
  }
 }
 
+
+/* Keep top header content aligned; menu drawer handles navigation */
+.top{display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:12px!important}
+.top .actions{display:flex!important;align-items:center!important;justify-content:flex-start!important;flex-wrap:wrap!important;gap:8px!important;width:100%!important}
+.top .actions>*{position:static!important;float:none!important;margin:0!important}
+.top .actions .btn-danger,.top .actions a[href*="logout"]{background:#dc3545!important;color:#fff!important;border-color:#c82333!important}
+
 </style>
 </head>
 <body>
