@@ -604,67 +604,17 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .ml-admin-sidebar .header-actions [title*="Language"] * { text-align:left!important; justify-content:flex-start!important; }
 
 
-/* FORCE EVERY SIDEBAR CONTROL TO THE LEFT EDGE */
-.ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:12px!important;width:100%!important;padding:0!important;margin:0!important}
-.ml-admin-sidebar .header-actions>*{box-sizing:border-box!important;display:flex!important;flex:0 0 100%!important;align-self:stretch!important;justify-self:start!important;width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important;left:auto!important;right:auto!important;transform:none!important}
+/* CONSISTENT SIDEBAR ROW ALIGNMENT: MUSIC + COMMUNITY */
+.ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:12px!important;width:100%!important}
 .ml-admin-sidebar .header-actions>a,
 .ml-admin-sidebar .header-actions>button,
 .ml-admin-sidebar .header-actions>select,
-.ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;padding-left:22px!important;padding-right:12px!important;margin-left:0!important;margin-right:0!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]{justify-content:flex-start!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*{margin-left:0!important;margin-right:10px!important;text-align:left!important}
-.ml-admin-sidebar .header-actions [class*="language"],
-.ml-admin-sidebar .header-actions [aria-label*="Language"],
-.ml-admin-sidebar .header-actions [title*="Language"],
-.ml-admin-sidebar [class*="language"],
-.ml-admin-sidebar [aria-label*="Language"],
-.ml-admin-sidebar [title*="Language"]{box-sizing:border-box!important;align-self:stretch!important;justify-self:start!important;width:100%!important;max-width:100%!important;margin-left:0!important;margin-right:0!important;left:auto!important;right:auto!important;transform:none!important;text-align:left!important}
-.ml-admin-sidebar [class*="language"] button,
-.ml-admin-sidebar [class*="language"] a,
-.ml-admin-sidebar [aria-label*="Language"] button,
-.ml-admin-sidebar [title*="Language"] button{display:flex!important;justify-content:flex-start!important;align-items:center!important;width:100%!important;max-width:100%!important;margin-left:0!important;margin-right:0!important;text-align:left!important}
-</style>
-<script id="manlung-admin-sidebar-nav-script">
-(function(){
- if(window.__manlungAdminSidebarNavInstalled)return;
- window.__manlungAdminSidebarNavInstalled=true;
- function init(){
-  var header=document.querySelector('.site-header');
-  var actions=header&&header.querySelector('.header-actions');
-  var container=header&&header.querySelector('.container');
-  if(!header||!actions||!container||document.querySelector('.ml-admin-menu-toggle'))return;
-  var toggle=document.createElement('button');
-  toggle.type='button';toggle.className='ml-admin-menu-toggle';
-  toggle.setAttribute('aria-label','Open admin navigation');toggle.setAttribute('aria-expanded','false');
-  toggle.innerHTML='<i class="fas fa-bars" aria-hidden="true"></i><span>MENU</span>';
-  container.appendChild(toggle);
-  var overlay=document.createElement('div');overlay.className='ml-admin-menu-overlay';
-  overlay.setAttribute('aria-hidden','true');
-  var sidebar=document.createElement('aside');sidebar.className='ml-admin-sidebar';
-  sidebar.setAttribute('aria-label','Admin navigation');sidebar.setAttribute('aria-hidden','true');
-  var brand=header.querySelector('.brand h1');
-  var title=brand?brand.textContent.trim():'Manlung Recovery';
-  sidebar.innerHTML='<div class="ml-admin-sidebar-head"><div><div class="ml-admin-sidebar-title">Manlung Recovery</div><div class="ml-admin-sidebar-subtitle">'+title.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})+'</div></div><button type="button" class="ml-admin-sidebar-close" aria-label="Close navigation">×</button></div>';
-
-  var extraNav=[['/admin/operations.html','fa-list-check','Operations'],['/admin/music.html','fa-music','Music'],['/admin/connect.html','fa-users','Community'],['/','fa-house','Home']];
-  extraNav.forEach(function(item){if(!Array.prototype.some.call(actions.querySelectorAll('a'),function(a){return a.getAttribute('href')===item[0]})){var a=document.createElement('a');a.href=item[0];a.innerHTML='<i class="fas '+item[1]+'" aria-hidden="true"></i><span>'+item[2]+'</span>';actions.appendChild(a)}});
-  sidebar.appendChild(actions);document.body.append(overlay,sidebar);
-  var close=sidebar.querySelector('.ml-admin-sidebar-close');
-  function setOpen(open){
-   overlay.classList.toggle('is-open',open);sidebar.classList.toggle('is-open',open);
-   document.body.classList.toggle('ml-admin-menu-open',open);
-   toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close admin navigation':'Open admin navigation');
-   sidebar.setAttribute('aria-hidden',String(!open));overlay.setAttribute('aria-hidden',String(!open));
-   if(open)close.focus();else toggle.focus();
-  }
-  toggle.addEventListener('click',function(){setOpen(!sidebar.classList.contains('is-open'))});
-  close.addEventListener('click',function(){setOpen(false)});
-  overlay.addEventListener('click',function(){setOpen(false)});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sidebar.classList.contains('is-open'))setOpen(false)});
-  sidebar.addEventListener('click',function(e){if(e.target.closest('a'))setOpen(false)});
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-})();
-</script>
-
-</body></html>
+.ml-admin-sidebar .header-actions>[role="button"]{display:flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:58px!important;margin:0!important;padding:14px 22px!important;text-align:left!important;white-space:normal!important;gap:12px!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music.html"],
+.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]{justify-content:flex-start!important;text-align:left!important;padding-left:22px!important;gap:12px!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>i,
+.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>i{display:inline-flex!important;flex:0 0 24px!important;width:24px!important;min-width:24px!important;justify-content:center!important;margin:0!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>span,
+.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>span{display:inline!important;flex:1 1 auto!important;min-width:0!important;margin:0!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]{justify-content:flex-start!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]{justify-content:flex-start!important}
