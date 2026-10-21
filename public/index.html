@@ -1617,6 +1617,64 @@ html body .home-page-container .premium-service-card .service-icon-fallback[hidd
 html body .home-page-container .premium-service-card img.service-icon-image[hidden]{display:none!important}
 </style>
 
+
+<style id="manlung-hero-speed-and-apk-glow">
+/* Render the hero immediately; do not wait for scroll-reveal or entrance effects. */
+html body .hero,
+html body #hero,
+html body .mr-hero,
+html body .hero-content,
+html body .mr-hero-content {
+  content-visibility: visible !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  animation: none !important;
+  transition: none !important;
+}
+html body .hero-content,
+html body .mr-hero-content,
+html body .mr-hero-actions,
+html body .mr-hero-trust-row {
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+html body .hero-video {
+  animation: none !important;
+  transition: none !important;
+}
+/* Bright cycling red, yellow, white, orange and pink glow for the APK link. */
+html body a.mr-hero-download {
+  color: #fff !important;
+  background: linear-gradient(120deg, #b91c1c, #facc15, #fff, #f97316, #ec4899, #b91c1c) !important;
+  background-size: 300% 300% !important;
+  border: 2px solid #fff !important;
+  box-shadow: 0 0 8px #ef4444, 0 0 16px #facc15, 0 0 24px #fb7185 !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.9) !important;
+  animation: manlungApkGlow 2.8s ease-in-out infinite, manlungApkColorFlow 5s linear infinite !important;
+  position: relative !important;
+  isolation: isolate !important;
+}
+html body a.mr-hero-download span,
+html body a.mr-hero-download i {
+  color: #fff !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,.95), 0 0 8px rgba(255,255,255,.65) !important;
+}
+@keyframes manlungApkGlow {
+  0%, 100% { box-shadow: 0 0 7px #ff1744, 0 0 14px #ff1744, 0 0 22px #ff1744; }
+  25% { box-shadow: 0 0 8px #ffe600, 0 0 17px #ffe600, 0 0 26px #ffe600; }
+  50% { box-shadow: 0 0 8px #ffffff, 0 0 17px #ffffff, 0 0 26px #ffffff; }
+  75% { box-shadow: 0 0 8px #ff7a00, 0 0 17px #ff7a00, 0 0 26px #ff4fa3; }
+}
+@keyframes manlungApkColorFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body a.mr-hero-download { animation: none !important; }
+}
+</style>
+
 </head>
 <body>
 <div id="manlungStartupLoader" aria-label="Loading Manlung Recovery">
