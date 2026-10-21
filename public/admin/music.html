@@ -282,17 +282,105 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .ml-admin-sidebar .header-actions [title*="Language"] * { text-align:left!important; justify-content:flex-start!important; }
 
 
-/* CONSISTENT SIDEBAR ROW ALIGNMENT: MUSIC + COMMUNITY */
-.ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:12px!important;width:100%!important}
+/* FORCE EVERY SIDEBAR CONTROL TO THE LEFT EDGE */
+.ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:12px!important;width:100%!important;padding:0!important;margin:0!important}
+.ml-admin-sidebar .header-actions>*{box-sizing:border-box!important;display:flex!important;flex:0 0 100%!important;align-self:stretch!important;justify-self:start!important;width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important;left:auto!important;right:auto!important;transform:none!important}
 .ml-admin-sidebar .header-actions>a,
 .ml-admin-sidebar .header-actions>button,
 .ml-admin-sidebar .header-actions>select,
-.ml-admin-sidebar .header-actions>[role="button"]{display:flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:58px!important;margin:0!important;padding:14px 22px!important;text-align:left!important;white-space:normal!important;gap:12px!important}
+.ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;padding-left:22px!important;padding-right:12px!important;margin-left:0!important;margin-right:0!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]{justify-content:flex-start!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*{margin-left:0!important;margin-right:10px!important;text-align:left!important}
+.ml-admin-sidebar .header-actions [class*="language"],
+.ml-admin-sidebar .header-actions [aria-label*="Language"],
+.ml-admin-sidebar .header-actions [title*="Language"],
+.ml-admin-sidebar [class*="language"],
+.ml-admin-sidebar [aria-label*="Language"],
+.ml-admin-sidebar [title*="Language"]{box-sizing:border-box!important;align-self:stretch!important;justify-self:start!important;width:100%!important;max-width:100%!important;margin-left:0!important;margin-right:0!important;left:auto!important;right:auto!important;transform:none!important;text-align:left!important}
+.ml-admin-sidebar [class*="language"] button,
+.ml-admin-sidebar [class*="language"] a,
+.ml-admin-sidebar [aria-label*="Language"] button,
+.ml-admin-sidebar [title*="Language"] button{display:flex!important;justify-content:flex-start!important;align-items:center!important;width:100%!important;max-width:100%!important;margin-left:0!important;margin-right:0!important;text-align:left!important}
+/* FINAL FIX: consistent left-aligned sidebar links */
+.ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;width:100%!important;gap:10px!important}
+.ml-admin-sidebar .header-actions>a,
+.ml-admin-sidebar .header-actions>button,
+.ml-admin-sidebar .header-actions>select,
+.ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:48px!important;margin:0!important;padding:12px 16px!important;gap:10px!important;text-align:left!important}
 .ml-admin-sidebar .header-actions>a[href="/admin/music.html"],
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]{justify-content:flex-start!important;text-align:left!important;padding-left:22px!important;gap:12px!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]{display:flex!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;padding-left:16px!important}
 .ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>i,
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>i{display:inline-flex!important;flex:0 0 24px!important;width:24px!important;min-width:24px!important;justify-content:center!important;margin:0!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>span,
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>span{display:inline!important;flex:1 1 auto!important;min-width:0!important;margin:0!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]{justify-content:flex-start!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]{justify-content:flex-start!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>i{flex:0 0 20px!important;width:20px!important;min-width:20px!important;margin:0!important;text-align:center!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*:not(i),
+.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
+</style>
+</head>
+<body>
+<header class="music-header">
+  <div class="music-header-inner">
+    <div class="music-brand"><i class="fas fa-music"></i> Manlung Recovery<small>Admin Music Center</small></div>
+    <nav class="music-nav" aria-label="Admin navigation">
+      <a href="/admin/dashboard.html"><i class="fas fa-folder-open"></i> Dashboard</a>
+      <a href="/admin/reports.html"><i class="fas fa-chart-line"></i> Reports</a>
+      <a href="/admin/operations.html"><i class="fas fa-tasks"></i> Operations</a>
+      <a href="/admin/tools.html"><i class="fas fa-tools"></i> Tools</a>
+      <a href="/admin/music.html" aria-current="page"><i class="fas fa-music"></i> Music</a>
+    </nav>
+  </div>
+</header>
+<main class="music-shell">
+  <div class="earphone-alert"><i class="fas fa-headphones"></i><span>Admins: always plug in your earphones before playing music or videos.</span></div>
+  <section class="music-card">
+    <div class="card-title"><i class="fab fa-youtube"></i> Admin Music Center</div>
+    <p class="intro">Search YouTube, play songs/videos, and build a temporary queue while you work.</p>
+    <div class="toolbar">
+      <input id="search" class="search" type="search" placeholder="Search for a song to start listening." autocomplete="off">
+      <button id="searchBtn" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+    </div>
+    <div id="status" class="status"></div>
+    <div id="results" class="results"></div>
+    <div id="queue" class="queue" style="display:none"></div>
+    <section class="audio-panel" aria-label="Audio player">
+      <div class="audio-head"><div><div class="audio-title"><i class="fas fa-headphones"></i> Audio Player</div><div id="audioStatus" class="audio-status">Select a song, then choose Play Audio.</div></div><i class="fas fa-volume-up" aria-hidden="true"></i></div>
+      <div class="audio-actions"><button id="audioLast" class="btn btn-outline" type="button"><i class="fas fa-step-backward"></i> Previous</button><button id="audioPlay" class="btn btn-primary" type="button"><i class="fas fa-play"></i> Play Audio</button><button id="audioNext" class="btn btn-outline" type="button">Next <i class="fas fa-step-forward"></i></button></div>
+    </section>
+    <div class="persistent-note"><i class="fas fa-window-restore"></i> Playback opens in the persistent Admin Music Player so it can keep playing while you move between Admin functions.</div>
+  </section>
+</main>
+<script src="/js/admin-session-guard.js"></script>
+<script src="/js/theme.js"></script>
+<script src="/js/pwa.js" defer></script>
+<script>
+const results=document.getElementById('results'),status=document.getElementById('status'),queueEl=document.getElementById('queue'),audioStatus=document.getElementById('audioStatus');
+const queue=[]; let audioIndex=-1;
+function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
+function views(v){const n=Number(v||0);if(!n)return '';if(n>=1e6)return (n/1e6).toFixed(1).replace('.0','')+'M views';if(n>=1e3)return (n/1e3).toFixed(1).replace('.0','')+'K views';return n.toLocaleString()+' views'}
+function renderQueue(){if(!queue.length){queueEl.style.display='none';queueEl.innerHTML='';return}queueEl.style.display='flex';queueEl.innerHTML=queue.map((s,i)=>'<button class="chip" data-q="'+i+'">'+(i+1)+'. '+esc(s.title)+'</button>').join('');queueEl.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>play(queue[Number(b.dataset.q)]))}
+function persistPlay(song){try{localStorage.setItem('manlung-admin-music-now-playing-v1',JSON.stringify({id:String(song.id),title:String(song.title||'Now playing'),updatedAt:Date.now()}))}catch(_){}}
+function openPlayer(song,mode){if(!song||!song.id)return;if(!queue.some(x=>x.id===song.id))queue.push(song);renderQueue();persistPlay({...song,mode});window.open('/admin/music-player.html','manlungAdminMusicPlayer','popup=yes,width=760,height=520,resizable=yes,scrollbars=no');}
+function play(song){if(!song||!song.id)return;audioIndex=queue.findIndex(x=>x.id===song.id);openPlayer(song,'video');status.textContent='Playing video: '+song.title;audioStatus.textContent='Selected: '+song.title}
+function playAudio(song){if(!song||!song.id)return;audioIndex=queue.findIndex(x=>x.id===song.id);openPlayer(song,'audio');status.textContent='Playing audio: '+song.title;audioStatus.textContent='Audio playing: '+song.title}
+function playQueuedAudio(i){if(queue[i]){audioIndex=i;playAudio(queue[i]);}}
+function add(song){if(!queue.some(x=>x.id===song.id)){queue.push(song);status.textContent='Added "'+song.title+'" to the queue.';renderQueue()}else status.textContent='That song is already in the queue.';audioStatus.textContent='Selected: '+song.title;}
+function previousAudio(){if(!queue.length)return;audioIndex=(audioIndex<=0?queue.length-1:audioIndex-1);playQueuedAudio(audioIndex)}
+function nextAudio(){if(!queue.length)return;audioIndex=(audioIndex+1)%queue.length;playQueuedAudio(audioIndex)}
+function render(songs){if(!songs.length){results.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--music-muted);padding:1rem;">No matching videos found.</div>';return}results.innerHTML=songs.map(s=>'<article class="song"><img class="thumb" src="'+esc(s.thumbnail)+'" alt="" loading="lazy"><div><div class="song-title">'+esc(s.title)+'</div><div class="meta">'+esc(s.author||'YouTube')+' · '+esc(s.duration||'')+(s.views?' · '+esc(views(s.views)):'')+'</div><div class="actions"><button class="btn btn-primary" data-play="'+esc(s.id)+'"><i class="fas fa-play"></i> Play</button><button class="btn btn-outline" data-add="'+esc(s.id)+'"><i class="fas fa-plus"></i> Add</button><a class="btn btn-outline" href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a></div></div></article>').join('');
+results.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>{const s=songs.find(x=>x.id===b.dataset.play);play(s);});
+results.querySelectorAll('[data-play]').forEach(b=>{const audio=document.createElement('button');audio.className='btn btn-outline';audio.type='button';audio.innerHTML='<i class="fas fa-headphones"></i> Audio';audio.onclick=()=>{const s=songs.find(x=>x.id===b.dataset.play);if(s)playAudio(s)};b.parentElement.insertBefore(audio,b.nextSibling);});
+results.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const s=songs.find(x=>x.id===b.dataset.add);add(s)});
+}
+async function search(){const q=document.getElementById('search').value.trim();if(q.length<2){status.textContent='Enter at least 2 characters to search.';return}const btn=document.getElementById('searchBtn');btn.disabled=true;status.textContent='Searching YouTube…';try{const r=await fetch('/api/youtube/search?q='+encodeURIComponent(q),{credentials:'include',cache:'no-store'});if(r.status===401||r.status===403){location.href='/admin/login.html';return}const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw new Error(d.error||'Search failed.');render(Array.isArray(d.songs)?d.songs:[]);status.textContent=(d.songs?.length||0)+' results found.'}catch(e){console.error(e);status.textContent=e.message||'Could not search YouTube.'}finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-search"></i> Search'}}
+document.getElementById('audioPlay').onclick=()=>{if(audioIndex>=0&&queue[audioIndex])playAudio(queue[audioIndex]);else if(queue[0]){audioIndex=0;playAudio(queue[0]);}else audioStatus.textContent='Add a song to the temporary queue first.'};document.getElementById('audioLast').onclick=previousAudio;document.getElementById('audioNext').onclick=nextAudio;
+document.getElementById('searchBtn').onclick=search;document.getElementById('search').onkeydown=e=>{if(e.key==='Enter')search()};
+</script>
+
+<script id="manlung-music-menu">
+
+/* UI refinement: white drawer and compact navigation icons */
+.music-nav-drawer{background:#fff!important;color:#0f172a!important;border-left:1px solid #e2e8f0;box-shadow:-16px 0 40px #0f172a24!important}.music-nav-head{border-bottom-color:#e2e8f0!important;color:#0f172a}.music-nav-close{background:#f1f5f9!important;color:#334155!important;font-size:20px!important}.music-nav-drawer nav a{background:#fff!important;border-color:#e2e8f0!important;color:#1e293b!important;min-height:44px!important;padding:10px 12px!important;font-size:.88rem}.music-nav-drawer nav a i{font-size:15px!important;color:#475569!important}.music-nav-drawer nav a:hover{background:#f1f5f9!important;border-color:#cbd5e1!important}.music-menu-toggle{min-height:38px!important;padding:8px 11px!important;font-size:12px!important;box-shadow:none!important}.music-menu-toggle i{font-size:15px!important}
+
+(function(){var links=[['/admin/dashboard.html','fa-gauge-high','Dashboard'],['/admin/operations.html','fa-list-check','Operations'],['/admin/reports.html','fa-chart-column','Reports'],['/admin/music.html','fa-music','Music'],['/admin/tools.html','fa-toolbox','Tools'],['/admin/owner.html','fa-user-shield','Owner Tools'],['/admin/connect.html','fa-users','Community'],['/','fa-house','Home']];function init(){var inner=document.querySelector('.music-header-inner'),nav=document.querySelector('.music-nav');if(!inner||!nav||document.getElementById('musicMenuToggle'))return;var toggle=document.createElement('button');toggle.id='musicMenuToggle';toggle.type='button';toggle.className='music-menu-toggle';toggle.innerHTML='<i class="fas fa-bars"></i> Menu';inner.appendChild(toggle);var overlay=document.createElement('div');overlay.className='music-nav-overlay';var drawer=document.createElement('aside');drawer.className='music-nav-drawer';drawer.setAttribute('aria-label','Admin navigation');drawer.innerHTML='<div class="music-nav-head"><span>Manlung Recovery</span><button class="music-nav-close" aria-label="Close menu" type="button">×</button></div><nav>'+links.map(function(x){return '<a href="'+x[0]+'"><i class="fas '+x[1]+'"></i>'+x[2]+'</a>'}).join('')+'</nav>';document.body.append(overlay,drawer);function close(){overlay.classList.remove('open');drawer.classList.remove('open');toggle.setAttribute('aria-expanded','false')}toggle.setAttribute('aria-expanded','false');toggle.onclick=function(){var on=!drawer.classList.contains('open');overlay.classList.toggle('open',on);drawer.classList.toggle('open',on);toggle.setAttribute('aria-expanded',String(on))};overlay.onclick=close;drawer.querySelector('.music-nav-close').onclick=close;drawer.querySelectorAll('a').forEach(function(a){a.onclick=close});document.addEventListener('keydown',function(e){if(e.key==='Escape')close()})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();
+</script>
+
+</body>
+</html>
