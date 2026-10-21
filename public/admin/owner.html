@@ -1567,6 +1567,13 @@ a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="l
  }
 }
 
+
+.site-header .header-actions{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%!important}
+.site-header .header-actions>*{order:initial!important;position:static!important;float:none!important;margin:0!important}
+.site-header .header-actions a[href="/admin/dashboard.html"]{order:1!important}
+.site-header .header-actions a[href="/admin/tools.html"]{order:2!important}
+.site-header .header-actions a#ownerLogoutBtn{order:3!important;background:#dc3545!important;color:#fff!important;border-color:#c82333!important}
+
 </style>
 <script id="manlung-admin-sidebar-nav-script">
 (function(){
