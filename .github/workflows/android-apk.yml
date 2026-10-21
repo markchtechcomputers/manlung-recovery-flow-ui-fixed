@@ -93,10 +93,10 @@ jobs:
             },
             "plugins": {
               "SplashScreen": {
-                "launchShowDuration": 1800,
+                "launchShowDuration": 350,
                 "launchAutoHide": true,
                 "backgroundColor": "#071629",
-                "showSpinner": true,
+                "showSpinner": false,
                 "spinnerColor": "#38bdf8",
                 "androidScaleType": "CENTER_CROP"
               },
@@ -126,6 +126,24 @@ jobs:
           npx cap add android
           npx capacitor-assets generate --android
           npx cap sync android
+          # Android WebView may block muted background-video autoplay unless this is disabled.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          candidates = list(Path("android/app/src/main/java").rglob("MainActivity.java"))
+          if len(candidates) != 1:
+              raise SystemExit(f"Expected exactly one MainActivity.java, found {len(candidates)}")
+          activity = candidates[0]
+          source = activity.read_text()
+          marker = "super.onCreate(savedInstanceState);"
+          if marker not in source:
+              raise SystemExit("Could not find MainActivity onCreate marker")
+          line = marker + '\\n        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);'
+          if "setMediaPlaybackRequiresUserGesture(false)" not in source:
+              source = source.replace(marker, line, 1)
+          activity.write_text(source)
+          print(f"Enabled inline autoplay in {activity}")
+          PY
           python3 - <<'PY'
           import os, re
           from pathlib import Path
