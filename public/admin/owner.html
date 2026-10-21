@@ -950,26 +950,26 @@ html:not(.dark) body.admin-page-bg #pageContent span:not(.role-badge):not(.statu
     </header>
 
     <div class="container" id="pageContent" style="display:none;">
-        <div class="card" style="border:2px solid var(--accent);">
+        <div class="card" id="ownerApprovalQueue" style="border:2px solid var(--accent);">
 
             <div class="card-title"><i class="fas fa-user-shield"></i> Owner Approval Queue</div>
             <p style="color:var(--text-muted);font-size:.88rem;">Only the Owner can grant Admin access. Send an invitation below; after the invited person registers, their account appears here as <strong>Pending approval</strong>. Approving the request activates the Admin portal and case/call permissions.</p>
             <div id="pendingAdminNotice" style="margin-top:.8rem;"></div>
         </div>
 
-        <div class="card">
+        <div class="card" id="inviteAdminSection">
             <div class="card-title"><i class="fas fa-envelope"></i> Invite Admin</div>
             <p style="color:var(--text-muted);font-size:.85rem;">The Owner sends an invitation. The invited person creates their own Admin username and password.</p>
             <div style="display:flex;gap:.6rem;"><input id="inviteEmail" type="email" placeholder="admin@example.com" style="flex:1"><button class="btn btn-primary" onclick="inviteAdmin()">Send Invitation</button></div>
             <div id="inviteResult" style="margin-top:.7rem;color:var(--text-muted);font-size:.85rem;"></div>
         </div>
 
-        <div class="card">
+        <div class="card" id="currentAdminsSection">
             <div class="card-title"><i class="fas fa-users-gear"></i> Current Admins &amp; Owner</div>
             <div id="adminsList"><p style="color:var(--text-muted);">Loading…</p></div>
         </div>
 
-        <div class="card">
+        <div class="card" id="callMonitoringSection">
             <div class="card-title"><i class="fas fa-phone-volume"></i> Call Monitoring</div>
             <p style="color:var(--text-muted); font-size:0.85rem;">Owner-only call metadata. Admins and the Owner can go online from the main Admin dashboard and answer client calls; this page keeps the Owner in control of the audit trail.</p>
             <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;">
@@ -978,13 +978,13 @@ html:not(.dark) body.admin-page-bg #pageContent span:not(.role-badge):not(.statu
             <div id="ownerCalls"><p style="color:var(--text-muted);">Loading calls…</p></div>
         </div>
 
-        <div class="card">
+        <div class="card" id="careerApplicationsSection">
             <div class="card-title"><i class="fas fa-briefcase"></i> Careers / Job Applications</div>
             <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;"><button class="btn btn-danger" onclick="clearCareerApplications()"><i class="fas fa-trash"></i> Delete All Applications</button></div>
             <div id="careerApplications"><p style="color:var(--text-muted);">Loading applications…</p></div>
         </div>
 
-        <div class="card">
+        <div class="card" id="auditLogSection">
             <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Audit Log</div>
             <div style="display:flex;justify-content:flex-end;margin-bottom:.7rem;"><button class="btn btn-danger" onclick="clearAuditLog()"><i class="fas fa-eraser"></i> Clear Audit Log</button></div>
             <div id="auditLog" class="admin-scroll" style="max-height:320px; overflow-y:auto;"><p style="color:var(--text-muted);">Loading…</p></div>
@@ -1000,7 +1000,7 @@ html:not(.dark) body.admin-page-bg #pageContent span:not(.role-badge):not(.statu
     </div>
 
     
-    <section class="container" style="margin-top:1.5rem;">
+    <section class="container" id="ownerMfaSection" style="margin-top:1.5rem;">
       <div class="card">
         <h2><i class="fas fa-shield-halved"></i> Owner Two-Factor Authentication</h2>
         <p style="color:var(--text-muted);">Protect the Owner account with a time-based authenticator code. After activation, the Owner cannot access protected APIs without completing MFA at login.</p>
@@ -1387,7 +1387,7 @@ async function disableMfa() {
 
 loadMfaStatus().catch(() => {});
 </script>
-<section class="card" style="margin-top:1rem;">
+<section class="card" id="complimentaryCallAccessSection" style="margin-top:1rem;">
   <div class="card-title"><i class="fas fa-phone-volume"></i> Complimentary Call Access</div>
   <p style="color:var(--text-muted);font-size:.85rem;">Give a registered client temporary free access to browser calls without changing their Paystack subscription.</p>
   <div style="display:grid;grid-template-columns:minmax(0,1fr) 160px auto;gap:.6rem;align-items:end;">
@@ -1763,6 +1763,12 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .ml-admin-sidebar [class*="language"] a,
 .ml-admin-sidebar [aria-label*="Language"] button,
 .ml-admin-sidebar [title*="Language"] button{display:flex!important;justify-content:flex-start!important;align-items:center!important;width:100%!important;max-width:100%!important;margin-left:0!important;margin-right:0!important;text-align:left!important}
+/* Owner dashboard section navigation */
+#ownerApprovalQueue,#inviteAdminSection,#currentAdminsSection,#callMonitoringSection,#careerApplicationsSection,#auditLogSection,#ownerMfaSection,#complimentaryCallAccessSection{scroll-margin-top:24px}
+.ml-admin-sidebar .header-actions a[href^="#"]{border-left:3px solid #cbd5e1!important;padding-left:13px!important;font-size:.88rem!important;line-height:1.25!important;white-space:normal!important}
+.ml-admin-sidebar .header-actions a[href^="#"]:hover{border-left-color:#2563eb!important;background:#eff6ff!important}
+html.dark .ml-admin-sidebar .header-actions a[href^="#"],body.dark .ml-admin-sidebar .header-actions a[href^="#"],html[data-theme="dark"] .ml-admin-sidebar .header-actions a[href^="#"],body[data-theme="dark"] .ml-admin-sidebar .header-actions a[href^="#"]{border-left-color:#475569!important}
+html.dark .ml-admin-sidebar .header-actions a[href^="#"]:hover,body.dark .ml-admin-sidebar .header-actions a[href^="#"]:hover,html[data-theme="dark"] .ml-admin-sidebar .header-actions a[href^="#"]:hover,body[data-theme="dark"] .ml-admin-sidebar .header-actions a[href^="#"]:hover{background:#1e3a5f!important;border-left-color:#60a5fa!important}
 /* FINAL FIX: consistent left-aligned sidebar links */
 .ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;width:100%!important;gap:10px!important}
 .ml-admin-sidebar .header-actions>a,
@@ -1799,6 +1805,18 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
   sidebar.innerHTML='<div class="ml-admin-sidebar-head"><div><div class="ml-admin-sidebar-title">Manlung Recovery</div><div class="ml-admin-sidebar-subtitle">'+title.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})+'</div></div><button type="button" class="ml-admin-sidebar-close" aria-label="Close navigation">×</button></div>';
 
   var extraNav=[['/admin/operations.html','fa-list-check','Operations'],['/admin/music.html','fa-music','Music'],['/admin/connect.html','fa-users','Community'],['/','fa-house','Home']];
+  if(/(?:^|\/)owner\.html$/.test(location.pathname)){
+   extraNav=extraNav.concat([
+    ['#ownerApprovalQueue','fa-user-shield','Owner Approval Queue'],
+    ['#inviteAdminSection','fa-envelope','Invite Admin'],
+    ['#currentAdminsSection','fa-users-gear','Current Admins & Owner'],
+    ['#callMonitoringSection','fa-phone-volume','Call Monitoring'],
+    ['#careerApplicationsSection','fa-briefcase','Careers / Job Applications'],
+    ['#auditLogSection','fa-clock-rotate-left','Audit Log'],
+    ['#ownerMfaSection','fa-shield-halved','Owner Two-Factor Authentication'],
+    ['#complimentaryCallAccessSection','fa-phone','Complimentary Call Access']
+   ]);
+  }
   extraNav.forEach(function(item){if(!Array.prototype.some.call(actions.querySelectorAll('a'),function(a){return a.getAttribute('href')===item[0]})){var a=document.createElement('a');a.href=item[0];a.innerHTML='<i class="fas '+item[1]+'" aria-hidden="true"></i><span>'+item[2]+'</span>';actions.appendChild(a)}});
   sidebar.appendChild(actions);document.body.append(overlay,sidebar);
   var close=sidebar.querySelector('.ml-admin-sidebar-close');
