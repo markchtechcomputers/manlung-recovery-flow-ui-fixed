@@ -108,93 +108,196 @@
     <link rel="stylesheet" href="/css/footer.css">
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
+
+<style id="manlung-admin-registration-polish">
+  :root {
+    --reg-ink: #172554;
+    --reg-muted: #64748b;
+    --reg-line: #dbe4f0;
+    --reg-brand: #4f46e5;
+    --reg-brand-dark: #3730a3;
+    --reg-brand-soft: #eef2ff;
+    --reg-green: #15803d;
+  }
+  body.admin-register-page {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--reg-ink);
+    background:
+      radial-gradient(ellipse at 12% 8%, rgba(129,140,248,.22), transparent 38%),
+      radial-gradient(ellipse at 92% 88%, rgba(56,189,248,.15), transparent 34%),
+      linear-gradient(135deg, #f8faff 0%, #eef2ff 52%, #f5f8ff 100%);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .admin-register-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:36px 18px; box-sizing:border-box; }
+  .admin-register-card {
+    width:100%; max-width:510px; box-sizing:border-box; padding:30px 36px 24px;
+    border:1px solid rgba(203,213,225,.8); border-radius:24px; color:var(--reg-ink);
+    background:rgba(255,255,255,.96); box-shadow:0 24px 70px rgba(30,41,99,.13), 0 3px 12px rgba(30,41,99,.05);
+    overflow:hidden; position:relative;
+  }
+  .admin-register-card:before { content:""; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(90deg,#4338ca,#6366f1,#38bdf8,#34d399); }
+  .register-brand { display:flex; align-items:center; justify-content:center; gap:10px; margin:0 0 26px; color:#334155; font-size:12px; font-weight:800; letter-spacing:.13em; }
+  .register-brand img { display:block; width:36px; height:36px; border-radius:11px; object-fit:cover; box-shadow:0 3px 10px rgba(49,46,129,.16); }
+  .register-brand b { color:#4f46e5; }
+  .register-header { text-align:center; margin:0 0 25px; }
+  .register-shield { width:60px; height:60px; display:grid; place-items:center; margin:0 auto 15px; border:1px solid #dbeafe; border-radius:19px; color:#4f46e5; background:linear-gradient(145deg,#eef2ff,#e0f2fe); box-shadow:0 8px 20px rgba(79,70,229,.1); }
+  .register-shield svg { width:31px; height:31px; }
+  .eyebrow { margin:0 0 8px; color:#6366f1; font-size:10px; font-weight:800; letter-spacing:.17em; }
+  .admin-register-card h1 { margin:0 0 9px; color:#172554; font-size:clamp(23px,4vw,28px); font-weight:800; letter-spacing:-.045em; line-height:1.2; }
+  .register-subtitle { max-width:370px; margin:0 auto; color:#64748b; font-size:13.5px; line-height:1.65; }
+  .invite-badge { display:inline-flex; align-items:center; gap:7px; margin-top:15px; padding:7px 12px; color:#854d0e; background:#fffbeb; border:1px solid #fde68a; border-radius:999px; font-size:11px; font-weight:750; }
+  .invite-badge span { color:#d97706; }
+  .admin-register-card .warning { display:flex; align-items:flex-start; gap:11px; margin:0 0 22px; padding:14px; color:#991b1b; background:#fff1f2; border:1px solid #fecdd3; border-radius:13px; font-size:12.5px; line-height:1.5; }
+  .admin-register-card .warning.hidden { display:none; }
+  .notice-icon { flex:0 0 23px; width:23px; height:23px; display:grid; place-items:center; border-radius:50%; color:white; background:#e11d48; font-weight:800; font-size:14px; }
+  .warning strong { display:block; margin:0 0 3px; font-size:13px; color:#9f1239; }
+  .warning p { margin:0; color:#881337; }
+  .admin-register-card .field { margin:0 0 16px; }
+  .admin-register-card label { display:block; margin:0 0 7px; color:#334155; font-size:12px; font-weight:750; }
+  .label-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .locked-label { display:inline-flex; align-items:center; gap:4px; margin-bottom:7px; color:#64748b; font-size:10px; font-weight:650; }
+  .locked-label svg { width:12px; height:12px; }
+  .optional-label { color:#94a3b8; font-size:10px; font-weight:600; }
+  .input-shell { position:relative; display:flex; align-items:center; }
+  .input-shell .field-icon { position:absolute; left:13px; width:17px; height:17px; color:#94a3b8; pointer-events:none; }
+  .admin-register-card input { display:block; width:100%; min-width:0; height:46px; box-sizing:border-box; padding:0 13px 0 41px; border:1px solid #dbe4f0; border-radius:11px; outline:none; background:#fff; color:#172554; font:500 13px/1.4 inherit; font-size:13px; transition:border-color .18s,box-shadow .18s,background .18s; }
+  .admin-register-card input::placeholder { color:#a0aec0; font-weight:450; }
+  .admin-register-card input:focus { border-color:#818cf8; box-shadow:0 0 0 4px rgba(99,102,241,.13); }
+  .admin-register-card .input-locked input, .admin-register-card input:read-only { background:#f8fafc; color:#64748b; cursor:not-allowed; }
+  .field-hint { display:block; margin-top:6px; color:#8290a5; font-size:10.5px; line-height:1.5; }
+  .password-shell input { padding-right:47px; }
+  .password-toggle { position:absolute; right:7px; display:grid; place-items:center; width:34px; height:34px; padding:0; border:0; border-radius:8px; color:#64748b; background:transparent; cursor:pointer; }
+  .password-toggle:hover { background:#eef2ff; color:#4f46e5; }
+  .password-toggle:focus-visible { outline:2px solid #818cf8; outline-offset:1px; }
+  .password-toggle svg { width:18px; height:18px; }
+  .strength-track { display:flex; gap:5px; margin-top:10px; }
+  .strength-track span { flex:1; height:4px; border-radius:999px; background:#e2e8f0; transition:background .2s ease; }
+  .strength-caption { display:flex; justify-content:space-between; gap:8px; margin-top:6px; color:#8290a5; font-size:10px; }
+  .strength-caption #strengthLabel { color:#64748b; font-weight:650; }
+  .admin-register-card .register-submit { display:flex; align-items:center; justify-content:center; gap:9px; width:100%; min-height:48px; margin-top:7px; padding:12px 16px; border:0; border-radius:12px; color:#fff; background:linear-gradient(110deg,#4f46e5,#4338ca 60%,#3730a3); box-shadow:0 8px 18px rgba(79,70,229,.22); font-size:13px; font-weight:750; cursor:pointer; transition:transform .18s,box-shadow .18s,filter .18s; }
+  .admin-register-card .register-submit svg { width:17px; height:17px; }
+  .admin-register-card .register-submit:hover:not(:disabled) { transform:translateY(-1px); filter:brightness(1.06); box-shadow:0 11px 24px rgba(79,70,229,.28); }
+  .admin-register-card .register-submit:active:not(:disabled) { transform:translateY(0); }
+  .admin-register-card .register-submit:disabled { color:#eef2ff; background:#a5b4fc; box-shadow:none; cursor:not-allowed; }
+  .admin-register-card .msg { display:none; margin-top:15px; padding:13px 14px; border:1px solid #fecaca; border-radius:12px; color:#991b1b; background:#fef2f2; white-space:pre-wrap; font-size:12px; line-height:1.6; }
+  .admin-register-card .msg:not(:empty) { display:block; }
+  .admin-register-card .msg.success { color:#166534; background:#f0fdf4; border-color:#bbf7d0; }
+  .back-link { display:flex; align-items:center; justify-content:center; gap:7px; margin:15px auto 0; padding:8px; color:#64748b; text-decoration:none; font-size:12px; font-weight:650; border-radius:8px; transition:color .18s,background .18s; }
+  .back-link:hover { color:#4338ca; background:#eef2ff; }
+  .back-link span { font-size:16px; }
+  .register-footer { display:flex; align-items:center; justify-content:center; gap:7px; margin-top:18px; padding-top:16px; border-top:1px solid #edf1f7; color:#94a3b8; text-align:center; font-size:10px; line-height:1.5; }
+  .register-footer svg { flex:0 0 14px; width:14px; height:14px; color:#64748b; }
+  @media(max-width:520px) {
+    .admin-register-wrap { align-items:flex-start; padding:16px 10px; }
+    .admin-register-card { padding:25px 20px 20px; border-radius:19px; }
+    .register-brand { margin-bottom:22px; }
+    .register-header { margin-bottom:21px; }
+  }
+  @media(prefers-reduced-motion:reduce) {
+    .admin-register-card *, .admin-register-card *:before, .admin-register-card *:after { transition:none !important; animation:none !important; }
+  }
+</style>
 </head>
 
-<body>
+<body class="admin-register-page">
 
-<div class="wrap">
-  <div class="card">
+<div class="wrap admin-register-wrap">
+  <main class="card admin-register-card">
+    <div class="register-brand">
+      <img src="/icons/icon-512.png" alt="Manlung Recovery" width="48" height="48">
+      <span>MANLUNG <b>RECOVERY</b></span>
+    </div>
 
-    <h1>Admin Registration</h1>
+    <header class="register-header">
+      <div class="register-shield" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <p class="eyebrow">SECURE ADMIN ONBOARDING</p>
+      <h1>Accept Admin Invitation</h1>
+      <p class="register-subtitle">You’ve been invited by the Owner. Complete your details to set up your Manlung Recovery admin account.</p>
+      <span class="invite-badge"><span aria-hidden="true">✦</span> Invited by Owner</span>
+    </header>
 
-    <p style="color:#a9c0ec">
-      Use the invitation sent by the Owner.
-      You cannot create an Admin account without an invitation.
-    </p>
-
-    <div id="inviteWarning" class="warning hidden">
-      This registration link is invalid or missing an Owner invitation.
-      Please ask the Owner to send you a new invitation.
+    <div id="inviteWarning" class="warning hidden" role="alert">
+      <span class="notice-icon" aria-hidden="true">!</span>
+      <div>
+        <strong>This admin invitation is invalid or expired.</strong>
+        <p>This link may be missing, expired, or already used. Please contact the Owner and request a new invitation.</p>
+      </div>
     </div>
 
     <form id="registrationForm">
+      <div class="field">
+        <label for="fullName">Full name</label>
+        <div class="input-shell">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>
+          <input id="fullName" type="text" autocomplete="name" placeholder="Enter your full name" required>
+        </div>
+      </div>
 
-      <label for="fullName">Full name</label>
-      <input
-        id="fullName"
-        type="text"
-        autocomplete="name"
-        required
-      >
+      <div class="field">
+        <label for="username">Username</label>
+        <div class="input-shell">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+          <input id="username" type="text" minlength="3" maxlength="80" autocomplete="username" placeholder="Choose a username" required>
+        </div>
+        <small class="field-hint">Use at least 3 characters.</small>
+      </div>
 
-      <label for="username">Username</label>
-      <input
-        id="username"
-        type="text"
-        minlength="3"
-        maxlength="80"
-        autocomplete="username"
-        required
-      >
+      <div class="field">
+        <div class="label-row">
+          <label for="email">Invited email</label>
+          <span class="locked-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Locked by Owner</span>
+        </div>
+        <div class="input-shell input-locked">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+          <input id="email" type="email" autocomplete="email" placeholder="Email selected by the Owner" readonly required>
+        </div>
+        <small class="field-hint">This email was selected by the Owner for this invitation.</small>
+      </div>
 
-      <label for="email">Invited Email</label>
-      <input
-        id="email"
-        type="email"
-        autocomplete="email"
-        readonly
-        required
-      >
-      <small style="display:block;color:#9fb0c8;margin-top:.35rem;">
-        This email was selected by the Owner for this invitation.
-      </small>
+      <div class="field">
+        <label for="phone">Phone <span class="optional-label">Optional</span></label>
+        <div class="input-shell">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72l.38 2.72a2 2 0 0 1-.57 1.7L7.1 9.96a16 16 0 0 0 6 6l1.82-1.82a2 2 0 0 1 1.7-.57l2.72.38a2 2 0 0 1 1.66 2.97z"/></svg>
+          <input id="phone" type="tel" autocomplete="tel" placeholder="+254 7XX XXX XXX">
+        </div>
+      </div>
 
-      <label for="phone">Phone</label>
-      <input
-        id="phone"
-        type="tel"
-        autocomplete="tel"
-      >
+      <div class="field">
+        <label for="password">Create password</label>
+        <div class="input-shell password-shell">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input id="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="Create a strong password" required>
+          <button type="button" class="password-toggle" id="togglePassword" aria-label="Show password" aria-pressed="false">
+            <svg id="passwordEye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="strength-track" id="passwordStrength" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div class="strength-caption"><span id="strengthLabel" aria-live="polite">Use a strong, unique password</span><span>8–72 characters</span></div>
+        <small class="field-hint">Include uppercase and lowercase letters, a number, and a special character.</small>
+      </div>
 
-      <label for="password">Password</label>
-      <input
-        id="password"
-        type="password"
-        minlength="8"
-        maxlength="72"
-        autocomplete="new-password"
-        required
-      >
-
-      <button
-        id="submitButton"
-        class="btn btn-primary"
-        type="submit"
-      >
-        Create Admin Account
+      <button id="submitButton" class="btn btn-primary register-submit" type="submit">
+        <span>Create Admin Account</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </button>
-
     </form>
 
-    <div id="msg" class="msg"></div>
+    <div id="msg" class="msg" role="status" aria-live="polite"></div>
 
-    <p>
-      <a href="/admin/login.html" style="color:#6ea8ff">
-        Back to Admin login
-      </a>
-    </p>
+    <a class="back-link" href="/admin/login.html"><span aria-hidden="true">←</span> Back to Admin login</a>
 
-  </div>
+    <div class="register-footer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span>Your details are protected and used for account setup.</span>
+    </div>
+  </main>
 </div>
 
 <script>
@@ -223,6 +326,42 @@
   const submitButton = document.getElementById("submitButton");
   const message = document.getElementById("msg");
   const inviteWarning = document.getElementById("inviteWarning");
+  const passwordToggle = document.getElementById("togglePassword");
+  const passwordEye = document.getElementById("passwordEye");
+  const strengthBars = document.querySelectorAll("#passwordStrength span");
+  const strengthLabel = document.getElementById("strengthLabel");
+
+  if (passwordToggle && passwordInput) {
+    passwordToggle.addEventListener("click", function () {
+      const showPassword = passwordInput.type === "password";
+      passwordInput.type = showPassword ? "text" : "password";
+      passwordToggle.setAttribute("aria-label", showPassword ? "Hide password" : "Show password");
+      passwordToggle.setAttribute("aria-pressed", String(showPassword));
+      passwordEye.innerHTML = showPassword
+        ? '<path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.1 4.1"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.5 7 10 7c1.1 0 2.1-.2 3-.5"/>'
+        : '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>';
+    });
+    passwordInput.addEventListener("input", function () {
+      const value = passwordInput.value;
+      let score = 0;
+      if (value.length >= 8) score++;
+      if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score++;
+      if (/\d/.test(value)) score++;
+      if (/[^A-Za-z0-9]/.test(value)) score++;
+      const levels = [
+        { label: "Weak password", color: "#ef4444" },
+        { label: "Fair password", color: "#f59e0b" },
+        { label: "Good password", color: "#ca8a04" },
+        { label: "Strong password", color: "#16a34a" }
+      ];
+      strengthBars.forEach((bar, index) => {
+        bar.style.background = value && index < score ? levels[Math.max(0, score - 1)].color : "#e2e8f0";
+      });
+      strengthLabel.textContent = value ? levels[Math.max(0, score - 1)].label : "Use a strong, unique password";
+      strengthLabel.style.color = value ? levels[Math.max(0, score - 1)].color : "#64748b";
+    });
+  }
+
 
 
   // ==========================================================
