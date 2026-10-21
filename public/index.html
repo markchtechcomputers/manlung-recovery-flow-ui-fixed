@@ -1676,16 +1676,16 @@ html body a.mr-hero-download i {
 </style>
 
 <style id="manlung-hero-final-polish">
-.hero{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(560px,76svh,780px);display:flex;align-items:center;background:#071629}
-.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 45%;opacity:.48;filter:saturate(.88) contrast(1.05) brightness(.76);z-index:0;pointer-events:none}
-.hero-overlay{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(3,12,28,.84) 0%,rgba(3,20,42,.68) 52%,rgba(3,20,42,.42) 100%),linear-gradient(0deg,rgba(3,12,28,.44),transparent 55%)}
-.hero-content{position:relative;z-index:2;width:100%;max-width:1180px;margin-inline:auto;padding:clamp(44px,7vw,92px) clamp(18px,4vw,40px);text-align:center}
-.hero-content h1,.hero-content h2{max-width:1000px;margin-inline:auto;line-height:1.08;letter-spacing:-.035em;text-wrap:balance}
-.hero-content p{max-width:760px;margin:16px auto 0;line-height:1.75;text-wrap:pretty}
-.hero-content a,.hero-content button{touch-action:manipulation}
-#typing-text{max-width:1000px;margin-inline:auto;line-height:1.12;text-wrap:balance}
-@media(max-width:700px){.hero{min-height:590px;min-height:min(720px,82svh);background:linear-gradient(145deg,#08254a,#0b4774 55%,#087f73)!important}.hero-video{object-position:center;opacity:.24;filter:brightness(.82) saturate(.92)}.hero-overlay{background:linear-gradient(180deg,rgba(3,12,28,.28),rgba(3,12,28,.72))}.hero-content{padding:58px 20px}.hero-content p{font-size:1rem;line-height:1.7}#typing-text{font-size:clamp(1.65rem,7vw,2.6rem);min-height:2.2em}}
-@media(prefers-reduced-motion:reduce){.hero-video{display:none!important}#typing-text:after{animation:none!important}}
+.mr-home-hero,.mr-video-hero{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(560px,76svh,780px);display:flex;align-items:center;background:#071629}
+.mr-home-hero .mr-hero-background-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 45%;opacity:.48;filter:saturate(.88) contrast(1.05) brightness(.76);z-index:0;pointer-events:none}
+.mr-home-hero .mr-hero-video-overlay{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(3,12,28,.84) 0%,rgba(3,20,42,.68) 52%,rgba(3,20,42,.42) 100%),linear-gradient(0deg,rgba(3,12,28,.44),transparent 55%)}
+.mr-home-hero .mr-home-hero-inner{position:relative;z-index:2;width:100%;max-width:1180px;margin-inline:auto;padding:clamp(44px,7vw,92px) clamp(18px,4vw,40px);text-align:center}
+.mr-home-hero .mr-hero-copy h1,.mr-home-hero .mr-hero-copy h2{max-width:1000px;margin-inline:auto;line-height:1.08;letter-spacing:-.035em;text-wrap:balance}
+.mr-home-hero .mr-hero-description{max-width:760px;margin:16px auto 0;line-height:1.75;text-wrap:pretty}
+.mr-home-hero .mr-hero-actions a,.mr-home-hero .mr-hero-actions button{touch-action:manipulation}
+.mr-home-hero #typing-text{max-width:1000px;margin-inline:auto;line-height:1.12;text-wrap:balance}
+@media(max-width:700px){.mr-home-hero,.mr-video-hero{min-height:590px;min-height:min(720px,82svh);background:linear-gradient(145deg,#08254a,#0b4774 55%,#087f73)!important}.mr-home-hero .mr-hero-background-video{object-position:center;opacity:.24;filter:brightness(.82) saturate(.92)}.mr-home-hero .mr-hero-video-overlay{background:linear-gradient(180deg,rgba(3,12,28,.28),rgba(3,12,28,.72))}.mr-home-hero .mr-home-hero-inner{padding:58px 20px}.mr-home-hero .mr-hero-description{font-size:1rem;line-height:1.7}.mr-home-hero #typing-text{font-size:clamp(1.65rem,7vw,2.6rem);min-height:2.2em}}
+@media(prefers-reduced-motion:reduce){.mr-home-hero .mr-hero-background-video{display:none!important}.mr-home-hero #typing-text:after{animation:none!important}}
 </style></head>
 <body>
 <div id="manlungStartupLoader" aria-label="Loading Manlung Recovery">
