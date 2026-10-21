@@ -417,6 +417,32 @@ button[data-theme-toggle="true"] i,button[data-theme-toggle="true"] svg{display:
 .ml-admin-menu-toggle i,.op-menu-toggle i,.music-menu-toggle i{width:14px!important;min-width:14px!important;max-width:14px!important;height:14px!important;font-size:14px!important;line-height:14px!important;transform:none!important}
 .ml-admin-menu-toggle,.op-menu-toggle,.music-menu-toggle{min-height:34px!important;padding:7px 9px!important}
 
+
+/* Header navigation alignment: even spacing, no centered stray links, clear red logout */
+.site-header .header-actions,.header-actions,.top .actions,.music-nav{
+ display:flex!important;align-items:center!important;justify-content:flex-end!important;
+ gap:8px!important;flex-wrap:wrap!important;row-gap:8px!important;
+}
+.site-header .header-actions>* ,.header-actions>* ,.top .actions>*{flex:0 0 auto!important;margin:0!important}
+.site-header .header-actions .btn,.header-actions .btn,.top .actions a,.music-nav a{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ white-space:nowrap!important;min-height:36px!important;padding:8px 11px!important;
+ line-height:1.2!important;border-radius:9px!important;
+}
+.site-header .header-actions a[href*="music"],.header-actions a[href*="music"],.top .actions a[href*="music"],.music-nav a[href*="music"]{margin:0!important;align-self:auto!important;justify-self:auto!important}
+.site-header .header-actions button.btn-danger,.site-header .header-actions a.btn-danger,
+.header-actions button.btn-danger,.header-actions a.btn-danger,.top .actions .btn-danger,
+a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="logout"]{
+ background:#dc2626!important;background-image:none!important;color:#fff!important;
+ border:1px solid #b91c1c!important;box-shadow:0 2px 5px #991b1b22!important;
+}
+.site-header .header-actions button.btn-danger:hover,.site-header .header-actions a.btn-danger:hover,
+.header-actions .btn-danger:hover,.top .actions .btn-danger:hover,a#ownerLogoutBtn:hover{background:#b91c1c!important;color:#fff!important}
+@media(max-width:760px){
+ .site-header .header-actions,.header-actions,.top .actions,.music-nav{justify-content:flex-start!important;gap:6px!important}
+ .site-header .header-actions .btn,.header-actions .btn,.top .actions a,.music-nav a{min-height:34px!important;padding:7px 9px!important;font-size:.78rem!important}
+}
+
 </style>
 <script id="manlung-admin-sidebar-nav-script">
 (function(){
