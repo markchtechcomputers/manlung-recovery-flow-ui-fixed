@@ -170,7 +170,8 @@
       <input
         id="password"
         type="password"
-        minlength="8"
+        minlength="12"
+        maxlength="72"
         autocomplete="new-password"
         required
       >
@@ -289,9 +290,15 @@
       return;
     }
 
-    if (password.length < 8 || new TextEncoder().encode(password).length > 72) {
+    if (password.length < 12 || new TextEncoder().encode(password).length > 72) {
       message.textContent =
-        "Password must be between 8 and 72 UTF-8 bytes.";
+        "Password must be between 12 and 72 characters (maximum 72 UTF-8 bytes).";
+      return;
+    }
+
+    if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/\\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+      message.textContent =
+        "Use at least one uppercase letter, one lowercase letter, one number, and one special character.";
       return;
     }
 
