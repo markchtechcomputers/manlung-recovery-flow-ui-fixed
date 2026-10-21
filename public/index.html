@@ -2456,6 +2456,45 @@ body.manlung-page-leaving{opacity:.96;transition:opacity .18s ease}
 #manlung-android-download-popup .app-popup-note{display:block;margin-top:10px;color:#94a3b8;font-size:.75rem;line-height:1.45}
 @keyframes manlungAppPopupFade{from{opacity:0}to{opacity:1}}
 @media(max-width:420px){#manlung-android-download-popup{padding:14px}#manlung-android-download-popup .app-popup-card{padding:27px 19px 19px;border-radius:20px}#manlung-android-download-popup .app-popup-icon{width:66px;height:66px;font-size:32px}}
+/* Full-width, edge-to-edge layout on phones */
+@media(max-width:600px){
+  #manlung-android-download-popup{
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    min-height:100vh!important;
+    padding:0!important;
+    align-items:stretch!important;
+    justify-content:stretch!important;
+    background:rgba(2,8,23,.88)!important;
+    backdrop-filter:blur(7px);
+    -webkit-backdrop-filter:blur(7px);
+  }
+  #manlung-android-download-popup .app-popup-card{
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    width:100%!important;
+    max-width:none!important;
+    height:100%!important;
+    min-height:100%!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:clamp(22px,6vh,44px) 22px max(22px,env(safe-area-inset-bottom))!important;
+    border-radius:0!important;
+    border-left:0!important;
+    border-right:0!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain;
+  }
+  #manlung-android-download-popup .app-popup-close{
+    top:max(12px,env(safe-area-inset-top))!important;
+    right:14px!important;
+  }
+  #manlung-android-download-popup .app-popup-icon{flex:0 0 auto}
+  #manlung-android-download-popup .app-popup-version{align-self:center;max-width:100%;text-align:center;flex-wrap:wrap}
+  #manlung-android-download-popup .app-popup-download{flex:0 0 auto}
+}
 @media(prefers-reduced-motion:reduce){#manlung-android-download-popup.is-visible{animation:none}#manlung-android-download-popup .app-popup-download{transition:none}}
 </style>
 <div id="manlung-android-download-popup" aria-hidden="true">
