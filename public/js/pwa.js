@@ -471,8 +471,7 @@
   function setUpdateBellState(options) {
     updateBellState = options || null;
     if (!document.getElementById(UPDATE_BELL_ID)) {
-      setupUpdateBell();
-    }
+        }
     const root = document.getElementById(UPDATE_BELL_ID);
     if (!root) return;
     const badge = root.querySelector('.mlub-badge');
@@ -499,7 +498,6 @@
 
   function showRuntimeUpdateNotice(options) {
     options = { ...options, autoOpen: true };
-    setUpdateBellState(options);
     let notice = document.getElementById(UPDATE_NOTICE_ID);
     if (notice) notice.remove();
 
