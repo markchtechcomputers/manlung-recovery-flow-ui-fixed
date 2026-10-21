@@ -3151,3 +3151,129 @@ html body footer.manlung-footer .manlung-footer-social a img{
 <style id="manlung-social-account-links-final">
 /* Use the official Manlung Recovery social destinations throughout the footer. */
 </style>
+
+
+<style id="manlung-home-mobile-fullbleed-icons-menu-final">
+/* Final homepage mobile polish: true edge-to-edge sections, consistent icon scale, cleaner menu. */
+@media (max-width: 600px) {
+  html, body { width:100%; max-width:100%; overflow-x:clip; }
+  body .home-page-container {
+    width:100%!important; max-width:none!important;
+    padding:0 0 32px!important; margin:0!important;
+    overflow:visible!important; box-sizing:border-box!important;
+  }
+  body .home-page-container > .home-section,
+  body .home-page-container > .demo-section,
+  body .home-page-container > section.home-section,
+  body .home-page-container > section.demo-section,
+  body .home-page-container > .home-demo-section {
+    position:relative!important;
+    width:100vw!important; max-width:100vw!important;
+    margin-left:calc(50% - 50vw)!important;
+    margin-right:calc(50% - 50vw)!important;
+    box-sizing:border-box!important;
+    border-radius:0!important;
+  }
+  body .home-page-container > .home-section:not(.final-cta),
+  body .home-page-container > .demo-section,
+  body .home-page-container > .home-demo-section {
+    padding-left:16px!important; padding-right:16px!important;
+  }
+  body .home-page-container .section-heading,
+  body .home-page-container .section-heading.centered {
+    width:100%!important; max-width:none!important;
+    margin-left:auto!important; margin-right:auto!important;
+  }
+  body .home-page-container .services-grid,
+  body .home-page-container .features-grid,
+  body .home-page-container .process-grid,
+  body .home-page-container .demo-cards,
+  body .home-page-container .scam-help-grid,
+  body .home-page-container .recovery-journey-grid {
+    width:100%!important; max-width:none!important;
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  body .home-page-container .premium-service-card,
+  body .home-page-container .feature-card,
+  body .home-page-container .tracker-card,
+  body .home-page-container .scam-help-card,
+  body .home-page-container .recovery-journey-card,
+  body .home-page-container .demo-cards > *,
+  body .home-page-container .process-card {
+    width:100%!important; max-width:none!important;
+    min-width:0!important; box-sizing:border-box!important;
+  }
+
+  /* Keep icons compact and consistent in both themes. */
+  body .home-page-container .service-icon-wrap {
+    width:52px!important; height:52px!important; min-width:52px!important;
+    flex:0 0 52px!important; border-radius:14px!important;
+  }
+  body .home-page-container .service-icon-image,
+  body .home-page-container .service-icon-fallback {
+    width:30px!important; height:30px!important;
+    min-width:30px!important; min-height:30px!important;
+    max-width:30px!important; max-height:30px!important;
+    font-size:25px!important; line-height:1!important;
+    object-fit:contain!important;
+  }
+  body .home-page-container .process-icon,
+  body .home-page-container .safety-icon,
+  body .home-page-container .manlung-onboarding-icon {
+    width:42px!important; height:42px!important; min-width:42px!important;
+    flex:0 0 42px!important; font-size:19px!important;
+    display:grid!important; place-items:center!important;
+  }
+  body .home-page-container .premium-service-card,
+  body .home-page-container .tracker-card,
+  body .home-page-container .scam-help-card,
+  body .home-page-container .recovery-journey-card {
+    padding:18px!important; border-radius:14px!important;
+  }
+
+  /* A visible, easy-to-tap mobile menu without oversized icons. */
+  body .site-header .home-mobile-menu {
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    width:42px!important; height:42px!important; min-width:42px!important;
+    padding:0!important; border-radius:12px!important;
+    border:1px solid #cbd5e1!important; background:#fff!important;
+    color:#172033!important; box-shadow:0 2px 8px rgba(15,23,42,.08)!important;
+  }
+  body .site-header .home-mobile-menu i,
+  body .site-header .home-mobile-menu svg {
+    font-size:18px!important; width:18px!important; height:18px!important;
+    line-height:1!important;
+  }
+  body.dark .site-header .home-mobile-menu,
+  html.dark .site-header .home-mobile-menu {
+    background:#111827!important; color:#e5edf8!important;
+    border-color:#334155!important; box-shadow:none!important;
+  }
+  body .site-header .home-mobile-nav:not([hidden]) {
+    display:grid!important; grid-template-columns:1fr!important;
+    gap:6px!important; width:calc(100% - 24px)!important;
+    max-width:none!important; margin:0 12px 12px!important;
+    padding:10px!important; border-radius:14px!important;
+    box-sizing:border-box!important;
+  }
+  body .site-header .home-mobile-nav a {
+    display:flex!important; align-items:center!important; width:100%!important;
+    min-height:44px!important; padding:12px 14px!important;
+    border-radius:10px!important; box-sizing:border-box!important;
+  }
+
+  /* Theme toggle remains a small square in light and dark mode. */
+  body .site-header button[data-theme-toggle="true"] {
+    width:40px!important; min-width:40px!important; height:40px!important;
+    min-height:40px!important; padding:0!important; flex:0 0 40px!important;
+  }
+  body .site-header button[data-theme-toggle="true"] i,
+  body .site-header button[data-theme-toggle="true"] svg {
+    width:18px!important; height:18px!important; font-size:18px!important;
+  }
+  body.dark .home-page-container .service-icon-wrap,
+  html.dark .home-page-container .service-icon-wrap {
+    box-shadow:none!important;
+  }
+}
+</style>
