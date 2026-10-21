@@ -1832,7 +1832,21 @@ html.dark .ml-admin-sidebar .header-actions a[href^="#"]:hover,body.dark .ml-adm
     ['#complimentaryCallAccessSection','fa-phone','Complimentary Call Access']
    ]);
   }
-  extraNav.forEach(function(item){if(!Array.prototype.some.call(actions.querySelectorAll('a'),function(a){return a.getAttribute('href')===item[0]})){var a=document.createElement('a');a.href=item[0];a.innerHTML='<i class="fas '+item[1]+'" aria-hidden="true"></i><span>'+item[2]+'</span>';actions.appendChild(a)}});
+  extraNav.forEach(function(item){
+   if(Array.prototype.some.call(actions.querySelectorAll('a'),function(existing){return existing.getAttribute('href')===item[0]}))return;
+   var a=document.createElement('a');
+   a.href=item[0];
+   a.innerHTML='<i class="fas '+item[1]+'" aria-hidden="true"></i><span>'+item[2]+'</span>';
+   if(item[0]==='#language'){
+    a.addEventListener('click',function(e){
+     e.preventDefault();
+     var target=header.querySelector('.language-control,[aria-label*="Language" i],[title*="Language" i],select[name*="language" i]');
+     if(target){target.scrollIntoView({behavior:'smooth',block:'center'});if(target.matches('select,input,button,a,[tabindex]'))target.focus({preventScroll:true});else target.click();}
+     else {var langButton=header.querySelector('button[aria-label*="language" i],a[aria-label*="language" i],[title*="language" i],.language-control');if(langButton)langButton.click();}
+    });
+   }
+   actions.appendChild(a);
+  });
   sidebar.appendChild(actions);document.body.append(overlay,sidebar);
   var close=sidebar.querySelector('.ml-admin-sidebar-close');
   function setOpen(open){
