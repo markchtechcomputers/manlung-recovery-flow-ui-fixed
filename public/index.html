@@ -1544,57 +1544,56 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
 </style>
 <script id="mr-hero-video-autoplay-fix">
 document.addEventListener('DOMContentLoaded',function(){
-  var video=document.querySelector('.mr-home-hero.mr-video-hero .mr-hero-background-video');
+  var hero=document.querySelector('.mr-home-hero.mr-video-hero');
+  var video=hero&&hero.querySelector('.mr-hero-background-video');
   if(!video)return;
+  var fallback=hero.querySelector('.mr-hero-video-fallback');
+  var fallbackShown=false;
   video.muted=true;
   video.defaultMuted=true;
   video.playsInline=true;
   video.loop=true;
-  video.setAttribute('muted','');
-  video.setAttribute('playsinline','');
-  video.setAttribute('webkit-playsinline','');
-  video.setAttribute('autoplay','');
-  video.setAttribute('loop','');
-  var fallback=video.parentElement.querySelector('.mr-hero-video-fallback');
-  var showFallback=function(){
+  ['muted','playsinline','webkit-playsinline','autoplay','loop'].forEach(function(name){video.setAttribute(name,'');});
+  video.setAttribute('preload','auto');
+
+  function showFallback(){
+    if(fallbackShown)return;
+    fallbackShown=true;
     video.style.display='none';
-    if(fallback)fallback.style.zIndex='1';
-    console.warn('Manlung hero video failed to load; showing fallback background.');
-  };
-  video.addEventListener('error',showFallback);
-  var playVideo=function(){
-    if(video.style.display==='none')return;
+    if(fallback){fallback.style.display='block';fallback.style.zIndex='1';}
+    console.warn('Manlung hero video could not be loaded; showing the branded fallback background.');
+  }
+  function tryPlay(){
+    if(fallbackShown || document.hidden)return;
     video.muted=true;
-    var result=video.play();
-    if(result&&typeof result.catch==='function'){
-      result.catch(function(){ /* Browser autoplay policy may reject background playback. */ });
+    var attempt=video.play();
+    if(attempt&&typeof attempt.catch==='function'){
+      attempt.catch(function(){
+        /* Autoplay can be blocked even for muted video. Keep the source and retry on user interaction. */
+        if(video.error || video.readyState===0)showFallback();
+      });
     }
-  };
-  /* Recover if the media reaches its end or the browser pauses it unexpectedly. */
-  video.addEventListener('ended',function(){
-    try{video.currentTime=0;}catch(e){}
-    playVideo();
-  });
+  }
+  video.addEventListener('error',showFallback);
+  video.addEventListener('ended',function(){try{video.currentTime=0;}catch(e){}tryPlay();});
+  video.addEventListener('loadeddata',tryPlay);
+  video.addEventListener('canplay',tryPlay);
   video.addEventListener('pause',function(){
-    if(!video.ended && !document.hidden){
-      window.setTimeout(function(){
-        if(video.paused && !video.ended && !document.hidden)playVideo();
-      },1200);
+    if(!video.ended&&!document.hidden&&!fallbackShown){
+      window.setTimeout(function(){if(video.paused&&!video.ended)tryPlay();},1200);
     }
   });
-  /* Retry playback after transient buffering without repeatedly reloading the file. */
-  video.addEventListener('canplay',playVideo);
   video.addEventListener('stalled',function(){
-    window.setTimeout(function(){
-      if(video.readyState>=2 && video.paused && !document.hidden)playVideo();
-      else if(video.readyState===0 && video.networkState===3)showFallback();
-    },2500);
+    window.setTimeout(function(){if(video.readyState===0&&(video.networkState===3||video.error))showFallback();},3000);
   });
-  document.addEventListener('visibilitychange',function(){
-    if(!document.hidden)playVideo();
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)tryPlay();});
+  ['pointerdown','touchstart','keydown'].forEach(function(eventName){
+    document.addEventListener(eventName,tryPlay,{passive:true});
   });
+  /* Avoid leaving an empty/black hero if the remote MP4 never responds. */
+  window.setTimeout(function(){if(video.readyState===0||video.error)showFallback();},9000);
   video.load();
-  playVideo();
+  tryPlay();
 });
 </script>
 
