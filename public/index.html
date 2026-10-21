@@ -2441,7 +2441,9 @@ body.manlung-page-leaving{opacity:.96;transition:opacity .18s ease}
 <style id="manlung-android-download-popup-style">
 #manlung-android-download-popup{position:fixed;inset:0;z-index:1000001;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(2,8,23,.78);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
 #manlung-android-download-popup.is-visible{display:flex;animation:manlungAppPopupFade .22s ease-out}
-#manlung-android-download-popup .app-popup-card{position:relative;width:min(100%,440px);padding:30px 24px 24px;border:1px solid rgba(96,165,250,.35);border-radius:24px;background:linear-gradient(155deg,#102746,#071629 70%);color:#f8fafc;text-align:center;box-shadow:0 24px 90px rgba(0,0,0,.5)}
+#manlung-android-download-popup .app-popup-card{position:relative;isolation:isolate;overflow:hidden;width:min(100%,440px);padding:30px 24px 24px;border:1px solid rgba(147,197,253,.48);border-radius:24px;background:#071629 url("https://i.postimg.cc/7L43Npfq/images-%284%29.jpg") center/cover no-repeat;color:#f8fafc;text-align:center;box-shadow:0 24px 90px rgba(0,0,0,.62)}
+#manlung-android-download-popup .app-popup-card:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(160deg,rgba(3,12,29,.78),rgba(3,12,29,.94) 78%)}
+#manlung-android-download-popup .app-popup-version{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 22px;padding:10px 15px;border:1px solid rgba(74,222,128,.5);border-radius:12px;background:linear-gradient(135deg,rgba(6,78,59,.92),rgba(5,46,38,.9));color:#bbf7d0;font-size:.8rem;font-weight:900;letter-spacing:.025em;box-shadow:0 6px 22px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.08);text-shadow:0 1px 2px rgba(0,0,0,.35)}
 #manlung-android-download-popup .app-popup-icon{display:flex;align-items:center;justify-content:center;width:76px;height:76px;margin:0 auto 16px;border-radius:22px;background:linear-gradient(135deg,#22c55e,#0d9488);color:#fff;font-size:38px;box-shadow:0 10px 30px rgba(34,197,94,.25)}
 #manlung-android-download-popup h2{margin:0 28px 10px;color:#fff;font-size:clamp(1.4rem,5vw,1.8rem);font-weight:900;line-height:1.2}
 #manlung-android-download-popup p{margin:0 auto 20px;max-width:340px;color:#cbd5e1;font-size:.98rem;line-height:1.6}
@@ -2477,15 +2479,18 @@ body.manlung-page-leaving{opacity:.96;transition:opacity .18s ease}
   var closeButton=popup.querySelector('.app-popup-close');
   var laterButton=popup.querySelector('.app-popup-later');
   var downloadButton=popup.querySelector('.app-popup-download');
-  var key='manlungAndroidPopupDismissed';
+  var dismissedKey='manlungAndroidPopupDismissed';
+  var downloadedKey='manlungAndroidApkDownloadStarted';
   function closePopup(){
     popup.classList.remove('is-visible');
     popup.setAttribute('aria-hidden','true');
     document.body.style.overflow='';
-    try{sessionStorage.setItem(key,'1')}catch(_){}
+    try{localStorage.setItem(dismissedKey,'1')}catch(_){}
   }
   function openPopup(){
-    try{if(sessionStorage.getItem(key)==='1')return}catch(_){}
+    try{
+      if(localStorage.getItem(downloadedKey)==='1'||localStorage.getItem(dismissedKey)==='1')return;
+    }catch(_){}
     popup.classList.add('is-visible');
     popup.setAttribute('aria-hidden','false');
     document.body.style.overflow='hidden';
@@ -2494,7 +2499,12 @@ body.manlung-page-leaving{opacity:.96;transition:opacity .18s ease}
   laterButton.addEventListener('click',closePopup);
   popup.addEventListener('click',function(e){if(e.target===popup)closePopup()});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&popup.classList.contains('is-visible'))closePopup()});
-  downloadButton.addEventListener('click',function(){try{sessionStorage.setItem(key,'1')}catch(_){}});
+  downloadButton.addEventListener('click',function(){
+    try{localStorage.setItem(downloadedKey,'1')}catch(_){}
+    popup.classList.remove('is-visible');
+    popup.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  });
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){window.setTimeout(openPopup,250)});
   else window.setTimeout(openPopup,250);
 })();
