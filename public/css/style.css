@@ -691,10 +691,4 @@ html body main :where(img, video, iframe, canvas) {
 }
 
 
-/* Permanently hide the retired update bell and its popup across all pages. */
-#manlung-update-bell,
-#manlung-runtime-update-notice {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
+
