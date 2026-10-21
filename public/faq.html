@@ -255,4 +255,25 @@ html.dark .faq-empty,body.dark .faq-empty{background:#0d1927;border-color:#33465
   filterFaqs();
 })();
 </script>
+<script id="faq-literal-newline-cleanup">
+/* Guard against literal escaped newline markers leaking into visible FAQ text. */
+(function () {
+  function cleanFaqText() {
+    const root = document.getElementById('faq-sections');
+    if (!root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const parent = node.parentElement;
+        if (!parent || parent.closest('script,style,code,pre,textarea')) return NodeFilter.FILTER_REJECT;
+        return /\\\\n/.test(node.nodeValue || '') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => { node.nodeValue = node.nodeValue.replace(/\\\\n/g, ' '); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cleanFaqText, { once: true });
+  else cleanFaqText();
+})();
+</script>
 </body></html>
