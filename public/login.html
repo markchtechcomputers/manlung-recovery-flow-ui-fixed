@@ -917,6 +917,23 @@ html body.manlung-auth-page .manlung-discord-icon:focus-visible{outline:3px soli
 @media(max-width:520px){html body.manlung-auth-page .manlung-social-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}html body.manlung-auth-page .manlung-social-grid .manlung-social-icon,html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{width:50px!important;min-width:50px!important;height:50px!important;min-height:50px!important}}
 </style>
 
+
+<style id="manlung-login-tabs-and-google-centering-fix">
+/* Keep the Google provider centered, and make account tabs readable in light and dark themes. */
+html body.manlung-auth-page .manlung-social-grid{position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:16px!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-icon{flex:0 0 54px!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{flex:0 0 54px!important;margin-inline:auto!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-discord-icon img{display:block!important;width:28px!important;height:28px!important;object-fit:contain!important}
+html body.manlung-auth-page .manlung-auth-tabs{position:relative!important;z-index:2!important;isolation:isolate!important;overflow:visible!important;background:#e2e8f0!important;border-color:#cbd5e1!important}
+html body.manlung-auth-page .manlung-auth-tabs button{position:relative!important;z-index:1!important;color:#334155!important;background:transparent!important;opacity:1!important;visibility:visible!important;text-shadow:none!important}
+html body.manlung-auth-page .manlung-auth-tabs button.active{z-index:2!important;background:linear-gradient(135deg,#2563eb,#4f46e5)!important;color:#fff!important}
+html body.manlung-auth-page.dark .manlung-auth-tabs{background:#111827!important;border-color:#475569!important}
+html body.manlung-auth-page.dark .manlung-auth-tabs button{color:#e2e8f0!important}
+html body.manlung-auth-page.dark .manlung-auth-tabs button.active{color:#fff!important}
+html body.manlung-auth-page.dark .manlung-social-grid .manlung-discord-icon img{filter:brightness(1.12)!important}
+@media(max-width:520px){html body.manlung-auth-page .manlung-social-grid{gap:14px!important}}
+</style>
+
 </head>
 <body class="manlung-auth-page">
 <div class="fa-floating-orb fa-orb-1" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-2" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-3" aria-hidden="true"></div>
@@ -950,7 +967,7 @@ html body.manlung-auth-page .manlung-discord-icon:focus-visible{outline:3px soli
         <div class="manlung-social-grid">
           <div id="googleLoginBtn" class="manlung-google-btn" aria-label="Continue with Google"></div>
           <button type="button" id="githubLoginBtn" class="manlung-social-btn manlung-social-icon" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i></button>
-          <button type="button" id="discordLoginBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Discord sign-in is not configured yet" title="Discord sign-in coming soon"><i class="fab fa-discord" aria-hidden="true"></i></button>
+          <button type="button" id="discordLoginBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Discord sign-in is not configured yet" title="Discord sign-in coming soon"><img src="https://i.postimg.cc/RZYZDLbV/icons8-discord-new-48.png" alt="" width="28" height="28" loading="eager"></button>
         </div>
         <div class="manlung-auth-divider">or continue with email</div>
         <form id="loginForm" onsubmit="handleLogin(event)">
@@ -975,7 +992,7 @@ html body.manlung-auth-page .manlung-discord-icon:focus-visible{outline:3px soli
 
       <div id="registerPanel" hidden>
         <div class="manlung-auth-heading"><h2>Create your account</h2><p>Create a secure client account before submitting a recovery request.</p></div>
-        <div class="manlung-social-grid"><div id="googleRegisterBtn" class="manlung-google-btn" aria-label="Continue with Google"></div><button type="button" id="githubRegisterBtn" class="manlung-social-btn manlung-social-icon" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i></button><button type="button" id="discordRegisterBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Discord sign-in is not configured yet" title="Discord sign-in coming soon"><i class="fab fa-discord" aria-hidden="true"></i></button></div>
+        <div class="manlung-social-grid"><div id="googleRegisterBtn" class="manlung-google-btn" aria-label="Continue with Google"></div><button type="button" id="githubRegisterBtn" class="manlung-social-btn manlung-social-icon" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i></button><button type="button" id="discordRegisterBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Discord sign-in is not configured yet" title="Discord sign-in coming soon"><img src="https://i.postimg.cc/RZYZDLbV/icons8-discord-new-48.png" alt="" width="28" height="28" loading="eager"></button></div>
         <div class="manlung-auth-divider">or create with email verification</div>
         <form id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group"><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="200" placeholder="Your full name" required></div>
