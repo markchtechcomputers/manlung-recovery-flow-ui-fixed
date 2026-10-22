@@ -1685,7 +1685,77 @@ html body a.mr-hero-download i {
 .mr-home-hero #typing-text{max-width:1000px;margin-inline:auto;line-height:1.12;text-wrap:balance}
 @media(max-width:700px){.mr-home-hero,.mr-video-hero{min-height:590px;min-height:min(720px,82svh);background:linear-gradient(145deg,#08254a,#0b4774 55%,#087f73)!important}.mr-home-hero .mr-hero-background-video{object-position:center;opacity:.24;filter:brightness(.82) saturate(.92)}.mr-home-hero .mr-hero-video-overlay{background:linear-gradient(180deg,rgba(3,12,28,.28),rgba(3,12,28,.72))}.mr-home-hero .mr-home-hero-inner{padding:58px 20px}.mr-home-hero .mr-hero-description{font-size:1rem;line-height:1.7}.mr-home-hero #typing-text{font-size:clamp(1.65rem,7vw,2.6rem);min-height:2.2em}}
 @media(prefers-reduced-motion:reduce){.mr-home-hero .mr-hero-background-video{display:none!important}.mr-home-hero #typing-text:after{animation:none!important}}
-</style></head>
+</style>
+<style id="manlung-professional-home-refresh">
+/* Visual-only homepage refresh: preserve all existing content, links, forms and scripts. */
+:root{--mr-navy:#06264a;--mr-blue:#0759a6;--mr-orange:#ff861c;--mr-ink:#10243e;--mr-muted:#536782;--mr-line:#dce7f3;--mr-soft:#f3f8fe}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{background:#f7faff;color:var(--mr-ink);font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6}
+body a{transition:color .2s ease,background .2s ease,border-color .2s ease,transform .2s ease}
+.site-header{background:rgba(255,255,255,.97)!important;border-bottom:1px solid #e2eaf4!important;box-shadow:0 5px 24px rgba(5,34,69,.08)!important;backdrop-filter:blur(16px)}
+.site-header .container{max-width:1240px!important;justify-content:space-between!important;min-height:74px!important;padding:12px 24px!important}
+.site-header .brand h1{color:var(--mr-navy)!important;font-size:1.12rem!important}
+.site-header .brand span{color:#63758c!important}
+.site-header nav a,.site-header .nav-links a,.site-header .main-nav a{font-weight:650!important}
+.site-header .header-actions a,.site-header .header-actions button{border-radius:10px!important}
+.site-header .header-actions .btn-primary{background:var(--mr-orange)!important;border-color:var(--mr-orange)!important;color:#fff!important}
+.site-header .header-actions .btn-primary:hover{background:#e96f08!important;border-color:#e96f08!important}
+.home-page-container{max-width:1240px!important}
+.mr-home-hero{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(115deg,#041b35 0%,#073d70 55%,#0b5a94 100%)!important;border-radius:0 0 26px 26px!important;box-shadow:0 18px 45px rgba(3,30,60,.16);color:#fff}
+.mr-home-hero:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 82% 28%,rgba(43,151,242,.28),transparent 32%),linear-gradient(90deg,rgba(3,22,44,.88),rgba(4,39,75,.42) 70%,rgba(4,39,75,.22))}
+.mr-home-hero-inner{max-width:1240px!important;min-height:400px!important;padding:68px 34px 58px!important;align-items:center!important}
+.mr-hero-copy{max-width:670px!important}
+.mr-home-hero h1,.mr-home-hero h2{color:#fff!important;font-size:clamp(2.45rem,4.5vw,4.1rem)!important;line-height:1.06!important;letter-spacing:-.045em!important;font-weight:850!important;text-wrap:balance}
+.mr-home-hero h1 strong,.mr-home-hero h2 strong,.mr-home-hero .accent,.mr-home-hero .highlight{color:#ff922e!important}
+.mr-hero-description{max-width:620px!important;color:#e2edf9!important;font-size:1.08rem!important;line-height:1.75!important}
+.mr-hero-actions{gap:12px!important;margin-top:26px!important;flex-wrap:wrap}
+.mr-hero-actions a,.mr-hero-actions button{min-height:46px!important;border-radius:11px!important;font-weight:750!important;padding:12px 18px!important}
+.mr-hero-primary{background:var(--mr-orange)!important;border:1px solid var(--mr-orange)!important;color:white!important;box-shadow:0 8px 22px rgba(255,134,28,.22)}
+.mr-hero-primary:hover{background:#e96f08!important;transform:translateY(-2px)}
+.mr-hero-secondary,.mr-hero-download{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.42)!important;color:white!important;backdrop-filter:blur(8px)}
+.mr-hero-secondary:hover,.mr-hero-download:hover{background:rgba(255,255,255,.16)!important;transform:translateY(-2px)}
+.mr-hero-trust-row{gap:18px!important;margin-top:26px!important;color:#e6f1ff!important;font-size:.9rem!important}
+.home-section{padding:54px 24px!important}
+.home-section:nth-of-type(even){background:linear-gradient(180deg,#f5f9fe,#edf5fd)!important}
+.section-heading{margin-bottom:28px!important}
+.section-heading h2,.home-section h2{color:var(--mr-navy)!important;font-size:clamp(1.8rem,3vw,2.45rem)!important;line-height:1.16!important;letter-spacing:-.035em!important;font-weight:820!important}
+.section-heading p,.home-section .section-intro{color:var(--mr-muted)!important;font-size:1rem!important;max-width:760px}
+.feature-card,.premium-service-card,.tracker-card,.scam-help-card,.recovery-journey-card{border:1px solid var(--mr-line)!important;border-radius:18px!important;background:#fff!important;box-shadow:0 8px 28px rgba(11,49,89,.07)!important;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.feature-card:hover,.premium-service-card:hover,.recovery-journey-card:hover{transform:translateY(-4px);border-color:#b9d5f2!important;box-shadow:0 16px 34px rgba(11,49,89,.12)!important}
+.premium-service-card{padding:25px!important}
+.premium-service-card h3,.feature-card h3{color:var(--mr-navy)!important;font-weight:780!important}
+.premium-service-card p,.feature-card p{color:#536782!important;line-height:1.7!important}
+.premium-service-card a,.feature-card a{font-weight:750!important;color:var(--mr-blue)!important}
+.home-section .btn,.home-section button,.home-section a.button,.final-cta a{border-radius:10px!important}
+.how-section .recovery-journey-card{padding:22px!important}
+.demo-section,.home-demo-section{border-radius:22px!important}
+.tracker-section{background:#f1f7fd!important}
+.tracker-card{padding:26px!important}
+.tracker-card input,.tracker-card select,.home-page-container input,.home-page-container select,.home-page-container textarea{border-radius:10px!important;border-color:#cfdeee!important}
+.scam-help-section{background:#fff7f6!important}
+.scam-help-card{padding:20px!important}
+.support-section{background:linear-gradient(115deg,#06264a,#07518a)!important;color:#fff!important;border-radius:18px!important}
+.support-section h2,.support-section h3,.support-section p{color:#fff!important}
+.final-cta{border-radius:18px!important}
+.recovery-journey-section{background:#f3f8fe!important}
+.home-page-container footer,.site-footer,footer{color:#dce9f8}
+@media(min-width:1000px){.mr-home-hero-inner{grid-template-columns:minmax(0,1.05fr) minmax(340px,.95fr)!important}.premium-service-card{min-height:230px}}
+@media(max-width:760px){
+ .site-header .container{padding:10px 14px!important}
+ .mr-home-hero{border-radius:0 0 18px 18px!important}
+ .mr-home-hero-inner{min-height:0!important;padding:46px 20px 38px!important}
+ .mr-home-hero h1,.mr-home-hero h2{font-size:clamp(2rem,8vw,3rem)!important}
+ .mr-hero-description{font-size:.98rem!important}
+ .mr-hero-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important}
+ .mr-hero-actions a,.mr-hero-actions button{width:100%!important;justify-content:center!important}
+ .mr-hero-trust-row{display:flex!important;flex-wrap:wrap!important;gap:10px 14px!important}
+ .home-section{padding:38px 16px!important}
+ .premium-service-card,.tracker-card,.scam-help-card,.recovery-journey-card{padding:18px!important}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body a,.feature-card,.premium-service-card,.recovery-journey-card{transition:none!important}}
+</style>
+
+</head>
 <body>
 <div id="manlungStartupLoader" aria-label="Loading Manlung Recovery">
   <div class="startup-inner">
