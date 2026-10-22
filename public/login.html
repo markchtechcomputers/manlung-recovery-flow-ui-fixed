@@ -1764,6 +1764,32 @@ async function handleSocialCallback(){
 
 /* Login page never auto-redirects. Users must explicitly choose Google, GitHub, or email/password. */
 </script>
+<script>
+/* Floating login theme toggle: visual-only and independent of authentication flows. */
+(function(){
+  const init = () => {
+    const toggle = document.querySelector('[data-theme-toggle="true"]');
+    if (!toggle) return;
+    const icon = toggle.querySelector('i');
+    const applyTheme = (dark) => {
+      document.body.classList.toggle('dark', dark);
+      if (icon) icon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+      toggle.setAttribute('aria-pressed', dark ? 'true' : 'false');
+      toggle.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    };
+    let saved = null;
+    try { saved = localStorage.getItem('manlung-login-theme'); } catch (_) {}
+    applyTheme(saved === 'dark');
+    toggle.addEventListener('click', () => {
+      const dark = !document.body.classList.contains('dark');
+      applyTheme(dark);
+      try { localStorage.setItem('manlung-login-theme', dark ? 'dark' : 'light'); } catch (_) {}
+    });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once:true});
+  else init();
+})();
+</script>
 <script src="/js/pwa.js" defer></script>
 <footer class="manlung-footer" aria-label="Manlung Recovery footer">
   <div class="manlung-footer-inner">
