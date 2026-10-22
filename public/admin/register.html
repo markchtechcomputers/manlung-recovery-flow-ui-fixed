@@ -199,7 +199,49 @@
     .admin-register-card *, .admin-register-card *:before, .admin-register-card *:after { transition:none !important; animation:none !important; }
   }
 </style>
-<style id="manlung-auth-no-footer">footer,.site-footer,.manlung-footer,.manlung-footer-bottom,.footer-text{display:none!important}.admin-register-wrap{min-height:100svh!important}</style></head>
+<style id="manlung-auth-no-footer">footer,.site-footer,.manlung-footer,.manlung-footer-bottom,.footer-text{display:none!important}.admin-register-wrap{min-height:100svh!important}</style>
+<style id="manlung-owner-invitation-cyberpunk-design">
+:root{color-scheme:dark;--invite-green:#39ff14;--invite-soft:#a3ffa3}
+html,body{min-height:100%;margin:0}
+body.admin-register-page{min-height:100vh;color:#fff;background-color:#020b02;background-image:radial-gradient(circle at 50% 45%,rgba(0,255,100,.1),transparent 60%),linear-gradient(rgba(0,255,100,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,100,.045) 1px,transparent 1px)!important;background-size:100% 100%,40px 40px,40px 40px;background-position:center;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.admin-register-wrap{min-height:100svh!important;padding:22px 14px!important;box-sizing:border-box}
+.admin-register-card{width:100%;max-width:480px;padding:34px 30px 24px!important;border:1px solid rgba(57,255,20,.32)!important;border-radius:16px!important;color:#fff!important;background:rgba(5,20,5,.83)!important;box-shadow:0 20px 40px rgba(0,0,0,.6),0 0 25px rgba(57,255,20,.12),inset 0 0 20px rgba(57,255,20,.04)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.admin-register-card:before{height:3px;background:linear-gradient(90deg,transparent,#39ff14,#a3ffa3,#39ff14,transparent)}
+.admin-register-card:after{display:none}
+.register-brand{color:#a3ffa3!important;letter-spacing:.16em;margin-bottom:24px}
+.register-brand img{border:1px solid rgba(57,255,20,.35);box-shadow:0 0 18px rgba(57,255,20,.15)}
+.register-brand b{color:#39ff14!important}
+.register-shield{width:58px;height:58px;border-radius:17px;border-color:rgba(57,255,20,.35);color:#39ff14;background:rgba(57,255,20,.08);box-shadow:0 0 25px rgba(57,255,20,.1)}
+.register-shield svg{width:29px;height:29px}
+.eyebrow{color:#a3ffa3!important;letter-spacing:.22em}
+.admin-register-card h1{color:#fff!important;font-family:Orbitron,Inter,sans-serif;letter-spacing:.01em;font-size:clamp(21px,4vw,25px);text-shadow:0 0 14px rgba(57,255,20,.18)}
+.register-subtitle{color:#b8c5b8!important;font-size:13px}
+.invite-badge{color:#39ff14;background:rgba(57,255,20,.08);border-color:rgba(57,255,20,.45);letter-spacing:.06em}
+.invite-badge span{color:#39ff14}
+.admin-register-card .warning{color:#ffb3b3;background:rgba(255,50,50,.1);border-color:rgba(255,77,77,.42);border-radius:9px}
+.warning strong{color:#ff7373}.warning p{color:#ffb3b3}.notice-icon{color:#180505;background:#ff4d4d}
+.admin-register-card .field{margin-bottom:17px}
+.admin-register-card label{color:#a3ffa3!important;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.locked-label{color:#ffb3b3!important}.optional-label{color:#777!important}
+.input-shell .field-icon{color:#39ff14;opacity:.8}
+.admin-register-card input{height:46px;padding-left:42px;border:1px solid rgba(57,255,20,.24)!important;border-radius:8px!important;background:rgba(0,0,0,.4)!important;color:#fff!important;font-size:13px;box-shadow:none!important}
+.admin-register-card input::placeholder{color:#657265}
+.admin-register-card input:focus{border-color:#39ff14!important;background:rgba(0,0,0,.6)!important;box-shadow:0 0 0 3px rgba(57,255,20,.1)!important}
+.admin-register-card .input-locked input,.admin-register-card input:read-only{background:rgba(0,0,0,.55)!important;color:#8a998a!important;border-color:rgba(255,255,255,.12)!important}
+.field-hint,.strength-caption{color:#8dff8d!important}
+.password-requirements li,.strength-caption #strengthLabel{color:#8dff8d}
+.strength-track span{background:rgba(57,255,20,.12)}
+.password-toggle{color:#8dff8d}.password-toggle:hover{color:#39ff14;background:rgba(57,255,20,.1)}
+.admin-register-card .register-submit{min-height:49px;border-radius:8px;color:#001800;background:linear-gradient(90deg,#009600,#39ff14);box-shadow:0 0 20px rgba(57,255,20,.25);font-family:Orbitron,Inter,sans-serif;letter-spacing:.04em}
+.admin-register-card .register-submit:hover:not(:disabled){filter:none;background:linear-gradient(90deg,#39ff14,#009600);box-shadow:0 0 28px rgba(57,255,20,.45)}
+.admin-register-card .register-submit:disabled{background:#234523;color:#7f9f7f}
+.admin-register-card .msg{color:#ffb3b3;background:rgba(255,50,50,.1);border-color:rgba(255,77,77,.4)}
+.admin-register-card .msg.success{color:#a3ffa3;background:rgba(0,180,70,.1);border-color:rgba(57,255,20,.35)}
+.back-link{color:#a3ffa3}.back-link:hover{color:#39ff14;background:rgba(57,255,20,.08)}
+.register-footer{border-color:rgba(57,255,20,.15);color:#7f907f}.register-footer svg{color:#39ff14}
+@media(max-width:520px){.admin-register-wrap{align-items:flex-start;padding:12px 9px!important}.admin-register-card{padding:27px 20px 20px!important;border-radius:14px!important}.register-brand{margin-bottom:20px}}
+</style>
+</head>
 
 <body class="admin-register-page">
 
