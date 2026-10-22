@@ -366,7 +366,54 @@ nav button span{display:grid;place-items:center;width:58px;height:30px;border-ra
 .ml-group-fullscreen .ml-group-compose input{color:var(--chat-ink,#111b21)!important}
 
 </style>    <link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261022">
+
+<style id="ml-connect-whatsapp-desktop-polish">
+/* WhatsApp-inspired desktop structure layered over the existing live Manlung Community app. */
+.ml-connect-browserbar{display:none}
+.ml-connect-browserbar .mac-dots{display:flex;gap:8px;align-items:center;flex:none}
+.ml-connect-browserbar .dot{width:12px;height:12px;border-radius:50%}
+.ml-connect-browserbar .dot.red{background:#ff5f56}.ml-connect-browserbar .dot.yellow{background:#ffbd2e}.ml-connect-browserbar .dot.green{background:#27c93f}
+.ml-connect-browserbar .url{display:flex;align-items:center;justify-content:center;gap:7px;flex:1;min-width:0;max-width:620px;margin:auto;padding:5px 14px;border:1px solid #d1d7db;border-radius:7px;background:#fff;color:#667781;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hd .ml-admin-dashboard-link{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:none;padding:8px 10px;border:1px solid #cdece1;border-radius:10px;background:#e7f8f1;color:#087d63;text-decoration:none;font-size:12px;font-weight:800;line-height:1;white-space:nowrap;transition:background .18s,border-color .18s}
+#hd .ml-admin-dashboard-link:hover{background:#d2f3e5;border-color:#8fd8bf}
+#hd .ml-admin-dashboard-link span:first-child{font-size:18px;line-height:.8}
+#hd .ml-admin-dashboard-link:focus-visible{outline:2px solid #00a884;outline-offset:2px}
+@media(min-width:900px){
+ body{overflow:hidden;background:#d1d7db}
+ #app{--ml-chatlist-width:clamp(320px,32vw,400px);width:100vw;max-width:none;height:100dvh;margin:0;display:grid;grid-template-columns:64px var(--ml-chatlist-width) minmax(0,1fr);grid-template-rows:68px minmax(0,1fr);border-radius:0;box-shadow:none;background:#fff;position:relative;overflow:hidden}
+ #hd{grid-column:2;grid-row:1;min-width:0;min-height:68px;height:68px;gap:9px;padding:10px 12px;background:#f8f9fa;border-bottom:1px solid #e9edef;z-index:7}
+ #hd .logo{width:38px;height:38px;flex:0 0 38px}
+ #hd h1{min-width:0;font-size:clamp(16px,1.5vw,20px);font-weight:750;color:#111b21;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ #mn{grid-column:2;grid-row:2;min-width:0;min-height:0;overflow-y:auto;background:#fff}
+ #nv{grid-column:1;grid-row:1 / 3;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;min-width:0;min-height:0;overflow-x:hidden;overflow-y:auto;padding:16px 5px;border-top:0;border-right:1px solid #e9edef;background:#f0f2f5}
+ #nv button{display:flex;flex:0 0 54px;flex-direction:column;align-items:center;justify-content:center;gap:0;width:100%;min-width:0;min-height:54px;padding:5px 0;font-size:0;line-height:1;color:#54656f;white-space:normal;border-radius:12px}
+ #nv button span{display:grid;place-items:center;width:46px;height:38px;border-radius:15px;font-size:21px;line-height:1}
+ #nv button span img{width:24px!important;height:24px!important}
+ #nv button.on{color:#008069;font-weight:800}
+ #nv button.on span{background:#d9fdd3}
+ #nv button:hover{background:#e6ebee}
+ #chat{position:absolute;inset:0 0 0 calc(64px + var(--ml-chatlist-width));min-width:0;width:auto;height:auto;z-index:5;border-left:1px solid #dfe5e8;background:#efeae2}
+ #chat header{background:#f0f2f5;border-bottom:1px solid #e9edef}
+ #chat header h1{font-weight:650;color:#111b21}
+ #chat .compose{background:#f0f2f5;border-top:1px solid #e4e8ea}
+ #chat .compose input{background:#fff}
+ #app:not(:has(#chat))::after{content:"Select a chat to start messaging";grid-column:3;grid-row:1 / 3;display:grid;place-items:center;min-width:0;padding:32px;color:#667781;background-color:#efeae2;background-image:radial-gradient(#7d8d7f16 .8px,transparent .8px);background-size:14px 14px;border-left:1px solid #e9edef;text-align:center;font-size:16px}
+}
+@media(min-width:1400px){
+ body{height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#d1d7db}
+ .ml-connect-browserbar{display:flex;align-items:center;gap:10px;flex:none;width:95vw;max-width:1600px;height:38px;padding:0 16px;border:1px solid #d1d7db;border-bottom:0;border-radius:8px 8px 0 0;background:#f0f2f5}
+ #app{width:95vw;max-width:1600px;height:calc(95dvh - 38px);border-radius:0 0 8px 8px;box-shadow:0 12px 24px rgba(0,0,0,.1)}
+}
+@media(max-width:899px){
+ .ml-connect-browserbar{display:none}
+ #app{width:100%;max-width:none;height:100dvh;margin:0;border-radius:0;box-shadow:none}
+ #hd .ml-admin-dashboard-link{font-size:11px;padding:8px 8px}
+}
+@media(prefers-reduced-motion:reduce){#hd .ml-admin-dashboard-link{transition:none}}
+</style>
+
 </head><body>
+<div class="ml-connect-browserbar" aria-hidden="true"><div class="mac-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="url"><span aria-hidden="true">🔒</span> manlungrecovery.manlungshop.co.ke/admin/connect.html</div></div>
 <div id="app"><header id="hd"><div class="logo">M</div><h1>Manlung Community</h1></header><main id="mn" aria-live="polite"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden><input type="file" id="status-media" accept="image/*,video/*" hidden></div>
 <script>
 const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -402,8 +449,8 @@ function ding(){if(S.notif)play(S.tone)}
 // render
 function render(){theme();S.chats=Array.isArray(S.chats)?S.chats:[];if(tab==='chats'&&typeof ensureSpecialChatRecords==='function')ensureSpecialChatRecords();S.inc=Array.isArray(S.inc)?S.inc:[];S.blocked=Array.isArray(S.blocked)?S.blocked:[];S.friends=Array.isArray(S.friends)?S.friends:[];S.req=Array.isArray(S.req)?S.req:[];S.stat=Array.isArray(S.stat)?S.stat:[];const h=$('#hd'),m=$('#mn');
  const tt={chats:'Chats',groups:'Groups',channels:'Channels',status:'Status',calls:'Calls',comm:'Community',set:'Settings',adminmsg:'Admin Messages'}[tab];
- h.innerHTML=`<div class="logo" role="img" aria-label="Manlung app"></div><h1>${tt}</h1>`;
- const navItems=[['chats',ic(I.chat),'Chats'],['groups',ic(I.users),'Groups'],['channels','<img src="https://i.postimg.cc/1Xfv3yks/icons8-decentralized-network-50.png" alt="" loading="eager" style="width:24px;height:24px;object-fit:contain">','Channels'],['status',ic(I.status),'Status'],['calls',ic(I.phone),'Calls'],['comm',ic(I.users),'Community'],['set',ic(I.gear),'Settings']];if(['admin','owner'].includes(ML.role)||['admin','owner'].includes(window.__mlRole))navItems.splice(3,0,['adminmsg',ic(I.chat),'Admin Messages']);$('#nv').innerHTML=navItems.map(([k,i,l])=>{const count=k==='chats'?S.chats.reduce((n,c)=>n+(Number(c.un)||0),0):k==='comm'?S.inc.length:0;return `<button class="${tab===k?'on':''}" onclick="go('${k}')"><span>${i}</span>${l}${count?` <span class="badge">${count>99?'99+':count}</span>`:''}</button>`}).join('');
+ const adminBack=['admin','owner'].includes(String(ML.role||window.__mlRole||'').toLowerCase())?'<a class="ml-admin-dashboard-link" href="/admin/dashboard.html" title="Back to admin dashboard" aria-label="Back to admin dashboard"><span aria-hidden="true">←</span><span>Dashboard</span></a>':'';h.innerHTML=`<div class="logo" role="img" aria-label="Manlung app"></div><h1>${tt}</h1>`+adminBack;
+ const navItems=[['chats',ic(I.chat),'Chats'],['groups',ic(I.users),'Groups'],['channels','<img src="https://i.postimg.cc/1Xfv3yks/icons8-decentralized-network-50.png" alt="" loading="eager" style="width:24px;height:24px;object-fit:contain">','Channels'],['status',ic(I.status),'Status'],['calls',ic(I.phone),'Calls'],['comm',ic(I.users),'Community'],['set',ic(I.gear),'Settings']];if(['admin','owner'].includes(ML.role)||['admin','owner'].includes(window.__mlRole))navItems.splice(3,0,['adminmsg',ic(I.chat),'Admin Messages']);$('#nv').innerHTML=navItems.map(([k,i,l])=>{const count=k==='chats'?S.chats.reduce((n,c)=>n+(Number(c.un)||0),0):k==='comm'?S.inc.length:0;return `<button type="button" title="${l}" aria-label="${l}" class="${tab===k?'on':''}" onclick="go('${k}')"><span>${i}</span>${l}${count?` <span class="badge">${count>99?'99+':count}</span>`:''}</button>`}).join('');
  const views={chats:vChats,groups:window.vGroups||vGroups,channels:window.vChannels||vChannels,status:vStatus,calls:vCalls,comm:window.vHub||vHub,set:vSet,adminmsg:window.vAdminMessages};const view=views[tab];try{m.innerHTML=typeof view==='function'?view():'<div class="empty">This section is still loading. Refresh the page and try again.</div>'}catch(viewError){console.error('Manlung Community section render failed:',tab,viewError);m.innerHTML='<div class="empty"><b>'+esc(tt||'Community')+' could not load.</b><p>Please refresh and try again. If this continues, check the page console for the section error.</p></div>'}
  const c=$('#chat');if(c)c.remove();if(open)drawChat()}
 const go=k=>{tab=k;open=null;showAr=false;render()};
