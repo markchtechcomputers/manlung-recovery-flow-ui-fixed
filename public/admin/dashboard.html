@@ -2900,73 +2900,175 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*:not(i),
 .ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
 </style>
-<script id="manlung-admin-sidebar-nav-script">
-(function(){
- if(window.__manlungAdminSidebarNavInstalled)return;
- window.__manlungAdminSidebarNavInstalled=true;
- function init(){
-  var header=document.querySelector('.site-header');
-  var actions=header&&header.querySelector('.header-actions');
-  var container=header&&header.querySelector('.container');
-  if(!header||!actions||!container||document.querySelector('.ml-admin-menu-toggle'))return;
-  var toggle=document.createElement('button');
-  toggle.type='button';toggle.className='ml-admin-menu-toggle';
-  toggle.setAttribute('aria-label','Open admin navigation');toggle.setAttribute('aria-expanded','false');
-  toggle.innerHTML='<i class="fas fa-bars" aria-hidden="true"></i><span>MENU</span>';
-  container.appendChild(toggle);
-  var overlay=document.createElement('div');overlay.className='ml-admin-menu-overlay';
-  overlay.setAttribute('aria-hidden','true');
-  var sidebar=document.createElement('aside');sidebar.className='ml-admin-sidebar';
-  sidebar.setAttribute('aria-label','Admin navigation');sidebar.setAttribute('aria-hidden','true');
-  var brand=header.querySelector('.brand h1');
-  var title=brand?brand.textContent.trim():'Manlung Recovery';
-  sidebar.innerHTML='<div class="ml-admin-sidebar-head"><div><div class="ml-admin-sidebar-title">Manlung Recovery</div><div class="ml-admin-sidebar-subtitle">'+title.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})+'</div></div><button type="button" class="ml-admin-sidebar-close" aria-label="Close navigation">×</button></div>';
 
-  var extraNav=[['/admin/operations.html','fa-list-check','Operations'],['/admin/music.html','fa-music','Music'],['/admin/connect.html','fa-users','Community'],['/','fa-house','Home']];
-  var languageControl=actions.querySelector('.language-control,[aria-label*="Language"],[title*="Language"],select[name*="language" i]');
-  if(languageControl && !languageControl.matches('a,button')){
-   var languageLink=document.createElement('a');
-   languageLink.href='#language';
-   languageLink.innerHTML='<i class="fas fa-language" aria-hidden="true"></i><span>Language</span>';
-   languageLink.addEventListener('click',function(e){
-    e.preventDefault();
-    var target=header.querySelector('.language-control,[aria-label*="Language"],[title*="Language"],select[name*="language" i]');
-    if(target){target.scrollIntoView({behavior:'smooth',block:'center'});target.focus({preventScroll:true});}
-    else {var toggle=header.querySelector('[aria-label*="language" i],[title*="language" i],.language-control');if(toggle)toggle.click();}
+
+
+<style id="manlung-dashboard-design-v2">
+:root{
+ --dash-purple:#6A35C2;--dash-purple-light:#8253d6;--dash-bg:#F5F6F8;
+ --dash-text:#333333;--dash-muted:#777777;--dash-white:#fff;--dash-border:#EAEAEA;
+}
+html,body{min-height:100%;background:var(--dash-bg)!important}
+body.admin-page-bg{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;color:var(--dash-text)!important;padding-top:0!important}
+body.admin-page-bg .site-header{
+ position:fixed!important;inset:0 auto 0 0!important;width:260px!important;height:100dvh!important;
+ overflow-y:auto!important;overflow-x:hidden!important;background:var(--dash-purple)!important;color:#fff!important;
+ border:0!important;border-radius:0!important;box-shadow:4px 0 24px rgba(39,18,79,.12)!important;z-index:1000!important;
+}
+body.admin-page-bg .site-header .container{
+ width:100%!important;max-width:none!important;min-height:100%!important;height:auto!important;
+ padding:22px 12px 18px!important;display:flex!important;flex-direction:column!important;
+ align-items:stretch!important;justify-content:flex-start!important;gap:18px!important;
+}
+body.admin-page-bg .site-header .brand{padding:4px 9px 22px!important;border-bottom:1px solid rgba(255,255,255,.14)!important;gap:12px!important}
+body.admin-page-bg .site-header .brand h1{color:#fff!important;font-size:16px!important;font-weight:700!important}
+body.admin-page-bg .site-header .brand span{color:rgba(255,255,255,.72)!important;font-size:10px!important}
+body.admin-page-bg .site-header .manlung-site-logo{width:42px!important;height:42px!important;flex:0 0 42px!important;border-radius:9px!important}
+body.admin-page-bg .site-header .header-actions{
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;
+ width:100%!important;gap:5px!important;flex-wrap:nowrap!important;margin:0!important;padding:0!important;
+}
+body.admin-page-bg .site-header .header-actions a,
+body.admin-page-bg .site-header .header-actions button{
+ display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:11px!important;
+ width:100%!important;min-width:0!important;min-height:43px!important;padding:11px 13px!important;margin:0!important;
+ color:rgba(255,255,255,.82)!important;background:transparent!important;border:0!important;border-radius:8px!important;
+ box-shadow:none!important;text-decoration:none!important;font-size:12px!important;font-weight:600!important;
+ text-align:left!important;white-space:normal!important;transform:none!important;
+}
+body.admin-page-bg .site-header .header-actions a:hover,
+body.admin-page-bg .site-header .header-actions button:hover{
+ color:#fff!important;background:rgba(255,255,255,.12)!important;box-shadow:none!important;
+}
+body.admin-page-bg .site-header .header-actions a i,
+body.admin-page-bg .site-header .header-actions button i{color:#fff!important;width:19px!important;min-width:19px!important;text-align:center!important}
+body.admin-page-bg .site-header .header-actions a[href="/admin/owner.html"]{background:rgba(255,255,255,.10)!important}
+body.admin-page-bg .site-header .header-actions button.btn-danger{margin-top:10px!important;background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.16)!important}
+body.admin-page-bg .site-header .header-actions button[data-theme-toggle]{border:1px solid rgba(255,255,255,.14)!important}
+body.admin-page-bg>.container{
+ width:auto!important;max-width:none!important;margin:0 0 0 260px!important;padding:28px 30px 24px!important;
+}
+body.admin-page-bg>.container>.card{
+ background:#fff!important;border:1px solid var(--dash-border)!important;border-radius:12px!important;
+ box-shadow:0 4px 15px rgba(0,0,0,.035)!important;padding:20px!important;margin-bottom:20px!important;
+}
+body.admin-page-bg>.container>.card .card-title{font-size:15px!important;font-weight:700!important;color:#333!important}
+body.admin-page-bg>.container>.card .card-title i{color:var(--dash-purple)!important}
+body.admin-page-bg #statsGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important;margin:0 0 20px!important}
+body.admin-page-bg .stat-card{
+ display:flex!important;flex-direction:column!important;justify-content:center!important;gap:7px!important;
+ background:#fff!important;border:1px solid var(--dash-border)!important;border-left:4px solid var(--dash-purple)!important;
+ border-radius:12px!important;padding:18px!important;min-height:100px!important;
+ box-shadow:0 4px 15px rgba(0,0,0,.03)!important;transition:transform .18s,box-shadow .18s!important;
+}
+body.admin-page-bg .stat-card:hover{transform:translateY(-2px)!important;box-shadow:0 8px 20px rgba(0,0,0,.06)!important}
+body.admin-page-bg .stat-card .number{font-size:24px!important;font-weight:800!important;color:#262626!important}
+body.admin-page-bg .stat-card .label{font-size:11px!important;font-weight:700!important;color:#777!important;text-transform:uppercase!important;letter-spacing:.035em!important}
+body.admin-page-bg .filters-bar{display:grid!important;grid-template-columns:minmax(180px,1.5fr) repeat(3,minmax(130px,1fr)) auto auto auto!important;gap:9px!important;align-items:center!important;padding:12px!important;background:#f8fafc!important;border:1px solid #e5e7eb!important;border-radius:10px!important;margin:14px 0 16px!important}
+body.admin-page-bg .filters-bar input,body.admin-page-bg .filters-bar select{
+ min-height:42px!important;padding:9px 11px!important;background:#fff!important;color:#333!important;border:1px solid #ddd!important;border-radius:7px!important;font-size:12px!important;min-width:0!important
+}
+body.admin-page-bg .btn-primary,body.admin-page-bg .btn-success,body.admin-page-bg .btn-danger,
+body.admin-page-bg .btn-outline-dark,body.admin-page-bg .btn-outline{
+ border-radius:7px!important;font-weight:700!important;min-height:38px!important
+}
+body.admin-page-bg .btn-primary{background:var(--dash-purple)!important;border-color:var(--dash-purple)!important}
+body.admin-page-bg .btn-primary:hover{background:var(--dash-purple-light)!important}
+body.admin-page-bg .table-wrap{border:1px solid #e9e9e9!important;border-radius:10px!important;background:#fff!important;overflow:auto!important}
+body.admin-page-bg .admin-table{font-size:12px!important;min-width:760px}
+body.admin-page-bg .admin-table th{background:#f8f8fa!important;color:#777!important;font-size:10px!important;text-transform:uppercase!important;letter-spacing:.04em!important;padding:13px 12px!important;white-space:nowrap!important}
+body.admin-page-bg .admin-table td{padding:13px 12px!important;border-bottom:1px solid #f0f0f0!important;color:#414141!important}
+body.admin-page-bg .admin-table tbody tr:hover{background:#faf9fc!important}
+#manlungDashboardTopbar{
+ display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 18px;margin:0 0 24px;
+ background:#fff;border:1px solid var(--dash-border);border-radius:12px;box-shadow:0 3px 12px rgba(0,0,0,.025);
+}
+#manlungDashboardTopbar .dash-search{display:flex;align-items:center;gap:10px;max-width:460px;width:100%;padding:10px 14px;border-radius:24px;background:#f5f6f8;color:#777}
+#manlungDashboardTopbar .dash-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#333;font-size:12px}
+#manlungDashboardTopbar .dash-page-heading{font-size:21px;font-weight:750;color:#292929;letter-spacing:-.025em}
+#manlungDashboardTopbar .dash-page-subtitle{margin-top:4px;color:#777;font-size:11px}
+#manlungDashboardTopbar .dash-export{white-space:nowrap;background:#fff;border:1px solid #e5e5e5;border-radius:7px;padding:9px 12px;color:#444;font-weight:700;font-size:11px;cursor:pointer}
+#manlungDashboardTopbar .dash-export:hover{background:#f8f6fc;border-color:#d7c9ef}
+#manlungDashboardBottomNote{padding:18px 0 4px;text-align:center;color:#888;font-size:10px}
+@media(max-width:1100px){
+ body.admin-page-bg>.container{padding:22px 18px!important}
+ body.admin-page-bg #statsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ body.admin-page-bg .filters-bar{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:700px){
+ body.admin-page-bg .site-header{width:70px!important}
+ body.admin-page-bg .site-header .container{padding:14px 7px!important;gap:16px!important}
+ body.admin-page-bg .site-header .brand{justify-content:center!important;padding:0 0 15px!important}
+ body.admin-page-bg .site-header .brand .manlung-brand-copy{display:none!important}
+ body.admin-page-bg .site-header .manlung-site-logo{width:42px!important;height:42px!important;flex-basis:42px!important}
+ body.admin-page-bg .site-header .header-actions a,body.admin-page-bg .site-header .header-actions button{
+  justify-content:center!important;padding:11px 5px!important;font-size:0!important;min-height:44px!important;gap:0!important
+ }
+ body.admin-page-bg .site-header .header-actions a i,body.admin-page-bg .site-header .header-actions button i{font-size:16px!important;margin:0!important}
+ body.admin-page-bg .site-header .header-actions a[href="/admin/reports.html"]::after{content:"";display:none}
+ body.admin-page-bg>.container{margin-left:70px!important;padding:14px 10px 20px!important}
+ #manlungDashboardTopbar{align-items:flex-start;flex-direction:column;padding:14px;margin-bottom:15px;gap:12px}
+ #manlungDashboardTopbar .dash-page-heading{font-size:19px}
+ #manlungDashboardTopbar .dash-search{max-width:none;order:2}
+ #manlungDashboardTopbar .dash-export{position:absolute;right:22px;margin-top:1px;font-size:0}
+ #manlungDashboardTopbar .dash-export i{font-size:13px}
+ body.admin-page-bg>.container>.card{padding:14px!important;border-radius:11px!important;margin-bottom:14px!important}
+ body.admin-page-bg #statsGrid{gap:9px!important}
+ body.admin-page-bg .stat-card{padding:12px!important;min-height:82px!important}
+ body.admin-page-bg .stat-card .number{font-size:20px!important}
+ body.admin-page-bg .filters-bar{grid-template-columns:1fr!important}
+}
+@media(prefers-reduced-motion:reduce){body.admin-page-bg .stat-card{transition:none!important}}
+</style>
+<script id="manlung-dashboard-design-behavior">
+(function(){
+ if(window.__manlungDashboardDesignV2)return;window.__manlungDashboardDesignV2=true;
+ function init(){
+  var header=document.querySelector('.site-header'),main=document.querySelector('body.admin-page-bg>.container');
+  if(!header||!main||document.getElementById('manlungDashboardTopbar'))return;
+  var actions=header.querySelector('.header-actions');
+  if(actions){
+   var links=actions.querySelectorAll('a,button');
+   links.forEach(function(el){
+    var label=(el.innerText||el.getAttribute('aria-label')||el.title||'').trim().replace(/\s+/g,' ');
+    if(!el.querySelector('i')){
+     var i=document.createElement('i');i.className='fas fa-circle';i.setAttribute('aria-hidden','true');el.insertBefore(i,el.firstChild);
+    }
+    if(label==='Reports')el.querySelector('i').className='fas fa-chart-pie';
+    else if(label==='Operations')el.querySelector('i').className='fas fa-list-check';
+    else if(label==='Music')el.querySelector('i').className='fas fa-music';
+    else if(label==='Tools')el.querySelector('i').className='fas fa-screwdriver-wrench';
+    else if(label.indexOf('Community')>=0)el.querySelector('i').className='fas fa-users';
+    else if(label.indexOf('Management')>=0)el.querySelector('i').className='fas fa-user-shield';
+    else if(label==='Home')el.querySelector('i').className='fas fa-house';
+    else if(label==='Logout')el.querySelector('i').className='fas fa-right-from-bracket';
+    else if(label.toLowerCase().indexOf('theme')>=0)el.querySelector('i').className='fas fa-circle-half-stroke';
    });
-   extraNav.unshift(['#language','fa-language','Language']);
-  } else {
-   extraNav.unshift(['#language','fa-language','Language']);
+   var nav=document.createElement('a');nav.href='#dashboard-overview';nav.className='dash-added-nav';nav.innerHTML='<i class="fas fa-border-all" aria-hidden="true"></i><span>Dashboard</span>';actions.insertBefore(nav,actions.firstChild);
+   var cases=document.createElement('a');cases.href='#cases-section';cases.className='dash-added-nav';cases.innerHTML='<i class="fas fa-folder-open" aria-hidden="true"></i><span>Cases</span>';actions.insertBefore(cases,actions.children[1]||null);
+   var donations=document.createElement('a');donations.href='#donations-section';donations.className='dash-added-nav';donations.innerHTML='<i class="fas fa-hand-holding-dollar" aria-hidden="true"></i><span>Donations</span>';actions.insertBefore(donations,actions.children[2]||null);
+   var calls=document.createElement('a');calls.href='#call-admin-section';calls.className='dash-added-nav';calls.innerHTML='<i class="fas fa-phone-volume" aria-hidden="true"></i><span>Call Admin</span>';actions.insertBefore(calls,actions.children[3]||null);
   }
-  extraNav.forEach(function(item){
-   if(Array.prototype.some.call(actions.querySelectorAll('a'),function(existing){return existing.getAttribute('href')===item[0]}))return;
-   var a=document.createElement('a');
-   a.href=item[0];
-   a.innerHTML='<i class="fas '+item[1]+'" aria-hidden="true"></i><span>'+item[2]+'</span>';
-   if(item[0]==='#language'){
-    a.addEventListener('click',function(e){
-     e.preventDefault();
-     var target=header.querySelector('.language-control,[aria-label*="Language" i],[title*="Language" i],select[name*="language" i]');
-     if(target){target.scrollIntoView({behavior:'smooth',block:'center'});if(target.matches('select,input,button,a,[tabindex]'))target.focus({preventScroll:true});else target.click();}
-     else {var langButton=header.querySelector('button[aria-label*="language" i],a[aria-label*="language" i],[title*="language" i],.language-control');if(langButton)langButton.click();}
-    });
-   }
-   actions.appendChild(a);
-  });
-  sidebar.appendChild(actions);document.body.append(overlay,sidebar);
-  var close=sidebar.querySelector('.ml-admin-sidebar-close');
-  function setOpen(open){
-   overlay.classList.toggle('is-open',open);sidebar.classList.toggle('is-open',open);
-   document.body.classList.toggle('ml-admin-menu-open',open);
-   toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close admin navigation':'Open admin navigation');
-   sidebar.setAttribute('aria-hidden',String(!open));overlay.setAttribute('aria-hidden',String(!open));
-   if(open)close.focus();else toggle.focus();
+  var cards=main.querySelectorAll(':scope > .card');
+  if(cards[0])cards[0].id='call-admin-section';
+  if(cards[1])cards[1].id='video-call-section';
+  if(cards[2])cards[2].id='donations-section';
+  var stats=document.getElementById('statsGrid');if(stats)stats.id='dashboard-overview';
+  var caseCard=main.querySelector('.cases-scroll');if(caseCard){var c=caseCard.closest('.card');if(c)c.id='cases-section';}
+  var top=document.createElement('section');top.id='manlungDashboardTopbar';
+  top.innerHTML='<div><div class="dash-page-heading">Dashboard Overview</div><div class="dash-page-subtitle">Manlung Recovery · Cyber Recovery &amp; Digital Investigation Portal</div></div><label class="dash-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input id="dashboardQuickSearch" type="search" placeholder="Search name, phone, email, case ID, IMEI…" aria-label="Search cases"></label><button class="dash-export" type="button" id="dashboardExportBtn"><i class="fas fa-download" aria-hidden="true"></i> Export CSV</button>';
+  main.insertBefore(top,main.firstChild);
+  var quick=document.getElementById('dashboardQuickSearch'),search=document.getElementById('searchInput');
+  if(quick&&search){
+   quick.addEventListener('input',function(){search.value=quick.value;});
+   quick.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(typeof window.loadCases==='function')window.loadCases(1);}});
+   quick.addEventListener('change',function(){if(typeof window.loadCases==='function')window.loadCases(1);});
+   var originalSearch=search;
+   originalSearch.addEventListener('input',function(){if(quick.value!==originalSearch.value)quick.value=originalSearch.value;});
   }
-  toggle.addEventListener('click',function(){setOpen(!sidebar.classList.contains('is-open'))});
-  close.addEventListener('click',function(){setOpen(false)});
-  overlay.addEventListener('click',function(){setOpen(false)});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sidebar.classList.contains('is-open'))setOpen(false)});
-  sidebar.addEventListener('click',function(e){if(e.target.closest('a'))setOpen(false)});
+  var exportBtn=document.getElementById('dashboardExportBtn');if(exportBtn)exportBtn.addEventListener('click',function(){if(typeof window.exportCsv==='function')window.exportCsv();});
+  var note=document.createElement('div');note.id='manlungDashboardBottomNote';note.textContent='Manlung Recovery · Cyber Recovery & Digital Investigation Portal · © 2026';
+  main.appendChild(note);
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
