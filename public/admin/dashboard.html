@@ -664,7 +664,6 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
                 <a class="btn btn-outline" href="/admin/music.html"><i class="fas fa-music"></i> Music</a>
                 <a class="btn btn-outline" href="/admin/tools.html"> Tools</a>
                 <a class="btn btn-outline" href="/admin/connect.html"><i class="fas fa-comments"></i> Manlung Community</a>
-                <button class="btn btn-outline" data-theme-toggle="true"></button>
                 <a href="/" class="btn btn-outline"> Home</a>
                 <button class="btn btn-danger" onclick="handleLogout()"> Logout</button>
             </div>
@@ -3384,6 +3383,30 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions button:hover{
 html.dark .ml-admin-sidebar .header-actions i,
 body.dark .ml-admin-sidebar .header-actions i,
 html[data-theme="dark"] .ml-admin-sidebar .header-actions i{color:#93c5fd!important}
+</style>
+
+
+<style id="manlung-admin-remove-theme-tighten-nav">
+/* Admin dashboard: remove the theme switch and keep navigation controls grouped. */
+body.admin-page-bg .site-header .header-actions [data-theme-toggle="true"],
+body.admin-page-bg .ml-admin-sidebar .header-actions [data-theme-toggle="true"]{
+ display:none!important;
+}
+body.admin-page-bg .site-header .header-actions,
+body.admin-page-bg .ml-admin-sidebar .header-actions{
+ justify-content:flex-start!important;
+ align-content:flex-start!important;
+ column-gap:7px!important;
+ row-gap:7px!important;
+}
+body.admin-page-bg .site-header .header-actions>*,
+body.admin-page-bg .ml-admin-sidebar .header-actions>*{
+ margin:0!important;
+}
+body.admin-page-bg .site-header .header-actions .manlung-ai-tab,
+body.admin-page-bg .ml-admin-sidebar .header-actions .manlung-ai-tab{
+ margin-inline:0!important;
+}
 </style>
 
 </body>
