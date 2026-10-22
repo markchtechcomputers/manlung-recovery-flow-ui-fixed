@@ -230,36 +230,68 @@ body:has(.center-wrap){background:radial-gradient(ellipse at 12% 8%,rgba(20,184,
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
     <script>
-        let adminTurnstileEnabled=false;
-        let adminTurnstileWidget=null;
-        let adminTurnstileLoadError=null;
+        let adminTurnstileEnabled = false;
+        let adminTurnstileWidget = null;
+        let adminTurnstileLoadError = null;
+        let adminTurnstileSetupComplete = false;
+
         function showTurnstileStatus(message) {
             const errorEl = document.getElementById('loginError');
             if (errorEl) errorEl.textContent = message || '';
         }
-        async function setupAdminTurnstile(){
+
+        function waitForTurnstile(timeoutMs = 15000) {
+            return new Promise((resolve, reject) => {
+                if (window.turnstile) return resolve(window.turnstile);
+                const started = Date.now();
+                const timer = setInterval(() => {
+                    if (window.turnstile) {
+                        clearInterval(timer);
+                        resolve(window.turnstile);
+                    } else if (Date.now() - started >= timeoutMs) {
+                        clearInterval(timer);
+                        reject(new Error('Cloudflare challenge script did not load. Check your connection or content blocker, then refresh.'));
+                    }
+                }, 100);
+            });
+        }
+
+        async function setupAdminTurnstile() {
             const widgetBox = document.getElementById('adminTurnstile');
             try {
-                const r = await fetch('/api/config/public', { cache: 'no-store' });
-                if (!r.ok) throw new Error('Could not load security configuration.');
-                const c = await r.json();
-                adminTurnstileEnabled = Boolean(c.turnstileEnabled && c.turnstileSiteKey);
-                if (!adminTurnstileEnabled) return;
-                if (!window.turnstile) {
-                    await new Promise((resolve, reject) => {
-                        const started = Date.now();
-                        const timer = setInterval(() => {
-                            if (window.turnstile) { clearInterval(timer); resolve(); }
-                            else if (Date.now() - started > 15000) { clearInterval(timer); reject(new Error('Cloudflare challenge script did not load.')); }
-                        }, 100);
-                    });
+                const response = await fetch('/api/config/public', {
+                    method: 'GET',
+                    cache: 'no-store',
+                    credentials: 'same-origin',
+                    headers: { Accept: 'application/json' }
+                });
+                if (!response.ok) throw new Error('Could not load security configuration.');
+                const config = await response.json();
+
+                adminTurnstileEnabled = Boolean(config.turnstileEnabled);
+                if (!adminTurnstileEnabled) {
+                    adminTurnstileSetupComplete = true;
+                    if (widgetBox) widgetBox.closest('.manlung-turnstile-box')?.setAttribute('hidden', '');
+                    return;
                 }
-                adminTurnstileWidget = window.turnstile.render('#adminTurnstile', {
-                    sitekey: c.turnstileSiteKey,
+                if (!config.turnstileSiteKey) {
+                    throw new Error('Cloudflare verification is enabled but its site key is missing. Please contact the site owner.');
+                }
+
+                const turnstile = await waitForTurnstile();
+                if (!widgetBox) throw new Error('Cloudflare verification area is missing.');
+                widgetBox.closest('.manlung-turnstile-box')?.removeAttribute('hidden');
+                adminTurnstileWidget = turnstile.render(widgetBox, {
+                    sitekey: config.turnstileSiteKey,
                     theme: 'auto',
                     size: 'normal',
                     appearance: 'always',
-                    callback: () => { adminTurnstileLoadError = null; showTurnstileStatus(''); },
+                    retry: 'auto',
+                    'refresh-expired': 'auto',
+                    callback: () => {
+                        adminTurnstileLoadError = null;
+                        showTurnstileStatus('');
+                    },
                     'expired-callback': () => {
                         adminTurnstileLoadError = 'Cloudflare verification expired. Complete the challenge again.';
                         showTurnstileStatus(adminTurnstileLoadError);
@@ -269,18 +301,20 @@ body:has(.center-wrap){background:radial-gradient(ellipse at 12% 8%,rgba(20,184,
                         showTurnstileStatus(adminTurnstileLoadError);
                     },
                     'timeout-callback': () => {
-                        adminTurnstileLoadError = 'Cloudflare verification timed out. Please complete it again.';
+                        adminTurnstileLoadError = 'Cloudflare verification timed out. Complete it again.';
                         showTurnstileStatus(adminTurnstileLoadError);
                     }
                 });
-                if (widgetBox) widgetBox.setAttribute('aria-label', 'Cloudflare security verification');
-            } catch (e) {
-                adminTurnstileLoadError = e?.message || 'Cloudflare security verification failed to load.';
-                console.error('Turnstile setup failed:', e);
+                adminTurnstileSetupComplete = true;
+            } catch (error) {
+                adminTurnstileLoadError = error?.message || 'Cloudflare security verification failed to load.';
+                console.error('Admin Turnstile setup failed:', error);
                 showTurnstileStatus(adminTurnstileLoadError + ' Refresh the page and try again.');
+            } finally {
+                adminTurnstileSetupComplete = true;
             }
         }
-        window.addEventListener('load',setupAdminTurnstile);
+        window.addEventListener('load', setupAdminTurnstile);
         let pendingMfaTicket = null;
         let mfaEnrollmentUser = null;
 
@@ -406,12 +440,16 @@ body:has(.center-wrap){background:radial-gradient(ellipse at 12% 8%,rgba(20,184,
             let submittedTurnstileToken = false;
 
             try {
-                if (adminTurnstileEnabled && (!window.turnstile || adminTurnstileWidget === null)) {
-                    errorEl.textContent = adminTurnstileLoadError || 'Cloudflare security verification has not loaded yet. Refresh the page and try again.';
+                if (!adminTurnstileSetupComplete) {
+                    errorEl.textContent = 'Loading secure login verification. Please wait a moment and try again.';
                     return;
                 }
-                if (adminTurnstileEnabled && adminTurnstileLoadError) {
-                    errorEl.textContent = adminTurnstileLoadError;
+                if (adminTurnstileLoadError) {
+                    errorEl.textContent = adminTurnstileLoadError + ' Refresh the page and try again.';
+                    return;
+                }
+                if (adminTurnstileEnabled && (!window.turnstile || adminTurnstileWidget === null)) {
+                    errorEl.textContent = 'Cloudflare security verification is not ready. Refresh the page and try again.';
                     return;
                 }
                 const turnstileToken = adminTurnstileEnabled ? window.turnstile.getResponse(adminTurnstileWidget) : null;
