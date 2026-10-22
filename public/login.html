@@ -1384,12 +1384,6 @@ html body.manlung-auth-page.dark .manlung-auth-tabs button.active {
 
       <div id="loginPanel">
         <div class="manlung-auth-heading"><h2>Welcome back</h2><p>Sign in to access your client portal.</p></div>
-        <div class="manlung-social-grid">
-          <div id="googleLoginBtn" class="manlung-google-btn" aria-label="Continue with Google"></div>
-          <button type="button" id="githubLoginBtn" class="manlung-social-btn manlung-social-icon" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i></button>
-          <button type="button" id="discordLoginBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Discord sign-in is not configured yet" title="Discord sign-in coming soon"><img src="https://i.postimg.cc/RZYZDLbV/icons8-discord-new-48.png" alt="" width="28" height="28" loading="eager"></button>
-        </div>
-        <div class="manlung-auth-divider">or continue with email</div>
         <form id="loginForm" onsubmit="handleLogin(event)">
           <div class="form-group"><label for="loginEmail">Email address or phone number</label><input type="text" id="loginEmail" autocomplete="username" inputmode="text" placeholder="you@example.com or +254 7XX XXX XXX" required></div>
           <div class="form-group"><label for="loginPassword">Password</label><div class="manlung-password-field"><input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter your password" required><button type="button" class="manlung-password-toggle" data-password-target="loginPassword" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button></div></div>
@@ -1408,6 +1402,12 @@ html body.manlung-auth-page.dark .manlung-auth-tabs button.active {
             Resend verification email
           </button>
         </form>
+        <div class="manlung-auth-divider">or continue with</div>
+        <div class="manlung-social-grid" aria-label="Social sign-in options">
+          <div id="googleLoginBtn" class="manlung-google-btn" aria-label="Continue with Google"></div>
+          <button type="button" id="githubLoginBtn" class="manlung-social-btn manlung-social-icon" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i></button>
+          <button type="button" id="discordLoginBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Discord sign-in is not configured yet" title="Discord sign-in coming soon"><img src="https://i.postimg.cc/RZYZDLbV/icons8-discord-new-48.png" alt="" width="28" height="28" loading="eager"></button>
+        </div>
       </div>
 
       <div id="registerPanel" hidden>
