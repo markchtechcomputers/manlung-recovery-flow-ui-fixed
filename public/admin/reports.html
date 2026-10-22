@@ -632,7 +632,7 @@ body.admin-page-bg .coverage-insight,body.admin-page-bg .monthly-call-row{
 body.admin-page-bg .data-center-month{background:#eae8ff!important;color:#5148e5!important;border-radius:10px!important}
 body.admin-page-bg .operations-flow{gap:.35rem!important}
 body.admin-page-bg .operations-pie{filter:drop-shadow(0 4px 8px rgba(99,91,255,.12))}
-body.admin-page-bg .reports-flow-nav{display:none!important}
+body.admin-page-bg .reports-flow-nav{display:flex!important}
 body.admin-page-bg .ml-admin-menu-toggle,body.admin-page-bg .ml-admin-sidebar,
 body.admin-page-bg .ml-admin-menu-overlay{display:none!important}
 body.admin-page-bg footer,body.admin-page-bg .site-footer,body.admin-page-bg .manlung-footer{display:none!important}
@@ -661,18 +661,97 @@ body.admin-page-bg footer,body.admin-page-bg .site-footer,body.admin-page-bg .ma
 @media(prefers-reduced-motion:reduce){body.admin-page-bg *{scroll-behavior:auto!important;transition:none!important}}
 </style>
 
+
+<style id="reports-dashboard-sidebar-and-charts">
+:root{--reports-sidebar:#6A35C2;--reports-sidebar-hover:rgba(255,255,255,.13)}
+body.admin-page-bg{padding:0!important;margin:0!important;background:#f5f6f8!important;color:#30313a!important}
+.reports-sidebar{position:fixed;inset:0 auto 0 0;width:260px;height:100dvh;overflow-y:auto;z-index:1100;background:var(--reports-sidebar);color:#fff;display:flex;flex-direction:column;padding:20px 12px 14px;box-shadow:4px 0 24px rgba(39,18,79,.12)}
+.reports-sidebar-brand{display:flex;align-items:center;gap:11px;padding:4px 8px 20px;margin-bottom:13px;border-bottom:1px solid rgba(255,255,255,.16);text-decoration:none;color:#fff}
+.reports-sidebar-brand img{width:42px;height:42px;flex:0 0 42px;border-radius:9px;background:#fff}
+.reports-sidebar-brand span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.reports-sidebar-brand strong{font-size:14px;line-height:1.2;color:#fff}
+.reports-sidebar-brand small{font-size:10px;color:rgba(255,255,255,.7)}
+.reports-sidebar-nav{display:flex;flex-direction:column;gap:4px}
+.reports-sidebar-nav a,.reports-sidebar-nav button{display:flex;align-items:center;gap:11px;width:100%;min-height:42px;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:rgba(255,255,255,.84);text-align:left;text-decoration:none;font:600 12px/1.25 Inter,system-ui,sans-serif;cursor:pointer}
+.reports-sidebar-nav a i,.reports-sidebar-nav button i{width:19px;min-width:19px;text-align:center;color:#fff}
+.reports-sidebar-nav a:hover,.reports-sidebar-nav button:hover,.reports-sidebar-nav a.active{background:rgba(255,255,255,.15);color:#fff}
+.reports-sidebar-divider{height:1px;background:rgba(255,255,255,.15);margin:8px 4px}
+.reports-sidebar-foot{margin-top:auto;padding:18px 8px 2px;color:rgba(255,255,255,.6);font-size:9px;line-height:1.5}
+.reports-page-header{margin:0 0 20px;padding:14px 18px;display:flex;align-items:center;gap:16px;position:relative;border:1px solid #eaeaea;border-radius:12px;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.025)}
+.reports-page-header .reports-back-link{background:#f7f5fb;border-color:#e5dff4;color:#6A35C2}
+.reports-page-header .reports-header-title h1{font-size:21px;color:#292929}
+.reports-page-header .reports-header-title p{color:#777}
+body.admin-page-bg main.container{width:auto!important;max-width:none!important;margin:0 0 0 260px!important;padding:26px 28px 32px!important}
+body.admin-page-bg main.container .operations-shell{margin:0!important}
+body.admin-page-bg .reports-flow-nav{position:sticky;top:8px;z-index:20;max-width:none;margin:0 0 16px;border-radius:10px}
+.reports-history-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;margin:0 0 16px}
+.reports-chart-card{min-width:0;padding:16px;border:1px solid #e7e7ef;border-radius:12px;background:#fff;box-shadow:0 4px 15px rgba(0,0,0,.035)}
+.reports-chart-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.reports-chart-heading h3{margin:0;color:#30313a;font-size:14px;font-weight:800}
+.reports-chart-heading p{margin:4px 0 0;color:#7b7b89;font-size:11px}
+.reports-chart-canvas-wrap{position:relative;width:100%;height:260px;min-height:220px}
+.reports-chart-canvas-wrap canvas{display:block;width:100%;height:100%}
+.reports-chart-note{margin-top:8px;color:#7b7b89;font-size:10px}
+.reports-chart-filters{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.reports-chart-filters button{border:1px solid #e1ddec;border-radius:7px;background:#fff;color:#625a70;padding:6px 9px;font-size:10px;font-weight:800;cursor:pointer}
+.reports-chart-filters button.active{background:#6A35C2;border-color:#6A35C2;color:#fff}
+.reports-history-empty{display:grid;place-items:center;height:100%;color:#888;font-size:12px;text-align:center}
+@media(max-width:1050px){.reports-history-grid{grid-template-columns:1fr}body.admin-page-bg main.container{padding:20px 16px!important}}
+@media(max-width:700px){
+ .reports-sidebar{width:70px;padding:14px 7px}
+ .reports-sidebar-brand{justify-content:center;padding:0 0 15px}
+ .reports-sidebar-brand img{width:42px;height:42px}
+ .reports-sidebar-brand span,.reports-sidebar-nav a span,.reports-sidebar-nav button span,.reports-sidebar-foot{display:none}
+ .reports-sidebar-nav a,.reports-sidebar-nav button{justify-content:center;padding:10px 4px;min-height:44px}
+ .reports-sidebar-nav a i,.reports-sidebar-nav button i{font-size:16px}
+ body.admin-page-bg main.container{margin-left:70px!important;padding:12px 10px 20px!important}
+ .reports-page-header{align-items:flex-start;padding:12px;gap:9px}
+ .reports-page-header .reports-back-link{width:40px;min-width:40px;padding:0;justify-content:center;font-size:0}
+ .reports-page-header .reports-back-link span{display:none}
+ .reports-page-header .reports-header-title h1{font-size:18px}
+ .reports-page-header .reports-header-title p{font-size:10px}
+ .reports-page-header .reports-header-mark{display:none}
+ .reports-chart-card{padding:12px}
+ .reports-chart-canvas-wrap{height:230px}
+}
+</style>
+
 </head>
 
 <body class="admin-page-bg">
 
-<header class="reports-glass-header">
+<aside class="reports-sidebar" aria-label="Admin navigation">
+  <a class="reports-sidebar-brand" href="/admin/dashboard.html">
+    <img src="/icons/icon-512.png" alt="Manlung Recovery">
+    <span><strong>Manlung Recovery</strong><small>Admin Dashboard</small></span>
+  </a>
+  <nav class="reports-sidebar-nav">
+    <a href="/admin/dashboard.html"><i class="fas fa-border-all"></i><span>Dashboard</span></a>
+    <a href="/admin/dashboard.html#cases-section"><i class="fas fa-folder-open"></i><span>Cases</span></a>
+    <a href="/admin/dashboard.html#donations-section"><i class="fas fa-hand-holding-dollar"></i><span>Donations</span></a>
+    <a href="/admin/dashboard.html#call-admin-section"><i class="fas fa-phone-volume"></i><span>Call Admin</span></a>
+    <a href="/admin/dashboard.html#clients-section"><i class="fas fa-users"></i><span>Clients</span></a>
+    <a class="active" href="/admin/reports.html" aria-current="page"><i class="fas fa-chart-pie"></i><span>Reports</span></a>
+    <a href="/admin/dashboard.html#settings-section"><i class="fas fa-gear"></i><span>Settings</span></a>
+    <div class="reports-sidebar-divider"></div>
+    <a href="/admin/operations.html"><i class="fas fa-list-check"></i><span>Operations</span></a>
+    <a href="/admin/owner.html" class="owner-only"><i class="fas fa-user-shield"></i><span>Admin Management</span></a>
+    <a href="/admin/tools.html"><i class="fas fa-screwdriver-wrench"></i><span>Tools</span></a>
+    <a href="/admin/music.html"><i class="fas fa-music"></i><span>Music</span></a>
+    <a href="/admin/connect.html"><i class="fas fa-comments"></i><span>Manlung Community</span></a>
+    <button type="button" data-theme-toggle="true"><i class="fas fa-circle-half-stroke"></i><span>Theme</span></button>
+    <a href="/"><i class="fas fa-house"></i><span>Home</span></a>
+    <button type="button" id="reportsLogoutBtn"><i class="fas fa-right-from-bracket"></i><span>Logout</span></button>
+  </nav>
+  <div class="reports-sidebar-foot">Cyber Recovery &amp; Digital Investigation Portal</div>
+</aside>
+<header class="reports-page-header">
   <a class="reports-back-link" href="/admin/dashboard.html" aria-label="Back to Admin Dashboard" title="Back to Admin Dashboard">
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-    <span>Admin Dashboard</span>
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back to Dashboard</span>
   </a>
   <div class="reports-header-title">
     <h1>Admin Reports</h1>
-    <p>Manlung Recovery · Live cases, calls and admin performance</p>
+    <p>Historical trends, case outcomes, calls and admin performance</p>
   </div>
   <div class="reports-header-mark" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></div>
 </header>
@@ -707,6 +786,37 @@ body.admin-page-bg footer,body.admin-page-bg .site-footer,body.admin-page-bg .ma
 
 
 <main class="container">
+
+
+<section class="reports-history-grid" id="reportsHistoricalCharts" aria-label="Historical charts">
+  <article class="reports-chart-card">
+    <div class="reports-chart-heading">
+      <div><h3><i class="fas fa-chart-line" style="color:#6A35C2"></i> Historical Case Trends</h3><p>Submitted and completed cases over the available daily history</p></div>
+      <div class="reports-chart-filters" aria-label="History range">
+        <button type="button" class="active" data-history-range="14">14 days</button>
+        <button type="button" data-history-range="30">30 days</button>
+        <button type="button" data-history-range="all">All available</button>
+      </div>
+    </div>
+    <div class="reports-chart-canvas-wrap"><canvas id="reportsHistoryLineChart" role="img" aria-label="Line graph of submitted and completed cases"></canvas></div>
+    <div class="reports-chart-note" id="reportsHistoryLineNote">Loading historical case data…</div>
+  </article>
+  <article class="reports-chart-card">
+    <div class="reports-chart-heading"><div><h3><i class="fas fa-chart-column" style="color:#6A35C2"></i> Monthly Call History</h3><p>Answered calls grouped by month</p></div></div>
+    <div class="reports-chart-canvas-wrap"><canvas id="reportsHistoryBarChart" role="img" aria-label="Bar graph of answered calls by month"></canvas></div>
+    <div class="reports-chart-note" id="reportsHistoryBarNote">Loading historical call data…</div>
+  </article>
+  <article class="reports-chart-card">
+    <div class="reports-chart-heading"><div><h3><i class="fas fa-chart-pie" style="color:#6A35C2"></i> Case Status Breakdown</h3><p>Current status distribution from live report data</p></div></div>
+    <div class="reports-chart-canvas-wrap"><canvas id="reportsHistoryPieChart" role="img" aria-label="Pie chart of case statuses"></canvas></div>
+    <div class="reports-chart-note" id="reportsHistoryPieNote">Loading case status data…</div>
+  </article>
+  <article class="reports-chart-card">
+    <div class="reports-chart-heading"><div><h3><i class="fas fa-chart-column" style="color:#6A35C2"></i> Monthly Case Activity</h3><p>Submitted versus completed cases across available dates</p></div></div>
+    <div class="reports-chart-canvas-wrap"><canvas id="reportsHistoryCaseBarChart" role="img" aria-label="Bar graph of submitted and completed cases"></canvas></div>
+    <div class="reports-chart-note" id="reportsHistoryCaseBarNote">Loading historical case data…</div>
+  </article>
+</section>
 
 <section class="card operations-shell" id="manlungOperationsDashboard">
 
@@ -2732,6 +2842,10 @@ function logout() {
                 statusItems
             );
 
+            if(typeof window.renderReportsHistoricalCharts === 'function'){
+                window.renderReportsHistoricalCharts(data);
+            }
+
         }
         catch(error){
 
@@ -2770,6 +2884,97 @@ function logout() {
 
 })();
 
+</script>
+
+
+<script id="reports-history-chart-engine">
+(function(){
+  var historyDays=[],historyMonthlyCalls=[],historyStatus={},historyRange='14';
+  var palette=['#6A35C2','#3B82F6','#16A34A','#F59E0B','#EC4899','#0EA5E9','#8B5CF6','#64748B'];
+  function canvasContext(id){
+    var canvas=document.getElementById(id);if(!canvas)return null;
+    var rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return null;
+    var ratio=window.devicePixelRatio||1;canvas.width=Math.round(rect.width*ratio);canvas.height=Math.round(rect.height*ratio);
+    var ctx=canvas.getContext('2d');ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,rect.width,rect.height);
+    return {ctx:ctx,w:rect.width,h:rect.height};
+  }
+  function empty(ctx,w,h,msg){ctx.fillStyle='#8b8b98';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(msg,w/2,h/2);}
+  function drawLine(id,items){
+    var c=canvasContext(id);if(!c)return;var ctx=c.ctx,w=c.w,h=c.h;
+    if(!items.length){empty(ctx,w,h,'No historical case data returned by the API');return;}
+    var pad={l:34,r:12,t:15,b:36},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;
+    var max=Math.max(1,...items.flatMap(x=>[Number(x.submitted||0),Number(x.completed||0)]));
+    ctx.font='10px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
+    for(var i=0;i<=4;i++){var y=pad.t+ph*i/4;ctx.strokeStyle='#ececf2';ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();ctx.fillStyle='#81818d';ctx.fillText(String(Math.round(max*(4-i)/4)),pad.l-7,y);}
+    function series(key,color){ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();items.forEach(function(d,i){var x=pad.l+(items.length===1?pw/2:pw*i/(items.length-1)),y=pad.t+ph-(Number(d[key]||0)/max)*ph;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();items.forEach(function(d,i){var x=pad.l+(items.length===1?pw/2:pw*i/(items.length-1)),y=pad.t+ph-(Number(d[key]||0)/max)*ph;ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();});}
+    series('submitted',palette[1]);series('completed',palette[2]);
+    var step=Math.max(1,Math.ceil(items.length/6));ctx.textAlign='center';ctx.textBaseline='top';ctx.fillStyle='#81818d';
+    items.forEach(function(d,i){if(i%step===0||i===items.length-1){var x=pad.l+(items.length===1?pw/2:pw*i/(items.length-1));var date=new Date((d.date||'')+'T00:00:00');var label=isNaN(date)?String(d.date||''):date.toLocaleDateString(undefined,{month:'short',day:'numeric'});ctx.fillText(label,x,h-pad.b+10);}});
+  }
+  function drawBars(id,items,key,labelKey){
+    var c=canvasContext(id);if(!c)return;var ctx=c.ctx,w=c.w,h=c.h;
+    if(!items.length){empty(ctx,w,h,'No historical data returned by the API');return;}
+    var pad={l:30,r:8,t:14,b:36},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;
+    var max=Math.max(1,...items.map(x=>Number(x[key]||0)));
+    ctx.font='10px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
+    for(var i=0;i<=4;i++){var y=pad.t+ph*i/4;ctx.strokeStyle='#ececf2';ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();ctx.fillStyle='#81818d';ctx.fillText(String(Math.round(max*(4-i)/4)),pad.l-6,y);}
+    var step=pw/items.length,bw=Math.min(32,step*.58);ctx.textAlign='center';ctx.textBaseline='top';
+    items.forEach(function(d,i){var v=Number(d[key]||0),bh=v/max*ph,x=pad.l+i*step+(step-bw)/2,y=pad.t+ph-bh;ctx.fillStyle=palette[0];ctx.beginPath();ctx.roundRect(x,y,bw,Math.max(0,bh),4);ctx.fill();var dateLabel=String(d[labelKey]||'');ctx.fillStyle='#81818d';if(items.length<=8||i%Math.ceil(items.length/6)===0||i===items.length-1)ctx.fillText(dateLabel.length>9?dateLabel.slice(0,9):dateLabel,x+bw/2,h-pad.b+10);});
+  }
+  function drawCaseBars(id,items){
+    var c=canvasContext(id);if(!c)return;var ctx=c.ctx,w=c.w,h=c.h;
+    if(!items.length){empty(ctx,w,h,'No historical case data returned by the API');return;}
+    var pad={l:30,r:8,t:14,b:36},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;
+    var max=Math.max(1,...items.flatMap(x=>[Number(x.submitted||0),Number(x.completed||0)]));
+    ctx.font='10px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
+    for(var j=0;j<=4;j++){var gy=pad.t+ph*j/4;ctx.strokeStyle='#ececf2';ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(w-pad.r,gy);ctx.stroke();ctx.fillStyle='#81818d';ctx.fillText(String(Math.round(max*(4-j)/4)),pad.l-6,gy);}
+    var step=pw/items.length,bw=Math.min(15,step*.3);items.forEach(function(d,i){var x=pad.l+i*step+step/2;[['submitted',palette[1],-bw*.55],['completed',palette[2],bw*.55]].forEach(function(z){var v=Number(d[z[0]]||0),bh=v/max*ph;ctx.fillStyle=z[1];ctx.beginPath();ctx.roundRect(x+z[2]-bw/2,pad.t+ph-bh,bw,Math.max(0,bh),3);ctx.fill();});if(items.length<=8||i%Math.ceil(items.length/6)===0||i===items.length-1){ctx.fillStyle='#81818d';ctx.textAlign='center';ctx.textBaseline='top';var dt=new Date((d.date||'')+'T00:00:00');ctx.fillText(isNaN(dt)?String(d.date||''):dt.toLocaleDateString(undefined,{month:'short',day:'numeric'}),x,h-pad.b+10);}});
+  }
+  function drawPie(id,items){
+    var c=canvasContext(id);if(!c)return;var ctx=c.ctx,w=c.w,h=c.h;
+    var rows=Object.entries(items||{}).map(function(e){return {name:e[0],value:Number(e[1]||0)};}).filter(function(x){return x.value>0;});
+    if(!rows.length){empty(ctx,w,h,'No case status totals returned by the API');return;}
+    var total=rows.reduce(function(a,x){return a+x.value;},0),cx=w*.32,cy=h*.48,r=Math.min(w*.25,h*.37),a=-Math.PI/2;
+    rows.forEach(function(d,i){var end=a+(d.value/total)*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a,end);ctx.closePath();ctx.fillStyle=palette[i%palette.length];ctx.fill();a=end;});
+    ctx.textAlign='left';ctx.textBaseline='middle';ctx.font='11px system-ui';var lx=w*.58,ly=Math.max(18,h*.18);
+    rows.slice(0,8).forEach(function(d,i){ctx.fillStyle=palette[i%palette.length];ctx.fillRect(lx,ly+i*25,9,9);ctx.fillStyle='#555562';ctx.fillText(d.name+' · '+d.value,lx+15,ly+5+i*25);});
+    ctx.fillStyle='#30313a';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.fillText(String(total),cx,cy);
+  }
+  function filteredDays(){if(historyRange==='all')return historyDays.slice();return historyDays.slice(-Number(historyRange));}
+  function renderAll(){
+    var days=filteredDays();drawLine('reportsHistoryLineChart',days);drawCaseBars('reportsHistoryCaseBarChart',days);
+    drawBars('reportsHistoryBarChart',historyMonthlyCalls,'calls','label');drawPie('reportsHistoryPieChart',historyStatus);
+    var lineNote=document.getElementById('reportsHistoryLineNote');if(lineNote)lineNote.textContent=days.length?'Showing '+days.length+' available daily records. Historical range is limited to records returned by the reports API.':'No daily history was returned.';
+    var barNote=document.getElementById('reportsHistoryBarNote');if(barNote)barNote.textContent=historyMonthlyCalls.length?'Showing '+historyMonthlyCalls.length+' monthly call records.':'No monthly call history was returned.';
+    var pieNote=document.getElementById('reportsHistoryPieNote');if(pieNote)pieNote.textContent=Object.keys(historyStatus).length?'Status counts use the live monthly status totals returned by the API.':'No status totals were returned.';
+    var caseNote=document.getElementById('reportsHistoryCaseBarNote');if(caseNote)caseNote.textContent=days.length?'Submitted and completed cases from available daily records.':'No case history was returned.';
+  }
+  window.renderReportsHistoricalCharts=function(data){
+    data=data||{};historyDays=Array.isArray(data.dailyFlow)?data.dailyFlow.slice():[];
+    historyMonthlyCalls=Array.isArray(data.monthlyCallReports)?data.monthlyCallReports.slice(-12).map(function(x){var date=new Date((x.month||'')+'-01T00:00:00');return {calls:Number(x.calls||0),label:isNaN(date)?String(x.month||''):date.toLocaleDateString(undefined,{month:'short',year:'2-digit'}),month:x.month};}):[];
+    historyStatus=data.monthlyStatusCounts||{};renderAll();
+  };
+  document.addEventListener('click',function(e){var b=e.target.closest('[data-history-range]');if(!b)return;historyRange=b.getAttribute('data-history-range');document.querySelectorAll('[data-history-range]').forEach(function(x){x.classList.toggle('active',x===b);});renderAll();});
+  window.addEventListener('resize',function(){if(window.__reportsHistoryResizeTimer)clearTimeout(window.__reportsHistoryResizeTimer);window.__reportsHistoryResizeTimer=setTimeout(renderAll,120);});
+  document.addEventListener('DOMContentLoaded',renderAll);
+})();
+</script>
+
+
+<script id="reports-sidebar-behavior">
+(function(){
+ var b=document.getElementById('reportsLogoutBtn');
+ if(b)b.addEventListener('click',function(){
+   if(typeof window.handleLogout==='function'){window.handleLogout();return;}
+   window.location.href='/admin/dashboard.html';
+ });
+ var t=document.querySelector('.reports-sidebar [data-theme-toggle]');
+ if(t)t.addEventListener('click',function(){
+   var existing=document.querySelector('[data-theme-toggle]:not(.reports-sidebar [data-theme-toggle])');
+   if(existing)existing.click();
+   else document.documentElement.classList.toggle('dark');
+ });
+})();
 </script>
 
 <script src="/js/pwa.js" defer></script>
