@@ -3165,5 +3165,96 @@ body.admin-page-bg [title*="Language" i][role="menu"]{
 })();
 </script>
 
+
+<style id="manlung-language-header-placement-fix">
+/* Keep the language switcher in the top header beside Home and Logout. */
+.site-header .header-actions .language-control,
+.site-header .header-actions [data-language-control],
+.site-header .header-actions [data-language-selector],
+.site-header .header-actions .language-switcher,
+.site-header .header-actions button[aria-label*="Language" i],
+.site-header .header-actions button[title*="Language" i],
+.site-header .header-actions select[aria-label*="Language" i]{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  gap:.45rem!important;flex:0 0 auto!important;width:auto!important;max-width:100%!important;
+  min-height:40px!important;margin:0!important;padding:.45rem .72rem!important;
+  border:1px solid rgba(148,163,184,.28)!important;border-radius:11px!important;
+  background:rgba(255,255,255,.07)!important;color:#f8fafc!important;
+  font:700 .76rem/1.2 inherit!important;white-space:nowrap!important;position:relative!important;
+}
+.site-header .header-actions .language-control *,
+.site-header .header-actions [data-language-control] *,
+.site-header .header-actions [data-language-selector] *{max-width:100%!important}
+.site-header .header-actions .language-control [role="menu"],
+.site-header .header-actions [data-language-control] [role="menu"],
+.site-header .header-actions [data-language-selector] [role="menu"]{
+  position:fixed!important;z-index:10000!important;top:auto!important;left:auto!important;
+  right:12px!important;max-width:calc(100vw - 24px)!important;
+  max-height:70vh!important;overflow:auto!important;
+}
+@media(max-width:650px){
+ .site-header .header-actions .language-control,
+ .site-header .header-actions [data-language-control],
+ .site-header .header-actions [data-language-selector],
+ .site-header .header-actions .language-switcher,
+ .site-header .header-actions button[aria-label*="Language" i],
+ .site-header .header-actions button[title*="Language" i],
+ .site-header .header-actions select[aria-label*="Language" i]{
+   min-width:0!important;max-width:100%!important;justify-content:flex-start!important;
+   white-space:normal!important;padding:10px!important;font-size:.72rem!important
+ }
+}
+</style>
+<script id="manlung-language-header-placement-fix">
+(function(){
+  if(window.__manlungLanguageHeaderPlacementFix)return;
+  window.__manlungLanguageHeaderPlacementFix=true;
+  function placeLanguageControl(){
+    var header=document.querySelector('.site-header .header-actions');
+    if(!header)return;
+    var candidates=Array.from(document.querySelectorAll(
+      '.language-control,[data-language-control],[data-language-selector],.language-switcher,'+
+      '[id*="language" i],[class*="language-selector" i],[class*="language-switcher" i],'+
+      'button[aria-label*="Language" i],button[title*="Language" i],select[aria-label*="Language" i]'
+    ));
+    if(!candidates.length){
+      candidates=Array.from(document.querySelectorAll('button,a,[role="button"],select'))
+        .filter(function(el){
+          if(el.closest('.site-header .header-actions'))return false;
+          if(el.closest('[role="menu"],[role="listbox"],.language-menu,.language-dropdown'))return false;
+          var label=((el.innerText||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.title||'')).trim();
+          return /^(?:🌐\s*)?Language(?:\s*[:▼⌄▾])?$|^Choose language$/i.test(label);
+        });
+    }
+    var control=candidates.find(function(el){
+      if(!el||!el.isConnected||el.closest('[role="menu"],[role="listbox"],.language-menu,.language-dropdown'))return false;
+      if(el.matches('html,body,script,style'))return false;
+      return !el.closest('.site-header .header-actions');
+    });
+    if(!control)return;
+    /* Move the smallest real control, not its whole sidebar or popover container. */
+    var wrapper=control.closest('.language-control,[data-language-control],[data-language-selector],.language-switcher');
+    if(wrapper)control=wrapper;
+    if(control===header||header.contains(control))return;
+    control.classList.add('language-control');
+    control.style.setProperty('order','90');
+    var home=Array.from(header.querySelectorAll('a,button')).find(function(el){
+      return (el.innerText||'').trim().toLowerCase()==='home'||el.getAttribute('href')==='/';
+    });
+    if(home)header.insertBefore(control,home);else header.appendChild(control);
+    control.setAttribute('data-manlung-header-language','true');
+  }
+  function start(){
+    placeLanguageControl();
+    var observer=new MutationObserver(function(){placeLanguageControl();});
+    observer.observe(document.body,{childList:true,subtree:true});
+    window.addEventListener('resize',placeLanguageControl,{passive:true});
+    setTimeout(placeLanguageControl,400);
+    setTimeout(placeLanguageControl,1400);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+</script>
+
 </body>
 </html>
