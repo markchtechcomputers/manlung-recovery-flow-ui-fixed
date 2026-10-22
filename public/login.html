@@ -1354,6 +1354,44 @@ html body.manlung-auth-page.dark .manlung-auth-tabs button.active {
 }
 </style>
 
+
+<style id="manlung-social-icons-transparent-v1">
+/* Social sign-in should show clean provider icons without white icon-holder circles. */
+html body.manlung-auth-page .manlung-social-grid .manlung-social-icon,
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn,
+html body.manlung-auth-page.dark .manlung-social-grid .manlung-social-icon,
+html body.manlung-auth-page.dark .manlung-social-grid .manlung-google-btn {
+  position:relative!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  justify-self:center!important;width:54px!important;min-width:54px!important;max-width:54px!important;
+  height:54px!important;min-height:54px!important;padding:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;overflow:visible!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-icon i {
+  font-size:30px!important;color:#202938!important;
+}
+html body.manlung-auth-page.dark .manlung-social-grid .manlung-social-icon i {color:#f8fafc!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-discord-icon img {
+  width:31px!important;height:31px!important;object-fit:contain!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-icon:hover,
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:hover {
+  transform:translateY(-2px)!important;border:0!important;box-shadow:none!important;background:transparent!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn .manlung-google-glyph {
+  display:flex;align-items:center;justify-content:center;width:32px;height:32px;
+  font-family:Arial,sans-serif;font-size:30px;font-weight:700;line-height:1;
+  background:conic-gradient(from -45deg,#4285f4 0deg 90deg,#34a853 90deg 180deg,#fbbc05 180deg 250deg,#ea4335 250deg 310deg,#4285f4 310deg 360deg);
+  color:transparent;background-clip:text;-webkit-background-clip:text;pointer-events:none;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe {
+  position:absolute!important;inset:0!important;width:54px!important;height:54px!important;
+  max-width:54px!important;opacity:0!important;z-index:2!important;cursor:pointer!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-within {outline:2px solid #60a5fa!important;outline-offset:3px!important}
+</style>
+
 </head>
 <body class="manlung-auth-page">
 <div class="fa-floating-orb fa-orb-1" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-2" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-3" aria-hidden="true"></div>
@@ -2094,6 +2132,13 @@ async function setupOfficialGoogleButtons(){
       host.innerHTML='';
       host.setAttribute('aria-label','Continue with Google');
       host.setAttribute('title','Continue with Google');
+      // Show a clean Google G glyph while keeping Google's real sign-in button
+      // as an invisible, clickable overlay (the provider iframe cannot be styled internally).
+      const googleGlyph=document.createElement('span');
+      googleGlyph.className='manlung-google-glyph';
+      googleGlyph.setAttribute('aria-hidden','true');
+      googleGlyph.textContent='G';
+      host.appendChild(googleGlyph);
       // Use Google's real, interactive Identity Services button rather than the
       // One Tap prompt. One Tap is not a reliable click-triggered sign-in flow.
       google.accounts.id.renderButton(host,{
