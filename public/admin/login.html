@@ -116,7 +116,13 @@ body:has(.center-wrap){background:radial-gradient(ellipse at 12% 8%,rgba(20,184,
 .footer-text,footer,.site-footer,.manlung-footer,.manlung-footer-bottom{display:none!important}
 @media(max-width:480px){.center-wrap{align-items:flex-start;padding:18px 12px!important}.login-container{padding:25px 20px!important;border-radius:20px!important}.login-container .logo{margin-bottom:22px}}
 @media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
-</style></head>
+</style><style id="manlung-admin-turnstile-single-use-fix">
+/* Keep the challenge visible and give configuration/load failures readable feedback. */
+#adminTurnstile{min-height:65px;display:flex;justify-content:center;align-items:center;overflow-x:auto}
+#loginError{overflow-wrap:anywhere}
+</style>
+
+</head>
 <body>
     <div class="center-wrap">
         <div class="login-container">
@@ -350,10 +356,19 @@ body:has(.center-wrap){background:radial-gradient(ellipse at 12% 8%,rgba(20,184,
             const password = document.getElementById('adminPassword').value;
             const errorEl = document.getElementById('loginError');
             errorEl.textContent = '';
+            let submittedTurnstileToken = false;
 
             try {
-                const turnstileToken=adminTurnstileEnabled&&window.turnstile&&adminTurnstileWidget!==null?window.turnstile.getResponse(adminTurnstileWidget):null;
-                if(adminTurnstileEnabled&&!turnstileToken){document.getElementById('loginError').textContent='Please complete the Cloudflare security verification.';return;}
+                if (adminTurnstileEnabled && (!window.turnstile || adminTurnstileWidget === null)) {
+                    errorEl.textContent = 'Cloudflare security verification has not loaded yet. Refresh the page and try again.';
+                    return;
+                }
+                const turnstileToken = adminTurnstileEnabled ? window.turnstile.getResponse(adminTurnstileWidget) : null;
+                if (adminTurnstileEnabled && !turnstileToken) {
+                    errorEl.textContent = 'Please complete the Cloudflare security verification.';
+                    return;
+                }
+                submittedTurnstileToken = Boolean(turnstileToken);
                 const response = await fetch('/api/auth/admin/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -391,6 +406,14 @@ body:has(.center-wrap){background:radial-gradient(ellipse at 12% 8%,rgba(20,184,
             } catch (error) {
                 errorEl.textContent = error?.message || 'Unable to reach the login service. Please try again.';
                 console.error('Login error:', error);
+            } finally {
+                // Cloudflare Turnstile responses are single-use. Reset after every
+                // submitted attempt so invited admins can retry without a stale token.
+                if (submittedTurnstileToken && adminTurnstileEnabled && window.turnstile && adminTurnstileWidget !== null) {
+                    try { window.turnstile.reset(adminTurnstileWidget); } catch (resetError) {
+                        console.warn('Could not reset Cloudflare verification widget:', resetError);
+                    }
+                }
             }
         }
 
