@@ -1131,6 +1131,74 @@ html body.manlung-auth-page .fa-theme-toggle .manlung-theme-icon{width:22px!impo
  html body.manlung-auth-page .fa-theme-toggle .manlung-theme-icon{width:20px!important;height:20px!important;max-width:20px!important;max-height:20px!important}
 }
 </style>
+<style id="manlung-tabs-background-and-google-final-fix">
+/* The tabs' pale surface is a backing layer, never a layer above the labels. */
+html body.manlung-auth-page .manlung-auth-tabs{
+ position:relative!important;isolation:isolate!important;overflow:visible!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ padding:5px!important;gap:5px!important;
+}
+html body.manlung-auth-page .manlung-auth-tabs::before{
+ content:""!important;position:absolute!important;inset:0!important;z-index:-1!important;
+ display:block!important;border-radius:15px!important;
+ background:rgba(226,232,240,.78)!important;
+ border:1px solid rgba(148,163,184,.28)!important;
+ box-shadow:inset 0 1px 2px rgba(15,23,42,.05)!important;
+ pointer-events:none!important;
+}
+html body.manlung-auth-page .manlung-auth-tabs button{
+ position:relative!important;z-index:1!important;flex:1 1 0!important;
+ min-width:0!important;isolation:isolate!important;
+}
+html body.manlung-auth-page .manlung-auth-tabs button:not(.active){
+ background:transparent!important;color:#1e293b!important;
+ -webkit-text-fill-color:#1e293b!important;opacity:1!important;
+}
+html body.manlung-auth-page .manlung-auth-tabs button.active{
+ position:relative!important;z-index:2!important;
+ background:linear-gradient(135deg,#2563eb,#4f46e5)!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+ box-shadow:0 5px 12px rgba(37,99,235,.2)!important;
+}
+html body.manlung-auth-page.dark .manlung-auth-tabs::before{
+ background:rgba(15,23,42,.86)!important;border-color:rgba(100,116,139,.55)!important;
+ box-shadow:inset 0 1px 2px rgba(0,0,0,.2)!important;
+}
+html body.manlung-auth-page.dark .manlung-auth-tabs button:not(.active){
+ background:transparent!important;color:#f1f5f9!important;
+ -webkit-text-fill-color:#f1f5f9!important;
+}
+html body.manlung-auth-page.dark .manlung-auth-tabs button.active{
+ background:linear-gradient(135deg,#2563eb,#4f46e5)!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+}
+/* Center the official Google Identity Services icon without clipping its click target. */
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
+ position:relative!important;display:flex!important;align-items:center!important;
+ justify-content:center!important;overflow:visible!important;padding:0!important;
+ background:#fff!important;border:1px solid #cbd5e1!important;border-radius:50%!important;
+ box-shadow:0 2px 8px rgba(15,23,42,.08)!important;cursor:pointer!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn>div{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ margin:auto!important;max-width:100%!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe{
+ display:block!important;position:relative!important;opacity:1!important;visibility:visible!important;
+ width:40px!important;height:40px!important;max-width:40px!important;max-height:40px!important;
+ min-width:40px!important;min-height:40px!important;border:0!important;margin:auto!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-within{
+ outline:3px solid rgba(59,130,246,.45)!important;outline-offset:3px!important;
+}
+@media(max-width:520px){
+ html body.manlung-auth-page .manlung-auth-tabs{padding:4px!important}
+ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe{
+  width:38px!important;height:38px!important;max-width:38px!important;max-height:38px!important;
+  min-width:38px!important;min-height:38px!important;
+ }
+}
+</style>
 </head>
 <body class="manlung-auth-page">
 <div class="fa-floating-orb fa-orb-1" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-2" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-3" aria-hidden="true"></div>
