@@ -294,6 +294,29 @@ function checkValidation(req, res) {
 }
 
 
+// Public, read-only invitation check used to populate the locked email field.
+// The raw token is never returned and invalid/expired/accepted invitations are rejected.
+router.get('/admin/invitation/:token', async (req, res) => {
+  const token = String(req.params.token || '').trim();
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    return res.status(400).json({ valid: false, error: 'This invitation link is missing or invalid.' });
+  }
+  try {
+    const invitation = await AdminInvitation.findValid(token);
+    if (!invitation) {
+      return res.status(404).json({ valid: false, error: 'This admin invitation is invalid or expired. Please contact the Owner for a new invitation.' });
+    }
+    return res.status(200).json({
+      valid: true,
+      email: String(invitation.email || '').toLowerCase(),
+      expiresAt: invitation.expires_at || null
+    });
+  } catch (error) {
+    console.error('Admin invitation validation error:', error);
+    return res.status(500).json({ valid: false, error: 'Could not verify this invitation right now. Please refresh and try again.' });
+  }
+});
+
 // ============================================================
 // ADMIN REGISTRATION
 // Invitation required — clients cannot self-promote.
