@@ -934,6 +934,85 @@ html body.manlung-auth-page.dark .manlung-social-grid .manlung-discord-icon img{
 @media(max-width:520px){html body.manlung-auth-page .manlung-social-grid{gap:14px!important}}
 </style>
 
+
+<style id="manlung-google-custom-icon-and-social-alignment">
+/* Use the requested Google artwork while keeping Google's real sign-in iframe clickable. */
+html body.manlung-auth-page .manlung-social-grid{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex-wrap:nowrap!important;
+  gap:16px!important;
+  width:100%!important;
+  margin-inline:auto!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-icon,
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
+  position:relative!important;
+  display:flex!important;
+  flex:0 0 54px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  justify-self:center!important;
+  box-sizing:border-box!important;
+  width:54px!important;
+  min-width:54px!important;
+  max-width:54px!important;
+  height:54px!important;
+  min-height:54px!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border-radius:50%!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
+  background-image:url("https://i.postimg.cc/Jn2xygTC/icons8-google-48-(1).png")!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:32px 32px!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe{
+  position:absolute!important;
+  inset:0!important;
+  z-index:2!important;
+  display:block!important;
+  width:100%!important;
+  min-width:100%!important;
+  max-width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  max-height:100%!important;
+  opacity:0!important;
+  cursor:pointer!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-icon img{
+  display:block!important;
+  width:28px!important;
+  height:28px!important;
+  object-fit:contain!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-icon i{
+  display:block!important;
+  font-size:25px!important;
+  line-height:1!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-within,
+html body.manlung-auth-page .manlung-social-grid .manlung-social-icon:focus-visible{
+  outline:3px solid rgba(59,130,246,.55)!important;
+  outline-offset:3px!important;
+}
+@media(max-width:520px){
+  html body.manlung-auth-page .manlung-social-grid{gap:14px!important}
+  html body.manlung-auth-page .manlung-social-grid .manlung-social-icon,
+  html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
+    flex-basis:50px!important;width:50px!important;min-width:50px!important;
+    max-width:50px!important;height:50px!important;min-height:50px!important;
+  }
+  html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{background-size:30px 30px!important}
+}
+</style>
+
 </head>
 <body class="manlung-auth-page">
 <div class="fa-floating-orb fa-orb-1" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-2" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-3" aria-hidden="true"></div>
