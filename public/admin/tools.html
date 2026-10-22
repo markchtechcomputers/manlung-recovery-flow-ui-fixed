@@ -78,6 +78,103 @@ body{margin:0;background:var(--tool-bg);color:var(--tool-text);font-family:Inter
 .device-recovery-feature{margin-top:22px}.device-recovery-feature .eyebrow{margin-bottom:3px}.device-recovery-hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.75fr);gap:18px;padding:20px;border:1px solid var(--tool-line);border-radius:18px;background:linear-gradient(145deg,var(--tool-card),rgba(36,81,214,.045));box-shadow:0 10px 30px rgba(15,23,42,.07)}.device-recovery-copy{display:grid;grid-template-columns:116px minmax(0,1fr);gap:18px;align-items:start}.device-recovery-icon{width:116px;height:116px;border:1px solid var(--tool-line);border-radius:22px;padding:10px;background:var(--tool-bg);display:grid;place-items:center;overflow:hidden;box-shadow:0 8px 20px rgba(15,23,42,.12)}.device-recovery-icon img{width:100%;height:100%;object-fit:contain}.device-recovery-copy h3{margin:8px 0 7px;font-size:1.35rem}.device-recovery-copy p{margin:0;color:var(--tool-muted);line-height:1.6;font-size:.86rem;max-width:760px}.device-recovery-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}.device-recovery-tags span{padding:6px 9px;border:1px solid var(--tool-line);border-radius:999px;background:rgba(100,116,139,.06);font-size:.67rem;color:var(--tool-muted)}.device-recovery-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.device-recovery-summary>div{padding:13px;border:1px solid var(--tool-line);border-radius:13px;background:rgba(255,255,255,.02)}.device-recovery-summary strong{display:block;font-size:.68rem;color:var(--tool-accent);letter-spacing:.08em}.device-recovery-summary span{display:block;margin-top:3px;font-size:.8rem;font-weight:800}.device-recovery-summary small{display:block;margin-top:5px;color:var(--tool-muted);font-size:.68rem;line-height:1.45}@media(max-width:850px){.device-recovery-hero{grid-template-columns:1fr}.device-recovery-copy{grid-template-columns:88px minmax(0,1fr)}.device-recovery-icon{width:88px;height:88px;border-radius:17px}}@media(max-width:560px){.device-recovery-copy{grid-template-columns:1fr}.device-recovery-icon{width:92px;height:92px}.device-recovery-summary{grid-template-columns:1fr}.device-recovery-copy .hero-actions{width:100%}.device-recovery-copy .hero-actions a{flex:1}}
 </style>
     <link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261022">
+<style id="tools-header-no-sidebar">
+/* Header navigation replaces the fixed side drawer on all screen sizes. */
+.site-header{
+  display:block!important;position:sticky!important;top:0!important;z-index:1000!important;
+  width:100%!important;padding:0!important;background:var(--tool-card,#fff)!important;
+  border-bottom:1px solid var(--tool-line,#e5e7eb)!important;
+  box-shadow:0 3px 16px rgba(15,23,42,.07)!important
+}
+.site-header:after{content:"";display:block!important;height:3px!important;background:linear-gradient(90deg,transparent,#0EA5E9,#14B8A6,transparent)!important}
+.site-header>.container{
+  width:100%!important;max-width:1480px!important;min-height:78px!important;margin:0 auto!important;
+  padding:12px clamp(16px,3vw,36px)!important;display:flex!important;align-items:center!important;
+  justify-content:space-between!important;gap:20px!important;flex-wrap:wrap!important
+}
+.site-header .brand{display:flex!important;align-items:center!important;gap:11px!important;flex:0 1 auto!important;width:auto!important;min-width:190px!important}
+.site-header .admin-portal-logo{width:45px!important;height:45px!important;flex:0 0 45px!important;border-radius:12px!important;object-fit:contain!important}
+.site-header .manlung-brand-copy h1{margin:0!important;color:var(--tool-text,#1C2B33)!important;font-size:15px!important;font-weight:850!important;line-height:1.2!important}
+.site-header .manlung-brand-copy span{display:block!important;margin-top:4px!important;color:var(--tool-muted,#7B8C98)!important;font-size:10px!important;line-height:1.3!important;white-space:normal!important}
+.header-actions{
+  display:flex!important;flex:1 1 520px!important;flex-direction:row!important;align-items:center!important;
+  justify-content:flex-end!important;flex-wrap:wrap!important;gap:8px!important;width:auto!important;min-width:0!important;
+  margin:0!important;padding:0!important;float:none!important;position:static!important;transform:none!important
+}
+.header-actions>a,.header-actions>button{
+  display:inline-flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;
+  justify-content:center!important;gap:7px!important;min-width:0!important;min-height:42px!important;height:auto!important;
+  max-width:100%!important;margin:0!important;padding:10px 13px!important;border:1px solid var(--tool-line,#e5e7eb)!important;
+  border-radius:11px!important;background:var(--tool-card,#fff)!important;color:var(--tool-text,#1C2B33)!important;
+  font-size:11px!important;font-weight:800!important;line-height:1.2!important;text-align:center!important;text-decoration:none!important;
+  white-space:nowrap!important;box-shadow:none!important;cursor:pointer!important;transform:none!important
+}
+.header-actions>a>i,.header-actions>button>i{display:inline-block!important;width:auto!important;min-width:0!important;margin:0!important;color:inherit!important;font-size:15px!important;line-height:1!important}
+.header-actions>a:hover,.header-actions>button:hover{background:#effaff!important;border-color:#7dd3fc!important;color:#075985!important}
+html.dark .site-header{background:#111d29!important;border-color:#293949!important}
+html.dark .header-actions>a,html.dark .header-actions>button{background:#111d29!important;color:#e2e8f0!important;border-color:#293949!important}
+html.dark .header-actions>a:hover,html.dark .header-actions>button:hover{background:#122c3c!important;border-color:#0ea5e9!important;color:#e0f2fe!important}
+.header-actions>a.dashboard-header-btn,.header-actions>a[href="/admin/dashboard.html"]{
+  min-height:44px!important;padding:11px 16px!important;background:#0C3A4A!important;border-color:#0C3A4A!important;
+  color:#fff!important;box-shadow:0 5px 13px rgba(12,58,74,.14)!important
+}
+.header-actions>a.dashboard-header-btn>i{font-size:16px!important}
+.header-actions>a.dashboard-header-btn:hover,.header-actions>a[href="/admin/dashboard.html"]:hover{background:#0EA5E9!important;border-color:#0EA5E9!important;color:#fff!important}
+html.dark .header-actions>a.dashboard-header-btn,html.dark .header-actions>a[href="/admin/dashboard.html"]{background:#0c718d!important;border-color:#0c718d!important;color:#fff!important}
+/* Remove all remnants of the drawer/sidebar; navigation now stays in the header. */
+.ml-admin-sidebar,.ml-admin-menu-overlay,.ml-admin-menu-toggle{display:none!important}
+body.ml-admin-menu-open{overflow:auto!important}
+.tools-shell{width:100%!important;max-width:1480px!important;margin:0 auto!important;padding:28px clamp(16px,3vw,36px) 42px!important}
+.manlung-footer{width:100%!important;margin:0!important}
+.manlung-footer-inner{max-width:1480px!important}
+/* More prominent tool icons and larger URL-sourced artwork previews. */
+.tool-icon{width:72px!important;height:72px!important;flex-basis:72px!important;border-radius:18px!important;font-size:30px!important}
+.tool-image-card .tool-icon{width:100%!important;height:205px!important;max-height:205px!important;min-height:205px!important;flex-basis:auto!important;border-radius:16px!important}
+.tool-image-card .tool-image{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;border-radius:15px!important}
+.tool-image-card .tool-top{min-height:205px!important}
+.tool-card h3{font-size:1.05rem!important;margin-top:17px!important}
+.device-recovery-icon{width:96px!important;height:96px!important;border-radius:20px!important}
+.device-recovery-copy{grid-template-columns:96px minmax(0,1fr)!important}
+@media(max-width:1040px){
+ .site-header>.container{align-items:flex-start!important}
+ .header-actions{justify-content:flex-start!important;flex-basis:100%!important}
+ .tool-image-card .tool-icon{height:180px!important;min-height:180px!important;max-height:180px!important}
+ .tool-image-card .tool-top{min-height:180px!important}
+}
+@media(max-width:760px){
+ .site-header{display:block!important;position:sticky!important;top:0!important}
+ .site-header>.container{min-height:0!important;padding:12px 14px!important;gap:12px!important;align-items:center!important}
+ .site-header .brand{min-width:0!important;flex:1 1 100%!important;gap:9px!important}
+ .site-header .admin-portal-logo{width:40px!important;height:40px!important;flex-basis:40px!important}
+ .site-header .manlung-brand-copy h1{font-size:14px!important}
+ .site-header .manlung-brand-copy span{font-size:10px!important}
+ .header-actions{display:flex!important;flex:1 1 100%!important;justify-content:flex-start!important;gap:7px!important}
+ .header-actions>a,.header-actions>button{min-height:39px!important;padding:9px 10px!important;font-size:10px!important}
+ .header-actions>a>i,.header-actions>button>i{font-size:14px!important}
+ .header-actions>a.dashboard-header-btn,.header-actions>a[href="/admin/dashboard.html"]{order:-1!important}
+ .tools-shell{padding:19px 14px 30px!important}
+ .manlung-footer{width:100%!important;margin:0!important}
+ .tool-icon{width:64px!important;height:64px!important;flex-basis:64px!important;font-size:27px!important}
+ .tool-image-card .tool-icon{height:210px!important;min-height:210px!important;max-height:210px!important}
+ .tool-image-card .tool-top{min-height:210px!important}
+ .device-recovery-copy{grid-template-columns:78px minmax(0,1fr)!important}
+ .device-recovery-icon{width:78px!important;height:78px!important}
+}
+@media(max-width:560px){
+ .site-header>.container{padding:11px 12px!important}
+ .site-header .brand{flex-basis:100%!important}
+ .header-actions{gap:6px!important}
+ .header-actions>a,.header-actions>button{flex:1 1 auto!important;min-width:max-content!important;justify-content:center!important;padding:9px 10px!important;font-size:10px!important}
+ .header-actions>a.dashboard-header-btn,.header-actions>a[href="/admin/dashboard.html"]{flex:1 0 100%!important;justify-content:center!important}
+ .tools-shell{padding:14px 12px 26px!important}
+ .tool-icon{width:60px!important;height:60px!important;flex-basis:60px!important;font-size:25px!important}
+ .tool-image-card .tool-icon{height:210px!important;min-height:210px!important;max-height:210px!important}
+ .tool-image-card .tool-top{min-height:210px!important}
+ .device-recovery-copy{grid-template-columns:minmax(0,1fr)!important}
+ .device-recovery-icon{width:72px!important;height:72px!important}
+}
+@media(prefers-reduced-motion:reduce){.tool-card,.tool-action i{transition:none!important}.tool-card:hover{transform:none!important}}
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -87,7 +184,7 @@ body{margin:0;background:var(--tool-bg);color:var(--tool-text);font-family:Inter
       <div class="manlung-brand-copy"><h1>Manlung Recovery</h1><span>Admin Tools · Investigation &amp; Operations Center</span></div>
     </div>
     <div class="header-actions" aria-label="Admin navigation">
-      <a class="btn btn-outline" href="/admin/dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
+      <a class="btn btn-primary dashboard-header-btn" href="/admin/dashboard.html"><i class="fas fa-gauge-high"></i> Admin Dashboard</a>
       <a class="btn btn-outline" href="/admin/reports.html"><i class="fas fa-chart-column"></i> Reports</a>
       <a class="btn btn-outline" href="/admin/operations.html"><i class="fas fa-list-check"></i> Operations</a>
       <a class="btn btn-outline" href="/admin/tools.html" aria-current="page"><i class="fas fa-toolbox"></i> Tools</a>
@@ -845,71 +942,7 @@ html.dark .tools-hero,html.dark .panel,html.dark .tool-card,html.dark .device-re
 html.dark .tools-hero h1,html.dark .panel-title h2,html.dark .section-head h2,html.dark .tool-card h3,html.dark .device-recovery-copy h3{color:var(--tool-text)!important}
 html.dark .tool-card p,html.dark .tools-hero p,html.dark .section-head p{color:var(--tool-muted)!important}
 </style>
-<script id="manlung-admin-sidebar-nav-script">
-(function(){
- if(window.__manlungAdminSidebarNavInstalled)return;
- window.__manlungAdminSidebarNavInstalled=true;
- function init(){
-  var header=document.querySelector('.site-header');
-  var actions=header&&header.querySelector('.header-actions');
-  var container=header&&header.querySelector('.container');
-  if(!header||!actions||!container||document.querySelector('.ml-admin-menu-toggle'))return;
-  var toggle=document.createElement('button');
-  toggle.type='button';toggle.className='ml-admin-menu-toggle';
-  toggle.setAttribute('aria-label','Open admin navigation');toggle.setAttribute('aria-expanded','false');
-  toggle.innerHTML='<i class="fas fa-bars" aria-hidden="true"></i><span>MENU</span>';
-  container.appendChild(toggle);
-  var overlay=document.createElement('div');overlay.className='ml-admin-menu-overlay';
-  overlay.setAttribute('aria-hidden','true');
-  var sidebar=document.createElement('aside');sidebar.className='ml-admin-sidebar';
-  sidebar.setAttribute('aria-label','Admin navigation');sidebar.setAttribute('aria-hidden','true');
-  sidebar.innerHTML='<div class="ml-admin-sidebar-head"><div><div class="ml-admin-sidebar-title">Manlung Recovery</div><div class="ml-admin-sidebar-subtitle">Administration</div></div><button type="button" class="ml-admin-sidebar-close" aria-label="Close navigation">×</button></div>';
-  var extraNav=[['/admin/operations.html','fa-list-check','Operations'],['/admin/tools.html','fa-toolbox','Tools'],['/admin/music.html','fa-music','Music'],['/admin/connect.html','fa-users','Community'],['/','fa-house','Home']];
-  extraNav.forEach(function(item){
-   if(!Array.prototype.some.call(actions.querySelectorAll('a'),function(a){return a.getAttribute('href')===item[0]})){
-    var a=document.createElement('a');a.href=item[0];a.innerHTML='<i class="fas '+item[1]+'" aria-hidden="true"></i><span>'+item[2]+'</span>';
-    if(item[0]==='/admin/tools.html'){a.setAttribute('aria-current','page')}
-    actions.appendChild(a);
-   }
-  });
-  sidebar.appendChild(actions);document.body.append(overlay,sidebar);
-  var close=sidebar.querySelector('.ml-admin-sidebar-close');
-  function setOpen(open){
-   var desktop=window.matchMedia('(min-width: 761px)').matches;
-   if(desktop)open=true;
-   overlay.classList.toggle('is-open',!!open&&!desktop);
-   sidebar.classList.toggle('is-open',!!open);
-   document.body.classList.toggle('ml-admin-menu-open',!!open&&!desktop);
-   toggle.setAttribute('aria-expanded',String(!!open&&!desktop));
-   toggle.setAttribute('aria-label',open&&!desktop?'Close admin navigation':'Open admin navigation');
-   sidebar.setAttribute('aria-hidden',String(!open));
-   overlay.setAttribute('aria-hidden',String(!(open&&!desktop)));
-   if(open&&!desktop)close.focus();
-   else if(!open&&!desktop)toggle.focus();
-  }
-  function syncLayout(){
-   var desktop=window.matchMedia('(min-width: 761px)').matches;
-   if(desktop){
-    overlay.classList.remove('is-open');overlay.setAttribute('aria-hidden','true');
-    sidebar.classList.add('is-open');sidebar.setAttribute('aria-hidden','false');
-    document.body.classList.remove('ml-admin-menu-open');toggle.setAttribute('aria-expanded','false');
-   }else{
-    sidebar.classList.remove('is-open');sidebar.setAttribute('aria-hidden','true');
-    overlay.classList.remove('is-open');overlay.setAttribute('aria-hidden','true');
-    document.body.classList.remove('ml-admin-menu-open');toggle.setAttribute('aria-expanded','false');
-   }
-  }
-  toggle.addEventListener('click',function(){setOpen(!sidebar.classList.contains('is-open'))});
-  close.addEventListener('click',function(){setOpen(false)});
-  overlay.addEventListener('click',function(){setOpen(false)});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sidebar.classList.contains('is-open')&&!window.matchMedia('(min-width: 761px)').matches)setOpen(false)});
-  sidebar.addEventListener('click',function(e){if(e.target.closest('a')&&!window.matchMedia('(min-width: 761px)').matches)setOpen(false)});
-  window.addEventListener('resize',syncLayout);
-  syncLayout();
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-})();
-</script>
+
 
 <script id="manlung-tools-filter">
 (function(){
