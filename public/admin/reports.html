@@ -564,67 +564,117 @@ html.dark .operations-kpi:nth-child(6) strong{color:#f472b6}
 @media(max-width:700px){.operations-shell>.operations-head:after{font-size:.74rem}.operations-shell>.operations-head h2:after{font-size:1.15rem}}
 </style>
     <link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261022">
+ 
+<style id="reports-glass-redesign">
+:root{
+ --rg-primary:#635bff;--rg-primary-soft:#eae8ff;--rg-text:#1a1c24;--rg-muted:#737b91;
+ --rg-glass:rgba(255,255,255,.68);--rg-card:rgba(255,255,255,.86);--rg-border:rgba(255,255,255,.92);
+}
+html,body{min-height:100%;margin:0}
+body.admin-page-bg{
+ background:linear-gradient(135deg,#e6e9f0 0%,#d4d9ec 50%,#c2c9e8 100%) fixed!important;
+ color:var(--rg-text)!important;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif!important;
+}
+.reports-glass-header{
+ width:min(1300px,calc(100% - 32px));margin:18px auto 0;padding:18px 24px;
+ display:flex;align-items:center;gap:18px;position:relative;z-index:2;
+ border:1px solid var(--rg-border);border-radius:22px 22px 0 0;
+ background:rgba(255,255,255,.58);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+ box-shadow:0 12px 30px rgba(30,41,80,.06);
+}
+.reports-back-link{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:42px;
+ padding:10px 14px;border-radius:12px;background:#fff;border:1px solid #e1e5f3;color:var(--rg-primary);
+ text-decoration:none;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(15,23,42,.04)}
+.reports-back-link:hover{background:var(--rg-primary);border-color:var(--rg-primary);color:#fff}
+.reports-header-title{flex:1;min-width:0}
+.reports-header-title h1{font-size:22px;line-height:1.25;font-weight:700;letter-spacing:-.03em;margin:0 0 5px;color:#1a1c24}
+.reports-header-title p{font-size:12px;color:var(--rg-muted);margin:0}
+.reports-header-mark{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;
+ color:#fff;background:linear-gradient(135deg,#635bff,#9b92ff);box-shadow:0 7px 18px rgba(99,91,255,.25)}
+body.admin-page-bg main.container{
+ width:min(1300px,calc(100% - 32px))!important;max-width:1300px!important;
+ margin:0 auto 24px!important;padding:22px 26px 30px!important;
+ background:var(--rg-glass)!important;border:1px solid var(--rg-border)!important;border-top:0!important;
+ border-radius:0 0 24px 24px!important;box-shadow:0 20px 50px rgba(0,0,0,.09)!important;
+ backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+body.admin-page-bg .operations-shell,
+body.admin-page-bg .operations-card,
+body.admin-page-bg .operations-kpi,
+body.admin-page-bg .operations-report-kpi{
+ background:var(--rg-card)!important;border:1px solid var(--rg-border)!important;
+ border-radius:18px!important;box-shadow:0 8px 24px rgba(31,41,75,.055)!important;
+}
+body.admin-page-bg .operations-shell{padding:22px!important}
+body.admin-page-bg .operations-head h2{font-size:20px!important;font-weight:700!important;color:var(--rg-text)!important}
+body.admin-page-bg .operations-head h2 i,body.admin-page-bg .operations-card-title i,
+body.admin-page-bg .data-center-title i{color:var(--rg-primary)!important}
+body.admin-page-bg .operations-head p,body.admin-page-bg .operations-refresh,
+body.admin-page-bg .operations-report-kpi small,body.admin-page-bg .operations-kpi small{color:var(--rg-muted)!important}
+body.admin-page-bg .operations-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+body.admin-page-bg .operations-kpi{padding:17px!important}
+body.admin-page-bg .operations-kpi strong,body.admin-page-bg .operations-report-kpi strong{font-size:25px!important;font-weight:750!important;color:var(--rg-text)!important}
+body.admin-page-bg .operations-grid{gap:16px!important}
+body.admin-page-bg .operations-card{padding:20px!important}
+body.admin-page-bg .operations-card-title,body.admin-page-bg .data-center-title{font-size:14px!important;font-weight:700!important;color:var(--rg-text)!important}
+body.admin-page-bg .operations-report-kpi{padding:14px!important}
+body.admin-page-bg .operations-report-tab{border:1px solid #dedff0!important;background:#fff!important;color:#5d6478!important;border-radius:10px!important;font-weight:650!important}
+body.admin-page-bg .operations-report-tab.active{background:var(--rg-primary)!important;border-color:var(--rg-primary)!important;color:#fff!important}
+body.admin-page-bg .operations-date-panel{background:rgba(255,255,255,.74)!important}
+body.admin-page-bg .operations-admin-wrap{border:1px solid rgba(255,255,255,.95)!important;border-radius:14px!important;overflow:auto!important;background:rgba(255,255,255,.6)!important}
+body.admin-page-bg .operations-admin-table th{background:#f5f5ff!important;color:#626980!important}
+body.admin-page-bg .operations-admin-table td{color:#343849!important;border-bottom-color:#ececf4!important}
+body.admin-page-bg .operations-admin-table tbody tr:hover{background:#f7f7ff!important}
+body.admin-page-bg .operations-rank-row,body.admin-page-bg .coverage-row,
+body.admin-page-bg .coverage-insight,body.admin-page-bg .monthly-call-row{
+ background:rgba(255,255,255,.82)!important;border-color:#ececf6!important;border-radius:13px!important;
+}
+body.admin-page-bg .data-center-month{background:#eae8ff!important;color:#5148e5!important;border-radius:10px!important}
+body.admin-page-bg .operations-flow{gap:.35rem!important}
+body.admin-page-bg .operations-pie{filter:drop-shadow(0 4px 8px rgba(99,91,255,.12))}
+body.admin-page-bg .reports-flow-nav{display:none!important}
+body.admin-page-bg .ml-admin-menu-toggle,body.admin-page-bg .ml-admin-sidebar,
+body.admin-page-bg .ml-admin-menu-overlay{display:none!important}
+body.admin-page-bg footer,body.admin-page-bg .site-footer,body.admin-page-bg .manlung-footer{display:none!important}
+@media(max-width:900px){
+ body.admin-page-bg .operations-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ body.admin-page-bg main.container{padding:16px!important}
+ .reports-glass-header{padding:15px 16px;gap:12px}
+}
+@media(max-width:600px){
+ .reports-glass-header{width:calc(100% - 20px);margin-top:10px;padding:13px 12px;border-radius:18px 18px 0 0;gap:10px}
+ .reports-back-link{width:42px;min-width:42px;padding:0;font-size:0;gap:0}
+ .reports-back-link i{font-size:16px}
+ .reports-header-title h1{font-size:18px}
+ .reports-header-title p{font-size:10px;line-height:1.4}
+ .reports-header-mark{width:36px;height:36px;flex:0 0 36px}
+ body.admin-page-bg main.container{width:calc(100% - 20px)!important;margin-bottom:12px!important;padding:12px!important;border-radius:0 0 18px 18px!important}
+ body.admin-page-bg .operations-shell{padding:13px!important}
+ body.admin-page-bg .operations-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ body.admin-page-bg .operations-kpi{padding:12px!important}
+ body.admin-page-bg .operations-kpi strong,body.admin-page-bg .operations-report-kpi strong{font-size:20px!important}
+ body.admin-page-bg .operations-card{padding:13px!important}
+ body.admin-page-bg .operations-report-header{gap:12px!important}
+ body.admin-page-bg .operations-date-controls{flex-wrap:wrap!important}
+ body.admin-page-bg .operations-report-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(prefers-reduced-motion:reduce){body.admin-page-bg *{scroll-behavior:auto!important;transition:none!important}}
+</style>
+
 </head>
 
 <body class="admin-page-bg">
 
-<header class="site-header">
-    <div class="container">
-
-        <div class="brand">
-
-            <img
-                class="manlung-site-logo"
-                src="/icons/icon-512.png"
-                alt="Manlung Recovery"
-            >
-
-            <h1>
-                
-                Manlung Recovery Reports
-            </h1>
-
-            <span>
-                Company performance, cases, calls and admin activity
-            </span>
-
-        </div>
-
-        <div class="header-actions">
-
-            <a class="btn btn-outline"
-               href="/admin/dashboard.html">
-                
-                <span>Case Management</span>
-            </a>
-
-            <a class="btn btn-outline"
-               href="/admin/reports.html">
-                
-                <span>Reports</span>
-            </a>
-
-            <a class="btn btn-outline"
-               href="/admin/tools.html">
-                <span>Tools</span>
-            </a>
-
-            <a class="btn btn-outline"
-               href="/">
-                
-                <span>Home</span>
-            </a>
-
-            <button
-                class="btn btn-outline"
-                type="button"
-                onclick="logout()">
-                
-                <span>Logout</span>
-            </button>
-
-        </div>
-    </div>
+<header class="reports-glass-header">
+  <a class="reports-back-link" href="/admin/dashboard.html" aria-label="Back to Admin Dashboard" title="Back to Admin Dashboard">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Admin Dashboard</span>
+  </a>
+  <div class="reports-header-title">
+    <h1>Admin Reports</h1>
+    <p>Manlung Recovery · Live cases, calls and admin performance</p>
+  </div>
+  <div class="reports-header-mark" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></div>
 </header>
 
 <nav class="reports-flow-nav" aria-label="Reports sections">
@@ -2743,378 +2793,8 @@ function logout() {
   </div>
 </footer>
 
-<style id="manlung-admin-sidebar-nav">
-
-/* UI refinement: white navigation drawer and compact icons */
-.ml-admin-sidebar{background:#fff!important;color:#0f172a!important;border-left:1px solid #e2e8f0!important;box-shadow:-18px 0 48px #0f172a24!important}
-.ml-admin-sidebar-head{border-bottom-color:#e2e8f0!important}
-.ml-admin-sidebar-title{color:#0f172a!important}
-.ml-admin-sidebar-subtitle{color:#64748b!important}
-.ml-admin-sidebar-close{background:#f1f5f9!important;border-color:#cbd5e1!important;color:#334155!important;font-size:20px!important}
-.ml-admin-sidebar .header-actions a,.ml-admin-sidebar .header-actions button{background:#fff!important;border-color:#e2e8f0!important;color:#1e293b!important;min-height:44px!important;padding:10px 12px!important;font-size:.84rem!important;box-shadow:0 1px 2px rgba(15,23,42,.04)!important}
-.ml-admin-sidebar .header-actions a:hover,.ml-admin-sidebar .header-actions button:hover{background:#f1f5f9!important;border-color:#cbd5e1!important;color:#0f172a!important}
-.ml-admin-sidebar .header-actions a i,.ml-admin-sidebar .header-actions button i{font-size:15px!important;width:20px!important;color:#475569!important}
-.ml-admin-sidebar .header-actions a[href*="reports"] i{color:#16a34a!important}.ml-admin-sidebar .header-actions a[href*="music"] i{color:#9333ea!important}.ml-admin-sidebar .header-actions a[href*="connect"] i{color:#0891b2!important}
-.ml-admin-menu-toggle{min-height:38px!important;padding:8px 11px!important;border-radius:10px!important;font-size:12px!important;box-shadow:none!important}
-.ml-admin-menu-toggle i{font-size:15px!important}
-@media(max-width:650px){.ml-admin-menu-toggle{min-height:38px!important;padding:8px 10px!important}.ml-admin-menu-toggle i{font-size:16px!important}}
-
-.site-header .container{position:relative;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;min-height:68px!important}
-.site-header .header-actions{display:none!important}
-.ml-admin-menu-toggle{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:none;min-height:42px;padding:10px 14px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:#12345a;color:#fff;font:800 14px/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 5px 16px #02061733}
-.ml-admin-menu-toggle i{font-size:16px;color:#93c5fd}
-.ml-admin-menu-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(2,6,23,.58);opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s ease}
-.ml-admin-menu-overlay.is-open{opacity:1;visibility:visible}
-.ml-admin-sidebar{position:fixed;z-index:2147483001;top:0;right:0;bottom:0;width:min(340px,88vw);padding:calc(16px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;background:linear-gradient(160deg,#071525,#10233b 70%,#0b1727);color:#f8fafc;border-left:1px solid rgba(148,163,184,.22);box-shadow:-18px 0 48px #02061755;transform:translateX(105%);transition:transform .24s ease}
-.ml-admin-sidebar.is-open{transform:translateX(0)}
-.ml-admin-sidebar-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 2px 18px;margin-bottom:12px;border-bottom:1px solid #ffffff20}
-.ml-admin-sidebar-title{font-size:1rem;font-weight:900;letter-spacing:.01em}
-.ml-admin-sidebar-subtitle{margin-top:4px;color:#94a3b8;font-size:.72rem}
-.ml-admin-sidebar-close{width:40px;height:40px;border:1px solid #ffffff25;border-radius:10px;background:#ffffff0c;color:#fff;font-size:25px;cursor:pointer}
-.ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column;align-items:stretch;gap:8px;width:100%;padding:0}
-.ml-admin-sidebar .header-actions a,.ml-admin-sidebar .header-actions button{display:flex!important;align-items:center;justify-content:flex-start!important;gap:12px;width:100%;min-height:48px;padding:12px 14px!important;border:1px solid #ffffff1c!important;border-radius:12px!important;background:#ffffff08!important;color:#e5edf8!important;text-decoration:none;font-size:.88rem!important;font-weight:750!important;text-align:left;white-space:normal}
-.ml-admin-sidebar .header-actions a:hover,.ml-admin-sidebar .header-actions button:hover{background:#2563eb33!important;border-color:#60a5fa77!important;color:#fff!important}
-.ml-admin-sidebar .header-actions a i,.ml-admin-sidebar .header-actions button i{display:inline-block!important;width:22px!important;text-align:center;color:#93c5fd!important;font-size:1rem!important}
-.ml-admin-sidebar .header-actions a[href*="reports"] i{color:#4ade80!important}
-.ml-admin-sidebar .header-actions a[href*="music"] i{color:#f0abfc!important}
-.ml-admin-sidebar .header-actions a[href*="connect"] i{color:#67e8f9!important}
-.ml-admin-sidebar .header-actions .btn-danger{background:#7f1d1d44!important;border-color:#f8717144!important}
-body.ml-admin-menu-open{overflow:hidden}
-@media(max-width:650px){
- .site-header .container{padding:.55rem .7rem!important;gap:.6rem!important}
- .site-header .brand{flex:1;min-width:0;width:auto!important}
- .site-header .brand h1{font-size:.9rem!important}
- .site-header .brand span{white-space:normal!important;line-height:1.25}
- .site-header .manlung-site-logo{width:38px;height:38px;flex-basis:38px}
- .ml-admin-menu-toggle{min-height:40px;padding:9px 11px;font-size:0;gap:0}
- .ml-admin-menu-toggle i{font-size:19px}
-}
-@media(prefers-reduced-motion:reduce){.ml-admin-menu-overlay,.ml-admin-sidebar{transition:none}}
 
 
-/* Manlung Recovery admin layout — consolidated responsive header rules */
-*,*::before,*::after{box-sizing:border-box}
-html,body{max-width:100%;overflow-x:clip}
-body{margin:0}
-img,svg,video,canvas{max-width:100%}
-.site-header{width:100%;padding:12px max(16px,env(safe-area-inset-left)) 16px max(16px,env(safe-area-inset-right))}
-.site-header>.container{width:100%;max-width:1440px;margin-inline:auto;padding:0;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.site-header .brand{min-width:0;max-width:100%;flex:0 1 auto}
-.site-header .brand h1{margin:0}
-.site-header .header-actions,.header-actions,.top .actions,.music-nav{
- min-width:0;max-width:100%;display:flex;flex:1 1 100%;align-items:center;justify-content:flex-start;
- align-content:center;flex-wrap:wrap;gap:8px;margin:0;padding:0;float:none;position:static;transform:none
-}
-.site-header .header-actions>* ,.header-actions>* ,.top .actions>* ,.music-nav>*{
- flex:0 0 auto;min-width:0;max-width:100%;margin:0!important;float:none;position:static;transform:none;align-self:center
-}
-.site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,
-.top .actions a,.top .actions button,.music-nav a{
- box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:7px;
- min-height:36px;height:auto;max-width:100%;padding:8px 12px;line-height:1.2;white-space:normal;
- text-align:center;text-decoration:none;border-radius:9px;vertical-align:middle
-}
-.site-header .header-actions i,.header-actions i,.top .actions i,.music-nav i{font-size:14px;line-height:1;flex:0 0 auto}
-.site-header .header-actions [data-theme-toggle="true"],.header-actions [data-theme-toggle="true"]{
- width:36px;min-width:36px;max-width:36px;height:36px;min-height:36px;max-height:36px;padding:0;
- display:inline-flex;align-items:center;justify-content:center;overflow:hidden
-}
-.site-header .header-actions [data-theme-toggle="true"] i,.site-header .header-actions [data-theme-toggle="true"] svg,
-.header-actions [data-theme-toggle="true"] i,.header-actions [data-theme-toggle="true"] svg{
- width:14px;min-width:14px;max-width:14px;height:14px;min-height:14px;max-height:14px;font-size:14px;line-height:14px
-}
-.site-header .header-actions .btn-danger,.header-actions .btn-danger,.top .actions .btn-danger,.music-nav .btn-danger,
-a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="logout"]{
- background:#dc3545;color:#fff;border:1px solid #c82333
-}
-.site-header .header-actions .btn-danger:hover,.header-actions .btn-danger:hover,.top .actions .btn-danger:hover,a#ownerLogoutBtn:hover{
- background:#c82333;color:#fff
-}
-.music-header{width:100%;padding:12px max(16px,env(safe-area-inset-left)) 16px max(16px,env(safe-area-inset-right))}
-.music-header-inner{width:100%;max-width:1440px;margin-inline:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
-.music-brand{min-width:0;max-width:100%}
-.music-nav{flex:1 1 100%;width:100%;justify-content:flex-start}
-.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;max-width:100%;min-width:0}
-.top>div{min-width:0;max-width:100%}
-@media(min-width:900px){
- .site-header .header-actions,.header-actions,.top .actions,.music-nav{flex:1 1 100%}
-}
-@media(max-width:760px){
- .site-header{padding:12px max(12px,env(safe-area-inset-left)) 14px max(12px,env(safe-area-inset-right))}
- .site-header>.container,.music-header-inner{align-items:flex-start;gap:12px}
- .site-header .brand{width:100%}
- .site-header .header-actions,.header-actions,.top .actions,.music-nav{width:100%;justify-content:flex-start;gap:8px}
- .site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,.top .actions a,.top .actions button,.music-nav a{
-  min-height:36px;padding:8px 10px;font-size:.82rem
- }
- .top{align-items:flex-start}
-}
-@media(max-width:430px){
- .site-header .header-actions,.header-actions,.top .actions,.music-nav{gap:8px}
- .site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,.top .actions a,.top .actions button,.music-nav a{
-  min-height:36px;padding:8px 10px;font-size:.8rem
- }
-}
-@media(max-width:340px){
- .site-header .header-actions a,.site-header .header-actions button,.header-actions a,.header-actions button,.top .actions a,.top .actions button,.music-nav a{
-  padding:7px 8px;font-size:.76rem
- }
-}
-
-
-/* Keep reports page header actions aligned in a stable row */
-.site-header .header-actions,.header-actions{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%!important}
-.site-header .header-actions>* ,.header-actions>*{position:static!important;float:none!important;margin:0!important}
-.site-header .header-actions a[href="/admin/dashboard.html"]{order:1!important}
-.site-header .header-actions a[href="/admin/reports.html"]{order:2!important}
-.site-header .header-actions a[href="/admin/tools.html"]{order:3!important}
-.site-header .header-actions a[href="/"]{order:4!important}
-.site-header .header-actions button[onclick*="logout"],.header-actions button[onclick*="logout"]{order:5!important;background:#dc3545!important;color:#fff!important;border-color:#c82333!important}
-
-
-/* Navigation contrast and alignment correction */
-.ml-admin-sidebar{background:#fff!important;color:#111827!important}
-.ml-admin-sidebar .ml-admin-sidebar-title{color:#111827!important}
-.ml-admin-sidebar .ml-admin-sidebar-subtitle{color:#475569!important}
-.ml-admin-sidebar .header-actions{align-items:stretch!important;justify-content:flex-start!important;text-align:left!important;margin:0!important;padding:0!important}
-.ml-admin-sidebar .header-actions a,
-.ml-admin-sidebar .header-actions button,
-.ml-admin-sidebar .header-actions select,
-.ml-admin-sidebar .header-actions [role="button"]{
-  display:flex!important;align-items:center!important;justify-content:flex-start!important;
-  width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;
-  text-align:left!important;color:#111827!important;background:#fff!important;
-  border-color:#e2e8f0!important;box-shadow:none!important;
-}
-.ml-admin-sidebar .header-actions a span,
-.ml-admin-sidebar .header-actions button span{ text-align:left!important }
-.ml-admin-sidebar .header-actions a i,
-.ml-admin-sidebar .header-actions button i{color:#475569!important}
-.ml-admin-sidebar .header-actions a[href*="logout"],
-.ml-admin-sidebar .header-actions button[onclick*="logout"],
-.ml-admin-sidebar .header-actions button[id*="Logout"],
-.ml-admin-sidebar .header-actions .btn-danger{
-  color:#fff!important;background:#dc2626!important;border-color:#b91c1c!important
-}
-.ml-admin-sidebar .header-actions a[href*="logout"] i,
-.ml-admin-sidebar .header-actions button[onclick*="logout"] i,
-.ml-admin-sidebar .header-actions button[id*="Logout"] i{color:#fff!important}
-.ml-admin-sidebar .header-actions a:hover,
-.ml-admin-sidebar .header-actions button:hover{color:#111827!important;background:#f1f5f9!important}
-.ml-admin-sidebar .header-actions a[href*="logout"]:hover,
-.ml-admin-sidebar .header-actions button[onclick*="logout"]:hover,
-.ml-admin-sidebar .header-actions .btn-danger:hover{color:#fff!important;background:#b91c1c!important}
-html.dark .ml-admin-sidebar,body.dark .ml-admin-sidebar,html[data-theme="dark"] .ml-admin-sidebar,body[data-theme="dark"] .ml-admin-sidebar{
- background:#0f172a!important;color:#f8fafc!important;border-color:#334155!important
-}
-html.dark .ml-admin-sidebar .ml-admin-sidebar-title,body.dark .ml-admin-sidebar .ml-admin-sidebar-title,
-html[data-theme="dark"] .ml-admin-sidebar .ml-admin-sidebar-title,body[data-theme="dark"] .ml-admin-sidebar .ml-admin-sidebar-title{color:#fff!important}
-html.dark .ml-admin-sidebar .ml-admin-sidebar-subtitle,body.dark .ml-admin-sidebar .ml-admin-sidebar-subtitle,
-html[data-theme="dark"] .ml-admin-sidebar .ml-admin-sidebar-subtitle,body[data-theme="dark"] .ml-admin-sidebar .ml-admin-sidebar-subtitle{color:#cbd5e1!important}
-html.dark .ml-admin-sidebar .header-actions a,html.dark .ml-admin-sidebar .header-actions button,
-body.dark .ml-admin-sidebar .header-actions a,body.dark .ml-admin-sidebar .header-actions button,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions a,html[data-theme="dark"] .ml-admin-sidebar .header-actions button,
-body[data-theme="dark"] .ml-admin-sidebar .header-actions a,body[data-theme="dark"] .ml-admin-sidebar .header-actions button{
- color:#fff!important;background:#111f33!important;border-color:#334155!important
-}
-html.dark .ml-admin-sidebar .header-actions a i,html.dark .ml-admin-sidebar .header-actions button i,
-body.dark .ml-admin-sidebar .header-actions a i,body.dark .ml-admin-sidebar .header-actions button i,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions a i,html[data-theme="dark"] .ml-admin-sidebar .header-actions button i,
-body[data-theme="dark"] .ml-admin-sidebar .header-actions a i,body[data-theme="dark"] .ml-admin-sidebar .header-actions button i{color:#cbd5e1!important}
-html.dark .ml-admin-sidebar .header-actions a:hover,html.dark .ml-admin-sidebar .header-actions button:hover,
-body.dark .ml-admin-sidebar .header-actions a:hover,body.dark .ml-admin-sidebar .header-actions button:hover,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions a:hover,html[data-theme="dark"] .ml-admin-sidebar .header-actions button:hover,
-body[data-theme="dark"] .ml-admin-sidebar .header-actions a:hover,body[data-theme="dark"] .ml-admin-sidebar .header-actions button:hover{color:#fff!important;background:#1e3a5f!important}
-.ml-admin-sidebar .header-actions .language-control,
-.ml-admin-sidebar .header-actions [aria-label*="Language"],
-.ml-admin-sidebar .header-actions [title*="Language"]{align-self:stretch!important;justify-content:flex-start!important;text-align:left!important;margin-left:0!important;margin-right:0!important}
-.music-nav{justify-content:flex-start!important;align-items:flex-start!important;text-align:left!important;margin-left:0!important}
-.music-nav a{justify-content:flex-start!important;text-align:left!important}
-@media(max-width:700px){.music-header-inner{align-items:center!important}.music-nav{margin-inline:0!important}}
-
-
-/* FINAL ADMIN NAV THEME + LEFT EDGE FIX */
-.ml-admin-sidebar .header-actions,
-.ml-admin-sidebar .header-actions > * {
-  box-sizing:border-box!important;
-}
-.ml-admin-sidebar .header-actions {
-  display:flex!important; flex-direction:column!important; align-items:stretch!important;
-  justify-content:flex-start!important; gap:8px!important; width:100%!important;
-  margin:0!important; padding:0!important; text-align:left!important;
-}
-.ml-admin-sidebar .header-actions a,
-.ml-admin-sidebar .header-actions button,
-.ml-admin-sidebar .header-actions select,
-.ml-admin-sidebar .header-actions [role="button"],
-.ml-admin-sidebar .header-actions .language-control,
-.ml-admin-sidebar .header-actions [aria-label*="Language"],
-.ml-admin-sidebar .header-actions [title*="Language"] {
-  display:flex!important; align-items:center!important; justify-content:flex-start!important;
-  align-self:stretch!important; width:100%!important; max-width:100%!important; min-width:0!important;
-  margin:0!important; margin-inline:0!important; padding:10px 12px!important;
-  text-align:left!important; text-indent:0!important; color:#111827!important;
-  background:#fff!important; border-color:#e2e8f0!important;
-}
-.ml-admin-sidebar .header-actions a span,
-.ml-admin-sidebar .header-actions button span,
-.ml-admin-sidebar .header-actions select,
-.ml-admin-sidebar .header-actions [aria-label*="Language"] * {
-  text-align:left!important; color:inherit!important;
-}
-.ml-admin-sidebar .header-actions a i,
-.ml-admin-sidebar .header-actions button i { color:#475569!important; }
-html.dark .ml-admin-sidebar .header-actions a,
-html.dark .ml-admin-sidebar .header-actions button,
-html.dark .ml-admin-sidebar .header-actions select,
-html.dark .ml-admin-sidebar .header-actions [role="button"],
-html.dark .ml-admin-sidebar .header-actions .language-control,
-html.dark .ml-admin-sidebar .header-actions [aria-label*="Language"],
-html.dark .ml-admin-sidebar .header-actions [title*="Language"],
-body.dark .ml-admin-sidebar .header-actions a,
-body.dark .ml-admin-sidebar .header-actions button,
-body.dark .ml-admin-sidebar .header-actions select,
-body.dark .ml-admin-sidebar .header-actions [role="button"],
-body.dark .ml-admin-sidebar .header-actions .language-control,
-body.dark .ml-admin-sidebar .header-actions [aria-label*="Language"],
-body.dark .ml-admin-sidebar .header-actions [title*="Language"],
-html[data-theme="dark"] .ml-admin-sidebar .header-actions a,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions button,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions select,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions [role="button"],
-html[data-theme="dark"] .ml-admin-sidebar .header-actions .language-control,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions [aria-label*="Language"],
-html[data-theme="dark"] .ml-admin-sidebar .header-actions [title*="Language"] {
-  color:#fff!important; background:#111f33!important; border-color:#334155!important;
-}
-html.dark .ml-admin-sidebar .header-actions a *,
-html.dark .ml-admin-sidebar .header-actions button *,
-html.dark .ml-admin-sidebar .header-actions select *,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions a *,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions button *,
-html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!important; }
-.ml-admin-sidebar .header-actions a[href*="logout"],
-.ml-admin-sidebar .header-actions button[onclick*="logout"],
-.ml-admin-sidebar .header-actions button[id*="Logout"],
-.ml-admin-sidebar .header-actions .btn-danger {
-  color:#fff!important; background:#dc2626!important; border-color:#b91c1c!important;
-}
-.ml-admin-sidebar .header-actions a[href*="logout"] *,
-.ml-admin-sidebar .header-actions button[onclick*="logout"] *,
-.ml-admin-sidebar .header-actions button[id*="Logout"] * { color:#fff!important; }
-.music-nav { margin-left:0!important; margin-right:auto!important; padding-left:0!important;
-  width:100%!important; justify-content:flex-start!important; align-items:flex-start!important;
-  text-align:left!important; }
-.music-nav > * { margin-left:0!important; margin-right:0!important; }
-.music-nav a { justify-content:flex-start!important; text-align:left!important; }
-
-
-/* NAV ITEMS MUST SHARE THE SAME LEFT EDGE — INCLUDING MUSIC AND LANGUAGE */
-.ml-admin-sidebar .header-actions { display:flex!important; flex-direction:column!important; align-items:stretch!important; justify-content:flex-start!important; }
-.ml-admin-sidebar .header-actions > * { align-self:stretch!important; justify-self:start!important; float:none!important; position:static!important; inset-inline:auto!important; transform:none!important; margin-inline:0!important; }
-.ml-admin-sidebar .header-actions a,
-.ml-admin-sidebar .header-actions button,
-.ml-admin-sidebar .header-actions select,
-.ml-admin-sidebar .header-actions [role="button"],
-.ml-admin-sidebar .header-actions .language-control,
-.ml-admin-sidebar .header-actions [aria-label*="Language"],
-.ml-admin-sidebar .header-actions [title*="Language"] {
- display:flex!important; flex-direction:row!important; align-items:center!important; justify-content:flex-start!important;
- align-self:stretch!important; text-align:left!important; text-indent:0!important; padding-left:12px!important;
- margin-left:0!important; margin-right:0!important; width:100%!important; max-width:100%!important;
-}
-.ml-admin-sidebar .header-actions a > *,
-.ml-admin-sidebar .header-actions button > *,
-.ml-admin-sidebar .header-actions [aria-label*="Language"] > *,
-.ml-admin-sidebar .header-actions [title*="Language"] > * {
- text-align:left!important; justify-self:start!important; margin-left:0!important; margin-right:auto!important;
-}
-.ml-admin-sidebar .header-actions a span,
-.ml-admin-sidebar .header-actions button span { flex:1 1 auto!important; text-align:left!important; }
-.ml-admin-sidebar .header-actions a[href*="music"],
-.ml-admin-sidebar .header-actions a[href*="connect"],
-.ml-admin-sidebar .header-actions a[href*="reports"],
-.ml-admin-sidebar .header-actions a[href*="operations"],
-.ml-admin-sidebar .header-actions a[href*="tools"] { justify-content:flex-start!important; text-align:left!important; }
-.ml-admin-sidebar .header-actions .language-control *,
-.ml-admin-sidebar .header-actions [aria-label*="Language"] *,
-.ml-admin-sidebar .header-actions [title*="Language"] * { text-align:left!important; justify-content:flex-start!important; }
-
-
-/* FORCE EVERY SIDEBAR CONTROL TO THE LEFT EDGE */
-.ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:12px!important;width:100%!important;padding:0!important;margin:0!important}
-.ml-admin-sidebar .header-actions>*{box-sizing:border-box!important;display:flex!important;flex:0 0 100%!important;align-self:stretch!important;justify-self:start!important;width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important;left:auto!important;right:auto!important;transform:none!important}
-.ml-admin-sidebar .header-actions>a,
-.ml-admin-sidebar .header-actions>button,
-.ml-admin-sidebar .header-actions>select,
-.ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;padding-left:22px!important;padding-right:12px!important;margin-left:0!important;margin-right:0!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]{justify-content:flex-start!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*{margin-left:0!important;margin-right:10px!important;text-align:left!important}
-.ml-admin-sidebar .header-actions [class*="language"],
-.ml-admin-sidebar .header-actions [aria-label*="Language"],
-.ml-admin-sidebar .header-actions [title*="Language"],
-.ml-admin-sidebar [class*="language"],
-.ml-admin-sidebar [aria-label*="Language"],
-.ml-admin-sidebar [title*="Language"]{box-sizing:border-box!important;align-self:stretch!important;justify-self:start!important;width:100%!important;max-width:100%!important;margin-left:0!important;margin-right:0!important;left:auto!important;right:auto!important;transform:none!important;text-align:left!important}
-.ml-admin-sidebar [class*="language"] button,
-.ml-admin-sidebar [class*="language"] a,
-.ml-admin-sidebar [aria-label*="Language"] button,
-.ml-admin-sidebar [title*="Language"] button{display:flex!important;justify-content:flex-start!important;align-items:center!important;width:100%!important;max-width:100%!important;margin-left:0!important;margin-right:0!important;text-align:left!important}
-/* FINAL FIX: consistent left-aligned sidebar links */
-.ml-admin-sidebar .header-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;width:100%!important;gap:10px!important}
-.ml-admin-sidebar .header-actions>a,
-.ml-admin-sidebar .header-actions>button,
-.ml-admin-sidebar .header-actions>select,
-.ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:48px!important;margin:0!important;padding:12px 16px!important;gap:10px!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"],
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]{display:flex!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;padding-left:16px!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>i,
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>i{flex:0 0 20px!important;width:20px!important;min-width:20px!important;margin:0!important;text-align:center!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*:not(i),
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
-</style>
-<script id="manlung-admin-sidebar-nav-script">
-(function(){
- if(window.__manlungAdminSidebarNavInstalled)return;
- window.__manlungAdminSidebarNavInstalled=true;
- function init(){
-  var header=document.querySelector('.site-header');
-  var actions=header&&header.querySelector('.header-actions');
-  var container=header&&header.querySelector('.container');
-  if(!header||!actions||!container||document.querySelector('.ml-admin-menu-toggle'))return;
-  var toggle=document.createElement('button');
-  toggle.type='button';toggle.className='ml-admin-menu-toggle';
-  toggle.setAttribute('aria-label','Open admin navigation');toggle.setAttribute('aria-expanded','false');
-  toggle.innerHTML='<i class="fas fa-bars" aria-hidden="true"></i><span>MENU</span>';
-  container.appendChild(toggle);
-  var overlay=document.createElement('div');overlay.className='ml-admin-menu-overlay';
-  overlay.setAttribute('aria-hidden','true');
-  var sidebar=document.createElement('aside');sidebar.className='ml-admin-sidebar';
-  sidebar.setAttribute('aria-label','Admin navigation');sidebar.setAttribute('aria-hidden','true');
-  var brand=header.querySelector('.brand h1');
-  var title=brand?brand.textContent.trim():'Manlung Recovery';
-  sidebar.innerHTML='<div class="ml-admin-sidebar-head"><div><div class="ml-admin-sidebar-title">Manlung Recovery</div><div class="ml-admin-sidebar-subtitle">'+title.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})+'</div></div><button type="button" class="ml-admin-sidebar-close" aria-label="Close navigation">×</button></div>';
-
-  var extraNav=[['/admin/operations.html','fa-list-check','Operations'],['/admin/music.html','fa-music','Music'],['/admin/connect.html','fa-users','Community'],['/','fa-house','Home']];
-  extraNav.forEach(function(item){if(!Array.prototype.some.call(actions.querySelectorAll('a'),function(a){return a.getAttribute('href')===item[0]})){var a=document.createElement('a');a.href=item[0];a.innerHTML='<i class="fas '+item[1]+'" aria-hidden="true"></i><span>'+item[2]+'</span>';actions.appendChild(a)}});
-  sidebar.appendChild(actions);document.body.append(overlay,sidebar);
-  var close=sidebar.querySelector('.ml-admin-sidebar-close');
-  function setOpen(open){
-   overlay.classList.toggle('is-open',open);sidebar.classList.toggle('is-open',open);
-   document.body.classList.toggle('ml-admin-menu-open',open);
-   toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close admin navigation':'Open admin navigation');
-   sidebar.setAttribute('aria-hidden',String(!open));overlay.setAttribute('aria-hidden',String(!open));
-   if(open)close.focus();else toggle.focus();
-  }
-  toggle.addEventListener('click',function(){setOpen(!sidebar.classList.contains('is-open'))});
-  close.addEventListener('click',function(){setOpen(false)});
-  overlay.addEventListener('click',function(){setOpen(false)});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sidebar.classList.contains('is-open'))setOpen(false)});
-  sidebar.addEventListener('click',function(e){if(e.target.closest('a'))setOpen(false)});
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-})();
-</script>
 
 </body>
 </html>
