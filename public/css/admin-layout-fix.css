@@ -1,0 +1,83 @@
+/* Shared admin section cleanup: no public footer inside admin workspace. */
+body.admin-page-bg > footer,
+body.admin-page-bg footer.manlung-footer,
+body.admin-page-bg footer.site-footer,
+body.admin-page-bg .site-footer,
+body.admin-page-bg .manlung-footer,
+body.admin-page-bg #manlungDashboardBottomNote { display:none !important; }
+
+/* Keep the admin navigation stable and the content aligned beside it. */
+body.admin-page-bg .site-header {
+  position:fixed !important; inset:0 auto 0 0 !important;
+  width:260px !important; height:100dvh !important; max-height:100dvh !important;
+  overflow-x:hidden !important; overflow-y:auto !important;
+  z-index:1000 !important; margin:0 !important;
+}
+body.admin-page-bg .site-header > .container {
+  width:100% !important; max-width:none !important; min-height:100% !important;
+  height:auto !important; margin:0 !important; display:flex !important;
+  flex-direction:column !important; align-items:stretch !important;
+  justify-content:flex-start !important; flex-wrap:nowrap !important;
+}
+body.admin-page-bg .site-header .header-actions {
+  width:100% !important; display:flex !important; flex-direction:column !important;
+  align-items:stretch !important; justify-content:flex-start !important;
+  flex-wrap:nowrap !important; gap:5px !important; margin:0 !important;
+}
+body.admin-page-bg .site-header .header-actions > a,
+body.admin-page-bg .site-header .header-actions > button {
+  width:100% !important; max-width:100% !important; min-width:0 !important;
+  min-height:44px !important; flex:0 0 auto !important; align-self:stretch !important;
+  display:flex !important; flex-direction:row !important; align-items:center !important;
+  justify-content:flex-start !important; gap:11px !important; margin:0 !important;
+  padding:11px 13px !important; text-align:left !important; white-space:normal !important;
+  transform:none !important;
+}
+body.admin-page-bg .site-header .header-actions > a > i,
+body.admin-page-bg .site-header .header-actions > button > i {
+  flex:0 0 19px !important; width:19px !important; min-width:19px !important;
+  text-align:center !important; margin:0 !important;
+}
+body.admin-page-bg > .container,
+body.admin-page-bg > main.container,
+body.admin-page-bg > main.wrap,
+body.admin-page-bg > main.tools-shell,
+body.admin-page-bg > main.music-shell {
+  margin-left:260px !important; width:auto !important; max-width:none !important;
+}
+@media(max-width:700px) {
+  body.admin-page-bg .site-header { width:220px !important; }
+  body.admin-page-bg .site-header > .container { padding:14px 10px !important; }
+  body.admin-page-bg .site-header .brand { justify-content:flex-start !important; }
+  body.admin-page-bg .site-header .brand .manlung-brand-copy { display:block !important; }
+  body.admin-page-bg .site-header .header-actions > a,
+  body.admin-page-bg .site-header .header-actions > button {
+    justify-content:flex-start !important; padding:10px 11px !important;
+    font-size:12px !important; gap:9px !important;
+  }
+  body.admin-page-bg > .container,
+  body.admin-page-bg > main.container,
+  body.admin-page-bg > main.wrap,
+  body.admin-page-bg > main.tools-shell,
+  body.admin-page-bg > main.music-shell {
+    margin-left:220px !important; padding-left:12px !important; padding-right:12px !important;
+  }
+}
+@media(max-width:420px) {
+  body.admin-page-bg .site-header { width:68px !important; }
+  body.admin-page-bg .site-header > .container { padding:12px 6px !important; }
+  body.admin-page-bg .site-header .brand .manlung-brand-copy,
+  body.admin-page-bg .site-header .brand span { display:none !important; }
+  body.admin-page-bg .site-header .brand { justify-content:center !important; padding-inline:0 !important; }
+  body.admin-page-bg .site-header .header-actions > a,
+  body.admin-page-bg .site-header .header-actions > button {
+    justify-content:center !important; padding:10px 4px !important; font-size:0 !important;
+  }
+  body.admin-page-bg .site-header .header-actions > a > i,
+  body.admin-page-bg .site-header .header-actions > button > i { font-size:15px !important; }
+  body.admin-page-bg > .container,
+  body.admin-page-bg > main.container,
+  body.admin-page-bg > main.wrap,
+  body.admin-page-bg > main.tools-shell,
+  body.admin-page-bg > main.music-shell { margin-left:68px !important; }
+}
