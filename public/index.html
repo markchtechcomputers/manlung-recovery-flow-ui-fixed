@@ -2882,6 +2882,49 @@ html body footer.manlung-footer .manlung-footer-social a[href="https://x.com/iam
 }
 </style>
 
+
+<style id="manlung-apk-download-button-size-fix">
+/* Keep the APK download CTA prominent without making it oversized or overflowing. */
+html body .home-page-container .mr-hero-actions a.mr-hero-download {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .55rem !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 46px !important;
+  padding: .72rem 1rem !important;
+  box-sizing: border-box !important;
+  border-radius: 10px !important;
+  font-size: .9rem !important;
+  line-height: 1.2 !important;
+  white-space: normal !important;
+  text-align: center !important;
+}
+html body .home-page-container .mr-hero-actions a.mr-hero-download span {
+  min-width: 0 !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+html body .home-page-container .mr-hero-actions a.mr-hero-download i {
+  flex: 0 0 auto !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+}
+@media (max-width: 600px) {
+  html body .home-page-container .mr-hero-actions a.mr-hero-download {
+    min-height: 44px !important;
+    padding: .62rem .78rem !important;
+    gap: .42rem !important;
+    font-size: .82rem !important;
+  }
+  html body .home-page-container .mr-hero-actions a.mr-hero-download i {
+    font-size: .92rem !important;
+  }
+}
+</style>
+
 </body>
 </html>
 
