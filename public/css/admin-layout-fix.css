@@ -1,10 +1,9 @@
 /* Shared admin section cleanup: no public footer inside admin workspace. */
-body.admin-page-bg > footer,
-body.admin-page-bg footer.manlung-footer,
-body.admin-page-bg footer.site-footer,
-body.admin-page-bg .site-footer,
-body.admin-page-bg .manlung-footer,
-body.admin-page-bg #manlungDashboardBottomNote { display:none !important; }
+footer.manlung-footer,
+footer.site-footer,
+.site-footer,
+.manlung-footer,
+#manlungDashboardBottomNote { display:none !important; }
 
 /* Keep the admin navigation stable and the content aligned beside it. */
 body.admin-page-bg .site-header {
