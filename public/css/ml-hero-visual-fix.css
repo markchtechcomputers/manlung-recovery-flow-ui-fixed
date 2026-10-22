@@ -940,3 +940,52 @@ body.dark .ml-balanced-hero .ml-hero-device-visual img {
   transform: translateZ(0) !important;
   backface-visibility: hidden !important;
 }
+
+
+/* ANDROID DOWNLOAD CTA — intentionally compact beside the main hero actions */
+.ml-hero-actions .ml-hero-download {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 36px !important;
+    padding: 8px 11px !important;
+    border: 1px solid rgba(125, 211, 252, .55) !important;
+    border-radius: 9px !important;
+    background: rgba(8, 25, 45, .72) !important;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .16) !important;
+    backdrop-filter: blur(8px) !important;
+}
+.ml-hero-actions .ml-hero-download i {
+    font-size: 13px !important;
+    line-height: 1 !important;
+}
+.ml-hero-actions .ml-hero-download:hover {
+    background: rgba(14, 116, 144, .88) !important;
+    border-color: rgba(186, 230, 253, .8) !important;
+    transform: translateY(-1px) !important;
+}
+@media (max-width: 768px) {
+    .ml-balanced-hero .ml-hero-actions .ml-hero-download {
+        align-self: flex-start !important;
+        width: auto !important;
+        max-width: 100% !important;
+        min-height: 32px !important;
+        padding: 7px 9px !important;
+        gap: 6px !important;
+        font-size: 11px !important;
+        white-space: normal !important;
+    }
+    .ml-balanced-hero .ml-hero-actions .ml-hero-download i {
+        font-size: 12px !important;
+    }
+}
