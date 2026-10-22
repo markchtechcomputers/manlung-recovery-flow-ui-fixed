@@ -564,7 +564,7 @@
       }
     };
   }
-  function injectHeaderTab(){const a=document.querySelector('.site-header .header-actions');if(!a||a.querySelector('[data-manlung-ai-tab]'))return;const b=document.createElement('button');b.type='button';b.dataset.manlungAiTab='true';b.className='manlung-ai-tab';b.textContent='Manlung AI';b.addEventListener('click',()=>toggle(true));a.appendChild(b);}
+  function injectHeaderTab(){const a=document.querySelector('.site-header .header-actions');if(!a||a.querySelector('[data-manlung-ai-tab]'))return;const b=document.createElement('a');b.href='/manlung-ai.html';b.dataset.manlungAiTab='true';b.className='manlung-ai-tab';b.innerHTML='<i class="fa-solid fa-robot" aria-hidden="true"></i> Manlung AI';b.setAttribute('aria-label','Open Manlung AI in its own page');a.appendChild(b);}
 
   function now() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
 
