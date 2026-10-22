@@ -928,6 +928,128 @@ html:not(.dark) body.admin-page-bg #pageContent span:not(.role-badge):not(.statu
 /* Dark Mode remains available through the existing theme styles. */
 </style>
     <link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261022">
+
+<style id="owner-dashboard-visual-parity">
+/* Admin Management follows the same visual system as Admin Dashboard. */
+body.admin-page-bg{
+  background:#f4f7fb!important;color:#0f172a!important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+}
+body.admin-page-bg .site-header{
+  position:sticky!important;top:0!important;left:auto!important;right:auto!important;
+  width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;
+  z-index:1000!important;
+  background:linear-gradient(135deg,#081525,#10253f)!important;
+  border-bottom:1px solid rgba(96,165,250,.18)!important;
+  box-shadow:0 8px 28px rgba(2,6,23,.22)!important;
+}
+body.admin-page-bg .site-header>.container{
+  width:100%!important;max-width:1220px!important;min-height:72px!important;height:auto!important;
+  margin:0 auto!important;padding:.65rem 1rem!important;display:flex!important;
+  flex-direction:row!important;align-items:center!important;justify-content:space-between!important;
+  flex-wrap:wrap!important;gap:1rem!important;
+}
+body.admin-page-bg .site-header .brand{
+  display:flex!important;flex:0 1 auto!important;width:auto!important;min-width:0!important;
+  align-items:center!important;justify-content:flex-start!important;text-align:left!important;gap:.7rem!important;
+}
+body.admin-page-bg .site-header .brand h1{color:#f8fafc!important;font-size:1.02rem!important;font-weight:800!important;margin:0!important}
+body.admin-page-bg .site-header .brand span{color:#94a3b8!important;font-size:.7rem!important;white-space:normal!important}
+body.admin-page-bg .site-header .header-actions{
+  display:flex!important;flex:0 1 auto!important;flex-direction:row!important;align-items:center!important;
+  justify-content:flex-end!important;flex-wrap:wrap!important;gap:.45rem!important;width:auto!important;margin:0!important;
+}
+body.admin-page-bg .site-header .header-actions>a,
+body.admin-page-bg .site-header .header-actions>button{
+  display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;
+  width:auto!important;max-width:100%!important;min-width:0!important;min-height:40px!important;height:auto!important;
+  padding:.45rem .72rem!important;border:1px solid rgba(148,163,184,.18)!important;border-radius:11px!important;
+  background:rgba(255,255,255,.045)!important;color:#e2e8f0!important;text-decoration:none!important;
+  font-size:.76rem!important;font-weight:700!important;white-space:normal!important;text-align:center!important;
+  transform:none!important;
+}
+body.admin-page-bg .site-header .header-actions>a:hover,
+body.admin-page-bg .site-header .header-actions>button:hover{background:rgba(255,255,255,.09)!important;border-color:rgba(148,163,184,.34)!important;color:#fff!important}
+body.admin-page-bg .site-header .header-actions .btn-danger,
+body.admin-page-bg .site-header .header-actions .btn-danger *{background:#dc2626!important;border-color:#b91c1c!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+#pageContent,body.admin-page-bg>section.container{
+  width:min(1220px,calc(100% - 40px))!important;max-width:1220px!important;
+  margin:28px auto 40px!important;padding:0!important;
+}
+#pageContent>.card,body.admin-page-bg>section.container>.card{
+  margin:0 0 20px!important;padding:22px!important;overflow:visible!important;
+  color:#0f172a!important;background:#fff!important;border:1px solid #e2e8f0!important;
+  border-radius:18px!important;box-shadow:0 8px 26px rgba(15,23,42,.055)!important;
+}
+#pageContent>.card::before,body.admin-page-bg>section.container>.card::before{height:3px!important;background:linear-gradient(90deg,#2563eb,#60a5fa)!important;opacity:1!important}
+#pageContent>.card:first-child{background:#fff!important;border-color:#dbeafe!important}
+#pageContent .card-title,body.admin-page-bg>section.container>.card h2{
+  color:#0f172a!important;font-size:1.08rem!important;font-weight:800!important;
+}
+#pageContent .card-title i,body.admin-page-bg>section.container>.card h2 i{color:#2563eb!important}
+#pageContent p,#pageContent label,#pageContent small{color:#64748b}
+#pageContent input,#pageContent select,#pageContent textarea{
+  min-height:42px!important;padding:10px 12px!important;color:#0f172a!important;
+  background:#fff!important;border:1px solid #cbd5e1!important;border-radius:10px!important;
+}
+#pageContent input:focus,#pageContent select:focus,#pageContent textarea:focus{
+  border-color:#60a5fa!important;box-shadow:0 0 0 3px rgba(37,99,235,.12)!important;outline:none!important;
+}
+#pageContent .btn{
+  min-height:38px!important;border-radius:10px!important;font-weight:750!important;
+  box-shadow:none!important;transform:none!important;
+}
+#pageContent .btn-primary{background:#2563eb!important;border:1px solid #2563eb!important;color:#fff!important}
+#pageContent .btn-primary:hover{background:#1d4ed8!important}
+#pageContent .btn-outline{background:#fff!important;border:1px solid #cbd5e1!important;color:#334155!important}
+#pageContent .btn-success{background:#16a34a!important;border-color:#16a34a!important;color:#fff!important}
+#pageContent .btn-danger{background:#dc2626!important;border-color:#dc2626!important;color:#fff!important}
+#adminsList .case-item,#ownerCalls .case-item,#careerApplications .case-item{
+  color:#0f172a!important;background:#f8fafc!important;border:1px solid #e2e8f0!important;
+  border-radius:14px!important;box-shadow:none!important;
+}
+#adminsList .case-info strong{color:#0f172a!important}
+#adminsList .case-info>span:not(.role-badge):not(.status-badge){color:#64748b!important}
+#inviteResult a{color:#1d4ed8!important}
+#pendingAdminNotice>div{background:#fffbeb!important;color:#92400e!important;border-color:#fde68a!important}
+#mfaStatus,#mfaSetupBox,#mfaDisableBox,#pageContent>.card:nth-child(6) #auditLog{
+  background:#f8fafc!important;border:1px solid #e2e8f0!important;color:#334155!important;border-radius:12px!important;
+}
+#pageContent>.card:nth-child(4)>.card-title::after{color:#15803d!important;background:#f0fdf4!important;border-color:#bbf7d0!important}
+html.dark body.admin-page-bg,body.dark.admin-page-bg{
+  background:#0b1220!important;color:#e2e8f0!important;
+}
+html.dark #pageContent>.card,html.dark body.admin-page-bg>section.container>.card,
+body.dark #pageContent>.card,body.dark body.admin-page-bg>section.container>.card{
+  background:#111c2b!important;color:#e2e8f0!important;border-color:#29384b!important;
+}
+html.dark #pageContent .card-title,html.dark body.admin-page-bg>section.container>.card h2,
+body.dark #pageContent .card-title,body.dark body.admin-page-bg>section.container>.card h2{color:#f8fafc!important}
+html.dark #pageContent input,html.dark #pageContent select,html.dark #pageContent textarea,
+body.dark #pageContent input,body.dark #pageContent select,body.dark #pageContent textarea{
+  background:#0b1220!important;color:#e2e8f0!important;border-color:#334155!important;
+}
+html.dark #adminsList .case-item,html.dark #ownerCalls .case-item,html.dark #careerApplications .case-item,
+body.dark #adminsList .case-item,body.dark #ownerCalls .case-item,body.dark #careerApplications .case-item{
+  background:#0f1928!important;color:#e2e8f0!important;border-color:#29384b!important;
+}
+html.dark #adminsList .case-info strong,body.dark #adminsList .case-info strong{color:#f8fafc!important}
+html.dark #mfaStatus,html.dark #mfaSetupBox,html.dark #mfaDisableBox,html.dark #pageContent>.card:nth-child(6) #auditLog,
+body.dark #mfaStatus,body.dark #mfaSetupBox,body.dark #mfaDisableBox,body.dark #pageContent>.card:nth-child(6) #auditLog{
+  background:#0b1220!important;color:#cbd5e1!important;border-color:#29384b!important;
+}
+@media(max-width:700px){
+  body.admin-page-bg .site-header>.container{padding:12px 14px!important;gap:10px!important}
+  body.admin-page-bg .site-header .brand{width:100%!important;justify-content:flex-start!important}
+  body.admin-page-bg .site-header .header-actions{width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+  body.admin-page-bg .site-header .header-actions>a,body.admin-page-bg .site-header .header-actions>button{width:100%!important;min-height:42px!important;padding:8px!important}
+  #pageContent,body.admin-page-bg>section.container{width:calc(100% - 24px)!important;margin:18px 12px 28px!important}
+  #pageContent>.card,body.admin-page-bg>section.container>.card{padding:16px!important;border-radius:14px!important}
+  #adminsList{grid-template-columns:minmax(0,1fr)!important}
+}
+</style>
+
+<link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261022">
 </head>
 <body class="admin-page-bg">
     <header class="site-header">
