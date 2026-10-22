@@ -458,3 +458,115 @@ body.dark .scam-help-section{background:linear-gradient(145deg,#101c31,#0d1728);
 @media(max-width:980px){.scam-help-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.scam-official-links{grid-template-columns:1fr}.scam-help-header{grid-template-columns:1fr}.scam-help-footer{align-items:flex-start;flex-direction:column}}
 @media(max-width:600px){.scam-help-section{padding:24px 16px;border-radius:20px;margin:22px auto}.scam-help-grid{grid-template-columns:1fr;gap:10px}.scam-help-card{padding:18px}.scam-warning-list{padding:19px 18px}.scam-help-footer{padding:19px}.scam-help-actions{width:100%;flex-direction:column}.scam-help-actions .btn{width:100%}}
 @media(prefers-reduced-motion:reduce){.scam-official-links>a{transition:none}.scam-official-links>a:hover{transform:none}}
+
+
+/* Responsive homepage refinement — phone, tablet and laptop */
+html { scroll-padding-top: 88px; }
+img, video, canvas, iframe { max-width: 100%; }
+.home-page-container,
+.home-page-container * { min-width: 0; }
+.home-page-container { width: 100%; box-sizing: border-box; }
+.home-hero-content { box-sizing: border-box; }
+.hero-copy p, .home-section p, .intro-strip p { overflow-wrap: anywhere; }
+.home-page-container .btn { max-width: 100%; white-space: normal; }
+.home-page-container .home-section,
+.home-page-container .demo-section,
+.home-page-container .scam-help-section { box-sizing: border-box; }
+.home-page-container .premium-service-grid,
+.home-page-container .process-flow,
+.home-page-container .trust-grid,
+.home-page-container .demo-cards { min-width: 0; }
+.site-header .home-header-container { width: 100%; box-sizing: border-box; }
+.site-header .home-nav { min-width: 0; }
+.site-header .header-actions { flex: 0 0 auto; }
+.site-header .header-actions a,
+.site-header .header-actions button { white-space: nowrap; }
+.home-hero-content > * { min-width: 0; }
+.home-hero .hero-copy h1 { overflow-wrap: anywhere; }
+.home-hero .hero-visual { min-width: 0; max-width: 100%; }
+.home-hero .security-panel,
+.home-hero .security-screen { max-width: 100%; box-sizing: border-box; }
+.home-page-container input,
+.home-page-container select,
+.home-page-container textarea { max-width: 100%; min-width: 0; }
+
+@media (min-width: 1200px) {
+  .home-header-container { padding-left: 28px!important; padding-right: 28px!important; }
+  .home-hero-content { max-width: 1240px!important; gap: clamp(36px, 4vw, 64px)!important; }
+  .home-section { padding-left: 24px!important; padding-right: 24px!important; }
+}
+@media (min-width: 781px) and (max-width: 1100px) {
+  .home-header-container { gap: 10px!important; padding-left: 14px!important; padding-right: 14px!important; }
+  .home-header-container .manlung-home-logo,
+  .home-header-container .manlung-site-logo { width: 38px!important; height: 38px!important; flex-basis: 38px!important; }
+  .brand-copy h1 { font-size: .92rem!important; }
+  .brand-copy span { font-size: .59rem!important; white-space: normal!important; }
+  .home-nav { gap: 12px!important; }
+  .home-nav a { font-size: .68rem!important; }
+  .site-header .header-actions { gap: 6px!important; }
+  .site-header .header-actions .btn { padding-left: 9px!important; padding-right: 9px!important; font-size: .69rem!important; }
+  .home-hero-content { grid-template-columns: minmax(0,1.05fr) minmax(0,.95fr)!important; gap: 28px!important; padding: 64px 28px!important; }
+  .hero-copy h1 { font-size: clamp(2.35rem, 4.4vw, 3.4rem)!important; }
+}
+@media (max-width: 780px) {
+  html { scroll-padding-top: 76px; }
+  .home-header-container { flex-wrap: nowrap!important; }
+  .home-header-container .brand { flex: 1 1 auto!important; }
+  .brand-copy h1 { overflow-wrap: normal!important; }
+  .site-header .header-actions { flex: 0 0 auto!important; }
+  .home-hero-content { width: 100%!important; max-width: 100%!important; padding: 48px 18px 36px!important; gap: 28px!important; }
+  .hero-copy h1 { max-width: 720px; }
+  .hero-copy>p { max-width: 620px; margin-left: auto!important; margin-right: auto!important; }
+  .hero-actions { width: 100%; gap: 10px!important; }
+  .hero-actions .btn { min-height: 48px; }
+  .hero-visual { width: 100%; min-height: 280px!important; }
+  .floating-mini-card { max-width: 46%; overflow-wrap: anywhere; }
+  .home-section { padding-top: 44px!important; padding-bottom: 44px!important; }
+  .section-heading { padding-left: 4px; padding-right: 4px; }
+  .premium-service-card { min-width: 0!important; }
+  .final-cta { gap: 20px!important; }
+}
+@media (max-width: 480px) {
+  .home-page-container { padding-left: 0!important; padding-right: 0!important; }
+  .home-hero { border-radius: 0 0 16px 16px!important; }
+  .home-hero-content { padding: 38px 16px 28px!important; }
+  .hero-copy h1 { font-size: clamp(2rem, 9.5vw, 2.7rem)!important; line-height: 1.06!important; letter-spacing: -.045em!important; }
+  .hero-copy>p { font-size: .9rem!important; line-height: 1.65!important; }
+  .hero-badge { font-size: .65rem!important; line-height: 1.4!important; max-width: 100%; }
+  .hero-actions { display: grid!important; grid-template-columns: minmax(0,1fr)!important; }
+  .hero-actions .btn { width: 100%!important; min-width: 0!important; padding: 13px 14px!important; white-space: normal!important; }
+  .hero-trust-row { display: flex!important; flex-wrap: wrap!important; gap: 9px 14px!important; }
+  .hero-visual { min-height: 250px!important; }
+  .security-panel { width: 100%!important; padding: 12px!important; }
+  .security-screen { padding: 17px 12px!important; }
+  .mini-one { left: 4px!important; bottom: 12px!important; }
+  .mini-two { right: 4px!important; top: 12px!important; }
+  .floating-mini-card { max-width: 47%!important; font-size: .58rem!important; padding: 7px!important; }
+  .home-section { padding: 38px 16px!important; }
+  .intro-strip { padding: 40px 16px 8px!important; }
+  .premium-service-card { padding: 20px!important; }
+  .demo-window { max-width: 100%; overflow: hidden; }
+  .demo-window-body { grid-template-columns: 38px minmax(0,1fr)!important; }
+  .demo-main { min-width: 0; padding: 10px!important; }
+  .demo-main * { overflow-wrap: anywhere; }
+  .tracker-card, .support-section, .final-cta { padding: 20px!important; }
+  .scam-help-section { margin: 18px 12px!important; width: auto!important; }
+  .scam-help-actions .btn { min-height: 46px; }
+  .home-page-container .section-heading h2 { font-size: clamp(1.5rem, 7vw, 2rem)!important; overflow-wrap: anywhere; }
+}
+@media (max-width: 360px) {
+  .home-header-container { padding-left: 9px!important; padding-right: 9px!important; gap: 7px!important; }
+  .home-header-container .manlung-home-logo,
+  .home-header-container .manlung-site-logo { width: 34px!important; height: 34px!important; flex-basis: 34px!important; }
+  .brand-copy h1 { font-size: .82rem!important; }
+  .brand-copy span { font-size: .52rem!important; }
+  .site-header .header-actions { gap: 5px!important; }
+  .site-header .header-actions button[data-theme-toggle=true],
+  .home-mobile-menu { width: 34px!important; min-width: 34px!important; height: 34px!important; min-height: 34px!important; }
+  .hero-copy h1 { font-size: 1.9rem!important; }
+  .home-hero-content { padding-left: 13px!important; padding-right: 13px!important; }
+  .home-section { padding-left: 13px!important; padding-right: 13px!important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-hero video { display: none!important; }
+}
