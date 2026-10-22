@@ -3273,5 +3273,31 @@ body.admin-page-bg [title*="Language" i][role="menu"]{
 })();
 </script>
 
+
+<style id="manlung-admin-hide-language">
+/* Admin dashboard: remove language/translation controls from the admin interface. */
+body.admin-page-bg .language-control,
+body.admin-page-bg [data-language-control],
+body.admin-page-bg [data-language-selector],
+body.admin-page-bg [data-manlung-header-language],
+body.admin-page-bg .language-switcher,
+body.admin-page-bg [id*="language-selector" i],
+body.admin-page-bg [class*="language-selector" i],
+body.admin-page-bg [id*="language-switcher" i],
+body.admin-page-bg [class*="language-switcher" i],
+body.admin-page-bg [aria-label*="language" i],
+body.admin-page-bg [title*="language" i],
+body.admin-page-bg #google_translate_element,
+body.admin-page-bg .goog-te-gadget,
+body.admin-page-bg .goog-te-menu-frame,
+body.admin-page-bg .goog-te-banner-frame,
+body.admin-page-bg .skiptranslate {
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+html body.admin-page-bg { top:0!important; }
+</style>
+
 </body>
 </html>
