@@ -936,80 +936,43 @@ html body.manlung-auth-page.dark .manlung-social-grid .manlung-discord-icon img{
 
 
 <style id="manlung-google-custom-icon-and-social-alignment">
-/* Use the requested Google artwork while keeping Google's real sign-in iframe clickable. */
+/* Custom Google art is visual only; the host element itself opens Google sign-in. */
 html body.manlung-auth-page .manlung-social-grid{
-  display:flex!important;
-  flex-direction:row!important;
-  align-items:center!important;
-  justify-content:center!important;
-  flex-wrap:nowrap!important;
-  gap:16px!important;
-  width:100%!important;
-  margin-inline:auto!important;
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:center!important;flex-wrap:nowrap!important;gap:16px!important;
+  width:100%!important;margin-inline:auto!important;
 }
 html body.manlung-auth-page .manlung-social-grid .manlung-social-icon,
 html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
-  position:relative!important;
-  display:flex!important;
-  flex:0 0 54px!important;
-  align-items:center!important;
-  justify-content:center!important;
-  justify-self:center!important;
-  box-sizing:border-box!important;
-  width:54px!important;
-  min-width:54px!important;
-  max-width:54px!important;
-  height:54px!important;
-  min-height:54px!important;
-  margin:0!important;
-  padding:0!important;
-  overflow:hidden!important;
-  border-radius:50%!important;
+  position:relative!important;display:flex!important;flex:0 0 54px!important;
+  align-items:center!important;justify-content:center!important;justify-self:center!important;
+  box-sizing:border-box!important;width:54px!important;min-width:54px!important;
+  max-width:54px!important;height:54px!important;min-height:54px!important;
+  margin:0!important;padding:0!important;overflow:hidden!important;border-radius:50%!important;
 }
 html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
+  background-color:#fff!important;
   background-image:url("https://i.postimg.cc/Jn2xygTC/icons8-google-48-(1).png")!important;
-  background-position:center!important;
-  background-repeat:no-repeat!important;
-  background-size:32px 32px!important;
-}
-html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe{
-  position:absolute!important;
-  inset:0!important;
-  z-index:2!important;
-  display:block!important;
-  width:100%!important;
-  min-width:100%!important;
-  max-width:100%!important;
-  height:100%!important;
-  min-height:100%!important;
-  max-height:100%!important;
-  opacity:0!important;
-  cursor:pointer!important;
+  background-position:center!important;background-repeat:no-repeat!important;background-size:32px 32px!important;
+  cursor:pointer!important;touch-action:manipulation!important;
 }
 html body.manlung-auth-page .manlung-social-grid .manlung-social-icon img{
-  display:block!important;
-  width:28px!important;
-  height:28px!important;
-  object-fit:contain!important;
+  display:block!important;width:28px!important;height:28px!important;object-fit:contain!important;
 }
-html body.manlung-auth-page .manlung-social-grid .manlung-social-icon i{
-  display:block!important;
-  font-size:25px!important;
-  line-height:1!important;
-}
-html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-within,
+html body.manlung-auth-page .manlung-social-grid .manlung-social-icon i{display:block!important;font-size:25px!important;line-height:1!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-visible,
 html body.manlung-auth-page .manlung-social-grid .manlung-social-icon:focus-visible{
-  outline:3px solid rgba(59,130,246,.55)!important;
-  outline-offset:3px!important;
+  outline:3px solid rgba(59,130,246,.55)!important;outline-offset:3px!important;
 }
+html body.manlung-auth-page.dark .manlung-social-grid .manlung-google-btn{background-color:#fff!important}
 @media(max-width:520px){
-  html body.manlung-auth-page .manlung-social-grid{gap:14px!important}
-  html body.manlung-auth-page .manlung-social-grid .manlung-social-icon,
-  html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
-    flex-basis:50px!important;width:50px!important;min-width:50px!important;
-    max-width:50px!important;height:50px!important;min-height:50px!important;
-  }
-  html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{background-size:30px 30px!important}
+ html body.manlung-auth-page .manlung-social-grid{gap:14px!important}
+ html body.manlung-auth-page .manlung-social-grid .manlung-social-icon,
+ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
+  flex-basis:50px!important;width:50px!important;min-width:50px!important;
+  max-width:50px!important;height:50px!important;min-height:50px!important;
+ }
+ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{background-size:30px 30px!important}
 }
 </style>
 
@@ -1750,16 +1713,31 @@ async function setupOfficialGoogleButtons(){
       const host=document.getElementById(id);
       if(!host)return;
       host.innerHTML='';
-      google.accounts.id.renderButton(host,{
-        type:'icon',
-        theme:'outline',
-        size:'large',
-        shape:'circle',
-        logo_alignment:'center',
-        button_auto_select:false,
-        click_listener:()=>{
-          window.__manlungGoogleErrorTarget=errorTarget;
-          localStorage.removeItem('clientUser');
+      // Keep the custom Google artwork purely visual. Clicking the visible control
+      // opens Google's sign-in prompt, whose credential callback is handled above.
+      host.setAttribute('role','button');
+      host.setAttribute('tabindex','0');
+      host.setAttribute('aria-label','Continue with Google');
+      host.setAttribute('title','Continue with Google');
+      const startGoogleSignIn=()=>{
+        window.__manlungGoogleErrorTarget=errorTarget;
+        localStorage.removeItem('clientUser');
+        google.accounts.id.prompt(notification=>{
+          if(notification.isNotDisplayed?.() || notification.isSkippedMoment?.()){
+            const reason=notification.getNotDisplayedReason?.()||notification.getSkippedReason?.()||'';
+            console.warn('Google sign-in prompt was not displayed:',reason);
+            const errorNode=document.getElementById(errorTarget);
+            if(errorNode && reason){
+              showMessage(errorNode,'Google sign-in could not open. Please allow Google sign-in pop-ups/cookies or try again.','error');
+            }
+          }
+        });
+      };
+      host.addEventListener('click',startGoogleSignIn);
+      host.addEventListener('keydown',event=>{
+        if(event.key==='Enter'||event.key===' '){
+          event.preventDefault();
+          startGoogleSignIn();
         }
       });
     });
