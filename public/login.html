@@ -1715,7 +1715,8 @@ async function setupOfficialGoogleButtons(){
       auto_select:false,
       cancel_on_tap_outside:true,
       callback:async response=>{
-        const errorTarget=window.__manlungGoogleErrorTarget||'loginError';
+        const registerPanel=document.getElementById('registerPanel');
+        const errorTarget=window.__manlungGoogleErrorTarget||(registerPanel&&!registerPanel.hidden?'registerError':'loginError');
         const errorNode=document.getElementById(errorTarget);
         const setGoogleStatus=(message,kind='info')=>{
           if(errorNode){
