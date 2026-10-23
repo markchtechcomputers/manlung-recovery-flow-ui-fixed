@@ -4405,3 +4405,76 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
 })();
 </script>
+
+
+<style id="manlung-icons-hard-fix-20261023">
+@media(max-width:650px){
+ html body .site-header .container.home-header-container{
+  display:grid!important;grid-template-columns:34px minmax(0,1fr) 34px 34px 38px!important;
+  grid-template-areas:"brandmark brand language theme menu"!important;align-items:center!important;gap:5px!important;
+  padding:8px 7px!important;min-height:0!important;
+ }
+ html body .site-header .manlung-home-logo{grid-area:brandmark!important;width:34px!important;min-width:34px!important;height:34px!important;flex:0 0 34px!important}
+ html body .site-header .brand{grid-area:brand!important;min-width:0!important;width:auto!important}
+ html body .site-header .phone-header-shortcuts{grid-area:language!important;display:flex!important;width:34px!important;min-width:34px!important;flex:0 0 34px!important}
+ html body .site-header #phoneLanguageButton{display:flex!important;width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;align-items:center!important;justify-content:center!important;font-size:0!important}
+ html body .site-header #phoneLanguageButton span,html body .site-header #phoneLanguageButton i{display:none!important}
+ html body .site-header #phoneLanguageButton::before{content:""!important;display:block!important;width:22px!important;height:22px!important;background:url("https://i.postimg.cc/3Jw4W5b9/icons8-globe-30.png") center/contain no-repeat!important}
+ html body .site-header .header-actions{display:contents!important}
+ html body .site-header .header-actions>a{display:none!important}
+ html body .site-header button[data-theme-toggle="true"]{grid-area:theme!important;display:flex!important;position:static!important;width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;margin:0!important;align-items:center!important;justify-content:center!important;font-size:0!important}
+ html body .site-header button[data-theme-toggle="true"]::before{content:none!important;display:none!important}
+ html body .site-header button[data-theme-toggle="true"] img.manlung-theme-image{display:block!important;width:25px!important;height:25px!important;object-fit:contain!important}
+ html body #manlungSidebarToggle{grid-area:menu!important;justify-self:end!important;display:flex!important;width:38px!important;min-width:38px!important;height:34px!important;min-height:34px!important;padding:0!important;align-items:center!important;justify-content:center!important;font-size:0!important}
+ html body #manlungSidebarToggle i{display:inline-block!important;font-size:18px!important}
+ html body #manlungSidebarToggle span{display:none!important}
+ html body #manlungSidebar .msb-links a{display:flex!important;gap:10px!important;padding:11px 12px!important}
+ html body #manlungSidebar .msb-links a i{display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:0 0 20px!important;width:20px!important;min-width:20px!important;align-items:center!important;justify-content:center!important;margin:0!important;font-size:16px!important;color:#0f766e!important}
+ html body #manlungSidebar .msb-links a:before{content:none!important;display:none!important}
+ html body #manlungSidebar .msb-links a.msb-primary i{color:#fff!important}
+}
+@media(max-width:380px){
+ html body .site-header .container.home-header-container{grid-template-columns:30px minmax(0,1fr) 32px 32px 34px!important;gap:4px!important;padding-left:5px!important;padding-right:5px!important}
+ html body .site-header .manlung-home-logo{width:30px!important;min-width:30px!important;height:30px!important;flex-basis:30px!important}
+ html body .site-header .phone-header-shortcuts,html body .site-header #phoneLanguageButton,html body .site-header button[data-theme-toggle="true"]{width:32px!important;min-width:32px!important;flex-basis:32px!important}
+ html body #manlungSidebarToggle{width:34px!important;min-width:34px!important}
+}
+</style>
+<script id="manlung-icons-hard-fix-js-20261023">
+(function(){
+ function init(){
+  var header=document.querySelector('.site-header .container.home-header-container');
+  var lang=document.getElementById('phoneLanguageButton');
+  var shortcuts=lang&&lang.closest('.phone-header-shortcuts');
+  var theme=document.querySelector('.site-header button[data-theme-toggle="true"]');
+  var menu=document.getElementById('manlungSidebarToggle');
+  if(!header)return;
+  if(shortcuts&&shortcuts.parentElement!==header)header.insertBefore(shortcuts,theme||menu);
+  if(theme&&theme.parentElement!==header)header.insertBefore(theme,menu);
+  if(theme){
+   var img=theme.querySelector('img.manlung-theme-image');
+   if(!img){img=document.createElement('img');img.className='manlung-theme-image';img.alt='';img.setAttribute('aria-hidden','true');theme.replaceChildren(img);}
+   function paint(){
+    var root=document.documentElement,body=document.body;
+    var dark=root.classList.contains('dark')||body.classList.contains('dark')||
+      root.getAttribute('data-theme')==='dark'||body.getAttribute('data-theme')==='dark'||
+      root.getAttribute('data-bs-theme')==='dark';
+    img.src=dark?'https://i.postimg.cc/k432pX6g/icons8-new-moon-48.png':'https://i.postimg.cc/fys0JTDt/icons8-sun-30.png';
+    img.alt='';
+    theme.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');
+    theme.title=dark?'Light mode':'Dark mode';
+   }
+   paint();
+   new MutationObserver(paint).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme','data-bs-theme']});
+   new MutationObserver(paint).observe(document.body,{attributes:true,attributeFilter:['class','data-theme']});
+   theme.addEventListener('click',function(){setTimeout(paint,80);setTimeout(paint,250);});
+  }
+  /* Make sure each sidebar row keeps its own icon and label. */
+  document.querySelectorAll('#manlungSidebar .msb-links a').forEach(function(a){
+   var icon=a.querySelector('i');
+   if(icon){icon.style.setProperty('display','inline-flex','important');icon.style.setProperty('visibility','visible','important');}
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
