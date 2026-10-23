@@ -4651,3 +4651,95 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
   }
 }
 </style>
+
+
+<!-- MANLUNG HOME LANGUAGE ICON + FULL-BLEED BLACK FOOTER FIX 2026-10-23 -->
+<style id="manlung-home-language-footer-final">
+/* Language control: show the globe icon, never the word "Language". */
+html body .site-header #phoneLanguageButton,
+html body .site-header [id*="LanguageButton"],
+html body .site-header [aria-label*="language" i] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+html body .site-header #phoneLanguageButton,
+html body .site-header [id*="LanguageButton"] {
+  font-size: 0 !important;
+  color: transparent !important;
+}
+html body .site-header #phoneLanguageButton span,
+html body .site-header #phoneLanguageButton .label,
+html body .site-header [id*="LanguageButton"] span,
+html body .site-header [id*="LanguageButton"] .label {
+  display: none !important;
+}
+html body .site-header #phoneLanguageButton::before,
+html body .site-header [id*="LanguageButton"]::before {
+  content: "" !important;
+  display: block !important;
+  width: 22px !important;
+  height: 22px !important;
+  flex: 0 0 22px !important;
+  background: url("https://i.postimg.cc/3Jw4W5b9/icons8-globe-30.png") center/contain no-repeat !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+/* Home page footer must be black from the far left edge to the far right edge,
+   with no transparent gutters or differently colored footer sections. */
+html body footer.manlung-footer,
+html body .manlung-footer,
+html body footer.manlung-footer > *,
+html body .manlung-footer .manlung-footer-inner,
+html body .manlung-footer .manlung-footer-grid,
+html body .manlung-footer .manlung-footer-brand,
+html body .manlung-footer .manlung-footer-column,
+html body .manlung-footer .manlung-footer-contact-row,
+html body .manlung-footer .manlung-footer-contact,
+html body .manlung-footer .manlung-footer-social-wrap,
+html body .manlung-footer .manlung-footer-social,
+html body .manlung-footer .manlung-footer-bottom,
+html body .manlung-footer .manlung-footer-legal {
+  background-color: #000 !important;
+}
+html body footer.manlung-footer,
+html body .manlung-footer {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #000 !important;
+  box-sizing: border-box !important;
+}
+html body footer.manlung-footer::before,
+html body footer.manlung-footer::after,
+html body .manlung-footer::before,
+html body .manlung-footer::after {
+  background-color: #000 !important;
+  box-shadow: none !important;
+}
+html body .manlung-footer .manlung-footer-inner {
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+@media (max-width: 768px) {
+  html body footer.manlung-footer,
+  html body .manlung-footer {
+    width: 100% !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-radius: 0 !important;
+    background: #000 !important;
+  }
+  html body .manlung-footer .manlung-footer-inner {
+    width: calc(100% - 32px) !important;
+    background: #000 !important;
+  }
+}
+</style>
