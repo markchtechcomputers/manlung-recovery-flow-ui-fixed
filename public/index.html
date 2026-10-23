@@ -4075,3 +4075,56 @@ html body #manlungSidebar .msb-links a i,
 html body #manlungSidebar .msb-links a::before { display:none!important; content:none!important; }
 html body #manlungSidebar .msb-links a { gap:0!important; }
 </style>
+
+<style id="manlung-phone-language-and-theme-icons-only">
+@media(max-width:650px){
+  html body .site-header .phone-header-shortcuts{
+    display:flex!important; flex:0 0 40px!important; width:40px!important; min-width:40px!important;
+    align-items:center!important; justify-content:center!important; margin:0!important; padding:0!important;
+  }
+  html body .site-header #phoneLanguageButton{
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    flex:0 0 40px!important; width:40px!important; min-width:40px!important;
+    height:40px!important; min-height:40px!important; padding:0!important; gap:0!important;
+    border-radius:11px!important; font-size:0!important; line-height:1!important;
+  }
+  html body .site-header #phoneLanguageButton span{display:none!important}
+  html body .site-header #phoneLanguageButton i,
+  html body .site-header #phoneLanguageButton svg{
+    display:block!important; font-size:20px!important; width:20px!important; height:20px!important;
+    line-height:1!important;
+  }
+  html body .site-header .header-actions{
+    display:flex!important; flex:0 0 40px!important; width:40px!important; min-width:40px!important;
+    align-items:center!important; justify-content:center!important; margin:0!important; padding:0!important;
+  }
+  html body .site-header button[data-theme-toggle="true"]{
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    flex:0 0 40px!important; width:40px!important; min-width:40px!important;
+    height:40px!important; min-height:40px!important; padding:0!important;
+    font-size:0!important; line-height:1!important;
+  }
+  html body .site-header button[data-theme-toggle="true"] span{display:none!important}
+  html body .site-header button[data-theme-toggle="true"] i,
+  html body .site-header button[data-theme-toggle="true"] svg{
+    display:block!important; font-size:20px!important; width:20px!important; height:20px!important;
+    line-height:1!important;
+  }
+}
+@media(max-width:390px){
+  html body .site-header .phone-header-shortcuts,
+  html body .site-header #phoneLanguageButton,
+  html body .site-header .header-actions,
+  html body .site-header button[data-theme-toggle="true"]{
+    flex-basis:34px!important; width:34px!important; min-width:34px!important;
+  }
+  html body .site-header #phoneLanguageButton,
+  html body .site-header button[data-theme-toggle="true"]{
+    height:36px!important; min-height:36px!important;
+  }
+  html body .site-header #phoneLanguageButton i,
+  html body .site-header button[data-theme-toggle="true"] i{
+    font-size:18px!important; width:18px!important; height:18px!important;
+  }
+}
+</style>
