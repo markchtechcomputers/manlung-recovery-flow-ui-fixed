@@ -4288,3 +4288,120 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
  document.addEventListener('click',e=>{if(e.target.closest('[data-theme-toggle="true"]'))window.setTimeout(sync,100);});
 })();
 </script>
+
+
+<style id="manlung-phone-header-sidebar-final-fix-20261023">
+/* Final phone header layout: brand, language, theme, menu — no empty actions column. */
+@media (max-width:650px) {
+  html body .site-header .container.home-header-container {
+    display:flex!important; flex-flow:row nowrap!important; align-items:center!important;
+    justify-content:flex-start!important; gap:6px!important; padding:8px 7px!important;
+    min-height:66px!important; width:100%!important;
+  }
+  html body .site-header .brand {
+    flex:1 1 0!important; width:auto!important; min-width:0!important;
+    margin:0!important; overflow:hidden!important;
+  }
+  html body .site-header .brand h1 {
+    white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important;
+    font-size:clamp(11px,3.2vw,14px)!important;
+  }
+  html body .site-header .brand span {
+    display:block!important; white-space:normal!important; font-size:clamp(8px,2.3vw,10px)!important;
+    line-height:1.2!important; max-width:100%!important;
+  }
+  /* The theme button is moved directly into the header by the existing header script.
+     Hide its now-empty wrapper so it cannot create a phantom extra icon/column. */
+  html body .site-header .header-actions { display:none!important; }
+  html body .site-header .phone-header-shortcuts {
+    display:flex!important; order:2!important; flex:0 0 32px!important;
+    width:32px!important; min-width:32px!important; margin:0!important; padding:0!important;
+    align-items:center!important; justify-content:center!important;
+  }
+  html body .site-header #phoneLanguageButton {
+    display:inline-flex!important; order:2!important; flex:0 0 32px!important;
+    width:32px!important; min-width:32px!important; height:36px!important; min-height:36px!important;
+    margin:0!important; padding:0!important; border-radius:9px!important;
+    align-items:center!important; justify-content:center!important; font-size:0!important;
+  }
+  html body .site-header #phoneLanguageButton span,
+  html body .site-header #phoneLanguageButton i,
+  html body .site-header #phoneLanguageButton svg { display:none!important; }
+  html body .site-header #phoneLanguageButton::before {
+    content:""!important; display:block!important; width:21px!important; height:21px!important;
+    background:url("https://i.postimg.cc/3Jw4W5b9/icons8-globe-30.png") center/contain no-repeat!important;
+  }
+  html body .site-header button[data-theme-toggle="true"] {
+    display:inline-flex!important; order:3!important; position:static!important; inset:auto!important;
+    flex:0 0 32px!important; width:32px!important; min-width:32px!important;
+    height:36px!important; min-height:36px!important; margin:0!important; padding:0!important;
+    align-items:center!important; justify-content:center!important; border-radius:9px!important;
+    font-size:0!important; line-height:1!important;
+  }
+  html body .site-header button[data-theme-toggle="true"] i,
+  html body .site-header button[data-theme-toggle="true"] svg,
+  html body .site-header button[data-theme-toggle="true"] span { display:none!important; }
+  html body .site-header button[data-theme-toggle="true"]::before {
+    content:""!important; display:block!important; width:25px!important; height:25px!important;
+    background:url("https://i.postimg.cc/fys0JTDt/icons8-sun-30.png") center/contain no-repeat!important;
+    color:transparent!important; font-size:0!important;
+  }
+  html.dark body .site-header button[data-theme-toggle="true"]::before,
+  body.dark .site-header button[data-theme-toggle="true"]::before,
+  html[data-theme="dark"] body .site-header button[data-theme-toggle="true"]::before {
+    background-image:url("https://i.postimg.cc/k432pX6g/icons8-new-moon-48.png")!important;
+  }
+  html body #manlungSidebarToggle {
+    display:inline-flex!important; order:4!important; position:static!important; inset:auto!important;
+    flex:0 0 36px!important; width:36px!important; min-width:36px!important;
+    height:36px!important; min-height:36px!important; margin:0!important; padding:0!important;
+    align-items:center!important; justify-content:center!important; border-radius:9px!important;
+    font-size:0!important;
+  }
+  html body #manlungSidebarToggle i { display:inline-block!important; font-size:18px!important; }
+  html body #manlungSidebarToggle span { display:none!important; }
+
+  /* Restore a consistent icon column for every sidebar link; retain text labels. */
+  html body #manlungSidebar .msb-links a {
+    display:flex!important; align-items:center!important; gap:10px!important; padding-left:14px!important;
+  }
+  html body #manlungSidebar .msb-links a i {
+    display:inline-flex!important; visibility:visible!important; opacity:1!important;
+    flex:0 0 19px!important; width:19px!important; min-width:19px!important;
+    align-items:center!important; justify-content:center!important; margin:0!important;
+    font-family:"Font Awesome 6 Free","Font Awesome 5 Free",FontAwesome!important;
+    font-weight:900!important; font-style:normal!important; font-size:15px!important;
+    line-height:1!important; color:#67e8f9!important;
+  }
+  html body #manlungSidebar .msb-links a.msb-primary i { color:#ffffff!important; }
+  html body #manlungSidebar .msb-links a::before { display:none!important; content:none!important; }
+}
+@media (max-width:390px) {
+  html body .site-header .container.home-header-container { gap:4px!important; padding-left:5px!important; padding-right:5px!important; }
+  html body .site-header .manlung-site-logo { flex-basis:32px!important; width:32px!important; min-width:32px!important; height:32px!important; }
+  html body .site-header .phone-header-shortcuts,
+  html body .site-header #phoneLanguageButton,
+  html body .site-header button[data-theme-toggle="true"] { flex-basis:29px!important; width:29px!important; min-width:29px!important; }
+  html body #manlungSidebarToggle { flex-basis:32px!important; width:32px!important; min-width:32px!important; }
+  html body .site-header button[data-theme-toggle="true"]::before { width:23px!important; height:23px!important; }
+}
+</style>
+<script id="manlung-phone-header-order-fix-20261023">
+(()=> {
+ const init=()=>{
+  const header=document.querySelector('.site-header .container.home-header-container');
+  const theme=document.querySelector('.site-header button[data-theme-toggle="true"]');
+  const menu=document.getElementById('manlungSidebarToggle');
+  if(header&&theme&&menu){
+   if(theme.parentElement!==header) header.insertBefore(theme,menu);
+   else if(theme.nextElementSibling!==menu) header.insertBefore(theme,menu);
+  }
+  const lang=document.getElementById('phoneLanguageButton');
+  if(header&&lang&&lang.parentElement!==header){
+   const shortcuts=lang.closest('.phone-header-shortcuts');
+   if(shortcuts&&shortcuts.parentElement!==header) header.insertBefore(shortcuts,theme||menu);
+  }
+ };
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
+})();
+</script>
