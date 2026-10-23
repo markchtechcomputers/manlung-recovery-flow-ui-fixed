@@ -4175,3 +4175,21 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
  }
 }
 </style>
+
+
+<style id="manlung-theme-icon-colours-final">
+@media(max-width:650px){
+ html body .site-header button[data-theme-toggle="true"]::before{
+  color:#000000!important;
+ }
+ /* Light appearance shows a black sun; dark appearance shows a white moon. */
+ html:not(.dark):not([data-theme="dark"]) body:not(.dark) .site-header button[data-theme-toggle="true"]::before{
+  content:"☀"!important;color:#000000!important;font:700 23px/1 Arial,sans-serif!important;
+ }
+ html.dark body .site-header button[data-theme-toggle="true"]::before,
+ body.dark .site-header button[data-theme-toggle="true"]::before,
+ html[data-theme="dark"] body .site-header button[data-theme-toggle="true"]::before{
+  content:"☾"!important;color:#ffffff!important;font:700 27px/1 Arial,sans-serif!important;
+ }
+}
+</style>
