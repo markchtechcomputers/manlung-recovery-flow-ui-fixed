@@ -4067,3 +4067,11 @@ html body .site-header button[data-theme-toggle="true"] svg {
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
+
+
+<style id="manlung-sidebar-text-only-all-screens">
+/* Sidebar navigation should be clean text links, not a row of decorative icons. */
+html body #manlungSidebar .msb-links a i,
+html body #manlungSidebar .msb-links a::before { display:none!important; content:none!important; }
+html body #manlungSidebar .msb-links a { gap:0!important; }
+</style>
