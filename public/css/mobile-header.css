@@ -235,6 +235,37 @@
   transform: scale(0.99);
 }
 
+/* Shared navigation icon alignment for desktop and phone home navigation. */
+.site-header .home-nav a i,
+.site-header .home-mobile-nav a i {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 1.05em;
+  flex: 0 0 1.05em;
+  line-height: 1;
+}
+
+.mr-home-hero .mr-hero-actions .mr-android-apk-icon {
+  display: inline-grid !important;
+  place-items: center;
+  width: 25px !important;
+  height: 25px !important;
+  min-width: 25px !important;
+  flex: 0 0 25px !important;
+  border-radius: 7px;
+  background: #8bea63 !important;
+  color: #173b12 !important;
+  text-shadow: none !important;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.25);
+}
+
+.mr-home-hero .mr-hero-actions .mr-android-apk-icon i {
+  color: #173b12 !important;
+  font-size: 0.92rem !important;
+  text-shadow: none !important;
+}
+
 .mobile-menu a:focus-visible,
 .mobile-menu-close:focus-visible,
 .mobile-menu-toggle:focus-visible,
