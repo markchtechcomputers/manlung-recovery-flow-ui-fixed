@@ -25,7 +25,7 @@ MOBILE NAVIGATION CONTROLLER
 
             const menu =
                 header.querySelector(
-                    '.mobile-nav'
+                    '.mobile-nav, .mobile-menu'
                 );
 
             const close =
