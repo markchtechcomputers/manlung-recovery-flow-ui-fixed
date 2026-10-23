@@ -2,6 +2,10 @@
   "version": 2,
   "builds": [
     {
+      "src": "api/download-apk.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/index.js",
       "use": "@vercel/node"
     },
@@ -185,6 +189,10 @@
     {
       "src": "/api/app-version",
       "dest": "/api/app-version.js"
+    },
+    {
+      "src": "/api/download-apk",
+      "dest": "/api/download-apk.js"
     },
     {
       "src": "/api/(.*)",
