@@ -303,3 +303,153 @@ body.dark .mobile-menu a {
   border-color: #334155;
   color: #f8fafc;
 }
+
+
+/* Phone-only header and drawer repair: scoped to the dedicated mobile header. */
+@media (max-width: 650px) {
+  #mobileHeader.mobile-friendly-header {
+    display: block !important;
+    position: sticky;
+    top: 0;
+    z-index: 3000;
+    width: 100%;
+    background: #fff !important;
+    color: #111827;
+    overflow: visible;
+  }
+
+  #mobileHeader .header-inner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 64px;
+    padding: 8px 12px;
+  }
+
+  #mobileHeader .mobile-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 9px;
+  }
+
+  #mobileHeader .mobile-brand-mark {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+  }
+
+  #mobileHeader .mobile-brand-text strong {
+    color: #111827 !important;
+    font-size: clamp(.82rem, 3.7vw, .96rem);
+    line-height: 1.15;
+  }
+
+  #mobileHeader .mobile-brand-text span {
+    color: #64748b !important;
+    font-size: clamp(.52rem, 2.4vw, .62rem);
+    white-space: normal;
+    line-height: 1.2;
+  }
+
+  #mobileHeader .mobile-header-actions {
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+
+  #mobileHeader .mobile-theme-toggle,
+  #mobileHeader .mobile-menu-toggle {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    flex: 0 0 40px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #111827;
+    touch-action: manipulation;
+  }
+
+  #mobileHeader .mobile-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 3001;
+    width: 100%;
+    max-height: calc(100dvh - 64px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 12px;
+    background: #fff !important;
+    color: #111827 !important;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 18px 32px rgba(15, 23, 42, .18);
+  }
+
+  #mobileHeader .mobile-menu.open,
+  #mobileHeader .mobile-menu.is-open {
+    display: grid !important;
+    gap: 8px;
+  }
+
+  #mobileHeader .mobile-menu-close {
+    position: sticky;
+    top: 0;
+    justify-self: end;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin: 0 0 4px auto;
+    border: 0;
+    border-radius: 50%;
+    background: #dc2626 !important;
+    color: #fff !important;
+    font-size: 27px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(220, 38, 38, .25);
+    z-index: 2;
+  }
+
+  #mobileHeader .mobile-menu a {
+    min-height: 48px;
+    padding: 12px 14px;
+    background: #fff !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: .9rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  #mobileHeader .mobile-menu a i {
+    display: none !important;
+  }
+
+  #mobileHeader .mobile-menu a:focus-visible,
+  #mobileHeader .mobile-menu-close:focus-visible,
+  #mobileHeader .mobile-menu-toggle:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+  }
+
+  body.mobile-menu-open {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 390px) {
+  #mobileHeader .header-inner { padding-inline: 9px; }
+  #mobileHeader .mobile-brand { gap: 7px; }
+  #mobileHeader .mobile-brand-mark { width: 36px; height: 36px; flex-basis: 36px; }
+  #mobileHeader .mobile-header-actions { gap: 4px; }
+  #mobileHeader .mobile-theme-toggle,
+  #mobileHeader .mobile-menu-toggle { width: 38px; height: 38px; min-width: 38px; flex-basis: 38px; }
+}
