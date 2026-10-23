@@ -4128,3 +4128,50 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
   }
 }
 </style>
+
+
+<style id="manlung-force-visible-header-icons-v2">
+@media(max-width:650px){
+ html body .site-header .phone-header-shortcuts,
+ html body .site-header .header-actions{
+  display:flex!important; visibility:visible!important; opacity:1!important;
+  position:static!important; transform:none!important; overflow:visible!important;
+ }
+ html body .site-header #phoneLanguageButton,
+ html body .site-header button[data-theme-toggle="true"]{
+  display:flex!important; visibility:visible!important; opacity:1!important;
+  color:#172033!important; background:#f3f4f6!important; border:1px solid #cbd5e1!important;
+  box-shadow:none!important; position:relative!important; z-index:12030!important;
+ }
+ html body .site-header #phoneLanguageButton i,
+ html body .site-header #phoneLanguageButton svg,
+ html body .site-header button[data-theme-toggle="true"] i,
+ html body .site-header button[data-theme-toggle="true"] svg{
+  display:inline-block!important; visibility:visible!important; opacity:1!important;
+  color:currentColor!important; fill:currentColor!important; stroke:currentColor!important;
+  width:22px!important; min-width:22px!important; height:22px!important; min-height:22px!important;
+  font-size:22px!important; line-height:1!important; flex:0 0 22px!important;
+ }
+ html body .site-header #phoneLanguageButton i::before,
+ html body .site-header button[data-theme-toggle="true"] i::before{
+  display:inline-block!important; visibility:visible!important; opacity:1!important;
+  font-family:"Font Awesome 6 Free","Font Awesome 5 Free",FontAwesome!important;
+  font-weight:900!important; line-height:1!important;
+ }
+ html body .site-header #phoneLanguageButton::before{
+  content:"◎"!important; display:block!important; color:#172033!important;
+  font:700 25px/1 Arial,sans-serif!important;
+ }
+ html body .site-header #phoneLanguageButton i{display:none!important}
+ html body .site-header button[data-theme-toggle="true"] i{display:none!important}
+ html body .site-header button[data-theme-toggle="true"]::before{
+  content:"☾"!important; display:block!important; color:#172033!important;
+  font:700 27px/1 Arial,sans-serif!important;
+ }
+ html.dark body .site-header button[data-theme-toggle="true"]::before,
+ body.dark .site-header button[data-theme-toggle="true"]::before,
+ html[data-theme="dark"] body .site-header button[data-theme-toggle="true"]::before{
+  content:"☀"!important; font-size:23px!important;
+ }
+}
+</style>
