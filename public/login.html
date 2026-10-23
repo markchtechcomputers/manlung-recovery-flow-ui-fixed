@@ -2376,5 +2376,137 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
   </div>
 <style id="manlung-footer-social-icons-v2">.manlung-footer-social{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap}.manlung-footer-social a{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:4px;border-radius:12px;background:rgba(255,255,255,.04);transition:transform .18s ease,background .18s ease}.manlung-footer-social a:hover{transform:translateY(-2px);background:rgba(37,99,235,.14)}.manlung-footer-social a img{display:block;width:32px;height:32px;object-fit:contain}.manlung-footer-social a:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}@media(max-width:600px){.manlung-footer-social{gap:10px}.manlung-footer-social a{width:40px;height:40px}}</style></footer>
+
+<!-- Capacitor Android external-browser OAuth return support -->
+<script id="manlung-capacitor-oauth-bridge">
+(function () {
+  const APP_REDIRECT = 'co.manlungrecovery.app://auth/callback';
+  const isNativeAndroid = () => {
+    try {
+      const cap = window.Capacitor;
+      return !!cap && (typeof cap.isNativePlatform === 'function' ? cap.isNativePlatform() : cap.getPlatform?.() === 'android');
+    } catch (_) { return false; }
+  };
+  const plugins = () => window.Capacitor?.Plugins || {};
+  let callbackBusy = false;
+
+  async function supabaseClient() {
+    const cfg = await fetch('/api/config/public', { cache: 'no-store' }).then(r => {
+      if (!r.ok) throw new Error('Could not load secure sign-in settings.');
+      return r.json();
+    });
+    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !window.supabase?.createClient) {
+      throw new Error('Secure Google sign-in is not configured.');
+    }
+    return window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, flowType: 'pkce', storage: window.localStorage }
+    });
+  }
+
+  function showNativeStatus(message, kind) {
+    const target = document.getElementById('loginError');
+    if (target && typeof showMessage === 'function') showMessage(target, message, kind || 'info');
+  }
+
+  async function startNativeOAuth(provider) {
+    try {
+      const { Browser } = plugins();
+      if (!Browser?.open) throw new Error('The app browser bridge is unavailable. Please update the Manlung APK.');
+      localStorage.removeItem('clientUser');
+      showNativeStatus('Opening secure ' + (provider === 'google' ? 'Google' : 'GitHub') + ' sign-in…');
+      const client = await supabaseClient();
+      const { data, error } = await client.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: APP_REDIRECT, skipBrowserRedirect: true }
+      });
+      if (error) throw error;
+      if (!data?.url) throw new Error('The sign-in provider did not return a secure login link.');
+      await Browser.open({ url: data.url, presentationStyle: 'popover' });
+    } catch (error) {
+      console.error('Native OAuth start failed:', error);
+      showNativeStatus(error?.message || 'Could not start sign-in. Please try again.', 'error');
+    }
+  }
+
+  async function finishNativeOAuth(callbackUrl) {
+    if (callbackBusy || !/^co\.manlungrecovery\.app:\/\/auth\/callback/i.test(callbackUrl)) return;
+    callbackBusy = true;
+    try {
+      const { Browser, App } = plugins();
+      try { await Browser?.close?.(); } catch (_) {}
+      const client = await supabaseClient();
+      const callback = new URL(callbackUrl);
+      const oauthError = callback.searchParams.get('error_description') || callback.searchParams.get('error');
+      if (oauthError) throw new Error(oauthError);
+      const code = callback.searchParams.get('code');
+      if (!code) throw new Error('The provider returned without an authorization code. Please try again.');
+      const { data: exchanged, error: exchangeError } = await client.auth.exchangeCodeForSession(callbackUrl);
+      if (exchangeError) throw exchangeError;
+      let session = exchanged?.session;
+      if (!session?.access_token) {
+        const { data, error } = await client.auth.getSession();
+        if (error) throw error;
+        session = data?.session;
+      }
+      if (!session?.access_token) throw new Error('Sign-in returned to the app, but the secure session is missing.');
+      const response = await fetch('/api/auth/client/oauth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({ accessToken: session.access_token })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success || !result.user) throw new Error(result.error || 'The server could not finish signing you in.');
+      localStorage.setItem('clientUser', JSON.stringify(result.user));
+      try { await client.auth.signOut(); } catch (_) {}
+      try { await App?.removeAllListeners?.(); } catch (_) {}
+      window.location.replace('/client/dashboard.html?session=1');
+    } catch (error) {
+      console.error('Native OAuth callback failed:', error);
+      showNativeStatus(error?.message || 'Sign-in could not return to Manlung. Please try again.', 'error');
+    } finally {
+      callbackBusy = false;
+    }
+  }
+
+  const originalGoogleSetup = window.setupOfficialGoogleButtons;
+  if (typeof originalGoogleSetup === 'function') {
+    window.setupOfficialGoogleButtons = async function () {
+      if (isNativeAndroid()) return;
+      return originalGoogleSetup.apply(this, arguments);
+    };
+  }
+  const originalSocialSignup = window.startSocialSignup;
+  if (typeof originalSocialSignup === 'function') {
+    window.startSocialSignup = function (provider) {
+      if (isNativeAndroid()) return startNativeOAuth(provider);
+      return originalSocialSignup.apply(this, arguments);
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', async function () {
+    if (!isNativeAndroid()) return;
+    const { App } = plugins();
+    if (App?.addListener) {
+      await App.addListener('appUrlOpen', event => {
+        if (event?.url) finishNativeOAuth(event.url);
+      });
+    }
+    [['googleLoginBtn', 'google'], ['googleRegisterBtn', 'google']].forEach(([id, provider]) => {
+      const host = document.getElementById(id);
+      if (!host) return;
+      host.innerHTML = '';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'manlung-google-btn';
+      button.setAttribute('aria-label', 'Continue with Google');
+      button.textContent = 'Continue with Google';
+      button.addEventListener('click', () => startNativeOAuth(provider));
+      host.appendChild(button);
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
