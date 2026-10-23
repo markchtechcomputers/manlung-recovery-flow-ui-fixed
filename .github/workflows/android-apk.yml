@@ -126,6 +126,29 @@ jobs:
           npx cap add android
           npx capacitor-assets generate --android
           npx cap sync android
+          # Register the custom OAuth callback URI so external Google/GitHub login can reopen the APK.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          source = manifest.read_text()
+          activity = re.search(r'(<activity\\b[^>]*android:name="[^"]*MainActivity"[^>]*>)([\\s\\S]*?)(</activity>)', source)
+          if not activity:
+              raise SystemExit("Could not locate the Capacitor MainActivity in AndroidManifest.xml")
+          if "co.manlungrecovery.app" not in activity.group(2):
+              intent_filter = '''
+                  <intent-filter>
+                      <action android:name="android.intent.action.VIEW" />
+                      <category android:name="android.intent.category.DEFAULT" />
+                      <category android:name="android.intent.category.BROWSABLE" />
+                      <data android:scheme="co.manlungrecovery.app" android:host="auth" android:path="/callback" />
+                  </intent-filter>
+              '''
+              replacement = activity.group(1) + activity.group(2) + intent_filter + activity.group(3)
+              source = source[:activity.start()] + replacement + source[activity.end():]
+              manifest.write_text(source)
+          print("Registered co.manlungrecovery.app://auth/callback for OAuth return")
+          PY
           # Android WebView may block muted background-video autoplay unless this is disabled.
           python3 - <<'PY'
           from pathlib import Path
