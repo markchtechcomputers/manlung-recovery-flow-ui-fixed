@@ -4193,3 +4193,98 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
  }
 }
 </style>
+
+
+<style id="manlung-final-phone-header-icons-20261023">
+@media (max-width:650px) {
+  html body .site-header .container.home-header-container {
+    display:flex!important; flex-flow:row nowrap!important; align-items:center!important;
+    gap:7px!important; padding:9px 8px!important; min-height:68px!important;
+  }
+  html body .site-header .brand {
+    flex:1 1 auto!important; width:auto!important; min-width:0!important;
+  }
+  html body .site-header .phone-header-shortcuts {
+    display:flex!important; flex:0 0 36px!important; width:36px!important; min-width:36px!important;
+    align-items:center!important; justify-content:center!important; margin:0!important;
+  }
+  html body .site-header #phoneLanguageButton {
+    display:inline-flex!important; flex:0 0 36px!important; width:36px!important; min-width:36px!important;
+    height:38px!important; min-height:38px!important; align-items:center!important; justify-content:center!important;
+    padding:0!important; margin:0!important; font-size:0!important; gap:0!important;
+  }
+  html body .site-header #phoneLanguageButton span,
+  html body .site-header #phoneLanguageButton i,
+  html body .site-header #phoneLanguageButton svg { display:none!important; }
+  html body .site-header #phoneLanguageButton::before {
+    content:""!important; display:block!important; width:22px!important; height:22px!important;
+    background:url("https://i.postimg.cc/3Jw4W5b9/icons8-globe-30.png") center/contain no-repeat!important;
+  }
+  html body .site-header .header-actions {
+    display:flex!important; flex:0 0 38px!important; width:38px!important; min-width:38px!important;
+    align-items:center!important; justify-content:center!important; margin:0!important; padding:0!important;
+  }
+  html body .site-header button[data-theme-toggle="true"] {
+    display:inline-flex!important; flex:0 0 38px!important; width:38px!important; min-width:38px!important;
+    height:38px!important; min-height:38px!important; align-items:center!important; justify-content:center!important;
+    padding:0!important; margin:0!important; font-size:0!important; line-height:1!important;
+    border-radius:10px!important; position:static!important;
+  }
+  html body .site-header button[data-theme-toggle="true"] i,
+  html body .site-header button[data-theme-toggle="true"] svg,
+  html body .site-header button[data-theme-toggle="true"] span { display:none!important; }
+  html body .site-header button[data-theme-toggle="true"]::before {
+    content:""!important; display:block!important; width:26px!important; height:26px!important;
+    background-image:url("https://i.postimg.cc/fys0JTDt/icons8-sun-30.png")!important;
+    background-position:center!important; background-size:contain!important; background-repeat:no-repeat!important;
+    color:transparent!important; font-size:0!important;
+  }
+  html.dark body .site-header button[data-theme-toggle="true"]::before,
+  body.dark .site-header button[data-theme-toggle="true"]::before,
+  html[data-theme="dark"] body .site-header button[data-theme-toggle="true"]::before {
+    background-image:url("https://i.postimg.cc/k432pX6g/icons8-new-moon-48.png")!important;
+  }
+  html body #manlungSidebarToggle {
+    display:inline-flex!important; flex:0 0 40px!important; width:40px!important; min-width:40px!important;
+    height:38px!important; min-height:38px!important; margin:0!important; padding:0!important;
+  }
+  /* Keep the three controls in separate columns: language, theme, menu. */
+  html body .site-header .phone-header-shortcuts { order:2!important; }
+  html body .site-header .header-actions { order:3!important; }
+  html body #manlungSidebarToggle { order:4!important; }
+  /* Restore sidebar navigation icons, with consistent sizing and spacing. */
+  html body #manlungSidebar .msb-links a i {
+    display:inline-flex!important; flex:0 0 18px!important; width:18px!important;
+    align-items:center!important; justify-content:center!important; font-size:15px!important;
+    margin-right:9px!important; color:#0f766e!important;
+  }
+  html body #manlungSidebar .msb-links a::before { display:none!important; content:none!important; }
+  html body #manlungSidebar .msb-links a { gap:0!important; padding-left:12px!important; }
+  html body #manlungSidebar .msb-links a.msb-primary i { color:#fff!important; }
+}
+@media(max-width:390px) {
+  html body .site-header .container.home-header-container { gap:5px!important; padding-left:6px!important; padding-right:6px!important; }
+  html body .site-header .phone-header-shortcuts { flex-basis:32px!important; width:32px!important; min-width:32px!important; }
+  html body .site-header #phoneLanguageButton { flex-basis:32px!important; width:32px!important; min-width:32px!important; }
+  html body .site-header .header-actions { flex-basis:34px!important; width:34px!important; min-width:34px!important; }
+  html body .site-header button[data-theme-toggle="true"] { flex-basis:34px!important; width:34px!important; min-width:34px!important; }
+  html body #manlungSidebarToggle { flex-basis:36px!important; width:36px!important; min-width:36px!important; }
+}
+</style>
+<script id="manlung-final-theme-image-sync-20261023">
+(()=> {
+ const sync=()=>{
+  const btn=document.querySelector('.site-header button[data-theme-toggle="true"]');
+  if(!btn)return;
+  const dark=document.documentElement.classList.contains('dark') ||
+    document.body.classList.contains('dark') ||
+    document.documentElement.getAttribute('data-theme')==='dark';
+  btn.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');
+  btn.setAttribute('title',dark?'Light mode':'Dark mode');
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync,{once:true});else sync();
+ new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme']});
+ new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});
+ document.addEventListener('click',e=>{if(e.target.closest('[data-theme-toggle="true"]'))window.setTimeout(sync,100);});
+})();
+</script>
