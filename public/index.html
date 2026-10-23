@@ -2916,18 +2916,32 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: .55rem !important;
-  width: fit-content !important;
-  max-width: 100% !important;
+  justify-self: start !important;
+  align-self: start !important;
+  gap: .4rem !important;
+  width: max-content !important;
+  max-width: min(100%, 260px) !important;
   min-width: 0 !important;
-  min-height: 46px !important;
-  padding: .72rem 1rem !important;
+  min-height: 40px !important;
+  padding: .52rem .78rem !important;
   box-sizing: border-box !important;
   border-radius: 10px !important;
-  font-size: .9rem !important;
-  line-height: 1.2 !important;
-  white-space: normal !important;
+  font-size: .82rem !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
   text-align: center !important;
+}
+html.manlung-android-app body .home-page-container .mr-hero-actions a.mr-hero-download {
+  display: none !important;
+}
+@media (max-width: 480px) {
+  html body .home-page-container .mr-hero-actions a.mr-hero-download {
+    max-width: min(100%, 240px) !important;
+    min-height: 38px !important;
+    padding: .48rem .68rem !important;
+    font-size: .78rem !important;
+    gap: .32rem !important;
+  }
 }
 html body .home-page-container .mr-hero-actions a.mr-hero-download span {
   min-width: 0 !important;
