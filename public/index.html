@@ -1982,9 +1982,6 @@ body.manlung-sidebar-open{overflow:hidden}
                 <a href="/faq.html">FAQ</a>
                 <a class="home-auth-link home-account-icon" href="/login.html" aria-label="Sign in or create an account" title="Account"><img class="home-account-image-icon home-account-image-icon-light" src="https://i.postimg.cc/RCGFYgnM/icons8-login-64.png" alt="" aria-hidden="true" loading="eager" decoding="async"><img class="home-account-image-icon home-account-image-icon-dark" src="https://i.postimg.cc/QCdzV8b7/icons8-login-100.png" alt="" aria-hidden="true" loading="eager" decoding="async"></a>
             </nav>
-            <div class="phone-header-shortcuts" aria-label="Header utilities">
-                <button type="button" id="phoneLanguageButton" aria-label="Choose language" title="Choose language"><i class="fas fa-globe" aria-hidden="true"></i><span>Language</span></button>
-            </div>
             <div class="header-actions">
                 <button class="btn btn-outline" data-theme-toggle="true" type="button" aria-label="Switch to dark mode"></button>
                 <a href="/client/request.html" class="btn btn-primary"><i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Request</a>
@@ -3108,6 +3105,7 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download i {
  <nav class="msb-links msb-account-links" aria-label="Account and preferences">
   <a href="/login.html"><i class="fas fa-user-circle" aria-hidden="true"></i><span>Sign In / Create Account</span></a>
   <a href="/settings.html"><i class="fas fa-sliders" aria-hidden="true"></i><span>Settings</span></a>
+  <button class="msb-theme-action" type="button" id="msbLanguageAction"><i class="fas fa-globe" aria-hidden="true"></i><span>Language / Translation</span></button>
   <button class="msb-theme-action" type="button" id="msbThemeAction"><i class="fas fa-circle-half-stroke" aria-hidden="true"></i><span>Switch light / dark mode</span></button>
   <a href="/terms.html"><i class="fas fa-file-contract" aria-hidden="true"></i><span>Terms &amp; Conditions</span></a>
   <a href="/privacy.html"><i class="fas fa-user-shield" aria-hidden="true"></i><span>Privacy Notice</span></a>
@@ -3220,9 +3218,9 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download i {
  html body #manlungSidebarToggle{width:34px!important;min-width:34px!important;height:32px!important;min-height:32px!important}
 }
 </style>
-<script id="manlung-phone-language-action">
+<script id="manlung-sidebar-language-action">
 (function(){
- var button=document.getElementById('phoneLanguageButton');
+ var button=document.getElementById('msbLanguageAction');
  if(!button)return;
  button.addEventListener('click',function(){
    var selectors=['#google_translate_element select','[id*="language-selector" i] select','select[aria-label*="language" i]','select[name*="language" i]','.goog-te-combo'];
@@ -3231,9 +3229,8 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download i {
    if(selector){selector.focus();selector.click();return;}
    var languageUi=document.querySelector('#google_translate_element,[id*="language-selector" i],[class*="language-selector" i]');
    if(languageUi){languageUi.scrollIntoView({behavior:'smooth',block:'center'});return;}
-   button.setAttribute('aria-label','Language selector is not configured on this page');
-   button.title='Language selector is not configured on this page';
-   window.setTimeout(function(){button.setAttribute('aria-label','Choose language');button.title='Choose language';},2200);
+   button.querySelector('span').textContent='Translation unavailable on this page';
+   window.setTimeout(function(){button.querySelector('span').textContent='Language / Translation';},2200);
  });
 })();
 </script>
@@ -4519,3 +4516,28 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
+
+
+<style id="manlung-mobile-header-without-language-20261023">
+@media(max-width:650px){
+ html body .site-header .container.home-header-container{
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr) 38px 38px!important;
+  grid-template-areas:"brandmark brand theme menu"!important;
+  align-items:center!important;gap:6px!important;padding:8px 8px!important;
+ }
+ html body .site-header .phone-header-shortcuts,
+ html body .site-header #phoneLanguageButton{display:none!important}
+ html body .site-header .manlung-home-logo{grid-area:brandmark!important}
+ html body .site-header .brand{grid-area:brand!important;min-width:0!important}
+ html body .site-header button[data-theme-toggle="true"]{grid-area:theme!important}
+ html body #manlungSidebarToggle{grid-area:menu!important;justify-self:end!important}
+}
+@media(max-width:380px){
+ html body .site-header .container.home-header-container{grid-template-columns:30px minmax(0,1fr) 34px 34px!important;gap:5px!important;padding-inline:6px!important}
+}
+#manlungSidebar #msbLanguageAction{display:flex!important;align-items:center!important;gap:11px!important;width:100%!important;min-height:42px!important;padding:9px 11px!important;border:0!important;border-radius:10px!important;background:transparent!important;color:inherit!important;text-align:left!important;font:inherit!important;cursor:pointer!important}
+#manlungSidebar #msbLanguageAction i{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 19px!important;width:19px!important;color:#67e8f9!important}
+#manlungSidebar #msbLanguageAction span{font-size:13px!important;line-height:1.25!important}
+#manlungSidebar #msbLanguageAction:hover{background:rgba(103,232,249,.1)!important}
+</style>
