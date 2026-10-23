@@ -4539,3 +4539,70 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
 #manlungSidebar .msb-links a{gap:0!important}
 #manlungSidebar .msb-links a span{display:block!important}
 </style>
+
+
+<!-- MANLUNG FINAL PHONE HEADER / THEME / SIDEBAR FIX 20261023 -->
+<link rel="preload" as="image" href="https://i.postimg.cc/ZnVkndnb/icons8-dark-mode-50.png" fetchpriority="high">
+<link rel="preload" as="image" href="https://i.postimg.cc/fys0JTDt/icons8-sun-30.png" fetchpriority="high">
+<style id="manlung-final-phone-header-theme-sidebar-20261023">
+@media(max-width:650px){
+ html body .site-header .container.home-header-container{
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr) 34px 36px 36px!important;
+  grid-template-areas:"brandmark brand language theme menu"!important;
+  align-items:center!important;gap:5px!important;padding:8px 7px!important;
+ }
+ html body .site-header .manlung-home-logo{grid-area:brandmark!important}
+ html body .site-header .brand{grid-area:brand!important;min-width:0!important;width:auto!important}
+ html body .site-header .phone-header-shortcuts{grid-area:language!important;display:flex!important;width:34px!important;min-width:34px!important;flex:0 0 34px!important;margin:0!important}
+ html body .site-header #phoneLanguageButton{display:inline-flex!important;grid-area:language!important;width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;align-items:center!important;justify-content:center!important;font-size:0!important}
+ html body .site-header #phoneLanguageButton span,html body .site-header #phoneLanguageButton i,html body .site-header #phoneLanguageButton svg{display:none!important}
+ html body .site-header #phoneLanguageButton:before{content:""!important;display:block!important;width:22px!important;height:22px!important;background:url("https://i.postimg.cc/3Jw4W5b9/icons8-globe-30.png") center/contain no-repeat!important}
+ html body .site-header button[data-theme-toggle="true"]{grid-area:theme!important;display:inline-flex!important;position:static!important;width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;margin:0!important;align-items:center!important;justify-content:center!important;font-size:0!important}
+ html body .site-header button[data-theme-toggle="true"] img.manlung-theme-image{display:block!important;width:26px!important;height:26px!important;min-width:26px!important;min-height:26px!important;object-fit:contain!important}
+ html body #manlungSidebarToggle{grid-area:menu!important;justify-self:end!important;width:36px!important;min-width:36px!important;height:34px!important;min-height:34px!important}
+ html body #manlungSidebar .msb-links a i,html body #manlungSidebar .msb-account-links a i,html body #manlungSidebar .msb-theme-action i{display:none!important;visibility:hidden!important;width:0!important;min-width:0!important;flex:0 0 0!important}
+ html body #manlungSidebar .msb-links a,html body #manlungSidebar .msb-account-links a{gap:0!important;padding-left:14px!important}
+}
+@media(max-width:380px){
+ html body .site-header .container.home-header-container{grid-template-columns:30px minmax(0,1fr) 30px 32px 34px!important;gap:4px!important;padding-inline:5px!important}
+ html body .site-header .phone-header-shortcuts,html body .site-header #phoneLanguageButton{width:30px!important;min-width:30px!important;flex-basis:30px!important}
+}
+</style>
+<script id="manlung-final-phone-header-theme-sidebar-js-20261023">
+(()=> {
+ const init=()=>{
+  const header=document.querySelector('.site-header .container.home-header-container');
+  const lang=document.getElementById('phoneLanguageButton');
+  const shortcuts=lang&&lang.closest('.phone-header-shortcuts');
+  const theme=document.querySelector('.site-header button[data-theme-toggle="true"]');
+  const menu=document.getElementById('manlungSidebarToggle');
+  if(header&&shortcuts&&shortcuts.parentElement!==header)header.insertBefore(shortcuts,theme||menu||null);
+  if(header&&theme&&theme.parentElement!==header)header.insertBefore(theme,menu||null);
+  if(theme){
+   let img=theme.querySelector('img.manlung-theme-image');
+   if(!img){img=document.createElement('img');img.className='manlung-theme-image';img.alt='';img.setAttribute('aria-hidden','true');theme.replaceChildren(img);}
+   const paint=()=>{
+    const root=document.documentElement,body=document.body;
+    const dark=root.classList.contains('dark')||body.classList.contains('dark')||root.getAttribute('data-theme')==='dark'||body.getAttribute('data-theme')==='dark'||root.getAttribute('data-bs-theme')==='dark';
+    const src=dark?'https://i.postimg.cc/ZnVkndnb/icons8-dark-mode-50.png':'https://i.postimg.cc/fys0JTDt/icons8-sun-30.png';
+    if(img.getAttribute('src')!==src)img.setAttribute('src',src);
+    theme.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');theme.title=dark?'Light mode':'Dark mode';
+   };
+   paint();
+   new MutationObserver(paint).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme','data-bs-theme']});
+   new MutationObserver(paint).observe(document.body,{attributes:true,attributeFilter:['class','data-theme']});
+   theme.addEventListener('click',()=>{setTimeout(paint,50);setTimeout(paint,200);setTimeout(paint,500);});
+  }
+  const removeSidebarIcons=()=>{
+   document.querySelectorAll('#manlungSidebar .msb-links a i,#manlungSidebar .msb-account-links a i,#manlungSidebar .msb-theme-action i').forEach(i=>{
+    i.style.removeProperty('display');i.style.removeProperty('visibility');i.style.removeProperty('opacity');
+    i.style.setProperty('display','none','important');i.style.setProperty('visibility','hidden','important');
+   });
+  };
+  removeSidebarIcons();
+  new MutationObserver(removeSidebarIcons).observe(document.getElementById('manlungSidebar')||document.body,{childList:true,subtree:true});
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
