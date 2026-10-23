@@ -22,7 +22,7 @@ jobs:
           node-version: 22
           cache: npm
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       - name: Run regression and security tests
         run: npm test
       - name: Validate build
