@@ -392,3 +392,52 @@ html body main :where(section + section, .section + .section, .panel + .panel, .
 @media(prefers-reduced-motion:reduce){
  .manlung-footer-links a,.manlung-footer-contact a,.manlung-footer-social a{transition:none!important}
 }
+
+
+/* Force the entire shared footer area to stay pure black on desktop and phones. */
+footer,
+.site-footer,
+#site-footer,
+.manlung-footer,
+.manlung-footer-inner,
+.manlung-footer-grid,
+.manlung-footer-brand,
+.manlung-footer-column,
+.manlung-footer-contact-row,
+.manlung-footer-contact,
+.manlung-footer-social,
+.manlung-footer-bottom,
+.manlung-footer-legal {
+  background-color: #000 !important;
+}
+.manlung-footer,
+.site-footer,
+#site-footer {
+  background: #000 !important;
+}
+.manlung-footer::before,
+.manlung-footer::after,
+.site-footer::before,
+.site-footer::after,
+#site-footer::before,
+#site-footer::after {
+  background-color: #000 !important;
+}
+@media (max-width: 768px) {
+  footer,
+  .site-footer,
+  #site-footer,
+  .manlung-footer,
+  .manlung-footer-inner,
+  .manlung-footer-grid,
+  .manlung-footer-brand,
+  .manlung-footer-column,
+  .manlung-footer-contact-row,
+  .manlung-footer-contact,
+  .manlung-footer-social,
+  .manlung-footer-bottom,
+  .manlung-footer-legal {
+    background: #000 !important;
+    background-color: #000 !important;
+  }
+}
