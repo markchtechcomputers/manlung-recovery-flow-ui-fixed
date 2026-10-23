@@ -4606,3 +4606,48 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
+
+
+<!-- MANLUNG ICON BACKGROUND REMOVAL — PHONE PRIORITY 2026-10-23 -->
+<style id="manlung-clean-icon-surfaces">
+/* Remove decorative button layers behind header icons, especially on phones. */
+.site-header #phoneLanguageButton,
+.site-header button[data-theme-toggle="true"],
+.site-header .phone-header-shortcuts,
+.site-header .phone-header-shortcuts a,
+.site-header .phone-header-shortcuts button {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.site-header #phoneLanguageButton::after,
+.site-header #phoneLanguageButton::before,
+.site-header button[data-theme-toggle="true"]::after {
+  box-shadow: none !important;
+  border: 0 !important;
+}
+@media (max-width: 768px) {
+  .site-header #phoneLanguageButton,
+  .site-header button[data-theme-toggle="true"],
+  .site-header .phone-header-shortcuts,
+  .site-header .phone-header-shortcuts a,
+  .site-header .phone-header-shortcuts button,
+  #manlungSidebar .msb-links a i,
+  #manlungSidebar .msb-account-links a i,
+  #manlungSidebar .msb-theme-action i {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+  }
+  .site-header #phoneLanguageButton,
+  .site-header button[data-theme-toggle="true"] {
+    -webkit-tap-highlight-color: transparent !important;
+  }
+}
+</style>
