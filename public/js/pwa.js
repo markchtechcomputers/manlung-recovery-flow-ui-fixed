@@ -75,12 +75,18 @@
 
   function isAndroidApp() {
     try {
-      return Boolean(window.Capacitor?.isNativePlatform?.()) ||
+      const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.()) ||
         /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator.userAgent);
+      if (nativeApp) document.documentElement.classList.add('manlung-android-app');
+      return nativeApp;
     } catch (_) {
       return false;
     }
   }
+
+  // Mark the document before the page finishes rendering so browser-only
+  // download controls stay hidden inside the installed Android app.
+  isAndroidApp();
 
   function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches ||
