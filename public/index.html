@@ -3965,3 +3965,105 @@ html body footer.manlung-footer .manlung-footer-social a img{
   html body #manlungSidebarToggle {min-width:60px!important;min-height:39px!important;height:39px!important;padding:0 8px!important;font-size:11px!important}
 }
 </style>
+
+
+<style id="manlung-mobile-header-and-icon-only-theme-final">
+/* Final responsive header: readable brand, no empty utility tiles, icon-only theme switch. */
+html body .site-header .container.home-header-container { min-width:0!important; }
+html body .site-header .brand-copy { min-width:0!important; }
+html body .site-header .brand h1 { white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important; }
+html body .site-header button[data-theme-toggle="true"] {
+  display:inline-flex!important; align-items:center!important; justify-content:center!important;
+  flex:0 0 42px!important; width:42px!important; min-width:42px!important;
+  height:42px!important; min-height:42px!important; padding:0!important;
+  border-radius:12px!important; font-size:0!important; line-height:1!important;
+}
+html body .site-header button[data-theme-toggle="true"] i,
+html body .site-header button[data-theme-toggle="true"] svg {
+  display:block!important; width:20px!important; height:20px!important;
+  font-size:20px!important; line-height:1!important;
+}
+@media(max-width:650px) {
+  html body .site-header .container.home-header-container {
+    display:flex!important; flex-flow:row nowrap!important; align-items:center!important;
+    justify-content:flex-start!important; gap:8px!important; min-height:72px!important;
+    padding:9px 10px!important; overflow:visible!important;
+  }
+  html body .site-header .manlung-home-logo,
+  html body .site-header .manlung-site-logo {
+    display:flex!important; flex:0 0 38px!important; width:38px!important; min-width:38px!important;
+    height:38px!important; min-height:38px!important; margin:0!important;
+  }
+  html body .site-header .brand {
+    display:block!important; flex:1 1 auto!important; width:auto!important; min-width:0!important;
+    margin:0!important; text-align:left!important;
+  }
+  html body .site-header .brand h1 {
+    font-size:clamp(12px,3.6vw,15px)!important; line-height:1.2!important;
+  }
+  html body .site-header .brand span {
+    display:block!important; margin-top:3px!important; font-size:9px!important;
+    line-height:1.25!important; white-space:normal!important; overflow-wrap:anywhere!important;
+  }
+  html body .site-header .phone-header-shortcuts,
+  html body .site-header #phoneLanguageButton,
+  html body .site-header .header-actions > a[href="/client/request.html"],
+  html body .site-header .home-nav,
+  html body .site-header .home-mobile-menu,
+  html body #homeMobileNav { display:none!important; }
+  html body .site-header .header-actions {
+    display:flex!important; flex:0 0 42px!important; width:42px!important; min-width:42px!important;
+    align-items:center!important; justify-content:center!important; gap:0!important;
+    margin:0!important; padding:0!important; position:static!important;
+  }
+  html body #manlungSidebarToggle {
+    display:inline-flex!important; flex:0 0 44px!important; width:44px!important; min-width:44px!important;
+    height:42px!important; min-height:42px!important; margin:0 0 0 0!important; padding:0!important;
+    align-items:center!important; justify-content:center!important; gap:0!important;
+    border-radius:11px!important; font-size:0!important;
+  }
+  html body #manlungSidebarToggle i { display:inline-block!important; font-size:20px!important; }
+  html body #manlungSidebarToggle span { display:none!important; }
+  html body #manlungSidebarToggle::after {
+    content:"Menu"; display:block; position:absolute; width:1px; height:1px;
+    overflow:hidden; clip-path:inset(50%); white-space:nowrap;
+  }
+  html body #manlungSidebar { width:min(340px,88vw)!important; max-width:88vw!important; }
+  /* Sidebar rows are text-first: remove decorative icons and arrow markers. */
+  html body #manlungSidebar .msb-links a i,
+  html body #manlungSidebar .msb-links a::before { display:none!important; content:none!important; }
+  html body #manlungSidebar .msb-links a { gap:0!important; padding-left:14px!important; }
+}
+@media(max-width:380px) {
+  html body .site-header .container.home-header-container { gap:6px!important; padding-left:7px!important; padding-right:7px!important; }
+  html body .site-header .manlung-home-logo,
+  html body .site-header .manlung-site-logo { flex-basis:34px!important; width:34px!important; min-width:34px!important; height:34px!important; min-height:34px!important; }
+  html body .site-header .brand h1 { font-size:12px!important; }
+  html body .site-header .brand span { font-size:8px!important; }
+}
+</style>
+<script id="manlung-theme-icon-only-final">
+(()=> {
+ const init=()=>{
+  const header=document.querySelector('.site-header .container.home-header-container');
+  const theme=document.querySelector('.site-header button[data-theme-toggle="true"]');
+  const menu=document.getElementById('manlungSidebarToggle');
+  if(header&&theme&&menu&&theme.parentElement!==header) header.insertBefore(theme,menu);
+  if(theme){
+   const paint=()=>{
+    const dark=document.body.classList.contains('dark')||document.documentElement.classList.contains('dark')||document.documentElement.getAttribute('data-theme')==='dark';
+    theme.innerHTML=dark?'<i class="fas fa-sun" aria-hidden="true"></i>':'<i class="fas fa-moon" aria-hidden="true"></i>';
+    theme.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');
+    theme.setAttribute('title',dark?'Light mode':'Dark mode');
+   };
+   paint();
+   theme.addEventListener('click',()=>window.setTimeout(paint,80));
+   document.addEventListener('click',e=>{if(e.target.closest('[data-theme-toggle="true"]'))window.setTimeout(paint,120)});
+   const observer=new MutationObserver(paint);
+   observer.observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme']});
+   observer.observe(document.body,{attributes:true,attributeFilter:['class']});
+  }
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
