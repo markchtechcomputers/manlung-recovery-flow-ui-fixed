@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - fix-current-deployment-20261022
 
 permissions:
   contents: write
