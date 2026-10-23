@@ -3088,19 +3088,29 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download i {
 <div id="manlungSidebarBackdrop" aria-hidden="true"></div>
 <aside id="manlungSidebar" aria-label="Manlung Recovery navigation" aria-hidden="true">
  <div class="msb-head"><a class="msb-brand" href="/" aria-label="Manlung Recovery home"><img src="/icons/icon-512.png" alt="" width="48" height="48"><span class="msb-brand-copy"><strong>Manlung Recovery</strong><small>Cyber Recovery &amp; Digital Investigation</small><span class="msb-status">Secure recovery portal</span></span></a><button class="msb-close" type="button" aria-label="Close menu"><i class="fas fa-xmark" aria-hidden="true"></i></button></div>
- <div class="msb-kicker">Explore the portal</div>
- <nav class="msb-links" aria-label="Site sections">
-  <a href="/#services">Services</a>
-  <a href="/#how-it-works">How It Works</a>
-  <a href="/#case-tracker">Case Tracker</a>
-  <a href="/#scam-help">Scam Help</a>
-  <a href="/about.html">About</a>
-  <a href="/faq.html">FAQ</a>
-  <a href="/client/track.html">Track My Case</a>
-  <a href="/login.html">Sign In / Account</a>
-  <a href="/donate.html">Donate</a>
-  <a href="/contact.html">Contact</a>
-  <a class="msb-primary" href="/client/request.html">Submit Request</a>
+ <div class="msb-kicker">Quick access</div>
+ <nav class="msb-links" aria-label="Main navigation">
+  <a class="msb-home" href="/"><i class="fas fa-house" aria-hidden="true"></i><span>Home</span></a>
+  <a class="msb-primary" href="/client/request.html"><i class="fas fa-paper-plane" aria-hidden="true"></i><span>New Request</span></a>
+  <a href="/client/track.html"><i class="fas fa-location-crosshairs" aria-hidden="true"></i><span>Track My Case</span></a>
+  <a href="/client/dashboard.html"><i class="fas fa-folder-open" aria-hidden="true"></i><span>Client Portal / My Cases</span></a>
+  <a href="/#services"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>Services</span></a>
+  <a href="/#how-it-works"><i class="fas fa-list-check" aria-hidden="true"></i><span>How It Works</span></a>
+  <a href="/#scam-help"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i><span>Scam Help &amp; Safety</span></a>
+  <a href="/about.html"><i class="fas fa-circle-info" aria-hidden="true"></i><span>About Manlung Recovery</span></a>
+  <a href="/faq.html"><i class="fas fa-circle-question" aria-hidden="true"></i><span>FAQ &amp; Help</span></a>
+  <a href="/contact.html"><i class="fas fa-headset" aria-hidden="true"></i><span>Contact &amp; Support</span></a>
+  <a href="/blog.html"><i class="fas fa-book-open" aria-hidden="true"></i><span>Knowledge Blog</span></a>
+  <a href="/careers.html"><i class="fas fa-briefcase" aria-hidden="true"></i><span>Careers</span></a>
+  <a href="/donate.html"><i class="fas fa-heart" aria-hidden="true"></i><span>Donate / Support</span></a>
+ </nav>
+ <div class="msb-kicker msb-secondary-kicker">Account &amp; preferences</div>
+ <nav class="msb-links msb-account-links" aria-label="Account and preferences">
+  <a href="/login.html"><i class="fas fa-user-circle" aria-hidden="true"></i><span>Sign In / Create Account</span></a>
+  <a href="/settings.html"><i class="fas fa-sliders" aria-hidden="true"></i><span>Settings</span></a>
+  <button class="msb-theme-action" type="button" id="msbThemeAction"><i class="fas fa-circle-half-stroke" aria-hidden="true"></i><span>Switch light / dark mode</span></button>
+  <a href="/terms.html"><i class="fas fa-file-contract" aria-hidden="true"></i><span>Terms &amp; Conditions</span></a>
+  <a href="/privacy.html"><i class="fas fa-user-shield" aria-hidden="true"></i><span>Privacy Notice</span></a>
  </nav>
  <div class="msb-foot">Secure guidance for digital recovery, case tracking, and human support.</div>
 </aside>
@@ -3224,6 +3234,53 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download i {
    button.setAttribute('aria-label','Language selector is not configured on this page');
    button.title='Language selector is not configured on this page';
    window.setTimeout(function(){button.setAttribute('aria-label','Choose language');button.title='Choose language';},2200);
+ });
+})();
+</script>
+
+
+<style id="manlung-sidebar-menu-complete">
+#manlungSidebar .msb-kicker{margin:17px 8px 8px!important}
+#manlungSidebar .msb-links{display:grid!important;gap:5px!important}
+#manlungSidebar .msb-links a{display:flex!important;align-items:center!important;gap:11px!important;min-height:42px!important;padding:9px 11px!important;border-radius:10px!important;font-size:13px!important;line-height:1.25!important}
+#manlungSidebar .msb-links a i,#manlungSidebar .msb-account-links a i,#manlungSidebar .msb-theme-action i{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 19px!important;width:19px!important;text-align:center!important;color:#67e8f9!important}
+#manlungSidebar .msb-links a.msb-primary{margin-top:0!important}
+#manlungSidebar .msb-account-links{padding-bottom:4px}
+#manlungSidebar .msb-theme-action{display:flex!important;align-items:center!important;gap:11px!important;width:100%!important;min-height:42px!important;padding:9px 11px!important;border:1px solid rgba(148,163,184,.2)!important;border-radius:10px!important;background:rgba(255,255,255,.04)!important;color:#dbeafe!important;text-align:left!important;font:650 13px/1.25 system-ui,-apple-system,"Segoe UI",sans-serif!important;cursor:pointer!important}
+#manlungSidebar .msb-theme-action:hover{background:rgba(255,255,255,.1)!important}
+#manlungSidebar .msb-secondary-kicker{margin-top:18px!important;padding-top:14px!important;border-top:1px solid rgba(148,163,184,.22)!important}
+#manlungSidebar .msb-brand-copy strong{display:block}
+#manlungSidebar .msb-brand-copy small{display:block;margin-top:3px;font-size:11px;line-height:1.25}
+#manlungSidebar .msb-status{display:inline-flex!important;align-items:center;gap:6px;margin-top:6px;font-size:9px!important}
+@media(max-width:650px){
+ #manlungSidebar{padding:15px 14px calc(18px + env(safe-area-inset-bottom))!important}
+ #manlungSidebar .msb-head{padding-bottom:13px!important}
+ #manlungSidebar .msb-brand img{width:40px!important;height:40px!important;flex-basis:40px!important}
+ #manlungSidebar .msb-brand{gap:9px!important;font-size:15px!important}
+ #manlungSidebar .msb-close{width:36px!important;height:36px!important;flex:0 0 36px!important}
+ #manlungSidebar .msb-kicker{margin:13px 7px 6px!important;font-size:10px!important}
+ #manlungSidebar .msb-links{gap:4px!important}
+ #manlungSidebar .msb-links a,#manlungSidebar .msb-theme-action{min-height:38px!important;padding:8px 10px!important;font-size:12.5px!important}
+ #manlungSidebar .msb-foot{margin-top:13px!important;padding:10px!important;font-size:11px!important}
+}
+@media(min-width:651px){
+ #manlungSidebar{width:min(390px,38vw)!important;min-width:340px!important}
+ #manlungSidebar .msb-links a,#manlungSidebar .msb-theme-action{min-height:42px!important}
+}
+</style>
+<script id="manlung-sidebar-theme-action">
+(function(){
+ var action=document.getElementById('msbThemeAction');
+ if(!action||action.dataset.ready==='true')return;
+ action.dataset.ready='true';
+ action.addEventListener('click',function(){
+  var themeToggle=document.querySelector('.site-header [data-theme-toggle="true"]');
+  if(themeToggle){themeToggle.click();return;}
+  var current=(document.documentElement.getAttribute('data-theme')||document.body.getAttribute('data-theme')||'').toLowerCase();
+  var dark=current!=='dark';
+  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+  document.body.setAttribute('data-theme',dark?'dark':'light');
+  try{localStorage.setItem('theme',dark?'dark':'light')}catch(e){}
  });
 })();
 </script>
