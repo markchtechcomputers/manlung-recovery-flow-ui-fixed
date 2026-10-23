@@ -1821,6 +1821,18 @@ body.manlung-sidebar-open{overflow:hidden}
 
 
 <style id="manlung-sidebar-white-theme-final">
+/* Sidebar close X: red for clear visibility on the white drawer. */
+#manlungSidebar .msb-close{
+  color:#dc2626!important;
+  background:#fff1f2!important;
+  border:1px solid #fecaca!important;
+}
+#manlungSidebar .msb-close i{color:#dc2626!important}
+#manlungSidebar .msb-close:hover,
+#manlungSidebar .msb-close:focus-visible{
+  color:#991b1b!important;background:#ffe4e6!important;border-color:#f87171!important;
+}
+#manlungSidebar .msb-close:focus-visible{outline:3px solid #fca5a5!important;outline-offset:2px!important}
 /* Shared desktop + phone header: keep the same single-row layout and menu button. */
 .site-header .container.home-header-container{
   display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
@@ -3077,19 +3089,17 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download i {
  <div class="msb-head"><a class="msb-brand" href="/" aria-label="Manlung Recovery home"><img src="/icons/icon-512.png" alt="" width="48" height="48"><span class="msb-brand-copy"><strong>Manlung Recovery</strong><small>Cyber Recovery &amp; Digital Investigation</small><span class="msb-status">Secure recovery portal</span></span></a><button class="msb-close" type="button" aria-label="Close menu"><i class="fas fa-xmark" aria-hidden="true"></i></button></div>
  <div class="msb-kicker">Explore the portal</div>
  <nav class="msb-links" aria-label="Site sections">
-  <a href="/#services"><i class="fas fa-shield-halved" aria-hidden="true"></i>Services</a>
-  <a href="/#how-it-works"><i class="fas fa-route" aria-hidden="true"></i>How It Works</a>
-  <a href="/#case-tracker"><i class="fas fa-magnifying-glass" aria-hidden="true"></i>Case Tracker</a>
-  <a href="/#scam-help"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i>Scam Help</a>
-  <a href="/about.html"><i class="fas fa-circle-info" aria-hidden="true"></i>About</a>
-  <a href="/faq.html"><i class="fas fa-circle-question" aria-hidden="true"></i>FAQ</a>
-  <a href="/client/track.html"><i class="fas fa-folder-open" aria-hidden="true"></i>Track My Case</a>
-  <a href="/login.html"><i class="fas fa-right-to-bracket" aria-hidden="true"></i>Sign In / Account</a>
-  <a href="/donate.html"><i class="fas fa-heart" aria-hidden="true"></i>Donate</a>
-  <a href="/contact.html"><i class="fas fa-phone" aria-hidden="true"></i>Contact</a>
-  <a href="/manlung-ai.html"><i class="fas fa-robot" aria-hidden="true"></i>Manlung AI</a>
-  <a href="/manlung-ai.html#chat"><i class="fas fa-language" aria-hidden="true"></i>Language &amp; AI Settings</a>
-  <a class="msb-primary" href="/client/request.html"><i class="fas fa-file-circle-plus" aria-hidden="true"></i>Submit Request</a>
+  <a href="/#services">Services</a>
+  <a href="/#how-it-works">How It Works</a>
+  <a href="/#case-tracker">Case Tracker</a>
+  <a href="/#scam-help">Scam Help</a>
+  <a href="/about.html">About</a>
+  <a href="/faq.html">FAQ</a>
+  <a href="/client/track.html">Track My Case</a>
+  <a href="/login.html">Sign In / Account</a>
+  <a href="/donate.html">Donate</a>
+  <a href="/contact.html">Contact</a>
+  <a class="msb-primary" href="/client/request.html">Submit Request</a>
  </nav>
  <div class="msb-foot">Secure guidance for digital recovery, case tracking, and human support.</div>
 </aside>
