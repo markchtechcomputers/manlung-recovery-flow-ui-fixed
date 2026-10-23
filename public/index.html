@@ -4478,3 +4478,44 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
+
+<style id="manlung-use-requested-theme-images-20261023">
+@media(max-width:650px){
+ html body .site-header button[data-theme-toggle="true"]::before{content:none!important;background:none!important;display:none!important}
+ html body .site-header button[data-theme-toggle="true"] img.manlung-theme-image{display:block!important;width:25px!important;height:25px!important;min-width:25px!important;min-height:25px!important;object-fit:contain!important}
+ html body #manlungSidebar .msb-links a i{display:inline-flex!important;visibility:visible!important;opacity:1!important;width:20px!important;min-width:20px!important;flex:0 0 20px!important;justify-content:center!important;align-items:center!important;font-size:16px!important}
+}
+</style>
+<script id="manlung-use-requested-theme-images-js-20261023">
+(function(){
+ function init(){
+  var theme=document.querySelector('.site-header button[data-theme-toggle="true"]');
+  if(!theme)return;
+  function sync(){
+   var dark=document.documentElement.classList.contains('dark')||
+    document.body.classList.contains('dark')||
+    document.documentElement.getAttribute('data-theme')==='dark'||
+    document.body.getAttribute('data-theme')==='dark'||
+    document.documentElement.getAttribute('data-bs-theme')==='dark';
+   var img=theme.querySelector('img.manlung-theme-image');
+   if(!img){
+    img=document.createElement('img');
+    img.className='manlung-theme-image';
+    img.setAttribute('aria-hidden','true');
+    img.alt='';
+    theme.replaceChildren(img);
+   }
+   var wanted=dark?'https://i.postimg.cc/k432pX6g/icons8-new-moon-48.png':'https://i.postimg.cc/fys0JTDt/icons8-sun-30.png';
+   if(img.getAttribute('src')!==wanted)img.setAttribute('src',wanted);
+   theme.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');
+   theme.title=dark?'Light mode':'Dark mode';
+  }
+  sync();
+  new MutationObserver(sync).observe(theme,{childList:true,subtree:true});
+  new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme','data-bs-theme']});
+  new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class','data-theme']});
+  theme.addEventListener('click',function(){window.setTimeout(sync,50);window.setTimeout(sync,150);window.setTimeout(sync,400);});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
