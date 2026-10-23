@@ -3105,8 +3105,6 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download i {
  <nav class="msb-links msb-account-links" aria-label="Account and preferences">
   <a href="/login.html"><i class="fas fa-user-circle" aria-hidden="true"></i><span>Sign In / Create Account</span></a>
   <a href="/settings.html"><i class="fas fa-sliders" aria-hidden="true"></i><span>Settings</span></a>
-  <button class="msb-theme-action" type="button" id="msbLanguageAction"><i class="fas fa-globe" aria-hidden="true"></i><span>Language / Translation</span></button>
-  <button class="msb-theme-action" type="button" id="msbThemeAction"><i class="fas fa-circle-half-stroke" aria-hidden="true"></i><span>Switch light / dark mode</span></button>
   <a href="/terms.html"><i class="fas fa-file-contract" aria-hidden="true"></i><span>Terms &amp; Conditions</span></a>
   <a href="/privacy.html"><i class="fas fa-user-shield" aria-hidden="true"></i><span>Privacy Notice</span></a>
  </nav>
@@ -3218,22 +3216,7 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download i {
  html body #manlungSidebarToggle{width:34px!important;min-width:34px!important;height:32px!important;min-height:32px!important}
 }
 </style>
-<script id="manlung-sidebar-language-action">
-(function(){
- var button=document.getElementById('msbLanguageAction');
- if(!button)return;
- button.addEventListener('click',function(){
-   var selectors=['#google_translate_element select','[id*="language-selector" i] select','select[aria-label*="language" i]','select[name*="language" i]','.goog-te-combo'];
-   var selector=null;
-   for(var i=0;i<selectors.length;i++){selector=document.querySelector(selectors[i]);if(selector)break;}
-   if(selector){selector.focus();selector.click();return;}
-   var languageUi=document.querySelector('#google_translate_element,[id*="language-selector" i],[class*="language-selector" i]');
-   if(languageUi){languageUi.scrollIntoView({behavior:'smooth',block:'center'});return;}
-   button.querySelector('span').textContent='Translation unavailable on this page';
-   window.setTimeout(function(){button.querySelector('span').textContent='Language / Translation';},2200);
- });
-})();
-</script>
+
 
 
 <style id="manlung-sidebar-menu-complete">
@@ -4540,4 +4523,19 @@ html body #manlungSidebar .msb-links a { gap:0!important; }
 #manlungSidebar #msbLanguageAction i{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 19px!important;width:19px!important;color:#67e8f9!important}
 #manlungSidebar #msbLanguageAction span{font-size:13px!important;line-height:1.25!important}
 #manlungSidebar #msbLanguageAction:hover{background:rgba(103,232,249,.1)!important}
+</style>
+
+
+
+<style id="manlung-header-theme-icon-final-20261023">
+.site-header button[data-theme-toggle="true"]{display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:0!important;min-width:38px;min-height:38px;overflow:hidden}
+.site-header button[data-theme-toggle="true"] img.manlung-theme-image{display:block!important;width:26px!important;height:26px!important;object-fit:contain!important}
+@media(max-width:650px){
+ html body .site-header .container.home-header-container{grid-template-columns:34px minmax(0,1fr) 36px 36px!important;grid-template-areas:"brandmark brand theme menu"!important}
+ html body .site-header .phone-header-shortcuts,html body .site-header #phoneLanguageButton{display:none!important}
+ html body .site-header button[data-theme-toggle="true"]{grid-area:theme!important}
+}
+#manlungSidebar .msb-links a i,#manlungSidebar .msb-account-links a i,#manlungSidebar .msb-theme-action i{display:none!important}
+#manlungSidebar .msb-links a{gap:0!important}
+#manlungSidebar .msb-links a span{display:block!important}
 </style>
