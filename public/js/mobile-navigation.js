@@ -324,3 +324,71 @@ MOBILE NAVIGATION CONTROLLER
     }
 
 })();
+
+
+/* Dedicated homepage phone header controller. Kept separate from desktop navigation. */
+(function () {
+  'use strict';
+  function setupDedicatedPhoneHeader() {
+    var header = document.getElementById('mobileHeader');
+    if (!header || header.dataset.phoneDrawerReady === 'true') return;
+    var toggle = header.querySelector('#mobileMenuToggle');
+    var menu = header.querySelector('#mobileMenu');
+    if (!toggle || !menu) return;
+    header.dataset.phoneDrawerReady = 'true';
+
+    var close = menu.querySelector('.mobile-menu-close');
+    if (!close) {
+      close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'mobile-menu-close';
+      close.setAttribute('aria-label', 'Close navigation menu');
+      close.setAttribute('title', 'Close menu');
+      close.textContent = '×';
+      menu.insertBefore(close, menu.firstChild);
+    }
+
+    function setOpen(open) {
+      menu.classList.toggle('open', open);
+      menu.classList.toggle('is-open', open);
+      toggle.classList.toggle('active', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      toggle.setAttribute('title', open ? 'Close menu' : 'Open menu');
+      menu.setAttribute('aria-hidden', open ? 'false' : 'true');
+      document.body.classList.toggle('mobile-menu-open', open);
+      document.body.classList.toggle('manlung-mobile-menu-open', open);
+    }
+
+    toggle.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(!menu.classList.contains('open'));
+    });
+    close.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+    });
+    menu.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () { setOpen(false); });
+    });
+    document.addEventListener('click', function (event) {
+      if (menu.classList.contains('open') &&
+          !menu.contains(event.target) &&
+          !toggle.contains(event.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') setOpen(false);
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 650) setOpen(false);
+    });
+    setOpen(false);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupDedicatedPhoneHeader);
+  } else {
+    setupDedicatedPhoneHeader();
+  }
+})();
