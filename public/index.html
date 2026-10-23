@@ -1913,7 +1913,12 @@ body{background:#f4f7fb!important;color:var(--mr2-ink)!important;font-family:Int
     </div>
   </div>
 
-  <nav class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" aria-hidden="true"></div>
+  <nav class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Mobile navigation">
+    <div class="mobile-menu-header">
+      <strong class="mobile-menu-title">Explore Manlung Recovery</strong>
+      <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Close menu" title="Close menu">×</button>
+    </div>
     <a href="/"><i class="fas fa-house"></i> Home</a>
     <a href="/services.html"><i class="fas fa-shield-halved"></i> Services</a>
     <a href="/client/request.html"><i class="fas fa-file-circle-plus"></i> New Request</a>
