@@ -465,3 +465,362 @@ body.dark .privacy-page-intro td { background: #122238 !important; color: #c5d4e
   .mr-home-hero.mr-video-hero .mr-hero-background-video { opacity: .08 !important; }
   .mr-home-hero .mr-hero-eyebrow { font-size: .58rem; letter-spacing: .055em; }
 }
+
+/* =========================================================
+   HOMEPAGE FLOW SYSTEM — one calm, professional product journey
+   understand -> choose support -> see the process -> track -> act
+   ========================================================= */
+.home-page-container {
+  --home-ink: #10243f;
+  --home-muted: #60758d;
+  --home-line: #dce7f1;
+  --home-blue: #1d6be5;
+  --home-teal: #08a7a5;
+  --home-soft: #f4f8fc;
+  max-width: 1240px !important;
+  padding: 0 clamp(16px, 3vw, 32px) 76px !important;
+}
+.home-page-container > .intro-strip,
+.home-page-container > .home-section {
+  position: relative;
+  z-index: 1;
+}
+.home-page-container .eyebrow {
+  color: var(--home-blue) !important;
+  font-size: .68rem !important;
+  font-weight: 850 !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase;
+}
+.home-page-container .section-heading {
+  max-width: 720px !important;
+  margin: 0 auto 30px !important;
+}
+.home-page-container .section-heading h2,
+.home-page-container .intro-strip h2,
+.home-page-container .demo-copy h2,
+.home-page-container .tracker-copy h2,
+.home-page-container .scam-help-header h2,
+.home-page-container .support-section h2,
+.home-page-container .final-cta h2 {
+  color: var(--home-ink) !important;
+  font-weight: 850 !important;
+  letter-spacing: -.055em !important;
+  line-height: 1.08 !important;
+}
+.home-page-container .section-heading p,
+.home-page-container .intro-strip p,
+.home-page-container .demo-copy > p,
+.home-page-container .support-section p,
+.home-page-container .final-cta p {
+  color: var(--home-muted) !important;
+  line-height: 1.75 !important;
+}
+.home-page-container > .intro-strip {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, .86fr) !important;
+  align-items: center !important;
+  gap: clamp(24px, 5vw, 76px) !important;
+  margin: 32px 0 14px !important;
+  padding: 30px clamp(22px, 4vw, 46px) !important;
+  border: 1px solid var(--home-line) !important;
+  border-radius: 24px !important;
+  background: linear-gradient(115deg, #fff 0%, #f5fbff 100%) !important;
+  box-shadow: 0 14px 38px rgba(16, 54, 93, .055) !important;
+}
+.home-page-container > .intro-strip > div:before { display: none !important; }
+.home-page-container .intro-strip h2 { margin: 8px 0 0 !important; font-size: clamp(1.6rem, 3vw, 2.35rem) !important; }
+.home-page-container .intro-strip p { margin: 0 !important; font-size: .98rem !important; }
+.home-page-container .home-section {
+  margin-top: 16px !important;
+  padding: clamp(58px, 7vw, 86px) 0 !important;
+}
+/* Services: make the choice easy and visually scannable. */
+.home-page-container #services { padding-top: 68px !important; }
+.home-page-container .service-transition-rail {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin: 0 auto 22px !important;
+  padding: 8px !important;
+  border: 1px solid var(--home-line) !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 22px rgba(16, 54, 93, .045) !important;
+}
+.home-page-container .service-transition-rail span {
+  min-width: 0 !important;
+  padding: 12px 10px !important;
+  border-radius: 11px !important;
+  color: var(--home-muted) !important;
+  font-size: .72rem !important;
+  line-height: 1.35 !important;
+  text-align: center !important;
+}
+.home-page-container .service-transition-rail span:hover { background: #edf6ff !important; }
+.home-page-container .service-transition-rail b {
+  display: block !important;
+  margin-bottom: 3px !important;
+  color: var(--home-blue) !important;
+  font-size: .62rem !important;
+}
+.home-page-container .service-transition-rail strong { color: var(--home-ink) !important; font-weight: 750 !important; }
+.home-page-container .premium-service-grid { gap: 16px !important; }
+.home-page-container .premium-service-card {
+  min-height: 300px !important;
+  padding: 26px 22px 23px !important;
+  border: 1px solid var(--home-line) !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  box-shadow: 0 10px 28px rgba(16, 54, 93, .055) !important;
+}
+.home-page-container .premium-service-card:before { background: linear-gradient(90deg, var(--home-blue), var(--home-teal)) !important; }
+.home-page-container .premium-service-card:hover { border-color: #bcd5f3 !important; box-shadow: 0 20px 42px rgba(29, 107, 229, .12) !important; }
+.home-page-container .premium-service-card .service-number,
+.home-page-container .process-index,
+.home-page-container .scam-help-number {
+  background: #eaf3ff !important;
+  color: var(--home-blue) !important;
+  border: 1px solid #cfe2fb !important;
+}
+.home-page-container .premium-service-card .service-icon-wrap {
+  background: linear-gradient(145deg, #edf6ff, #f0fffd) !important;
+  border-color: #cfe4f5 !important;
+}
+.home-page-container .premium-service-card h3 { color: var(--home-ink) !important; }
+.home-page-container .premium-service-card p { color: var(--home-muted) !important; }
+.home-page-container .service-learn,
+.home-page-container .show-more-btn {
+  color: var(--home-blue) !important;
+  font-weight: 800 !important;
+}
+.home-page-container .show-more-wrap { margin-top: 24px !important; text-align: center !important; }
+.home-page-container .show-more-btn { border-color: #c9dbef !important; background: #fff !important; }
+/* Process: a deliberate second chapter instead of another floating card wall. */
+.home-page-container #how-it-works {
+  margin-top: 26px !important;
+  padding: clamp(44px, 6vw, 72px) clamp(18px, 4vw, 48px) !important;
+  border: 1px solid #d9e9f4 !important;
+  border-radius: 30px !important;
+  background: linear-gradient(145deg, #f1f8ff 0%, #f7fffd 100%) !important;
+}
+.home-page-container #how-it-works .section-heading { margin-bottom: 34px !important; }
+.home-page-container .process-flow { position: relative; gap: 14px !important; }
+.home-page-container .process-flow:before {
+  content: "";
+  position: absolute;
+  top: 40px;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, #bcd8f4, #9de4d6);
+}
+.home-page-container .process-step {
+  position: relative !important;
+  z-index: 1;
+  min-height: 218px !important;
+  padding: 24px 19px !important;
+  border: 1px solid #d9e5ef !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.94) !important;
+  box-shadow: 0 8px 22px rgba(21, 70, 106, .05) !important;
+}
+.home-page-container .process-step:hover { border-color: #b8d5f3 !important; box-shadow: 0 16px 34px rgba(29, 107, 229, .1) !important; }
+.home-page-container .process-icon {
+  width: 42px !important;
+  height: 42px !important;
+  margin: 12px 0 16px !important;
+  border: 1px solid #cfe2f4 !important;
+  border-radius: 13px !important;
+  background: #eff7ff !important;
+  color: var(--home-blue) !important;
+}
+.home-page-container .process-step h3 { color: var(--home-ink) !important; }
+.home-page-container .process-step p { color: var(--home-muted) !important; line-height: 1.68 !important; }
+.home-page-container .demo-section {
+  display: grid !important;
+  grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr) !important;
+  gap: clamp(22px, 5vw, 60px) !important;
+  align-items: center !important;
+  margin-top: 52px !important;
+  padding-top: 38px !important;
+  border-top: 1px solid #d8e8f2 !important;
+}
+.home-page-container .demo-window { border: 1px solid #c6d8e8 !important; box-shadow: 0 18px 40px rgba(14, 53, 90, .1) !important; }
+/* Case tracker: one strong action panel. */
+.home-page-container #case-tracker {
+  margin-top: 26px !important;
+  padding: 48px 0 40px !important;
+}
+.home-page-container .tracker-card {
+  min-height: 188px !important;
+  padding: clamp(24px, 4vw, 42px) !important;
+  border: 1px solid #204d79 !important;
+  border-radius: 24px !important;
+  background: radial-gradient(circle at 100% 0, rgba(8, 167, 165, .2), transparent 34%), linear-gradient(135deg, #092340, #0b355b 72%, #0b4050) !important;
+  box-shadow: 0 24px 54px rgba(8, 35, 66, .18) !important;
+}
+.home-page-container .tracker-copy h2 { color: #fff !important; }
+.home-page-container .tracker-copy p { color: #c8d9eb !important; }
+.home-page-container .tracker-form { border: 1px solid rgba(255,255,255,.25) !important; border-radius: 14px !important; background: rgba(255,255,255,.1) !important; }
+.home-page-container .tracker-form input { min-height: 52px !important; border: 0 !important; background: #fff !important; }
+.home-page-container .tracker-form button { min-height: 52px !important; border-radius: 12px !important; background: linear-gradient(135deg, #1d7bea, #08aaa5) !important; }
+.home-page-container .trust-grid { margin-top: 14px !important; border: 0 !important; gap: 10px !important; }
+.home-page-container .trust-grid > div { padding: 18px !important; border: 1px solid var(--home-line) !important; border-radius: 16px !important; background: #fff !important; }
+.home-page-container .trust-grid > div > i { color: var(--home-blue) !important; }
+.home-page-container .trust-grid > div strong { color: var(--home-ink) !important; }
+.home-page-container .trust-grid > div span { color: var(--home-muted) !important; }
+/* Scam-help chapter: retain the warning tone, but bring it into the same system. */
+.home-page-container #scam-help {
+  margin-top: 24px !important;
+  padding: clamp(26px, 4vw, 44px) !important;
+  border: 1px solid #e9d9c6 !important;
+  border-radius: 26px !important;
+  background: linear-gradient(145deg, #fffaf4, #fff 70%) !important;
+  box-shadow: 0 14px 34px rgba(126, 76, 27, .055) !important;
+}
+.home-page-container .scam-help-header { margin-bottom: 26px !important; }
+.home-page-container .scam-help-header h2 { color: #243d57 !important; }
+.home-page-container .scam-help-card { border: 1px solid #eadfd3 !important; border-radius: 16px !important; background: rgba(255,255,255,.92) !important; box-shadow: 0 7px 18px rgba(126,76,27,.04) !important; }
+.home-page-container .scam-help-card > i { color: #1d6be5 !important; background: #eef6ff !important; border-color: #d5e5f4 !important; }
+.home-page-container .scam-warning-list { border-color: #eadfd3 !important; background: rgba(255,255,255,.75) !important; }
+.home-page-container .scam-warning-list li::marker { color: #d07b2e !important; }
+.home-page-container .scam-official-links > a { border-color: #e5ddd4 !important; background: rgba(255,255,255,.82) !important; }
+.home-page-container .scam-official-links > a > i:first-child { color: #1d6be5 !important; background: #eef6ff !important; border-color: #d5e5f4 !important; }
+/* Final actions: make the decision point unmistakable. */
+.home-page-container .support-section,
+.home-page-container .final-cta {
+  margin-top: 18px !important;
+  border: 1px solid var(--home-line) !important;
+  border-radius: 22px !important;
+  background: #fff !important;
+  box-shadow: 0 10px 28px rgba(16, 54, 93, .045) !important;
+}
+.home-page-container .support-target { border-color: #cfe1f2 !important; background: #f4f9ff !important; }
+.home-page-container .support-target strong { color: var(--home-blue) !important; }
+.home-page-container .final-cta { background: linear-gradient(120deg, #eaf5ff, #f5fffd) !important; }
+.home-page-container .final-cta-actions .btn-primary { background: linear-gradient(135deg, #1d6be5, #08a7a5) !important; }
+/* The older duplicate journey had oversized external image frames; keep the useful text
+   but make it a compact operations summary instead of a second visual detour. */
+.home-page-container #recovery-journey {
+  margin-top: 26px !important;
+  padding: 46px 0 20px !important;
+  border-top: 1px solid var(--home-line) !important;
+}
+.home-page-container #recovery-journey .recovery-journey-grid { gap: 12px !important; }
+.home-page-container #recovery-journey .recovery-journey-card { border-color: var(--home-line) !important; border-radius: 16px !important; box-shadow: 0 7px 19px rgba(16,54,93,.045) !important; }
+.home-page-container #recovery-journey .recovery-journey-card img { display: none !important; }
+.home-page-container #recovery-journey .recovery-journey-card > div { min-height: 174px; padding: 20px !important; }
+.home-page-container #recovery-journey .recovery-journey-card h3 { color: var(--home-ink) !important; }
+.home-page-container #recovery-journey .recovery-journey-card p { color: var(--home-muted) !important; line-height: 1.65 !important; }
+/* External safety/update blocks should look like part of the product, not leftovers. */
+body:has(.home-page-container) .manlung-platform-safety {
+  max-width: 1176px !important;
+  margin: 10px auto 18px !important;
+  border: 1px solid #cfe1f1 !important;
+  border-radius: 16px !important;
+  background: #f4f9ff !important;
+  color: var(--home-ink) !important;
+  box-shadow: none !important;
+}
+body:has(.home-page-container) #manlung-updates { max-width: 1176px !important; margin: 18px auto 28px !important; }
+body:has(.home-page-container) #manlung-updates > a { border-color: #cfe1f1 !important; background: linear-gradient(120deg, #f4f9ff, #f5fffd) !important; box-shadow: 0 8px 22px rgba(16,54,93,.045) !important; }
+body:has(.home-page-container) #manlung-updates > a > span:last-child { color: var(--home-blue) !important; }
+/* Dark mode remains calm and readable. */
+body.dark .home-page-container > .intro-strip,
+body.dark .home-page-container .premium-service-card,
+body.dark .home-page-container .process-step,
+body.dark .home-page-container .trust-grid > div,
+body.dark .home-page-container .support-section,
+body.dark .home-page-container .final-cta,
+body.dark .home-page-container .show-more-btn { background: #0e1b2d !important; border-color: #263b54 !important; }
+body.dark .home-page-container .section-heading h2,
+body.dark .home-page-container .intro-strip h2,
+body.dark .home-page-container .premium-service-card h3,
+body.dark .home-page-container .process-step h3,
+body.dark .home-page-container .support-section h2,
+body.dark .home-page-container .final-cta h2,
+body.dark .home-page-container .trust-grid > div strong { color: #f0f6ff !important; }
+body.dark .home-page-container .section-heading p,
+body.dark .home-page-container .intro-strip p,
+body.dark .home-page-container .premium-service-card p,
+body.dark .home-page-container .process-step p,
+body.dark .home-page-container .support-section p,
+body.dark .home-page-container .final-cta p,
+body.dark .home-page-container .trust-grid > div span { color: #aebfd2 !important; }
+body.dark .home-page-container > .intro-strip,
+body.dark .home-page-container #how-it-works { background: linear-gradient(145deg, #0e1b2d, #102a35) !important; }
+body.dark body:has(.home-page-container) .manlung-platform-safety,
+body.dark body:has(.home-page-container) #manlung-updates > a { background: #0e1b2d !important; border-color: #28445e !important; }
+@media (max-width: 900px) {
+  .home-page-container > .intro-strip { grid-template-columns: 1fr !important; gap: 14px !important; }
+  .home-page-container .service-transition-rail { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .home-page-container .process-flow:before { display: none !important; }
+  .home-page-container .demo-section { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 640px) {
+  .home-page-container { padding-inline: 13px !important; padding-bottom: 42px !important; }
+  .home-page-container > .intro-strip { margin-top: 20px !important; padding: 24px 20px !important; border-radius: 18px !important; }
+  .home-page-container > .intro-strip h2 { font-size: 1.65rem !important; }
+  .home-page-container .home-section { padding: 48px 0 !important; }
+  .home-page-container #services { padding-top: 48px !important; }
+  .home-page-container .service-transition-rail { gap: 6px !important; padding: 6px !important; }
+  .home-page-container .service-transition-rail span { padding: 9px 6px !important; font-size: .64rem !important; }
+  .home-page-container .premium-service-card { min-height: 0 !important; padding: 22px 18px !important; }
+  .home-page-container #how-it-works { padding: 36px 16px !important; border-radius: 22px !important; }
+  .home-page-container .process-step { min-height: 0 !important; padding: 20px 17px !important; }
+  .home-page-container .demo-section { margin-top: 34px !important; padding-top: 28px !important; }
+  .home-page-container #case-tracker { padding: 34px 0 28px !important; }
+  .home-page-container .tracker-card { padding: 24px 18px !important; border-radius: 20px !important; }
+  .home-page-container .trust-grid { grid-template-columns: 1fr !important; }
+  .home-page-container #scam-help { padding: 21px 16px !important; border-radius: 20px !important; }
+  .home-page-container .scam-help-footer { gap: 18px !important; }
+  .home-page-container .support-section,
+  .home-page-container .final-cta { padding: 23px 18px !important; border-radius: 18px !important; }
+  .home-page-container .final-cta-actions,
+  .home-page-container .scam-help-actions { display: grid !important; grid-template-columns: 1fr !important; }
+  .home-page-container .final-cta-actions .btn,
+  .home-page-container .scam-help-actions .btn { width: 100% !important; justify-content: center !important; }
+  .home-page-container #recovery-journey { padding-top: 36px !important; }
+  .home-page-container #recovery-journey .recovery-journey-grid { grid-template-columns: 1fr !important; }
+  .home-page-container #recovery-journey .recovery-journey-card > div { min-height: 0 !important; }
+}
+
+/* Final action normalization: remove legacy orange buttons from the homepage. */
+.home-page-container .service-learn,
+.home-page-container .show-more-btn,
+.home-page-container .scam-help-actions .btn-primary,
+.home-page-container .support-target .btn-primary,
+.home-page-container .final-cta-actions .btn-primary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  border: 1px solid rgba(83, 188, 235, .42) !important;
+  border-radius: 11px !important;
+  background: linear-gradient(135deg, #1d6be5, #08a7a5) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px rgba(29, 107, 229, .16) !important;
+}
+.home-page-container .service-learn:hover,
+.home-page-container .show-more-btn:hover,
+.home-page-container .scam-help-actions .btn-primary:hover,
+.home-page-container .support-target .btn-primary:hover,
+.home-page-container .final-cta-actions .btn-primary:hover {
+  background: linear-gradient(135deg, #1556c2, #078c8a) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 24px rgba(29, 107, 229, .22) !important;
+}
+.home-page-container .scam-help-actions .btn-outline,
+.home-page-container .final-cta-actions .btn-outline {
+  border: 1px solid #bfd4e8 !important;
+  border-radius: 11px !important;
+  background: #fff !important;
+  color: #1d5fae !important;
+}
+
+body.dark:has(.home-page-container) .manlung-platform-safety,
+body.dark:has(.home-page-container) #manlung-updates > a {
+  background: #0e1b2d !important;
+  border-color: #28445e !important;
+}
