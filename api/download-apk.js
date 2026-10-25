@@ -1,7 +1,8 @@
 const RELEASE_API = 'https://api.github.com/repos/markchtechcomputers/manlung-recovery-flow-ui-fixed/releases/tags/android-latest';
+const DIRECT_APK_URL = 'https://github.com/markchtechcomputers/manlung-recovery-flow-ui-fixed/releases/download/android-latest/ManlungRecovery.apk';
 
 module.exports = async function downloadApk(req, res) {
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
   if (req.method !== 'GET' && req.method !== 'HEAD') {
@@ -9,6 +10,8 @@ module.exports = async function downloadApk(req, res) {
     return res.status(405).send('Method not allowed');
   }
 
+  // Prefer GitHub release metadata, but never make the download depend on the
+  // GitHub API being available or under its unauthenticated rate limit.
   try {
     const response = await fetch(RELEASE_API, {
       headers: {
@@ -18,23 +21,26 @@ module.exports = async function downloadApk(req, res) {
       cache: 'no-store'
     });
 
-    if (!response.ok) throw new Error('Release metadata unavailable (' + response.status + ')');
+    if (response.ok) {
+      const release = await response.json();
+      const asset = Array.isArray(release.assets)
+        ? release.assets.find(item => item && item.name === 'ManlungRecovery.apk' && item.state === 'uploaded')
+        : null;
 
-    const release = await response.json();
-    const asset = Array.isArray(release.assets)
-      ? release.assets.find(item => item && item.name === 'ManlungRecovery.apk' && item.state === 'uploaded')
-      : null;
-
-    if (!asset || !asset.browser_download_url) {
-      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-      return res.status(503).send('The latest Android APK is not published yet. Please try again shortly.');
+      if (asset && asset.browser_download_url) {
+        res.setHeader('Location', asset.browser_download_url);
+        return res.status(302).end();
+      }
+    } else {
+      console.warn('Manlung APK release metadata returned HTTP', response.status, '- trying the stable asset URL');
     }
-
-    res.setHeader('Location', asset.browser_download_url);
-    return res.status(302).end();
   } catch (error) {
-    console.error('Manlung APK download redirect failed:', error);
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    return res.status(503).send('The APK download is temporarily unavailable. Please try again shortly.');
+    console.warn('Manlung APK metadata lookup failed; trying the stable asset URL:', error);
   }
+
+  // The stable URL is also used by the homepage and Android release workflow.
+  // This fallback avoids showing a false temporary-unavailable message when
+  // GitHub's metadata API is throttled or briefly unreachable.
+  res.setHeader('Location', DIRECT_APK_URL);
+  return res.status(302).end();
 };
