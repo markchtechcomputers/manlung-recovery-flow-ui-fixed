@@ -40,13 +40,16 @@
     <main class="container oauth-callback-wrap">
         <section class="card oauth-callback-card" aria-live="polite">
             <h2 id="title">Signing you in securely…</h2>
-            <p id="status" style="color:var(--text-muted);">Verifying your GitHub account securely.</p>
+            <p id="status" style="color:var(--text-muted);">Verifying your account securely…</p>
             <a id="backLink" class="btn btn-primary oauth-back" href="/login.html" style="display:none;">Back to Sign In</a>
         </section>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const CALLBACK_TIMEOUT_MS = 15000;
+
+        const oauthProvider = (() => { try { return sessionStorage.getItem('manlungOAuthProvider') || 'social'; } catch (_) { return 'social'; } })();
+        const providerLabel = oauthProvider === 'discord' ? 'Discord' : oauthProvider === 'github' ? 'GitHub' : 'social';
 
         function showError(message, redirect) {
             const title = document.getElementById('title');
@@ -62,7 +65,7 @@
                 return;
             }
 
-            title.textContent = 'GitHub sign-in failed';
+            title.textContent = `${providerLabel === 'social' ? 'Social' : providerLabel} sign-in failed`;
             status.textContent = message || 'Please return to sign in and try again.';
             status.classList.add('oauth-error');
             backLink.href = '/login.html';
@@ -126,7 +129,7 @@
             }
 
             if (!session?.access_token) {
-                throw new Error('GitHub authentication completed, but the session could not be restored. Please try GitHub again.');
+                throw new Error(`${providerLabel === 'social' ? 'Social' : providerLabel} authentication completed, but the secure session could not be restored. Please try again.`);
             }
 
             clearOAuthUrl();
@@ -138,11 +141,12 @@
             });
 
             if (!appSession.success || !appSession.user) {
-                throw new Error('Could not complete GitHub sign-in.');
+                throw new Error(`Could not complete ${providerLabel === 'social' ? 'social' : providerLabel} sign-in.`);
             }
 
             localStorage.setItem('clientUser', JSON.stringify(appSession.user));
             await client.auth.signOut();
+            try { sessionStorage.removeItem('manlungOAuthProvider'); } catch (_) {}
             clearOAuthUrl();
             window.location.replace('/client/dashboard.html');
         }
