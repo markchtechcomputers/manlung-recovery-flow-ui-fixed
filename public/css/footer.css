@@ -576,3 +576,59 @@ html body > .manlung-footer .manlung-footer-inner {
     width: calc(100% - 28px) !important;
   }
 }
+
+
+/* Definitive shared-footer layout reset: also covers footers nested in page wrappers.
+   Do not use 100vw + left:50% + negative margins; those caused the mobile offset. */
+html body footer.manlung-footer,
+html body .manlung-footer,
+html body footer#site-footer,
+html body #site-footer,
+html body footer.site-footer,
+html body .site-footer {
+  display: block !important;
+  position: relative !important;
+  inset: auto !important;
+  left: auto !important;
+  right: auto !important;
+  float: none !important;
+  transform: none !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: #000 !important;
+  background-color: #000 !important;
+}
+html body .manlung-footer .manlung-footer-inner,
+html body footer#site-footer .manlung-footer-inner,
+html body #site-footer .manlung-footer-inner,
+html body .site-footer .manlung-footer-inner {
+  width: min(calc(100% - 32px), 1240px) !important;
+  max-width: 1240px !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+  background: #000 !important;
+}
+html body .manlung-footer *,
+html body #site-footer *,
+html body .site-footer * {
+  box-sizing: border-box;
+}
+html body .manlung-footer .manlung-footer-grid {
+  width: 100%;
+  min-width: 0;
+}
+@media (max-width: 600px) {
+  html body .manlung-footer .manlung-footer-inner,
+  html body footer#site-footer .manlung-footer-inner,
+  html body #site-footer .manlung-footer-inner,
+  html body .site-footer .manlung-footer-inner {
+    width: calc(100% - 28px) !important;
+  }
+}
