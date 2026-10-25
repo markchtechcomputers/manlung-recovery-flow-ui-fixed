@@ -343,3 +343,27 @@ html.dark .manlung-onboarding-progress,
 body.dark .manlung-onboarding-progress {
   color: #94a3b8;
 }
+
+/* Branded first-open transition for the Manlung Recovery Portal. */
+.manlung-onboarding-icon.is-changing { animation: manlungPortalIconIn .62s cubic-bezier(.2,.8,.2,1) both; }
+.manlung-onboarding-icon img {
+  display: block;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(37, 99, 235, .22));
+  animation: manlungPortalLogoFloat 2.8s ease-in-out .25s infinite;
+}
+@keyframes manlungPortalIconIn {
+  from { opacity: 0; transform: translateY(8px) scale(.72) rotate(-8deg); }
+  65% { opacity: 1; transform: translateY(-2px) scale(1.06) rotate(2deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+@keyframes manlungPortalLogoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .manlung-onboarding-icon.is-changing,
+  .manlung-onboarding-icon img { animation: none !important; }
+}

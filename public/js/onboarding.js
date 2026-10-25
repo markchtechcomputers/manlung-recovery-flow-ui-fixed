@@ -4,8 +4,8 @@
   const steps = [
     {
       icon: 'fa-hand',
-      title: 'Welcome to Manlung Recovery',
-      text: 'Here is a quick guide to using the platform from start to finish.',
+      title: 'Welcome to Manlung Recovery Portal',
+      text: 'A secure, structured place to submit requests, organize evidence, and follow your case.',
       tips: [
         ['fa-user-shield', 'Secure access', 'Create an account so your requests can be connected to your profile.'],
         ['fa-shield-halved', 'Recovery support', 'The platform is designed for structured digital recovery and investigation support.'],
@@ -111,7 +111,12 @@
     function render() {
       const step = steps[current];
 
-      icon.className = 'manlung-onboarding-icon fas ' + step.icon;
+      icon.className = current === 0
+        ? 'manlung-onboarding-icon is-changing'
+        : 'manlung-onboarding-icon fas ' + step.icon + ' is-changing';
+      icon.innerHTML = current === 0
+        ? '<img src="/icons/icon-192.png" alt="Manlung Recovery Portal">'
+        : '';
       title.textContent = step.title;
       text.textContent = step.text;
 
