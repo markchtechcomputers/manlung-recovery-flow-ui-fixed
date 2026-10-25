@@ -1897,6 +1897,96 @@ body.manlung-sidebar-open{overflow:hidden}
 }
 </style>
 
+
+<style id="manlung-phone-language-left-visible-fix">
+/* Final mobile-only header layout override: make the language control visible
+   between the brand and theme toggle, without changing desktop layout. */
+@media (max-width: 650px) {
+  html body .site-header .container.home-header-container {
+    display: grid !important;
+    grid-template-columns: 30px minmax(0, 1fr) 36px 36px 38px !important;
+    grid-template-areas: "brandmark brand language theme menu" !important;
+    align-items: center !important;
+    column-gap: 5px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+    overflow: visible !important;
+  }
+  html body .site-header .manlung-home-logo { grid-area: brandmark !important; }
+  html body .site-header .brand { grid-area: brand !important; min-width: 0 !important; }
+  html body .site-header .phone-header-shortcuts {
+    grid-area: language !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    flex: 0 0 36px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    z-index: 12040 !important;
+  }
+  html body .site-header #phoneLanguageButton {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    color: #172033 !important;
+    background: #f1f3f7 !important;
+    border: 1px solid #d5dbe5 !important;
+    border-radius: 11px !important;
+    font-size: 0 !important;
+    z-index: 12041 !important;
+  }
+  html body .site-header #phoneLanguageButton::before {
+    content: "文A" !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font: 700 14px/1 system-ui, sans-serif !important;
+    color: #172033 !important;
+  }
+  html body .site-header #phoneLanguageButton span,
+  html body .site-header #phoneLanguageButton i,
+  html body .site-header #phoneLanguageButton svg { display: none !important; }
+}
+@media (max-width: 380px) {
+  html body .site-header .container.home-header-container {
+    grid-template-columns: 28px minmax(0, 1fr) 32px 32px 34px !important;
+    column-gap: 4px !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+  html body .site-header .phone-header-shortcuts,
+  html body .site-header #phoneLanguageButton {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    flex-basis: 32px !important;
+  }
+  html body .site-header #phoneLanguageButton { height: 34px !important; min-height: 34px !important; }
+}
+</style>
+
 </head>
 <body>
 <div id="manlungStartupLoader" aria-label="Loading Manlung Recovery">
