@@ -453,3 +453,77 @@ body.dark .mobile-menu a {
   #mobileHeader .mobile-theme-toggle,
   #mobileHeader .mobile-menu-toggle { width: 38px; height: 38px; min-width: 38px; flex-basis: 38px; }
 }
+
+
+/* 2026-10-25 premium phone header polish: clean icon surfaces and balanced spacing. */
+@media (max-width: 650px) {
+  #mobileHeader,
+  #mobileHeader .header-inner,
+  #mobileHeader .mobile-header-actions {
+    box-sizing: border-box !important;
+  }
+  #mobileHeader .header-inner {
+    gap: 14px !important;
+    padding: 10px 14px !important;
+    min-height: 68px !important;
+  }
+  #mobileHeader .mobile-brand {
+    gap: 10px !important;
+  }
+  #mobileHeader .mobile-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #mobileHeader .mobile-theme-toggle,
+  #mobileHeader .mobile-menu-toggle {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    flex: 0 0 40px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  #mobileHeader .mobile-theme-toggle i,
+  #mobileHeader .mobile-menu-toggle i,
+  #mobileHeader .mobile-menu-toggle span {
+    box-shadow: none !important;
+  }
+  #mobileHeader .mobile-menu-toggle span {
+    width: 22px !important;
+    height: 2px !important;
+    border-radius: 2px !important;
+  }
+  #mobileHeader .mobile-theme-toggle:focus-visible,
+  #mobileHeader .mobile-menu-toggle:focus-visible {
+    outline: 2px solid #60a5fa !important;
+    outline-offset: 3px !important;
+    border-radius: 6px !important;
+  }
+}
+@media (max-width: 390px) {
+  #mobileHeader .header-inner { padding-inline: 12px !important; gap: 10px !important; }
+  #mobileHeader .mobile-header-actions { gap: 10px !important; }
+  #mobileHeader .mobile-theme-toggle,
+  #mobileHeader .mobile-menu-toggle { width: 38px !important; height: 38px !important; min-width: 38px !important; min-height: 38px !important; flex-basis: 38px !important; }
+}
+html.dark #mobileHeader .mobile-theme-toggle,
+body.dark #mobileHeader .mobile-theme-toggle,
+html.dark #mobileHeader .mobile-menu-toggle,
+body.dark #mobileHeader .mobile-menu-toggle {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
