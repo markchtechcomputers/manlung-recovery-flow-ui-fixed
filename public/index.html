@@ -4953,3 +4953,113 @@ html body .manlung-footer .manlung-footer-inner {
   });
 })();
 </script>
+
+
+<!-- FINAL OVERRIDE: keep phone language control inside sidebar, after all older header scripts -->
+<style id="manlung-language-sidebar-final-20261025">
+@media (max-width: 650px) {
+  html body .site-header .phone-header-shortcuts,
+  html body .site-header #phoneLanguageButton {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  html body #manlungSidebar .phone-header-shortcuts {
+    display: flex !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 12px 0 4px !important;
+    padding: 0 !important;
+    order: 20 !important;
+  }
+  html body #manlungSidebar #phoneLanguageButton {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 11px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    height: auto !important;
+    padding: 10px 12px !important;
+    border: 1px solid rgba(103,232,249,.24) !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,.05) !important;
+    color: #dbeafe !important;
+    font: 650 13px/1.3 system-ui,-apple-system,"Segoe UI",sans-serif !important;
+    text-align: left !important;
+    white-space: normal !important;
+  }
+  html body #manlungSidebar #phoneLanguageButton::before {
+    content: "🌐" !important;
+    display: inline-block !important;
+    flex: 0 0 20px !important;
+    width: 20px !important;
+    background: none !important;
+    font-size: 17px !important;
+  }
+  html body #manlungSidebar #phoneLanguageButton span { display: inline !important; }
+  html body #manlungSidebar #phoneLanguageButton i,
+  html body #manlungSidebar #phoneLanguageButton svg { display: none !important; }
+}
+html body .goog-te-menu-frame,
+html body .goog-te-balloon-frame,
+html body iframe.goog-te-menu-frame {
+  position: fixed !important;
+  left: 50% !important;
+  right: auto !important;
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translate(-50%,-50%) !important;
+  width: min(92vw,360px) !important;
+  max-width: 92vw !important;
+  height: auto !important;
+  max-height: 75dvh !important;
+  z-index: 2147483647 !important;
+}
+html body .goog-te-menu-frame,
+html body iframe.goog-te-menu-frame { overflow: auto !important; }
+</style>
+<script id="manlung-language-sidebar-final-js-20261025">
+(function(){
+  function placeLanguageControl(){
+    var sidebar=document.getElementById('manlungSidebar');
+    var lang=document.getElementById('phoneLanguageButton');
+    if(!sidebar||!lang)return;
+    var wrapper=lang.closest('.phone-header-shortcuts')||lang;
+    if(wrapper.parentElement!==sidebar){
+      var accountHeading=sidebar.querySelector('.msb-secondary-kicker');
+      sidebar.insertBefore(wrapper,accountHeading||sidebar.querySelector('.msb-foot')||null);
+    }
+    lang.setAttribute('aria-label','Change language');
+    lang.setAttribute('title','Change language');
+    var label=lang.querySelector('span');
+    if(label && !label.textContent.trim()) label.textContent='Language / Translate';
+  }
+  function fitLanguagePopup(){
+    document.querySelectorAll('iframe.goog-te-menu-frame, .goog-te-menu-frame, .goog-te-balloon-frame').forEach(function(frame){
+      frame.style.setProperty('position','fixed','important');
+      frame.style.setProperty('left','50%','important');
+      frame.style.setProperty('right','auto','important');
+      frame.style.setProperty('top','50%','important');
+      frame.style.setProperty('bottom','auto','important');
+      frame.style.setProperty('transform','translate(-50%,-50%)','important');
+      frame.style.setProperty('width','min(92vw,360px)','important');
+      frame.style.setProperty('max-width','92vw','important');
+      frame.style.setProperty('max-height','75dvh','important');
+      frame.style.setProperty('z-index','2147483647','important');
+    });
+  }
+  function init(){
+    placeLanguageControl();
+    fitLanguagePopup();
+    // Older header scripts can move the language icon back. Re-home it after they run.
+    var observer=new MutationObserver(function(){
+      placeLanguageControl();
+      fitLanguagePopup();
+    });
+    observer.observe(document.body,{childList:true,subtree:true});
+    document.addEventListener('click',function(){setTimeout(fitLanguagePopup,50);setTimeout(fitLanguagePopup,200);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
