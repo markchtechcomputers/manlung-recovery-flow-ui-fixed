@@ -1478,13 +1478,13 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe {
         <div class="manlung-social-grid" aria-label="Social sign-in options">
           <div id="googleLoginBtn" class="manlung-google-btn" aria-label="Continue with Google"></div>
           <button type="button" id="githubLoginBtn" class="manlung-social-btn manlung-social-icon" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i></button>
-          <button type="button" id="discordLoginBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Discord sign-in is not configured yet" title="Discord sign-in coming soon"><img src="https://i.postimg.cc/RZYZDLbV/icons8-discord-new-48.png" alt="" width="28" height="28" loading="eager"></button>
+          <button type="button" id="discordLoginBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Continue with Discord" title="Continue with Discord"><img src="https://i.postimg.cc/RZYZDLbV/icons8-discord-new-48.png" alt="" width="28" height="28" loading="eager"></button>
         </div>
       </div>
 
       <div id="registerPanel" hidden>
         <div class="manlung-auth-heading"><h2>Create your account</h2><p>Create a secure client account before submitting a recovery request.</p></div>
-        <div class="manlung-social-grid"><div id="googleRegisterBtn" class="manlung-google-btn" aria-label="Continue with Google"></div><button type="button" id="githubRegisterBtn" class="manlung-social-btn manlung-social-icon" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i></button><button type="button" id="discordRegisterBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Discord sign-in is not configured yet" title="Discord sign-in coming soon"><img src="https://i.postimg.cc/RZYZDLbV/icons8-discord-new-48.png" alt="" width="28" height="28" loading="eager"></button></div>
+        <div class="manlung-social-grid"><div id="googleRegisterBtn" class="manlung-google-btn" aria-label="Continue with Google"></div><button type="button" id="githubRegisterBtn" class="manlung-social-btn manlung-social-icon" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i></button><button type="button" id="discordRegisterBtn" class="manlung-social-btn manlung-social-icon manlung-discord-icon" aria-label="Continue with Discord" title="Continue with Discord"><img src="https://i.postimg.cc/RZYZDLbV/icons8-discord-new-48.png" alt="" width="28" height="28" loading="eager"></button></div>
         <div class="manlung-auth-divider">or create with email verification</div>
         <form id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group"><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="200" placeholder="Your full name" required></div>
@@ -2212,7 +2212,7 @@ async function startSocialSignup(provider){
     );
 
     const {error}=await supabase.auth.signInWithOAuth({
-      provider:'github',
+      provider,
       options:{
         redirectTo:window.location.origin+'/oauth-callback.html'
       }
@@ -2341,7 +2341,7 @@ async function handleSocialCallback(){
 </script>
 
 <script>
-/* Discord buttons use the same configured Supabase OAuth flow as GitHub. */
+/* Discord buttons use the configured Supabase OAuth provider flow. */
 </script>
 
 <script src="/js/pwa.js" defer></script>
