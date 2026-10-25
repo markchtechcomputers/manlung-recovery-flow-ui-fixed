@@ -1,0 +1,215 @@
+{
+  "routes": [
+    {
+      "path": "/about.html",
+      "title": "About Us \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/connect.html",
+      "title": "Admin Updates | Manlung Recovery"
+    },
+    {
+      "path": "/admin/control-center.html",
+      "title": "Control Center \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/dashboard.html",
+      "title": "Admin Dashboard \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/index.html",
+      "title": "Opening Admin Dashboard | Manlung Recovery"
+    },
+    {
+      "path": "/admin/investigation-notes.html",
+      "title": "Investigation Notes \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/login.html",
+      "title": "Admin Login \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/music-player.html",
+      "title": "Admin Music Player \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/music.html",
+      "title": "Admin Music Center \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/operations.html",
+      "title": "Operations Dashboard \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/owner.html",
+      "title": "Admin Management \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/register.html",
+      "title": "Admin Registration \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/reports.html",
+      "title": "Reports \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/reset-password.html",
+      "title": "Reset Admin Password \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/tools/device-recovery.html",
+      "title": "Lost Device Recovery \u00b7 Admin \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/tools/link-analysis.html",
+      "title": "Link Analysis \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/tools/recovery-evidence.html",
+      "title": "Recovery Evidence \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/tools/remote-desktop.html",
+      "title": "Remote Desktop \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/tools/security.html",
+      "title": "Security & Monitoring \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/tools/website-scanner.html",
+      "title": "Website Safety Scanner \u00b7 Admin Tools \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/admin/tools.html",
+      "title": "Admin Tools \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/blog.html",
+      "title": "Blog \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/careers.html",
+      "title": "Careers \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/client/connect.html",
+      "title": "Manlung Community"
+    },
+    {
+      "path": "/client/dashboard.html",
+      "title": "My Cases \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/client/device-recovery.html",
+      "title": "Lost Device Recovery \u00b7 Admin \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/client/live-location.html",
+      "title": "Live Device Location \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/client/recovery-center.html",
+      "title": "Recovery Center \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/client/request.html",
+      "title": "New Request \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/client/settings.html",
+      "title": "Profile & Security \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/client/track.html",
+      "title": "Case Details \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/contact.html",
+      "title": "Contact Manlung Recovery | Cyber Recovery &amp; Digital Investigation"
+    },
+    {
+      "path": "/copy-otp.html",
+      "title": "Copy Verification Code \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/donate.html",
+      "title": "Support Manlung Recovery"
+    },
+    {
+      "path": "/download-app.html",
+      "title": "Download Manlung Recovery for Android"
+    },
+    {
+      "path": "/faq.html",
+      "title": "FAQ | Manlung Recovery"
+    },
+    {
+      "path": "/funnyclips/index.html",
+      "title": "Manlung Remote Support"
+    },
+    {
+      "path": "/googledd44bfeeb0f98fa7.html"
+    },
+    {
+      "path": "/",
+      "title": "Manlung Recovery"
+    },
+    {
+      "path": "/knowledge.html",
+      "title": "Manlung Recovery \u00b7 Knowledge Center"
+    },
+    {
+      "path": "/link-scanner.html",
+      "title": "Website Scanner \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/login.html",
+      "title": "Client Access \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/manlung-ai.html",
+      "title": "Manlung AI - 3D Conversational Support | Manlung Recovery"
+    },
+    {
+      "path": "/oauth-callback.html",
+      "title": "Signing you in\u2026 \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/offline-game.html",
+      "title": "Manlung Offline Run"
+    },
+    {
+      "path": "/privacy.html",
+      "title": "Privacy &amp; Data Protection \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/remote/device.html",
+      "title": "Manlung Remote Support"
+    },
+    {
+      "path": "/reset-password.html",
+      "title": "Reset Password \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/selfie.html",
+      "title": "Verification | Manlung Recovery"
+    },
+    {
+      "path": "/services.html",
+      "title": "Recovery Services | Manlung Recovery"
+    },
+    {
+      "path": "/terms.html",
+      "title": "Terms &amp; Conditions \u00b7 Manlung Recovery"
+    },
+    {
+      "path": "/trust.html",
+      "title": "How It Works &amp; Trust | Manlung Recovery"
+    },
+    {
+      "path": "/video.html",
+      "title": "Video Verification \u00b7 Manlung Recovery"
+    }
+  ]
+}

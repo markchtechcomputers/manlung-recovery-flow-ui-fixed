@@ -1,0 +1,347 @@
+/* Manlung Recovery — product-wide UI polish layer
+   Loaded last so legacy page-specific styles remain functional while shared
+   primitives gain one calm, professional visual language. */
+:root {
+  --mr-ink: #10233f;
+  --mr-ink-2: #1b3a5f;
+  --mr-blue: #1769e0;
+  --mr-blue-2: #0f56c7;
+  --mr-cyan: #0ea5b7;
+  --mr-orange: #f28a2e;
+  --mr-bg: #f4f7fb;
+  --mr-surface: #ffffff;
+  --mr-surface-soft: #eef4fa;
+  --mr-line: #dce5ef;
+  --mr-text: #15253d;
+  --mr-muted: #64748b;
+  --mr-shadow: 0 18px 50px rgba(21, 44, 74, .09);
+  --mr-shadow-soft: 0 8px 24px rgba(21, 44, 74, .07);
+  --mr-radius: 16px;
+  --mr-radius-sm: 11px;
+  --mr-focus: 0 0 0 4px rgba(23, 105, 224, .16);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--mr-bg);
+  color: var(--mr-text);
+  letter-spacing: .002em;
+  line-height: 1.58;
+}
+body, button, input, select, textarea { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+::selection { background: rgba(23, 105, 224, .18); color: var(--mr-ink); }
+:where(a, button, input, select, textarea):focus-visible { outline: 0; box-shadow: var(--mr-focus); }
+
+/* Shared shells and navigation */
+.site-header {
+  background: rgba(255, 255, 255, .93) !important;
+  border-bottom: 1px solid var(--mr-line) !important;
+  box-shadow: 0 4px 22px rgba(16, 35, 63, .06) !important;
+  backdrop-filter: blur(18px);
+}
+.site-header .container { max-width: 1240px; min-height: 72px; padding: 12px 24px; }
+.site-header .brand h1, .site-header .manlung-brand-copy h1 { color: var(--mr-ink) !important; font-weight: 850 !important; letter-spacing: -.035em; }
+.site-header .brand span, .site-header .manlung-brand-copy span { color: var(--mr-muted) !important; }
+.site-header .brand h1 i { color: var(--mr-blue) !important; }
+.site-header .header-actions { gap: 8px !important; }
+.site-header .header-actions a, .site-header .header-actions button {
+  min-height: 40px !important;
+  border: 1px solid var(--mr-line) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, .8) !important;
+  color: var(--mr-ink) !important;
+  font-weight: 750 !important;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.site-header .header-actions a:hover, .site-header .header-actions button:hover {
+  border-color: rgba(23, 105, 224, .35) !important;
+  background: #fff !important;
+  box-shadow: var(--mr-shadow-soft);
+  transform: translateY(-1px);
+}
+.site-header .header-actions .btn-primary, .site-header .header-actions a[href*="request"] {
+  background: var(--mr-blue) !important; border-color: var(--mr-blue) !important; color: #fff !important;
+}
+.site-header .header-actions .btn-danger { background: #fff4f3 !important; border-color: #fecaca !important; color: #b42318 !important; }
+
+.container { max-width: 1240px; }
+main > .container, .page-container, .admin-page-bg > .container { padding-top: 28px; padding-bottom: 36px; }
+
+/* Controls */
+.btn, button, input, select, textarea { border-radius: var(--mr-radius-sm); }
+.btn { min-height: 42px; padding: 10px 15px; font-weight: 760; letter-spacing: .005em; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(23, 105, 224, .12); }
+.btn-primary { background: var(--mr-blue) !important; border-color: var(--mr-blue) !important; color: #fff !important; }
+.btn-primary:hover { background: var(--mr-blue-2) !important; border-color: var(--mr-blue-2) !important; }
+.btn-outline, .btn-outline-dark { border-color: var(--mr-line) !important; background: #fff !important; color: var(--mr-ink) !important; }
+.btn-danger { background: #b42318 !important; border-color: #b42318 !important; color: #fff !important; }
+input, select, textarea { border: 1px solid var(--mr-line) !important; background: #fff !important; color: var(--mr-text) !important; min-height: 44px; }
+input::placeholder, textarea::placeholder { color: #94a3b8; }
+input:focus, select:focus, textarea:focus { border-color: rgba(23, 105, 224, .65) !important; box-shadow: var(--mr-focus) !important; outline: 0; }
+label { color: var(--mr-ink); font-weight: 720; }
+
+/* Cards, panels, metrics, tables, dialogs */
+.card, .panel, .modal-card, .case-card, .feature-card, .stat-card, .dr-card, .premium-service-card {
+  border: 1px solid var(--mr-line) !important;
+  border-radius: var(--mr-radius) !important;
+  background: var(--mr-surface) !important;
+  box-shadow: var(--mr-shadow-soft) !important;
+}
+.card:hover, .feature-card:hover, .case-card:hover { box-shadow: var(--mr-shadow) !important; }
+.card-title, .dr-title h2, .section-heading h2 { color: var(--mr-ink); letter-spacing: -.025em; }
+.card-title { font-weight: 820; }
+.stat-card .number { color: var(--mr-blue); font-weight: 850; }
+table.admin-table { border: 1px solid var(--mr-line); border-radius: var(--mr-radius-sm); overflow: hidden; background: #fff; }
+table.admin-table th { background: var(--mr-surface-soft); color: var(--mr-muted); font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; }
+table.admin-table td { color: var(--mr-text); }
+table.admin-table tr:hover td { background: #f5f9ff; }
+.status-badge, .badge, .admin-badge { border-radius: 999px !important; font-weight: 800 !important; letter-spacing: .02em; }
+
+/* Home experience */
+.mr-home-hero, .mr-video-hero { border-radius: 0 0 28px 28px !important; box-shadow: 0 18px 45px rgba(3, 30, 60, .12) !important; }
+.mr-home-hero .mr-hero-copy h1, .mr-home-hero .mr-hero-copy h2 { letter-spacing: -.055em !important; }
+.home-section { padding-top: 64px !important; padding-bottom: 64px !important; }
+.section-heading .eyebrow { background: #eaf3ff !important; color: var(--mr-blue) !important; }
+.premium-service-card .service-icon-wrap { box-shadow: inset 0 0 0 1px rgba(23, 105, 224, .08); }
+
+/* Auth */
+body.manlung-auth-page { background: radial-gradient(circle at 15% 0%, #e9f3ff 0, transparent 33%), var(--mr-bg) !important; }
+body.manlung-auth-page .manlung-auth-wrap { padding: 42px 20px 58px !important; }
+body.manlung-auth-page .manlung-auth-shell { max-width: 940px !important; }
+body.manlung-auth-page .manlung-auth-form { border: 1px solid var(--mr-line) !important; border-radius: 22px !important; background: rgba(255, 255, 255, .98) !important; box-shadow: var(--mr-shadow) !important; }
+body.manlung-auth-page .manlung-auth-form::before { opacity: .18; background-image: linear-gradient(135deg, #eaf3ff, #f8fbff) !important; }
+body.manlung-auth-page .manlung-auth-heading h2 { color: var(--mr-ink) !important; letter-spacing: -.055em !important; }
+body.manlung-auth-page .manlung-auth-heading p { color: var(--mr-muted) !important; }
+body.manlung-auth-page .manlung-auth-tabs { background: var(--mr-surface-soft) !important; border-color: var(--mr-line) !important; }
+body.manlung-auth-page .manlung-auth-tabs button.active { background: #fff !important; color: var(--mr-blue) !important; box-shadow: 0 3px 10px rgba(16, 35, 63, .1) !important; }
+body.manlung-auth-page .manlung-social-btn, body.manlung-auth-page .manlung-google-btn { background: #fff !important; border-color: var(--mr-line) !important; color: var(--mr-ink) !important; }
+body.manlung-auth-page .manlung-auth-primary { background: var(--mr-blue) !important; box-shadow: 0 10px 22px rgba(23, 105, 224, .2) !important; }
+body.manlung-auth-page .manlung-auth-primary:hover { background: var(--mr-blue-2) !important; }
+
+/* Client and admin data shells */
+.dashboard-hero, .dr-hero { border-radius: 20px !important; box-shadow: var(--mr-shadow) !important; }
+.case-meta div, .dr-metric { background: var(--mr-surface-soft) !important; border-color: var(--mr-line) !important; }
+.filters-bar { padding: 12px; border: 1px solid var(--mr-line); border-radius: var(--mr-radius-sm); background: var(--mr-surface-soft); }
+.login-container { border: 1px solid var(--mr-line) !important; background: #fff !important; box-shadow: var(--mr-shadow) !important; }
+.admin-page-bg { background: var(--mr-bg) !important; }
+
+/* Dark theme remains a deliberate option */
+html.dark body, body.dark { --mr-bg: #0b1628; --mr-surface: #12233d; --mr-surface-soft: #172c49; --mr-line: #294564; --mr-text: #edf5ff; --mr-muted: #a9bdd6; }
+html.dark .site-header, body.dark .site-header { background: rgba(11, 22, 40, .94) !important; border-bottom-color: #294564 !important; }
+html.dark .site-header .brand h1, body.dark .site-header .manlung-brand-copy h1 { color: #f8fbff !important; }
+html.dark .site-header .header-actions a, html.dark .site-header .header-actions button { background: rgba(18, 35, 61, .92) !important; color: #e5effb !important; border-color: #294564 !important; }
+html.dark .card, html.dark .panel, html.dark .modal-card, html.dark .case-card, html.dark .feature-card, html.dark .stat-card, html.dark .dr-card, body.dark .card, body.dark .panel { background: var(--mr-surface) !important; border-color: var(--mr-line) !important; }
+html.dark input, html.dark select, html.dark textarea, body.dark input, body.dark select, body.dark textarea { background: #0e1c31 !important; color: #eef6ff !important; border-color: #294564 !important; }
+html.dark table.admin-table, body.dark table.admin-table { background: var(--mr-surface) !important; border-color: var(--mr-line); }
+html.dark table.admin-table th, body.dark table.admin-table th { background: #19324f; color: #b7c9df; }
+
+@media (max-width: 760px) {
+  .site-header .container { padding: 10px 14px; }
+  .site-header .header-actions { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .site-header .header-actions > * { width: 100%; }
+  main > .container, .page-container, .admin-page-bg > .container { padding-top: 18px; }
+  .home-section { padding: 42px 16px !important; }
+  body.manlung-auth-page .manlung-auth-wrap { padding: 22px 12px 34px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
+/* Admin authentication: neutralize legacy decorative themes and use the same
+   secure, calm portal language as client authentication. */
+body:has(.center-wrap) {
+  background: radial-gradient(circle at 12% 0%, #e7f3ff 0, transparent 32%), var(--mr-bg) !important;
+  color: var(--mr-text) !important;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
+}
+body:has(.center-wrap)::before, body:has(.center-wrap)::after { display: none !important; }
+body:has(.center-wrap) .center-wrap { min-height: 100svh !important; padding: 28px 16px !important; }
+body:has(.center-wrap) .login-container {
+  width: min(100%, 460px) !important;
+  padding: 40px !important;
+  border: 1px solid var(--mr-line) !important;
+  border-radius: 22px !important;
+  background: rgba(255, 255, 255, .98) !important;
+  color: var(--mr-text) !important;
+  box-shadow: var(--mr-shadow) !important;
+  backdrop-filter: none !important;
+}
+body:has(.center-wrap) .login-container::before,
+body:has(.center-wrap) .login-container::after { display: none !important; }
+body:has(.center-wrap) .login-container .logo { margin-bottom: 26px !important; }
+body:has(.center-wrap) .login-container .logo > i {
+  width: 62px !important; height: 62px !important; margin: 0 auto 15px !important;
+  border: 0 !important; border-radius: 18px !important;
+  background: linear-gradient(135deg, #dff6f2, #e4efff) !important;
+  color: var(--mr-blue) !important; text-shadow: none !important;
+}
+body:has(.center-wrap) .login-container .logo h1 {
+  color: var(--mr-ink) !important; font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
+  font-size: clamp(1.5rem, 4vw, 1.8rem) !important; letter-spacing: -.045em !important; text-shadow: none !important;
+}
+body:has(.center-wrap) .login-container .logo > span { color: var(--mr-muted) !important; font-family: inherit !important; font-size: .78rem !important; letter-spacing: .14em !important; }
+body:has(.center-wrap) .login-container .admin-badge { border-color: #bfdbfe !important; background: #eff6ff !important; color: var(--mr-blue) !important; }
+body:has(.center-wrap) .login-container label { color: var(--mr-ink) !important; font-family: inherit !important; font-size: .86rem !important; letter-spacing: 0 !important; text-transform: none !important; }
+body:has(.center-wrap) .login-container label i { color: var(--mr-muted) !important; }
+body:has(.center-wrap) .login-container input {
+  min-height: 49px !important; border: 1px solid var(--mr-line) !important; border-radius: 12px !important;
+  background: #fff !important; color: var(--mr-text) !important; font: inherit !important; box-shadow: none !important;
+}
+body:has(.center-wrap) .login-container input:focus { border-color: rgba(23, 105, 224, .65) !important; box-shadow: var(--mr-focus) !important; }
+body:has(.center-wrap) .login-container .btn-primary { background: var(--mr-blue) !important; border-color: var(--mr-blue) !important; color: #fff !important; box-shadow: 0 10px 22px rgba(23, 105, 224, .18) !important; }
+body:has(.center-wrap) .login-container .btn-primary:hover { background: var(--mr-blue-2) !important; }
+body:has(.center-wrap) .login-container a { color: var(--mr-blue) !important; }
+body:has(.center-wrap) .manlung-turnstile-box { border-color: var(--mr-line) !important; background: var(--mr-surface-soft) !important; }
+body:has(.center-wrap) .manlung-turnstile-title, body:has(.center-wrap) .manlung-turnstile-help { color: var(--mr-muted) !important; }
+@media (max-width: 480px) {
+  body:has(.center-wrap) .center-wrap { padding: 18px 12px !important; }
+  body:has(.center-wrap) .login-container { padding: 28px 20px !important; border-radius: 18px !important; }
+}
+
+/* Production snapshot refresh — deeper trust palette, clearer hero, and Android-first touch polish. */
+:root {
+  --mr-brand-deep: #071a33;
+  --mr-brand-blue: #1367d8;
+  --mr-brand-cyan: #11b7b0;
+  --mr-brand-mint: #8de8d5;
+  --mr-brand-glow: rgba(17, 183, 176, .22);
+}
+
+/* Homepage hero: make the current video/fallback hero feel intentional, premium,
+   and unmistakably Manlung without removing the latest production media. */
+.mr-home-hero.mr-video-hero,
+.mr-home-hero {
+  background: linear-gradient(124deg, #06152b 0%, #082b4c 48%, #075b68 100%) !important;
+  box-shadow: 0 28px 80px rgba(4, 19, 42, .24) !important;
+}
+.mr-home-hero.mr-video-hero .mr-hero-video-overlay {
+  background:
+    radial-gradient(circle at 82% 22%, rgba(17, 183, 176, .28), transparent 28%),
+    linear-gradient(102deg, rgba(4, 15, 34, .94) 0%, rgba(4, 28, 56, .78) 54%, rgba(4, 72, 78, .48) 100%) !important;
+}
+.mr-home-hero .mr-hero-copy h1,
+.mr-home-hero.mr-video-hero .mr-hero-copy h1 {
+  max-width: 780px !important;
+  letter-spacing: -.065em !important;
+  line-height: .98 !important;
+  text-shadow: 0 10px 34px rgba(1, 10, 24, .24);
+}
+.mr-home-hero .mr-hero-copy h1 span,
+.mr-home-hero.mr-video-hero .mr-hero-copy h1 span {
+  background: linear-gradient(100deg, #b4fff1 0%, #8dd7ff 55%, #77f0df 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+.mr-home-hero .mr-hero-eyebrow,
+.mr-home-hero .mr-hero-badge {
+  border-color: rgba(141, 232, 213, .38) !important;
+  background: rgba(7, 42, 65, .62) !important;
+  color: #c9fff4 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+}
+.mr-home-hero .mr-hero-primary,
+.mr-home-hero .mr-hero-actions .btn-primary {
+  background: linear-gradient(135deg, #11b7b0, #1471e3) !important;
+  border-color: rgba(178, 255, 239, .46) !important;
+  color: #fff !important;
+  box-shadow: 0 13px 30px rgba(10, 170, 190, .24) !important;
+}
+.mr-home-hero .mr-hero-primary:hover,
+.mr-home-hero .mr-hero-actions .btn-primary:hover {
+  background: linear-gradient(135deg, #19c9bd, #2580ef) !important;
+}
+.mr-home-hero .mr-hero-secondary {
+  border-color: rgba(203, 239, 255, .42) !important;
+  background: rgba(7, 28, 53, .58) !important;
+  color: #f2fbff !important;
+}
+.mr-home-hero .mr-hero-trust-row span {
+  border-color: rgba(141, 232, 213, .22) !important;
+  background: rgba(4, 22, 42, .34) !important;
+}
+.mr-home-hero .mr-hero-trust-row i { color: #8de8d5 !important; }
+.mr-home-hero .mr-workspace-card,
+.mr-home-hero .mr-security-panel {
+  border-color: rgba(161, 224, 235, .42) !important;
+  box-shadow: 0 30px 90px rgba(1, 11, 26, .34) !important;
+}
+.mr-home-hero .mr-hero-bottom-line span:nth-child(1) { background: #11b7b0 !important; }
+.mr-home-hero .mr-hero-bottom-line span:nth-child(2) { background: #168fe4 !important; }
+.mr-home-hero .mr-hero-bottom-line span:nth-child(3) { background: #55c8e7 !important; }
+
+/* Consistent content rhythm under the new hero. */
+.home-page-container > section,
+.home-page-container > .home-section { scroll-margin-top: 94px; }
+.home-page-container .section-heading h2,
+.home-page-container .intro-strip h2,
+.home-page-container .final-cta h2 { letter-spacing: -.055em !important; }
+.home-page-container .premium-service-card:hover,
+.home-page-container .process-step:hover,
+.home-page-container .workflow-card:hover { border-color: rgba(19, 103, 216, .34) !important; }
+
+/* Android/webview safe area and touch targets. */
+html.manlung-android-app body,
+body.manlung-android-app {
+  background: #f5f9fd !important;
+  color: #12243d !important;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+html.manlung-android-app body .site-header,
+html.manlung-android-app body .mobile-friendly-header {
+  border-bottom: 1px solid rgba(202, 219, 235, .9) !important;
+  box-shadow: 0 6px 22px rgba(20, 59, 102, .08) !important;
+}
+html.manlung-android-app body button,
+html.manlung-android-app body .btn,
+html.manlung-android-app body a[role="button"] {
+  min-height: 46px !important;
+  border-radius: 13px !important;
+}
+html.manlung-android-app body input:not([type="checkbox"]):not([type="radio"]),
+html.manlung-android-app body select,
+html.manlung-android-app body textarea {
+  min-height: 46px !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+}
+html.manlung-android-app .mr-home-hero.mr-video-hero {
+  min-height: 78svh !important;
+  border-radius: 0 !important;
+}
+@media (max-width: 680px) {
+  .mr-home-hero .mr-home-hero-inner,
+  .mr-home-hero.mr-video-hero .mr-home-hero-inner { padding: 58px 19px 68px !important; }
+  .mr-home-hero .mr-hero-copy h1,
+  .mr-home-hero.mr-video-hero .mr-hero-copy h1 { font-size: clamp(2.45rem, 11vw, 3.75rem) !important; }
+  .mr-home-hero .mr-hero-description { font-size: .96rem !important; line-height: 1.72 !important; }
+  .mr-home-hero .mr-hero-actions { gap: 10px !important; }
+}
+
+/* Android download page: replace the utility page's old dark block with a calm install guide. */
+body.android-download-page {
+  min-height: 100svh !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 22px !important;
+  background: radial-gradient(circle at 12% 0%, #dff6f2, transparent 36%), linear-gradient(135deg, #f4f8fc, #eaf3fb) !important;
+  color: #12243d !important;
+}
+body.android-download-page main {
+  width: min(100%, 620px) !important;
+  padding: clamp(24px, 6vw, 46px) !important;
+  border: 1px solid #d8e5f0 !important;
+  border-radius: 26px !important;
+  background: rgba(255, 255, 255, .96) !important;
+  box-shadow: 0 28px 80px rgba(21, 64, 108, .14) !important;
+}
+body.android-download-page .brand img { border-radius: 18px !important; box-shadow: 0 8px 20px rgba(19, 103, 216, .18); }
+body.android-download-page .brand span,
+body.android-download-page .muted,
+body.android-download-page .note { color: #687b91 !important; }
+body.android-download-page h1 { color: #0c2340 !important; letter-spacing: -.055em !important; }
+body.android-download-page .download { min-height: 54px !important; border-radius: 14px !important; background: linear-gradient(135deg, #11b7b0, #146be0) !important; box-shadow: 0 12px 26px rgba(19, 103, 216, .2); }
+body.android-download-page .download:hover { background: linear-gradient(135deg, #1bc8bc, #2580ed) !important; }
+body.android-download-page .status { border-color: #d8e5f0 !important; background: #f7fbff !important; color: #38516d !important; }
+body.android-download-page a.back,
+body.android-download-page .note a { color: #146be0 !important; }

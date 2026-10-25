@@ -26,9 +26,12 @@ function normalizeSupabaseUrl(rawUrl) {
   }
 }
 
+// Public UI Preview must be able to boot without database secrets. The
+// placeholder is intentionally unreachable; configured production environments
+// continue to use the real Supabase values above.
 const supabase = createClient(
-  normalizeSupabaseUrl(process.env.SUPABASE_URL),
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  normalizeSupabaseUrl(process.env.SUPABASE_URL) || 'https://preview-placeholder.invalid',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || 'preview-placeholder-key',
   { auth: { persistSession: false, autoRefreshToken: false } }
 );
 
