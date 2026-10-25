@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v35';
+const CACHE_NAME = 'manlung-recovery-static-v36';
 
 // Only public/static pages are cached. Authenticated dashboards, settings,
 // admin pages, API responses, evidence, and other private data stay network-only.
@@ -10,10 +10,10 @@ const STATIC_ASSETS = [
   '/js/call-webrtc.js', '/js/call-widget.js', '/js/contact-fab.js',
   '/js/support-fab.js', '/js/manlung-ai-v2.js', '/js/manlung-ai.js',
   '/css/case-flow-animation.css', '/js/case-flow-animation.js', '/css/home-premium.css', '/js/home-premium.js',
-  '/icons/icon-192.png', '/icons/icon-512.png'
+  '/icons/icon-192.png', '/icons/icon-512.png', '/offline-game.html'
 ];
 const PUBLIC_DOCUMENTS = new Set(STATIC_ASSETS.filter(path => path.endsWith('.html') || path === '/'));
-const OFFLINE_PAGE = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Manlung Recovery · Offline</title></head><body><h1>You are offline</h1><p>Reconnect and try again.</p></body></html>`;
+const OFFLINE_PAGE = '/offline-game.html';
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS)).catch(() => {}).then(() => self.skipWaiting()));
 });
@@ -27,13 +27,13 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
   if (request.mode === 'navigate' || request.destination === 'document') {
     if (!PUBLIC_DOCUMENTS.has(url.pathname)) {
-      event.respondWith(fetch(request).catch(() => new Response(OFFLINE_PAGE, {status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}})));
+      event.respondWith(fetch(request).catch(() => (await caches.match(OFFLINE_PAGE)) || new Response('You are offline. Reconnect and try again.', {status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}})));
       return;
     }
     event.respondWith(caches.match(request).then(cached => fetch(request, { cache: 'no-cache' }).then(response => {
       if (response && response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone())).catch(() => {});
       return response;
-    }).catch(() => cached || new Response(OFFLINE_PAGE, {status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}}))));
+    }).catch(() => cached || (await caches.match(OFFLINE_PAGE)) || new Response('You are offline. Reconnect and try again.', {status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}}))));
     return;
   }
   if (STATIC_ASSETS.includes(url.pathname)) event.respondWith(fetch(request, { cache: 'no-cache' }).then(response => {
