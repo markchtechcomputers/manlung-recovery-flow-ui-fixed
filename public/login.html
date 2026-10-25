@@ -2469,13 +2469,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const originalGoogleSetup = window.setupOfficialGoogleButtons;
-  if (typeof originalGoogleSetup === 'function') {
-    window.setupOfficialGoogleButtons = async function () {
-      if (isNativeAndroid()) return;
-      return originalGoogleSetup.apply(this, arguments);
-    };
-  }
+  // Google sign-in must use the site's direct Google Identity Services flow
+  // and POST its verified Google credential to /api/auth/google. Do not route
+  // the Google button through Supabase OAuth on Android.
   const originalSocialSignup = window.startSocialSignup;
   if (typeof originalSocialSignup === 'function') {
     window.startSocialSignup = function (provider) {
@@ -2492,18 +2488,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event?.url) finishNativeOAuth(event.url);
       });
     }
-    [['googleLoginBtn', 'google'], ['googleRegisterBtn', 'google']].forEach(([id, provider]) => {
-      const host = document.getElementById(id);
-      if (!host) return;
-      host.innerHTML = '';
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'manlung-google-btn';
-      button.setAttribute('aria-label', 'Continue with Google');
-      button.textContent = 'Continue with Google';
-      button.addEventListener('click', () => startNativeOAuth(provider));
-      host.appendChild(button);
-    });
+    // Leave the Google button owned by setupOfficialGoogleButtons() above.
+    // GitHub remains on its existing native OAuth bridge.
   });
 })();
 </script>
