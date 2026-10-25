@@ -464,3 +464,68 @@ footer,
    margin-bottom: 28px !important;
  }
 }
+
+
+/* FIX: full-bleed footer in both light and dark themes, including nested page layouts. */
+html body footer.manlung-footer,
+html body .manlung-footer,
+html body #site-footer,
+html body .site-footer {
+  display: block !important;
+  position: relative !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 100vw !important;
+  left: 50% !important;
+  right: auto !important;
+  margin-left: -50vw !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-radius: 0 !important;
+  background: #000 !important;
+  background-color: #000 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+html body footer.manlung-footer *,
+html body .manlung-footer *,
+html body #site-footer *,
+html body .site-footer * {
+  box-sizing: border-box;
+}
+html body .manlung-footer .manlung-footer-inner {
+  width: min(calc(100% - 40px), 1240px) !important;
+  max-width: 1240px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  background: #000 !important;
+}
+html body .manlung-footer .manlung-footer-grid,
+html body .manlung-footer .manlung-footer-brand,
+html body .manlung-footer .manlung-footer-column,
+html body .manlung-footer .manlung-footer-contact-row,
+html body .manlung-footer .manlung-footer-contact,
+html body .manlung-footer .manlung-footer-social-wrap,
+html body .manlung-footer .manlung-footer-social,
+html body .manlung-footer .manlung-footer-bottom,
+html body .manlung-footer .manlung-footer-legal {
+  background: #000 !important;
+  background-color: #000 !important;
+}
+@media (max-width: 600px) {
+  html body footer.manlung-footer,
+  html body .manlung-footer,
+  html body #site-footer,
+  html body .site-footer {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+    left: 50% !important;
+    margin-left: -50vw !important;
+  }
+  html body .manlung-footer .manlung-footer-inner {
+    width: calc(100% - 32px) !important;
+    max-width: none !important;
+  }
+}
