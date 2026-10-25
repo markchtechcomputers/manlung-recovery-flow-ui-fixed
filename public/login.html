@@ -2183,7 +2183,7 @@ async function setupOfficialGoogleButtons(){
           });
           const { data, error } = await client.auth.signInWithOAuth({
             provider: 'google',
-            options: { redirectTo: 'co.manlungrecovery.app://auth/callback', skipBrowserRedirect: true }
+            options: { redirectTo: window.location.origin + '/oauth-callback.html?native=1', skipBrowserRedirect: true }
           });
           if (error) throw error;
           if (!data?.url) throw new Error('Google sign-in could not be started.');
