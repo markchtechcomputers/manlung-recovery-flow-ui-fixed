@@ -2186,7 +2186,7 @@ async function setupOfficialGoogleButtons(){
 }
 
 async function startSocialSignup(provider){
-  if(provider!=='github')return;
+  if(!['github','discord'].includes(provider))return;
 
   localStorage.removeItem('clientUser');
 
@@ -2231,6 +2231,7 @@ async function startSocialSignup(provider){
 document.addEventListener('DOMContentLoaded',()=>{
   setupOfficialGoogleButtons();
   ['githubLoginBtn','githubRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('github')));
+  ['discordLoginBtn','discordRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('discord')));
 });
 async function handleSocialCallback(){
   if(!window.supabase?.createClient)return;
@@ -2340,20 +2341,7 @@ async function handleSocialCallback(){
 </script>
 
 <script>
-/* Discord is shown as an icon, but stays honest until OAuth credentials and callback are configured. */
-document.addEventListener('DOMContentLoaded', () => {
-  ['discordLoginBtn','discordRegisterBtn'].forEach(id => {
-    const button = document.getElementById(id);
-    if (!button) return;
-    button.addEventListener('click', () => {
-      const target = id === 'discordRegisterBtn' ? 'registerError' : 'loginError';
-      const node = document.getElementById(target);
-      if (typeof showMessage === 'function' && node) {
-        showMessage(node, 'Discord sign-in is not connected yet. Please use Google, GitHub, or email for now.', 'info');
-      }
-    });
-  });
-});
+/* Discord buttons use the same configured Supabase OAuth flow as GitHub. */
 </script>
 
 <script src="/js/pwa.js" defer></script>
@@ -2413,7 +2401,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const { Browser } = plugins();
       if (!Browser?.open) throw new Error('The app browser bridge is unavailable. Please update the Manlung APK.');
       localStorage.removeItem('clientUser');
-      showNativeStatus('Opening secure ' + (provider === 'google' ? 'Google' : 'GitHub') + ' sign-in…');
+      showNativeStatus('Opening secure ' + (provider === 'google' ? 'Google' : provider === 'discord' ? 'Discord' : 'GitHub') + ' sign-in…');
       const client = await supabaseClient();
       const { data, error } = await client.auth.signInWithOAuth({
         provider,
