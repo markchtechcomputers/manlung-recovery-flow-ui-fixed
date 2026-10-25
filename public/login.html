@@ -1462,17 +1462,22 @@ html body.manlung-auth-page.dark #googleLoginBtn{background:#fff!important;borde
 
 
 <style id="manlung-auth-social-buttons-final-fix">
-/* Keep Google at the same full-width size as the other providers on both tabs. */
+/* Native full-width Google button avoids GIS iframe collapsing to an icon-only square. */
 html body.manlung-auth-page .manlung-social-grid{display:flex!important;flex-direction:column!important;gap:12px!important;width:100%!important}
-html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .manlung-google-btn{box-sizing:border-box!important;width:100%!important;max-width:100%!important;height:54px!important;min-height:54px!important;max-height:54px!important;border-radius:8px!important;font-size:15px!important}
-html body.manlung-auth-page .manlung-google-btn{display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;padding:0!important;background:#fff!important;border:1px solid #dadce0!important}
-html body.manlung-auth-page .manlung-google-btn>div,html body.manlung-auth-page .manlung-google-btn iframe{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;height:54px!important;min-height:54px!important;margin:0!important}
-html body.manlung-auth-page .manlung-social-btn span{display:inline!important;white-space:nowrap!important}
-html body.manlung-auth-page .manlung-social-btn .discord-brand-mark{width:22px!important;height:22px!important;flex:0 0 22px!important}
-html body.manlung-auth-page #githubRegisterBtn{background:#24292e!important;color:#fff!important;border-color:#24292e!important}
-html body.manlung-auth-page #discordRegisterBtn{background:#5865f2!important;color:#fff!important;border-color:#5865f2!important}
-html body.manlung-auth-page #discordRegisterBtn .discord-brand-mark path{fill:#fff!important}
+html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .manlung-google-btn{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;position:relative!important;width:100%!important;max-width:100%!important;height:54px!important;min-height:54px!important;max-height:54px!important;padding:0 16px!important;gap:12px!important;border:1px solid #d6dfeb!important;border-radius:8px!important;font:600 15px/1.25 Arial,sans-serif!important;cursor:pointer!important;box-shadow:0 1px 2px rgba(0,0,0,.05)!important}
+html body.manlung-auth-page .manlung-google-btn{overflow:hidden!important;background:#fff!important;color:#273449!important;border-color:#dadce0!important}
+html body.manlung-auth-page .manlung-google-btn .manlung-google-glyph{display:block!important;flex:0 0 20px!important;width:20px!important;height:20px!important}
+html body.manlung-auth-page .manlung-google-btn .manlung-google-label{display:block!important;flex:1 1 auto!important;text-align:center!important;white-space:nowrap!important}
+html body.manlung-auth-page .manlung-google-btn iframe{display:none!important}
+html body.manlung-auth-page .manlung-social-btn i,html body.manlung-auth-page .manlung-social-btn svg{display:block!important;flex:0 0 20px!important;width:20px!important;height:20px!important;font-size:20px!important;border-radius:0!important}
+html body.manlung-auth-page .manlung-social-btn span{display:block!important;flex:1 1 auto!important;text-align:center!important;white-space:nowrap!important}
+html body.manlung-auth-page #githubLoginBtn,html body.manlung-auth-page #githubRegisterBtn{background:#24292e!important;color:#fff!important;border-color:#24292e!important}
+html body.manlung-auth-page #discordLoginBtn,html body.manlung-auth-page #discordRegisterBtn{background:#5865f2!important;color:#fff!important;border-color:#5865f2!important}
+html body.manlung-auth-page #discordLoginBtn .discord-brand-mark path,html body.manlung-auth-page #discordRegisterBtn .discord-brand-mark path{fill:#fff!important}
+html body.manlung-auth-page .manlung-social-btn:hover,html body.manlung-auth-page .manlung-google-btn:hover{transform:translateY(-1px)!important;filter:brightness(.97);box-shadow:0 4px 12px rgba(15,23,42,.09)!important}
+html body.manlung-auth-page .manlung-social-btn:focus-visible,html body.manlung-auth-page .manlung-google-btn:focus-visible{outline:3px solid rgba(59,130,246,.35)!important;outline-offset:2px!important}
 @media(max-width:640px){html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .manlung-google-btn{height:54px!important;min-height:54px!important;max-height:54px!important}}
+@media(prefers-reduced-motion:reduce){html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .manlung-google-btn{transition:none!important}}
 </style>
 </head>
 <body class="manlung-auth-page">
@@ -2214,21 +2219,16 @@ async function setupOfficialGoogleButtons(){
       host.innerHTML='';
       host.setAttribute('aria-label','Continue with Google');
       host.setAttribute('title','Continue with Google');
-      // Render Google's official interactive button visibly so its icon and
-      // click target stay together and the sign-in flow remains functional.
-      google.accounts.id.renderButton(host,{
-        type:'standard',
-        text:'continue_with',
-        theme:'outline',
-        size:'large',
-        shape:'rectangular',
-        width:Math.min(400,Math.max(240,Math.floor(host.getBoundingClientRect().width||360)))
+      // Native full-width button avoids Google's iframe shrinking to an icon-only square.
+      host.innerHTML='<button type="button" class="manlung-google-btn-inner" aria-label="Continue with Google"><svg class="manlung-google-glyph" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 37.98 46.98 31.9 46.98 24.55z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.14 1.44-4.89 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span class="manlung-google-label">Continue with Google</span></button>';
+      const googleButton=host.querySelector('button');
+      googleButton.style.cssText='all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;height:54px;padding:0 16px;cursor:pointer;font:600 15px/1.25 Arial,sans-serif;color:#273449';
+      googleButton.addEventListener('click',()=>{
+        window.__manlungGoogleErrorTarget=errorTarget;
+        host.dataset.googleErrorTarget=errorTarget;
+        google.accounts.id.prompt();
       });
       host.dataset.googleErrorTarget=errorTarget;
-      host.addEventListener('pointerdown',()=>{
-        window.__manlungGoogleErrorTarget =
-          document.getElementById('registerPanel')?.hidden ? 'loginError' : 'registerError';
-      });
     });
   }catch(err){
     showMessage(document.getElementById('loginError'),readableAuthError(err,'Google authentication could not be loaded.'));
