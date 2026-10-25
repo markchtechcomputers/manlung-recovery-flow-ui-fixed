@@ -2244,36 +2244,34 @@ async function setupOfficialGoogleButtons(){
       host.style.height='54px';
       host.style.minHeight='54px';
       host.style.display='flex';
-      host.style.alignItems='stretch';
-      host.style.justifyContent='stretch';
+      host.style.alignItems='center';
+      host.style.justifyContent='center';
       host.style.overflow='visible';
       host.style.padding='0';
       host.style.border='0';
       host.style.background='transparent';
       host.style.boxShadow='none';
 
-      // GIS renders its own iframe button with a limited internal width.
-      // Use a full-width native visual button, then open Google's supported
-      // One Tap prompt from the user's click; the existing credential callback
-      // above still verifies the returned credential on the server.
-      const button=document.createElement('button');
-      button.type='button';
-      button.className='manlung-google-native-button';
-      button.setAttribute('aria-label','Continue with Google');
-      button.innerHTML='<svg class="manlung-google-glyph" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 3.2 13.22l7.98 6.19C13.07 13.72 18.09 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 37.94 46.98 31.84 46.98 24.55Z"/><path fill="#FBBC05" d="M11.18 28.59A14.4 14.4 0 0 1 10.4 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 .02 24c0 3.87.93 7.52 2.58 10.78l8.58-6.19Z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.14 1.44-4.89 2.3-8.18 2.3-5.91 0-10.93-4.22-12.82-9.91l-8.58 6.19C6.51 42.62 14.62 48 24 48Z"/></svg><span class="manlung-google-label">Continue with Google</span>';
-      button.addEventListener('click',()=>{
-        window.__manlungGoogleErrorTarget=errorTarget;
-        if(!window.google?.accounts?.id){
-          showMessage(document.getElementById(errorTarget),'Google sign-in is still loading. Please try again in a moment.','error');
-          return;
-        }
-        google.accounts.id.prompt(notification=>{
-          if(notification?.isNotDisplayed?.() || notification?.isSkippedMoment?.()){
-            showMessage(document.getElementById(errorTarget),'Google sign-in is unavailable in this browser session. Refresh the page or try another sign-in option.','error');
-          }
-        });
+      // Use Google's real, interactive Identity Services button. The custom
+      // One Tap trigger made the visual button unreliable/non-clickable.
+      // GIS supports button widths up to 400px; size it to the available host
+      // width so it fills the social-button column without clipping.
+      const availableWidth=Math.max(200,Math.min(400,Math.floor(host.getBoundingClientRect().width||400)));
+      google.accounts.id.renderButton(host,{
+        type:'standard',
+        theme:document.documentElement.classList.contains('dark')?'filled_black':'outline',
+        size:'large',
+        text:'continue_with',
+        shape:'rectangular',
+        logo_alignment:'left',
+        width:availableWidth,
+        locale:'en'
       });
-      host.appendChild(button);
+      const iframe=host.querySelector('iframe');
+      if(iframe){
+        iframe.style.display='block';
+        iframe.style.maxWidth='100%';
+      }
     });
   }catch(err){
     showMessage(document.getElementById('loginError'),readableAuthError(err,'Google authentication could not be loaded.'));
@@ -2437,6 +2435,32 @@ async function handleSocialCallback(){
 </script>
 
 <script>
+<style id="manlung-google-real-button-sizing">
+/* Keep the official Google button clickable and aligned with the other providers. */
+html body.manlung-auth-page #googleLoginBtn,
+html body.manlung-auth-page #googleRegisterBtn{
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-width:0!important;
+  height:54px!important;
+  min-height:54px!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+html body.manlung-auth-page #googleLoginBtn>div,
+html body.manlung-auth-page #googleRegisterBtn>div{
+  max-width:100%!important;
+}
+html body.manlung-auth-page #googleLoginBtn iframe,
+html body.manlung-auth-page #googleRegisterBtn iframe{
+  display:block!important;
+  max-width:100%!important;
+}
+</style>
 /* Discord buttons use the configured Supabase OAuth provider flow. */
 </script>
 
