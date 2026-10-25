@@ -35,4 +35,5 @@ async function stopSession(reason){if(stream)stream.getTracks().forEach(t=>t.sto
 $('stop').onclick=()=>stopSession('device_ended');
 function finish(){if(pc){pc.close();pc=null}if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$('active').classList.add('hidden');$('stop').classList.add('hidden');$('request').classList.add('hidden');pending=null;lastSignal=0;status('Remote session ended.')}
 if(deviceToken){showConnected();start()} document.addEventListener('visibilitychange',()=>{if(!document.hidden&&deviceToken)heartbeat().catch(()=>{})});
-</script></body></html>
+</script>  <link rel="stylesheet" href="/css/product-polish.css?v=20261025">
+</body></html>

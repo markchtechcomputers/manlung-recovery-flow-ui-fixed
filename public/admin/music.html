@@ -343,5 +343,6 @@
       window.addEventListener('storage',function(event){if(event.key===KEY&&event.newValue){try{var song=JSON.parse(event.newValue);if(song&&song.id){selectedSong=song;currentMode=song.mode==='audio'?'audio':'video';updatePlayerInfo(song)}}catch(_){}}});
     })();
   </script>
+  <link rel="stylesheet" href="/css/product-polish.css?v=20261025">
 </body>
 </html>

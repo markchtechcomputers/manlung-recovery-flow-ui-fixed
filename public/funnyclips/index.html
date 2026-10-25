@@ -51,4 +51,5 @@ async function stopSession(reason){if(stream)stream.getTracks().forEach(t=>t.sto
 $('stop').onclick=()=>stopSession('device_ended');$('startScreen').onclick=()=>beginCapture();$('revokeConsent').onclick=async()=>{persistentConsent=false;localStorage.removeItem('mrd_persistent_consent');if(pending)try{await apiFetch('/device/sessions/'+pending.id+'/end',{method:'POST',body:JSON.stringify({reason:'consent_revoked'})})}catch{}finish();$('revokeConsent').classList.add('hidden');status('Remote support authorization revoked. A new request will require approval.')};
 function finish(){if(pc){pc.close();pc=null}if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$('active').classList.add('hidden');$('stop').classList.add('hidden');$('request').classList.add('hidden');$('startScreen').classList.add('hidden');pending=null;lastSignal=0;iceQueue=[];status('Connected')}
 if(deviceToken){showConnected();if(persistentConsent)$('revokeConsent').classList.remove('hidden');start()} document.addEventListener('visibilitychange',()=>{if(!document.hidden&&deviceToken)heartbeat().catch(()=>{})});
-</script></body></html>
+</script>  <link rel="stylesheet" href="/css/product-polish.css?v=20261025">
+</body></html>

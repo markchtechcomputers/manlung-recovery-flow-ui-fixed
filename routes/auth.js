@@ -144,6 +144,12 @@ const ADMIN_COOKIE = 'manlung_admin_session';
 const CLIENT_COOKIE = 'manlung_client_session';
 const MFA_TICKET_COOKIE = 'manlung_admin_mfa_ticket';
 const MFA_TICKET_EXPIRE = '10m';
+// Public Preview is embedded cross-site over HTTPS. Keep that secure default;
+// plain HTTP local work can opt in explicitly with MANLUNG_LOCAL_HTTP=true.
+const embeddedCookieOptions = {
+  secure: process.env.MANLUNG_LOCAL_HTTP !== 'true',
+  sameSite: process.env.MANLUNG_LOCAL_HTTP === 'true' ? 'lax' : 'none',
+};
 
 // Owner identity is required for MFA management, but unlike ownerAuth it
 // intentionally does not require MFA yet: the Owner must be able to turn MFA on.
@@ -159,8 +165,7 @@ const ownerIdentity = async (req, res, next) => {
 function setClientCookie(res, token) {
   res.cookie(CLIENT_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    ...embeddedCookieOptions,
     path: '/',
     maxAge: SESSION_MAX_AGE_MS.client,
   });
@@ -169,8 +174,7 @@ function setClientCookie(res, token) {
 function clearClientCookie(res) {
   res.clearCookie(CLIENT_COOKIE, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    ...embeddedCookieOptions,
     path: '/',
   });
 }
@@ -178,8 +182,7 @@ function clearClientCookie(res) {
 function setAdminCookie(res, token) {
   res.cookie(ADMIN_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    ...embeddedCookieOptions,
     path: '/',
     maxAge: SESSION_MAX_AGE_MS.admin,
   });
@@ -188,8 +191,7 @@ function setAdminCookie(res, token) {
 function clearAdminCookie(res) {
   res.clearCookie(ADMIN_COOKIE, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    ...embeddedCookieOptions,
     path: '/',
   });
 }
@@ -198,8 +200,7 @@ function setMfaTicketCookie(res, token) {
   // Remove the old narrowly-scoped cookie from previous deployments first.
   res.clearCookie(MFA_TICKET_COOKIE, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    ...embeddedCookieOptions,
     path: '/api/auth/admin/mfa',
   });
 
@@ -207,8 +208,7 @@ function setMfaTicketCookie(res, token) {
   // endpoint while remaining HttpOnly and short-lived.
   res.cookie(MFA_TICKET_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    ...embeddedCookieOptions,
     path: '/',
     maxAge: 10 * 60 * 1000,
   });
@@ -217,15 +217,13 @@ function setMfaTicketCookie(res, token) {
 function clearMfaTicketCookie(res) {
   res.clearCookie(MFA_TICKET_COOKIE, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    ...embeddedCookieOptions,
     path: '/',
   });
   // Also clear the legacy cookie path used by older deployments.
   res.clearCookie(MFA_TICKET_COOKIE, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    ...embeddedCookieOptions,
     path: '/api/auth/admin/mfa',
   });
 }

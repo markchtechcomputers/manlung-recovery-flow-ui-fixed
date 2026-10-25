@@ -26,9 +26,13 @@ function normalizeSupabaseUrl(rawUrl) {
   }
 }
 
+// The UI Preview can serve public HTML without a database connection. Use a
+// deliberately unreachable placeholder client when secrets are absent so the
+// process can boot and health/static routes remain inspectable; configured
+// environments continue to use the real Supabase values above.
 const supabase = createClient(
-  normalizeSupabaseUrl(process.env.SUPABASE_URL),
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  normalizeSupabaseUrl(process.env.SUPABASE_URL) || 'https://preview-placeholder.invalid',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || 'preview-placeholder-key',
   { auth: { persistSession: false, autoRefreshToken: false } }
 );
 
