@@ -101,6 +101,17 @@
             return data;
         }
 
+        // OAuth provider redirects to this HTTPS page first (already on the
+        // site's Supabase allow-list), then hands the token fragment to the APK.
+        // Remove native=1 from the deep link to prevent a redirect loop.
+        (function returnNativeOAuthToApp() {
+            const current = new URL(window.location.href);
+            if (current.searchParams.get('native') !== '1') return;
+            current.searchParams.delete('native');
+            const suffix = current.search + current.hash;
+            window.location.replace('co.manlungrecovery.app://auth/callback' + suffix);
+        })();
+
         async function processCallback() {
             const config = await fetchJson('/api/config/public', { cache: 'no-store' });
             if (!config.supabaseUrl || !config.supabaseAnonKey) throw new Error('Social sign-in is not configured.');
