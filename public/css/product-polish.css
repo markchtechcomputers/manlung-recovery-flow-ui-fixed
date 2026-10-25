@@ -1178,3 +1178,68 @@ body.dark:has(.home-page-container) #manlung-updates > a {
 .mr-home-hero .mr-hero-visual,
 .mr-home-hero .mr-hero-workspace-card,
 .mr-home-hero .mr-hero-floating-card { display: none !important; }
+
+/* Business-facing homepage refinement. */
+.mr-home-hero.mr-video-hero .mr-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 7px 11px;
+  border: 1px solid rgba(103, 232, 249, .3);
+  border-radius: 999px;
+  background: rgba(15, 118, 110, .2);
+  color: #a5f3fc;
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+.mr-home-hero.mr-video-hero .mr-hero-eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2dd4bf;
+  box-shadow: 0 0 0 4px rgba(45, 212, 191, .13);
+}
+.mr-home-hero.mr-video-hero .mr-hero-copy h1 {
+  max-width: 850px !important;
+  margin-bottom: 18px !important;
+  letter-spacing: -.045em !important;
+}
+.mr-home-hero.mr-video-hero .mr-hero-description {
+  max-width: 690px !important;
+  color: #dbeafe !important;
+  font-size: 1.08rem !important;
+  line-height: 1.75 !important;
+}
+.mr-home-hero.mr-video-hero .mr-hero-primary {
+  background: #14b8a6 !important;
+  border-color: #14b8a6 !important;
+  box-shadow: 0 12px 30px rgba(20, 184, 166, .24) !important;
+}
+.mr-home-hero.mr-video-hero .mr-hero-primary:hover { background: #0d9488 !important; }
+.mr-home-hero.mr-video-hero .mr-hero-trust-row { gap: 9px 12px !important; margin-top: 30px !important; }
+.mr-home-hero.mr-video-hero .mr-hero-trust-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid rgba(148, 163, 184, .23);
+  border-radius: 999px;
+  background: rgba(2, 12, 27, .35);
+  color: #dbeafe !important;
+  font-size: .78rem;
+}
+.intro-strip, .home-section .section-heading { max-width: 1180px; }
+.home-section .section-heading h2 { letter-spacing: -.035em; }
+.premium-service-card {
+  border: 1px solid rgba(148, 163, 184, .22) !important;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, .07) !important;
+}
+.premium-service-card:hover { border-color: rgba(20, 184, 166, .42) !important; }
+@media (max-width: 760px) {
+  .mr-home-hero.mr-video-hero .mr-hero-eyebrow { font-size: .61rem; letter-spacing: .09em; }
+  .mr-home-hero.mr-video-hero .mr-hero-description { font-size: .98rem !important; }
+  .mr-home-hero.mr-video-hero .mr-hero-trust-row span { font-size: .72rem; }
+}
