@@ -1468,7 +1468,7 @@ html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .man
 html body.manlung-auth-page .manlung-google-btn{overflow:hidden!important;background:#fff!important;color:#273449!important;border-color:#dadce0!important}
 html body.manlung-auth-page .manlung-google-btn .manlung-google-glyph{display:block!important;flex:0 0 20px!important;width:20px!important;height:20px!important}
 html body.manlung-auth-page .manlung-google-btn .manlung-google-label{display:block!important;flex:1 1 auto!important;text-align:center!important;white-space:nowrap!important}
-html body.manlung-auth-page .manlung-google-btn iframe{display:none!important}
+html body.manlung-auth-page .manlung-google-btn iframe{display:block!important;width:100%!important;max-width:100%!important;height:54px!important;border:0!important}
 html body.manlung-auth-page .manlung-social-btn i,html body.manlung-auth-page .manlung-social-btn svg{display:block!important;flex:0 0 20px!important;width:20px!important;height:20px!important;font-size:20px!important;border-radius:0!important}
 html body.manlung-auth-page .manlung-social-btn span{display:block!important;flex:1 1 auto!important;text-align:center!important;white-space:nowrap!important}
 html body.manlung-auth-page #githubLoginBtn,html body.manlung-auth-page #githubRegisterBtn{background:#24292e!important;color:#fff!important;border-color:#24292e!important}
@@ -2234,21 +2234,39 @@ async function setupOfficialGoogleButtons(){
       host.innerHTML='';
       host.setAttribute('aria-label','Continue with Google');
       host.setAttribute('title','Continue with Google');
-      // Native full-width button avoids Google's iframe shrinking to an icon-only square.
-      host.innerHTML='<button type="button" class="manlung-google-btn-inner" aria-label="Continue with Google"><svg class="manlung-google-glyph" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 37.98 46.98 31.9 46.98 24.55z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.14 1.44-4.89 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span class="manlung-google-label">Continue with Google</span></button>';
-      const googleButton=host.querySelector('button');
-      googleButton.style.cssText='all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;height:54px;padding:0 16px;cursor:pointer;font:600 15px/1.25 Arial,sans-serif;color:#273449';
-      googleButton.addEventListener('click',()=>{
-        window.__manlungGoogleErrorTarget=errorTarget;
-        host.dataset.googleErrorTarget=errorTarget;
-        google.accounts.id.prompt(notification=>{
-          if(notification && notification.isNotDisplayed && notification.isNotDisplayed()){
-            const errorNode=document.getElementById(errorTarget);
-            if(errorNode)showMessage(errorNode,'Google sign-in could not open. Check that pop-ups/cookies are allowed, then refresh and try again.','error');
-          }
-        });
-      });
+      host.style.width='100%';
+      host.style.minWidth='0';
+      host.style.height='54px';
+      host.style.minHeight='54px';
+      host.style.display='block';
+      host.style.overflow='hidden';
       host.dataset.googleErrorTarget=errorTarget;
+      // Use Google's supported sign-in button so clicking opens the real account chooser.
+      // The host is full width; renderButton receives the measured width for both panels.
+      const renderGoogleButton=()=>{
+        const buttonWidth=Math.max(200,Math.floor(host.getBoundingClientRect().width));
+        google.accounts.id.renderButton(host,{
+          type:'standard',
+          theme:'outline',
+          size:'large',
+          text:'continue_with',
+          shape:'rectangular',
+          logo_alignment:'left',
+          width:buttonWidth
+        });
+        const iframe=host.querySelector('iframe');
+        if(iframe){
+          iframe.style.width='100%';
+          iframe.style.maxWidth='100%';
+          iframe.style.height='54px';
+        }
+      };
+      renderGoogleButton();
+      if(window.ResizeObserver){
+        const observer=new ResizeObserver(()=>renderGoogleButton());
+        observer.observe(host);
+      }
+
     });
   }catch(err){
     showMessage(document.getElementById('loginError'),readableAuthError(err,'Google authentication could not be loaded.'));
