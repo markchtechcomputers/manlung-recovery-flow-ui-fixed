@@ -2137,7 +2137,68 @@ function readableAuthError(value, fallback='Authentication could not be complete
   return fallback;
 }
 
+
+// Reopen the web sign-in callback inside the APK when Google/Supabase returns
+// to the custom co.manlungrecovery.app://auth/callback URI.
+(function registerNativeOAuthReturn() {
+  const app = window.Capacitor?.Plugins?.App;
+  if (!app?.addListener) return;
+  app.addListener('appUrlOpen', ({ url }) => {
+    if (typeof url !== 'string' || !url.startsWith('co.manlungrecovery.app://auth/callback')) return;
+    const parsed = new URL(url);
+    const callback = new URL('/oauth-callback.html', window.location.origin);
+    callback.search = parsed.search;
+    callback.hash = parsed.hash;
+    window.location.replace(callback.href);
+  }).catch(() => {});
+})();
+
 async function setupOfficialGoogleButtons(){
+  // In the Android APK, run Google OAuth in the system browser and return through
+  // the registered Capacitor deep link. GIS popups are unreliable inside Android WebView.
+  const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.() ||
+    window.Capacitor?.getPlatform?.() === 'android');
+  if (nativeApp) {
+    const googleHosts = ['googleLoginBtn', 'googleRegisterBtn'];
+    googleHosts.forEach(id => {
+      const host = document.getElementById(id);
+      if (!host) return;
+      host.innerHTML = '';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'manlung-social-btn manlung-google-btn';
+      button.style.width = '100%';
+      button.innerHTML = '<span aria-hidden="true" style="font-weight:800;color:#4285f4">G</span> Continue with Google';
+      button.addEventListener('click', async () => {
+        const target = document.getElementById(id === 'googleRegisterBtn' ? 'registerError' : 'loginError');
+        try {
+          if (!window.supabase?.createClient) throw new Error('Google sign-in is loading. Please try again.');
+          const cfg = await fetch('/api/config/public', { cache: 'no-store' }).then(async r => {
+            const d = await r.json();
+            if (!r.ok || !d.supabaseUrl || !d.supabaseAnonKey) throw new Error('Google sign-in is not configured.');
+            return d;
+          });
+          const client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storage: window.localStorage }
+          });
+          const { data, error } = await client.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: 'co.manlungrecovery.app://auth/callback', skipBrowserRedirect: true }
+          });
+          if (error) throw error;
+          if (!data?.url) throw new Error('Google sign-in could not be started.');
+          const browser = window.Capacitor?.Plugins?.Browser;
+          if (!browser?.open) throw new Error('This APK needs an update to enable secure Google sign-in.');
+          await browser.open({ url: data.url });
+        } catch (e) {
+          if (target) showMessage(target, e?.message || 'Google sign-in failed. Please try again.', 'error');
+        }
+      });
+      host.appendChild(button);
+    });
+    return;
+  }
+
   try{
     // Start loading Google's library and the lightweight config endpoint concurrently.
     // This avoids waiting for the config request before even checking the Google SDK.
