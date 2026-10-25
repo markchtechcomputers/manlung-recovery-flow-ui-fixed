@@ -118,3 +118,24 @@ body.dark .final-cta{background:linear-gradient(120deg,#101d32,#111827 60%,#1024
  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
  .ml-scroll-reveal,.ml-scroll-reveal:not(.is-visible){opacity:1!important;transform:none!important;filter:none!important}
 }
+
+/* Hero controls use the site's actual semantic link classes. */
+.mr-home-hero .mr-hero-actions{display:flex!important;align-items:center!important;gap:12px!important;flex-wrap:wrap!important}
+.mr-home-hero .mr-hero-primary,.mr-home-hero .mr-hero-secondary{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;min-height:50px!important;padding:0 19px!important;border-radius:13px!important;font-weight:800!important;text-decoration:none!important;transition:transform .24s cubic-bezier(.2,.8,.2,1),box-shadow .24s,background .24s,border-color .24s!important}
+.mr-home-hero .mr-hero-primary{background:linear-gradient(135deg,#2563eb,#0891b2)!important;color:#fff!important;border:1px solid rgba(147,197,253,.55)!important;box-shadow:0 10px 28px rgba(37,99,235,.28)!important}
+.mr-home-hero .mr-hero-secondary{background:rgba(255,255,255,.08)!important;border:1px solid rgba(226,232,240,.34)!important;color:#f8fafc!important;backdrop-filter:blur(10px)}
+.mr-home-hero .mr-hero-primary:hover,.mr-home-hero .mr-hero-secondary:hover{transform:translateY(-3px)!important;box-shadow:0 15px 32px rgba(2,6,23,.24)!important}
+.mr-home-hero .mr-hero-download{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:50px!important;height:50px!important;border:1px solid rgba(226,232,240,.34)!important;border-radius:13px!important;background:rgba(255,255,255,.08)!important;transition:transform .24s,background .24s!important}
+.mr-home-hero .mr-hero-download:hover{transform:translateY(-3px)!important;background:rgba(255,255,255,.16)!important}
+.mr-home-hero .mr-hero-download img{width:26px!important;height:26px!important;object-fit:contain!important}
+.mr-home-hero .mr-hero-trust-row{display:flex!important;gap:10px 18px!important;flex-wrap:wrap!important;margin-top:26px!important}
+.mr-home-hero .mr-hero-trust-row span{display:inline-flex!important;align-items:center!important;gap:7px!important;padding:7px 10px!important;border:1px solid rgba(191,219,254,.18)!important;border-radius:999px!important;background:rgba(15,23,42,.25)!important;font-size:.72rem!important}
+.mr-home-hero .mr-hero-trust-row i{color:#67e8f9!important}
+@media(max-width:600px){
+ .mr-home-hero .mr-hero-actions{display:grid!important;grid-template-columns:minmax(0,1fr) 50px!important}
+ .mr-home-hero .mr-hero-primary{grid-column:1/-1!important;width:100%!important}
+ .mr-home-hero .mr-hero-secondary{width:100%!important;grid-column:1!important}
+ .mr-home-hero .mr-hero-download{grid-column:2!important;grid-row:2!important;width:50px!important}
+ .mr-home-hero .mr-hero-trust-row{gap:7px!important;margin-top:20px!important}
+ .mr-home-hero .mr-hero-trust-row span{font-size:.66rem!important;padding:6px 8px!important}
+}
