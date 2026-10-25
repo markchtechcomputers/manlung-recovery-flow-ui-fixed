@@ -1100,3 +1100,60 @@ body.dark:has(.home-page-container) #manlung-updates > a {
   .mr-hero-workspace-grid strong { font-size: .58rem; }
   .mr-hero-floating-card { max-width: 215px; }
 }
+
+/* Final customer hero: use the supplied, repository-backed artwork everywhere. */
+.mr-home-hero.mr-video-hero {
+  background-image: url('/images/manlung-hero-customer.jpg') !important;
+  background-position: center center !important;
+  background-size: cover !important;
+}
+.mr-home-hero.mr-video-hero .mr-hero-video-fallback {
+  background-image: url('/images/manlung-hero-customer.jpg') !important;
+  background-position: center center !important;
+  background-size: cover !important;
+}
+.mr-home-hero.mr-video-hero .mr-hero-background-video {
+  display: none !important;
+  visibility: hidden !important;
+}
+.mr-home-hero.mr-video-hero .mr-hero-video-overlay {
+  background: linear-gradient(90deg, rgba(3, 12, 28, .9) 0%, rgba(3, 18, 38, .67) 48%, rgba(3, 18, 38, .32) 100%), linear-gradient(0deg, rgba(3, 12, 28, .42), transparent 64%) !important;
+}
+/* Phone header: keep only brand, theme, and menu. Language belongs in sidebar preferences. */
+@media (max-width: 650px) {
+  html body .site-header .phone-header-shortcuts,
+  html body .site-header #phoneLanguageButton,
+  html body .site-header #manlungLanguageControl,
+  html body .mobile-header-actions #manlungLanguageControl {
+    display: none !important;
+  }
+  html body #manlungSidebar #manlungLanguageControl,
+  html body #manlungSidebar .phone-header-shortcuts {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 12px 0 8px !important;
+    padding: 0 !important;
+  }
+  html body #manlungSidebar #manlungLanguageControl .manlung-language-button,
+  html body #manlungSidebar #phoneLanguageButton {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-height: 46px !important;
+    padding: 11px 13px !important;
+    border: 1px solid rgba(103, 232, 249, .28) !important;
+    border-radius: 11px !important;
+    background: rgba(103, 232, 249, .08) !important;
+    color: inherit !important;
+    font-size: .84rem !important;
+    text-align: left !important;
+  }
+  html body #manlungSidebar #manlungLanguageControl .manlung-language-short-label,
+  html body #manlungSidebar #phoneLanguageButton span { display: inline !important; }
+}
+/* Fast image rendering: prevent layout shift on the supplied asset. */
+.mr-hero-video-fallback { contain: paint; }

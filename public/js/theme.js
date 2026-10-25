@@ -424,8 +424,10 @@
 
   function installGlobalLanguageSelector() {
     if (document.getElementById('manlungLanguageControl')) return;
-    const mobileActions = window.matchMedia('(max-width: 768px)').matches ? document.querySelector('.mobile-header-actions') : null;
-    const actions = mobileActions || document.querySelector('.home-header-container .header-actions') || document.querySelector('.site-header .header-actions');
+    const isPhone = window.matchMedia('(max-width: 650px)').matches;
+    const mobileSidebar = isPhone ? document.querySelector('#manlungSidebar .msb-account-links') : null;
+    const mobileActions = isPhone ? document.querySelector('.mobile-header-actions') : null;
+    const actions = mobileSidebar || mobileActions || document.querySelector('.home-header-container .header-actions') || document.querySelector('.site-header .header-actions');
     if (!actions) return;
 
     const control = document.createElement('div');
@@ -448,7 +450,8 @@
     `;
 
     const themeButton = actions.querySelector('[data-theme-toggle="true"]');
-    if (themeButton?.parentElement === actions) themeButton.insertAdjacentElement('afterend', control);
+    if (mobileSidebar) actions.parentElement.insertBefore(control, actions);
+    else if (themeButton?.parentElement === actions) themeButton.insertAdjacentElement('afterend', control);
     else actions.insertBefore(control, actions.firstChild);
 
     const style = document.createElement('style');
