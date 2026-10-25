@@ -529,3 +529,50 @@ html body .manlung-footer .manlung-footer-legal {
     max-width: none !important;
   }
 }
+
+
+/* FINAL FOOTER ALIGNMENT FIX — remove the offset/negative-margin full-bleed hack.
+   The shared footer is a direct page-level section and should start at viewport x=0. */
+html,
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+html body > footer.manlung-footer,
+html body > .manlung-footer,
+html body > #site-footer,
+html body > .site-footer {
+  display: block !important;
+  position: relative !important;
+  inset: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  float: none !important;
+  clear: both !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+}
+html body > footer.manlung-footer .manlung-footer-inner,
+html body > .manlung-footer .manlung-footer-inner {
+  width: min(calc(100% - 40px), 1240px) !important;
+  max-width: 1240px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+@media (max-width: 600px) {
+  html body > footer.manlung-footer .manlung-footer-inner,
+  html body > .manlung-footer .manlung-footer-inner {
+    width: calc(100% - 28px) !important;
+  }
+}
