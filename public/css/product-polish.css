@@ -1157,3 +1157,24 @@ body.dark:has(.home-page-container) #manlung-updates > a {
 }
 /* Fast image rendering: prevent layout shift on the supplied asset. */
 .mr-hero-video-fallback { contain: paint; }
+
+/* Clean hero after removing the dashboard mockup: one strong message over the supplied artwork. */
+.mr-home-hero.mr-video-hero .mr-home-hero-inner {
+  display: block !important;
+  width: min(1240px, 100%) !important;
+  padding: clamp(82px, 10vw, 132px) clamp(24px, 5vw, 64px) !important;
+}
+.mr-home-hero.mr-video-hero .mr-hero-copy {
+  width: min(100%, 760px) !important;
+  max-width: 760px !important;
+}
+.mr-home-hero.mr-video-hero .mr-hero-copy h1 { max-width: 730px !important; }
+@media (max-width: 760px) {
+  .mr-home-hero.mr-video-hero .mr-home-hero-inner { padding: 62px 20px 72px !important; }
+  .mr-home-hero.mr-video-hero .mr-hero-copy { width: 100% !important; max-width: none !important; }
+}
+
+/* The hero is intentionally message-led; never render the former workspace mockup. */
+.mr-home-hero .mr-hero-visual,
+.mr-home-hero .mr-hero-workspace-card,
+.mr-home-hero .mr-hero-floating-card { display: none !important; }

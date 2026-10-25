@@ -706,6 +706,12 @@
   } else {
     window.addEventListener('load', startNativeApkUpdateChecks, { once: true });
   }
+  window.addEventListener('online', () => {
+    if (!isAndroidApp()) return;
+    // The APK can be opened offline; as soon as connectivity returns, check
+    // the server immediately instead of waiting for the five-minute interval.
+    window.setTimeout(() => checkNativeApkUpdate(true), 800);
+  });
   document.addEventListener('visibilitychange', () => {
     if (!isAndroidApp()) return;
     if (document.hidden) {
