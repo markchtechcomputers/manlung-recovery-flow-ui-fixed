@@ -1479,6 +1479,21 @@ html body.manlung-auth-page .manlung-social-btn:focus-visible,html body.manlung-
 @media(max-width:640px){html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .manlung-google-btn{height:54px!important;min-height:54px!important;max-height:54px!important}}
 @media(prefers-reduced-motion:reduce){html body.manlung-auth-page .manlung-social-btn,html body.manlung-auth-page .manlung-google-btn{transition:none!important}}
 </style>
+
+<style id="manlung-google-equal-width-final">
+/* Keep Google, GitHub and Discord identical in size on both auth panels. */
+html body.manlung-auth-page .manlung-social-grid{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:12px!important;width:100%!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-btn,
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 54px!important;width:100%!important;min-width:0!important;max-width:100%!important;height:54px!important;min-height:54px!important;max-height:54px!important;margin:0!important;padding:0 16px!important;gap:12px!important;border-radius:8px!important;overflow:hidden!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{padding:0!important;background:#fff!important;color:#273449!important;border:1px solid #dadce0!important}
+html body.manlung-auth-page .manlung-google-btn-inner{all:unset;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;height:52px!important;margin:0!important;padding:0 16px!important;gap:12px!important;border:0!important;border-radius:7px!important;background:#fff!important;color:#273449!important;font:600 15px/1.25 Arial,sans-serif!important;cursor:pointer!important}
+html body.manlung-auth-page .manlung-google-btn .manlung-google-glyph{display:block!important;flex:0 0 20px!important;width:20px!important;height:20px!important}
+html body.manlung-auth-page .manlung-google-btn .manlung-google-label{display:block!important;flex:1 1 auto!important;text-align:center!important;white-space:nowrap!important}
+html body.manlung-auth-page .manlung-google-btn iframe{display:none!important}
+html body.manlung-auth-page .manlung-social-btn i,html body.manlung-auth-page .manlung-social-btn svg{display:block!important;flex:0 0 20px!important;width:20px!important;height:20px!important;font-size:20px!important}
+html body.manlung-auth-page .manlung-social-btn span{display:block!important;flex:1 1 auto!important;text-align:center!important;white-space:nowrap!important}
+@media(max-width:640px){html body.manlung-auth-page .manlung-social-grid .manlung-social-btn,html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{flex-basis:54px!important;width:100%!important;height:54px!important;min-height:54px!important;max-height:54px!important}}
+</style>
 </head>
 <body class="manlung-auth-page">
 <div class="fa-floating-orb fa-orb-1" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-2" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-3" aria-hidden="true"></div>
@@ -2226,7 +2241,12 @@ async function setupOfficialGoogleButtons(){
       googleButton.addEventListener('click',()=>{
         window.__manlungGoogleErrorTarget=errorTarget;
         host.dataset.googleErrorTarget=errorTarget;
-        google.accounts.id.prompt();
+        google.accounts.id.prompt(notification=>{
+          if(notification && notification.isNotDisplayed && notification.isNotDisplayed()){
+            const errorNode=document.getElementById(errorTarget);
+            if(errorNode)showMessage(errorNode,'Google sign-in could not open. Check that pop-ups/cookies are allowed, then refresh and try again.','error');
+          }
+        });
       });
       host.dataset.googleErrorTarget=errorTarget;
     });
