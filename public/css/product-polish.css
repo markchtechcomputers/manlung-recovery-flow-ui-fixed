@@ -417,10 +417,11 @@ body.dark .privacy-page-intro td { background: #122238 !important; color: #c5d4e
   body:has(.privacy-page-intro) .site-header .header-actions .btn { flex: 0 0 auto !important; }
 }
 
-/* New cyber-security program hero artwork: the generated visual replaces the
-   generic background while the existing video remains a quiet motion layer. */
+/* Shared hero atmosphere: keep Preview and Vercel production pixel-consistent. */
 .mr-home-hero.mr-video-hero {
-  background-image: url('/manus-storage/async-images/XWIbB57P1wrblDQQn6YgNe/image-1.webp') !important;
+  background-image:
+    radial-gradient(circle at 84% 28%, rgba(18, 164, 181, .28), transparent 28%),
+    linear-gradient(135deg, #06172d 0%, #0b3657 56%, #073a4b 100%) !important;
   background-position: center !important;
   background-size: cover !important;
 }
@@ -430,9 +431,13 @@ body.dark .privacy-page-intro td { background: #122238 !important; color: #c5d4e
   filter: saturate(.8) contrast(1.08) brightness(.8) !important;
 }
 .mr-home-hero.mr-video-hero .mr-hero-video-fallback {
-  background-image: url('/manus-storage/async-images/XWIbB57P1wrblDQQn6YgNe/image-1.webp') !important;
+  background-image:
+    linear-gradient(rgba(104, 187, 224, .08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(104, 187, 224, .08) 1px, transparent 1px),
+    radial-gradient(circle at 82% 30%, rgba(28, 192, 183, .24), transparent 26%),
+    linear-gradient(135deg, #06172d 0%, #0b3657 56%, #073a4b 100%) !important;
+  background-size: 42px 42px, 42px 42px, auto, auto !important;
   background-position: center !important;
-  background-size: cover !important;
 }
 .mr-home-hero.mr-video-hero .mr-hero-video-overlay {
   background:
