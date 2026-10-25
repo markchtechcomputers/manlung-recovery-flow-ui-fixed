@@ -2245,7 +2245,7 @@ async function setupOfficialGoogleButtons(){
       host.style.minHeight='54px';
       host.style.display='flex';
       host.style.alignItems='center';
-      host.style.justifyContent='center';
+      host.style.justifyContent='flex-start';
       host.style.overflow='visible';
       host.style.padding='0';
       host.style.border='0';
@@ -2256,7 +2256,8 @@ async function setupOfficialGoogleButtons(){
       // One Tap trigger made the visual button unreliable/non-clickable.
       // GIS supports button widths up to 400px; size it to the available host
       // width so it fills the social-button column without clipping.
-      const availableWidth=400;
+      const measuredWidth=Math.floor(host.getBoundingClientRect().width || host.parentElement?.getBoundingClientRect().width || 400);
+      const availableWidth=Math.max(200,Math.min(400,measuredWidth));
       google.accounts.id.renderButton(host,{
         type:'standard',
         theme:'outline',
@@ -2270,6 +2271,7 @@ async function setupOfficialGoogleButtons(){
       const iframe=host.querySelector('iframe');
       if(iframe){
         iframe.style.display='block';
+        iframe.style.width='100%';
         iframe.style.maxWidth='100%';
       }
     });
