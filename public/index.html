@@ -3356,6 +3356,73 @@ html body .home-page-container .mr-hero-actions a.mr-hero-download i {
 })();
 </script>
 
+
+<!-- Phone APK language selector: keep it in the sidebar and constrain its popup to the viewport. -->
+<style id="manlung-sidebar-language-fit">
+@media(max-width:650px){
+  .site-header .phone-header-shortcuts,
+  .site-header #phoneLanguageButton{display:none!important}
+  #manlungSidebar .phone-header-shortcuts{
+    display:block!important;position:relative!important;width:100%!important;min-width:0!important;
+    margin:14px 0 0!important;padding:0!important;overflow:visible!important;
+  }
+  #manlungSidebar #phoneLanguageButton{
+    display:flex!important;align-items:center!important;justify-content:flex-start!important;
+    gap:10px!important;width:100%!important;min-width:0!important;height:auto!important;min-height:48px!important;
+    padding:12px 14px!important;border:1px solid #dbe3ed!important;border-radius:12px!important;
+    background:#f8fafc!important;color:#111827!important;font-size:14px!important;font-weight:650!important;
+    box-sizing:border-box!important;
+  }
+  #manlungSidebar #phoneLanguageButton:before{
+    content:"🌐"!important;display:inline-block!important;width:22px!important;height:auto!important;
+    background:none!important;font-size:18px!important;flex:0 0 22px!important;
+  }
+  #manlungSidebar #phoneLanguageButton span{display:inline!important}
+  #manlungSidebar #phoneLanguageButton i,
+  #manlungSidebar #phoneLanguageButton svg{display:none!important}
+  /* Google Translate and language menus must stay inside the phone viewport. */
+  body .goog-te-menu-frame,
+  body .goog-te-balloon-frame,
+  body .language-popup,
+  body [role="dialog"][data-language-popup]{
+    position:fixed!important;left:50%!important;right:auto!important;top:50%!important;
+    transform:translate(-50%,-50%)!important;width:min(92vw,360px)!important;
+    max-width:92vw!important;max-height:75dvh!important;overflow:auto!important;
+    z-index:2147483647!important;box-sizing:border-box!important;
+  }
+}
+</style>
+<script id="manlung-sidebar-language-fit-js">
+(()=>{
+ const init=()=>{
+  const sidebar=document.getElementById('manlungSidebar');
+  const lang=document.getElementById('phoneLanguageButton');
+  if(!sidebar||!lang)return;
+  const wrapper=lang.closest('.phone-header-shortcuts')||lang;
+  if(wrapper.parentElement!==sidebar){
+   const accountNav=sidebar.querySelector('.msb-account-links');
+   if(accountNav)accountNav.insertAdjacentElement('beforebegin',wrapper);
+   else sidebar.appendChild(wrapper);
+  }
+  lang.setAttribute('aria-label','Choose language');
+  lang.setAttribute('title','Choose language');
+  const fitPopup=()=>{
+   document.querySelectorAll('.goog-te-menu-frame,.goog-te-balloon-frame,body .language-popup,body [role="dialog"][data-language-popup]').forEach(el=>{
+    el.style.setProperty('max-width','92vw','important');
+    el.style.setProperty('max-height','75dvh','important');
+    el.style.setProperty('overflow','auto','important');
+    el.style.setProperty('z-index','2147483647','important');
+    const rect=el.getBoundingClientRect();
+    if(rect.right>innerWidth)el.style.setProperty('left','50%','important');
+   });
+  };
+  lang.addEventListener('click',()=>{requestAnimationFrame(fitPopup);setTimeout(fitPopup,100);setTimeout(fitPopup,350);});
+  new MutationObserver(fitPopup).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
 </body>
 </html>
 
