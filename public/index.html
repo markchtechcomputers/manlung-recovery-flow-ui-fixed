@@ -4777,3 +4777,21 @@ html body .manlung-footer .manlung-footer-inner {
   }
 }
 </style>
+
+
+<!-- Offline game handoff: preserve current route, show cached game while disconnected, return live on reconnect. -->
+<script id="manlung-offline-game-handoff">
+(function(){
+  function game(){
+    try { sessionStorage.setItem('manlungOfflineReturn', location.pathname + location.search + location.hash); } catch(e) {}
+    if (location.pathname !== '/offline-game.html') location.replace('/offline-game.html');
+  }
+  window.addEventListener('offline', game);
+  if (!navigator.onLine) game();
+  window.addEventListener('online', function(){
+    if (location.pathname === '/offline-game.html') return;
+    // Refresh the live page when connectivity returns so stale content is replaced.
+    setTimeout(function(){ location.reload(); }, 900);
+  });
+})();
+</script>
