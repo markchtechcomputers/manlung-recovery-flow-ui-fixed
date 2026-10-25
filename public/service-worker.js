@@ -27,13 +27,13 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
   if (request.mode === 'navigate' || request.destination === 'document') {
     if (!PUBLIC_DOCUMENTS.has(url.pathname)) {
-      event.respondWith(fetch(request).catch(() => (await caches.match(OFFLINE_PAGE)) || new Response('You are offline. Reconnect and try again.', {status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}})));
+      event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_PAGE).then(page => page || new Response('You are offline. Reconnect and try again.', {status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}}))));
       return;
     }
     event.respondWith(caches.match(request).then(cached => fetch(request, { cache: 'no-cache' }).then(response => {
       if (response && response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone())).catch(() => {});
       return response;
-    }).catch(() => cached || (await caches.match(OFFLINE_PAGE)) || new Response('You are offline. Reconnect and try again.', {status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}}))));
+    }).catch(() => cached || caches.match(OFFLINE_PAGE).then(page => page || new Response('You are offline. Reconnect and try again.', {status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}})))));
     return;
   }
   if (STATIC_ASSETS.includes(url.pathname)) event.respondWith(fetch(request, { cache: 'no-cache' }).then(response => {
