@@ -301,3 +301,49 @@ html body main :where(section + section, .section + .section, .panel + .panel, .
 .manlung-footer .manlung-footer-divider{background:linear-gradient(90deg,transparent,rgba(255,220,190,.36),transparent)!important}
 .manlung-footer .manlung-footer-bottom{border-top-color:rgba(255,220,190,.22)!important}
 @media(prefers-reduced-motion:reduce){.manlung-pwa-download{animation:none!important}}
+
+/* Final footer treatment: black background, white text, yellow live time. */
+html body footer.manlung-footer,
+html body .manlung-footer {
+  background: #000 !important;
+  background-image: none !important;
+  border-top: 3px solid #000 !important;
+  color: #fff !important;
+}
+html body footer.manlung-footer h2,
+html body footer.manlung-footer h3,
+html body footer.manlung-footer strong,
+html body footer.manlung-footer p,
+html body footer.manlung-footer span,
+html body footer.manlung-footer a,
+html body footer.manlung-footer .manlung-footer-bottom,
+html body footer.manlung-footer .manlung-footer-bottom a,
+html body footer.manlung-footer .manlung-footer-legal a {
+  color: #fff !important;
+}
+html body footer.manlung-footer .manlung-footer-links a:hover,
+html body footer.manlung-footer .manlung-footer-bottom a:hover,
+html body footer.manlung-footer .manlung-footer-legal a:hover {
+  color: #fff !important;
+}
+html body footer.manlung-footer .manlung-footer-divider,
+html body footer.manlung-footer .manlung-footer-bottom {
+  border-color: rgba(255,255,255,.24) !important;
+}
+html body footer.manlung-footer .manlung-footer-divider {
+  background: rgba(255,255,255,.24) !important;
+}
+html body footer.manlung-footer .manlung-footer-live {
+  background: #facc15 !important;
+  border-color: #facc15 !important;
+  color: #111827 !important;
+  box-shadow: 0 7px 18px rgba(250,204,21,.18) !important;
+}
+html body footer.manlung-footer .manlung-footer-live span,
+html body footer.manlung-footer .manlung-footer-clock {
+  color: #111827 !important;
+}
+html body footer.manlung-footer .manlung-footer-live-dot {
+  background: #111827 !important;
+  box-shadow: 0 0 0 3px rgba(17,24,39,.14) !important;
+}

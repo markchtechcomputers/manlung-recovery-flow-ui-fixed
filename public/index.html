@@ -1978,35 +1978,34 @@ body{background:#f4f7fb!important;color:var(--mr2-ink)!important;font-family:Int
 
     <main>
         <div class="container home-page-container">
-            <section class="mr-home-hero mr-video-hero" aria-labelledby="hero-title">
-  <video class="mr-hero-background-video" autoplay muted loop playsinline webkit-playsinline preload="auto" controlslist="nodownload noplaybackrate" aria-hidden="true" tabindex="-1">
-    <source src="https://files.catbox.moe/cogeyc.mp4" type="video/mp4">
-  </video>
-  <div class="mr-hero-video-fallback" aria-hidden="true"></div>
-  <div class="mr-hero-video-overlay" aria-hidden="true"></div>
-  <div class="mr-home-hero-inner mr-video-hero-inner">
-    <div class="mr-hero-copy">
-      <div class="mr-phone-hero-kicker"><span class="mr-phone-hero-kicker-dot" aria-hidden="true"></span> Digital recovery support</div>
-      <h1 id="hero-title">When Digital Problems Strike, <span>Know Your Next Step.</span></h1>
-      <p class="mr-hero-description">From compromised accounts and lost device access to online scams and digital security concerns, we provide clear guidance and practical next steps to help you move forward with confidence.</p>
-      <div class="mr-hero-actions">
-        <a href="/client/request.html" class="mr-hero-primary"><span>Start a Recovery Request</span><i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-        <a href="/client/track.html" class="mr-hero-secondary"><i class="fas fa-location-crosshairs" aria-hidden="true"></i><span>Track an Existing Case</span></a>
-        <a href="https://github.com/markchtechcomputers/manlung-recovery-flow-ui-fixed/releases/download/android-latest/ManlungRecovery.apk" class="mr-hero-download" aria-label="Download the latest Manlung Recovery Android app" download><span class="mr-android-apk-icon" aria-hidden="true"><i class="fab fa-android"></i></span><span>Download Android App</span><i class="fas fa-download" aria-hidden="true"></i></a>
-      </div>
-      <div class="mr-hero-trust-row">
-        <span><i class="fas fa-shield-halved" aria-hidden="true"></i> Security-focused support</span>
-        <span><i class="fas fa-lock" aria-hidden="true"></i> Privacy-conscious process</span>
-        <span><i class="fas fa-list-check" aria-hidden="true"></i> Clear case steps</span>
-      </div>
-      <div class="mr-phone-hero-proof" aria-label="What you can expect">
-        <div><i class="fas fa-list-check" aria-hidden="true"></i><span><strong>Clear next steps</strong><small>Practical guidance</small></span></div>
-        <div><i class="fas fa-folder-open" aria-hidden="true"></i><span><strong>Track progress</strong><small>One secure case</small></span></div>
-        <div><i class="fas fa-headset" aria-hidden="true"></i><span><strong>Human support</strong><small>When you need it</small></span></div>
-      </div>
-    </div>
-
-  </div>
+            <section class="mr-home-hero mr-professional-hero" aria-labelledby="hero-title">
+                <div class="mr-professional-hero-grid">
+                    <div class="mr-hero-copy">
+                        <p class="mr-hero-kicker">MANLUNG RECOVERY</p>
+                        <h1 id="hero-title">A clearer way forward.</h1>
+                        <p class="mr-hero-lead">When something goes wrong online, know your next step.</p>
+                        <p class="mr-hero-description">Clear, structured support for compromised accounts, missing devices, online scams, data loss, and digital security concerns. Understand your options, organize your case, and move forward with confidence.</p>
+                        <div class="mr-hero-actions">
+                            <a href="/client/request.html" class="mr-hero-primary">Submit a Request</a>
+                            <a href="#recovery-journey" class="mr-hero-secondary">See How It Works</a>
+                        </div>
+                        <div class="mr-hero-track">
+                            <span>Already have a case reference?</span>
+                            <a href="/client/track.html">Track your case</a>
+                        </div>
+                    </div>
+                    <aside class="mr-hero-side" aria-label="Manlung Recovery information">
+                        <div class="mr-hero-download-card">
+                            <span>Manlung Recovery for Android</span>
+                            <a href="https://github.com/markchtechcomputers/manlung-recovery-flow-ui-fixed/releases/download/android-latest/ManlungRecovery.apk" download>Download the latest APK</a>
+                        </div>
+                        <div class="mr-hero-privacy-card">
+                            <h2>Your privacy matters</h2>
+                            <strong>Clear next steps</strong>
+                            <p>Privacy-conscious support. We never ask for your PINs or passwords.</p>
+                        </div>
+                    </aside>
+                </div>
 </section>
 
             
@@ -3482,5 +3481,306 @@ html body footer.manlung-footer .manlung-footer-social a img{
   html.dark .home-page-container .service-icon-wrap {
     box-shadow:none!important;
   }
+}
+</style>
+
+
+<style id="manlung-requested-hero-footer-final">
+/* Requested homepage hero: clear hierarchy, restrained contrast and responsive cards. */
+.mr-professional-hero {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  min-height: clamp(520px, 72svh, 720px) !important;
+  display: flex !important;
+  align-items: center !important;
+  border-radius: 0 0 28px 28px !important;
+  background: linear-gradient(118deg, #061426 0%, #0b2e52 58%, #0b4d76 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 22px 55px rgba(3, 22, 42, .2) !important;
+}
+.mr-professional-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 82% 16%, rgba(250, 204, 21, .18), transparent 26%),
+    radial-gradient(circle at 92% 84%, rgba(56, 189, 248, .22), transparent 32%),
+    linear-gradient(90deg, rgba(2, 10, 23, .28), transparent 70%);
+}
+.mr-professional-hero-grid {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  padding: clamp(54px, 8vw, 94px) clamp(22px, 5vw, 64px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, .72fr);
+  align-items: center;
+  gap: clamp(34px, 7vw, 94px);
+}
+.mr-professional-hero .mr-hero-copy {
+  width: auto !important;
+  max-width: 720px !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+.mr-professional-hero .mr-hero-kicker {
+  margin: 0 0 17px !important;
+  color: #facc15 !important;
+  font-size: .78rem !important;
+  font-weight: 850 !important;
+  letter-spacing: .18em !important;
+  line-height: 1.2 !important;
+}
+.mr-professional-hero .mr-hero-copy h1 {
+  max-width: 760px !important;
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: clamp(2.8rem, 5.2vw, 5rem) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.055em !important;
+  font-weight: 850 !important;
+}
+.mr-professional-hero .mr-hero-lead {
+  max-width: 680px !important;
+  margin: 22px 0 0 !important;
+  color: #f8fafc !important;
+  font-size: clamp(1.22rem, 2vw, 1.65rem) !important;
+  line-height: 1.35 !important;
+  font-weight: 650 !important;
+  letter-spacing: -.02em !important;
+}
+.mr-professional-hero .mr-hero-description {
+  max-width: 690px !important;
+  margin: 16px 0 0 !important;
+  color: #d8e7f5 !important;
+  font-size: 1.04rem !important;
+  line-height: 1.78 !important;
+}
+.mr-professional-hero .mr-hero-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  margin: 30px 0 0 !important;
+}
+.mr-professional-hero .mr-hero-actions a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 50px !important;
+  padding: 13px 19px !important;
+  border-radius: 12px !important;
+  font-size: .9rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease !important;
+}
+.mr-professional-hero .mr-hero-primary {
+  background: #facc15 !important;
+  border: 1px solid #facc15 !important;
+  color: #111827 !important;
+  box-shadow: 0 10px 24px rgba(250, 204, 21, .2) !important;
+}
+.mr-professional-hero .mr-hero-primary:hover {
+  background: #fde047 !important;
+  border-color: #fde047 !important;
+  transform: translateY(-2px) !important;
+}
+.mr-professional-hero .mr-hero-secondary {
+  background: rgba(255, 255, 255, .08) !important;
+  border: 1px solid rgba(255, 255, 255, .45) !important;
+  color: #fff !important;
+}
+.mr-professional-hero .mr-hero-secondary:hover {
+  background: rgba(255, 255, 255, .15) !important;
+  border-color: #fff !important;
+  transform: translateY(-2px) !important;
+}
+.mr-professional-hero .mr-hero-track {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 8px 14px !important;
+  margin-top: 21px !important;
+  color: #c9d9e8 !important;
+  font-size: .86rem !important;
+  line-height: 1.5 !important;
+}
+.mr-professional-hero .mr-hero-track a {
+  color: #facc15 !important;
+  font-weight: 800 !important;
+  text-underline-offset: 3px !important;
+}
+.mr-professional-hero .mr-hero-track a:hover {
+  color: #fde047 !important;
+}
+.mr-professional-hero .mr-hero-side {
+  display: grid !important;
+  gap: 14px !important;
+  width: 100% !important;
+  max-width: 380px !important;
+  margin-left: auto !important;
+}
+.mr-professional-hero .mr-hero-download-card,
+.mr-professional-hero .mr-hero-privacy-card {
+  position: relative !important;
+  overflow: hidden !important;
+  padding: 24px !important;
+  border: 1px solid rgba(255, 255, 255, .18) !important;
+  border-radius: 18px !important;
+  background: rgba(4, 18, 37, .58) !important;
+  box-shadow: 0 18px 40px rgba(2, 8, 20, .18) !important;
+  backdrop-filter: blur(12px) !important;
+}
+.mr-professional-hero .mr-hero-download-card::before,
+.mr-professional-hero .mr-hero-privacy-card::before {
+  content: "";
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  right: -60px;
+  top: -62px;
+  border-radius: 50%;
+  background: rgba(250, 204, 21, .18);
+  pointer-events: none;
+}
+.mr-professional-hero .mr-hero-download-card span,
+.mr-professional-hero .mr-hero-privacy-card h2,
+.mr-professional-hero .mr-hero-privacy-card strong,
+.mr-professional-hero .mr-hero-privacy-card p {
+  position: relative !important;
+  z-index: 1 !important;
+}
+.mr-professional-hero .mr-hero-download-card span {
+  display: block !important;
+  color: #fff !important;
+  font-size: 1.02rem !important;
+  font-weight: 800 !important;
+  line-height: 1.35 !important;
+}
+.mr-professional-hero .mr-hero-download-card a {
+  display: inline-flex !important;
+  margin-top: 17px !important;
+  padding: 9px 13px !important;
+  border-radius: 9px !important;
+  background: #facc15 !important;
+  color: #111827 !important;
+  font-size: .8rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+}
+.mr-professional-hero .mr-hero-download-card a:hover {
+  background: #fde047 !important;
+}
+.mr-professional-hero .mr-hero-privacy-card {
+  border-color: rgba(250, 204, 21, .44) !important;
+  background: linear-gradient(145deg, rgba(10, 35, 61, .82), rgba(4, 18, 37, .72)) !important;
+}
+.mr-professional-hero .mr-hero-privacy-card h2 {
+  margin: 0 0 17px !important;
+  color: #fff !important;
+  font-size: 1.35rem !important;
+  line-height: 1.2 !important;
+}
+.mr-professional-hero .mr-hero-privacy-card strong {
+  display: block !important;
+  color: #facc15 !important;
+  font-size: .92rem !important;
+  line-height: 1.35 !important;
+}
+.mr-professional-hero .mr-hero-privacy-card p {
+  margin: 9px 0 0 !important;
+  color: #d8e7f5 !important;
+  font-size: .9rem !important;
+  line-height: 1.65 !important;
+}
+@media (max-width: 820px) {
+  .mr-professional-hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 34px !important;
+  }
+  .mr-professional-hero .mr-hero-side {
+    max-width: none !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    margin-left: 0 !important;
+  }
+}
+@media (max-width: 600px) {
+  .mr-professional-hero {
+    min-height: 0 !important;
+    border-radius: 0 0 18px 18px !important;
+  }
+  .mr-professional-hero-grid {
+    padding: 48px 20px 42px !important;
+    gap: 28px !important;
+  }
+  .mr-professional-hero .mr-hero-copy h1 {
+    font-size: clamp(2.45rem, 12vw, 3.6rem) !important;
+  }
+  .mr-professional-hero .mr-hero-lead {
+    font-size: 1.16rem !important;
+  }
+  .mr-professional-hero .mr-hero-description {
+    font-size: .98rem !important;
+    line-height: 1.7 !important;
+  }
+  .mr-professional-hero .mr-hero-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    margin-top: 24px !important;
+  }
+  .mr-professional-hero .mr-hero-actions a {
+    width: 100% !important;
+  }
+  .mr-professional-hero .mr-hero-side {
+    grid-template-columns: 1fr !important;
+  }
+}
+/* Homepage footer follows the shared black-and-white footer treatment. */
+html body footer.manlung-footer,
+html body .manlung-footer {
+  background: #000 !important;
+  background-image: none !important;
+  border-top: 3px solid #000 !important;
+  color: #fff !important;
+}
+html body footer.manlung-footer h2,
+html body footer.manlung-footer h3,
+html body footer.manlung-footer strong,
+html body footer.manlung-footer p,
+html body footer.manlung-footer span,
+html body footer.manlung-footer a,
+html body footer.manlung-footer .manlung-footer-bottom,
+html body footer.manlung-footer .manlung-footer-bottom a,
+html body footer.manlung-footer .manlung-footer-legal a {
+  color: #fff !important;
+}
+html body footer.manlung-footer .manlung-footer-links a:hover,
+html body footer.manlung-footer .manlung-footer-bottom a:hover,
+html body footer.manlung-footer .manlung-footer-legal a:hover {
+  color: #fff !important;
+}
+html body footer.manlung-footer .manlung-footer-divider {
+  background: rgba(255,255,255,.24) !important;
+}
+html body footer.manlung-footer .manlung-footer-bottom {
+  border-color: rgba(255,255,255,.24) !important;
+}
+html body footer.manlung-footer .manlung-footer-live {
+  background: #facc15 !important;
+  border-color: #facc15 !important;
+  color: #111827 !important;
+  box-shadow: 0 7px 18px rgba(250,204,21,.18) !important;
+}
+html body footer.manlung-footer .manlung-footer-live span,
+html body footer.manlung-footer .manlung-footer-clock {
+  color: #111827 !important;
+}
+html body footer.manlung-footer .manlung-footer-live-dot {
+  background: #111827 !important;
+  box-shadow: 0 0 0 3px rgba(17,24,39,.14) !important;
 }
 </style>
