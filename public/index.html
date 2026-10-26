@@ -1994,6 +1994,115 @@ body.manlung-sidebar-open{overflow:hidden}
 
     <link rel="preload" as="image" href="/images/manlung-hero-customer.jpg" fetchpriority="high">
     <link rel="stylesheet" href="/css/product-polish.css?v=hero-customer-20261025">
+<style id="manlung-customer-first-hero-20261026">
+/* Customer-first hero: readable over the supplied image on desktop and phones. */
+.mr-customer-hero{
+  position:relative!important;
+  isolation:isolate!important;
+  display:flex!important;
+  align-items:center!important;
+  min-height:clamp(560px,68vw,720px)!important;
+  overflow:hidden!important;
+  border-radius:0 0 30px 30px!important;
+  background:#071629!important;
+  color:#fff!important;
+}
+.mr-customer-hero .mr-hero-background-video{display:none!important}
+.mr-hero-customer-image{
+  position:absolute!important;inset:0!important;z-index:-2!important;
+  display:block!important;width:100%!important;height:100%!important;
+  object-fit:cover!important;object-position:center 42%!important;
+}
+.mr-customer-hero-overlay{
+  position:absolute!important;inset:0!important;z-index:-1!important;
+  background:linear-gradient(90deg,rgba(3,12,27,.94) 0%,rgba(3,12,27,.82) 43%,rgba(3,12,27,.36) 75%,rgba(3,12,27,.22) 100%)!important;
+}
+.mr-customer-hero-inner{
+  width:100%!important;max-width:1240px!important;margin:0 auto!important;
+  padding:clamp(54px,7vw,94px) clamp(24px,6vw,78px)!important;
+}
+.mr-customer-hero-copy{width:min(100%,760px)!important;text-align:left!important}
+.mr-customer-eyebrow{
+  display:inline-flex!important;align-items:center!important;gap:9px!important;
+  margin:0 0 22px!important;padding:10px 14px!important;
+  border:1px solid rgba(125,211,252,.42)!important;border-radius:999px!important;
+  background:rgba(8,47,73,.62)!important;color:#bae6fd!important;
+  font-size:.76rem!important;font-weight:800!important;letter-spacing:.09em!important;
+}
+.mr-customer-hero #hero-title{
+  max-width:760px!important;margin:0 0 22px!important;color:#fff!important;
+  font-size:clamp(2.65rem,5.2vw,5.05rem)!important;line-height:1.04!important;
+  font-weight:850!important;letter-spacing:-.045em!important;text-wrap:balance!important;
+  text-shadow:0 3px 24px rgba(0,0,0,.25)!important;
+}
+.mr-customer-hero #hero-title span{
+  display:block!important;margin-top:.14em!important;color:#7dd3fc!important;
+}
+.mr-customer-hero .mr-hero-description{
+  max-width:650px!important;margin:0 0 30px!important;color:#e2e8f0!important;
+  font-size:clamp(1rem,1.35vw,1.18rem)!important;line-height:1.75!important;
+}
+.mr-customer-hero-actions{
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  flex-wrap:wrap!important;gap:12px!important;margin:0 0 25px!important;
+}
+.mr-customer-hero-actions .mr-hero-primary,
+.mr-customer-hero-actions .mr-hero-secondary{
+  min-height:54px!important;padding:14px 20px!important;border-radius:13px!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  gap:10px!important;font-weight:800!important;text-decoration:none!important;
+}
+.mr-customer-hero-actions .mr-hero-primary{
+  background:#38bdf8!important;color:#082f49!important;border:1px solid #7dd3fc!important;
+  box-shadow:0 12px 30px rgba(14,165,233,.24)!important;
+}
+.mr-customer-hero-actions .mr-hero-primary:hover{background:#7dd3fc!important;transform:translateY(-1px)!important}
+.mr-customer-hero-actions .mr-hero-secondary{
+  background:rgba(15,23,42,.48)!important;color:#fff!important;
+  border:1px solid rgba(226,232,240,.5)!important;
+}
+.mr-customer-hero-actions .mr-hero-secondary:hover{background:rgba(30,41,59,.85)!important}
+.mr-customer-track-link{
+  display:inline-flex!important;align-items:center!important;gap:6px!important;flex-wrap:wrap!important;
+  color:#e0f2fe!important;font-size:.9rem!important;text-decoration:none!important;padding:8px 2px!important;
+}
+.mr-customer-track-link strong{color:#fff!important;text-decoration:underline!important;text-underline-offset:3px!important}
+.mr-customer-trust-row{
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  flex-wrap:wrap!important;gap:10px 20px!important;margin-top:10px!important;
+}
+.mr-customer-trust-row span{
+  display:inline-flex!important;align-items:center!important;gap:8px!important;
+  color:#f1f5f9!important;font-size:.82rem!important;font-weight:650!important;
+}
+.mr-customer-trust-row i{color:#7dd3fc!important}
+@media(max-width:760px){
+  .mr-customer-hero{min-height:650px!important;min-height:min(760px,calc(100svh - 72px))!important;border-radius:0 0 22px 22px!important;align-items:flex-end!important}
+  .mr-hero-customer-image{object-position:58% center!important}
+  .mr-customer-hero-overlay{
+    background:linear-gradient(180deg,rgba(3,12,27,.16) 0%,rgba(3,12,27,.40) 24%,rgba(3,12,27,.88) 48%,rgba(3,12,27,.97) 100%)!important;
+  }
+  .mr-customer-hero-inner{padding:clamp(210px,44vh,330px) 20px 32px!important}
+  .mr-customer-hero-copy{width:100%!important;text-align:left!important}
+  .mr-customer-eyebrow{font-size:.64rem!important;letter-spacing:.055em!important;margin-bottom:15px!important;padding:8px 11px!important}
+  .mr-customer-hero #hero-title{font-size:clamp(2.15rem,9.5vw,3.25rem)!important;line-height:1.06!important;letter-spacing:-.04em!important;margin-bottom:15px!important}
+  .mr-customer-hero .mr-hero-description{font-size:.96rem!important;line-height:1.62!important;margin-bottom:21px!important}
+  .mr-customer-hero-actions{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important;margin-bottom:15px!important}
+  .mr-customer-hero-actions .mr-hero-primary,.mr-customer-hero-actions .mr-hero-secondary{width:100%!important;min-height:52px!important;box-sizing:border-box!important;font-size:.94rem!important}
+  .mr-customer-track-link{font-size:.82rem!important;line-height:1.5!important}
+  .mr-customer-trust-row{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important;margin-top:17px!important}
+  .mr-customer-trust-row span{font-size:.78rem!important}
+}
+@media(max-width:380px){
+  .mr-customer-hero-inner{padding-left:16px!important;padding-right:16px!important}
+  .mr-customer-hero #hero-title{font-size:2.05rem!important}
+  .mr-customer-eyebrow{font-size:.58rem!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .mr-customer-hero *{scroll-behavior:auto!important;transition:none!important}
+}
+</style>
+
 </head>
 <body>
 <div id="manlungStartupLoader" aria-label="Loading Manlung Recovery">
@@ -2102,25 +2211,23 @@ body.manlung-sidebar-open{overflow:hidden}
 
     <main>
         <div class="container home-page-container">
-            <section class="mr-home-hero mr-video-hero" aria-labelledby="hero-title">
-  <video class="mr-hero-background-video" autoplay muted loop playsinline webkit-playsinline preload="none" controlslist="nodownload noplaybackrate" aria-hidden="true" tabindex="-1">
-    <source src="https://files.catbox.moe/cogeyc.mp4" type="video/mp4">
-  </video>
-  <div class="mr-hero-video-fallback" aria-hidden="true"></div>
-  <div class="mr-hero-video-overlay" aria-hidden="true"></div>
-  <div class="mr-home-hero-inner mr-video-hero-inner">
-    <div class="mr-hero-copy">
-      <h1 id="hero-title">Practical help when your digital life is at risk. <span>Clear steps. Safer decisions.</span></h1>
-      <p class="mr-hero-description">Manlung Recovery helps individuals and organizations respond to device loss, account compromise, online scams, and digital incidents with structured guidance, evidence organization, and confidential case support.</p>
-      <div class="mr-hero-actions">
+            <section class="mr-home-hero mr-video-hero mr-customer-hero" aria-labelledby="hero-title">
+  <img class="mr-hero-customer-image" src="https://i.postimg.cc/FKNFtwTr/2d662bbb99eeb310cda594013bfc6c20.jpg" alt="" fetchpriority="high" decoding="async">
+  <div class="mr-hero-video-overlay mr-customer-hero-overlay" aria-hidden="true"></div>
+  <div class="mr-home-hero-inner mr-video-hero-inner mr-customer-hero-inner">
+    <div class="mr-hero-copy mr-customer-hero-copy">
+      <span class="mr-customer-eyebrow"><i class="fas fa-shield-halved" aria-hidden="true"></i> MANLUNG RECOVERY · CONFIDENTIAL CASE SUPPORT</span>
+      <h1 id="hero-title">When something goes wrong online, <span>you don’t have to face it alone.</span></h1>
+      <p class="mr-hero-description">Get clear, practical guidance for compromised accounts, missing devices, online scams, and digital security concerns. We’ll help you organize the details and understand your next steps.</p>
+      <div class="mr-hero-actions mr-customer-hero-actions">
         <a href="/client/request.html" class="mr-hero-primary"><span>Start a Confidential Request</span><i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-        <a href="/client/track.html" class="mr-hero-secondary"><i class="fas fa-location-crosshairs" aria-hidden="true"></i><span>Track Your Case</span></a>
-        <a href="/api/download-apk" class="mr-hero-download" aria-label="Download the Manlung Recovery Android app" title="Download the Manlung Recovery Android app"><img class="mr-android-apk-icon" src="https://i.postimg.cc/tgPmdYt0/icons8-android-os-48.png" alt="" width="48" height="48" loading="eager" decoding="async"></a>
+        <a href="#how-it-works" class="mr-hero-secondary"><i class="fas fa-route" aria-hidden="true"></i><span>See How It Works</span></a>
+        <a href="/client/track.html" class="mr-customer-track-link"><i class="fas fa-magnifying-glass-location" aria-hidden="true"></i> Already have a case reference? <strong>Track your case</strong></a>
       </div>
-      <div class="mr-hero-trust-row">
-        <span><i class="fas fa-shield-halved" aria-hidden="true"></i> Structured case support</span>
-        <span><i class="fas fa-lock" aria-hidden="true"></i> Privacy-conscious handling</span>
-        <span><i class="fas fa-list-check" aria-hidden="true"></i> Clear progress updates</span>
+      <div class="mr-hero-trust-row mr-customer-trust-row">
+        <span><i class="fas fa-lock" aria-hidden="true"></i> Your privacy matters</span>
+        <span><i class="fas fa-list-check" aria-hidden="true"></i> Clear next steps</span>
+        <span><i class="fas fa-user-shield" aria-hidden="true"></i> Respectful, structured support</span>
       </div>
     </div>
   </div>
