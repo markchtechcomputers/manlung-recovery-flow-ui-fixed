@@ -2166,9 +2166,9 @@ async function setupOfficialGoogleButtons(){
       host.innerHTML = '';
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'manlung-social-btn manlung-google-btn';
+      button.className = 'manlung-social-btn manlung-google-native-button';
       button.style.width = '100%';
-      button.innerHTML = '<span aria-hidden="true" style="font-weight:800;color:#4285f4">G</span> Continue with Google';
+      button.innerHTML = '<img class="manlung-google-glyph" src="https://i.postimg.cc/Jn2xygTC/icons8-google-48-(1).png" alt=""><span class="manlung-google-label">Continue with Google</span>';
       button.addEventListener('click', async () => {
         const target = document.getElementById(id === 'googleRegisterBtn' ? 'registerError' : 'loginError');
         try {
@@ -2756,4 +2756,76 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:hover {
   html body.manlung-auth-page .manlung-social-grid .manlung-google-btn { min-height: 50px !important; height: 50px !important; }
   html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe { height: 50px !important; min-height: 50px !important; }
 }
+
+/* Final Google GIS width repair.
+   Older icon-only rules set the generated child DIV to 38–40px wide.
+   The iframe cannot expand beyond that wrapper, even when its own width is 100%. */
+html body.manlung-auth-page #googleLoginBtn,
+html body.manlung-auth-page #googleRegisterBtn {
+  display:flex!important;
+  align-items:stretch!important;
+  justify-content:stretch!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:54px!important;
+  min-height:54px!important;
+  max-height:54px!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-radius:12px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+html body.manlung-auth-page #googleLoginBtn > div,
+html body.manlung-auth-page #googleRegisterBtn > div {
+  display:block!important;
+  position:relative!important;
+  flex:1 1 auto!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:54px!important;
+  min-height:54px!important;
+  max-height:54px!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:0!important;
+  background:transparent!important;
+}
+html body.manlung-auth-page #googleLoginBtn iframe,
+html body.manlung-auth-page #googleRegisterBtn iframe {
+  display:block!important;
+  position:relative!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:54px!important;
+  min-height:54px!important;
+  max-height:54px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+}
+html body.manlung-auth-page .manlung-google-native-button .manlung-google-glyph {
+  object-fit:contain!important;
+}
+@media(max-width:520px) {
+  html body.manlung-auth-page #googleLoginBtn,
+  html body.manlung-auth-page #googleRegisterBtn,
+  html body.manlung-auth-page #googleLoginBtn > div,
+  html body.manlung-auth-page #googleRegisterBtn > div,
+  html body.manlung-auth-page #googleLoginBtn iframe,
+  html body.manlung-auth-page #googleRegisterBtn iframe {
+    height:50px!important;
+    min-height:50px!important;
+    max-height:50px!important;
+  }
+}
+
 </style>
