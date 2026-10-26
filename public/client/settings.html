@@ -422,6 +422,97 @@ body.dark .client-photo-preview{border-color:#1e293b}
 .call-subscription-card{grid-column:1/-1;position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(15,23,42,.98),rgba(30,64,175,.96) 48%,rgba(13,148,136,.94));color:#fff;border:0;border-radius:24px;box-shadow:0 22px 55px rgba(15,23,42,.22)}.call-subscription-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.call-subscription-head h2{color:#fff}.call-subscription-head p{color:#dbeafe}.call-subscription-status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;margin:1rem 0}.call-subscription-stat{padding:.78rem;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px)}.call-subscription-stat span{display:block;color:#bfdbfe;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800}.call-subscription-stat strong{display:block;margin-top:.25rem;font-size:.88rem;color:#fff}.call-subscription-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.9rem;margin-top:1rem}.call-plan{position:relative;padding:1.05rem;border:2px solid rgba(255,255,255,.16);border-radius:20px;background:rgba(255,255,255,.97);color:#0f172a;cursor:pointer;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}.call-plan:nth-child(1){border-top:4px solid #2563eb}.call-plan:nth-child(2){border-top:4px solid #8b5cf6}.call-plan:nth-child(3){border-top:4px solid #f59e0b}.call-plan:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(2,6,23,.2)}.call-plan.selected{border-color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.22),0 16px 34px rgba(2,6,23,.2)}.call-plan input{position:absolute;opacity:0;pointer-events:none}.call-plan-label{display:flex;justify-content:space-between;gap:.5rem;font-weight:900}.call-plan-label i{color:#64748b}.call-plan-price{font-size:1.5rem;font-weight:900;margin:.55rem 0 .15rem}.call-plan-normal{text-decoration:line-through;color:#64748b;font-size:.78rem}.call-plan-discount{display:inline-block;margin:.25rem 0;padding:.22rem .5rem;border-radius:999px;background:#dcfce7;color:#15803d;font-size:.7rem;font-weight:900}.call-plan-billing{color:#64748b;font-size:.78rem}.call-plan button{width:100%;margin-top:.85rem;border-radius:12px}.call-plan:nth-child(1) button{background:#2563eb;border-color:#2563eb}.call-plan:nth-child(2) button{background:#7c3aed;border-color:#7c3aed}.call-plan:nth-child(3) button{background:#d97706;border-color:#d97706}.call-payment-row{display:flex;gap:.65rem;align-items:end;margin-top:1rem}.call-payment-row .form-group{flex:1;margin:0}.call-payment-row label{color:#e0f2fe}.call-payment-row input{background:rgba(255,255,255,.97);color:#0f172a;border:0;border-radius:13px;min-height:46px}.call-payment-message{min-height:1.2rem;margin-top:.7rem;font-size:.82rem;font-weight:700}.call-payment-message.success{color:#bbf7d0}.call-payment-message.error{color:#fecaca}.call-payment-message.info{color:#bfdbfe}.call-subscription-expired{padding:.85rem;border-radius:14px;background:rgba(127,29,29,.34);border:1px solid rgba(254,202,202,.25);color:#fee2e2;font-size:.84rem;margin-top:.8rem}.call-subscription-expired strong{color:#fff}@media(max-width:800px){.call-subscription-status,.call-subscription-plans{grid-template-columns:1fr 1fr}}@media(max-width:560px){.call-subscription-head,.call-payment-row{display:block}.call-payment-row .form-group{margin-bottom:.65rem}.call-subscription-status,.call-subscription-plans{grid-template-columns:1fr}}
 </style>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
+
+<style id="manlung-settings-responsive-premium-refresh">
+/* Premium settings refresh: preserve existing forms, account actions and payment handlers. */
+:root{--settings-gold:#facc15;--settings-gold-deep:#eab308;--settings-ink:#111827;--settings-muted:#64748b;--settings-line:#e2e8f0}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{min-width:0;overflow-x:hidden;background:radial-gradient(ellipse at 8% 0%,rgba(250,204,21,.12),transparent 32%),linear-gradient(145deg,#f1f5f9 0%,#f8fafc 55%,#eef2ff 100%)}
+body>footer.manlung-footer,body footer.manlung-footer,.manlung-footer{display:none!important}
+.site-header{position:sticky;top:0;z-index:1000;background:linear-gradient(115deg,#111827 0%,#1f2937 58%,#374151 100%);border-bottom:3px solid var(--settings-gold);box-shadow:0 10px 28px rgba(15,23,42,.18);backdrop-filter:blur(12px)}
+.site-header .container{width:min(1280px,100%);max-width:1280px;min-height:76px;padding:.8rem clamp(1rem,3vw,2rem);gap:1rem}
+.site-header .brand{gap:.75rem;min-width:0}
+.site-header .brand h1{font-size:clamp(.95rem,1.8vw,1.2rem);font-weight:850;letter-spacing:-.035em;color:#fff}
+.site-header .brand>span{color:#cbd5e1;font-size:.76rem}
+.site-header .manlung-site-logo{border-radius:13px;border:2px solid rgba(250,204,21,.65);box-shadow:0 5px 16px rgba(0,0,0,.22)}
+.site-header .header-actions{display:flex;align-items:center;justify-content:flex-end;gap:.55rem;flex-wrap:wrap}
+.site-header .header-actions .btn{min-height:40px;border-radius:11px;font-size:.78rem;font-weight:800;padding:.55rem .85rem;white-space:nowrap}
+.site-header .header-actions .btn-outline{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff}
+.site-header .header-actions .btn-outline:hover{background:var(--settings-gold);border-color:var(--settings-gold);color:#111827}
+main.container{width:min(1280px,100%);max-width:1280px;padding:clamp(1rem,2.7vw,2rem);margin:0 auto}
+main.container>.card,main.container>.settings-grid,main.container>.settings-card{margin-top:1.1rem;margin-bottom:1.1rem}
+.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;align-items:start}
+.settings-card,.card.settings-card{min-width:0;border:1px solid rgba(203,213,225,.85);border-radius:22px;background:rgba(255,255,255,.96);box-shadow:0 12px 34px rgba(15,23,42,.065);padding:clamp(1rem,2vw,1.6rem);transition:box-shadow .2s ease,border-color .2s ease}
+.settings-card:hover{box-shadow:0 18px 42px rgba(15,23,42,.09);border-color:#cbd5e1}
+.settings-card h2{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:850;letter-spacing:-.025em}
+.settings-card>p{font-size:.88rem;line-height:1.65}
+.settings-card .form-group input,.settings-card .form-group select,.settings-card .form-group textarea{max-width:100%;min-width:0}
+.settings-card .btn{max-width:100%;font-weight:800}
+.client-photo-editor{min-width:0;flex-wrap:wrap}
+.call-subscription-card{grid-column:1/-1;border:0;border-radius:26px;background:linear-gradient(135deg,#111827 0%,#1e293b 55%,#312e81 100%);box-shadow:0 22px 55px rgba(15,23,42,.19);padding:clamp(1rem,2.5vw,2rem);overflow:hidden}
+.call-subscription-head{gap:1rem;align-items:flex-start;flex-wrap:wrap}
+.call-subscription-head h2{font-size:clamp(1.05rem,2vw,1.35rem);font-weight:850;letter-spacing:-.025em}
+.call-subscription-head h2 i{color:var(--settings-gold)}
+.call-subscription-head p{max-width:760px;font-size:.88rem;line-height:1.65}
+.call-subscription-status{grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}
+.call-subscription-stat{min-width:0;padding:.9rem;border-radius:15px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);overflow-wrap:anywhere}
+.call-subscription-stat strong{font-size:.9rem}
+.call-subscription-plans{grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.call-plan{min-width:0;border-radius:18px;padding:clamp(.9rem,1.7vw,1.25rem);box-shadow:0 8px 22px rgba(2,6,23,.1)}
+.call-plan.selected{outline:3px solid rgba(250,204,21,.45);outline-offset:1px}
+.call-plan-price{font-size:clamp(1.25rem,2vw,1.65rem);overflow-wrap:anywhere}
+.call-plan button{min-height:44px;font-weight:850}
+.call-payment-row{flex-wrap:wrap}
+.call-payment-row .form-group{min-width:min(100%,280px)}
+.currency-choice{gap:.6rem}
+.currency-choice select{min-height:42px}
+.settings-danger{border-color:rgba(220,38,38,.25);background:linear-gradient(135deg,#fff,#fff7f7)}
+body.dark{background:radial-gradient(ellipse at 8% 0%,rgba(250,204,21,.07),transparent 32%),#0b1220}
+body.dark .settings-card,body.dark .card.settings-card{background:#111827;border-color:#334155;box-shadow:0 12px 34px rgba(0,0,0,.2)}
+body.dark .settings-danger{background:linear-gradient(135deg,#21151b,#111827)}
+@media(max-width:900px){
+ .site-header .container{align-items:flex-start}
+ .site-header .brand{flex:1 1 260px}
+ .site-header .header-actions{flex:1 1 100%;justify-content:flex-start}
+ .call-subscription-status{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .call-subscription-plans{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .call-subscription-plans .call-plan:last-child{grid-column:1/-1}
+}
+@media(max-width:700px){
+ main.container{padding:.85rem}
+ .settings-grid{grid-template-columns:minmax(0,1fr);gap:.9rem;margin:1rem 0 1.4rem}
+ .settings-card,.card.settings-card{padding:1rem;border-radius:17px}
+ .call-subscription-card{border-radius:20px;padding:1rem}
+ .call-subscription-head{display:flex}
+ .call-subscription-status{grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
+ .call-subscription-stat{padding:.72rem}
+ .call-subscription-stat span{font-size:.62rem}
+ .call-subscription-stat strong{font-size:.82rem}
+ .call-subscription-plans{grid-template-columns:minmax(0,1fr);gap:.8rem}
+ .call-subscription-plans .call-plan:last-child{grid-column:auto}
+ .call-plan{padding:1rem}
+ .call-payment-row{display:block}
+ .call-payment-row .form-group{margin-bottom:.7rem}
+ .call-payment-row input{width:100%;min-width:0}
+ .currency-choice{align-items:flex-start;flex-direction:column}
+ .currency-choice select{width:100%;min-width:0}
+ .site-header .container{display:flex;flex-wrap:wrap;align-items:center;padding:.7rem .85rem;gap:.65rem}
+ .site-header .brand{flex:1 1 100%;gap:.6rem}
+ .site-header .brand h1{font-size:1rem}
+ .site-header .brand>span{flex-basis:100%;margin-left:calc(38px + .6rem)}
+ .site-header .header-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:.45rem}
+ .site-header .header-actions .btn{width:100%;padding:.55rem .35rem;font-size:.72rem}
+}
+@media(max-width:380px){
+ main.container{padding:.6rem}
+ .call-subscription-status{grid-template-columns:minmax(0,1fr)}
+ .site-header .header-actions .btn{font-size:.66rem}
+ .client-photo-editor{gap:.6rem}
+ .client-photo-preview{width:56px;height:56px;flex-basis:56px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.settings-card,.call-plan{transition:none}}
+</style>
+
 </head>
 
 <body>
