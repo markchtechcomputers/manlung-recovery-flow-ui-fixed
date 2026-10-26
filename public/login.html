@@ -1493,7 +1493,7 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{padding:0!i
 html body.manlung-auth-page .manlung-google-btn-inner{all:unset;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;height:52px!important;margin:0!important;padding:0 16px!important;gap:12px!important;border:0!important;border-radius:7px!important;background:#fff!important;color:#273449!important;font:600 15px/1.25 Arial,sans-serif!important;cursor:pointer!important}
 html body.manlung-auth-page .manlung-google-btn .manlung-google-glyph{display:block!important;flex:0 0 20px!important;width:20px!important;height:20px!important}
 html body.manlung-auth-page .manlung-google-btn .manlung-google-label{display:block!important;flex:1 1 auto!important;text-align:center!important;white-space:nowrap!important}
-html body.manlung-auth-page .manlung-google-btn iframe{display:none!important}
+html body.manlung-auth-page .manlung-google-btn iframe{display:block!important;width:100%!important;max-width:100%!important;height:54px!important;min-height:54px!important;border:0!important}
 html body.manlung-auth-page .manlung-social-btn i,html body.manlung-auth-page .manlung-social-btn svg{display:block!important;flex:0 0 20px!important;width:20px!important;height:20px!important;font-size:20px!important}
 html body.manlung-auth-page .manlung-social-btn span{display:block!important;flex:1 1 auto!important;text-align:center!important;white-space:nowrap!important}
 @media(max-width:640px){html body.manlung-auth-page .manlung-social-grid .manlung-social-btn,html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{flex-basis:54px!important;width:100%!important;height:54px!important;min-height:54px!important;max-height:54px!important}}
@@ -2318,8 +2318,14 @@ async function setupOfficialGoogleButtons(){
       // One Tap trigger made the visual button unreliable/non-clickable.
       // GIS supports button widths up to 400px; size it to the available host
       // width so it fills the social-button column without clipping.
-      const measuredWidth=Math.floor(host.getBoundingClientRect().width || host.parentElement?.getBoundingClientRect().width || 400);
-      const availableWidth=Math.max(200,Math.min(400,measuredWidth));
+      // Measure the full provider row first; the Google host can report an old icon-sized width
+      // before the browser finishes applying the responsive layout.
+      const measuredWidth = Math.floor(
+        host.parentElement?.getBoundingClientRect().width ||
+        host.getBoundingClientRect().width ||
+        400
+      );
+      const availableWidth = Math.max(200, Math.min(400, measuredWidth));
       google.accounts.id.renderButton(host,{
         type:'standard',
         theme:'outline',
@@ -2332,9 +2338,14 @@ async function setupOfficialGoogleButtons(){
       });
       const iframe=host.querySelector('iframe');
       if(iframe){
-        iframe.style.display='block';
-        iframe.style.width='100%';
-        iframe.style.maxWidth='100%';
+        // GIS injects a cross-origin iframe; force the iframe box to use the full
+        // provider-button width instead of inheriting legacy 40px icon styles.
+        iframe.style.setProperty('display','block','important');
+        iframe.style.setProperty('width','100%','important');
+        iframe.style.setProperty('max-width','100%','important');
+        iframe.style.setProperty('height','54px','important');
+        iframe.style.setProperty('min-height','54px','important');
+        iframe.style.setProperty('border','0','important');
       }
     });
   }catch(err){
