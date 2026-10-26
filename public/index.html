@@ -1646,6 +1646,86 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
   <div class="ml-clean-hero-bottom" aria-hidden="true"><span>Clear process</span><span class="ml-clean-bottom-line"></span><span>Practical next steps</span><span class="ml-clean-bottom-line"></span><span>Respectful support</span></div>
 </section>
 
+
+<style id="clearer-way-forward-home-style">
+  .clearer-way-forward {
+    display: grid;
+    grid-template-columns: minmax(240px, .82fr) minmax(0, 1.18fr);
+    align-items: center;
+    gap: clamp(24px, 5vw, 64px);
+    max-width: 1120px;
+    margin: clamp(34px, 5vw, 64px) auto;
+    padding: clamp(18px, 3vw, 32px);
+    border: 1px solid rgba(148, 163, 184, .2);
+    border-radius: 24px;
+    background: var(--card-bg, rgba(255,255,255,.96));
+    box-shadow: 0 16px 44px rgba(2, 6, 23, .08);
+  }
+  .clearer-way-forward-visual { min-width: 0; }
+  .clearer-way-forward-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 18px;
+    background: #e8edf4;
+    box-shadow: 0 12px 28px rgba(2, 6, 23, .12);
+  }
+  .clearer-way-forward-heading { margin: 20px 0 0; }
+  .clearer-way-forward-heading h2 {
+    margin: 0 0 8px;
+    color: var(--text-color, #102033);
+    font-size: clamp(1.65rem, 3vw, 2.25rem);
+    line-height: 1.15;
+    letter-spacing: -.035em;
+    font-weight: 800;
+  }
+  .clearer-way-forward-heading p {
+    margin: 0;
+    color: var(--text-muted, #526174);
+    font-size: clamp(1rem, 1.5vw, 1.12rem);
+    line-height: 1.55;
+    font-weight: 650;
+  }
+  .clearer-way-forward-copy {
+    margin: 0;
+    max-width: 54ch;
+    color: var(--text-muted, #526174);
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+    line-height: 1.85;
+  }
+  @media (max-width: 680px) {
+    .clearer-way-forward {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 22px;
+      margin: 28px 12px;
+      padding: 16px;
+      border-radius: 20px;
+    }
+    .clearer-way-forward-image {
+      width: min(100%, 420px);
+      margin-inline: auto;
+      border-radius: 15px;
+    }
+    .clearer-way-forward-heading { margin-top: 16px; }
+    .clearer-way-forward-copy { line-height: 1.75; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .clearer-way-forward * { scroll-behavior: auto; }
+  }
+</style>
+<section id="clearer-way-forward" class="clearer-way-forward" aria-labelledby="clearer-way-forward-title">
+  <div class="clearer-way-forward-visual">
+    <img class="clearer-way-forward-image" src="https://i.postimg.cc/qMC0YpxH/f46ae9680d10f0039bd76dfae1c5b2ae.jpg" alt="Manlung Recovery support visual" loading="lazy" decoding="async">
+    <div class="clearer-way-forward-heading">
+      <h2 id="clearer-way-forward-title">A clearer way forward</h2>
+      <p>Support for the moment you need it most.</p>
+    </div>
+  </div>
+  <p class="clearer-way-forward-copy">From the first report to the next recommended action, we help you organize what happened, protect what matters, and move forward with a clear case workflow.</p>
+</section>
+
 <section class="intro-strip" aria-label="Manlung Recovery overview">
                 <div><span class="eyebrow">A structured approach</span><h2>From incident to informed next steps.</h2></div>
                 <p>We help organize recovery requests, investigation information, evidence, and progress so clients can move through a clear, secure workflow.</p>
