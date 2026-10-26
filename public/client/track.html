@@ -419,6 +419,81 @@ function openCaseFromForm(event){
     <link rel="stylesheet" href="/css/unified-ui.css">
     <script src="/js/client-session-guard.js"></script>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
+
+<style id="manlung-case-tracker-responsive-refresh">
+:root{--track-violet:#7c3aed;--track-indigo:#4f46e5;--track-ink:#1f2937;--track-muted:#64748b;--track-border:#e5e7eb}
+html{scroll-behavior:smooth}
+body{min-height:100vh;background:radial-gradient(ellipse at 8% 0%,rgba(139,92,246,.08),transparent 34%),linear-gradient(135deg,#f8fafc 0%,#eef2f7 100%);color:var(--track-ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body>footer,body>.manlung-footer,footer.manlung-footer{display:none!important}
+.site-header{position:sticky;top:0;z-index:1000;background:linear-gradient(120deg,#1e1b4b,#312e81 70%,#4c1d95);border:0;box-shadow:0 8px 26px rgba(30,27,75,.22)}
+.site-header .container{width:min(1180px,100%);max-width:1180px;min-height:70px;padding:.7rem 1rem;gap:1rem}
+.site-header .brand{gap:.7rem;flex-wrap:wrap}
+.site-header .brand h1{font-size:1.08rem;font-weight:800;letter-spacing:-.025em;color:#fff}
+.site-header .brand span{color:#ddd6fe;font-size:.75rem}
+.site-header .manlung-site-logo{border-radius:13px;border:1px solid rgba(255,255,255,.2);box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.site-header .header-actions a,.site-header .header-actions button{border-radius:11px;padding:.55rem .8rem;font-size:.78rem;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16);color:#fff}
+.site-header .header-actions a:hover,.site-header .header-actions button:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3)}
+body>.container{width:min(1180px,100%);max-width:1180px;margin:1.6rem auto 3rem;padding:0 1rem}
+#content{min-width:0}
+#content>.card,#content>.track-entry-card{border-radius:22px;box-shadow:0 12px 34px rgba(15,23,42,.065)}
+#content>.card{padding:clamp(1rem,2.4vw,1.5rem);background:rgba(255,255,255,.96);border:1px solid rgba(226,232,240,.9)}
+.track-entry-card{margin:0 0 1rem;padding:clamp(1.25rem,3.5vw,2.5rem);border:1px solid #e9d5ff;background:linear-gradient(135deg,#fff 0%,#faf5ff 100%);box-shadow:0 16px 44px rgba(79,70,229,.09);gap:1rem 1.2rem}
+.track-entry-icon{width:64px;height:64px;border-radius:19px;background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 10px 25px rgba(124,58,237,.24)}
+.track-eyebrow{color:#7c3aed}
+.track-entry-copy h2{color:#1f2937;line-height:1.2}
+.track-entry-copy p{font-size:.92rem}
+.track-entry-controls input{min-width:0;min-height:50px;border:1.5px solid #d1d5db;border-radius:13px}
+.track-entry-controls input:focus{outline:0;border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.12)}
+.track-entry-controls .btn,.btn.btn-primary{border:0;border-radius:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 8px 18px rgba(124,58,237,.2);font-weight:750}
+.track-entry-controls .btn:hover,.btn.btn-primary:hover{filter:brightness(1.04);transform:translateY(-1px)}
+.track-help-grid{gap:1rem}
+.track-help-grid article{border-radius:16px;padding:1.1rem;background:rgba(255,255,255,.95);border-color:#e5e7eb;box-shadow:0 6px 18px rgba(15,23,42,.035)}
+.track-help-grid i{color:#7c3aed}
+.track-help-grid strong{color:#1f2937;font-size:.82rem}
+.track-help-grid span{font-size:.74rem}
+#content>.card:first-child .case-summary-id:before{color:#7c3aed;background:#ede9fe}
+#content>.card:first-child:before{background:linear-gradient(180deg,#a78bfa,#6366f1)}
+#content>.card .card-title i{color:#7c3aed}
+#caseMessagesCard .manlung-message-compose .btn{background:linear-gradient(135deg,#6366f1,#8b5cf6);border:0;color:#fff}
+#caseMessagesCard .manlung-message-compose .btn:hover{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+#content a:focus-visible,#content button:focus-visible,#content input:focus-visible,#content textarea:focus-visible{outline:3px solid rgba(139,92,246,.35);outline-offset:2px}
+@media(min-width:1000px){body>.container{padding:0 1.25rem}#content>.card{margin:.9rem 0}}
+@media(max-width:760px){
+ body>.container{margin:1rem auto 2rem;padding:0 .85rem}
+ .site-header .container{padding:.65rem .8rem;min-height:auto}
+ .site-header .brand{width:auto;justify-content:flex-start;text-align:left}
+ .site-header .brand span{white-space:normal}
+ .site-header .header-actions{display:flex;width:auto;gap:.4rem}
+ .site-header .header-actions a{min-height:40px;padding:.5rem .65rem;font-size:.72rem}
+ .track-entry-card{grid-template-columns:1fr;gap:.8rem;padding:1.2rem}
+ .track-entry-icon{width:52px;height:52px;border-radius:15px}
+ .track-entry-form{grid-column:1}
+ .track-help-grid{grid-template-columns:1fr}
+ #content>.card{border-radius:16px;padding:.9rem}
+ #content>.card:first-child .case-summary-meta{grid-template-columns:1fr;display:grid}
+ #caseMessagesCard .manlung-message-compose{flex-direction:row;align-items:stretch}
+ #caseMessagesCard .manlung-message-compose textarea{width:100%;min-width:0;flex:1}
+}
+@media(max-width:480px){
+ body>.container{padding:0 .65rem;margin:.8rem auto 1.5rem}
+ .site-header .container{align-items:stretch;gap:.55rem}
+ .site-header .brand{width:100%;gap:.55rem}
+ .site-header .brand h1{font-size:.95rem}
+ .site-header .brand span{width:100%;font-size:.68rem}
+ .site-header .header-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+ .site-header .header-actions a{width:100%;justify-content:center;min-height:42px;font-size:.72rem!important;flex-direction:row;padding:.5rem .35rem}
+ .track-entry-copy h2{font-size:1.35rem}
+ .track-entry-copy p{font-size:.84rem}
+ .track-entry-controls{flex-direction:column}
+ .track-entry-controls .btn{width:100%;min-height:48px}
+ #content>.card:first-child .case-summary-top{align-items:flex-start}
+ #content>.card:first-child .case-summary-id{font-size:.92rem;overflow-wrap:anywhere}
+ #caseMessagesCard .manlung-message-compose{flex-direction:column}
+ #caseMessagesCard .manlung-message-compose .btn{width:100%}
+ #caseMessagesCard .message-compose-hint{flex-wrap:wrap}
+}
+</style>
+
 </head>
 <body>
     <header class="site-header">
