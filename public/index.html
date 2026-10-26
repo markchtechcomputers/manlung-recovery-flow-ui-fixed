@@ -6018,3 +6018,68 @@ html body footer.manlung-footer .manlung-footer-live-dot{background:#15803d!impo
 <script id="manlung-production-cleanup-20261026">
 (function(){document.querySelectorAll('#services [data-gallery]').forEach(function(el){el.removeAttribute('data-gallery');el.removeAttribute('data-images');});document.querySelectorAll('#services .mr-gallery-indicator').forEach(function(el){el.remove();});document.querySelectorAll('#services .mr-service-kicker').forEach(function(el){el.textContent=el.textContent.replace(/^\s*\d+\s*\/\s*/,'').trim();});const f=document.querySelector('footer.manlung-footer, .manlung-footer');if(f&&f.querySelectorAll('.manlung-footer-live').length>1)f.querySelectorAll('.manlung-footer-live').forEach(function(el,i){if(i>0)el.remove();});})();
 </script>
+
+<style id="manlung-home-hero-footer-alignment-20261026">
+/* Keep the hero content in a predictable reading order and align the visual beside it. */
+html body main > .home-page-container{width:100%;max-width:1240px;margin-inline:auto;padding:24px clamp(14px,3vw,32px);box-sizing:border-box}
+html body .mr-customer-hero{position:relative!important;display:grid!important;grid-template-columns:minmax(0,1.08fr) minmax(260px,.92fr)!important;grid-template-rows:auto!important;align-items:center!important;gap:clamp(24px,4vw,52px)!important;min-height:0!important;padding:clamp(28px,4.5vw,58px)!important;background:#f8fafc!important;background-image:none!important;color:#0f172a!important;border:1px solid #e2e8f0!important;border-radius:24px!important;overflow:hidden!important}
+html body .mr-customer-hero>.mr-hero-customer-image{position:relative!important;inset:auto!important;grid-column:2!important;grid-row:1!important;align-self:center!important;width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:4/3!important;max-height:480px!important;object-fit:cover!important;object-position:center!important;border-radius:18px!important;opacity:1!important;z-index:1!important}
+html body .mr-customer-hero>.mr-customer-hero-overlay,html body .mr-customer-hero>.mr-hero-video-overlay{display:none!important}
+html body .mr-customer-hero>.mr-customer-hero-inner,html body .mr-customer-hero>.mr-home-hero-inner{display:contents!important}
+html body .mr-customer-hero .mr-customer-hero-copy,html body .mr-customer-hero .mr-hero-copy{display:flex!important;flex-direction:column!important;align-items:flex-start!important;grid-column:1!important;grid-row:1!important;position:relative!important;z-index:2!important;min-width:0!important;width:100%!important;max-width:680px!important;padding:0!important;margin:0!important;text-align:left!important}
+html body .mr-customer-hero .mr-home-eyebrow{order:0!important;margin:0 0 12px!important;color:#1d4ed8!important;font-size:.74rem!important;font-weight:850!important;letter-spacing:.12em!important}
+html body .mr-customer-hero #hero-title{order:1!important;margin:0 0 12px!important;color:#0f172a!important;font-size:clamp(2.2rem,4.2vw,4rem)!important;line-height:1.04!important;letter-spacing:-.045em!important;font-weight:850!important;text-shadow:none!important;max-width:100%!important}
+html body .mr-customer-hero #hero-title span{color:#1d4ed8!important}
+html body .mr-customer-hero .mr-hero-supporting-heading{order:2!important;margin:0 0 12px!important;color:#334155!important;font-size:clamp(1.1rem,1.8vw,1.45rem)!important;line-height:1.35!important;font-weight:750!important}
+html body .mr-customer-hero .mr-hero-description{order:3!important;margin:0!important;max-width:620px!important;color:#475569!important;font-size:1rem!important;line-height:1.7!important}
+html body .mr-customer-hero .mr-customer-hero-actions,html body .mr-customer-hero .mr-hero-actions{order:4!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;flex-wrap:wrap!important;gap:10px!important;width:100%!important;margin:20px 0 0!important}
+html body .mr-customer-hero .mr-hero-primary,html body .mr-customer-hero .mr-hero-secondary{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;min-height:46px!important;width:auto!important;max-width:100%!important;padding:11px 15px!important;border-radius:10px!important;white-space:normal!important;line-height:1.3!important;text-decoration:none!important;font-size:.9rem!important;font-weight:800!important;box-sizing:border-box!important}
+html body .mr-customer-hero .mr-hero-primary{background:#1d4ed8!important;color:#fff!important;border:1px solid #1d4ed8!important}
+html body .mr-customer-hero .mr-hero-secondary{background:#fff!important;color:#1e293b!important;border:1px solid #cbd5e1!important}
+html body .mr-customer-hero .mr-customer-track-link{flex:1 1 100%!important;width:auto!important;max-width:100%!important;margin:2px 0 0!important;color:#334155!important;overflow-wrap:anywhere!important}
+html body .mr-customer-hero .mr-hero-android-link{display:flex!important;align-items:center!important;gap:10px!important;flex:0 1 320px!important;min-width:0!important;max-width:100%!important;width:auto!important;margin:0!important;padding:10px 12px!important;border:1px solid #cbd5e1!important;border-radius:12px!important;background:#fff!important;color:#1e293b!important;overflow-wrap:anywhere!important}
+html body .mr-customer-hero .mr-hero-android-link strong,html body .mr-customer-hero .mr-hero-android-link small{display:block!important;color:inherit!important;overflow-wrap:anywhere!important}
+html body .mr-customer-hero .mr-hero-trust-row{order:5!important;display:flex!important;flex-wrap:wrap!important;gap:8px 14px!important;margin:16px 0 0!important;color:#475569!important;font-size:.78rem!important;line-height:1.5!important}
+html body .mr-customer-hero .mr-hero-trust-row span{color:#475569!important;overflow-wrap:anywhere!important}
+html body .mr-customer-hero .mr-hero-trust-row i{color:#2563eb!important}
+@media(max-width:760px){
+ html body main > .home-page-container{padding:12px 12px 24px!important}
+ html body .mr-customer-hero{grid-template-columns:minmax(0,1fr)!important;gap:20px!important;padding:22px!important;border-radius:18px!important}
+ html body .mr-customer-hero .mr-customer-hero-copy,html body .mr-customer-hero .mr-hero-copy{grid-column:1!important;grid-row:1!important}
+ html body .mr-customer-hero>.mr-hero-customer-image{grid-column:1!important;grid-row:2!important;aspect-ratio:16/10!important;max-height:340px!important}
+ html body .mr-customer-hero #hero-title{font-size:clamp(2.05rem,8vw,3.15rem)!important}
+ html body .mr-customer-hero .mr-customer-hero-actions,html body .mr-customer-hero .mr-hero-actions{display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:stretch!important}
+ html body .mr-customer-hero .mr-hero-primary,html body .mr-customer-hero .mr-hero-secondary,html body .mr-customer-hero .mr-hero-android-link{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+ html body .mr-customer-hero .mr-hero-trust-row{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+}
+@media(max-width:430px){html body .mr-customer-hero{padding:17px!important}html body .mr-customer-hero #hero-title{font-size:2.05rem!important}}
+
+/* Footer is consistently black; remove pale panels and keep readable text. */
+html body footer.manlung-footer{display:block!important;width:100%!important;margin:28px 0 0!important;padding:0!important;background:#000!important;background-color:#000!important;background-image:none!important;color:#fff!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+html body footer.manlung-footer .manlung-footer-inner{width:min(100% - 32px,1180px)!important;max-width:1180px!important;margin:0 auto!important;padding:30px 0 16px!important;background:transparent!important}
+html body footer.manlung-footer .manlung-footer-grid{display:grid!important;grid-template-columns:minmax(0,1.35fr) repeat(3,minmax(0,1fr))!important;align-items:start!important;gap:26px!important;background:transparent!important}
+html body footer.manlung-footer .manlung-footer-brand,html body footer.manlung-footer .manlung-footer-column,html body footer.manlung-footer .manlung-footer-brand-row,html body footer.manlung-footer .manlung-footer-contact-row,html body footer.manlung-footer .manlung-footer-social-wrap{min-width:0!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important}
+html body footer.manlung-footer h2,html body footer.manlung-footer h3{color:#fff!important;margin-top:0!important}
+html body footer.manlung-footer p,html body footer.manlung-footer .manlung-footer-description,html body footer.manlung-footer .manlung-footer-trust-text{color:#d1d5db!important;line-height:1.65!important}
+html body footer.manlung-footer .manlung-footer-links{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:9px!important;background:transparent!important}
+html body footer.manlung-footer .manlung-footer-links a{display:inline-flex!important;align-items:center!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;background-image:none!important;box-shadow:none!important;color:#e5e7eb!important;font-size:.82rem!important;line-height:1.45!important;text-decoration:none!important;overflow-wrap:anywhere!important}
+html body footer.manlung-footer .manlung-footer-links a:hover{background:transparent!important;color:#93c5fd!important}
+html body footer.manlung-footer .manlung-footer-contact a,html body footer.manlung-footer .manlung-footer-social a{display:inline-flex!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;max-width:100%!important;margin:0!important;padding:6px 8px!important;border:1px solid #262626!important;border-radius:8px!important;background:#0a0a0a!important;background-image:none!important;box-shadow:none!important;color:#f3f4f6!important;overflow-wrap:anywhere!important}
+html body footer.manlung-footer .manlung-footer-social a img{background:transparent!important;border:0!important;box-shadow:none!important}
+html body footer.manlung-footer .manlung-footer-divider{background:#262626!important}
+html body footer.manlung-footer .manlung-footer-bottom{background:transparent!important;color:#d1d5db!important}
+html body footer.manlung-footer .manlung-footer-bottom *,html body footer.manlung-footer .manlung-footer-legal a{color:#d1d5db!important}
+html body footer.manlung-footer .manlung-footer-live{background:#f5c542!important;color:#111827!important;border:1px solid #e4b52f!important;border-radius:6px!important}
+html body footer.manlung-footer .manlung-footer-live span,html body footer.manlung-footer .manlung-footer-live .manlung-footer-clock{color:#111827!important}
+
+/* Yellow is reserved for the live clock only, not the scam-help closing panel. */
+html body #scam-help .scam-help-footer{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:20px!important;border-radius:16px!important;background:#eff6ff!important;background-color:#eff6ff!important;background-image:none!important;border:1px solid #bfdbfe!important;box-shadow:none!important;color:#0f172a!important}
+html body #scam-help .scam-help-footer h3,html body #scam-help .scam-help-footer p,html body.dark #scam-help .scam-help-footer h3,html body.dark #scam-help .scam-help-footer p{color:#0f172a!important}
+html body #scam-help .scam-help-footer .btn-primary{background:#1d4ed8!important;border-color:#1d4ed8!important;color:#fff!important}
+html body #scam-help .scam-help-footer .btn-outline{background:#fff!important;border-color:#cbd5e1!important;color:#1e293b!important}
+html body.dark #scam-help .scam-help-footer{background:#111827!important;background-color:#111827!important;border-color:#334155!important;color:#f8fafc!important}
+html body.dark #scam-help .scam-help-footer h3,html body.dark #scam-help .scam-help-footer p{color:#f8fafc!important}
+@media(max-width:760px){html body #scam-help .scam-help-footer{flex-direction:column!important;align-items:stretch!important;gap:14px!important}html body #scam-help .scam-help-actions{display:flex!important;flex-direction:column!important;width:100%!important}html body #scam-help .scam-help-actions a{width:100%!important;box-sizing:border-box!important;justify-content:center!important}}
+@media(max-width:900px){html body footer.manlung-footer .manlung-footer-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:22px!important}}
+@media(max-width:430px){html body footer.manlung-footer .manlung-footer-grid{grid-template-columns:minmax(0,1fr)!important;gap:18px!important}html body footer.manlung-footer .manlung-footer-inner{width:calc(100% - 28px)!important}html body footer.manlung-footer .manlung-footer-contact-row{align-items:stretch!important;flex-direction:column!important}}
+</style>
