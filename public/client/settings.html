@@ -553,6 +553,148 @@ body .manlung-footer,body footer.manlung-footer,body>footer{display:none!importa
 </style>
 
 <style id="manlung-footer-social-icons-force-v3">html body .manlung-footer .manlung-footer-social{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:14px!important;flex-wrap:wrap!important;width:auto!important;max-width:100%!important}html body .manlung-footer .manlung-footer-social a{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;flex:0 0 42px!important;padding:4px!important;border:0!important;border-radius:10px!important;background:rgba(255,255,255,.06)!important;box-shadow:none!important;font-size:0!important;overflow:visible!important}html body .manlung-footer .manlung-footer-social a img{display:block!important;visibility:visible!important;opacity:1!important;width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;object-fit:contain!important;flex:0 0 32px!important}html body .manlung-footer .manlung-footer-social a i,html body .manlung-footer .manlung-footer-social a span{display:none!important}@media(max-width:600px){html body .manlung-footer .manlung-footer-social{gap:10px!important;flex-wrap:wrap!important}html body .manlung-footer .manlung-footer-social a{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important;flex-basis:40px!important}html body .manlung-footer .manlung-footer-social a img{width:32px!important;height:32px!important}}</style>
+
+<style id="manlung-settings-reference-design">
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+:root{--set-outer:#e2e8f0;--set-app:#f8fafc;--set-card:#fff;--set-text:#0f172a;--set-muted:#64748b;--set-light:#94a3b8;--set-yellow:#fcd34d;--set-yellow-hover:#fbbf24;--set-border:#e2e8f0;--set-danger-bg:#fef2f2;--set-danger:#b91c1c;--set-danger-border:#fca5a5;--set-pending-bg:#fef3c7;--set-pending:#92400e;--set-radius:24px;--set-shadow:0 4px 6px -1px rgba(0,0,0,.05),0 2px 4px -1px rgba(0,0,0,.03)}
+html{min-width:320px;background:var(--set-outer)}
+body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;background:var(--set-outer)!important;color:var(--set-text)!important;min-height:100vh;margin:0!important;padding:32px 20px!important;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.dark{background:#111827!important;color:#e2e8f0!important}
+body>.site-header,body>main.container{width:100%;max-width:1350px;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}
+body>.site-header{position:relative!important;top:auto!important;z-index:1;background:var(--set-app)!important;border:0!important;border-radius:36px 36px 0 0;box-shadow:none!important;padding:30px 40px 0!important;backdrop-filter:none!important}
+.site-header .container{width:100%!important;max-width:none!important;min-height:60px;padding:0!important;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.site-header .brand{display:flex;align-items:center;gap:10px;min-width:0}
+.site-header .manlung-home-logo{flex-shrink:0}
+.site-header .manlung-site-logo{width:36px;height:36px;object-fit:contain;border:0!important;border-radius:10px;box-shadow:none!important}
+.site-header .brand h1{font-size:24px!important;line-height:1.2;font-weight:800!important;letter-spacing:-1px;color:var(--set-text)!important}
+.site-header .brand>span{display:none}
+.site-header .header-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.site-header .header-actions .btn{min-height:42px;padding:10px 17px!important;border-radius:14px!important;border:1px solid var(--set-border)!important;background:#fff!important;color:var(--set-muted)!important;font-size:13px!important;font-weight:700!important;white-space:nowrap}
+.site-header .header-actions .btn:hover{background:#f8fafc!important;color:var(--set-text)!important}
+body>main.container{background:var(--set-app)!important;border-radius:0 0 36px 36px;padding:25px 40px 40px!important;box-shadow:0 25px 50px -12px rgba(0,0,0,.15);display:grid;grid-template-columns:380px minmax(0,1fr);grid-template-rows:auto auto;column-gap:30px;row-gap:26px;align-items:start}
+main.container:before{content:"Account Settings";grid-column:1/-1;grid-row:1;display:block;font-size:32px;line-height:1.25;font-weight:800;letter-spacing:-1px;color:var(--set-text);margin:0 0 2px}
+#callSubscriptionSettings{grid-column:2;grid-row:2;min-width:0;margin:0!important;padding:30px!important;border-radius:var(--set-radius)!important;border:1px solid var(--set-border)!important;background:#fff!important;color:var(--set-text)!important;box-shadow:var(--set-shadow)!important;overflow:hidden}
+.settings-grid{display:contents!important}
+.settings-grid>.settings-card:nth-child(1){grid-column:1;grid-row:2 / span 3}
+.settings-grid>.settings-card:nth-child(2){grid-column:2;grid-row:3}
+.settings-grid>.settings-card:nth-child(3){grid-column:2;grid-row:4}
+.settings-card,.card.settings-card{min-width:0;max-width:100%;margin:0!important;padding:30px!important;border:1px solid var(--set-border)!important;border-radius:var(--set-radius)!important;background:var(--set-card)!important;color:var(--set-text)!important;box-shadow:var(--set-shadow)!important;transition:box-shadow .2s ease,border-color .2s ease}
+.settings-card:hover{box-shadow:0 20px 25px -5px rgba(0,0,0,.05),0 10px 10px -5px rgba(0,0,0,.02)!important}
+.settings-card h2,#callSubscriptionSettings h2{font-family:inherit!important;font-size:20px!important;font-weight:700!important;letter-spacing:-.5px;color:var(--set-text)!important;margin:0 0 10px!important}
+.settings-card h2 i,#callSubscriptionSettings h2 i{color:var(--set-text)!important}
+.settings-card>p,#callSubscriptionSettings .call-subscription-head p{font-size:14px!important;line-height:1.65!important;color:var(--set-muted)!important;margin:0 0 25px!important}
+.settings-card .form-group{margin:0 0 20px!important}
+.settings-card .form-group label,#callSubscriptionSettings label{display:block;font-size:13px!important;font-weight:700!important;color:var(--set-text)!important;margin:0 0 8px!important}
+.settings-card input:not([type=file]),.settings-card select,.settings-card textarea,#callSubscriptionSettings input[type=email],#callSubscriptionSettings select{width:100%;max-width:100%;min-width:0;min-height:48px;padding:14px 16px!important;border:1px solid transparent!important;border-radius:14px!important;background:#f1f5f9!important;color:var(--set-text)!important;font-family:inherit!important;font-size:14px!important;font-weight:500!important;outline:none;box-shadow:none}
+.settings-card input:focus,.settings-card select:focus,.settings-card textarea:focus,#callSubscriptionSettings input:focus,#callSubscriptionSettings select:focus{background:#fff!important;border-color:var(--set-yellow)!important;box-shadow:0 0 0 4px rgba(252,211,77,.2)!important}
+.settings-card input:read-only{background:#f8fafc!important;color:var(--set-muted)!important}
+.settings-card .btn,#callSubscriptionSettings .btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:13px 22px!important;border:0!important;border-radius:14px!important;font-family:inherit!important;font-size:14px!important;font-weight:800!important;text-align:center;cursor:pointer;transition:all .2s}
+.settings-card .btn-primary,#callSubscriptionSettings .call-subscribe-button{background:var(--set-yellow)!important;color:var(--set-text)!important;box-shadow:0 4px 15px rgba(252,211,77,.3)!important}
+.settings-card .btn-primary:hover,#callSubscriptionSettings .call-subscribe-button:hover{background:var(--set-yellow-hover)!important;transform:translateY(-1px)}
+.settings-card .btn-outline{background:#fff!important;color:var(--set-text)!important;border:1px solid var(--set-border)!important}
+.settings-card .btn-danger{background:var(--set-danger-bg)!important;color:var(--set-danger)!important;border:1px solid var(--set-danger-border)!important}
+.settings-card .btn-danger:hover{background:var(--set-danger)!important;color:#fff!important}
+.client-photo-editor{display:flex;flex-direction:column;align-items:center;gap:15px;margin:0 0 28px!important;padding:22px!important;border:2px dashed var(--set-border)!important;border-radius:20px!important;background:#f8fafc!important;text-align:center}
+.client-photo-preview{width:80px!important;height:80px!important;flex:0 0 80px!important;border-radius:50%!important;background:linear-gradient(135deg,var(--set-yellow),#f59e0b)!important;color:var(--set-text)!important;font-size:28px!important;font-weight:800!important;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.client-photo-preview img{width:100%;height:100%;object-fit:cover}
+.client-photo-controls{width:100%;display:flex;flex-direction:column;align-items:center;gap:9px}
+.client-photo-controls label{font-size:13px!important;font-weight:700!important}
+.client-photo-controls input[type=file]{width:100%;max-width:100%;font-size:12px}
+.client-photo-controls small{font-size:11px!important;line-height:1.5;color:var(--set-light)!important}
+#removeClientPhoto{align-self:center}
+.settings-status{font-size:12px!important;line-height:1.5;min-height:1.2rem}
+#callSubscriptionSettings .call-subscription-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+#callSubscriptionSettings .call-subscription-head h2{margin-bottom:10px!important}
+#callSubscriptionSettings .call-subscription-head p{margin-bottom:18px!important}
+#callSubscriptionBadge,.status-badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:6px 12px;border-radius:20px;background:var(--set-danger-bg)!important;color:var(--set-danger)!important;border:1px solid var(--set-danger-border)!important;font-size:11px!important;font-weight:800!important;letter-spacing:.5px}
+#callSubscriptionSettings .call-subscription-status{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;margin:0 0 14px!important;padding:18px!important;border:1px solid var(--set-border)!important;border-radius:16px!important;background:#f8fafc!important}
+#callSubscriptionSettings .call-subscription-stat{min-width:0;padding:0!important;margin:0!important;border:0!important;background:transparent!important;overflow-wrap:anywhere}
+#callSubscriptionSettings .call-subscription-stat span{display:block;font-size:10px!important;font-weight:800!important;text-transform:uppercase;letter-spacing:.5px;color:var(--set-muted)!important;margin-bottom:6px}
+#callSubscriptionSettings .call-subscription-stat strong{display:block;font-size:13px!important;font-weight:800!important;color:var(--set-text)!important}
+#callSubscriptionSettings #callDaysValue{font-size:14px!important}
+#callSubscriptionSettings .call-subscription-expired{display:flex;align-items:center;gap:10px;margin:0 0 20px;padding:15px 16px;border-radius:14px;background:var(--set-danger-bg);color:var(--set-danger);border:1px solid var(--set-danger-border);font-size:13px;font-weight:700}
+#callSubscriptionSettings .call-subscription-expired[hidden]{display:none!important}
+#callSubscriptionSettings .call-payment-row{display:block;margin:0 0 18px}
+#callSubscriptionSettings .call-payment-row .form-group{margin:0!important}
+#callSubscriptionSettings .call-currency-choice{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+#callSubscriptionSettings .call-currency-choice label{margin:0!important}
+#callSubscriptionSettings .call-currency-choice select{width:auto;min-width:220px;flex:1}
+#callSubscriptionSettings .call-currency-note{font-size:11px!important;line-height:1.5;color:var(--set-light)!important;margin:0 0 22px!important}
+#callSubscriptionSettings .call-subscription-plans{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;margin-top:22px!important;align-items:stretch}
+#callSubscriptionSettings .call-plan{position:relative;display:flex!important;flex-direction:column;gap:10px;min-width:0;padding:20px!important;border:1px solid var(--set-border)!important;border-radius:20px!important;background:#fff!important;color:var(--set-text)!important;box-shadow:none!important;overflow:visible;transition:all .25s}
+#callSubscriptionSettings .call-plan:hover{border-color:var(--set-yellow)!important;transform:translateY(-3px);box-shadow:0 20px 25px -5px rgba(0,0,0,.05)!important}
+#callSubscriptionSettings .call-plan.selected{border:2px solid var(--set-yellow)!important;background:#fffdf5!important}
+#callSubscriptionSettings .call-plan input[type=radio]{position:absolute;opacity:0;pointer-events:none}
+#callSubscriptionSettings .call-plan-label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px!important;font-weight:800;letter-spacing:1px;color:var(--set-muted)!important}
+#callSubscriptionSettings .call-plan-label i{color:#10b981}
+#callSubscriptionSettings .call-plan-price{font-size:clamp(20px,2vw,28px)!important;line-height:1.2;font-weight:800!important;letter-spacing:-.7px;color:var(--set-text)!important;overflow-wrap:anywhere}
+#callSubscriptionSettings .call-plan-normal{font-size:12px;color:var(--set-light);text-decoration:line-through}
+#callSubscriptionSettings .call-plan-discount{position:absolute;top:-10px;right:14px;padding:4px 10px;border-radius:20px;background:var(--set-yellow);color:var(--set-text);font-size:10px;font-weight:800}
+#callSubscriptionSettings .call-plan-billing{font-size:12px;color:var(--set-muted)!important}
+#callSubscriptionSettings .call-plan .call-subscribe-button{width:100%;margin-top:auto;padding:11px!important;font-size:11px!important}
+#callSubscriptionSettings .call-plan:last-child{background:var(--set-text)!important;color:#fff!important;border-color:var(--set-text)!important}
+#callSubscriptionSettings .call-plan:last-child .call-plan-label,#callSubscriptionSettings .call-plan:last-child .call-plan-billing{color:#94a3b8!important}
+#callSubscriptionSettings .call-plan:last-child .call-plan-price{color:#fff!important}
+#callSubscriptionSettings .call-plan:last-child .call-plan-normal{color:#cbd5e1}
+#callSubscriptionSettings .call-payment-message{margin-top:16px;font-size:13px;line-height:1.5}
+.settings-danger{border:1px solid var(--set-danger-border)!important;background:#fff5f5!important}
+.settings-danger h2{color:var(--set-danger)!important}
+.settings-danger>p{color:var(--set-danger)!important}
+body.dark>.site-header,body.dark>main.container{background:#111827!important}
+body.dark .settings-card,body.dark #callSubscriptionSettings{background:#1f2937!important;border-color:#374151!important;color:#e2e8f0!important}
+body.dark .settings-card h2,body.dark #callSubscriptionSettings h2,body.dark .settings-card label,body.dark #callSubscriptionSettings label{color:#f8fafc!important}
+body.dark .settings-card>p,body.dark #callSubscriptionSettings .call-subscription-head p{color:#cbd5e1!important}
+body.dark .settings-card input:not([type=file]),body.dark .settings-card select,body.dark .settings-card textarea,body.dark #callSubscriptionSettings input[type=email],body.dark #callSubscriptionSettings select{background:#0f172a!important;color:#f8fafc!important}
+body.dark #callSubscriptionSettings .call-subscription-status,body.dark .client-photo-editor{background:#0f172a!important;border-color:#334155!important}
+body.dark #callSubscriptionSettings .call-subscription-stat strong{color:#f8fafc!important}
+body.dark #callSubscriptionSettings .call-plan{background:#1f2937!important;color:#f8fafc!important;border-color:#475569!important}
+body.dark #callSubscriptionSettings .call-plan:last-child{background:#0b1220!important}
+body.dark .settings-danger{background:#21151b!important}
+body .manlung-footer,body>footer.manlung-footer{display:none!important}
+@media(max-width:1100px){
+ body{padding:18px 12px!important}
+ body>.site-header{padding:24px 26px 0!important}
+ body>main.container{padding:24px 26px 30px!important;grid-template-columns:300px minmax(0,1fr);column-gap:18px;row-gap:20px}
+ #callSubscriptionSettings,.settings-card,.card.settings-card{padding:22px!important}
+ #callSubscriptionSettings .call-subscription-plans{grid-template-columns:minmax(0,1fr)!important}
+ #callSubscriptionSettings .call-plan:last-child{grid-column:auto}
+ #callSubscriptionSettings .call-subscription-status{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+ body{padding:0!important;background:var(--set-app)!important}
+ body>.site-header{border-radius:0!important;padding:16px 16px 0!important}
+ .site-header .container{align-items:flex-start;flex-wrap:wrap;gap:14px}
+ .site-header .brand{flex:1 1 100%}
+ .site-header .brand h1{font-size:20px!important}
+ .site-header .header-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:7px}
+ .site-header .header-actions .btn{white-space:normal;min-width:0;padding:10px 6px!important;font-size:12px!important}
+ body>main.container{border-radius:0!important;padding:24px 16px 28px!important;display:flex;flex-direction:column;gap:16px;box-shadow:none}
+ main.container:before{font-size:27px;width:100%;margin-bottom:0}
+ #callSubscriptionSettings,.settings-card,.card.settings-card{width:100%;padding:20px!important;border-radius:20px!important}
+ #callSubscriptionSettings{order:2}
+ .settings-grid{display:flex!important;flex-direction:column;gap:16px!important;width:100%}
+ .settings-grid>.settings-card:nth-child(1){order:1}
+ .settings-grid>.settings-card:nth-child(2){order:3}
+ .settings-grid>.settings-card:nth-child(3){order:4}
+ #callSubscriptionSettings .call-subscription-status{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+ #callSubscriptionSettings .call-subscription-plans{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+ #callSubscriptionSettings .call-plan{padding:22px!important}
+ #callSubscriptionSettings .call-plan-price{font-size:27px!important}
+ #callSubscriptionSettings .call-currency-choice{align-items:flex-start;flex-direction:column}
+ #callSubscriptionSettings .call-currency-choice select{width:100%;min-width:0}
+ .settings-card .form-group{margin-bottom:16px!important}
+ .client-photo-editor{padding:18px!important}
+}
+@media(max-width:380px){
+ body>.site-header{padding-left:12px!important;padding-right:12px!important}
+ body>main.container{padding-left:12px!important;padding-right:12px!important}
+ .site-header .header-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #callSubscriptionSettings,.settings-card,.card.settings-card{padding:16px!important}
+ #callSubscriptionSettings .call-subscription-status{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
 </head>
 
 <body>
