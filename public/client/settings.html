@@ -513,6 +513,46 @@ body.dark .settings-danger{background:linear-gradient(135deg,#21151b,#111827)}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.settings-card,.call-plan{transition:none}}
 </style>
 
+
+<style id="manlung-settings-live-layout-override">
+/* Final responsive override: make the settings layout resilient to global theme styles. */
+html,body{width:100%;max-width:100%;margin:0;overflow-x:clip}
+body main.container{box-sizing:border-box;width:100%;max-width:1280px;margin-inline:auto;padding:clamp(12px,2.5vw,32px)}
+body main.container *{box-sizing:border-box}
+body main.container .settings-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:clamp(12px,1.8vw,22px)!important;align-items:start}
+body main.container .settings-card{min-width:0;max-width:100%;overflow-wrap:anywhere}
+body main.container input,body main.container select,body main.container textarea,body main.container button{max-width:100%;font:inherit}
+body main.container input,body main.container select,body main.container textarea{min-width:0}
+body main.container .call-subscription-card{grid-column:1/-1;min-width:0;max-width:100%;overflow:hidden}
+body main.container .call-subscription-status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+body main.container .call-subscription-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+body main.container .call-plan{min-width:0;max-width:100%;overflow-wrap:anywhere}
+body main.container .call-payment-row{display:flex;gap:12px;align-items:end}
+body main.container .call-payment-row>*{min-width:0;flex:1 1 220px}
+body .manlung-footer,body footer.manlung-footer,body>footer{display:none!important}
+@media(max-width:760px){
+ body main.container{padding:12px}
+ body main.container .settings-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+ body main.container .settings-card{padding:16px;border-radius:16px}
+ body main.container .call-subscription-card{grid-column:1;padding:16px}
+ body main.container .call-subscription-status{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body main.container .call-subscription-plans{grid-template-columns:minmax(0,1fr)}
+ body main.container .call-subscription-plans .call-plan:last-child{grid-column:auto}
+ body main.container .call-payment-row{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+ body main.container .call-payment-row>*{width:100%;min-width:0}
+ body .site-header .container{width:100%;padding:10px 12px;display:flex;flex-wrap:wrap;gap:10px}
+ body .site-header .brand{min-width:0;max-width:100%;flex:1 1 100%}
+ body .site-header .header-actions{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+ body .site-header .header-actions .btn{min-width:0;width:100%;white-space:normal;padding:9px 5px;font-size:12px}
+}
+@media(max-width:380px){
+ body main.container{padding:8px}
+ body main.container .call-subscription-status{grid-template-columns:minmax(0,1fr)}
+ body .site-header .header-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+
+<style id="manlung-footer-social-icons-force-v3">html body .manlung-footer .manlung-footer-social{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:14px!important;flex-wrap:wrap!important;width:auto!important;max-width:100%!important}html body .manlung-footer .manlung-footer-social a{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;flex:0 0 42px!important;padding:4px!important;border:0!important;border-radius:10px!important;background:rgba(255,255,255,.06)!important;box-shadow:none!important;font-size:0!important;overflow:visible!important}html body .manlung-footer .manlung-footer-social a img{display:block!important;visibility:visible!important;opacity:1!important;width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;object-fit:contain!important;flex:0 0 32px!important}html body .manlung-footer .manlung-footer-social a i,html body .manlung-footer .manlung-footer-social a span{display:none!important}@media(max-width:600px){html body .manlung-footer .manlung-footer-social{gap:10px!important;flex-wrap:wrap!important}html body .manlung-footer .manlung-footer-social a{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important;flex-basis:40px!important}html body .manlung-footer .manlung-footer-social a img{width:32px!important;height:32px!important}}</style>
 </head>
 
 <body>
@@ -1480,4 +1520,3 @@ body.dark #removeClientPhoto:hover{background:#501522!important;color:#fff1f2!im
 </body>
 </html>
 
-<style id="manlung-footer-social-icons-force-v3">html body .manlung-footer .manlung-footer-social{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:14px!important;flex-wrap:wrap!important;width:auto!important;max-width:100%!important}html body .manlung-footer .manlung-footer-social a{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;flex:0 0 42px!important;padding:4px!important;border:0!important;border-radius:10px!important;background:rgba(255,255,255,.06)!important;box-shadow:none!important;font-size:0!important;overflow:visible!important}html body .manlung-footer .manlung-footer-social a img{display:block!important;visibility:visible!important;opacity:1!important;width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important;object-fit:contain!important;flex:0 0 32px!important}html body .manlung-footer .manlung-footer-social a i,html body .manlung-footer .manlung-footer-social a span{display:none!important}@media(max-width:600px){html body .manlung-footer .manlung-footer-social{gap:10px!important;flex-wrap:wrap!important}html body .manlung-footer .manlung-footer-social a{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important;flex-basis:40px!important}html body .manlung-footer .manlung-footer-social a img{width:32px!important;height:32px!important}}</style>
