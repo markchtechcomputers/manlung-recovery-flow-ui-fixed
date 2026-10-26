@@ -6210,16 +6210,16 @@ html body main>.container.home-page-container>.mr-customer-hero{
   background:#071629!important;color:#fff!important;box-sizing:border-box!important;
 }
 html body .mr-customer-hero>.mr-hero-customer-image{
-  position:absolute!important;inset:0!important;z-index:-2!important;
+  position:absolute!important;inset:0!important;z-index:0!important;
   display:block!important;width:100%!important;height:100%!important;min-height:100%!important;
   max-height:none!important;aspect-ratio:auto!important;object-fit:cover!important;
   object-position:center 48%!important;border:0!important;border-radius:0!important;
   opacity:1!important;visibility:visible!important;pointer-events:none!important;
 }
 html body .mr-customer-hero:before{
-  content:""!important;position:absolute!important;inset:0!important;z-index:-1!important;
+  content:""!important;position:absolute!important;inset:0!important;z-index:1!important;
   display:block!important;pointer-events:none!important;
-  background:linear-gradient(90deg,rgba(3,12,27,.94) 0%,rgba(3,12,27,.84) 42%,rgba(3,12,27,.48) 72%,rgba(3,12,27,.22) 100%)!important;
+  background:linear-gradient(90deg,rgba(3,12,27,.82) 0%,rgba(3,12,27,.68) 42%,rgba(3,12,27,.34) 72%,rgba(3,12,27,.14) 100%)!important;
 }
 html body .mr-customer-hero .mr-customer-hero-inner,html body .mr-customer-hero .mr-home-hero-inner{display:contents!important}
 html body .mr-customer-hero .mr-customer-hero-copy,html body .mr-customer-hero .mr-hero-copy{
@@ -6244,4 +6244,13 @@ html body .mr-customer-hero .mr-hero-trust-row i{color:#93c5fd!important}
    background:linear-gradient(180deg,rgba(3,12,27,.88),rgba(3,12,27,.76))!important;
  }
 }
+</style>
+
+<style id="manlung-hero-image-stack-fix-20261026">
+/* Keep the supplied photo above the hero background fill, with overlay and copy above it. */
+html body .mr-customer-hero{isolation:isolate!important;background-color:#071629!important}
+html body .mr-customer-hero>.mr-hero-customer-image{z-index:0!important}
+html body .mr-customer-hero:before{z-index:1!important}
+html body .mr-customer-hero .mr-customer-hero-copy,
+html body .mr-customer-hero .mr-hero-copy{position:relative!important;z-index:2!important}
 </style>
