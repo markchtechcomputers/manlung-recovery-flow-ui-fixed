@@ -1731,101 +1731,88 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
                 <p>We help organize recovery requests, investigation information, evidence, and progress so clients can move through a clear, secure workflow.</p>
             </section>
 
-            <section id="services" class="home-section services-section" aria-labelledby="services-title">
-                <div class="section-heading">
-                    <span class="eyebrow">Our expertise</span>
-                    <h2 id="services-title">How We Can Help</h2>
-                    <p>Structured digital recovery, investigation, and cybersecurity support for individuals and organizations.</p>
-                </div>
-                <div class="service-transition-rail" aria-label="Recovery services overview">
-  <span><b>01</b><strong>Device Recovery</strong></span>
-  <span><b>02</b><strong>Identity &amp; Account Recovery</strong></span>
-  <span><b>03</b><strong>Scam &amp; Fraud Investigation</strong></span>
-  <span><b>04</b><strong>Security Assessment &amp; Audit</strong></span>
-</div>
-<div class="features premium-service-grid">
-                    <article class="feature-card premium-service-card" data-service="device">
-                        <div class="service-card-top"><span class="service-number">01</span><span class="service-icon-wrap"><img src="/images/device-recovery.png" alt="" class="service-icon-image"></span></div>
-                        <h3>Device Recovery</h3>
-                        <p>Lost phone, laptop, tablet or smartwatch? We'll help you understand recovery options and guide you through the appropriate next steps.</p>
-                        <button class="service-learn" type="button" onclick="openServiceModal('device')">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
-                    </article>
-                    <article class="feature-card premium-service-card" data-service="identity">
-                        <div class="service-card-top"><span class="service-number">02</span><span class="service-icon-wrap"><img src="/images/identity-theft.png" alt="" class="service-icon-image"></span></div>
-                        <h3>Identity Theft &amp; Account Recovery</h3>
-                        <p>Protect your identity and recover compromised accounts with structured assistance and security guidance.</p>
-                        <button class="service-learn" type="button" onclick="openServiceModal('identity')">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
-                    </article>
-                    <article class="feature-card premium-service-card" data-service="scam">
-                        <div class="service-card-top"><span class="service-number">03</span><span class="service-icon-wrap"><img src="/images/scam-investigation.png" alt="" class="service-icon-image"></span></div>
-                        <h3>Scam &amp; Fraud Investigation</h3>
-                        <p>Online scams, fraud, and phishing — we help organize digital evidence and guide investigation and reporting steps.</p>
-                        <button class="service-learn" type="button" onclick="openServiceModal('scam')">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
-                    </article>
-                    <article class="feature-card premium-service-card" data-service="security">
-                        <div class="service-card-top"><span class="service-number">04</span><span class="service-icon-wrap"><img src="/images/security-assessment.png" alt="" class="service-icon-image"></span></div>
-                        <h3>Security Assessment &amp; Audit</h3>
-                        <p>Security reviews, vulnerability awareness, and practical recommendations to help organizations improve their digital security posture.</p>
-                        <button class="service-learn" type="button" onclick="openServiceModal('security')">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
-                    </article>
-                </div>
-                <div class="show-more-wrap"><a class="show-more-btn" href="/services.html"><span>Explore All Services</span><i class="fas fa-arrow-right" aria-hidden="true"></i></a></div>
-            </section>
+            <style id="manlung-home-services-process-refresh">
+.mr-services,.mr-process-section{width:min(100% - 32px,1180px);margin:clamp(44px,6vw,76px) auto;padding:0}
+.mr-section-heading{max-width:760px;margin:0 auto 30px}.mr-section-heading .eyebrow{display:inline-flex;align-items:center;margin-bottom:12px;color:#0f766e;font-size:.76rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase}
+.mr-section-heading h2{margin:0;color:#102033;font-size:clamp(1.9rem,3.7vw,3rem);line-height:1.12;letter-spacing:-.045em;font-weight:850}.mr-section-heading p{max-width:68ch;margin:14px 0 0;color:#607086;font-size:1.04rem;line-height:1.75}
+.mr-section-heading.centered{text-align:center}.mr-section-heading.centered p{margin-left:auto;margin-right:auto}
+.mr-service-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:24px!important;align-items:stretch}
+.mr-service-card{display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:0!important;border:1px solid #e1e8f0!important;border-radius:20px!important;background:#fff!important;box-shadow:0 10px 30px rgba(15,23,42,.065)!important;min-width:0;transition:transform .22s ease,box-shadow .22s ease!important}
+.mr-service-card:hover{transform:translateY(-4px)!important;box-shadow:0 18px 42px rgba(15,23,42,.12)!important}
+.mr-service-image-wrap{position:relative;display:block;width:100%;aspect-ratio:1/1;overflow:hidden;background:#e9eff6}
+.mr-service-image{display:block!important;width:100%!important;height:100%!important;aspect-ratio:1/1;object-fit:cover!important;object-position:center!important;margin:0!important;border-radius:0!important;max-width:none!important;max-height:none!important;transition:opacity .32s ease,transform .65s ease!important}
+.mr-service-card:hover .mr-service-image{transform:scale(1.025)}.mr-service-card-copy{display:flex;flex:1;flex-direction:column;align-items:flex-start;padding:22px 22px 24px}
+.mr-service-kicker{margin-bottom:10px;color:#0f766e;font-size:.67rem;font-weight:850;letter-spacing:.1em;line-height:1.4}
+.mr-service-card h3{margin:0 0 11px;color:#142238;font-size:1.22rem;line-height:1.3;font-weight:820;letter-spacing:-.025em}.mr-service-card p{margin:0 0 22px;color:#5b687a;font-size:.94rem;line-height:1.7}
+.mr-service-card .service-learn{display:inline-flex;align-items:center;gap:10px;margin-top:auto;padding:10px 0 0;border:0;background:transparent;color:#155eef;font-size:.9rem;font-weight:800;cursor:pointer}.mr-service-card .service-learn span{font-size:1.1rem;transition:transform .2s ease}.mr-service-card .service-learn:hover span{transform:translateX(4px)}
+.mr-gallery-indicator{position:absolute;right:12px;bottom:12px;padding:6px 9px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(15,23,42,.72);color:#fff;font-size:.7rem;font-weight:800;letter-spacing:.08em;backdrop-filter:blur(8px)}.mr-gallery-indicator i{font-style:normal;opacity:.65;margin:0 2px}.mr-service-card .mr-service-image-wrap img.is-changing{opacity:.25}
+.mr-process-flow{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important;margin:30px 0 42px}
+.mr-process-step{position:relative;min-width:0;padding:24px 20px!important;border:1px solid #e1e8f0!important;border-radius:18px!important;background:#fff!important;box-shadow:0 8px 24px rgba(15,23,42,.045)!important}
+.mr-process-step .process-index{display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin-bottom:22px;border-radius:13px;background:#e8f5f3;color:#0f766e;font-size:.88rem;font-weight:900;letter-spacing:.04em}
+.mr-process-step h3{margin:0 0 10px;color:#17263a;font-size:1.05rem;line-height:1.35;font-weight:820}.mr-process-step p{margin:0;color:#607086;font-size:.88rem;line-height:1.7}
+.mr-demo-section{display:grid!important;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;align-items:center!important;gap:clamp(28px,5vw,62px)!important;margin-top:42px!important;padding:clamp(22px,4vw,42px)!important;border:1px solid #dfe7f0!important;border-radius:26px!important;background:linear-gradient(135deg,#f7fafc 0%,#edf5f7 100%)!important}
+.mr-demo-copy h2{margin:0 0 14px;color:#142238;font-size:clamp(1.65rem,2.8vw,2.35rem);line-height:1.16;letter-spacing:-.04em;font-weight:850}.mr-demo-copy>p{margin:0;color:#5b687a;font-size:.98rem;line-height:1.75}
+.mr-demo-list{display:grid;gap:15px;margin:24px 0 0;padding:0;list-style:none}.mr-demo-list li{display:flex;align-items:flex-start;gap:12px}.mr-demo-list li>span{display:grid;place-items:center;flex:0 0 25px;width:25px;height:25px;border-radius:50%;background:#d9f4e8;color:#087443;font-size:.83rem;font-weight:900}.mr-demo-list strong{display:block;color:#1e2e42;font-size:.9rem;line-height:1.4}.mr-demo-list small{display:block;margin-top:3px;color:#68788c;font-size:.81rem;line-height:1.5}
+.mr-demo-window{overflow:hidden!important;border:1px solid #d9e3ed!important;border-radius:18px!important;background:#fff!important;box-shadow:0 18px 44px rgba(15,23,42,.12)!important;min-width:0}.mr-demo-window .demo-window-bar{display:flex;align-items:center;gap:6px;padding:13px 16px;border-bottom:1px solid #e6edf4;background:#f8fafc}.mr-demo-window .demo-window-bar span{width:8px;height:8px;border-radius:50%;background:#c4d0dd}.mr-demo-window .demo-window-bar b{margin-left:auto;color:#718096;font-size:.68rem;font-weight:750;letter-spacing:.04em}
+.mr-demo-app{padding:clamp(16px,3vw,28px)}.mr-demo-app-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:19px;border-bottom:1px solid #e8eef4}.mr-demo-app-head small{display:block;margin-bottom:5px;color:#718096;font-size:.63rem;font-weight:850;letter-spacing:.12em}.mr-demo-app-head strong{display:block;color:#17263a;font-size:1rem;line-height:1.3}.mr-demo-status{padding:7px 10px;border-radius:999px;background:#fff3d6;color:#93630c;font-size:.7rem;font-weight:800;white-space:nowrap}
+.mr-demo-progress-label{display:flex;justify-content:space-between;gap:12px;margin:20px 0 8px;color:#66768a;font-size:.73rem}.mr-demo-progress-label strong{color:#0f766e}.mr-demo-progress{height:7px;overflow:hidden;border-radius:99px;background:#e8eef4}.mr-demo-progress span{display:block;width:62%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#0f766e,#38bdf8)}
+.mr-demo-timeline{display:grid;gap:0;margin-top:18px}.mr-demo-timeline>div{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid #edf1f5}.mr-demo-timeline>div:last-child{border-bottom:0}.mr-demo-timeline>div>span{display:grid;place-items:center;width:30px;height:30px;border:1px solid #d8e1eb;border-radius:9px;color:#7b8b9e;font-size:.7rem;font-weight:900}.mr-demo-timeline .is-complete>span{border-color:#b9e8d2;background:#e5f7ee;color:#087443}.mr-demo-timeline .is-current>span{border-color:#bfdbfe;background:#eaf3ff;color:#1d4ed8}
+.mr-demo-timeline strong{display:block;color:#233449;font-size:.78rem;line-height:1.35}.mr-demo-timeline small{display:block;margin-top:3px;color:#7a899b;font-size:.68rem;line-height:1.4}.mr-demo-timeline em{color:#7b8b9e;font-size:.63rem;font-style:normal;font-weight:750;text-align:right}.mr-demo-timeline .is-complete em{color:#087443}.mr-demo-timeline .is-current em{color:#1d4ed8}.mr-demo-note{margin:12px 0 0;color:#8a98a9;font-size:.65rem;text-align:right}
+.mr-services .show-more-wrap{margin-top:30px}.mr-services .show-more-btn{display:inline-flex;align-items:center;gap:10px;border-radius:12px;padding:13px 18px;background:#12263d;color:#fff;text-decoration:none;font-weight:800}
+@media(max-width:960px){.mr-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.mr-process-flow{grid-template-columns:repeat(2,minmax(0,1fr))!important}.mr-demo-section{grid-template-columns:1fr!important}}
+@media(max-width:600px){.mr-services,.mr-process-section{width:calc(100% - 28px);margin:42px auto}.mr-section-heading{margin-bottom:23px}.mr-section-heading h2{font-size:clamp(1.75rem,8vw,2.35rem)}.mr-section-heading p{font-size:.96rem;line-height:1.7}.mr-service-grid{grid-template-columns:1fr!important;gap:19px!important}.mr-service-image-wrap{aspect-ratio:1/1}.mr-service-card-copy{padding:20px 19px 22px}.mr-service-card h3{font-size:1.17rem}.mr-process-flow{grid-template-columns:1fr!important;gap:12px!important;margin:24px 0 30px}.mr-process-step{padding:20px!important}.mr-process-step .process-index{margin-bottom:15px}.mr-demo-section{gap:25px!important;margin-top:28px!important;padding:19px!important;border-radius:20px!important}.mr-demo-app{padding:15px}.mr-demo-timeline>div{grid-template-columns:30px minmax(0,1fr);gap:9px}.mr-demo-timeline em{grid-column:2;text-align:left}.mr-demo-app-head strong{font-size:.9rem}}
+@media(prefers-reduced-motion:reduce){.mr-service-card,.mr-service-image,.mr-service-card .service-learn span{transition:none!important}}
+/* Footer cleanup: consistent spacing, visible navigation, and responsive columns. */
+.manlung-footer{background:linear-gradient(145deg,#07111f,#0d1d31)!important;border-top:3px solid #0f766e!important;color:#f8fafc!important;margin-top:3.5rem!important}
+.manlung-footer-inner{width:min(calc(100% - 36px),1180px)!important;padding:2.4rem 0 1rem!important}
+.manlung-footer-grid{grid-template-columns:minmax(240px,1.4fr) repeat(3,minmax(135px,1fr))!important;gap:clamp(18px,3vw,36px)!important}
+.manlung-footer-brand-row{align-items:center;gap:13px}.manlung-footer-logo{width:50px!important;height:50px!important;border-radius:13px!important}
+.manlung-footer h2{font-size:1.08rem!important}.manlung-footer-brand-subtitle{font-size:.76rem!important;line-height:1.45!important}
+.manlung-footer-description,.manlung-footer-trust-text{font-size:.84rem!important;line-height:1.75!important;color:#c2cfde!important}
+.manlung-footer-column h3{font-size:.86rem!important;letter-spacing:.01em}.manlung-footer-links{gap:.42rem!important}.manlung-footer-links a{font-size:.81rem!important;line-height:1.5!important;color:#d5dfeb!important}
+.manlung-footer-links a:hover,.manlung-footer-legal a:hover{color:#fff!important}
+.manlung-footer-divider{margin:1.8rem 0 1.1rem!important;background:rgba(203,213,225,.2)!important}
+.manlung-footer-contact-row{align-items:center!important;gap:1.2rem!important}.manlung-footer-contact a{font-size:.8rem!important;padding:.7rem .85rem!important;border-radius:11px!important}
+.manlung-footer-social-title{font-size:.82rem!important;letter-spacing:.08em;text-transform:uppercase}
+.manlung-footer .manlung-footer-social{gap:16px!important}.manlung-footer .manlung-footer-social a{width:38px!important;height:38px!important;flex-basis:38px!important;color:#b7c9dd!important}
+.manlung-footer .manlung-footer-social a i{font-size:25px!important}
+.manlung-footer-bottom{margin-top:1.2rem!important;padding-top:1rem!important;font-size:.72rem!important;color:#aebed0!important}.manlung-footer-legal{gap:1rem!important}.manlung-footer-legal a{font-size:.74rem!important;color:#c0cede!important}
+@media(max-width:900px){.manlung-footer-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.manlung-footer-brand{grid-column:1/-1}.manlung-footer-contact-row{align-items:flex-start!important;flex-direction:column!important}.manlung-footer-social-wrap{align-items:flex-start!important}}
+@media(max-width:600px){.manlung-footer-inner{width:calc(100% - 28px)!important;padding:1.8rem 0 .9rem!important}.manlung-footer-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:24px 16px!important}.manlung-footer-brand{grid-column:1/-1}.manlung-footer-description,.manlung-footer-trust-text{font-size:.79rem!important}.manlung-footer-column h3{font-size:.8rem!important}.manlung-footer-links a{font-size:.75rem!important;min-height:32px}.manlung-footer-contact a{width:100%;font-size:.74rem!important;overflow-wrap:anywhere}.manlung-footer-social-wrap{align-items:flex-start!important}.manlung-footer .manlung-footer-social{gap:14px!important}.manlung-footer-bottom{align-items:center!important;text-align:center;flex-direction:column!important;gap:10px!important}.manlung-footer-legal{justify-content:center}}
+@media(max-width:380px){.manlung-footer-grid{grid-template-columns:1fr!important}.manlung-footer-brand{grid-column:auto}.mr-service-card-copy{padding:18px!important}}
+</style>
+<section id="services" class="home-section services-section mr-services" aria-labelledby="services-title">
+  <div class="section-heading mr-section-heading"><span class="eyebrow">What we support</span><h2 id="services-title">Practical support for digital incidents</h2><p>Clear guidance for individuals, families, and organizations dealing with recovery, fraud, account, device, and security concerns.</p></div>
+  <div class="features premium-service-grid mr-service-grid">
+    <article class="feature-card premium-service-card mr-service-card" data-service="device"><div class="mr-service-image-wrap"><img class="mr-service-image" src="https://i.postimg.cc/RCfF21Tb/246ba012d70bbca6973976d074b80834.jpg" alt="Device recovery support" loading="lazy" decoding="async"></div><div class="mr-service-card-copy"><span class="mr-service-kicker">01 / DEVICE SUPPORT</span><h3>Device Recovery</h3><p>Lost phone, laptop, tablet or smartwatch? Understand your options, secure your information, and take the right next steps.</p><button class="service-learn" type="button" onclick="openServiceModal('device')">Learn More <span aria-hidden="true">→</span></button></div></article>
+    <article class="feature-card premium-service-card mr-service-card" data-service="identity"><div class="mr-service-image-wrap"><img class="mr-service-image" src="https://i.postimg.cc/W14sp0MN/61d482a9b4d0e60040c3e3a62f4ec1f1.jpg" alt="Identity and account recovery support" loading="lazy" decoding="async"></div><div class="mr-service-card-copy"><span class="mr-service-kicker">02 / IDENTITY &amp; ACCOUNTS</span><h3>Identity Theft &amp; Account Recovery</h3><p>Respond to compromised accounts or identity misuse with structured recovery guidance and practical security steps.</p><button class="service-learn" type="button" onclick="openServiceModal('identity')">Learn More <span aria-hidden="true">→</span></button></div></article>
+    <article class="feature-card premium-service-card mr-service-card" data-service="scam"><div class="mr-service-image-wrap mr-service-gallery" data-gallery data-images="https://i.postimg.cc/SK83mKtR/7b64f9a33fc739e1f34ef23e3cf3fa6a.jpg|https://i.postimg.cc/fTrrXdGs/f0c8606d59d42beaeda59d638d336527.jpg"><img class="mr-service-image" src="https://i.postimg.cc/SK83mKtR/7b64f9a33fc739e1f34ef23e3cf3fa6a.jpg" alt="Scam and fraud investigation support, image 1 of 2" loading="lazy" decoding="async"><span class="mr-gallery-indicator" aria-live="off">01 <i aria-hidden="true">/</i> 02</span></div><div class="mr-service-card-copy"><span class="mr-service-kicker">03 / FRAUD RESPONSE</span><h3>Scam &amp; Fraud Investigation</h3><p>Organize messages, transaction records, and other digital evidence to support reporting and explore appropriate next steps.</p><button class="service-learn" type="button" onclick="openServiceModal('scam')">Learn More <span aria-hidden="true">→</span></button></div></article>
+    <article class="feature-card premium-service-card mr-service-card" data-service="security"><div class="mr-service-image-wrap mr-service-gallery" data-gallery data-images="https://i.postimg.cc/fbTCrRn8/63cb05e032b0e08475ecc2e5b6321932.jpg|https://i.postimg.cc/WbLnPncZ/a8eeb6ba34345dff2e345628f17fbae6.jpg|https://i.postimg.cc/yNdhTp0K/cc00596d0e48224d8cc2d74e16fbdd4f.jpg|https://i.postimg.cc/wMKhg6PP/18faa5c7b583606f5114d8b48169500d.jpg"><img class="mr-service-image" src="https://i.postimg.cc/fbTCrRn8/63cb05e032b0e08475ecc2e5b6321932.jpg" alt="Security assessment and audit, image 1 of 4" loading="lazy" decoding="async"><span class="mr-gallery-indicator" aria-live="off">01 <i aria-hidden="true">/</i> 04</span></div><div class="mr-service-card-copy"><span class="mr-service-kicker">04 / ORGANIZATIONAL SECURITY</span><h3>Security Assessment &amp; Audit</h3><p>Review security practices, understand potential weaknesses, and prioritize practical improvements for your systems and organization.</p><button class="service-learn" type="button" onclick="openServiceModal('security')">Learn More <span aria-hidden="true">→</span></button></div></article>
+    <article class="feature-card premium-service-card mr-service-card" data-service="data"><div class="mr-service-image-wrap mr-service-gallery" data-gallery data-images="https://i.postimg.cc/d3vL5DgT/6508288ba811d1bb90534dcb8f581e3c.jpg|https://i.postimg.cc/ZRzRqCb7/9821817814155e371ae1817cebfc7d1b.jpg"><img class="mr-service-image" src="https://i.postimg.cc/d3vL5DgT/6508288ba811d1bb90534dcb8f581e3c.jpg" alt="Data restoration support, image 1 of 2" loading="lazy" decoding="async"><span class="mr-gallery-indicator" aria-live="off">01 <i aria-hidden="true">/</i> 02</span></div><div class="mr-service-card-copy"><span class="mr-service-kicker">05 / DATA RECOVERY</span><h3>Data Restoration &amp; Recovery</h3><p>Explore options for deleted, inaccessible, or damaged files and learn how to protect remaining data before taking action.</p><button class="service-learn" type="button" onclick="openServiceModal('data')">Learn More <span aria-hidden="true">→</span></button></div></article>
+  </div><div class="show-more-wrap"><a class="show-more-btn" href="/services.html"><span>Explore All Services</span><span aria-hidden="true">→</span></a></div>
+</section>
 
-            <section id="how-it-works" class="home-section how-section" aria-labelledby="how-title">
-                <div class="section-heading centered">
-                    <span class="eyebrow">Simple, structured, transparent</span>
-                    <h2 id="how-title">How Manlung Recovery Works</h2>
-                    <p>A clear four-step journey from your first request to the next recommended action.</p>
-                </div>
-                <div class="process-flow" aria-label="Four-step recovery workflow">
-                    <article class="process-step">
-                        <span class="process-index">01</span>
-                        <div class="process-icon"><i class="fas fa-paper-plane" aria-hidden="true"></i></div>
-                        <h3>Request submitted</h3>
-                        <p>Tell us what happened and provide the relevant information or evidence you already have.</p>
-                    </article>
-                    <article class="process-step">
-                        <span class="process-index">02</span>
-                        <div class="process-icon"><i class="fas fa-user-shield" aria-hidden="true"></i></div>
-                        <h3>Case review</h3>
-                        <p>The request is organized for review and an authorized admin can claim the case for handling.</p>
-                    </article>
-                    <article class="process-step">
-                        <span class="process-index">03</span>
-                        <div class="process-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></div>
-                        <h3>Investigation &amp; updates</h3>
-                        <p>Case activity and reports are organized so progress can be communicated at meaningful stages.</p>
-                    </article>
-                    <article class="process-step">
-                        <span class="process-index">04</span>
-                        <div class="process-icon"><i class="fas fa-location-crosshairs" aria-hidden="true"></i></div>
-                        <h3>Track your case</h3>
-                        <p>Use your private case reference to view the updates available to you through the client portal.</p>
-                    </article>
-                </div>
+<section id="how-it-works" class="home-section how-section mr-process-section" aria-labelledby="how-title">
+  <div class="section-heading centered mr-section-heading"><span class="eyebrow">Simple, structured, transparent</span><h2 id="how-title">A clear process from report to next step</h2><p>Share what happened, let us organize the case, and follow progress through a secure client workflow.</p></div>
+  <div class="process-flow mr-process-flow" aria-label="Four-step recovery workflow">
+    <article class="process-step mr-process-step"><span class="process-index">01</span><h3>Request submitted</h3><p>Tell us what happened and provide the relevant information or evidence you already have.</p></article>
+    <article class="process-step mr-process-step"><span class="process-index">02</span><h3>Case review</h3><p>Your request is organized for review and an authorized administrator can take ownership of the case.</p></article>
+    <article class="process-step mr-process-step"><span class="process-index">03</span><h3>Investigation &amp; updates</h3><p>Case activity and findings are organized so progress can be communicated at meaningful stages.</p></article>
+    <article class="process-step mr-process-step"><span class="process-index">04</span><h3>Track your case</h3><p>Use your private case reference to view the updates made available through the client portal.</p></article>
+  </div>
+  <div class="demo-section home-demo-section mr-demo-section">
+    <div class="demo-copy mr-demo-copy"><span class="eyebrow">Example interface</span><h2>From submitted information to visible progress.</h2><p>This illustrative example shows how a request can move through a structured workflow. It uses demonstration details only, not real client information.</p>
+      <ul class="mr-demo-list"><li><span aria-hidden="true">✓</span><div><strong>Request information received</strong><small>Your initial details are recorded for review.</small></div></li><li><span aria-hidden="true">✓</span><div><strong>Case review and ownership</strong><small>The case is organized for the appropriate next step.</small></div></li><li><span aria-hidden="true">✓</span><div><strong>Progress and reporting</strong><small>Relevant updates are shown as they become available.</small></div></li></ul>
+    </div>
+    <div class="demo-window mr-demo-window" aria-label="Illustrative Manlung Recovery case interface"><div class="demo-window-bar"><span></span><span></span><span></span><b>Illustrative case view</b></div><div class="mr-demo-app">
+      <div class="mr-demo-app-head"><div><small>DEMONSTRATION CASE</small><strong>MRC-DEMO-1024</strong></div><span class="mr-demo-status">In review</span></div>
+      <div class="mr-demo-progress-label"><span>Workflow progress</span><strong>In progress</strong></div><div class="mr-demo-progress"><span></span></div>
+      <div class="mr-demo-timeline"><div class="is-complete"><span>01</span><div><strong>Request submitted</strong><small>Initial information received</small></div><em>Received</em></div><div class="is-current"><span>02</span><div><strong>Case review</strong><small>Details being organized</small></div><em>In review</em></div><div><span>03</span><div><strong>Next recommended action</strong><small>Shown when available</small></div><em>Pending</em></div></div><p class="mr-demo-note">Sample interface · No real client data</p>
+    </div></div>
+  </div>
+</section>
 
-                <div class="demo-section home-demo-section">
-                    <div class="demo-copy">
-                        <span class="eyebrow">Example Interface</span>
-                        <h2>From submitted information to visible progress.</h2>
-                        <p>The example below shows how a recovery request can move through a structured workflow without exposing real client information.</p>
-                        <div class="demo-list">
-                            <div><i class="fas fa-circle-check" aria-hidden="true"></i> Request information received</div>
-                            <div><i class="fas fa-circle-check" aria-hidden="true"></i> Case review and ownership</div>
-                            <div><i class="fas fa-circle-check" aria-hidden="true"></i> Progress and reporting</div>
-                        </div>
-                    </div>
-                    <div class="demo-window" aria-label="Example Manlung Recovery interface">
-                    <div class="demo-window-bar"><span></span><span></span><span></span><b>Example Interface</b></div>
-                    <div class="demo-window-body">
-                        <div class="demo-sidebar"><div class="demo-logo"><i class="fas fa-shield-halved" aria-hidden="true"></i></div><span></span><span></span><span></span><span></span></div>
-                        <div class="demo-main"><div class="demo-title-row"><div><small>CASE MRC-DEMO-1024</small><strong>Example Investigation</strong></div><em>In Review</em></div><div class="demo-progress"><span style="width:68%"></span></div><div class="demo-cards"><div><i class="fas fa-file-circle-check" aria-hidden="true"></i><strong>Request submitted</strong><small>Information received</small></div><div><i class="fas fa-user-shield" aria-hidden="true"></i><strong>Case review</strong><small>Workflow organized</small></div><div><i class="fas fa-clock-rotate-left" aria-hidden="true"></i><strong>Next update</strong><small>Progress will appear here</small></div></div></div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="case-tracker" class="home-section tracker-section" aria-labelledby="tracker-title">
+<section id="case-tracker" class="home-section tracker-section" aria-labelledby="tracker-title">
                 <div class="tracker-card">
                     <div class="tracker-copy"><span class="eyebrow">Existing client?</span><h2 id="tracker-title">Track Your Case</h2><p>Enter your private case reference to view available updates.</p></div>
                     <div class="tracker-form-wrap">
@@ -2061,6 +2048,19 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
                 ],
                 needed: 'Have ready: a rough description of your network/systems and what prompted the request (routine audit, suspected incident, compliance requirement, etc.). Requires written authorization from someone with authority over the network — see the form\'s Network Investigation section.',
             },
+            data: {
+                image: 'https://i.postimg.cc/d3vL5DgT/6508288ba811d1bb90534dcb8f581e3c.jpg',
+                title: 'Data Restoration & Recovery',
+                defaultCaseType: 'Data Recovery Assistance',
+                intro: 'Guidance for deleted, inaccessible, or damaged files on supported devices and storage media. Recovery depends on the device condition, storage type, and whether data has been overwritten.',
+                points: [
+                    'Review practical recovery options for phones, computers, memory cards, external drives, and other supported storage.',
+                    'Help identify available backups, synced copies, and built-in recovery options before attempting more invasive steps.',
+                    'Explain how to reduce the risk of overwriting recoverable data while options are assessed.',
+                    'Set realistic expectations: recovery is not guaranteed, especially where storage is physically damaged or data has been overwritten.'
+                ],
+                needed: 'Have ready: the device or storage type, what happened, when you first noticed the data loss, and any steps already attempted. If the data is important, stop using the affected storage until you have advice.'
+            },
         };
 
         function openServiceModal(key) {
@@ -2068,7 +2068,7 @@ html.dark .mobile-brand-mark,body.dark .mobile-brand-mark{box-shadow:0 3px 12px 
             if (!s) return;
             document.getElementById('serviceModalBody').innerHTML = `
                 <div style="position:relative; margin-bottom:1rem; text-align:center;">
-                    <div><img src="${s.image}" alt="${s.title}" style="width:2.3rem;height:2.3rem;object-fit:contain;display:block;margin:0 auto .65rem;"><h2 style="margin:0;">${s.title}</h2></div>
+                    <div><h2 style="margin:0;">${s.title}</h2></div>
                     <button type="button" class="manlung-service-close" aria-label="Close" onclick="closeServiceModal()">×</button>
                 </div>
                 <p style="color:var(--text-muted); margin-bottom:1rem;">${s.intro}</p>
@@ -2342,6 +2342,16 @@ body.manlung-page-leaving{opacity:.96;transition:opacity .18s ease}
 </div>
 
 <script src="/js/onboarding.js" defer></script>
+<script id="manlung-service-gallery-rotation">
+(function(){document.querySelectorAll('[data-gallery][data-images]').forEach(function(gallery){
+ const image=gallery.querySelector('img'),indicator=gallery.querySelector('.mr-gallery-indicator');
+ const urls=(gallery.dataset.images||'').split('|').map(function(u){return u.trim()}).filter(Boolean);if(!image||urls.length<2)return;
+ let index=0;window.setInterval(function(){const nextIndex=(index+1)%urls.length,next=new Image();image.classList.add('is-changing');
+ next.onload=function(){index=nextIndex;image.src=urls[index];image.alt=(image.alt||'Service image').replace(/image \d+ of \d+/i,'image '+(index+1)+' of '+urls.length);if(indicator)indicator.innerHTML=String(index+1).padStart(2,'0')+' <i aria-hidden="true">/</i> '+String(urls.length).padStart(2,'0');image.classList.remove('is-changing')};
+ next.onerror=function(){image.classList.remove('is-changing')};next.src=urls[nextIndex];
+ },6500);
+})})();
+</script>
 </body>
 </html>
 
