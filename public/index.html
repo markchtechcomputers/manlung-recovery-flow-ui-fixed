@@ -2211,6 +2211,66 @@ html body .manlung-footer .manlung-footer-social a{display:inline-flex!important
 @media(max-width:460px){html body .manlung-footer .manlung-footer-grid{grid-template-columns:minmax(0,1fr)!important}html body .manlung-footer .manlung-footer-brand{grid-column:auto!important}}
 @media(prefers-reduced-motion:reduce){html body .mr-apk-download-button{transition:none!important}}
 </style>
+
+<style id="manlung-hero-phone-layout-20261026">
+/* Keep the homepage hero actions clear and touch-friendly on phones. */
+.mr-customer-hero .mr-customer-hero-inner { width:100%; box-sizing:border-box; }
+.mr-customer-hero .mr-hero-copy { min-width:0; }
+.mr-customer-hero .mr-hero-description { max-width:64ch; line-height:1.7; }
+.mr-customer-hero .mr-customer-hero-actions {
+  display:flex; flex-wrap:wrap; align-items:stretch; gap:12px; width:100%; min-width:0;
+}
+.mr-customer-hero .mr-customer-hero-actions > a { box-sizing:border-box; min-width:0; }
+.mr-customer-hero .mr-customer-track-link {
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:7px;
+  padding:13px 16px; border-radius:14px; line-height:1.45; text-align:center;
+}
+.mr-customer-hero .mr-hero-android-link {
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  flex:1 1 260px; min-height:58px; padding:11px 16px; border-radius:14px;
+  background:linear-gradient(135deg,#15803d,#16a34a); border:1px solid #22c55e;
+  color:#fff !important; text-decoration:none; box-shadow:0 8px 22px rgba(22,163,74,.22);
+}
+.mr-customer-hero .mr-hero-android-link > i:first-child { font-size:1.55rem; flex:0 0 auto; }
+.mr-customer-hero .mr-hero-android-link > span { display:flex; flex-direction:column; gap:3px; min-width:0; text-align:left; }
+.mr-customer-hero .mr-hero-android-link strong { font-weight:800; line-height:1.25; overflow-wrap:anywhere; }
+.mr-customer-hero .mr-hero-android-link small { color:#dcfce7; font-size:.82rem; line-height:1.3; }
+.mr-customer-hero .mr-hero-android-link .mr-hero-download-icon { margin-left:auto; flex:0 0 auto; }
+.mr-customer-hero .mr-hero-trust-row {
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:18px; width:100%;
+}
+.mr-customer-hero .mr-hero-trust-row span {
+  display:inline-flex; align-items:center; gap:7px; min-width:0; max-width:100%;
+  padding:9px 12px; border:1px solid rgba(148,163,184,.32); border-radius:999px;
+  line-height:1.35; overflow-wrap:anywhere;
+}
+.mr-customer-hero .mr-hero-trust-row span i { flex:0 0 auto; }
+@media(max-width:640px) {
+  .mr-customer-hero { min-width:0; }
+  .mr-customer-hero .mr-customer-hero-inner { padding:28px 16px 26px !important; }
+  .mr-customer-hero .mr-hero-copy { width:100%; max-width:none; }
+  .mr-customer-hero #hero-title { font-size:clamp(1.85rem,8vw,2.45rem) !important; line-height:1.12 !important; letter-spacing:-.035em; overflow-wrap:anywhere; }
+  .mr-customer-hero .mr-hero-description { font-size:1rem !important; line-height:1.65 !important; margin:14px 0 20px !important; }
+  .mr-customer-hero .mr-customer-hero-actions { display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:10px !important; }
+  .mr-customer-hero .mr-customer-hero-actions > a {
+    display:flex !important; width:100% !important; max-width:100% !important; min-height:54px;
+    margin:0 !important; padding:13px 15px !important; border-radius:13px !important;
+    box-sizing:border-box !important; justify-content:center; align-items:center;
+    text-align:center; white-space:normal !important; overflow-wrap:anywhere; line-height:1.35;
+  }
+  .mr-customer-hero .mr-customer-hero-actions .mr-customer-track-link { flex-wrap:wrap; gap:5px 7px; }
+  .mr-customer-hero .mr-customer-hero-actions .mr-hero-android-link { justify-content:flex-start; gap:12px; }
+  .mr-customer-hero .mr-hero-android-link > span { flex:1 1 auto; }
+  .mr-customer-hero .mr-hero-trust-row { display:grid !important; grid-template-columns:minmax(0,1fr) !important; gap:8px !important; margin-top:16px !important; }
+  .mr-customer-hero .mr-hero-trust-row span { display:flex !important; width:100%; box-sizing:border-box; border-radius:11px; padding:10px 12px; font-size:.9rem; }
+}
+@media(max-width:360px) {
+  .mr-customer-hero .mr-customer-hero-inner { padding-left:12px !important; padding-right:12px !important; }
+  .mr-customer-hero #hero-title { font-size:1.78rem !important; }
+  .mr-customer-hero .mr-customer-hero-actions > a { padding:12px 10px !important; font-size:.92rem; }
+}
+</style>
+
 </head>
 <body>
 <div id="manlungStartupLoader" aria-label="Loading Manlung Recovery">
@@ -2330,7 +2390,8 @@ html body .manlung-footer .manlung-footer-social a{display:inline-flex!important
       <div class="mr-hero-actions mr-customer-hero-actions">
         <a href="/client/request.html" class="mr-hero-primary"><span>Start a Confidential Request</span><i class="fas fa-arrow-right" aria-hidden="true"></i></a>
         <a href="#how-it-works" class="mr-hero-secondary"><i class="fas fa-route" aria-hidden="true"></i><span>See How It Works</span></a>
-        <a href="/client/track.html" class="mr-customer-track-link"><i class="fas fa-magnifying-glass-location" aria-hidden="true"></i> Already have a case reference? <strong>Track your case</strong></a>
+        <a href="/client/track.html" class="mr-customer-track-link"><i class="fas fa-magnifying-glass-location" aria-hidden="true"></i> <span>Already have a case reference?</span> <strong>Track your case</strong></a>
+        <a href="/api/download-apk" class="mr-hero-android-link" aria-label="Download the latest Manlung Recovery Android app"><i class="fab fa-android" aria-hidden="true"></i><span><strong>Manlung Recovery for Android</strong><small>Download the latest APK</small></span><i class="fas fa-download mr-hero-download-icon" aria-hidden="true"></i></a>
       </div>
       <div class="mr-hero-trust-row mr-customer-trust-row">
         <span><i class="fas fa-lock" aria-hidden="true"></i> Your privacy matters</span>
