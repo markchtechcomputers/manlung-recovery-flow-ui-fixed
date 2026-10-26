@@ -88,6 +88,31 @@
   // download controls stay hidden inside the installed Android app.
   isAndroidApp();
 
+  // Native APK presentation is intentionally different from the browser site:
+  // keep the app header visible while scrolling and hide the browser marketing footer.
+  function applyNativeAppLayout() {
+    if (!isAndroidApp() || document.getElementById('manlung-native-app-layout-style')) return;
+    const style = document.createElement('style');
+    style.id = 'manlung-native-app-layout-style';
+    style.textContent = `
+      html.manlung-android-app .site-header,
+      html.manlung-android-app header.site-header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 2147482000 !important;
+        width: 100% !important;
+      }
+      html.manlung-android-app footer.manlung-footer {
+        display: none !important;
+      }
+      html.manlung-android-app {
+        scroll-padding-top: 76px;
+      }
+    `;
+    (document.head || document.documentElement).appendChild(style);
+  }
+  applyNativeAppLayout();
+
   function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches ||
       window.navigator.standalone === true;
@@ -708,9 +733,15 @@
   }
   window.addEventListener('online', () => {
     if (!isAndroidApp()) return;
-    // The APK can be opened offline; as soon as connectivity returns, check
-    // the server immediately instead of waiting for the five-minute interval.
-    window.setTimeout(() => checkNativeApkUpdate(true), 800);
+    // The APK uses the live website for its UI. Refresh it as soon as network
+    // access returns so a newly deployed website version appears without a
+    // separate APK download. Never reload a form the user has edited.
+    window.setTimeout(() => {
+      checkNativeApkUpdate(true);
+      if (!nativePageEdited && document.visibilityState === 'visible') {
+        window.location.reload();
+      }
+    }, 1200);
   });
   document.addEventListener('visibilitychange', () => {
     if (!isAndroidApp()) return;
