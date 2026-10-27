@@ -5,15 +5,15 @@ const {body,validationResult}=require('express-validator');
 const {supabase}=require('../config/supabase');
 const router=express.Router();
 const TABLE='recovery_service_payments', REVIEWS='recovery_service_reviews';
-const PACKAGES={200:'Basic Support',500:'Standard Support',1000:'Premium Support'};
+const PACKAGES={200:'Basic Support',300:'Starter Support',500:'Standard Support',1000:'Premium Support',1500:'Priority Support'};
 const API='https://api.paystack.co';
 function invalid(req,res){const e=validationResult(req);if(e.isEmpty())return false;res.status(400).json({success:false,error:e.array()[0].msg});return true;}
 function origin(req){return String(process.env.PUBLIC_APP_URL||`${req.protocol}://${req.get('host')}`).replace(/\/$/,'');}
-router.post('/initialize',[body('email').isEmail().normalizeEmail(),body('amountKes').isInt({min:200,max:1000})],async(req,res)=>{
+router.post('/initialize',[body('email').isEmail().normalizeEmail(),body('amountKes').isInt({min:200,max:1500})],async(req,res)=>{
  if(invalid(req,res))return;
  try{
   if(!process.env.PAYSTACK_SECRET_KEY||!process.env.PAYSTACK_PUBLIC_KEY)return res.status(503).json({success:false,error:'Payments are not configured.'});
-  const amount=Number(req.body.amountKes),name=PACKAGES[amount];if(!name)return res.status(400).json({success:false,error:'Choose KES 200, KES 500, or KES 1,000.'});
+  const amount=Number(req.body.amountKes),name=PACKAGES[amount];if(!name)return res.status(400).json({success:false,error:'Choose KES 200, 300, 500, 1,000, or 1,500.'});
   const email=String(req.body.email).trim().toLowerCase(),reference=`MR-ACCOUNT-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`;
   const {error}=await supabase.from(TABLE).insert({reference,email,customer_name:null,package_name:name,currency:'KES',amount_kes:amount,status:'pending'});
   if(error)throw error;
