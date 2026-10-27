@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <script src="/js/theme.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Cases · Manlung Recovery</title>
+  <title>Manlung Recovery — Client Portal</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
   <style>
@@ -455,7 +455,7 @@
   <link rel="stylesheet" href="/css/theme.css">
 
     <meta name="description" content="Cyber Recovery & Digital Investigation Portal">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#F3F6F9">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.webmanifest">
@@ -2489,19 +2489,39 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
     const sidebar=document.createElement('aside');sidebar.className='client-sidepanel';sidebar.setAttribute('aria-label','Client dashboard navigation');
     const brand=document.createElement('div');brand.className='client-side-brand';brand.innerHTML='<i class="fas fa-shield-halved" aria-hidden="true"></i><span>Manlung Recovery</span>';
     const nav=document.createElement('nav');nav.className='client-side-nav';
+    const iconSvg={
+      dashboard:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>',
+      cases:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h6.8a2 2 0 0 1 2 2v7.7a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2z"/></svg>',
+      submit:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+      notifications:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+      security:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/><path d="m9.5 12 1.8 1.8 3.2-3.6"/></svg>',
+      settings:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+      logout:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>'
+    };
     const links=[
-      ['fa-house','Dashboard','/client/dashboard.html'],
-      ['fa-house-user','Home','/'],
-      ['fa-circle-plus','New Request','/client/request.html'],
-      ['fa-globe','Language','#language'],
-      ['fa-user-gear','Settings','/client/settings.html']
+      ['dashboard','Dashboard','/client/dashboard.html'],
+      ['cases','My Cases','#myCasesSection'],
+      ['submit','Submit Case','/client/request.html'],
+      ['notifications','Notifications','#manlungNotifications'],
+      ['security','Security','#clientSecurityCenter']
     ];
-    links.forEach(function(item){const a=document.createElement('a');a.href=item[2];a.innerHTML='<i class="fas '+item[0]+'" aria-hidden="true"></i><span>'+item[1]+'</span>';if(location.pathname===item[2])a.classList.add('active');if(item[1]==='Language'){a.addEventListener('click',function(e){e.preventDefault();if(typeof window.openLanguageSelector==='function'){window.openLanguageSelector()}else{const picker=document.querySelector('[lang], [data-language-selector], #languageSelector, .language-selector');if(picker){picker.scrollIntoView({behavior:'smooth',block:'center'});}else{alert('Language selection is not available on this page yet.');}}});}nav.appendChild(a)});
-    const logout=document.createElement('button');logout.type='button';logout.innerHTML='<i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i><span>Logout</span>';logout.addEventListener('click',function(){if(typeof window.logout==='function')window.logout();else location.href='/login.html'});nav.appendChild(logout);
+    links.forEach(function(item){
+      const a=document.createElement('a');a.href=item[2];a.className='client-side-nav-item';
+      a.innerHTML=iconSvg[item[0]]+'<span>'+item[1]+'</span>';
+      if((item[1]==='Dashboard'&&location.pathname==='/client/dashboard.html')||
+         (item[1]==='My Cases'&&location.hash==='#myCasesSection')||
+         (item[1]==='Notifications'&&location.hash==='#manlungNotifications')||
+         (item[1]==='Security'&&location.hash==='#clientSecurityCenter'))a.classList.add('active');
+      nav.appendChild(a);
+    });
+    const sidebarFooter=document.createElement('div');sidebarFooter.className='client-side-footer';
+    const sideSettings=document.createElement('a');sideSettings.href='/client/settings.html';sideSettings.innerHTML=iconSvg.settings+'<span>Settings</span>';sideSettings.setAttribute('aria-label','Settings');sideSettings.title='Settings';
+    const logout=document.createElement('button');logout.type='button';logout.innerHTML=iconSvg.logout+'<span>Logout</span>';logout.setAttribute('aria-label','Logout');logout.title='Logout';logout.addEventListener('click',function(){if(typeof window.logout==='function')window.logout();else location.href='/login.html'});
+    sidebarFooter.append(sideSettings,logout);
     const profile=document.createElement('div');profile.className='client-side-profile';
     const avatar=document.createElement('div');avatar.className='client-side-avatar';avatar.textContent='MR';
     const user=document.createElement('div');user.className='client-side-user';user.innerHTML='<strong>Client account</strong><small>Loading profile…</small>';
-    profile.append(avatar,user);sidebar.append(brand,nav,profile);
+    profile.append(avatar,user);sidebar.append(brand,nav,sidebarFooter,profile);
     const content=document.createElement('div');content.className='client-main';
     const parent=main.parentNode;parent.insertBefore(workspace,main);
     if(header)content.appendChild(header);
@@ -2511,8 +2531,8 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
         const title=document.createElement('div');title.className='dashboard-topbar-heading';
         title.innerHTML='<span class="dashboard-overview-title">Client Portal</span>';
         const actions=document.createElement('div');actions.className='dashboard-topbar-actions';
-        const notices=document.createElement('button');notices.type='button';notices.className='dashboard-topbar-icon';notices.setAttribute('aria-label','View notifications');notices.innerHTML='<i class="fas fa-bell" aria-hidden="true"></i>';notices.addEventListener('click',function(){const target=document.getElementById('manlungNotifications');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});});
-        const settings=document.createElement('a');settings.className='dashboard-topbar-icon';settings.href='/client/settings.html';settings.setAttribute('aria-label','Settings');settings.innerHTML='<i class="fas fa-gear" aria-hidden="true"></i>';
+        const notices=document.createElement('button');notices.type='button';notices.className='dashboard-topbar-icon';notices.setAttribute('aria-label','View notifications');notices.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>';notices.addEventListener('click',function(){const target=document.getElementById('manlungNotifications');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});});
+        const settings=document.createElement('a');settings.className='dashboard-topbar-icon';settings.href='/client/settings.html';settings.setAttribute('aria-label','Settings');settings.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
         const topAvatar=document.createElement('div');topAvatar.className='dashboard-topbar-avatar';topAvatar.id='clientTopbarAvatar';topAvatar.textContent='MR';topAvatar.setAttribute('aria-label','Client profile');
         const search=document.createElement('label');search.className='dashboard-search-box';search.innerHTML='<i class="fas fa-magnifying-glass" aria-hidden="true"></i><input id="clientDashboardSearch" type="search" placeholder="Search cases, updates..." autocomplete="off" aria-label="Search cases and updates">';
         const searchInput=search.querySelector('input');
@@ -2966,5 +2986,334 @@ body:has(.client-workspace) .manlung-footer,body:has(.client-workspace) footer,b
 @media(max-width:440px){body:has(.client-workspace) .client-main .dashboard-topbar-heading{flex:0 1 auto!important}body:has(.client-workspace) .client-main .dashboard-overview-title{font-size:16px!important}body:has(.client-workspace) .client-main .dashboard-search-box{max-width:120px!important;padding:8px 9px!important}body:has(.client-workspace) .client-main .dashboard-search-box input::placeholder{font-size:10px!important}body:has(.client-workspace) .client-main .dashboard-topbar-actions{gap:5px!important}body:has(.client-workspace) .client-main .dashboard-hero{grid-template-columns:minmax(0,1fr) 58px!important}body:has(.client-workspace) .client-analog-clock-widget{width:58px!important;min-width:58px!important;height:58px!important;min-height:58px!important}}
 @media(prefers-reduced-motion:reduce){body:has(.client-workspace) *{scroll-behavior:auto!important;transition:none!important}}
 </style>
+
+<style id="client-reference-full-layout-20261027">
+/* Full Light Theme Edition layout mapped to live Manlung Recovery data and controls. */
+:root{--bg:#F3F6F9;--card:#FFFFFF;--text:#1E293B;--muted:#94A3B8;--line:#E2E8F0;--blue:#3B82F6;--blue-light:#EFF6FF;--amber:#F59E0B;--amber-light:#FFFBEB;--green:#10B981;--green-light:#ECFDF5;--purple:#8B5CF6;--purple-light:#F5F3FF;--radius-xl:24px;--radius-lg:16px;--shadow:0 4px 20px rgba(0,0,0,.03)}
+html:has(body .client-workspace),body:has(.client-workspace){background:var(--bg)!important;color:var(--text)!important;color-scheme:light!important}
+body:has(.client-workspace){font-family:Inter,sans-serif!important;background:var(--bg)!important;color:var(--text)!important;min-height:100dvh!important;-webkit-font-smoothing:antialiased!important}
+body:has(.client-workspace) .client-workspace{display:flex!important;align-items:flex-start!important;gap:24px!important;max-width:1600px!important;width:100%!important;min-height:100vh!important;margin:0 auto!important;padding:20px!important;background:transparent!important}
+body:has(.client-workspace) .client-sidepanel{box-sizing:border-box!important;display:flex!important;flex:0 0 72px!important;flex-direction:column!important;align-items:center!important;gap:0!important;width:72px!important;min-width:72px!important;max-width:72px!important;height:calc(100vh - 40px)!important;min-height:calc(100vh - 40px)!important;max-height:calc(100vh - 40px)!important;position:sticky!important;top:20px!important;padding:24px 0!important;background:#fff!important;border:1px solid var(--line)!important;border-radius:var(--radius-xl)!important;box-shadow:var(--shadow)!important;z-index:20!important}
+body:has(.client-workspace) .client-side-brand{display:grid!important;place-items:center!important;position:relative!important;flex:0 0 40px!important;width:40px!important;height:40px!important;min-height:40px!important;max-height:40px!important;padding:0!important;margin:0 0 40px!important;border:0!important;border-radius:12px!important;background:var(--blue)!important;color:white!important;font-size:0!important;box-shadow:none!important}
+body:has(.client-workspace) .client-side-brand:before{content:"M";font-size:18px;font-weight:700;line-height:1;color:white}
+body:has(.client-workspace) .client-side-brand i,body:has(.client-workspace) .client-side-brand span{display:none!important}
+body:has(.client-workspace) .client-side-nav{display:flex!important;flex:0 0 auto!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;width:100%!important;margin:0!important;padding:0!important}
+body:has(.client-workspace) .client-side-nav a,body:has(.client-workspace) .client-side-nav button{appearance:none!important;position:relative!important;display:grid!important;place-items:center!important;flex:0 0 48px!important;width:48px!important;min-width:48px!important;max-width:48px!important;height:48px!important;min-height:48px!important;max-height:48px!important;margin:0!important;padding:0!important;border:0!important;border-radius:14px!important;background:transparent!important;color:var(--muted)!important;box-shadow:none!important;text-decoration:none!important;font:inherit!important;cursor:pointer!important;transition:background .18s,color .18s!important}
+body:has(.client-workspace) .client-side-nav a svg,body:has(.client-workspace) .client-side-nav button svg,body:has(.client-workspace) .client-side-footer a svg,body:has(.client-workspace) .client-side-footer button svg{display:block!important;width:20px!important;height:20px!important;fill:none!important;stroke:currentColor!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+body:has(.client-workspace) .client-side-nav a span,body:has(.client-workspace) .client-side-nav button span,body:has(.client-workspace) .client-side-footer a span,body:has(.client-workspace) .client-side-footer button span{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+body:has(.client-workspace) .client-side-nav a:hover,body:has(.client-workspace) .client-side-nav button:hover,body:has(.client-workspace) .client-side-footer a:hover,body:has(.client-workspace) .client-side-footer button:hover{background:var(--bg)!important;color:var(--text)!important}
+body:has(.client-workspace) .client-side-nav a.active{background:#1E293B!important;color:#fff!important}
+body:has(.client-workspace) .client-side-footer{display:flex!important;flex-direction:column!important;align-items:center!important;gap:12px!important;width:100%!important;margin:auto 0 0!important;padding:18px 0 0!important}
+body:has(.client-workspace) .client-side-footer a,body:has(.client-workspace) .client-side-footer button{appearance:none!important;position:relative!important;display:grid!important;place-items:center!important;flex:0 0 48px!important;width:48px!important;min-width:48px!important;height:48px!important;min-height:48px!important;margin:0!important;padding:0!important;border:0!important;border-radius:14px!important;background:transparent!important;color:var(--muted)!important;text-decoration:none!important;cursor:pointer!important}
+body:has(.client-workspace) .client-side-profile{display:none!important}
+body:has(.client-workspace) .client-main{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;gap:20px!important;min-width:0!important;width:auto!important;margin:0!important;padding:0!important;background:transparent!important;color:var(--text)!important}
+body:has(.client-workspace) .client-main .site-header{position:relative!important;top:auto!important;z-index:5!important;width:100%!important;min-height:44px!important;margin:0!important;padding:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+body:has(.client-workspace) .client-main .site-header .container{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:20px!important;width:100%!important;max-width:none!important;min-height:44px!important;margin:0!important;padding:0 8px!important;background:transparent!important}
+body:has(.client-workspace) .client-main .site-header .container>.brand,body:has(.client-workspace) .client-main .site-header .container>.header-actions{display:none!important}
+body:has(.client-workspace) .client-main .dashboard-topbar-heading{display:flex!important;flex:1 1 auto!important;align-items:flex-start!important;min-width:0!important;margin:0 auto 0 0!important;padding:0!important}
+body:has(.client-workspace) .client-main .dashboard-overview-title{display:block!important;color:var(--text)!important;font-size:18px!important;font-weight:600!important;line-height:1.35!important}
+body:has(.client-workspace) .client-main .dashboard-overview-subtitle{display:none!important}
+body:has(.client-workspace) .client-main .dashboard-topbar-actions{display:flex!important;flex:0 1 auto!important;align-items:center!important;justify-content:flex-end!important;gap:16px!important;width:auto!important;margin:0!important;padding:0!important}
+body:has(.client-workspace) .client-main .dashboard-search-box{display:flex!important;align-items:center!important;gap:10px!important;width:260px!important;max-width:34vw!important;min-width:0!important;padding:10px 18px!important;border:1px solid transparent!important;border-radius:999px!important;background:#fff!important;box-shadow:var(--shadow)!important;color:var(--muted)!important}
+body:has(.client-workspace) .client-main .dashboard-search-box>svg{width:16px!important;height:16px!important;flex:0 0 auto!important;fill:none!important;stroke:currentColor!important;stroke-width:2.5!important}
+body:has(.client-workspace) .client-main .dashboard-search-box input{width:100%!important;min-width:0!important;padding:0!important;margin:0!important;border:0!important;outline:none!important;background:transparent!important;font:13px Inter,sans-serif!important;color:var(--text)!important;box-shadow:none!important}
+body:has(.client-workspace) .client-main .dashboard-search-box input::placeholder{color:var(--muted)!important;opacity:1!important}
+body:has(.client-workspace) .client-main .dashboard-topbar-icon{display:grid!important;place-items:center!important;position:relative!important;flex:0 0 44px!important;width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;border:0!important;border-radius:50%!important;background:#fff!important;color:var(--text)!important;box-shadow:var(--shadow)!important;text-decoration:none!important}
+body:has(.client-workspace) .client-main .dashboard-topbar-icon svg{width:20px!important;height:20px!important;fill:none!important;stroke:currentColor!important;stroke-width:2.2!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+body:has(.client-workspace) .client-main .dashboard-topbar-icon[aria-label="View notifications"]:after{content:"";position:absolute;top:10px;right:11px;width:6px;height:6px;border-radius:50%;background:var(--amber);border:1.5px solid #fff}
+body:has(.client-workspace) .client-main .dashboard-topbar-avatar{display:grid!important;place-items:center!important;flex:0 0 44px!important;width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;overflow:hidden!important;border:0!important;border-radius:50%!important;background:#FFEDD5!important;color:#C2410C!important;font-size:14px!important;font-weight:600!important;box-shadow:var(--shadow)!important}
+body:has(.client-workspace) .client-main .dashboard-topbar-avatar img{width:100%!important;height:100%!important;object-fit:cover!important;border-radius:50%!important}
+body:has(.client-workspace) .client-main>main{display:flex!important;flex-direction:column!important;gap:20px!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;background:transparent!important}
+body:has(.client-workspace) .client-main .dashboard-hero{display:grid!important;grid-template-columns:minmax(0,1fr) 68px!important;grid-template-rows:auto!important;align-items:center!important;gap:8px 18px!important;width:100%!important;min-height:0!important;margin:0 0 4px!important;padding:0 8px!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--text)!important;box-shadow:none!important;overflow:visible!important}
+body:has(.client-workspace) .client-main .dashboard-hero-copy{display:block!important;grid-column:1!important;grid-row:1!important;min-width:0!important;max-width:none!important;margin:0!important;padding:0!important}
+body:has(.client-workspace) .client-main .dashboard-hero .dashboard-kicker,body:has(.client-workspace) .client-main .dashboard-hero-trust{display:none!important}
+body:has(.client-workspace) .client-main .dashboard-hero h2{margin:0 0 4px!important;color:var(--text)!important;font-size:26px!important;font-weight:700!important;line-height:1.25!important;letter-spacing:-.5px!important}
+body:has(.client-workspace) .client-main .dashboard-hero p{margin:0!important;color:var(--muted)!important;font-size:14px!important;line-height:1.5!important;max-width:650px!important}
+body:has(.client-workspace) .client-analog-clock-widget{display:block!important;grid-column:2!important;grid-row:1!important;order:0!important;flex:none!important;width:68px!important;min-width:68px!important;max-width:68px!important;height:68px!important;min-height:68px!important;max-height:68px!important;margin:0!important;padding:4px!important;border:0!important;border-radius:50%!important;background:#fff!important;box-shadow:var(--shadow)!important}
+body:has(.client-workspace) .client-clock-face{display:block!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;padding:0!important;border:0!important;border-radius:50%!important;background:#fff!important;box-shadow:none!important}
+body:has(.client-workspace) .client-clock-face svg{display:block!important;width:100%!important;height:100%!important}
+body:has(.client-workspace) .client-main .dashboard-hero-action{display:none!important}
+.reference-grid-top{display:grid;grid-template-columns:minmax(280px,1fr) minmax(0,1.6fr);gap:20px;width:100%}
+.reference-card{min-width:0;background:#fff;border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow);color:var(--text)}
+.reference-profile-card{display:flex;flex-direction:column;justify-content:space-between}
+.reference-profile-top{display:flex;align-items:center;gap:20px;min-width:0}
+.reference-profile-avatar{display:grid;place-items:center;flex:0 0 100px;width:100px;height:100px;border-radius:20px;background:linear-gradient(135deg,#E2E8F0,#CBD5E1);color:#64748B;font-size:28px;font-weight:700;overflow:hidden}
+.reference-profile-info{min-width:0}
+.reference-profile-info h2{margin:0 0 6px;font-size:18px;line-height:1.35;overflow-wrap:anywhere;color:var(--text)}
+.reference-profile-info p{margin:0 0 4px;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.reference-profile-tags{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:20px}
+.reference-tag{display:inline-flex;align-items:center;gap:8px;max-width:100%;font-size:12px;color:#64748B;background:var(--bg);padding:7px 10px;border-radius:8px;overflow-wrap:anywhere}
+.reference-tag svg{width:14px;height:14px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.reference-status-card{display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.reference-status-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px}
+.reference-status-metrics{display:flex;flex-wrap:wrap;gap:24px}
+.reference-metric{display:flex;flex-direction:column;gap:5px;min-width:75px}
+.reference-metric-label{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.reference-metric-label svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.reference-metric-value{font-size:14px;font-weight:600;color:var(--text);overflow-wrap:anywhere}
+.reference-metric-value.is-good{color:var(--green)}
+.reference-big-score{font-size:42px;font-weight:700;letter-spacing:-1px;line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums}
+.reference-big-score span{font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0}
+.reference-chart{height:80px;width:100%;display:flex;align-items:flex-end;gap:4px;margin-top:auto;padding-top:16px}
+.reference-chart span{flex:1;min-width:2px;background:var(--blue-light);border-radius:4px 4px 0 0;transition:height .3s ease}
+.reference-chart span:nth-child(5){background:#BFDBFE}
+.reference-chart span:nth-child(8n+5){background:var(--blue);opacity:.55}
+.reference-stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;width:100%}
+body:has(.client-workspace) .client-main .dashboard-overview-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:20px!important;width:100%!important;margin:0!important;padding:0!important}
+body:has(.client-workspace) .client-main .dashboard-overview-card{min-width:0!important;min-height:144px!important;display:flex!important;align-items:center!important;gap:14px!important;position:relative!important;padding:20px!important;border:1px solid var(--line)!important;border-radius:24px!important;background:#fff!important;color:var(--text)!important;box-shadow:var(--shadow)!important;text-align:left!important}
+body:has(.client-workspace) .client-main .dashboard-overview-card:hover{transform:translateY(-1px);border-color:#BFDBFE!important;box-shadow:0 8px 24px rgba(59,130,246,.07)!important}
+body:has(.client-workspace) .client-main .overview-icon{display:grid!important;place-items:center!important;flex:0 0 44px!important;width:44px!important;height:44px!important;padding:0!important;border:0!important;border-radius:14px!important;background:var(--blue-light)!important;color:var(--blue)!important}
+body:has(.client-workspace) .client-main .overview-icon img{max-width:25px!important;max-height:25px!important;filter:none!important}
+body:has(.client-workspace) .client-main .overview-icon i{font-size:18px!important;color:var(--blue)!important}
+body:has(.client-workspace) .client-main .overview-copy{display:flex!important;flex-direction:column!important;gap:5px!important;min-width:0!important}
+body:has(.client-workspace) .client-main .overview-copy>span{color:var(--muted)!important;font-size:12px!important;font-weight:500!important}
+body:has(.client-workspace) .client-main .overview-copy strong{color:var(--text)!important;font-size:24px!important;font-weight:700!important;line-height:1.2!important;overflow-wrap:anywhere!important}
+body:has(.client-workspace) .client-main .overview-copy small{color:var(--muted)!important;font-size:11px!important;line-height:1.4!important}
+body:has(.client-workspace) .client-main .overview-corner{margin-left:auto!important;color:var(--muted)!important;font-size:12px!important}
+.reference-mfa-card .reference-mfa-value{display:block;font-size:18px;font-weight:700;color:var(--text);line-height:1.25;overflow-wrap:anywhere}
+.reference-mfa-card .reference-progress{height:6px;background:var(--bg);border-radius:999px;overflow:hidden;margin-top:auto}
+.reference-mfa-card .reference-progress-fill{height:100%;width:0;background:var(--amber);border-radius:999px;transition:width .2s ease}
+.reference-bottom-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:20px;width:100%}
+.reference-timeline-card,.reference-action-card{min-width:0;background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:24px}
+.reference-card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.reference-card-heading h3{margin:0;color:var(--text);font-size:15px;font-weight:600}
+.reference-card-heading span{color:var(--muted);font-size:12px}
+.reference-timeline{display:flex;flex-direction:column;gap:14px;position:relative;padding-left:10px}
+.reference-timeline:before{content:"";position:absolute;left:24px;top:10px;bottom:10px;width:1px;border-left:1px dashed var(--line)}
+.reference-timeline-item{display:flex;gap:14px;position:relative;z-index:1;min-width:0}
+.reference-timeline-icon{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border:2px solid white;border-radius:50%;background:var(--blue-light);color:var(--blue)}
+.reference-timeline-icon.green{background:var(--green-light);color:var(--green)}
+.reference-timeline-icon.amber{background:var(--amber-light);color:var(--amber)}
+.reference-timeline-icon svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.reference-timeline-content{flex:1;min-width:0;background:var(--bg);padding:11px 14px;border-radius:12px}
+.reference-timeline-content h4{margin:0 0 4px;font-size:13px;font-weight:600;color:var(--text)}
+.reference-timeline-content p{margin:0;font-size:11px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
+.reference-action-card{display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center;padding:28px 24px}
+.reference-doc-icon{display:grid;place-items:center;width:64px;height:64px;margin-bottom:16px;border-radius:16px;background:var(--purple-light);color:var(--purple)}
+.reference-doc-icon svg{width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.reference-action-card h3{margin:0 0 6px;font-size:15px;font-weight:600;color:var(--text)}
+.reference-action-card p{margin:0 0 22px;font-size:12px;line-height:1.5;color:var(--muted)}
+.reference-action-buttons{display:flex;gap:12px;width:100%}
+.reference-action-buttons a{display:inline-flex;flex:1;align-items:center;justify-content:center;gap:8px;min-width:0;padding:12px 8px;border:0;border-radius:12px;text-decoration:none;font:600 12px Inter,sans-serif;cursor:pointer}
+.reference-view-cases{background:var(--bg);color:var(--text)}
+.reference-submit-case{background:var(--blue);color:#fff}
+.reference-submit-case:hover{background:#2563EB}
+body:has(.client-workspace) .client-main .dashboard-support-card{display:grid!important;grid-template-columns:92px minmax(0,1fr) auto!important;align-items:center!important;gap:20px!important;margin:0!important;padding:22px!important;border:1px solid var(--line)!important;border-radius:24px!important;background:#fff!important;color:var(--text)!important;box-shadow:var(--shadow)!important}
+body:has(.client-workspace) .client-main .dashboard-support-art{display:grid!important;place-items:center!important;width:92px!important;height:92px!important;overflow:hidden!important;border-radius:20px!important;background:var(--purple-light)!important}
+body:has(.client-workspace) .client-main .dashboard-support-copy h2{margin:5px 0 8px!important;color:var(--text)!important;font-size:18px!important;font-weight:700!important;line-height:1.35!important}
+body:has(.client-workspace) .client-main .dashboard-support-copy p{margin:0!important;color:var(--muted)!important;font-size:12px!important;line-height:1.6!important}
+body:has(.client-workspace) .client-main .dashboard-support-copy .dashboard-section-kicker{color:var(--purple)!important;font-size:10px!important;font-weight:700!important;letter-spacing:.07em!important;text-transform:uppercase!important}
+body:has(.client-workspace) .client-main .dashboard-support-action .btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;min-height:42px!important;padding:11px 17px!important;border:0!important;border-radius:12px!important;background:var(--blue)!important;color:#fff!important;font-size:13px!important;font-weight:600!important}
+body:has(.client-workspace) .client-main .dashboard-section,body:has(.client-workspace) .client-main .manlung-dashboard-card,body:has(.client-workspace) .client-main .client-context-item,body:has(.client-workspace) .client-main #clientSecurityCenter,body:has(.client-workspace) .client-main #clientCaseOverview{border:1px solid var(--line)!important;border-radius:24px!important;background:#fff!important;color:var(--text)!important;box-shadow:var(--shadow)!important}
+body:has(.client-workspace) .client-main .manlung-dashboard-card{padding:0!important;overflow:hidden!important}
+body:has(.client-workspace) .client-main .dashboard-section-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:16px!important;margin:0!important;padding:22px 22px 16px!important;border:0!important;background:transparent!important}
+body:has(.client-workspace) .client-main .dashboard-section-head h2{margin:0!important;color:var(--text)!important;font-size:15px!important;font-weight:600!important;line-height:1.4!important}
+body:has(.client-workspace) .client-main .dashboard-section-head p{margin:4px 0 0!important;color:var(--muted)!important;font-size:12px!important;line-height:1.5!important}
+body:has(.client-workspace) .client-main .dashboard-section-kicker{color:var(--muted)!important;font-size:10px!important;font-weight:700!important;letter-spacing:.07em!important;text-transform:uppercase!important}
+body:has(.client-workspace) .client-main .dashboard-section-icon{display:grid!important;place-items:center!important;flex:0 0 38px!important;width:38px!important;height:38px!important;border:0!important;border-radius:12px!important;background:var(--blue-light)!important;color:var(--blue)!important}
+body:has(.client-workspace) .client-main .dashboard-mini-link{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;min-height:36px!important;padding:8px 12px!important;border:1px solid #DBEAFE!important;border-radius:12px!important;background:var(--blue-light)!important;color:var(--blue)!important;font:600 12px Inter,sans-serif!important}
+body:has(.client-workspace) .client-main .dashboard-inline-count{background:var(--bg)!important;color:#64748B!important;border-radius:999px!important;padding:4px 8px!important;font-size:11px!important}
+body:has(.client-workspace) .client-main .case-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))!important;gap:16px!important;padding:0 22px 22px!important}
+body:has(.client-workspace) .client-main .case-card{border:1px solid var(--line)!important;border-radius:16px!important;background:#fff!important;box-shadow:var(--shadow)!important;color:var(--text)!important}
+body:has(.client-workspace) .client-main .case-card .case-id{color:var(--text)!important}
+body:has(.client-workspace) .client-main .case-card .case-type,body:has(.client-workspace) .client-main .case-card .case-meta small{color:var(--muted)!important}
+body:has(.client-workspace) .client-main .case-card .case-meta div{border:1px solid var(--line)!important;border-radius:12px!important;background:#F8FAFC!important}
+body:has(.client-workspace) .client-main .empty,body:has(.client-workspace) .client-main .loading{color:var(--muted)!important}
+body:has(.client-workspace) .client-main .dashboard-lower-grid{display:grid!important;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)!important;gap:20px!important;margin:0!important;padding:0!important}
+body:has(.client-workspace) .client-main .privacy-panel{margin:0 22px 22px!important;padding:18px!important;border:1px solid var(--line)!important;border-radius:16px!important;background:#F8FAFC!important}
+body:has(.client-workspace) .client-main .manlung-notification-list{padding:0 22px 22px!important;max-height:330px!important}
+body:has(.client-workspace) .client-main .manlung-notification-item{border:1px solid var(--line)!important;border-radius:12px!important;background:#F8FAFC!important;color:var(--text)!important}
+body:has(.client-workspace) .client-main .manlung-notification-item.unread{border-color:#BFDBFE!important;background:var(--blue-light)!important}
+body:has(.client-workspace) .client-main .manlung-notification-item h4{color:var(--text)!important}
+body:has(.client-workspace) .client-main .manlung-notification-item p,body:has(.client-workspace) .client-main .manlung-notification-meta{color:var(--muted)!important}
+body:has(.client-workspace) .manlung-footer,body:has(.client-workspace) footer,body:has(.client-workspace) #siteFooter{display:none!important;visibility:hidden!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+#clientOfflineOverlay{position:fixed;inset:0;z-index:99990;display:none;place-items:center;padding:24px;background:rgba(243,246,249,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);overflow:auto}
+#clientOfflineOverlay.show{display:grid}
+#clientOfflineOverlay .offline-modal{width:min(460px,100%);text-align:center;padding:36px 30px 28px;border-radius:24px;background:#fff;box-shadow:0 20px 60px -10px rgba(0,0,0,.12)}
+#clientOfflineOverlay .offline-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;margin-bottom:20px;border-radius:999px;background:#FEF2F2;color:#EF4444;border:1px solid #FEE2E2;font-size:12px;font-weight:700}
+#clientOfflineOverlay .offline-pill .dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:referencePing 1.8s ease-out infinite}
+#clientOfflineOverlay h2{font-size:24px;margin:0 0 8px;color:var(--text)}
+#clientOfflineOverlay p{font-size:14px;line-height:1.6;color:var(--muted);margin:0 auto 22px;max-width:36ch}
+#clientOfflineOverlay .offline-illustration{display:block;width:min(200px,72%);height:auto;margin:0 auto 14px;animation:referenceFloat 5s ease-in-out infinite}
+#clientOfflineOverlay button{border:0;border-radius:12px;padding:12px 18px;font:600 13px Inter,sans-serif;cursor:pointer}
+#clientOfflineOverlay .offline-retry{background:var(--blue);color:#fff}
+#clientOfflineOverlay .offline-cached{background:var(--bg);color:var(--text);margin-left:8px}
+#clientOfflineOverlay .offline-hint{margin:16px 0 0;font-size:12px;color:var(--muted)}
+@keyframes referencePing{0%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}70%{box-shadow:0 0 0 10px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+@keyframes referenceFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.reference-demo-switcher{position:fixed;right:20px;bottom:20px;z-index:99980;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 10px 30px -10px rgba(0,0,0,.1)}
+.reference-demo-switcher[hidden],#clientNotFoundView[hidden]{display:none!important}
+.reference-demo-switcher small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-right:4px}
+.reference-demo-switcher button{border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--text);padding:6px 10px;font:500 11px Inter,sans-serif;cursor:pointer}
+.reference-demo-switcher button:hover{background:#E2E8F0}
+#clientNotFoundView{display:none;text-align:center;padding:60px 20px 40px;min-height:70vh}
+#clientNotFoundView.show{display:block}
+#clientNotFoundView .notfound-card{max-width:500px;margin:0 auto;padding:32px;border-radius:24px;background:transparent}
+#clientNotFoundView .status-pill{display:inline-flex;padding:8px 14px;margin-bottom:18px;border-radius:999px;background:#FFFBEB;color:#D97706;border:1px solid #FDE68A;font-size:12px;font-weight:700}
+#clientNotFoundView h2{margin:0 0 8px;font-size:24px;color:var(--text)}
+#clientNotFoundView p{margin:0 auto 24px;max-width:38ch;font-size:14px;line-height:1.6;color:var(--muted)}
+#clientNotFoundView button{padding:12px 28px;border:0;border-radius:12px;background:var(--blue);color:#fff;font:600 13px Inter,sans-serif}
+body[data-reference-state="notfound"] .client-workspace{display:none!important}
+body[data-reference-state="notfound"] #clientNotFoundView.show{display:block}
+@media(max-width:1200px){body:has(.client-workspace) .client-main .dashboard-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.reference-status-top{flex-wrap:wrap}.reference-grid-top{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr)}}
+@media(max-width:900px){body:has(.client-workspace) .client-workspace{flex-direction:column!important;gap:14px!important;padding:12px!important}body:has(.client-workspace) .client-sidepanel{position:relative!important;top:auto!important;width:100%!important;min-width:0!important;max-width:none!important;min-height:0!important;height:auto!important;max-height:none!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important;padding:12px!important;border-radius:20px!important;flex-basis:auto!important}body:has(.client-workspace) .client-side-brand{flex-basis:40px!important;margin:0!important}body:has(.client-workspace) .client-side-nav{flex:1 1 auto!important;flex-direction:row!important;justify-content:flex-end!important;gap:8px!important;width:auto!important;margin:0!important}body:has(.client-workspace) .client-side-footer{display:none!important}body:has(.client-workspace) .client-side-nav a,body:has(.client-workspace) .client-side-nav button{width:40px!important;min-width:40px!important;max-width:40px!important;height:40px!important;min-height:40px!important;max-height:40px!important;flex-basis:40px!important;border-radius:12px!important}body:has(.client-workspace) .client-main{width:100%!important;gap:18px!important}.reference-grid-top{grid-template-columns:1fr}.reference-bottom-grid{grid-template-columns:1fr}.reference-profile-avatar{width:84px;height:84px;flex-basis:84px}}
+@media(max-width:700px){body:has(.client-workspace) .client-workspace{padding:10px!important}body:has(.client-workspace) .client-main{gap:16px!important}body:has(.client-workspace) .client-main .site-header .container{gap:10px!important;padding:0 4px!important}body:has(.client-workspace) .client-main .dashboard-topbar-actions{gap:7px!important}body:has(.client-workspace) .client-main .dashboard-search-box{width:auto!important;max-width:200px!important;padding:9px 12px!important}body:has(.client-workspace) .client-main .dashboard-search-box input{font-size:12px!important}body:has(.client-workspace) .client-main .dashboard-topbar-icon,body:has(.client-workspace) .client-main .dashboard-topbar-avatar{width:38px!important;min-width:38px!important;height:38px!important;min-height:38px!important;flex-basis:38px!important}body:has(.client-workspace) .client-main .dashboard-hero{grid-template-columns:minmax(0,1fr) 68px!important;gap:10px 12px!important;padding:0 4px!important}body:has(.client-workspace) .client-main .dashboard-hero h2{font-size:23px!important}body:has(.client-workspace) .client-main .dashboard-overview-grid{grid-template-columns:1fr!important;gap:12px!important}body:has(.client-workspace) .client-main .dashboard-overview-card{min-height:88px!important;padding:16px!important}.reference-profile-top{gap:14px}.reference-profile-avatar{width:72px;height:72px;flex-basis:72px}.reference-card,.reference-timeline-card,.reference-action-card{padding:16px}.reference-status-metrics{gap:14px}.reference-big-score{font-size:34px}.reference-bottom-grid{gap:12px}.reference-action-buttons{gap:8px}body:has(.client-workspace) .client-main .dashboard-support-card{grid-template-columns:52px minmax(0,1fr)!important;gap:12px!important;padding:14px!important}body:has(.client-workspace) .client-main .dashboard-support-art{width:52px!important;height:52px!important}body:has(.client-workspace) .client-main .dashboard-support-action{grid-column:1/-1!important;width:100%!important}body:has(.client-workspace) .client-main .dashboard-support-action .btn{width:100%!important}body:has(.client-workspace) .client-main .dashboard-section-head{padding:14px!important;align-items:flex-start!important}body:has(.client-workspace) .client-main .case-grid,body:has(.client-workspace) .client-main .manlung-notification-list{padding:0 14px 14px!important}body:has(.client-workspace) .client-main .privacy-panel{margin:0 14px 14px!important}body:has(.client-workspace) .client-main .client-context-card{grid-template-columns:1fr!important}}
+@media(max-width:460px){body:has(.client-workspace) .client-main .dashboard-topbar-heading{flex:0 1 auto!important}body:has(.client-workspace) .client-main .dashboard-overview-title{font-size:16px!important}body:has(.client-workspace) .client-main .dashboard-search-box{max-width:110px!important;padding:8px 9px!important}body:has(.client-workspace) .client-main .dashboard-search-box input::placeholder{font-size:10px!important}body:has(.client-workspace) .client-main .dashboard-topbar-actions{gap:5px!important}body:has(.client-workspace) .client-main .dashboard-hero{grid-template-columns:minmax(0,1fr) 58px!important}body:has(.client-workspace) .client-analog-clock-widget{width:58px!important;min-width:58px!important;height:58px!important;min-height:58px!important}.reference-stats-grid{grid-template-columns:1fr}.reference-status-top{gap:12px}.reference-action-buttons{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){body:has(.client-workspace) *,#clientOfflineOverlay .offline-illustration,#clientOfflineOverlay .offline-pill .dot{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+
+<script id="client-reference-full-layout-runtime-20261027">
+(function(){
+  'use strict';
+  const svg=(body)=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+body+'</svg>';
+  const previewMode=new URLSearchParams(location.search).get('dashboardPreview')==='1';
+  function start(){
+    const workspace=document.querySelector('.client-workspace');
+    const main=workspace&&workspace.querySelector('.client-main');
+    const pageMain=main&&main.querySelector('main');
+    if(!workspace||!main||!pageMain){document.addEventListener('DOMContentLoaded',start,{once:true});return;}
+    if(pageMain.dataset.referenceLayoutApplied==='1')return;
+    pageMain.dataset.referenceLayoutApplied='1';
+    document.title='Manlung Recovery — Client Portal';
+    document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.setAttribute('content','#F3F6F9');});
+    document.querySelectorAll('.manlung-footer,footer,#siteFooter').forEach(function(el){el.remove();});
+    const hero=pageMain.querySelector('.dashboard-hero');
+    const overview=pageMain.querySelector('.dashboard-overview-grid');
+    if(!hero||!overview)return;
+    const incoming=pageMain.querySelector('#manlungIncomingAdminCall');
+    const support=pageMain.querySelector('.dashboard-support-card');
+    const myCases=pageMain.querySelector('#myCasesSection');
+    const lower=pageMain.querySelector('.dashboard-lower-grid');
+    const security=pageMain.querySelector('#clientSecurityCenter');
+    const progress=pageMain.querySelector('#clientCaseOverview');
+    const originalAction=hero.querySelector('.dashboard-primary-action');
+    const originalActionNote=hero.querySelector('.dashboard-hero-action small');
+    const clock=hero.querySelector('.client-analog-clock-widget');
+
+    function accountData(){
+      try{return JSON.parse(localStorage.getItem('clientUser')||'{}')||{};}catch(_){return {};}
+    }
+    function accountName(){
+      const a=accountData();
+      const joined=[a.first_name||a.firstName,a.last_name||a.lastName].filter(Boolean).join(' ').trim();
+      const fromAccount=String(a.full_name||a.fullName||a.displayName||a.name||joined||a.username||'').trim();
+      const fromSidebar=document.querySelector('.client-side-user strong')?.textContent?.trim()||'';
+      return fromAccount||(fromSidebar!=='Client account'&&fromSidebar!=='Loading profile…'?fromSidebar:'Festus');
+    }
+    function accountEmail(){
+      const a=accountData();
+      return String(a.email||a.emailAddress||document.querySelector('.client-side-user small')?.textContent||'').trim();
+    }
+    function initials(value){
+      return String(value||'FK').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')||'FK';
+    }
+    const profileCard=document.createElement('article');profileCard.className='reference-card reference-profile-card';
+    profileCard.innerHTML='<div class="reference-profile-top"><div class="reference-profile-avatar" id="referenceProfileInitials">FK</div><div class="reference-profile-info"><h2 id="referenceProfileName">Client account</h2><p id="referenceProfileEmail">Signed-in client</p><p id="referenceProfileRole">Secure client portal</p></div></div><div class="reference-profile-tags" id="referenceProfileTags"></div>';
+    function addTag(container,icon,label){
+      if(!label)return;
+      const tag=document.createElement('span');tag.className='reference-tag';tag.innerHTML=svg(icon)+'<span></span>';tag.lastElementChild.textContent=label;container.appendChild(tag);
+    }
+    function updateProfile(){
+      const a=accountData(),name=accountName(),email=accountEmail();
+      const nameEl=profileCard.querySelector('#referenceProfileName'),emailEl=profileCard.querySelector('#referenceProfileEmail'),initialEl=profileCard.querySelector('#referenceProfileInitials');
+      if(nameEl)nameEl.textContent=name;
+      if(emailEl)emailEl.textContent=email&&email!=='Signed-in client'&&email!=='Loading profile…'?email:'Signed-in client';
+      if(initialEl)initialEl.textContent=initials(name);
+      const tags=profileCard.querySelector('#referenceProfileTags');if(!tags)return;
+      tags.replaceChildren();
+      const id=a.client_id||a.clientId||a.user_id||a.userId||a.id||a.account_id||a.accountId;
+      const phone=a.phone||a.phone_number||a.phoneNumber||a.mobile||a.mobile_number;
+      if(id)addTag(tags,'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v6"/>','Account: '+String(id));
+      if(phone)addTag(tags,'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.1 4.14 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72l.45 2.81a2 2 0 0 1-.57 1.75L7.1 10.1a16 16 0 0 0 6 6l1.82-1.4a2 2 0 0 1 1.75-.57l2.81.45A2 2 0 0 1 21.2 16"/>',String(phone));
+      if(!id&&!phone)addTag(tags,'<path d="M4 5h16v14H4z"/><path d="m4 7 8 6 8-6"/>',email&&email!=='Signed-in client'&&email!=='Loading profile…'?email:'Signed-in client');
+    }
+    const statusCard=document.createElement('article');statusCard.className='reference-card reference-status-card';
+    statusCard.innerHTML='<div class="reference-status-top"><div class="reference-status-metrics"><div class="reference-metric"><span class="reference-metric-label">'+svg('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>')+'Session</span><span class="reference-metric-value is-good">Active</span></div><div class="reference-metric"><span class="reference-metric-label">'+svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>')+'Status</span><span class="reference-metric-value is-good" id="referenceProtectionStatus">Protected</span></div><div class="reference-metric"><span class="reference-metric-label">'+svg('<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>')+'Device</span><span class="reference-metric-value">Client Portal</span></div></div><div class="reference-big-score"><strong id="referenceCasesBig">0</strong> <span>cases</span></div></div><div class="reference-chart" aria-label="Decorative dashboard activity bars"></div>';
+    const chart=statusCard.querySelector('.reference-chart');
+    [30,45,60,40,80,50,70,35,55,25,65,45,75,40,50].forEach(function(h){const bar=document.createElement('span');bar.style.height=h+'%';chart.appendChild(bar);});
+    const topGrid=document.createElement('section');topGrid.className='reference-grid-top';topGrid.setAttribute('aria-label','Client profile and account status');topGrid.append(profileCard,statusCard);
+    pageMain.insertBefore(topGrid,overview);
+
+    const mfaCard=document.createElement('article');mfaCard.className='dashboard-overview-card reference-mfa-card';mfaCard.innerHTML='<span class="overview-icon" aria-hidden="true">'+svg('<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>')+'</span><span class="overview-copy"><span>MFA Status</span><strong class="reference-mfa-value" id="referenceMfaValue">Checking…</strong><small id="referenceMfaDetail">Account security setting</small><span class="reference-progress"><span class="reference-progress-fill" id="referenceMfaFill"></span></span></span>';
+    overview.appendChild(mfaCard);
+    overview.setAttribute('aria-label','Client account statistics');
+
+    const bottom=document.createElement('section');bottom.className='reference-bottom-grid';
+    const activity=document.createElement('article');activity.className='reference-timeline-card';
+    activity.innerHTML='<div class="reference-card-heading"><h3>Recent Activity</h3><span>Live account summary</span></div><div class="reference-timeline" id="referenceTimeline"></div>';
+    const action=document.createElement('article');action.className='reference-action-card';
+    action.innerHTML='<div class="reference-doc-icon" aria-hidden="true">'+svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>')+'</div><h3>Start a New Request</h3><p>Submit a new recovery case securely.</p><div class="reference-action-buttons" id="referenceActionButtons"></div>';
+    const actionButtons=action.querySelector('#referenceActionButtons');
+    const viewCases=document.createElement('a');viewCases.className='reference-view-cases';viewCases.href='#myCasesSection';viewCases.textContent='View Cases';
+    if(originalAction){originalAction.classList.add('reference-submit-case');originalAction.innerHTML='<span>Submit a Case</span>';originalAction.removeAttribute('style');actionButtons.append(viewCases,originalAction);}
+    else {const submit=document.createElement('a');submit.className='reference-submit-case';submit.href='/client/request.html';submit.textContent='Submit a Case';actionButtons.append(viewCases,submit);}
+    if(originalActionNote)originalActionNote.remove();
+    bottom.append(activity,action);
+    pageMain.insertBefore(bottom,overview.nextSibling);
+    const badge=document.querySelector('#clientSecurityBadge'),mfaOriginal=document.querySelector('#clientMfaSecurity');
+    function textOf(selector,fallback){const node=document.querySelector(selector);const t=node&&node.textContent.trim();return t||fallback;}
+    function renderTimeline(){
+      const host=activity.querySelector('#referenceTimeline');if(!host)return;
+      host.replaceChildren();
+      const info=[
+        {kind:'green',icon:'<path d="m20 6-11 11-5-5"/>',title:'Account status',detail:textOf('#clientAccountSecurity', 'Secure client session'),time:textOf('#clientSecurityBadge','Account status checked')},
+        {kind:'amber',icon:'<path d="M12 8v5M12 16h.01"/>',title:'Recovery progress',detail:'Total: '+textOf('#clientCaseTotal',textOf('#dashboardCaseMetric','0'))+' · In progress: '+textOf('#clientCaseActive','—'),time:'Current case summary'},
+        {kind:'',icon:'<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',title:'Notifications',detail:textOf('#manlungNotificationCount','0')+' unread updates',time:'Current notification count'}
+      ];
+      info.forEach(function(item){const row=document.createElement('div');row.className='reference-timeline-item';row.innerHTML='<div class="reference-timeline-icon '+item.kind+'">'+svg(item.icon)+'</div><div class="reference-timeline-content"><h4></h4><p></p></div>';row.querySelector('h4').textContent=item.title;row.querySelector('p').textContent=item.detail+' · '+item.time;host.appendChild(row);});
+    }
+    function refreshMetrics(){
+      const count=textOf('#dashboardCaseMetric',textOf('#caseCount','0')).replace(/[^\d]/g,'')||'0';
+      const big=statusCard.querySelector('#referenceCasesBig');if(big)big.textContent=count;
+      const mfaText=(mfaOriginal?.textContent||'Checking…').trim();
+      const mfaValue=mfaCard.querySelector('#referenceMfaValue');const detail=mfaCard.querySelector('#referenceMfaDetail');const fill=mfaCard.querySelector('#referenceMfaFill');
+      if(mfaValue)mfaValue.textContent=mfaText;
+      const low=mfaText.toLowerCase();
+      const enabled=low.includes('enabled')&&!low.includes('not enabled')&&!low.includes('disabled')&&!low.includes('not set');
+      if(detail)detail.textContent=enabled?'Multi-factor authentication is on':'Account security setting';
+      if(fill){fill.style.width=enabled?'100%':'0%';fill.style.background=enabled?'var(--green)':'var(--amber)';}
+      if(badge&&statusCard.querySelector('#referenceProtectionStatus'))statusCard.querySelector('#referenceProtectionStatus').textContent=badge.textContent.trim()&&badge.textContent.trim()!=='Checking'?badge.textContent.trim():'Protected';
+      renderTimeline();
+    }
+    updateProfile();refreshMetrics();
+    setInterval(function(){updateProfile();refreshMetrics();},2000);
+    if(window.MutationObserver){
+      const observer=new MutationObserver(refreshMetrics);
+      ['#dashboardCaseMetric','#clientCaseTotal','#clientCaseActive','#clientMfaSecurity','#clientSecurityBadge','#clientAccountSecurity','#manlungNotificationCount'].forEach(function(selector){const el=document.querySelector(selector);if(el)observer.observe(el,{childList:true,subtree:true,characterData:true,attributes:true});});
+    }
+    /* Real offline state overlay. Demo controls appear only when explicitly requested with ?dashboardPreview=1. */
+    const offline=document.createElement('div');offline.id='clientOfflineOverlay';offline.className='reference-offline-overlay';offline.setAttribute('role','dialog');offline.setAttribute('aria-modal','true');offline.setAttribute('aria-live','assertive');
+    offline.innerHTML='<div class="offline-modal"><div class="offline-pill" id="referenceOfflinePill"><span class="dot" aria-hidden="true"></span><span id="referenceOfflinePillText">No internet connection</span></div><svg class="offline-illustration" viewBox="0 0 240 240" role="img" aria-label="A telescope pointing at the stars"><defs><linearGradient id="referenceTube" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FDE68A"/><stop offset="1" stop-color="#F59E0B"/></linearGradient></defs><g fill="#CBD5E1"><circle cx="42" cy="46" r="2.2"/><circle cx="196" cy="34" r="1.8"/><circle cx="210" cy="96" r="2.4"/><circle cx="30" cy="112" r="1.6"/><circle cx="70" cy="22" r="1.4"/><circle cx="168" cy="18" r="1.2"/></g><line x1="150" y1="86" x2="206" y2="40" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="4 5" opacity=".6"/><g transform="rotate(-35 120 122)"><rect x="150" y="106" width="16" height="34" rx="4" fill="#D97706"/><rect x="74" y="108" width="86" height="28" rx="8" fill="url(#referenceTube)"/><rect x="74" y="108" width="86" height="10" rx="5" fill="#fff" opacity=".4"/><rect x="58" y="113" width="18" height="16" rx="4" fill="#B45309"/></g><circle cx="120" cy="150" r="9" fill="#94A3B8"/><circle cx="120" cy="150" r="3.5" fill="#F8FAFC"/><g stroke="#94A3B8" stroke-width="7" stroke-linecap="round" fill="none"><line x1="120" y1="152" x2="64" y2="224"/><line x1="120" y1="152" x2="176" y2="224"/><line x1="120" y1="152" x2="120" y2="222"/></g><line x1="94" y1="192" x2="146" y2="192" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/></svg><h2 id="referenceOfflineTitle">You’re offline</h2><p id="referenceOfflineMessage">We pointed the telescope, but the signal is out of range. Check your connection and we’ll bring the page back.</p><button class="offline-retry" id="referenceRetryButton" type="button">Try again</button><button class="offline-cached" id="referenceCachedButton" type="button">View cached portal</button><p class="offline-hint" id="referenceOfflineHint">The portal shell may remain available if it was cached previously.</p></div>';
+    document.body.appendChild(offline);
+    const notfound=document.createElement('section');notfound.id='clientNotFoundView';notfound.hidden=true;notfound.innerHTML='<div class="notfound-card"><div class="status-pill">Page not found</div><svg class="offline-illustration" viewBox="0 0 240 240" aria-hidden="true"><g fill="#CBD5E1"><circle cx="42" cy="46" r="2.2"/><circle cx="196" cy="34" r="1.8"/><circle cx="210" cy="96" r="2.4"/><circle cx="30" cy="112" r="1.6"/></g><g transform="rotate(-35 120 122)"><rect x="150" y="106" width="16" height="34" rx="4" fill="#D97706"/><rect x="74" y="108" width="86" height="28" rx="8" fill="#F59E0B"/><rect x="58" y="113" width="18" height="16" rx="4" fill="#B45309"/></g><g stroke="#94A3B8" stroke-width="7" stroke-linecap="round"><line x1="120" y1="152" x2="64" y2="224"/><line x1="120" y1="152" x2="176" y2="224"/><line x1="120" y1="152" x2="120" y2="222"/></g></svg><h2>404 — Lost in space</h2><p>This page doesn’t exist, but your recovery portal is still here. Return to your dashboard.</p><button type="button" id="referenceBackDashboard">Back to dashboard</button></div>';
+    document.body.appendChild(notfound);
+    const switcher=document.createElement('div');switcher.className='reference-demo-switcher';switcher.hidden=!previewMode;switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Dashboard preview states');switcher.innerHTML='<small>Preview</small><button type="button" data-reference-demo="online">Online</button><button type="button" data-reference-demo="offline">Offline</button><button type="button" data-reference-demo="notfound">404</button><button type="button" data-reference-demo="offline-uncached">Offline + uncached</button>';document.body.appendChild(switcher);
+    let demoLock=false;
+    function setDemoState(state){
+      document.body.dataset.referenceState=state;
+      if(state==='offline'||state==='offline-uncached'){
+        offline.classList.add('show');
+        document.querySelector('#referenceOfflinePillText').textContent=state==='offline'?'No internet connection':'Offline — page not saved';
+        document.querySelector('#referenceOfflineTitle').textContent=state==='offline'?'You’re offline':'This page isn’t saved';
+        document.querySelector('#referenceOfflineMessage').textContent=state==='offline'?'We pointed the telescope, but the signal is out of range. Check your connection and we’ll bring the page back.':'You’re offline and this page wasn’t cached for offline use. Check your connection or return to a saved page.';
+        document.querySelector('#referenceOfflineHint').textContent=state==='offline'?'The portal shell may remain available if it was cached previously.':'Only previously cached portal content may be available right now.';
+        const pill=document.querySelector('#referenceOfflinePill');pill.style.background=state==='offline'?'#FEF2F2':'#FFFBEB';pill.style.color=state==='offline'?'#EF4444':'#D97706';pill.style.borderColor=state==='offline'?'#FEE2E2':'#FDE68A';
+      }else{offline.classList.remove('show');}
+      notfound.classList.toggle('show',state==='notfound');
+    }
+    switcher.querySelectorAll('[data-reference-demo]').forEach(function(btn){btn.addEventListener('click',function(){demoLock=true;setDemoState(btn.dataset.referenceDemo);});});
+    window.addEventListener('offline',function(){if(!demoLock)setDemoState('offline');});
+    window.addEventListener('online',function(){if(!demoLock&&document.body.dataset.referenceState==='offline'){setDemoState('online');}});
+    document.querySelector('#referenceRetryButton').addEventListener('click',function(){if(navigator.onLine){demoLock=false;setDemoState('online');location.reload();}else{this.textContent='Still offline…';setTimeout(()=>{this.textContent='Try again';},1500);}});
+    document.querySelector('#referenceCachedButton').addEventListener('click',function(){offline.classList.remove('show');});
+    document.querySelector('#referenceBackDashboard').addEventListener('click',function(){demoLock=true;setDemoState('online');window.scrollTo({top:0,behavior:'smooth'});});
+    setDemoState(navigator.onLine?'online':'offline');
+    if(navigator.onLine)demoLock=false;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+</script>
+
 </body>
 </html>
