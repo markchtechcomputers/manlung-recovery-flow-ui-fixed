@@ -2420,15 +2420,40 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
     const parent=main.parentNode;parent.insertBefore(workspace,main);
     if(header)content.appendChild(header);
     content.appendChild(main);workspace.append(sidebar,content);
-    // Reflect the already-rendered profile image and identity instead of replacing saved profile data.
+    // Use the verified client account saved by guardClientPortal(), then
+    // fall back to profile elements rendered elsewhere on the page.
     function syncProfile(){
-      const candidates=Array.from(document.querySelectorAll('.manlung-profile-avatar img,.client-photo-preview img,.profile-pic,.user-avatar img,[data-profile-avatar]'));
-      const source=candidates.find(function(img){return img.getAttribute('src')&&!/placeholder|default-avatar/i.test(img.getAttribute('src'))});
-      if(source){const current=avatar.querySelector('img');if(!current||current.src!==source.src){avatar.textContent='';const img=document.createElement('img');img.src=source.src;img.alt='Your saved profile photo';avatar.appendChild(img)}}
-      const name=document.querySelector('[data-user-name],.user-info h4,.profile-name,.client-name');
-      const email=document.querySelector('[data-user-email],.user-info p,.profile-email');
-      if(name&&name.textContent.trim())user.querySelector('strong').textContent=name.textContent.trim();
-      if(email&&email.textContent.trim())user.querySelector('small').textContent=email.textContent.trim();
+      let account={};
+      try{account=JSON.parse(localStorage.getItem('clientUser')||'{}')||{}}catch(_){}
+      const nameNode=document.querySelector('[data-user-name],.user-info h4,.profile-name,.client-name');
+      const emailNode=document.querySelector('[data-user-email],.user-info p,.profile-email');
+      const accountName=String(account.full_name||account.fullName||account.displayName||account.username||account.name||'').trim();
+      const domName=nameNode&&nameNode.textContent.trim();
+      const accountEmail=String(account.email||account.emailAddress||'').trim();
+      const domEmail=emailNode&&emailNode.textContent.trim();
+      const displayName=accountName||domName||accountEmail||domEmail;
+      const displayEmail=accountEmail||domEmail;
+      if(displayName)user.querySelector('strong').textContent=displayName;
+      else user.querySelector('strong').textContent='Client account';
+      if(displayEmail)user.querySelector('small').textContent=displayEmail;
+      else user.querySelector('small').textContent='Signed-in client';
+
+      const imageValue=account.profilePicture||account.profile_picture||account.avatarUrl||account.avatar_url||account.photoURL||account.photo_url||account.imageUrl||account.image_url;
+      const domImage=Array.from(document.querySelectorAll('.manlung-profile-avatar img,.client-photo-preview img,.profile-pic,.user-avatar img,[data-profile-avatar]'))
+        .find(function(img){return img.getAttribute('src')&&!/placeholder|default-avatar/i.test(img.getAttribute('src'))});
+      const imageSource=(typeof imageValue==='string'&&(/^(https?:\\/\\/|data:image\\/(?:png|jpeg|webp|gif);base64,)/i.test(imageValue)))?imageValue:(domImage?domImage.src:'');
+      const current=avatar.querySelector('img');
+      if(imageSource){
+        if(!current||current.src!==imageSource){
+          avatar.textContent='';
+          const img=document.createElement('img');img.src=imageSource;img.alt='Your saved profile photo';img.referrerPolicy='no-referrer';
+          img.onerror=function(){img.remove();const initials=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';avatar.textContent=initials};
+          avatar.appendChild(img);
+        }
+      }else if(!current){
+        const initials=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
+        if(avatar.textContent!==initials)avatar.textContent=initials;
+      }
     }
     syncProfile();setInterval(syncProfile,3000);
     const context=document.createElement('section');context.className='client-context-card';context.setAttribute('aria-label','Your local time, location and weather');
