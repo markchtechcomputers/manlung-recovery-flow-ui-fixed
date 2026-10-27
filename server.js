@@ -490,6 +490,7 @@ app.use('/api/payments/call-admin', subscriptionRoutes);
 
 app.use('/api/calls', callRoutes);
 app.use('/api/donations', donationRoutes);
+app.use('/api/account-recovery-payments', require('./routes/account-recovery-payments'));
 app.use('/api/service-payments', servicePaymentRoutes);
 app.use('/api/owner', ownerRoutes);
 app.use('/api/careers', careerRoutes);
