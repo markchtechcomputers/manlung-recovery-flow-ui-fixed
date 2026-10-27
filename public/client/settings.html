@@ -788,6 +788,51 @@ body>footer,body footer,.manlung-footer,footer.manlung-footer{display:none!impor
 }
 </style>
 
+
+<style id="manlung-settings-layout-actual-fix">
+/* Final layout: profile, security and privacy stay in the left rail; subscription occupies the right. */
+@media(min-width:761px){
+ body>main.container{
+  display:grid!important;
+  grid-template-columns:minmax(350px,390px) minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto auto!important;
+  align-items:start!important;
+  column-gap:28px!important;
+  row-gap:22px!important;
+ }
+ body>main.container:before{grid-column:1/-1!important;grid-row:1!important}
+ body>main.container>#callSubscriptionSettings{
+  grid-column:2!important;grid-row:2/span 3!important;
+  width:100%!important;min-width:0!important;align-self:start!important;
+ }
+ body>main.container>.settings-grid{display:contents!important}
+ body>main.container>.settings-grid>.settings-card:nth-child(1){grid-column:1!important;grid-row:2!important}
+ body>main.container>.settings-grid>.settings-card:nth-child(2){grid-column:1!important;grid-row:3!important}
+ body>main.container>.settings-grid>.settings-card:nth-child(3){grid-column:1!important;grid-row:4!important}
+}
+body>main.container,body>main.container *{min-width:0}
+.settings-grid>.settings-card,.settings-card,#callSubscriptionSettings{overflow-wrap:break-word;word-break:normal}
+.settings-card .btn,#callSubscriptionSettings .btn{white-space:normal;overflow-wrap:normal;word-break:normal;max-width:100%}
+#callSubscriptionSettings .call-subscription-status{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#callSubscriptionSettings .call-subscription-plans{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+@media(max-width:1100px) and (min-width:761px){
+ body>main.container{grid-template-columns:minmax(300px,350px) minmax(0,1fr)!important;column-gap:18px!important;padding-left:clamp(16px,2.5vw,26px)!important;padding-right:clamp(16px,2.5vw,26px)!important}
+ #callSubscriptionSettings .call-subscription-plans{grid-template-columns:1fr!important}
+}
+@media(max-width:760px){
+ body>main.container{display:flex!important;flex-direction:column!important;gap:16px!important}
+ body>main.container>.settings-grid{display:contents!important}
+ body>main.container>.settings-grid>.settings-card:nth-child(1){order:1!important;width:100%!important}
+ body>main.container>.settings-grid>.settings-card:nth-child(2){order:2!important;width:100%!important}
+ body>main.container>.settings-grid>.settings-card:nth-child(3){order:3!important;width:100%!important}
+ body>main.container>#callSubscriptionSettings{order:4!important;width:100%!important}
+ #callSubscriptionSettings .call-subscription-status{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #callSubscriptionSettings .call-subscription-plans{grid-template-columns:1fr!important}
+}
+@media(max-width:380px){
+ #callSubscriptionSettings .call-subscription-status{grid-template-columns:1fr!important}
+}
+</style>
 </head>
 
 <body>
