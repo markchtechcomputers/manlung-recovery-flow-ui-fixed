@@ -21,6 +21,7 @@ const analyticsRoutes = require('./routes/analytics');
 const subscriptionRoutes = require('./routes/subscription');
 const callRoutes = require('./routes/calls');
 const donationRoutes = require('./routes/donations');
+const servicePaymentRoutes = require('./routes/service-payments');
 const ownerRoutes = require('./routes/owner');
 const careerRoutes = require('./routes/careers');
 const platformRoutes = require('./routes/platform');
@@ -489,6 +490,7 @@ app.use('/api/payments/call-admin', subscriptionRoutes);
 
 app.use('/api/calls', callRoutes);
 app.use('/api/donations', donationRoutes);
+app.use('/api/service-payments', servicePaymentRoutes);
 app.use('/api/owner', ownerRoutes);
 app.use('/api/careers', careerRoutes);
 app.use('/api/platform', platformRoutes);
