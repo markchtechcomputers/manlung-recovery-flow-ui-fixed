@@ -15,20 +15,18 @@
   "theme_color": "#071629",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/favicon.svg?v=20261027",
+      "sizes": "any",
+      "type": "image/svg+xml"
     },
     {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/favicon.svg?v=20261027",
+      "sizes": "any",
+      "type": "image/svg+xml"
     }
   ],
   "prefer_related_applications": false,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "shortcuts": [
     {
       "name": "Track a case",
@@ -37,9 +35,9 @@
       "url": "/client/track.html",
       "icons": [
         {
-          "src": "/icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
+          "src": "/favicon.svg?v=20261027",
+          "sizes": "any",
+          "type": "image/svg+xml"
         }
       ]
     },
