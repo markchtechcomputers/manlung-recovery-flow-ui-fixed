@@ -3213,7 +3213,7 @@ body:has(.client-workspace) .client-side-nav a .client-nav-badge{
       const fromAccount=String(a.full_name||a.fullName||a.displayName||a.name||joined||(username&&username.toLowerCase()!==email.toLowerCase()?username:'')).trim();
       const fromSidebar=document.querySelector('.client-side-user strong')?.textContent?.trim()||'';
       const sidebarName=fromSidebar&&fromSidebar.toLowerCase()!==email.toLowerCase()&&fromSidebar!=='Client account'&&fromSidebar!=='Loading profile…'?fromSidebar:'';
-      const emailName=email.includes('@')?email.split('@')[0].replace(/[._-]+/g,' ').replace(/\\b\\p{L}/gu,ch=>ch.toUpperCase()):'';
+      const emailName=email.includes('@')?email.split('@')[0].replace(/[._-]+/g,' ').replace(/\b[a-z]/g,ch=>ch.toUpperCase()):'';
       return fromAccount||sidebarName||emailName||'Client';
     }
     function accountEmail(){
