@@ -46,7 +46,7 @@ router.post('/reviews',[body('reference').trim().isLength({min:8,max:120}),body(
   const reference=String(req.body.reference).trim();
   const {data:p,error:pe}=await supabase.from(TABLE).select('status').eq('reference',reference).maybeSingle();if(pe)throw pe;
   if(!p||p.status!=='confirmed')return res.status(403).json({success:false,error:'A verified payment is required before reviewing.'});
-  const {error}=await supabase.from(REVIEWS).insert({payment_reference:reference,display_name:String(req.body.displayName).trim(),rating:Number(req.body.rating),review_text:String(req.body.review).trim(),status:'published'});
+  const {error}=await supabase.from(REVIEWS).insert({payment_reference:reference,customer_name:String(req.body.displayName).trim(),rating:Number(req.body.rating),review:String(req.body.review).trim(),is_public:true});
   if(error?.code==='23505')return res.status(409).json({success:false,error:'A review was already submitted for this payment.'});if(error)throw error;
   res.status(201).json({success:true,message:'Thank you for your review.'});
  }catch(e){console.error('Account recovery review:',e.message);res.status(500).json({success:false,error:'Could not submit review.'});}
