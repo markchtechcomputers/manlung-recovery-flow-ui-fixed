@@ -3237,7 +3237,7 @@ body:has(.client-workspace) .client-side-nav a .client-nav-badge{
       if(initialEl){
         const initialsText=initials(name);
         const imageValue=a.profilePicture||a.profile_picture||a.avatarUrl||a.avatar_url||a.photoURL||a.photo_url||a.imageUrl||a.image_url;
-        const isAllowedImage=value=>typeof value==='string'&&(/^https:\\/\\//i.test(value)||/^data:image\\/(?:png|jpeg|webp|gif);base64,/i.test(value));
+        const isAllowedImage=value=>typeof value==='string'&&(/^https:\/\/|^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(value));
         const domImage=Array.from(document.querySelectorAll('#manlungClientAvatar img,.manlung-profile-avatar img,#clientPhotoPreview img,.client-photo-preview img,.profile-pic,.user-avatar img,[data-profile-avatar] img'))
           .find(img=>img.getAttribute('src')&&!/placeholder|default-avatar/i.test(img.getAttribute('src')));
         const imageSource=isAllowedImage(imageValue)?imageValue:(domImage&&isAllowedImage(domImage.src)?domImage.src:'');
