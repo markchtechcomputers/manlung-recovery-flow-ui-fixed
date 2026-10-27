@@ -2824,5 +2824,44 @@ body:has(.client-workspace) #siteFooter{display:none!important;visibility:hidden
 }
 </style>
 
+
+<style id="client-reference-topbar-fix-20261027">
+/* The script appends the new topbar controls as siblings of the legacy header elements.
+   Hide the unused legacy wrappers and align the real title/actions like the supplied reference. */
+body:has(.client-workspace) .client-main .site-header .container{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:20px!important;width:100%!important;max-width:none!important;min-height:44px!important;
+  margin:0!important;padding:0 8px!important;background:transparent!important;
+}
+body:has(.client-workspace) .client-main .site-header .container>.brand,
+body:has(.client-workspace) .client-main .site-header .container>.header-actions{
+  display:none!important;
+}
+body:has(.client-workspace) .client-main .site-header .container>.dashboard-topbar-heading{
+  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+  align-items:flex-start!important;justify-content:center!important;gap:3px!important;
+  min-width:0!important;margin:0 auto 0 0!important;padding:0!important;
+}
+body:has(.client-workspace) .client-main .site-header .container>.dashboard-topbar-actions{
+  display:flex!important;flex:0 0 auto!important;align-items:center!important;
+  justify-content:flex-end!important;gap:12px!important;width:auto!important;
+  margin:0!important;padding:0!important;
+}
+body:has(.client-workspace) .client-main .site-header .dashboard-overview-title{
+  display:block!important;color:#1E293B!important;font-size:18px!important;
+  font-weight:700!important;line-height:1.3!important;
+}
+body:has(.client-workspace) .client-main .site-header .dashboard-overview-subtitle{
+  display:block!important;color:#94A3B8!important;font-size:12px!important;line-height:1.45!important;
+}
+@media(max-width:600px){
+ body:has(.client-workspace) .client-main .site-header .container{gap:10px!important;padding:0 4px!important}
+ body:has(.client-workspace) .client-main .site-header .dashboard-overview-subtitle{font-size:11px!important}
+ body:has(.client-workspace) .client-main .site-header .container>.dashboard-topbar-actions{gap:7px!important}
+ body:has(.client-workspace) .client-main .dashboard-topbar-icon{width:38px!important;height:38px!important;min-height:38px!important}
+ body:has(.client-workspace) .client-main .dashboard-topbar-avatar{width:38px!important;height:38px!important;min-height:38px!important}
+}
+</style>
+
 </body>
 </html>
