@@ -2577,53 +2577,29 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
       }
     }
     syncProfile();setInterval(syncProfile,3000);
-    const context=document.createElement('section');context.className='client-context-card';context.setAttribute('aria-label','Your location and local weather');
-    context.innerHTML='<div class="client-context-item"><div class="context-label"><i class="fas fa-location-dot context-icon"></i> Your location</div><strong class="context-value" id="clientLocalPlace">Permission required</strong><small class="context-detail" id="clientLocalCoords">Location is only read if you allow it.</small></div><div class="client-context-item"><div class="context-label"><i class="fas fa-cloud-sun context-icon"></i> Local weather</div><strong class="context-value" id="clientLocalWeather">Waiting for location</strong><small class="context-detail" id="clientLocalWeatherDetail">Weather uses approximate coordinates from your browser permission.</small></div>';
+    // Add the reference-style analog clock beside the existing client greeting.
+    // The reference design contains no location/weather panels, so do not request geolocation here.
     const hero=main.querySelector('.dashboard-hero');
     const clock=document.createElement('section');
     clock.className='client-analog-clock-widget';
     clock.setAttribute('role','timer');
-    clock.setAttribute('aria-label','Live local clock and date');
-    clock.innerHTML='<div class="client-clock-face"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="45" fill="none" stroke="#E2E8F0" stroke-width="4" stroke-dasharray="2 22" stroke-linecap="round"/><line id="clientClockHourHand" x1="50" y1="50" x2="50" y2="29" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/><line id="clientClockMinuteHand" x1="50" y1="50" x2="50" y2="19" stroke="#1E293B" stroke-width="3" stroke-linecap="round"/><line id="clientClockSecondHand" x1="50" y1="50" x2="50" y2="12" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/><circle cx="50" cy="50" r="3.5" fill="#1E293B"/></svg></div><div class="client-clock-copy"><span class="client-clock-kicker">LOCAL TIME</span><strong id="clientClockDigitalTime">--:--:--</strong><span id="clientClockDate" class="client-clock-date"></span></div>';
+    clock.setAttribute('aria-label','Live local clock');
+    clock.innerHTML='<div class="client-clock-face"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="45" fill="none" stroke="#E2E8F0" stroke-width="4" stroke-dasharray="2 22" stroke-linecap="round"/><line id="clientClockHourHand" x1="50" y1="50" x2="50" y2="29" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/><line id="clientClockMinuteHand" x1="50" y1="50" x2="50" y2="19" stroke="#1E293B" stroke-width="3" stroke-linecap="round"/><line id="clientClockSecondHand" x1="50" y1="50" x2="50" y2="12" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/><circle cx="50" cy="50" r="3.5" fill="#1E293B"/></svg></div>';
     if(hero){
       const heroAction=hero.querySelector('.dashboard-hero-action');
       if(heroAction)hero.insertBefore(clock,heroAction);else hero.appendChild(clock);
-      hero.insertAdjacentElement('afterend',context);
     }else{
       main.insertBefore(clock,main.firstChild);
-      main.insertBefore(context,clock.nextSibling);
     }
     const clockHour=clock.querySelector('#clientClockHourHand'),clockMinute=clock.querySelector('#clientClockMinuteHand'),clockSecond=clock.querySelector('#clientClockSecondHand');
-    const clockDigital=clock.querySelector('#clientClockDigitalTime'),clockDate=clock.querySelector('#clientClockDate');
     function updateTime(){
       const now=new Date(),hours=now.getHours(),minutes=now.getMinutes(),seconds=now.getSeconds();
       clockHour.style.transform='rotate('+((hours%12)*30+minutes*.5)+'deg)';
       clockMinute.style.transform='rotate('+(minutes*6+seconds*.1)+'deg)';
       clockSecond.style.transform='rotate('+(seconds*6)+'deg)';
-      clockDigital.textContent=new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(now);
-      clockDate.textContent=new Intl.DateTimeFormat(undefined,{weekday:'long',month:'short',day:'numeric'}).format(now);
-      clock.setAttribute('aria-label','Local time '+clockDigital.textContent+', '+clockDate.textContent);
+      clock.setAttribute('aria-label','Live local clock, '+new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(now));
     }
     updateTime();setInterval(updateTime,1000);
-    const place=context.querySelector('#clientLocalPlace'),coords=context.querySelector('#clientLocalCoords'),weather=context.querySelector('#clientLocalWeather'),detail=context.querySelector('#clientLocalWeatherDetail');
-    if(!navigator.geolocation){place.textContent='Not available';coords.textContent='This browser does not support location access.';return}
-    navigator.geolocation.getCurrentPosition(async function(pos){
-      const lat=pos.coords.latitude,lon=pos.coords.longitude;
-      coords.textContent='Latitude '+lat.toFixed(5)+' · Longitude '+lon.toFixed(5)+' · Accuracy ±'+Math.round(pos.coords.accuracy)+' m';
-      place.textContent='Coordinates detected';
-      try{
-        const geo=await fetch('https://geocoding-api.open-meteo.com/v1/reverse?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&language=en&format=json');
-        if(geo.ok){const gd=await geo.json();const g=gd.results&&gd.results[0];if(g)place.textContent=[g.name,g.admin1,g.country].filter(Boolean).join(', ')}
-      }catch(_){}
-      try{
-        const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&timezone=auto');
-        if(!r.ok)throw new Error('Weather service unavailable');
-        const d=await r.json(),c=d.current||{},code=Number(c.weather_code);
-        const labels={0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Rime fog',51:'Light drizzle',53:'Drizzle',55:'Dense drizzle',56:'Freezing drizzle',57:'Heavy freezing drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',66:'Freezing rain',67:'Heavy freezing rain',71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',80:'Rain showers',81:'Rain showers',82:'Heavy rain showers',85:'Snow showers',86:'Heavy snow showers',95:'Thunderstorm',96:'Thunderstorm with hail',99:'Severe thunderstorm'};
-        weather.textContent=(labels[code]||'Conditions available')+' · '+(Number.isFinite(Number(c.temperature_2m))?Math.round(c.temperature_2m)+'°C':'');
-        detail.textContent='Feels like '+(c.apparent_temperature??'—')+'°C · Humidity '+(c.relative_humidity_2m??'—')+'% · Wind '+(c.wind_speed_10m??'—')+' km/h · '+(c.is_day?'Daytime':'Nighttime');
-      }catch(_){weather.textContent='Weather unavailable';detail.textContent='Could not load live weather. Your dashboard remains available.'}
-    },function(err){place.textContent='Location not shared';coords.textContent=err&&err.code===1?'Allow location permission to show coordinates and local weather.':'Location could not be detected on this device.';weather.textContent='Location needed';detail.textContent='Your location is not stored by this dashboard.'},{enableHighAccuracy:false,timeout:12000,maximumAge:300000});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initClientWorkspace,{once:true});else initClientWorkspace();
 })();
@@ -2797,6 +2773,56 @@ body:has(.client-workspace) .client-main .demo{display:none!important}
   window.addEventListener('load',polishNav,{once:true});
 })();
 </script>
+
+
+<style id="client-reference-theme-correction-20261027">
+/* Corrections mapped to the real portal markup while preserving its existing behavior. */
+body:has(.client-workspace) .client-main .dashboard-hero,
+body:has(.client-workspace) .client-main .manlung-dashboard-hero{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  flex-wrap:wrap!important;gap:20px!important;min-height:0!important;
+  margin:0 0 8px!important;padding:0 8px!important;border:0!important;
+  border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  color:#1E293B!important;overflow:visible!important;
+}
+body:has(.client-workspace) .client-main .manlung-dashboard-hero::after{display:none!important;content:none!important}
+body:has(.client-workspace) .client-main .dashboard-hero-copy{flex:1 1 300px!important;min-width:0!important;max-width:760px!important}
+body:has(.client-workspace) .client-main .dashboard-hero .dashboard-kicker,
+body:has(.client-workspace) .client-main .manlung-dashboard-hero .dashboard-kicker,
+body:has(.client-workspace) .client-main .dashboard-hero-trust{display:none!important}
+body:has(.client-workspace) .client-main .dashboard-hero h2,
+body:has(.client-workspace) .client-main .manlung-dashboard-hero h2{
+  margin:0 0 4px!important;color:#1E293B!important;font-size:26px!important;
+  line-height:1.25!important;font-weight:700!important;letter-spacing:-.5px!important;
+}
+body:has(.client-workspace) .client-main .dashboard-hero p,
+body:has(.client-workspace) .client-main .manlung-dashboard-hero p{
+  margin:0!important;color:#94A3B8!important;font-size:14px!important;line-height:1.55!important;
+}
+body:has(.client-workspace) .client-analog-clock-widget{
+  order:1!important;display:grid!important;place-items:center!important;flex:0 0 68px!important;
+  width:68px!important;min-width:68px!important;max-width:68px!important;
+  height:68px!important;min-height:68px!important;max-height:68px!important;
+  padding:4px!important;margin:0 0 0 auto!important;border:0!important;border-radius:50%!important;
+  background:#FFFFFF!important;box-shadow:0 4px 20px rgba(0,0,0,.03)!important;
+}
+body:has(.client-workspace) .client-clock-face{
+  display:block!important;width:100%!important;height:100%!important;min-width:0!important;
+  min-height:0!important;flex:none!important;padding:0!important;border:0!important;
+  border-radius:50%!important;background:#FFFFFF!important;box-shadow:none!important;
+}
+body:has(.client-workspace) .client-clock-face svg{display:block!important;width:100%!important;height:100%!important}
+body:has(.client-workspace) .client-clock-copy{display:none!important}
+body:has(.client-workspace) .manlung-footer,
+body:has(.client-workspace) footer,
+body:has(.client-workspace) #siteFooter{display:none!important;visibility:hidden!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+@media(max-width:700px){
+  body:has(.client-workspace) .client-main .dashboard-hero,
+  body:has(.client-workspace) .client-main .manlung-dashboard-hero{align-items:flex-start!important;gap:14px!important;padding:0 4px!important}
+  body:has(.client-workspace) .client-main .dashboard-hero-copy{flex:1 1 calc(100% - 82px)!important}
+  body:has(.client-workspace) .client-analog-clock-widget{flex-basis:68px!important;width:68px!important;height:68px!important;margin:0 0 0 auto!important}
+}
+</style>
 
 </body>
 </html>
