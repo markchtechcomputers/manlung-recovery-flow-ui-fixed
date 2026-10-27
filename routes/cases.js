@@ -141,13 +141,13 @@ const ALLOWED_EVIDENCE_TYPES = new Set([
 const SIGNED_URL_TTL = 15 * 60;
 
 router.get('/turnstile-config', (_req, res) => {
-  const siteKey = String(process.env.TURNSTILE_SITE_KEY || '').trim();
+  const siteKey = String(process.env.CLOUDFLARE_TURNSTILE_SITE_KEY || process.env.TURNSTILE_SITE_KEY || '').trim();
   if (!siteKey) return res.status(503).json({ error: 'Cloudflare verification is not configured.' });
   return res.set('Cache-Control', 'no-store').json({ siteKey });
 });
 
 async function verifyCaseTurnstile(req, res, next) {
-  const secret = String(process.env.TURNSTILE_SECRET_KEY || '').trim();
+  const secret = String(process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY || '').trim();
   if (!secret) return res.status(503).json({ error: 'Security verification is not configured. Please contact support.' });
   const token = req.body?.['cf-turnstile-response'];
   if (typeof token !== 'string' || !token || token.length > 2048) {
