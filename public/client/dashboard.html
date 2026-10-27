@@ -2508,10 +2508,11 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
     links.forEach(function(item){
       const a=document.createElement('a');a.href=item[2];a.className='client-side-nav-item';
       a.innerHTML=iconSvg[item[0]]+'<span>'+item[1]+'</span>';
-      if((item[1]==='Dashboard'&&location.pathname==='/client/dashboard.html')||
+      if((item[1]==='My Cases'&&location.pathname==='/client/dashboard.html')||
          (item[1]==='My Cases'&&location.hash==='#myCasesSection')||
          (item[1]==='Notifications'&&location.hash==='#manlungNotifications')||
          (item[1]==='Security'&&location.hash==='#clientSecurityCenter'))a.classList.add('active');
+      if(item[1]==='My Cases'){const badge=document.createElement('span');badge.className='client-nav-badge';badge.textContent='0';badge.setAttribute('aria-label','0 cases');a.appendChild(badge);}
       nav.appendChild(a);
     });
     const sidebarFooter=document.createElement('div');sidebarFooter.className='client-side-footer';
@@ -3160,6 +3161,15 @@ body[data-reference-state="notfound"] #clientNotFoundView.show{display:block}
 @media(max-width:700px){body:has(.client-workspace) .client-workspace{padding:10px!important}body:has(.client-workspace) .client-main{gap:16px!important}body:has(.client-workspace) .client-main .site-header .container{gap:10px!important;padding:0 4px!important}body:has(.client-workspace) .client-main .dashboard-topbar-actions{gap:7px!important}body:has(.client-workspace) .client-main .dashboard-search-box{width:auto!important;max-width:200px!important;padding:9px 12px!important}body:has(.client-workspace) .client-main .dashboard-search-box input{font-size:12px!important}body:has(.client-workspace) .client-main .dashboard-topbar-icon,body:has(.client-workspace) .client-main .dashboard-topbar-avatar{width:38px!important;min-width:38px!important;height:38px!important;min-height:38px!important;flex-basis:38px!important}body:has(.client-workspace) .client-main .dashboard-hero{grid-template-columns:minmax(0,1fr) 68px!important;gap:10px 12px!important;padding:0 4px!important}body:has(.client-workspace) .client-main .dashboard-hero h2{font-size:23px!important}body:has(.client-workspace) .client-main .dashboard-overview-grid{grid-template-columns:1fr!important;gap:12px!important}body:has(.client-workspace) .client-main .dashboard-overview-card{min-height:88px!important;padding:16px!important}.reference-profile-top{gap:14px}.reference-profile-avatar{width:72px;height:72px;flex-basis:72px}.reference-card,.reference-timeline-card,.reference-action-card{padding:16px}.reference-status-metrics{gap:14px}.reference-big-score{font-size:34px}.reference-bottom-grid{gap:12px}.reference-action-buttons{gap:8px}body:has(.client-workspace) .client-main .dashboard-support-card{grid-template-columns:52px minmax(0,1fr)!important;gap:12px!important;padding:14px!important}body:has(.client-workspace) .client-main .dashboard-support-art{width:52px!important;height:52px!important}body:has(.client-workspace) .client-main .dashboard-support-action{grid-column:1/-1!important;width:100%!important}body:has(.client-workspace) .client-main .dashboard-support-action .btn{width:100%!important}body:has(.client-workspace) .client-main .dashboard-section-head{padding:14px!important;align-items:flex-start!important}body:has(.client-workspace) .client-main .case-grid,body:has(.client-workspace) .client-main .manlung-notification-list{padding:0 14px 14px!important}body:has(.client-workspace) .client-main .privacy-panel{margin:0 14px 14px!important}body:has(.client-workspace) .client-main .client-context-card{grid-template-columns:1fr!important}}
 @media(max-width:460px){body:has(.client-workspace) .client-main .dashboard-topbar-heading{flex:0 1 auto!important}body:has(.client-workspace) .client-main .dashboard-overview-title{font-size:16px!important}body:has(.client-workspace) .client-main .dashboard-search-box{max-width:110px!important;padding:8px 9px!important}body:has(.client-workspace) .client-main .dashboard-search-box input::placeholder{font-size:10px!important}body:has(.client-workspace) .client-main .dashboard-topbar-actions{gap:5px!important}body:has(.client-workspace) .client-main .dashboard-hero{grid-template-columns:minmax(0,1fr) 58px!important}body:has(.client-workspace) .client-analog-clock-widget{width:58px!important;min-width:58px!important;height:58px!important;min-height:58px!important}.reference-stats-grid{grid-template-columns:1fr}.reference-status-top{gap:12px}.reference-action-buttons{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){body:has(.client-workspace) *,#clientOfflineOverlay .offline-illustration,#clientOfflineOverlay .offline-pill .dot{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+body:has(.client-workspace) .client-side-nav a .client-nav-badge{
+  position:absolute!important;top:5px!important;right:4px!important;display:grid!important;place-items:center!important;
+  width:14px!important;height:14px!important;min-width:14px!important;max-width:14px!important;
+  margin:0!important;padding:0!important;overflow:visible!important;clip:auto!important;clip-path:none!important;
+  white-space:nowrap!important;border:2px solid #FFFFFF!important;border-radius:50%!important;
+  background:#F59E0B!important;color:#FFFFFF!important;font-size:8px!important;font-weight:800!important;line-height:1!important;
+}
+
 </style>
 
 
@@ -3266,6 +3276,8 @@ body[data-reference-state="notfound"] #clientNotFoundView.show{display:block}
     function refreshMetrics(){
       const count=textOf('#dashboardCaseMetric',textOf('#caseCount','0')).replace(/[^\d]/g,'')||'0';
       const big=statusCard.querySelector('#referenceCasesBig');if(big)big.textContent=count;
+const navBadge=document.querySelector('.client-side-nav .client-nav-badge');
+      if(navBadge){navBadge.textContent=count;navBadge.setAttribute('aria-label',count+' cases');}
       const mfaText=(mfaOriginal?.textContent||'Checking…').trim();
       const mfaValue=mfaCard.querySelector('#referenceMfaValue');const detail=mfaCard.querySelector('#referenceMfaDetail');const fill=mfaCard.querySelector('#referenceMfaFill');
       if(mfaValue)mfaValue.textContent=mfaText;
@@ -3300,7 +3312,7 @@ body[data-reference-state="notfound"] #clientNotFoundView.show{display:block}
         document.querySelector('#referenceOfflineHint').textContent=state==='offline'?'The portal shell may remain available if it was cached previously.':'Only previously cached portal content may be available right now.';
         const pill=document.querySelector('#referenceOfflinePill');pill.style.background=state==='offline'?'#FEF2F2':'#FFFBEB';pill.style.color=state==='offline'?'#EF4444':'#D97706';pill.style.borderColor=state==='offline'?'#FEE2E2':'#FDE68A';
       }else{offline.classList.remove('show');}
-      notfound.classList.toggle('show',state==='notfound');
+      notfound.hidden=state!=='notfound';notfound.classList.toggle('show',state==='notfound');
     }
     switcher.querySelectorAll('[data-reference-demo]').forEach(function(btn){btn.addEventListener('click',function(){demoLock=true;setDemoState(btn.dataset.referenceDemo);});});
     window.addEventListener('offline',function(){if(!demoLock)setDemoState('offline');});
