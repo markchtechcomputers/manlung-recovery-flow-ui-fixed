@@ -2570,23 +2570,23 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
       if(topAvatar){
         topAvatar.title=displayName||'Client profile';
         const topImage=topAvatar.querySelector('img');
-        if(!topImage)topAvatar.textContent=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
+        if(!topImage)topAvatar.textContent=(displayName||displayEmail||'MR').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
       }
 
       const imageValue=account.profilePicture||account.profile_picture||account.avatarUrl||account.avatar_url||account.photoURL||account.photo_url||account.imageUrl||account.image_url;
       const domImage=Array.from(document.querySelectorAll('.manlung-profile-avatar img,.client-photo-preview img,.profile-pic,.user-avatar img,[data-profile-avatar]'))
         .find(function(img){return img.getAttribute('src')&&!/placeholder|default-avatar/i.test(img.getAttribute('src'))});
-      const imageSource=(typeof imageValue==='string'&&(/^(https?:\\/\\/|data:image\\/(?:png|jpeg|webp|gif);base64,)/i.test(imageValue)))?imageValue:(domImage?domImage.src:'');
+      const imageSource=(typeof imageValue==='string'&&(/^(https?:\/\/|data:image\/(?:png|jpeg|webp|gif);base64,)/i.test(imageValue)))?imageValue:(domImage?domImage.src:'');
       const current=avatar.querySelector('img');
       if(imageSource){
         if(!current||current.src!==imageSource){
           avatar.textContent='';
           const img=document.createElement('img');img.src=imageSource;img.alt='Your saved profile photo';img.referrerPolicy='no-referrer';
-          img.onerror=function(){img.remove();const initials=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';avatar.textContent=initials};
+          img.onerror=function(){img.remove();const initials=(displayName||displayEmail||'MR').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';avatar.textContent=initials};
           avatar.appendChild(img);
         }
       }else if(!current){
-        const initials=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
+        const initials=(displayName||displayEmail||'MR').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
         if(avatar.textContent!==initials)avatar.textContent=initials;
       }
       const topAvatarNow=document.getElementById('clientTopbarAvatar');
@@ -2596,11 +2596,11 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
           if(!topCurrent||topCurrent.src!==imageSource){
             topAvatarNow.textContent='';
             const topImg=document.createElement('img');topImg.src=imageSource;topImg.alt='Client profile';topImg.referrerPolicy='no-referrer';
-            topImg.onerror=function(){topImg.remove();topAvatarNow.textContent=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR'};
+            topImg.onerror=function(){topImg.remove();topAvatarNow.textContent=(displayName||displayEmail||'MR').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR'};
             topAvatarNow.appendChild(topImg);
           }
         }else if(!topCurrent){
-          topAvatarNow.textContent=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
+          topAvatarNow.textContent=(displayName||displayEmail||'MR').split(/[\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
         }
       }
     }
