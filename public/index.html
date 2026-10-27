@@ -2026,6 +2026,7 @@ body{background:#f4f7fb!important;color:var(--mr2-ink)!important;font-family:Int
   <span><b>02</b><strong>Identity &amp; Account Recovery</strong></span>
   <span><b>03</b><strong>Scam &amp; Fraud Investigation</strong></span>
   <span><b>04</b><strong>Security Assessment &amp; Audit</strong></span>
+  <span><b>05</b><strong>Hacked Social Media &amp; Emails</strong></span>
 </div>
 <div class="features premium-service-grid">
                     <article class="feature-card premium-service-card" data-service="device">
@@ -2045,6 +2046,12 @@ body{background:#f4f7fb!important;color:var(--mr2-ink)!important;font-family:Int
                         <h3>Scam &amp; Fraud Investigation</h3>
                         <p>Online scams, fraud, and phishing — we help organize digital evidence and guide investigation and reporting steps.</p>
                         <button class="service-learn" type="button" onclick="openServiceModal('scam')">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                    </article>
+                    <article class="feature-card premium-service-card" data-service="account-recovery">
+                        <div class="service-card-top"><span class="service-number">05</span><span class="service-icon-wrap"><img src="https://i.postimg.cc/XJx87tMJ/aa9b3a0f98c00d38b0a5e04bd0cceb46.jpg" alt="" class="service-icon-image" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><i class="service-icon-fallback fas fa-envelope-circle-check" aria-hidden="true" hidden></i></span></div>
+                        <h3>Hacked Social Media Pages &amp; Emails</h3>
+                        <p>Structured guidance for compromised social profiles and email accounts, official recovery channels, and steps to secure your identity.</p>
+                        <a class="service-learn" href="#" onclick="openServiceModal('accountRecovery'); return false;">Learn More <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
                     </article>
                     <article class="feature-card premium-service-card" data-service="security">
                         <div class="service-card-top"><span class="service-number">04</span><span class="service-icon-wrap"><img src="/images/security-assessment.png?v=service-icons-20261020" alt="" class="service-icon-image" loading="eager" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><i class="service-icon-fallback fas fa-shield-halved" aria-hidden="true" hidden></i></span></div>
@@ -2391,6 +2398,20 @@ body{background:#f4f7fb!important;color:var(--mr2-ink)!important;font-family:Int
                 ],
                 needed: 'Have ready: any scammer contact info (phone, email, social handles, website), transaction references, and amounts lost.',
             },
+            accountRecovery: {
+                image: 'https://i.postimg.cc/XJx87tMJ/aa9b3a0f98c00d38b0a5e04bd0cceb46.jpg',
+                title: 'Hacked Social Media Pages & Emails',
+                defaultCaseType: 'Hacked Social Media Pages & Emails',
+                intro: 'Practical, privacy-conscious support for compromised social media profiles and email accounts. We help you follow the platform owner’s official recovery process and secure related accounts. Account restoration depends on the provider’s checks and is never guaranteed.',
+                points: [
+                    'Identify the affected platform, review signs of unauthorized access, and help organize the timeline and available security alerts.',
+                    'Guide you to the platform’s official hacked-account recovery and appeal forms; we never bypass provider authentication or access an account without the owner’s authorization.',
+                    'Help prepare relevant evidence such as login alerts, profile changes, suspicious messages, recovery emails, and impersonation links while minimizing exposure of private data.',
+                    'After access is restored, guide you through changing the password, ending unfamiliar sessions, checking recovery email/phone details, enabling two-factor authentication, and reviewing connected apps.',
+                    'If the account is being used for fraud, impersonation, threats, or financial scams, help organize records for reporting to the platform and appropriate authorities.'
+                ],
+                needed: 'Have the account username or public profile URL, the approximate time access was lost, a safe contact email, and screenshots of provider alerts if available. Never send passwords, OTPs, backup codes, recovery codes, or identity documents through this form.'
+            },
             security: {
                 image: '/images/security-assessment.png',
                 title: 'Security Assessment',
@@ -2419,13 +2440,54 @@ body{background:#f4f7fb!important;color:var(--mr2-ink)!important;font-family:Int
                     ${s.points.map(p => `<li>${p}</li>`).join('')}
                 </ul>
                 <div class="notice" style="display:block;"><i class="fas fa-clipboard-list"></i> ${s.needed}</div>
+                ${key === 'accountRecovery' ? `
+                <section class="recovery-pay-box" aria-label="Pay for account recovery support" style="margin-top:1.5rem;padding:1rem;border:1px solid var(--border-color,rgba(128,128,128,.35));border-radius:14px;">
+                    <h3 style="margin:.1rem 0 .4rem;">Choose a support package</h3>
+                    <p style="margin:0 0 .8rem;color:var(--text-muted);">Secure checkout powered by Paystack. Select your amount and enter an email for your payment receipt.</p>
+                    <div style="display:grid;gap:.55rem;">
+                        <label style="display:flex;align-items:center;gap:.6rem;padding:.65rem;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:9px;"><input type="radio" name="recoveryPayAmount" value="200"><span style="flex:1"><strong>Basic Support</strong><small style="display:block;color:var(--text-muted)">Initial guidance</small></span><strong>KES 200</strong></label>
+                        <label style="display:flex;align-items:center;gap:.6rem;padding:.65rem;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:9px;"><input type="radio" name="recoveryPayAmount" value="300"><span style="flex:1"><strong>Starter Support</strong><small style="display:block;color:var(--text-muted)">Recovery options overview</small></span><strong>KES 300</strong></label>
+                        <label style="display:flex;align-items:center;gap:.6rem;padding:.65rem;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:9px;"><input type="radio" name="recoveryPayAmount" value="500" checked><span style="flex:1"><strong>Standard Support</strong><small style="display:block;color:var(--text-muted)">Detailed recovery steps</small></span><strong>KES 500</strong></label>
+                        <label style="display:flex;align-items:center;gap:.6rem;padding:.65rem;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:9px;"><input type="radio" name="recoveryPayAmount" value="1000"><span style="flex:1"><strong>Premium Support</strong><small style="display:block;color:var(--text-muted)">Extended guidance</small></span><strong>KES 1,000</strong></label>
+                        <label style="display:flex;align-items:center;gap:.6rem;padding:.65rem;border:1px solid var(--border-color,rgba(128,128,128,.3));border-radius:9px;"><input type="radio" name="recoveryPayAmount" value="1500"><span style="flex:1"><strong>Priority Support</strong><small style="display:block;color:var(--text-muted)">Extended recovery and security checklist</small></span><strong>KES 1,500</strong></label>
+                    </div>
+                    <label style="display:grid;gap:.35rem;margin:.9rem 0;">Email for receipt<input id="recoveryPayEmail" type="email" required autocomplete="email" maxlength="254" placeholder="you@example.com" style="width:100%;padding:.7rem;border:1px solid var(--border-color,rgba(128,128,128,.35));border-radius:9px;background:var(--card-bg,transparent);color:inherit;"></label>
+                    <button type="button" class="btn btn-primary" id="recoveryPayButton" onclick="startRecoveryPaystackCheckout()">Pay securely with Paystack</button>
+                    <p id="recoveryPayStatus" role="status" aria-live="polite" style="min-height:1.3em;margin:.55rem 0 0;color:var(--text-muted);"></p>
+                </section>` : `
                 <div style="margin-top:1.5rem;">
                     <a href="/client/request.html?type=${encodeURIComponent(s.defaultCaseType)}" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Start a ${s.title} Request</a>
-                </div>
+                </div>`}
             `;
             document.getElementById('serviceModalOverlay').style.display = 'flex';
             document.body.classList.add('service-modal-open');
         }
+        async function startRecoveryPaystackCheckout() {
+            const emailInput = document.getElementById('recoveryPayEmail');
+            const button = document.getElementById('recoveryPayButton');
+            const status = document.getElementById('recoveryPayStatus');
+            if (!emailInput || !button || !status) return;
+            const email = emailInput.value.trim();
+            const amountInput = document.querySelector('input[name="recoveryPayAmount"]:checked');
+            if (!emailInput.checkValidity()) { emailInput.reportValidity(); return; }
+            if (!amountInput) { status.textContent = 'Choose a support package first.'; return; }
+            button.disabled = true;
+            status.textContent = 'Preparing secure Paystack checkout…';
+            try {
+                const response = await fetch('/api/account-recovery-payments/initialize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, amountKes: Number(amountInput.value) })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success || !result.authorizationUrl) throw new Error(result.error || 'Could not start payment.');
+                window.location.assign(result.authorizationUrl);
+            } catch (error) {
+                status.textContent = error.message || 'Payment could not be started. Please try again.';
+                button.disabled = false;
+            }
+        }
+
         function closeServiceModal() {
             document.getElementById('serviceModalOverlay').style.display = 'none';
             document.body.classList.remove('service-modal-open');
