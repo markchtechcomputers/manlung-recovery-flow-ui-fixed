@@ -255,8 +255,6 @@
     <meta name="twitter:title" content="Manlung Recovery">
     <meta name="twitter:description" content="Cyber Recovery & Digital Investigation Portal">
     <meta name="twitter:image" content="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png">
-
-    <link rel="stylesheet" href="/css/footer.css">
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
     <script src="/js/client-session-guard.js"></script>
@@ -329,6 +327,68 @@ body.dark .request-welcome{border-color:rgba(96,165,250,.25);box-shadow:0 16px 3
 @media(prefers-reduced-motion:reduce){#incidentForm>.card,#incidentForm input,#incidentForm select,#incidentForm textarea,.progress-bar-fill{transition:none!important}}
 </style>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
+
+<style id="manlung-request-card-redesign">
+:root{--mr-page:#e8eef6;--mr-card:#fff;--mr-soft:#f8fafc;--mr-ink:#1e293b;--mr-muted:#64748b;--mr-border:#e2e8f0;--mr-blue:#1e3a8a;--mr-green:#16a34a}
+html{background:var(--mr-page)}
+body{background:linear-gradient(180deg,#e8eef6 0,#f1f5f9 380px,var(--mr-page) 100%);color:var(--mr-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.site-header{background:linear-gradient(135deg,#0f172a,#172f50);border-bottom:1px solid rgba(96,165,250,.2);box-shadow:0 5px 20px rgba(15,23,42,.16)}
+.site-header .container-narrow{max-width:1120px;padding-top:.65rem;padding-bottom:.65rem}
+.site-header .brand h1{font-size:1.05rem;font-weight:800;letter-spacing:-.025em}
+.site-header .brand>span{color:#cbd5e1}
+.progress-bar-wrap{background:rgba(255,255,255,.94);border-bottom:1px solid var(--mr-border)}
+.container-narrow{max-width:1000px}
+.request-welcome{border-radius:18px;margin:1.15rem 0 .85rem;padding:clamp(1.25rem,3vw,2rem);background:linear-gradient(125deg,#172554 0%,#1e3a8a 56%,#1d4ed8 100%);box-shadow:0 16px 36px rgba(30,58,138,.16)}
+.request-welcome h2{font-size:clamp(1.5rem,3vw,2.1rem)}
+.request-welcome p{font-size:.91rem;max-width:660px}
+.request-benefits span{padding:.38rem .6rem;border:1px solid rgba(219,234,254,.16);border-radius:999px;background:rgba(255,255,255,.06)}
+.request-flow-card,#incidentForm>.card{background:var(--mr-card);border:1px solid var(--mr-border);border-radius:15px;box-shadow:0 6px 22px rgba(15,23,42,.045)}
+.request-dashboard-note{margin-bottom:1rem}
+.request-dashboard-note .request-flow-head{align-items:center}
+.request-dashboard-note h2{font-size:1rem}
+#incidentForm>.card{padding:clamp(1rem,2.7vw,1.5rem);margin-bottom:1rem}
+#incidentForm .card-title{font-size:1rem;border-bottom:1px solid var(--mr-border);padding-bottom:.85rem;margin-bottom:1.15rem}
+#incidentForm .card-title>i{background:#eff6ff;color:#1d4ed8}
+#incidentForm .form-group label{font-size:.78rem;color:#334155}
+#incidentForm input:not([type=checkbox]):not([type=file]),#incidentForm select,#incidentForm textarea{background:#fff;border-color:#dbe3ee;border-radius:9px;min-height:45px}
+#incidentForm input::placeholder,#incidentForm textarea::placeholder{color:#94a3b8}
+#incidentForm input:focus-visible,#incidentForm select:focus-visible,#incidentForm textarea:focus-visible{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+#incidentForm .checkbox-group{background:#f8fafc;border-color:#e2e8f0;border-radius:10px}
+#incidentForm .notice{border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af}
+#incidentForm .upload-zone-enhanced{border-color:#bfdbfe;background:#f8fbff;border-radius:13px}
+#incidentForm .upload-zone-enhanced:hover,#incidentForm .upload-zone-enhanced.dragover{background:#eff6ff;border-color:#2563eb}
+#incidentForm .upload-policy-item{background:#f8fafc;border-color:#e2e8f0;border-radius:10px}
+#incidentForm .case-turnstile{background:#f8fafc;border-color:#e2e8f0}
+#incidentForm .btn-primary,#incidentForm button[type=submit]{background:#16a34a;border-color:#16a34a;color:#fff}
+#incidentForm .btn-primary:hover,#incidentForm button[type=submit]:hover{background:#15803d}
+#incidentForm .btn-outline-dark{border-color:#cbd5e1;border-radius:9px}
+#draftBanner{border:1px solid #bbf7d0;background:#f0fdf4;color:#166534;border-radius:11px;padding:.8rem 1rem}
+.request-intake-stepper{padding:1.15rem 1.35rem 1.05rem;margin:0 0 1rem;background:#fff;border:1px solid var(--mr-border);border-radius:15px;box-shadow:0 5px 18px rgba(15,23,42,.035)}
+.request-intake-stepper .stepper-heading{display:flex;align-items:center;justify-content:space-between;gap:.7rem;margin-bottom:1rem}
+.request-intake-stepper .stepper-heading strong{font-size:.85rem;color:#1e293b}
+.request-intake-stepper .stepper-heading span{font-size:.7rem;color:#64748b}
+.request-intake-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:relative;gap:.4rem}
+.request-intake-steps:before{content:"";position:absolute;left:9%;right:9%;top:16px;height:2px;background:#e2e8f0}
+.request-intake-step{position:relative;z-index:1;display:flex;align-items:center;flex-direction:column;gap:.45rem;text-align:center;min-width:0}
+.request-intake-step .step-number{display:grid;place-items:center;width:33px;height:33px;border:2px solid #dbe3ee;border-radius:50%;background:#fff;color:#64748b;font-size:.72rem;font-weight:850}
+.request-intake-step.active .step-number{border:3px solid #1e3a8a;background:#eff6ff;color:#1e3a8a}
+.request-intake-step .step-label{font-size:.68rem;line-height:1.3;font-weight:750;color:#64748b}
+.request-intake-step.active .step-label{color:#1e3a8a}
+.request-intake-step.done .step-number{background:#16a34a;border-color:#16a34a;color:white}
+.request-intake-step.done .step-label{color:#15803d}
+body.dark{--mr-page:#0b1220;--mr-card:#111c2d;--mr-soft:#172235;--mr-ink:#e2e8f0;--mr-muted:#94a3b8;--mr-border:#26364d}
+body.dark .request-intake-stepper{background:var(--mr-card);border-color:var(--mr-border)}
+body.dark .request-intake-stepper .stepper-heading strong{color:#e2e8f0}
+body.dark .request-intake-step .step-number{background:#111c2d;border-color:#334155;color:#94a3b8}
+body.dark .request-intake-step.active .step-number{background:#172554;border-color:#60a5fa;color:#dbeafe}
+body.dark .request-intake-step .step-label{color:#94a3b8}
+body.dark #incidentForm input:not([type=checkbox]):not([type=file]),body.dark #incidentForm select,body.dark #incidentForm textarea{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.dark #incidentForm .checkbox-group,body.dark #incidentForm .upload-policy-item,body.dark #incidentForm .case-turnstile{background:#172235;border-color:#334155}
+body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
+@media(max-width:620px){.request-intake-stepper{padding:.95rem .7rem}.request-intake-steps{grid-template-columns:1fr;gap:.65rem}.request-intake-steps:before{left:16px;right:auto;top:18px;bottom:18px;width:2px;height:auto}.request-intake-step{flex-direction:row;justify-content:flex-start;text-align:left;gap:.65rem}.request-intake-step .step-label{font-size:.75rem}.request-intake-step .step-number{flex:0 0 33px}.request-welcome-mark{display:none}.request-benefits span{border-radius:8px}.request-dashboard-note .request-flow-head{align-items:flex-start}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+
 </head>
 <body><div id="clientRequestToastStack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
 <div id="submissionModalOverlay" role="dialog" aria-modal="true" aria-labelledby="submissionModalTitle">
@@ -377,6 +437,18 @@ body.dark .request-welcome{border-color:rgba(96,165,250,.25);box-shadow:0 16px 3
           <div class="request-welcome-mark" aria-hidden="true"><i class="fas fa-file-shield"></i><span>CASE INTAKE</span></div>
         </section>
         
+
+<section class="request-intake-stepper" aria-label="Recovery request steps">
+  <div class="stepper-heading"><strong>Recovery request checklist</strong><span>Complete each section, then verify and submit</span></div>
+  <div class="request-intake-steps" id="requestIntakeSteps">
+    <div class="request-intake-step active" data-intake-step="personal"><span class="step-number">1</span><span class="step-label">Personal information</span></div>
+    <div class="request-intake-step" data-intake-step="incident"><span class="step-number">2</span><span class="step-label">Incident details</span></div>
+    <div class="request-intake-step" data-intake-step="device"><span class="step-number">3</span><span class="step-label">Device information</span></div>
+    <div class="request-intake-step" data-intake-step="evidence"><span class="step-number">4</span><span class="step-label">Evidence &amp; documents</span></div>
+    <div class="request-intake-step" data-intake-step="review"><span class="step-number">5</span><span class="step-label">Security &amp; submit</span></div>
+  </div>
+</section>
+
 <section class="request-flow-card request-dashboard-note" aria-label="Case tracking"><div class="request-flow-head"><div><h2><i class="fas fa-gauge-high"></i> Case Tracking</h2><p class="request-flow-sub">Your submitted and pending cases are managed from the Client Dashboard. This page is for creating a new recovery request and securely adding evidence.</p></div><a class="btn btn-primary" href="/client/dashboard.html"><i class="fas fa-folder-open"></i> Open My Cases</a></div></section><div id="formContainer">
             <div id="draftBanner" class="draft-banner" style="display:none;">
                 <span><i class="fas fa-clock-rotate-left"></i> We restored your unsaved draft from earlier.</span>
@@ -901,24 +973,6 @@ body.dark .request-welcome{border-color:rgba(96,165,250,.25);box-shadow:0 16px 3
     </script>
   <script src="/js/call-widget.js"></script>
 <script src="/js/pwa.js" defer></script>
-<footer class="manlung-footer" aria-label="Manlung Recovery footer">
-  <div class="manlung-footer-inner">
-    <div class="manlung-footer-grid">
-      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
-        <div class="manlung-footer-brand-row">
-          <a href="/" aria-label="Manlung Recovery Home"><img src="/icons/icon-512.png" alt="Manlung Recovery" class="manlung-footer-logo" width="46" height="46"></a>
-          <div><h2 id="footer-brand-title">Manlung Recovery</h2><p class="manlung-footer-brand-subtitle">Cyber Recovery &amp; Digital Investigation Portal</p></div>
-        </div>
-        <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
-      </section>
-      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
-      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request.html">New Recovery Request</a><a href="/client/dashboard.html">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/donate.html" class="footer-important">Donate</a><a href="/careers.html" class="footer-important">Careers</a><a href="/contact.html">Contact</a></nav></section>
-      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
-    </div>
-    <div class="manlung-footer-divider"></div>
-    <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="https://i.postimg.cc/DZHs0t4n/icons8-facebook-48.png" alt="Facebook" width="32" height="32" loading="lazy"></a><a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="https://i.postimg.cc/sD9QCBct/icons8-instagram-48.png" alt="Instagram" width="32" height="32" loading="lazy"></a><a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="X"><img src="https://i.postimg.cc/SNT49kNc/icons8-x-50.png" alt="X" width="32" height="32" loading="lazy"></a><a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="https://i.postimg.cc/3J667Rxx/icons8-tiktok-50.png" alt="TikTok" width="32" height="32" loading="lazy"></a><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="https://i.postimg.cc/W4V5bJLF/icons8-youtube-48.png" alt="YouTube" width="32" height="32" loading="lazy"></a><a href="https://news.google.com/" target="_blank" rel="noopener noreferrer" aria-label="Google News"><img src="https://i.postimg.cc/T2sQ5sMs/icons8-google-48.png" alt="Google News" width="32" height="32" loading="lazy"></a><a href="https://t.me/" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><img src="https://i.postimg.cc/ZRMP3Wgx/icons8-telegram-48.png" alt="Telegram" width="32" height="32" loading="lazy"></a></div></div>
-    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
-  </div>
-<style id="manlung-footer-social-icons-v2">.manlung-footer-social{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap}.manlung-footer-social a{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:4px;border-radius:12px;background:rgba(255,255,255,.04);transition:transform .18s ease,background .18s ease}.manlung-footer-social a:hover{transform:translateY(-2px);background:rgba(37,99,235,.14)}.manlung-footer-social a img{display:block;width:32px;height:32px;object-fit:contain}.manlung-footer-social a:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}@media(max-width:600px){.manlung-footer-social{gap:10px}.manlung-footer-social a{width:40px;height:40px}}</style></footer>
+
 </body>
 </html>
