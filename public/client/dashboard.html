@@ -3207,10 +3207,14 @@ body:has(.client-workspace) .client-side-nav a .client-nav-badge{
     }
     function accountName(){
       const a=accountData();
+      const email=String(a.email||a.emailAddress||'').trim();
       const joined=[a.first_name||a.firstName,a.last_name||a.lastName].filter(Boolean).join(' ').trim();
-      const fromAccount=String(a.full_name||a.fullName||a.displayName||a.name||joined||a.username||'').trim();
+      const username=String(a.username||'').trim();
+      const fromAccount=String(a.full_name||a.fullName||a.displayName||a.name||joined||(username&&username.toLowerCase()!==email.toLowerCase()?username:'')).trim();
       const fromSidebar=document.querySelector('.client-side-user strong')?.textContent?.trim()||'';
-      return fromAccount||(fromSidebar!=='Client account'&&fromSidebar!=='Loading profile…'?fromSidebar:'Festus');
+      const sidebarName=fromSidebar&&fromSidebar.toLowerCase()!==email.toLowerCase()&&fromSidebar!=='Client account'&&fromSidebar!=='Loading profile…'?fromSidebar:'';
+      const emailName=email.includes('@')?email.split('@')[0].replace(/[._-]+/g,' ').replace(/\\b\\p{L}/gu,ch=>ch.toUpperCase()):'';
+      return fromAccount||sidebarName||emailName||'Client';
     }
     function accountEmail(){
       const a=accountData();
@@ -3230,13 +3234,45 @@ body:has(.client-workspace) .client-side-nav a .client-nav-badge{
       const nameEl=profileCard.querySelector('#referenceProfileName'),emailEl=profileCard.querySelector('#referenceProfileEmail'),initialEl=profileCard.querySelector('#referenceProfileInitials');
       if(nameEl)nameEl.textContent=name;
       if(emailEl)emailEl.textContent=email&&email!=='Signed-in client'&&email!=='Loading profile…'?email:'Signed-in client';
-      if(initialEl)initialEl.textContent=initials(name);
+      if(initialEl){
+        const initialsText=initials(name);
+        const imageValue=a.profilePicture||a.profile_picture||a.avatarUrl||a.avatar_url||a.photoURL||a.photo_url||a.imageUrl||a.image_url;
+        const isAllowedImage=value=>typeof value==='string'&&(/^https:\\/\\//i.test(value)||/^data:image\\/(?:png|jpeg|webp|gif);base64,/i.test(value));
+        const domImage=Array.from(document.querySelectorAll('#manlungClientAvatar img,.manlung-profile-avatar img,#clientPhotoPreview img,.client-photo-preview img,.profile-pic,.user-avatar img,[data-profile-avatar] img'))
+          .find(img=>img.getAttribute('src')&&!/placeholder|default-avatar/i.test(img.getAttribute('src')));
+        const imageSource=isAllowedImage(imageValue)?imageValue:(domImage&&isAllowedImage(domImage.src)?domImage.src:'');
+        const currentSource=initialEl.dataset.profileImageSource||'';
+        if(currentSource!==imageSource){
+          initialEl.replaceChildren();
+          initialEl.dataset.profileImageSource=imageSource;
+          if(imageSource){
+            const photo=document.createElement('img');
+            photo.src=imageSource;
+            photo.alt='Saved client profile photo';
+            photo.loading='eager';
+            photo.referrerPolicy='no-referrer';
+            photo.style.cssText='display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit';
+            photo.onerror=function(){
+              if(initialEl.dataset.profileImageSource===imageSource){
+                initialEl.dataset.profileImageSource='';
+                initialEl.replaceChildren();
+                initialEl.textContent=initialsText;
+              }
+            };
+            initialEl.appendChild(photo);
+          }else{
+            initialEl.textContent=initialsText;
+          }
+        }else if(!imageSource&&initialEl.textContent!==initialsText){
+          initialEl.textContent=initialsText;
+        }
+      }
       const tags=profileCard.querySelector('#referenceProfileTags');if(!tags)return;
       tags.replaceChildren();
       const id=a.client_id||a.clientId||a.user_id||a.userId||a.id||a.account_id||a.accountId;
       const phone=a.phone||a.phone_number||a.phoneNumber||a.mobile||a.mobile_number;
       if(id)addTag(tags,'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v6"/>','Account: '+String(id));
-      if(phone)addTag(tags,'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.1 4.14 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72l.45 2.81a2 2 0 0 1-.57 1.75L7.1 10.1a16 16 0 0 0 6 6l1.82-1.4a2 2 0 0 1 1.75-.57l2.81.45A2 2 0 0 1 21.2 16"/>',String(phone));
+      if(phone)addTag(tags,'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.1 4.14 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72l.45 2.81a2 2 0 0 1-.57 1.75L7.1 10.1a16 16 0 0 0 6 6l1.82-1.4a2 2 0 0 0 1.75-.57l2.81.45A2 2 0 0 1 21.2 16"/>',String(phone));
       if(!id&&!phone)addTag(tags,'<path d="M4 5h16v14H4z"/><path d="m4 7 8 6 8-6"/>',email&&email!=='Signed-in client'&&email!=='Loading profile…'?email:'Signed-in client');
     }
     const statusCard=document.createElement('article');statusCard.className='reference-card reference-status-card';
