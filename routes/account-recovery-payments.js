@@ -15,7 +15,7 @@ router.post('/initialize',[body('email').isEmail().normalizeEmail(),body('amount
   if(!process.env.PAYSTACK_SECRET_KEY||!process.env.PAYSTACK_PUBLIC_KEY)return res.status(503).json({success:false,error:'Payments are not configured.'});
   const amount=Number(req.body.amountKes),name=PACKAGES[amount];if(!name)return res.status(400).json({success:false,error:'Choose KES 200, KES 500, or KES 1,000.'});
   const email=String(req.body.email).trim().toLowerCase(),reference=`MR-ACCOUNT-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`;
-  const {error}=await supabase.from(TABLE).insert({reference,customer_email:email,package_name:name,amount_kes:amount,currency:'KES',status:'pending'});
+  const {error}=await supabase.from(TABLE).insert({reference,email,customer_name:null,package_name:name,currency:'KES',amount_kes:amount,status:'pending'});
   if(error)throw error;
   const init=await axios.post(`${API}/transaction/initialize`,{email,amount:amount*100,currency:'KES',reference,callback_url:`${origin(req)}/account-recovery.html`,metadata:{service:'hacked-social-media-pages-and-emails',package_name:name,amount_kes:amount}},{headers:{Authorization:`Bearer ${process.env.PAYSTACK_SECRET_KEY}`,'Content-Type':'application/json'},timeout:15000});
   if(!init.data?.status||!init.data?.data?.authorization_url)throw new Error('Paystack checkout URL missing');
@@ -27,12 +27,12 @@ router.post('/verify',[body('reference').trim().isLength({min:8,max:120})],async
  try{
   if(!process.env.PAYSTACK_SECRET_KEY)return res.status(503).json({success:false,error:'Verification is not configured.'});
   const reference=String(req.body.reference).trim();
-  const {data:p,error}=await supabase.from(TABLE).select('reference,customer_email,package_name,amount_kes,currency,status').eq('reference',reference).maybeSingle();
+  const {data:p,error}=await supabase.from(TABLE).select('reference,email,package_name,amount_kes,currency,status').eq('reference',reference).maybeSingle();
   if(error)throw error;if(!p)return res.status(404).json({success:false,error:'Payment reference not found.'});
   if(p.status==='confirmed')return res.json({success:true,paid:true,reference,amountKes:p.amount_kes,packageName:p.package_name,reviewAllowed:true});
   const v=await axios.get(`${API}/transaction/verify/${encodeURIComponent(reference)}`,{headers:{Authorization:`Bearer ${process.env.PAYSTACK_SECRET_KEY}`},timeout:15000});
   const tx=v.data?.data;
-  if(Number(tx?.amount)!==Number(p.amount_kes)*100||String(tx?.currency||'').toUpperCase()!=='KES'||tx?.reference!==reference||String(tx?.customer?.email||'').toLowerCase()!==p.customer_email)return res.status(400).json({success:false,paid:false,error:'Payment details do not match this order.'});
+  if(Number(tx?.amount)!==Number(p.amount_kes)*100||String(tx?.currency||'').toUpperCase()!=='KES'||tx?.reference!==reference||String(tx?.customer?.email||'').toLowerCase()!==p.email)return res.status(400).json({success:false,paid:false,error:'Payment details do not match this order.'});
   if(tx.status!=='success')return res.status(202).json({success:false,paid:false,pending:['pending','ongoing','processing'].includes(String(tx.status||'').toLowerCase()),message:'Payment is not confirmed yet. Wait a moment and retry.'});
   const {data:updated,error:upErr}=await supabase.from(TABLE).update({status:'confirmed',paystack_transaction_id:String(tx.id),paid_at:tx.paid_at||tx.transaction_date||new Date().toISOString()}).eq('reference',reference).eq('status','pending').select('reference,amount_kes,package_name,status').maybeSingle();
   if(upErr)throw upErr;
@@ -52,7 +52,7 @@ router.post('/reviews',[body('reference').trim().isLength({min:8,max:120}),body(
  }catch(e){console.error('Account recovery review:',e.message);res.status(500).json({success:false,error:'Could not submit review.'});}
 });
 router.get('/reviews',async(_req,res)=>{
- try{const {data,error}=await supabase.from(REVIEWS).select('id,display_name,rating,review_text,created_at').eq('status','published').order('created_at',{ascending:false}).limit(12);if(error)throw error;res.set('Cache-Control','public, max-age=30, stale-while-revalidate=60');res.json({success:true,reviews:data||[]});}
+ try{const {data,error}=await supabase.from(REVIEWS).select('id,customer_name,rating,review,created_at').eq('is_public',true).order('created_at',{ascending:false}).limit(12);if(error)throw error;res.set('Cache-Control','public, max-age=30, stale-while-revalidate=60');res.json({success:true,reviews:data||[]});}
  catch(e){console.error('Account recovery reviews:',e.message);res.status(500).json({success:false,error:'Reviews are temporarily unavailable.'});}
 });
 module.exports=router;
