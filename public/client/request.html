@@ -1004,6 +1004,70 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
 
         checkAuth();
     </script>
+
+  <script>
+    // Keep the intake checklist synchronized with the visible form section.
+    (function initRequestIntakeStepper() {
+      const root = document.getElementById('requestIntakeSteps');
+      const form = document.getElementById('incidentForm');
+      if (!root || !form) return;
+
+      const steps = Array.from(root.querySelectorAll('[data-intake-step]'));
+      const cards = Array.from(form.querySelectorAll('.card'));
+      const sectionGroups = [
+        { key: 'personal', match: /case type|personal information/i },
+        { key: 'incident', match: /incident details|scam|fraud|identity theft|network investigation/i },
+        { key: 'device', match: /device information/i },
+        { key: 'evidence', match: /evidence|upload files/i },
+        { key: 'review', match: /priority|terms|security|submit/i }
+      ];
+      const tracked = [];
+      cards.forEach(card => {
+        const heading = card.querySelector('h1,h2,h3,h4,.card-title,.section-title');
+        const title = (heading ? heading.textContent : card.textContent).trim().slice(0, 180);
+        const group = sectionGroups.find(item => item.match.test(title));
+        if (group) tracked.push({ element: card, key: group.key });
+      });
+      const turnstile = document.querySelector('.case-turnstile');
+      if (turnstile) tracked.push({ element: turnstile, key: 'review' });
+      const submit = document.getElementById('submitBtn');
+      if (submit) {
+        const submitCard = submit.closest('.card');
+        if (submitCard && !tracked.some(item => item.element === submitCard)) tracked.push({ element: submitCard, key: 'review' });
+      }
+      const order = ['personal', 'incident', 'device', 'evidence', 'review'];
+      function setActive(key) {
+        const activeIndex = Math.max(0, order.indexOf(key));
+        steps.forEach(step => {
+          const index = order.indexOf(step.dataset.intakeStep);
+          step.classList.toggle('active', index === activeIndex);
+          step.classList.toggle('done', index >= 0 && index < activeIndex);
+          if (index === activeIndex) step.setAttribute('aria-current', 'step');
+          else step.removeAttribute('aria-current');
+        });
+      }
+      function updateFromScroll() {
+        if (!tracked.length) return;
+        const marker = Math.min(window.innerHeight * 0.42, window.innerHeight - 80);
+        let current = tracked[0];
+        for (const item of tracked) {
+          if (item.element.getBoundingClientRect().top <= marker) current = item;
+          else break;
+        }
+        setActive(current.key);
+      }
+      let scheduled = false;
+      function onScroll() {
+        if (scheduled) return;
+        scheduled = true;
+        window.requestAnimationFrame(() => { scheduled = false; updateFromScroll(); });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      updateFromScroll();
+    })();
+  </script>
+
   <script src="/js/call-widget.js"></script>
 <script src="/js/pwa.js" defer></script>
 
