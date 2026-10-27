@@ -20,7 +20,7 @@ router.post('/initialize', async (req, res) => {
     const init = await axios.post('https://api.paystack.co/transaction/initialize', {
       email, amount: amountKes * 100, currency: 'KES', reference,
       metadata: { service_payment: true, customer_name: customerName || null, amount_kes: amountKes },
-      callback_url: process.env.PAYSTACK_CALLBACK_URL || `${process.env.PUBLIC_APP_URL || `${req.protocol}://${req.get('host')}`}/services.html?payment=return`
+      callback_url: process.env.SERVICE_PAYMENT_CALLBACK_URL || `${process.env.PUBLIC_APP_URL || `${req.protocol}://${req.get('host')}`}/services.html`
     }, { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` } });
     res.json({ success: true, reference, authorizationUrl: init.data?.data?.authorization_url, accessCode: init.data?.data?.access_code, publicKey: process.env.PAYSTACK_PUBLIC_KEY });
   } catch (error) {
