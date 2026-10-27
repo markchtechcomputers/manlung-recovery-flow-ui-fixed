@@ -828,11 +828,8 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         </div>
       </div>
       <div class="header-actions">
-        <button class="btn btn-outline" type="button" data-theme-toggle="true"><i class="fas fa-circle-half-stroke" aria-hidden="true"></i><span>Theme</span></button>
-        <a class="btn btn-outline" href="/client/request.html"><i class="fas fa-file-circle-plus" aria-hidden="true"></i><span>New Request</span></a>
-        <a class="btn btn-outline" href="/client/settings.html"><i class="fas fa-user-gear" aria-hidden="true"></i><span>Settings</span></a>
-        <a class="btn btn-outline" href="/"><i class="fas fa-house" aria-hidden="true"></i><span>Home</span></a>
-        <button class="btn btn-outline" type="button" onclick="logout()"><i class="fas fa-right-from-bracket" aria-hidden="true"></i><span>Logout</span></button>
+        <button class="btn btn-outline" type="button" data-theme-toggle="true" aria-label="Toggle theme"><i class="fas fa-circle-half-stroke" aria-hidden="true"></i><span>Theme</span></button>
+        <span class="client-header-label"><i class="fas fa-shield-halved" aria-hidden="true"></i> Secure client portal</span>
       </div>
     </div>
   </header>
@@ -2354,6 +2351,12 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
 @media(max-width:560px){.overview-donations .community-grants-image-icon img{width:28px!important;height:28px!important;max-width:28px!important;max-height:28px!important;flex-basis:28px!important}}
 </style>
 
+<style id="manlung-dashboard-sidebar-only-nav">
+  .client-header-label{display:inline-flex;align-items:center;gap:8px;color:#64748b;font-size:13px;font-weight:700}
+  .client-header-label i{color:#2563eb}
+  .client-side-nav a[href="#language"]{cursor:pointer}
+  @media(max-width:768px){.client-header-label{display:none}}
+</style>
 <!-- manlung-client-dashboard-refresh-20261026 -->
 <style id="manlung-client-dashboard-refresh-20261026">
   :root{--client-yellow:#ffd633;--client-ink:#1e293b;--client-muted:#64748b}
@@ -2402,12 +2405,12 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
     const nav=document.createElement('nav');nav.className='client-side-nav';
     const links=[
       ['fa-house','Dashboard','/client/dashboard.html'],
+      ['fa-house-user','Home','/'],
       ['fa-circle-plus','New Request','/client/request.html'],
-      ['fa-folder-open','Recovery Center','/client/recovery-center.html'],
-      ['fa-location-dot','Track a Case','/client/track.html'],
+      ['fa-globe','Language','#language'],
       ['fa-user-gear','Settings','/client/settings.html']
     ];
-    links.forEach(function(item){const a=document.createElement('a');a.href=item[2];a.innerHTML='<i class="fas '+item[0]+'" aria-hidden="true"></i><span>'+item[1]+'</span>';if(location.pathname===item[2])a.classList.add('active');nav.appendChild(a)});
+    links.forEach(function(item){const a=document.createElement('a');a.href=item[2];a.innerHTML='<i class="fas '+item[0]+'" aria-hidden="true"></i><span>'+item[1]+'</span>';if(location.pathname===item[2])a.classList.add('active');if(item[1]==='Language'){a.addEventListener('click',function(e){e.preventDefault();if(typeof window.openLanguageSelector==='function'){window.openLanguageSelector()}else{const picker=document.querySelector('[lang], [data-language-selector], #languageSelector, .language-selector');if(picker){picker.scrollIntoView({behavior:'smooth',block:'center'});}else{alert('Language selection is not available on this page yet.');}}});}nav.appendChild(a)});
     const logout=document.createElement('button');logout.type='button';logout.innerHTML='<i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i><span>Logout</span>';logout.addEventListener('click',function(){if(typeof window.logout==='function')window.logout();else location.href='/login.html'});nav.appendChild(logout);
     const profile=document.createElement('div');profile.className='client-side-profile';
     const avatar=document.createElement('div');avatar.className='client-side-avatar';avatar.textContent='MR';
