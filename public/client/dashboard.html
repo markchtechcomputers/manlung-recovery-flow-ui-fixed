@@ -810,6 +810,59 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 @media(prefers-reduced-motion:reduce){.manlung-incoming-call-card.is-visible,.manlung-incoming-call-avatar{animation:none}}
 </style>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
+<style id="client-exact-light-theme-clock">
+  :root{--client-theme-bg:#F3F6F9;--client-theme-card:#FFFFFF;--client-theme-text:#1E293B;--client-theme-muted:#94A3B8;--client-theme-line:#E2E8F0;--client-theme-blue:#3B82F6;--client-theme-blue-light:#EFF6FF;--client-theme-amber:#F59E0B;--client-theme-amber-light:#FFFBEB;--client-theme-green:#10B981;--client-theme-green-light:#ECFDF5;--client-theme-purple:#8B5CF6;--client-theme-purple-light:#F5F3FF;--client-theme-radius:24px}
+  body:has(.client-workspace){background:var(--client-theme-bg)!important;color:var(--client-theme-text)!important;color-scheme:light}
+  body:has(.client-workspace) .client-workspace{max-width:1600px!important;padding:20px!important;gap:24px!important;background:transparent!important;color:var(--client-theme-text)!important}
+  body:has(.client-workspace) .client-sidepanel{background:var(--client-theme-card)!important;border:1px solid var(--client-theme-line)!important;border-radius:var(--client-theme-radius)!important;box-shadow:0 4px 20px rgba(0,0,0,.03)!important}
+  body:has(.client-workspace) .client-side-brand{color:var(--client-theme-text)!important}
+  body:has(.client-workspace) .client-side-nav a,body:has(.client-workspace) .client-side-nav button{color:#64748B!important;border-radius:14px!important;transition:background .18s ease,color .18s ease}
+  body:has(.client-workspace) .client-side-nav a:hover,body:has(.client-workspace) .client-side-nav button:hover{background:var(--client-theme-bg)!important;color:var(--client-theme-text)!important}
+  body:has(.client-workspace) .client-side-nav a.active{background:var(--client-theme-blue-light)!important;color:var(--client-theme-blue)!important}
+  body:has(.client-workspace) .client-side-profile{background:#F8FAFC!important;border:1px solid var(--client-theme-line)!important;border-radius:16px!important}
+  body:has(.client-workspace) .client-side-user strong{color:var(--client-theme-text)!important}
+  body:has(.client-workspace) .client-side-user small{color:var(--client-theme-muted)!important}
+  body:has(.client-workspace) .client-main{color:var(--client-theme-text)!important;gap:20px}
+  body:has(.client-workspace) .client-main .site-header{background:var(--client-theme-card)!important;border:1px solid var(--client-theme-line)!important;border-radius:16px!important;box-shadow:0 4px 20px rgba(0,0,0,.03)!important}
+  body:has(.client-workspace) .client-main .dashboard-overview-title{color:var(--client-theme-text)!important}
+  body:has(.client-workspace) .client-main .dashboard-overview-subtitle{color:#64748B!important}
+  body:has(.client-workspace) .client-main .dashboard-topbar-icon{background:var(--client-theme-card)!important;border:1px solid var(--client-theme-line)!important;color:#64748B!important;border-radius:14px!important}
+  body:has(.client-workspace) .client-main .dashboard-topbar-icon:hover{background:var(--client-theme-blue-light)!important;color:var(--client-theme-blue)!important}
+  body:has(.client-workspace) .client-main .dashboard-hero{display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:20px!important;margin:0 0 1rem!important;padding:24px!important;border:1px solid var(--client-theme-line)!important;border-radius:var(--client-theme-radius)!important;background:var(--client-theme-card)!important;color:var(--client-theme-text)!important;box-shadow:0 4px 20px rgba(0,0,0,.03)!important;min-height:0!important}
+  body:has(.client-workspace) .client-main .dashboard-hero-copy{flex:1 1 280px!important;min-width:0!important;max-width:760px!important}
+  body:has(.client-workspace) .client-main .dashboard-hero .dashboard-kicker{display:inline-flex!important;align-items:center!important;gap:7px!important;padding:7px 10px!important;border-radius:999px!important;background:var(--client-theme-blue-light)!important;color:var(--client-theme-blue)!important;font-size:.68rem!important;font-weight:800!important;letter-spacing:.06em!important}
+  body:has(.client-workspace) .client-main .dashboard-hero h2{color:var(--client-theme-text)!important;font-size:clamp(1.5rem,2.6vw,2rem)!important;line-height:1.25!important;letter-spacing:-.035em!important;margin:.65rem 0 .4rem!important}
+  body:has(.client-workspace) .client-main .dashboard-hero p{color:#64748B!important;font-size:.85rem!important;line-height:1.65!important;max-width:650px!important}
+  body:has(.client-workspace) .client-main .dashboard-hero-trust{display:flex!important;gap:8px!important;flex-wrap:wrap!important;margin-top:14px!important}
+  body:has(.client-workspace) .client-main .dashboard-hero-trust span{display:inline-flex!important;align-items:center!important;gap:6px!important;background:#F8FAFC!important;color:#64748B!important;border:1px solid var(--client-theme-line)!important;border-radius:999px!important;padding:6px 9px!important;font-size:.67rem!important}
+  body:has(.client-workspace) .client-main .dashboard-hero-trust span i{color:var(--client-theme-blue)!important}
+  body:has(.client-workspace) .client-main .dashboard-hero .dashboard-primary-action{background:var(--client-theme-blue)!important;color:#fff!important;border:0!important;border-radius:12px!important;box-shadow:0 8px 18px rgba(59,130,246,.18)!important;white-space:nowrap!important}
+  body:has(.client-workspace) .client-main .dashboard-hero .dashboard-primary-action:hover{background:#2563EB!important}
+  body:has(.client-workspace) .client-main .dashboard-hero .dashboard-primary-action .dashboard-action-arrow{color:#fff!important}
+  body:has(.client-workspace) .client-main .dashboard-hero-action small{color:var(--client-theme-muted)!important}
+  .client-analog-clock-widget{order:2;flex:0 0 auto;display:flex;align-items:center;gap:13px;padding:9px 13px;background:#F8FAFC;border:1px solid var(--client-theme-line);border-radius:20px;box-shadow:0 4px 16px rgba(15,23,42,.035);min-width:230px}
+  .client-clock-face{width:82px;height:82px;flex:0 0 82px;background:#fff;border:1px solid var(--client-theme-line);border-radius:50%;padding:3px;box-shadow:0 3px 10px rgba(15,23,42,.04)}
+  .client-clock-face svg{display:block;width:100%;height:100%}
+  #clientClockHourHand,#clientClockMinuteHand,#clientClockSecondHand{transform-origin:50px 50px}
+  .client-clock-copy{display:flex;flex-direction:column;min-width:0;gap:3px}
+  .client-clock-kicker{font-size:.59rem;font-weight:900;letter-spacing:.1em;color:var(--client-theme-blue)}
+  .client-clock-copy strong{font-size:1.13rem;line-height:1.2;font-weight:800;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--client-theme-text);white-space:nowrap}
+  .client-clock-date{font-size:.65rem;line-height:1.4;color:#64748B}
+  body:has(.client-workspace) .client-main .dashboard-overview-card,body:has(.client-workspace) .client-main .dashboard-section,body:has(.client-workspace) .client-main .manlung-dashboard-card,body:has(.client-workspace) .client-main .client-context-item{background:var(--client-theme-card)!important;border:1px solid var(--client-theme-line)!important;border-radius:var(--client-theme-radius)!important;box-shadow:0 4px 20px rgba(0,0,0,.03)!important;color:var(--client-theme-text)!important}
+  body:has(.client-workspace) .client-context-card{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;margin:0 0 18px!important}
+  body:has(.client-workspace) .client-context-item{padding:18px!important}
+  body:has(.client-workspace) .client-context-item .context-label{color:#64748B!important}
+  body:has(.client-workspace) .client-context-item .context-value{color:var(--client-theme-text)!important;font-variant-numeric:tabular-nums}
+  body:has(.client-workspace) .client-context-item .context-detail{color:var(--client-theme-muted)!important}
+  body:has(.client-workspace) .client-context-item .context-icon{color:var(--client-theme-blue)!important}
+  body:has(.client-workspace) .dashboard-section-icon{background:var(--client-theme-blue-light)!important;color:var(--client-theme-blue)!important}
+  body:has(.client-workspace) .dashboard-mini-link{background:var(--client-theme-blue-light)!important;border-color:#DBEAFE!important;color:var(--client-theme-blue)!important}
+  body:has(.client-workspace) .dashboard-inline-count{background:var(--client-theme-bg)!important;color:#64748B!important}
+  body:has(.client-workspace) .manlung-footer,body:has(.client-workspace) footer,body:has(.client-workspace) #siteFooter{display:none!important}
+  @media(max-width:1024px){body:has(.client-workspace) .client-workspace{padding:14px!important}.client-analog-clock-widget{min-width:215px}.client-clock-face{width:74px;height:74px;flex-basis:74px}}
+  @media(max-width:767px){body:has(.client-workspace) .client-workspace{padding:10px!important;gap:12px!important}body:has(.client-workspace) .client-main .dashboard-hero{padding:17px!important;gap:16px!important}body:has(.client-workspace) .client-main .dashboard-hero-copy{flex-basis:100%!important}.client-analog-clock-widget{order:3;width:100%;min-width:0;justify-content:flex-start;padding:9px 12px}body:has(.client-workspace) .client-main .dashboard-hero-action{order:4;width:100%;max-width:none!important}body:has(.client-workspace) .client-main .dashboard-hero-action .dashboard-primary-action{width:100%;justify-content:center}body:has(.client-workspace) .client-context-card{grid-template-columns:1fr!important}body:has(.client-workspace) .client-context-item{padding:14px!important}}
+  @media(prefers-reduced-motion:reduce){.client-analog-clock-widget *{transition:none!important}}
+</style>
 </head>
 <body>
   <header class="site-header">
@@ -2521,12 +2574,33 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
       }
     }
     syncProfile();setInterval(syncProfile,3000);
-    const context=document.createElement('section');context.className='client-context-card';context.setAttribute('aria-label','Your local time, location and weather');
-    context.innerHTML='<div class="client-context-item"><div class="context-label"><i class="fas fa-clock context-icon"></i> Your local time</div><strong class="context-value" id="clientLocalTime">Detecting time…</strong><small class="context-detail" id="clientLocalDate"></small></div><div class="client-context-item"><div class="context-label"><i class="fas fa-location-dot context-icon"></i> Your location</div><strong class="context-value" id="clientLocalPlace">Permission required</strong><small class="context-detail" id="clientLocalCoords">Location is only read if you allow it.</small></div><div class="client-context-item"><div class="context-label"><i class="fas fa-cloud-sun context-icon"></i> Local weather</div><strong class="context-value" id="clientLocalWeather">Waiting for location</strong><small class="context-detail" id="clientLocalWeatherDetail">Weather uses approximate coordinates from your browser permission.</small></div>';
+    const context=document.createElement('section');context.className='client-context-card';context.setAttribute('aria-label','Your location and local weather');
+    context.innerHTML='<div class="client-context-item"><div class="context-label"><i class="fas fa-location-dot context-icon"></i> Your location</div><strong class="context-value" id="clientLocalPlace">Permission required</strong><small class="context-detail" id="clientLocalCoords">Location is only read if you allow it.</small></div><div class="client-context-item"><div class="context-label"><i class="fas fa-cloud-sun context-icon"></i> Local weather</div><strong class="context-value" id="clientLocalWeather">Waiting for location</strong><small class="context-detail" id="clientLocalWeatherDetail">Weather uses approximate coordinates from your browser permission.</small></div>';
     const hero=main.querySelector('.dashboard-hero');
-    if(hero)hero.insertAdjacentElement('afterend',context);else main.insertBefore(context,main.firstChild);
-    const timeEl=context.querySelector('#clientLocalTime'),dateEl=context.querySelector('#clientLocalDate');
-    function updateTime(){const now=new Date();timeEl.textContent=new Intl.DateTimeFormat(undefined,{hour:'numeric',minute:'2-digit',second:'2-digit'}).format(now);dateEl.textContent=new Intl.DateTimeFormat(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(now)}
+    const clock=document.createElement('section');
+    clock.className='client-analog-clock-widget';
+    clock.setAttribute('role','timer');
+    clock.setAttribute('aria-label','Live local clock and date');
+    clock.innerHTML='<div class="client-clock-face"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="45" fill="none" stroke="#E2E8F0" stroke-width="4" stroke-dasharray="2 22" stroke-linecap="round"/><line id="clientClockHourHand" x1="50" y1="50" x2="50" y2="29" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/><line id="clientClockMinuteHand" x1="50" y1="50" x2="50" y2="19" stroke="#1E293B" stroke-width="3" stroke-linecap="round"/><line id="clientClockSecondHand" x1="50" y1="50" x2="50" y2="12" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round"/><circle cx="50" cy="50" r="3.5" fill="#1E293B"/></svg></div><div class="client-clock-copy"><span class="client-clock-kicker">LOCAL TIME</span><strong id="clientClockDigitalTime">--:--:--</strong><span id="clientClockDate" class="client-clock-date"></span></div>';
+    if(hero){
+      const heroAction=hero.querySelector('.dashboard-hero-action');
+      if(heroAction)hero.insertBefore(clock,heroAction);else hero.appendChild(clock);
+      hero.insertAdjacentElement('afterend',context);
+    }else{
+      main.insertBefore(clock,main.firstChild);
+      main.insertBefore(context,clock.nextSibling);
+    }
+    const clockHour=clock.querySelector('#clientClockHourHand'),clockMinute=clock.querySelector('#clientClockMinuteHand'),clockSecond=clock.querySelector('#clientClockSecondHand');
+    const clockDigital=clock.querySelector('#clientClockDigitalTime'),clockDate=clock.querySelector('#clientClockDate');
+    function updateTime(){
+      const now=new Date(),hours=now.getHours(),minutes=now.getMinutes(),seconds=now.getSeconds();
+      clockHour.style.transform='rotate('+((hours%12)*30+minutes*.5)+'deg)';
+      clockMinute.style.transform='rotate('+(minutes*6+seconds*.1)+'deg)';
+      clockSecond.style.transform='rotate('+(seconds*6)+'deg)';
+      clockDigital.textContent=new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(now);
+      clockDate.textContent=new Intl.DateTimeFormat(undefined,{weekday:'long',month:'short',day:'numeric'}).format(now);
+      clock.setAttribute('aria-label','Local time '+clockDigital.textContent+', '+clockDate.textContent);
+    }
     updateTime();setInterval(updateTime,1000);
     const place=context.querySelector('#clientLocalPlace'),coords=context.querySelector('#clientLocalCoords'),weather=context.querySelector('#clientLocalWeather'),detail=context.querySelector('#clientLocalWeatherDetail');
     if(!navigator.geolocation){place.textContent='Not available';coords.textContent='This browser does not support location access.';return}
