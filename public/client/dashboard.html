@@ -1126,7 +1126,8 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
           profilePicture: data.user.profilePicture || savedClientUser.profilePicture || null
         };
         localStorage.setItem('clientUser', JSON.stringify(clientUser));
-        const accountName = String(clientUser.full_name || clientUser.fullName || clientUser.displayName || clientUser.name || clientUser.username || '').trim();
+        const joinedName = [clientUser.first_name || clientUser.firstName, clientUser.last_name || clientUser.lastName].filter(Boolean).join(' ').trim();
+        const accountName = String(clientUser.full_name || clientUser.fullName || clientUser.displayName || clientUser.name || joinedName || clientUser.username || '').trim();
         const firstName = accountName ? accountName.split(/[\\s._-]+/)[0] : '';
         const greeting = document.getElementById('welcomeGreeting');
         const welcomeLine = document.getElementById('welcomeLine');
@@ -2363,9 +2364,9 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
 </style>
 <!-- manlung-client-dashboard-refresh-20261026 -->
 <style id="manlung-client-dashboard-refresh-20261026">
-  :root{--client-yellow:#ffd633;--client-ink:#1e293b;--client-muted:#64748b}
-  body:has(.client-workspace){display:block!important;padding:0!important;background:#e2e8f0!important}
-  .client-workspace{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;max-width:1500px;margin:0 auto;padding:18px;align-items:start}
+  :root{--client-yellow:#fcd34d;--client-ink:#1e293b;--client-muted:#64748b}
+  body:has(.client-workspace){display:block!important;padding:0!important;background:#f1f5f9!important}
+  .client-workspace{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;max-width:1600px;margin:0 auto;padding:18px;align-items:start}
   .client-sidepanel{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;background:var(--client-yellow);border-radius:22px;padding:22px 16px;box-shadow:0 10px 28px rgba(255,214,51,.2);color:var(--client-ink);z-index:900}
   .client-side-brand{display:flex;align-items:center;gap:10px;padding:0 7px 22px;font-weight:900;font-size:1.05rem}
   .client-side-brand i{font-size:1.35rem}
@@ -2381,7 +2382,18 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
   .client-side-user strong{font-size:.78rem}
   .client-side-user small{margin-top:3px;font-size:.68rem;color:#64748b}
   .client-main{min-width:0}
-  .client-main .site-header{position:sticky;top:0;z-index:850;border-radius:0 0 16px 16px}
+  .client-main .site-header{position:sticky;top:0;z-index:850;border-radius:0 0 16px 16px;background:#fff!important;border:1px solid #e2e8f0!important;box-shadow:0 5px 20px rgba(15,23,42,.05)!important}
+  .client-main .site-header .container{max-width:none;min-height:76px;padding:14px 22px!important;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .client-main .site-header .brand{display:none!important}
+  .client-main .site-header .header-actions{display:flex;align-items:center;gap:10px}
+  .client-main .site-header .header-actions .btn{background:#f8fafc!important;border:1px solid #e2e8f0!important;color:#334155!important;border-radius:12px!important}
+  .client-main .site-header .client-header-label{display:none!important}
+  .client-main .dashboard-overview-title{display:block;color:#0f172a;font-size:1.3rem;font-weight:850;letter-spacing:-.03em}
+  .client-main .dashboard-overview-subtitle{display:block;margin-top:4px;color:#64748b;font-size:.78rem}
+  .client-main .dashboard-topbar-actions{display:flex;align-items:center;gap:10px}
+  .client-main .dashboard-topbar-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;color:#334155;text-decoration:none;cursor:pointer}
+  .client-main .dashboard-topbar-avatar{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;overflow:hidden;background:#2563eb;color:#fff;font-weight:800;border:2px solid #dbeafe}
+  .client-main .dashboard-topbar-avatar img{width:100%;height:100%;object-fit:cover}
   .client-main .container{max-width:none}
   .client-main .dashboard-hero{margin-top:16px}
   .client-context-card{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
@@ -2392,7 +2404,7 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
   .client-context-item .context-icon{color:#2563eb}
   body:has(.client-workspace) footer,body:has(.client-workspace) .manlung-footer,body:has(.client-workspace) #siteFooter{display:none!important}
   @media(max-width:900px){.client-workspace{grid-template-columns:210px minmax(0,1fr);gap:14px;padding:10px}.client-sidepanel{padding:16px 10px}.client-context-card{grid-template-columns:1fr 1fr}.client-context-item:last-child{grid-column:1/-1}}
-  @media(max-width:650px){.client-workspace{display:block;padding:8px}.client-sidepanel{position:sticky;top:0;max-height:none;overflow:visible;border-radius:0 0 16px 16px;margin:-8px -8px 12px;padding:10px;display:flex;align-items:center;gap:8px}.client-side-brand{padding:0;margin:0;font-size:.9rem;white-space:nowrap}.client-side-brand i{font-size:1.1rem}.client-side-nav{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:thin}.client-side-nav a,.client-side-nav button{width:auto;min-width:max-content;min-height:38px;padding:8px 10px;font-size:.75rem}.client-side-nav a span,.client-side-nav button span{display:inline}.client-side-profile{display:none}.client-main .site-header{top:0}.client-context-card{grid-template-columns:1fr}.client-context-item:last-child{grid-column:auto}}
+  @media(max-width:767px){.client-workspace{display:block;padding:10px}.client-sidepanel{position:relative;top:auto;max-height:none;overflow:visible;border-radius:18px;margin:0 0 12px;padding:14px;display:block}.client-side-brand{padding:0 4px 12px;margin:0;font-size:.95rem;white-space:nowrap}.client-side-brand i{font-size:1.1rem}.client-side-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.client-side-nav a,.client-side-nav button{width:100%;min-width:0;min-height:40px;padding:8px;font-size:.75rem;justify-content:center}.client-side-nav a span,.client-side-nav button span{display:inline}.client-side-profile{display:flex;margin-top:12px}.client-main .site-header{top:0}.client-main .site-header .container{padding:12px!important;min-height:66px}.client-main .dashboard-overview-title{font-size:1.05rem}.client-main .dashboard-topbar-icon{width:36px;height:36px}.client-main .dashboard-topbar-avatar{width:36px;height:36px}.client-context-card{grid-template-columns:1fr}.client-context-item:last-child{grid-column:auto}}
   @media(prefers-reduced-motion:reduce){.client-side-nav a{transition:none}}
 </style>
 <script id="manlung-client-dashboard-refresh-script">
@@ -2423,6 +2435,19 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
     const content=document.createElement('div');content.className='client-main';
     const parent=main.parentNode;parent.insertBefore(workspace,main);
     if(header)content.appendChild(header);
+    if(header){
+      const container=header.querySelector('.container');
+      if(container){
+        const title=document.createElement('div');title.className='dashboard-topbar-heading';
+        title.innerHTML='<span class="dashboard-overview-title">Dashboard Overview</span><span class="dashboard-overview-subtitle">Your recovery activity at a glance</span>';
+        const actions=document.createElement('div');actions.className='dashboard-topbar-actions';
+        const notices=document.createElement('button');notices.type='button';notices.className='dashboard-topbar-icon';notices.setAttribute('aria-label','View notifications');notices.innerHTML='<i class="fas fa-bell" aria-hidden="true"></i>';notices.addEventListener('click',function(){const target=document.getElementById('manlungNotifications');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});});
+        const settings=document.createElement('a');settings.className='dashboard-topbar-icon';settings.href='/client/settings.html';settings.setAttribute('aria-label','Settings');settings.innerHTML='<i class="fas fa-gear" aria-hidden="true"></i>';
+        const topAvatar=document.createElement('div');topAvatar.className='dashboard-topbar-avatar';topAvatar.id='clientTopbarAvatar';topAvatar.textContent='MR';topAvatar.setAttribute('aria-label','Client profile');
+        actions.append(notices,settings,topAvatar);
+        container.append(title,actions);
+      }
+    }
     content.appendChild(main);workspace.append(sidebar,content);
     // Use the verified client account saved by guardClientPortal(), then
     // fall back to profile elements rendered elsewhere on the page.
@@ -2431,16 +2456,24 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
       try{account=JSON.parse(localStorage.getItem('clientUser')||'{}')||{}}catch(_){}
       const nameNode=document.querySelector('[data-user-name],.user-info h4,.profile-name,.client-name');
       const emailNode=document.querySelector('[data-user-email],.user-info p,.profile-email');
-      const accountName=String(account.full_name||account.fullName||account.displayName||account.username||account.name||'').trim();
+      const joinedName=[account.first_name||account.firstName,account.last_name||account.lastName].filter(Boolean).join(' ').trim();
+      const accountName=String(account.full_name||account.fullName||account.displayName||account.name||joinedName||'').trim();
       const domName=nameNode&&nameNode.textContent.trim();
       const accountEmail=String(account.email||account.emailAddress||'').trim();
       const domEmail=emailNode&&emailNode.textContent.trim();
-      const displayName=accountName||domName||accountEmail||domEmail;
+      const displayName=accountName||domName||String(account.username||'').trim()||accountEmail||domEmail;
       const displayEmail=accountEmail||domEmail;
       if(displayName)user.querySelector('strong').textContent=displayName;
       else user.querySelector('strong').textContent='Client account';
       if(displayEmail)user.querySelector('small').textContent=displayEmail;
       else user.querySelector('small').textContent='Signed-in client';
+      user.querySelector('strong').title=displayName||'Client account';
+      const topAvatar=document.getElementById('clientTopbarAvatar');
+      if(topAvatar){
+        topAvatar.title=displayName||'Client profile';
+        const topImage=topAvatar.querySelector('img');
+        if(!topImage)topAvatar.textContent=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
+      }
 
       const imageValue=account.profilePicture||account.profile_picture||account.avatarUrl||account.avatar_url||account.photoURL||account.photo_url||account.imageUrl||account.image_url;
       const domImage=Array.from(document.querySelectorAll('.manlung-profile-avatar img,.client-photo-preview img,.profile-pic,.user-avatar img,[data-profile-avatar]'))
@@ -2457,6 +2490,20 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
       }else if(!current){
         const initials=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
         if(avatar.textContent!==initials)avatar.textContent=initials;
+      }
+      const topAvatarNow=document.getElementById('clientTopbarAvatar');
+      if(topAvatarNow){
+        const topCurrent=topAvatarNow.querySelector('img');
+        if(imageSource){
+          if(!topCurrent||topCurrent.src!==imageSource){
+            topAvatarNow.textContent='';
+            const topImg=document.createElement('img');topImg.src=imageSource;topImg.alt='Client profile';topImg.referrerPolicy='no-referrer';
+            topImg.onerror=function(){topImg.remove();topAvatarNow.textContent=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR'};
+            topAvatarNow.appendChild(topImg);
+          }
+        }else if(!topCurrent){
+          topAvatarNow.textContent=(displayName||displayEmail||'MR').split(/[\\s@._-]+/).filter(Boolean).slice(0,2).map(function(part){return part[0].toUpperCase()}).join('')||'MR';
+        }
       }
     }
     syncProfile();setInterval(syncProfile,3000);
