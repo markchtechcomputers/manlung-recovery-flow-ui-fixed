@@ -703,3 +703,13 @@ body.admin-page footer,
 .manlung-admin-page footer {
   display: none !important;
 }
+
+/* ADMIN SECTIONS — NO FOOTERS. This stylesheet is shared by admin pages only. */
+.site-footer,
+footer,
+.footer-text,
+.manlung-footer,
+.manlung-footer-bottom,
+.admin-footer {
+  display: none !important;
+}
