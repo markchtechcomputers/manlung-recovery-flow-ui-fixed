@@ -1178,10 +1178,30 @@ body.dark #mfaStatus,body.dark #mfaSetupBox,body.dark #mfaDisableBox,body.dark #
         }
 
         async function inviteAdmin() {
-            const email=document.getElementById('inviteEmail').value.trim(); const out=document.getElementById('inviteResult');
-            if(!email){out.textContent='Enter an email.';return;} out.textContent='Sending…';
-            const res=await fetch('/api/owner/invitations',{method:'POST',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify({email})});
-            const d=await res.json(); if(d.success){out.innerHTML=d.emailSent?'Invitation email sent.':`Email provider is not configured. Secure invitation link: <a href="${d.invitation.link}" target="_blank">Open invitation</a>`;document.getElementById('inviteEmail').value='';}else out.textContent=d.error||'Could not send invitation';
+            const email=document.getElementById('inviteEmail').value.trim();
+            const out=document.getElementById('inviteResult');
+            if(!email){out.textContent='Enter an email.';return;}
+            out.textContent='Creating a secure invitation…';
+            try {
+              const res=await fetch('/api/owner/invitations',{method:'POST',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify({email})});
+              const d=await res.json();
+              if(!res.ok || !d.success || !d.invitation?.link){out.textContent=d.error||'Could not create invitation';return;}
+              out.replaceChildren();
+              const status=document.createElement('p');
+              status.textContent=d.invitation.emailSent ? 'Invitation email sent. You can also copy the secure link below.' : 'Email could not be sent. Copy the secure invitation link below and share it privately with the invited person.';
+              status.style.margin='0 0 .6rem';
+              const link=document.createElement('a');
+              link.href=d.invitation.link; link.target='_blank'; link.rel='noopener noreferrer';
+              link.textContent='Open invitation'; link.style.marginRight='.8rem';
+              const copy=document.createElement('button');
+              copy.type='button'; copy.className='btn btn-secondary'; copy.textContent='Copy invitation link'; copy.style.marginTop='.35rem';
+              copy.addEventListener('click',async()=>{
+                try { await navigator.clipboard.writeText(d.invitation.link); copy.textContent='Link copied'; }
+                catch (_) { const field=document.createElement('textarea'); field.value=d.invitation.link; field.readOnly=true; field.style.width='100%'; field.style.marginTop='.5rem'; out.appendChild(field); field.select(); copy.textContent='Select and copy the link'; }
+              });
+              out.append(status,link,copy);
+              document.getElementById('inviteEmail').value='';
+            } catch(error) { out.textContent=error.message||'Could not create invitation. Please try again.'; }
         }
 
         async function loadAdmins() {
