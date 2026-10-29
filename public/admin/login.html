@@ -2,22 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-  <script src="/js/theme.js"></script>
+    <script src="/js/theme.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login · Manlung Recovery</title>
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
-    <style>
-        body { background: var(--navy-900); }
-        .center-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-container { background: #101f42; border: 1px solid #223257; }
-        .login-container .logo h1 { color: #fff; }
-        .login-container .logo span { color: #a9c0ec; }
-        .login-container label { color: #a9c0ec; }
-        .login-container input { background: #0b1730; border-color: #223257; color: #e6ecf5; }
-        .footer-text { text-align: center; margin-top: 1.5rem; color: #6b7a99; font-size: 0.8rem; }
-    </style>
-<link rel="stylesheet" href="/css/theme.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <meta name="description" content="Cyber Recovery & Digital Investigation Portal">
     <meta name="theme-color" content="#ffffff">
@@ -48,64 +42,288 @@
     <link rel="stylesheet" href="/css/footer.css">
     <script src="/js/support-fab.js"></script>
     <link rel="stylesheet" href="/css/unified-ui.css">
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script><style>.manlung-turnstile-box{margin:.9rem 0 1rem;padding:.85rem;border:1px solid #223257;border-radius:12px;background:#0b1730}.manlung-turnstile-title{font-weight:700;font-size:.9rem;color:#e6ecf5;display:flex;gap:.45rem;align-items:center;margin-bottom:.2rem}.manlung-turnstile-help{font-size:.78rem;color:#a9c0ec;margin-bottom:.55rem}.manlung-turnstile-widget{min-height:65px;display:flex;align-items:center}</style>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
 
-<style id="manlung-admin-turnstile-single-use-fix">
-/* Keep the challenge visible and give configuration/load failures readable feedback. */
-#adminTurnstile{min-height:65px;display:flex;justify-content:center;align-items:center;overflow-x:auto}
-#loginError{overflow-wrap:anywhere}
-</style>
+    <style>
+        /* =========================================
+           SPACE THEME OVERRIDES
+           ========================================= */
+        
+        * {
+            box-sizing: border-box;
+        }
 
+        html, body {
+            margin: 0;
+            min-height: 100%;
+        }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        /* Background & Glowing Beams */
+        body:has(.center-wrap) {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            background-color: #05010a !important;
+            color: #ffffff !important;
+            font-family: 'Poppins', sans-serif !important;
+            overflow: hidden;
+            position: relative;
+        }
 
+        /* Glowing purple beams in the background */
+        body:has(.center-wrap)::before,
+        body:has(.center-wrap)::after {
+            content: '';
+            position: absolute;
+            width: 250vw;
+            height: 200px;
+            background: linear-gradient(90deg, transparent, #3a0ca3, #7209b7, #3a0ca3, transparent);
+            filter: blur(60px);
+            opacity: 0.8;
+            z-index: 0;
+            pointer-events: none;
+        }
 
-<style id="manlung-admin-login-user-design">
-:root{--login-bg:#f8fafc;--login-card:#fff;--login-ink:#0f172a;--login-muted:#475569;--login-tertiary:#94a3b8;--login-line:#e2e8f0;--login-primary:#4f46e5;--login-hover:#4338ca;--login-ring:rgba(79,70,229,.15)}
-html,body{min-height:100%;margin:0}
-body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;box-sizing:border-box;background-color:var(--login-bg)!important;background-image:radial-gradient(at 0% 0%,rgba(15,23,42,.03) 0,transparent 50%),radial-gradient(at 50% 0%,rgba(49,46,129,.03) 0,transparent 50%),radial-gradient(at 100% 0%,rgba(136,19,55,.025) 0,transparent 50%)!important;color:var(--login-ink)!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif!important;-webkit-font-smoothing:antialiased}
-.center-wrap{width:100%;min-height:calc(100vh - 48px)!important;display:flex;align-items:center;justify-content:center;padding:0!important;box-sizing:border-box}
-.login-container{position:relative;isolation:isolate;overflow:visible;box-sizing:border-box;width:100%!important;max-width:440px!important;padding:40px!important;background:var(--login-card)!important;border:1px solid var(--login-line)!important;border-radius:16px!important;color:var(--login-ink)!important;box-shadow:0 10px 15px -3px rgba(0,0,0,.05),0 4px 6px -4px rgba(0,0,0,.05),0 20px 40px -10px rgba(0,0,0,.05)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;animation:adminLoginFadeIn .6s ease-out}
-.login-container:before,.login-container:after{display:none!important;content:none!important}
-.login-container .logo{position:relative;z-index:1;text-align:center;margin:0 0 30px!important}
-.login-container .logo>.brand-logo{display:block;width:56px;height:56px;object-fit:contain;margin:0 auto 20px!important;border-radius:12px!important;background:#eef2ff!important;padding:6px;box-sizing:border-box;box-shadow:none!important}
-.login-container .logo h1{margin:0 0 8px!important;color:var(--login-ink)!important;font-family:inherit!important;font-size:24px!important;font-weight:700!important;letter-spacing:-.5px!important;text-shadow:none!important}
-.login-container .logo>span{display:block;color:var(--login-muted)!important;font-family:inherit!important;font-size:14px!important;font-weight:400!important;letter-spacing:0!important;text-transform:none!important;line-height:1.5!important}
-.login-container .admin-badge{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:5px 11px;border:1px solid #c7d2fe!important;border-radius:999px!important;background:#eef2ff!important;color:var(--login-primary)!important;font-family:inherit!important;font-size:11px!important;font-weight:700!important;letter-spacing:.04em!important;text-transform:uppercase}
-.login-container .form-group{position:relative;z-index:1;margin:0 0 20px!important}
-.login-container .label-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
-.login-container .label-row label{margin:0!important}
-.login-container .label-row .forgot-link{font-size:13px!important;white-space:nowrap}
-.login-container label{display:block;margin:0 0 8px!important;color:var(--login-ink)!important;font-family:inherit!important;font-size:14px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important}
-.login-container label i{color:var(--login-muted)!important}
-.login-container .input-wrapper{position:relative;display:flex;align-items:center}
-.login-container .input-icon{position:absolute;left:14px;width:20px;height:20px;color:var(--login-tertiary);pointer-events:none}
-.login-container input{display:block;width:100%;height:48px;min-height:48px;box-sizing:border-box;padding:0 16px 0 44px!important;border:1px solid var(--login-line)!important;border-radius:8px!important;background:#fff!important;color:var(--login-ink)!important;font-family:inherit!important;font-size:15px!important;font-weight:400!important;box-shadow:0 1px 2px rgba(0,0,0,.02)!important;transition:border-color .2s,box-shadow .2s!important}
-.login-container input::placeholder{color:var(--login-tertiary)!important}
-.login-container input:focus{outline:none!important;border-color:var(--login-primary)!important;background:#fff!important;box-shadow:0 0 0 3px var(--login-ring)!important}
-.login-container .toggle-password{position:absolute;right:10px;display:flex;align-items:center;justify-content:center;padding:5px;border:0;background:transparent;color:var(--login-tertiary);cursor:pointer}
-.login-container .toggle-password svg{width:20px;height:20px}
-.login-container .manlung-turnstile-box{position:relative;z-index:1;margin:0 0 20px!important;padding:12px!important;border:1px solid var(--login-line)!important;border-radius:8px!important;background:#f8fafc!important}
-.login-container .manlung-turnstile-title,.login-container .manlung-turnstile-help{color:var(--login-muted)!important}
-.login-container .manlung-turnstile-widget{display:flex;justify-content:center;align-items:center;min-height:65px;overflow-x:auto}
-.login-container .btn-primary{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;padding:12px 16px;border:0!important;border-radius:8px!important;background:var(--login-primary)!important;color:#fff!important;font-family:inherit!important;font-size:15px!important;font-weight:600!important;letter-spacing:0!important;box-shadow:none!important;transition:background-color .2s,transform .2s,box-shadow .2s!important}
-.login-container .btn-primary:hover{background:var(--login-hover)!important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(79,70,229,.3)!important}
-.login-container .btn-primary:active{transform:translateY(0)}
-.login-container a{color:var(--login-primary)!important;font-family:inherit!important;font-size:13px!important;font-weight:500!important;text-decoration:none!important}
-.login-container a:hover{color:var(--login-hover)!important;text-decoration:underline!important}
-.login-container .error-text,#loginError,#mfaLoginError,#mfaEnrollStatus{position:relative;z-index:1;margin-top:10px;color:#b91c1c!important;overflow-wrap:anywhere}
-#adminMfaEnroll>div{border:1px solid var(--login-line)!important;border-radius:12px!important;background:#f8fafc!important;color:var(--login-ink)!important}
-#adminMfaEnroll h3{color:var(--login-ink)!important}
-#adminMfaEnroll p,#adminMfaForm p,#adminForgotBox p{color:var(--login-muted)!important}
-#adminForgotBox{position:relative;z-index:1;padding:16px!important;border:1px solid var(--login-line)!important;border-radius:12px!important;background:#f8fafc!important}
-.login-container>p{position:relative;z-index:1;color:var(--login-muted)!important}
-.login-container .footer-text{display:none!important}
-@keyframes adminLoginFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:480px){body:has(.center-wrap){align-items:flex-start;padding:10vh 16px 24px!important}.center-wrap{min-height:auto!important}.login-container{padding:32px 24px!important;border-radius:16px!important;border:1px solid var(--login-line)!important;box-shadow:0 10px 15px -3px rgba(0,0,0,.05),0 4px 6px -4px rgba(0,0,0,.05)!important;background:#fff!important}}
-@media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
-</style>
+        body:has(.center-wrap)::before {
+            transform: rotate(25deg);
+            top: 10%;
+            left: -60%;
+        }
+
+        body:has(.center-wrap)::after {
+            transform: rotate(-25deg);
+            bottom: 10%;
+            right: -60%;
+        }
+
+        .center-wrap {
+            width: 100%;
+            min-height: calc(100vh - 48px) !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 !important;
+            z-index: 1;
+        }
+
+        /* Glassmorphism Card */
+        .login-container {
+            position: relative;
+            width: 100% !important;
+            max-width: 420px !important;
+            padding: 40px 35px !important;
+            background: rgba(15, 8, 30, 0.45) !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+            border-radius: 40px !important;
+            backdrop-filter: blur(25px) !important;
+            -webkit-backdrop-filter: blur(25px) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7) !important;
+            margin: 20px;
+            color: #ffffff;
+            overflow: visible;
+            z-index: 1;
+        }
+
+        .login-container::before,
+        .login-container::after {
+            display: none !important; /* Remove any old pseudo-elements */
+        }
+
+        /* Header / Logo section */
+        .login-container .logo {
+            text-align: center;
+            margin-bottom: 25px !important;
+        }
+
+        .login-container .logo > .brand-logo {
+            display: none !important; /* Hide the image icon */
+        }
+
+        .login-container .logo h1 {
+            color: #ffffff !important;
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 26px !important;
+            font-weight: 500 !important;
+            margin: 0 0 8px !important;
+            letter-spacing: 0.5px;
+            text-shadow: none !important;
+        }
+
+        .login-container .logo > span {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-size: 13px !important;
+            font-weight: 300 !important;
+            margin-bottom: 15px !important;
+            display: block;
+        }
+
+        /* Restricted Badge */
+        .login-container .admin-badge {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            background: rgba(239, 68, 68, 0.15) !important;
+            border: 1px solid rgba(239, 68, 68, 0.5) !important;
+            color: #ff6b6b !important;
+            padding: 4px 14px !important;
+            border-radius: 20px !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            margin-top: 10px;
+        }
+
+        /* Labels */
+        .login-container label {
+            color: #ffffff !important;
+            font-size: 14px !important;
+            font-weight: 300 !important;
+            margin-bottom: 8px !important;
+            padding-left: 5px !important;
+            display: block;
+        }
+
+        /* Inputs */
+        .login-container .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-container .input-wrapper input {
+            width: 100% !important;
+            padding: 16px 20px 16px 48px !important; /* Extra left padding for icon */
+            background: transparent !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+            border-radius: 12px !important;
+            color: #ffffff !important;
+            font-size: 15px !important;
+            font-family: 'Poppins', sans-serif !important;
+            outline: none !important;
+            transition: 0.3s ease !important;
+            box-shadow: none !important;
+        }
+
+        .login-container .input-wrapper input:focus {
+            border-color: #ffffff !important;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .login-container .input-wrapper input::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        .login-container .input-wrapper .input-icon {
+            position: absolute;
+            left: 15px;
+            width: 20px;
+            height: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .login-container .toggle-password {
+            position: absolute;
+            right: 15px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        /* Turnstile Box */
+        .manlung-turnstile-box {
+            margin: 20px 0 !important;
+            padding: 15px !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 12px !important;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Login Button */
+        .login-container .btn-primary {
+            width: 100% !important;
+            padding: 16px !important;
+            background: #7B2CBF !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+            border-radius: 12px !important;
+            color: #ffffff !important;
+            font-size: 20px !important;
+            font-weight: 500 !important;
+            font-family: 'Poppins', sans-serif !important;
+            cursor: pointer !important;
+            transition: 0.3s ease !important;
+            margin-top: 10px !important;
+            box-shadow: none !important;
+        }
+
+        .login-container .btn-primary:hover {
+            background: #9d4edd !important;
+            box-shadow: 0 0 15px rgba(157, 78, 221, 0.4) !important;
+        }
+
+        /* Links & Forgot Password */
+        .login-container a {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-size: 13px !important;
+            font-weight: 400 !important;
+            text-decoration: none !important;
+            transition: 0.3s;
+        }
+
+        .login-container a:hover {
+            color: #ffffff !important;
+            text-decoration: underline !important;
+        }
+
+        .login-container .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        /* Error Text */
+        #loginError {
+            color: #ff6b6b !important;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        /* MFA and Forgot Box styles to match glass theme */
+        #adminForgotBox, #adminMfaEnroll > div {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 12px !important;
+            color: white !important;
+        }
+
+        #adminForgotBox p, #adminMfaEnroll p, #adminMfaForm p {
+            color: rgba(255,255,255,0.7) !important;
+        }
+
+        .footer-text {
+            display: none !important;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px !important;
+                border-radius: 30px !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="center-wrap">
@@ -120,26 +338,38 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
             <form id="adminLoginForm">
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> Username</label>
-                    <div class="input-wrapper"><svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20 21a8 8 0 0 0-16 0m8-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg><input type="text" id="adminUsername" placeholder="Enter username" required autofocus autocomplete="username"></div>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20 21a8 8 0 0 0-16 0m8-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+                        <input type="text" id="adminUsername" placeholder="Enter username" required autofocus autocomplete="username">
+                    </div>
                 </div>
                 <div class="form-group">
                     <div class="label-row"><label><i class="fas fa-lock"></i> Password</label><a href="#" id="adminForgotPassword" class="forgot-link">Forgot your password?</a></div>
-                    <div class="input-wrapper"><svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6Zm10-10V7a4 4 0 0 0-8 0v4h8Z"/></svg><input type="password" id="adminPassword" placeholder="Enter password" required autocomplete="current-password"><button type="button" class="toggle-password" id="toggleAdminPassword" aria-label="Show password"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6Zm10-10V7a4 4 0 0 0-8 0v4h8Z"/></svg>
+                        <input type="password" id="adminPassword" placeholder="Enter password" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" id="toggleAdminPassword" aria-label="Show password">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
                 </div>
-                <div class="manlung-turnstile-box" aria-label="Cloudflare Turnstile"><div id="adminTurnstile" class="manlung-turnstile-widget"></div></div><button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                <div class="manlung-turnstile-box" aria-label="Cloudflare Turnstile">
+                    <div id="adminTurnstile" class="manlung-turnstile-widget"></div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
                     <i class="fas fa-arrow-right-to-bracket"></i> Login
                 </button>
                 <div id="loginError" class="error-text"></div>
             </form>
 
             <section id="adminMfaEnroll" style="display:none;margin-top:1rem;">
-                <div style="padding:1rem;border:1px solid rgba(110,168,255,.35);border-radius:14px;background:rgba(20,40,75,.35);">
-                    <h3 style="margin:0 0 .5rem;"><i class="fas fa-mobile-screen-button"></i> Set up your Authenticator</h3>
-                    <p style="font-size:.82rem;color:#a9c0ec;margin:.4rem 0 1rem;">Scan this QR code with Google Authenticator, Microsoft Authenticator, 1Password, or another TOTP app.</p>
+                <div style="padding:1rem;border:1px solid rgba(255,255,255,0.2);border-radius:14px;background:rgba(255,255,255,0.05);">
+                    <h3 style="margin:0 0 .5rem;color:#fff;"><i class="fas fa-mobile-screen-button"></i> Set up your Authenticator</h3>
+                    <p style="font-size:.82rem;color:rgba(255,255,255,0.7);margin:.4rem 0 1rem;">Scan this QR code with Google Authenticator, Microsoft Authenticator, 1Password, or another TOTP app.</p>
                     <div style="text-align:center;background:#fff;border-radius:12px;padding:12px;margin:0 auto 1rem;max-width:240px;">
                         <img id="mfaQrCode" alt="Authenticator setup QR code" style="display:block;width:100%;height:auto;">
                     </div>
-                    <p style="font-size:.72rem;color:#a9c0ec;word-break:break-all;">Can't scan? Secret: <strong id="mfaSecret"></strong></p>
+                    <p style="font-size:.72rem;color:rgba(255,255,255,0.7);word-break:break-all;">Can't scan? Secret: <strong id="mfaSecret" style="color:#fff;"></strong></p>
                     <form id="mfaEnrollForm">
                         <div class="form-group">
                             <label><i class="fas fa-key"></i> Enter the 6-digit code</label>
@@ -148,7 +378,7 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
                         <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-shield-check"></i> Enable MFA &amp; Continue</button>
                     </form>
                     <p id="mfaEnrollStatus" class="error-text"></p>
-                    <div id="mfaRecoveryCodes" style="display:none;margin-top:1rem;"></div>
+                    <div id="mfaRecoveryCodes" style="display:none;margin-top:1rem;color:#fff;"></div>
                 </div>
             </section>
 
@@ -157,47 +387,24 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
                     <label><i class="fas fa-shield-halved"></i> Authenticator code</label>
                     <input type="text" id="adminMfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" required>
                 </div>
-                <p style="font-size:.78rem;color:#a9c0ec;margin:.4rem 0 .8rem;">Enter the current 6-digit code from your authenticator app, or one unused recovery code.</p>
+                <p style="font-size:.78rem;color:rgba(255,255,255,0.7);margin:.4rem 0 .8rem;">Enter the current 6-digit code from your authenticator app, or one unused recovery code.</p>
                 <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
                     <i class="fas fa-check"></i> Verify &amp; Sign In
                 </button>
-                <button type="button" id="cancelMfaLoginBtn" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:.5rem;">Back</button>
+                <button type="button" id="cancelMfaLoginBtn" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:.5rem;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:12px;">Back</button>
                 <div id="mfaLoginError" class="error-text"></div>
             </form>
 
-<div
-  id="adminForgotBox"
-  style="display:none;margin-top:1rem;"
->
-  <div class="form-group">
-    <label for="adminResetEmail">
-      Admin Email
-    </label>
+            <div id="adminForgotBox" style="display:none;margin-top:1rem;">
+              <div class="form-group">
+                <label for="adminResetEmail">Admin Email</label>
+                <input id="adminResetEmail" type="email" autocomplete="email" placeholder="you@example.com">
+              </div>
+              <button type="button" id="requestAdminResetBtn" class="btn btn-primary" style="width:100%;">Send Reset Link</button>
+              <p id="adminResetStatus" style="margin-top:.6rem;font-size:.78rem;color:rgba(255,255,255,0.7);"></p>
+            </div>
 
-    <input
-      id="adminResetEmail"
-      type="email"
-      autocomplete="email"
-      placeholder="you@example.com"
-    >
-  </div>
-
-  <button
-    type="button"
-    id="requestAdminResetBtn"
-    class="btn btn-primary"
-  >
-    Send Reset Link
-  </button>
-
-  <p
-    id="adminResetStatus"
-    style="margin-top:.6rem;font-size:.78rem;"
-  ></p>
-</div>
-
-
-            <p style="text-align:center; margin-top:1rem;"><a href="/admin/register.html" style="color:#6ea8ff; font-size:0.85rem;">Have an Admin invitation? Create your account</a></p>
+            <p style="text-align:center; margin-top:1rem;"><a href="/admin/register.html">Have an Admin invitation? Create your account</a></p>
             <div class="footer-text"><i class="fas fa-shield"></i> Protected by 256-bit encryption</div>
         </div>
     </div>
@@ -257,7 +464,7 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
                 widgetBox.closest('.manlung-turnstile-box')?.removeAttribute('hidden');
                 adminTurnstileWidget = turnstile.render(widgetBox, {
                     sitekey: config.turnstileSiteKey,
-                    theme: 'auto',
+                    theme: 'dark',
                     size: 'normal',
                     appearance: 'always',
                     retry: 'auto',
@@ -383,8 +590,8 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
                 }
                 const recovery = document.getElementById('mfaRecoveryCodes');
                 recovery.style.display = 'block';
-                recovery.innerHTML = '<strong>Save these recovery codes now.</strong><br><small>Each code can be used once.</small><pre style="white-space:pre-wrap;background:#0b1730;padding:.75rem;border-radius:8px;margin-top:.5rem;">' + data.recoveryCodes.join('\
-') + '</pre><button type="button" id="finishMfaEnrollmentBtn" class="btn btn-primary" style="width:100%;justify-content:center;">Continue to Dashboard</button>';
+                recovery.innerHTML = '<strong style="color:#fff;">Save these recovery codes now.</strong><br><small style="color:rgba(255,255,255,0.7);">Each code can be used once.</small><pre style="white-space:pre-wrap;background:rgba(0,0,0,0.3);padding:.75rem;border-radius:8px;margin-top:.5rem;color:#fff;">' + data.recoveryCodes.join('\
+') + '</pre><button type="button" id="finishMfaEnrollmentBtn" class="btn btn-primary" style="width:100%;justify-content:center;background:#7B2CBF;color:#fff;border:none;padding:12px;border-radius:12px;margin-top:10px;cursor:pointer;">Continue to Dashboard</button>';
                 document.getElementById('finishMfaEnrollmentBtn')?.addEventListener('click', finishMfaEnrollment);
                 status.textContent = 'MFA enabled successfully.';
             } catch (error) {
@@ -446,10 +653,6 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
                 }
 
                 if (data.success && data.mfaRequired) {
-                    // Keep the fresh, short-lived ticket only in memory as a compatibility
-                    // fallback. The server also sets an HttpOnly cookie. Sending the same
-                    // fresh ticket in the MFA request avoids browser cookie/path issues while
-                    // never persisting the ticket in localStorage or sessionStorage.
                     pendingMfaTicket = data.mfaTicket || true;
                     sessionStorage.setItem('adminUser', JSON.stringify(data.user));
                     showMfaStep();
@@ -471,8 +674,6 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
                 errorEl.textContent = error?.message || 'Unable to reach the login service. Please try again.';
                 console.error('Login error:', error);
             } finally {
-                // Cloudflare Turnstile responses are single-use. Reset after every
-                // submitted attempt so invited admins can retry without a stale token.
                 if (submittedTurnstileToken && adminTurnstileEnabled && window.turnstile && adminTurnstileWidget !== null) {
                     try { window.turnstile.reset(adminTurnstileWidget); } catch (resetError) {
                         console.warn('Could not reset Cloudflare verification widget:', resetError);
@@ -502,8 +703,6 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
-                    // Prefer the fresh in-memory ticket; the server also accepts the
-                    // HttpOnly cookie as a fallback.
                     body: JSON.stringify({
                         code,
                         ...(typeof pendingMfaTicket === 'string' ? { mfaTicket: pendingMfaTicket } : {}),
@@ -536,157 +735,57 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
             if (res.ok) window.location.href = '/admin/dashboard.html';
         }).catch(() => {});
     </script>
-<script id="admin-forgot-password-script">
-(function(){
-  const link =
-    document.getElementById('adminForgotPassword');
+    <script id="admin-forgot-password-script">
+    (function(){
+      const link = document.getElementById('adminForgotPassword');
+      const box = document.getElementById('adminForgotBox');
+      if(link && box){
+        link.addEventListener('click', function(event){
+          event.preventDefault();
+          box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        });
+      }
+    })();
 
-  const box =
-    document.getElementById('adminForgotBox');
+    async function requestAdminReset(){
+      const email = document.getElementById('adminResetEmail')?.value?.trim();
+      const status = document.getElementById('adminResetStatus');
 
-  if(link && box){
-    link.addEventListener('click', function(event){
-      event.preventDefault();
+      if(!email){
+        if(status){ status.textContent = 'Enter your admin email address.'; }
+        return;
+      }
 
-      box.style.display =
-        box.style.display === 'none'
-          ? 'block'
-          : 'none';
-    });
-  }
-})();
+      if(status){ status.textContent = 'Sending reset link…'; }
 
-async function requestAdminReset(){
-  const email =
-    document.getElementById('adminResetEmail')
-      ?.value
-      ?.trim();
+      try{
+        const res = await fetch('/api/auth/admin/forgot-password', {
+            method:'POST',
+            headers:{ 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
 
-  const status =
-    document.getElementById('adminResetStatus');
+        const data = await res.json().catch(() => ({}));
 
-  if(!email){
-    if(status){
-      status.textContent =
-        'Enter your admin email address.';
-    }
-    return;
-  }
-
-  if(status){
-    status.textContent =
-      'Sending reset link…';
-  }
-
-  try{
-    const res =
-      await fetch(
-        '/api/auth/admin/forgot-password',
-        {
-          method:'POST',
-          headers:{
-            'Content-Type':
-              'application/json'
-          },
-          body:
-            JSON.stringify({ email })
+        if(!res.ok || !data.success){
+          throw new Error(data.error || 'Could not request password reset.');
         }
-      );
 
-    const data =
-      await res.json().catch(
-        () => ({})
-      );
+        if(status){
+          status.textContent = data.message || 'If the account exists, a reset link has been sent.';
+        }
 
-    if(!res.ok || !data.success){
-      throw new Error(
-        data.error ||
-        'Could not request password reset.'
-      );
+        if(data.devResetLink && window.location.hostname === 'localhost'){
+          console.log('Admin reset link:', data.devResetLink);
+        }
+      }catch(error){
+        if(status){
+          status.textContent = error.message || 'Could not request password reset.';
+        }
+      }
     }
-
-    if(status){
-      status.textContent =
-        data.message ||
-        'If the account exists, a reset link has been sent.';
-    }
-
-    if(
-      data.devResetLink &&
-      window.location.hostname === 'localhost'
-    ){
-      console.log(
-        'Admin reset link:',
-        data.devResetLink
-      );
-    }
-  }catch(error){
-    if(status){
-      status.textContent =
-        error.message ||
-        'Could not request password reset.';
-    }
-  }
-}
-</script>
-
-<script src="/js/pwa.js" defer></script>
-
-  <link rel="stylesheet" href="/css/product-polish.css?v=20261025">
-
-
-<style id="manlung-admin-login-light-input-fix">
-/* Clean black-and-white admin login. Keep the existing form, API, Turnstile, MFA and reset handlers intact. */
-:root{color-scheme:dark!important;--login-bg:#000;--login-card:#000;--login-ink:#fff;--login-muted:#c4c4c4;--login-tertiary:#a3a3a3;--login-line:#3f3f46;--login-primary:#fff;--login-hover:#e5e5e5;--login-ring:rgba(255,255,255,.16)}
-html,body{min-height:100%;margin:0}
-body:has(.center-wrap){min-height:100vh!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow-x:hidden!important;overflow-y:auto!important;padding:24px 14px!important;box-sizing:border-box!important;background:#080808!important;background-image:none!important;color:#fff!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif!important;-webkit-font-smoothing:antialiased}
-body:has(.center-wrap)::before,body:has(.center-wrap)::after{display:none!important;content:none!important}
-.center-wrap{width:100%!important;min-height:calc(100vh - 48px)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;box-sizing:border-box!important}
-.login-container,.login-card-stack{position:relative!important;isolation:isolate!important;width:100%!important;max-width:420px!important;margin:12px!important;padding:36px 32px!important;box-sizing:border-box!important;background:#000!important;border:1px solid #3f3f46!important;border-radius:20px!important;box-shadow:0 18px 48px rgba(0,0,0,.45)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:#fff!important;overflow:visible!important}
-.login-container::before,.login-container::after,.login-card-stack::before,.login-card-stack::after{display:none!important;content:none!important}
-.login-container .logo{display:block!important;text-align:center!important;margin:0 0 26px!important}
-.login-container .logo>.brand-logo{display:none!important}
-.login-container .logo h1{margin:0 0 7px!important;color:#fff!important;font-family:inherit!important;font-size:25px!important;line-height:1.3!important;font-weight:650!important;letter-spacing:-.35px!important;text-shadow:none!important}
-.login-container .logo>span{display:block!important;margin:0!important;color:#bdbdbd!important;font-family:inherit!important;font-size:13px!important;font-weight:400!important;line-height:1.55!important;letter-spacing:0!important;text-transform:none!important}
-.login-container .admin-badge{display:inline-flex!important;align-items:center!important;gap:6px!important;margin-top:14px!important;padding:4px 11px!important;background:#111!important;border:1px solid #525252!important;border-radius:999px!important;color:#e5e5e5!important;box-shadow:none!important;font-family:inherit!important;font-size:10px!important;font-weight:600!important;line-height:1.5!important;letter-spacing:.08em!important;text-transform:uppercase!important}
-.login-container .form-group{position:relative!important;z-index:1!important;margin:0 0 18px!important}
-.login-container .label-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin-bottom:8px!important}
-.login-container label{display:block!important;margin:0 0 8px!important;padding:0!important;color:#f5f5f5!important;font-family:inherit!important;font-size:13px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important}
-.login-container .label-row label{margin:0!important}
-.login-container label i{display:none!important}
-.login-container .input-wrapper{position:relative!important;display:flex!important;align-items:center!important;width:100%!important}
-.login-container .input-wrapper .input-icon{position:absolute!important;left:15px!important;top:50%!important;transform:translateY(-50%)!important;width:19px!important;height:19px!important;color:#a3a3a3!important;z-index:2!important;pointer-events:none!important}
-.login-container .input-wrapper input,.login-container .input-wrapper input[type=text],.login-container .input-wrapper input[type=password]{display:block!important;width:100%!important;min-width:0!important;height:50px!important;min-height:50px!important;box-sizing:border-box!important;padding:0 16px 0 48px!important;background:#0a0a0a!important;border:1px solid #525252!important;border-radius:10px!important;color:#fff!important;font-family:inherit!important;font-size:14px!important;font-weight:400!important;line-height:1.4!important;box-shadow:none!important;transition:border-color .18s,box-shadow .18s!important}
-.login-container .input-wrapper input[type=password]{padding-right:48px!important}
-.login-container .input-wrapper input::placeholder{color:#737373!important}
-.login-container .input-wrapper input:focus{outline:none!important;background:#0a0a0a!important;border-color:#d4d4d4!important;box-shadow:0 0 0 3px rgba(255,255,255,.09)!important}
-.login-container .input-wrapper .toggle-password{display:flex!important;position:absolute!important;top:50%!important;right:12px!important;left:auto!important;transform:translateY(-50%)!important;align-items:center!important;justify-content:center!important;width:28px!important;height:32px!important;padding:4px!important;margin:0!important;border:0!important;background:transparent!important;color:#a3a3a3!important;z-index:3!important;cursor:pointer!important}
-.login-container .input-wrapper .toggle-password:hover{color:#fff!important}
-.login-container .input-wrapper .toggle-password svg{width:19px!important;height:19px!important}
-.login-container .manlung-turnstile-box{display:block!important;position:relative!important;z-index:1!important;margin:20px 0!important;padding:12px!important;background:#0a0a0a!important;border:1px solid #3f3f46!important;border-radius:10px!important;box-shadow:none!important}
-.login-container .manlung-turnstile-title{color:#f5f5f5!important}
-.login-container .manlung-turnstile-help{color:#a3a3a3!important}
-.login-container .manlung-turnstile-widget{display:flex!important;justify-content:center!important;align-items:center!important;min-height:65px!important;overflow-x:auto!important}
-.login-container .btn-primary,.login-container .btn-login,.login-container .slot-login-button{display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;width:100%!important;min-height:48px!important;padding:13px 16px!important;margin:0 0 4px!important;border:1px solid #fff!important;border-radius:10px!important;background:#fff!important;color:#000!important;font-family:inherit!important;font-size:15px!important;font-weight:650!important;letter-spacing:0!important;box-shadow:none!important;cursor:pointer!important;transform:none!important;transition:background-color .18s,border-color .18s,box-shadow .18s!important}
-.login-container .btn-primary:hover,.login-container .btn-login:hover,.login-container .slot-login-button:hover{background:#e5e5e5!important;border-color:#e5e5e5!important;box-shadow:0 3px 12px rgba(255,255,255,.08)!important}
-.login-container .btn-primary:focus-visible,.login-container .btn-login:focus-visible{outline:2px solid #fff!important;outline-offset:3px!important}
-.login-container .btn-primary:disabled{opacity:.6!important;cursor:wait!important}
-.login-container a{color:#d4d4d4!important;font-family:inherit!important;font-size:13px!important;font-weight:500!important;text-decoration:underline!important;text-underline-offset:3px!important}
-.login-container a:hover{color:#fff!important}
-#adminForgotPassword{display:inline!important}
-#adminForgotBox{display:none;margin-top:16px!important;padding:14px!important;background:#080808!important;border:1px solid #3f3f46!important;border-radius:10px!important}
-#adminForgotBox[style*="display: block"]{display:block!important}
-#adminForgotBox label,#adminMfaEnroll label,#adminMfaForm label{color:#f5f5f5!important}
-#adminForgotBox input,#adminMfaEnroll input,#adminMfaForm input{background:#0a0a0a!important;color:#fff!important;border-color:#525252!important}
-#adminForgotBox p,#adminMfaEnroll p,#adminMfaForm p{color:#bdbdbd!important}
-#adminMfaEnroll>div{background:#080808!important;border:1px solid #3f3f46!important;border-radius:12px!important;color:#fff!important;box-shadow:none!important}
-#adminMfaEnroll h3,#adminMfaEnroll p,#adminMfaForm p{color:#e5e5e5!important}
-.login-container .error-text,#loginError,#mfaLoginError,#mfaEnrollStatus{position:relative!important;z-index:1!important;margin:10px 0!important;color:#fca5a5!important;font-size:13px!important;overflow-wrap:anywhere!important}
-.login-container>p{color:#a3a3a3!important}
-.login-container .footer-text{display:none!important}
-@media(max-width:480px){body:has(.center-wrap){align-items:center!important;padding:18px 12px!important}.center-wrap{min-height:calc(100vh - 36px)!important}.login-container,.login-card-stack{padding:30px 22px!important;border-radius:16px!important;margin:0!important}}
-@media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
-</style>
-
+    </script>
+    <script src="/js/pwa.js" defer></script>
+    <link rel="stylesheet" href="/css/product-polish.css?v=20261025">
 </body>
 </html>
