@@ -242,6 +242,16 @@ body.admin-register-page{min-height:100vh;color:#fff;background-color:#020b02;ba
 @media(max-width:520px){.admin-register-wrap{align-items:flex-start;padding:12px 9px!important}.admin-register-card{padding:27px 20px 20px!important;border-radius:14px!important}.register-brand{margin-bottom:20px}}
 </style>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
+
+<style id="manlung-admin-register-footer-only-fix">
+/* Hide only the registration card's own footer note/link; preserve the invitation form and validation. */
+.app-container > .register-footer,
+.app-container > .footer,
+.app-container > footer {
+  display: none !important;
+}
+</style>
+
 </head>
 
 <body class="admin-register-page">
