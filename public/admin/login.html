@@ -125,6 +125,126 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
 @media(max-width:480px){body:has(.center-wrap){align-items:flex-start;padding:10vh 16px 24px!important}.center-wrap{min-height:auto!important}.login-container{padding:32px 24px!important;border-radius:16px!important;border:1px solid var(--login-line)!important;box-shadow:0 10px 15px -3px rgba(0,0,0,.05),0 4px 6px -4px rgba(0,0,0,.05)!important;background:#fff!important}}
 @media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
 </style>
+
+<style id="manlung-admin-login-dark-green-reference">
+/* Dark slate + neon green visual treatment adapted from the supplied reference.
+   Existing authentication, Turnstile, MFA and password-reset markup/handlers remain intact. */
+:root{
+  --login-bg:#e2e8f0;
+  --login-card:#1e293b;
+  --login-ink:#f8fafc;
+  --login-muted:#94a3b8;
+  --login-tertiary:#94a3b8;
+  --login-line:#334155;
+  --login-primary:#4ade80;
+  --login-hover:#22c55e;
+  --login-ring:rgba(74,222,128,.2);
+}
+html,body{min-height:100%;margin:0}
+body:has(.center-wrap){
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px 14px;box-sizing:border-box;
+  background:linear-gradient(135deg,#f1f5f9 0%,#cbd5e1 100%)!important;
+  color:var(--login-ink)!important;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif!important;
+  -webkit-font-smoothing:antialiased
+}
+.center-wrap{width:100%;min-height:100vh!important;display:flex;align-items:center;justify-content:center;padding:0!important;box-sizing:border-box}
+.login-container{
+  position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;
+  width:100%!important;max-width:400px!important;padding:34px 22px!important;
+  background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%)!important;
+  border:8px solid #0f172a!important;border-radius:38px!important;
+  color:#f8fafc!important;
+  box-shadow:0 25px 50px -12px rgba(0,0,0,.5),inset 0 1px 1px rgba(255,255,255,.1)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  animation:adminLoginFadeIn .45s ease-out
+}
+.login-container:before,.login-container:after{display:none!important;content:none!important}
+.login-container .form-card{width:100%}
+.login-container .logo{position:relative;z-index:1;text-align:center;margin:0 0 28px!important}
+.login-container .logo>.brand-logo{
+  display:block;width:72px;height:72px;object-fit:contain;
+  margin:0 auto 16px!important;padding:7px;box-sizing:border-box;
+  border:1px solid #4ade80!important;border-radius:20px!important;
+  background:#0f172a!important;box-shadow:0 0 20px rgba(74,222,128,.2)!important
+}
+.login-container .logo h1{
+  margin:0 0 6px!important;color:#f8fafc!important;
+  font-family:inherit!important;font-size:28px!important;font-weight:700!important;
+  letter-spacing:-.5px!important;text-shadow:none!important
+}
+.login-container .logo>span{
+  display:block;color:#94a3b8!important;font-family:inherit!important;
+  font-size:13px!important;font-weight:400!important;letter-spacing:0!important;
+  text-transform:none!important;line-height:1.5!important
+}
+.login-container .admin-badge{
+  display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:5px 11px;
+  border:1px solid rgba(74,222,128,.45)!important;border-radius:999px!important;
+  background:rgba(74,222,128,.08)!important;color:#4ade80!important;
+  font-family:inherit!important;font-size:11px!important;font-weight:700!important;
+  letter-spacing:.04em!important;text-transform:uppercase
+}
+.login-container .form-group{position:relative;z-index:1;margin:0 0 17px!important}
+.login-container label{
+  display:block;margin:0 0 8px!important;color:#f8fafc!important;
+  font-family:inherit!important;font-size:13px!important;font-weight:500!important;
+  letter-spacing:0!important;text-transform:none!important
+}
+.login-container label i{color:#94a3b8!important;margin-right:5px}
+.login-container input{
+  display:block;width:100%;height:54px;min-height:54px;box-sizing:border-box;
+  padding:0 15px!important;border:1px solid #334155!important;border-radius:14px!important;
+  background:#0f172a!important;color:#f8fafc!important;
+  font-family:inherit!important;font-size:15px!important;font-weight:400!important;
+  box-shadow:none!important;transition:border-color .2s,box-shadow .2s!important
+}
+.login-container input::placeholder{color:#94a3b8!important}
+.login-container input:focus{
+  outline:none!important;border-color:#4ade80!important;background:#0f172a!important;
+  box-shadow:0 0 0 3px rgba(74,222,128,.2)!important
+}
+.login-container .manlung-turnstile-box{
+  position:relative;z-index:1;margin:4px 0 17px!important;padding:12px!important;
+  border:1px solid #334155!important;border-radius:14px!important;background:#0f172a!important
+}
+.login-container .manlung-turnstile-title{color:#f8fafc!important}
+.login-container .manlung-turnstile-help{color:#94a3b8!important}
+.login-container .manlung-turnstile-widget{display:flex;justify-content:center;align-items:center;min-height:65px;overflow-x:auto}
+.login-container .manlung-turnstile-status{color:#94a3b8!important}
+.login-container .btn-primary{
+  position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;min-height:54px;padding:13px 16px;border:0!important;border-radius:14px!important;
+  background:#4ade80!important;color:#0f172a!important;font-family:inherit!important;
+  font-size:16px!important;font-weight:700!important;letter-spacing:0!important;
+  box-shadow:0 8px 20px rgba(74,222,128,.2)!important;
+  transition:background-color .2s,transform .2s,box-shadow .2s!important
+}
+.login-container .btn-primary:hover{background:#22c55e!important;transform:translateY(-1px);box-shadow:0 12px 25px rgba(74,222,128,.22)!important}
+.login-container .btn-primary:active{transform:translateY(0)}
+.login-container a{color:#4ade80!important;font-family:inherit!important;font-size:13px!important;font-weight:500!important;text-decoration:none!important}
+.login-container a:hover{color:#86efac!important;text-decoration:underline!important}
+.login-container .slot-base{display:flex;flex-direction:column;gap:12px}
+.login-container .slot-notch{display:none!important}
+.login-container .slot-forgot-link{align-self:center;margin-top:2px}
+.login-container .error-text,#loginError,#mfaLoginError,#mfaEnrollStatus{position:relative;z-index:1;margin-top:10px;color:#fecaca!important;overflow-wrap:anywhere}
+#adminMfaEnroll>div{border:1px solid #334155!important;border-radius:16px!important;background:#0f172a!important;color:#f8fafc!important}
+#adminMfaEnroll h3{color:#f8fafc!important}
+#adminMfaEnroll p,#adminMfaForm p,#adminForgotBox p{color:#94a3b8!important}
+#adminForgotBox{position:relative;z-index:1;padding:14px!important;border:1px solid #334155!important;border-radius:14px!important;background:#0f172a!important}
+.login-container .admin-register-link{position:relative;z-index:1;margin:20px 0 0!important;text-align:center;color:#94a3b8!important;font-size:12px!important;line-height:1.6}
+.login-container .footer-text{display:none!important}
+@keyframes adminLoginFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){
+ body:has(.center-wrap){align-items:center;padding:12px!important}
+ .center-wrap{min-height:calc(100vh - 24px)!important}
+ .login-container{padding:30px 20px!important;border-radius:32px!important;border:7px solid #0f172a!important}
+ .login-container .logo h1{font-size:26px!important}
+}
+@media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
+</style>
+
 </head>
 <body>
     <div class="center-wrap">
