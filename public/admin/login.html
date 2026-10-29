@@ -201,6 +201,23 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
 }
 </style>
 
+
+<style id="manlung-admin-turnstile-section-polish">
+#adminTurnstileSection{display:block;position:relative;z-index:1;margin:4px 0 18px!important;padding:14px!important;border:1px solid rgba(212,175,55,.32)!important;border-radius:16px!important;background:rgba(0,0,0,.3)!important}
+#adminTurnstileSection[hidden]{display:none!important}
+#adminTurnstileSection .manlung-turnstile-heading{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+#adminTurnstileSection .manlung-turnstile-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border:1px solid rgba(212,175,55,.35);border-radius:11px;color:#e4c76c;background:rgba(212,175,55,.09)}
+#adminTurnstileSection .manlung-turnstile-title{margin:0 0 3px!important;color:#f3d982!important;font-size:12px!important;font-weight:800!important;letter-spacing:.07em;text-transform:uppercase}
+#adminTurnstileSection .manlung-turnstile-help{margin:0!important;color:#c9c0ad!important;font-size:11px!important;line-height:1.55}
+#adminTurnstileSection .manlung-turnstile-widget{min-height:68px;display:flex;align-items:center;justify-content:center;overflow-x:auto}
+#adminTurnstileSection .manlung-turnstile-loading{color:#d6c99f;font-size:12px;text-align:center}
+#adminTurnstileSection .manlung-turnstile-status{margin:7px 0 0!important;color:#c9c0ad!important;font-size:11px!important;line-height:1.5;overflow-wrap:anywhere}
+#adminTurnstileSection .manlung-turnstile-status:empty{display:none}
+#adminTurnstileSection .manlung-turnstile-status[data-state="error"]{color:#ffb4b4!important}
+#adminTurnstileSection .manlung-turnstile-status[data-state="success"]{color:#9ee6b0!important}
+@media(max-width:420px){#adminTurnstileSection{padding:11px!important}#adminTurnstileSection .manlung-turnstile-heading{align-items:flex-start}}
+</style>
+
 </head>
 <body>
     <div class="center-wrap">
@@ -221,7 +238,7 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
                     <label><i class="fas fa-lock"></i> Password</label>
                     <input type="password" id="adminPassword" placeholder="Enter password" required>
                 </div>
-                <div class="manlung-turnstile-box" aria-label="Cloudflare Turnstile"><div id="adminTurnstile" class="manlung-turnstile-widget"></div></div><button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                <section class="manlung-turnstile-box" id="adminTurnstileSection" aria-label="Cloudflare security verification" aria-describedby="adminTurnstileHelp"><div class="manlung-turnstile-heading"><span class="manlung-turnstile-icon" aria-hidden="true"><i class="fas fa-shield-halved"></i></span><div><p class="manlung-turnstile-title">Cloudflare security check</p><p class="manlung-turnstile-help" id="adminTurnstileHelp">Complete this check to help protect the admin sign-in.</p></div></div><div id="adminTurnstile" class="manlung-turnstile-widget" aria-live="polite"><span class="manlung-turnstile-loading">Loading secure verification…</span></div><p id="adminTurnstileStatus" class="manlung-turnstile-status" role="status" aria-live="polite">Connecting to Cloudflare…</p></section><button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
                     <i class="fas fa-arrow-right-to-bracket"></i> Login
                 </button>
                 <div id="loginError" class="error-text"></div>
@@ -314,9 +331,14 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
         let adminTurnstileLoadError = null;
         let adminTurnstileSetupComplete = false;
 
-        function showTurnstileStatus(message) {
+        function showTurnstileStatus(message, state = 'info') {
             const errorEl = document.getElementById('loginError');
-            if (errorEl) errorEl.textContent = message || '';
+            const statusEl = document.getElementById('adminTurnstileStatus');
+            if (errorEl && message && state === 'error') errorEl.textContent = message;
+            if (statusEl) {
+                statusEl.textContent = message || '';
+                statusEl.dataset.state = message ? state : '';
+            }
         }
 
         function waitForTurnstile(timeoutMs = 15000) {
@@ -350,7 +372,8 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
                 adminTurnstileEnabled = Boolean(config.turnstileEnabled);
                 if (!adminTurnstileEnabled) {
                     adminTurnstileSetupComplete = true;
-                    if (widgetBox) widgetBox.closest('.manlung-turnstile-box')?.setAttribute('hidden', '');
+                    const section = document.getElementById('adminTurnstileSection');
+                    if (section) section.hidden = true;
                     return;
                 }
                 if (!config.turnstileSiteKey) {
@@ -359,7 +382,9 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
 
                 const turnstile = await waitForTurnstile();
                 if (!widgetBox) throw new Error('Cloudflare verification area is missing.');
-                widgetBox.closest('.manlung-turnstile-box')?.removeAttribute('hidden');
+                const section = document.getElementById('adminTurnstileSection');
+                if (section) section.hidden = false;
+                showTurnstileStatus('Complete the Cloudflare check before signing in.', 'info');
                 adminTurnstileWidget = turnstile.render(widgetBox, {
                     sitekey: config.turnstileSiteKey,
                     theme: 'auto',
@@ -369,11 +394,13 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
                     'refresh-expired': 'auto',
                     callback: () => {
                         adminTurnstileLoadError = null;
-                        showTurnstileStatus('');
+                        showTurnstileStatus('Verification complete.', 'success');
+                        const errorEl = document.getElementById('loginError');
+                        if (errorEl && /Cloudflare|verification/i.test(errorEl.textContent)) errorEl.textContent = '';
                     },
                     'expired-callback': () => {
                         adminTurnstileLoadError = 'Cloudflare verification expired. Complete the challenge again.';
-                        showTurnstileStatus(adminTurnstileLoadError);
+                        showTurnstileStatus(adminTurnstileLoadError, 'error');
                     },
                     'error-callback': () => {
                         adminTurnstileLoadError = 'Cloudflare could not verify this browser. Check your connection or disable content-blocking extensions, then refresh.';
@@ -388,7 +415,7 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
             } catch (error) {
                 adminTurnstileLoadError = error?.message || 'Cloudflare security verification failed to load.';
                 console.error('Admin Turnstile setup failed:', error);
-                showTurnstileStatus(adminTurnstileLoadError + ' Refresh the page and try again.');
+                showTurnstileStatus(adminTurnstileLoadError + ' Refresh the page and try again.', 'error');
             } finally {
                 adminTurnstileSetupComplete = true;
             }
