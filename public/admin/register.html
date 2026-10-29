@@ -269,6 +269,27 @@ body.admin-register-page .site-footer-wrapper {
 }
 </style>
 
+<style id="manlung-admin-registration-neumorphic-refresh">
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+:root{--neo-bg:#e8e9ee;--neo-light:#fff;--neo-dark:#c3c4c9;--neo-ink:#343a46;--neo-muted:#737b89;--neo-green:#4b8d35}
+body.admin-register-page{min-height:100vh!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;font-family:Inter,sans-serif!important}
+.admin-register-wrap{min-height:100svh!important;padding:24px 16px!important}
+.admin-register-card{max-width:520px!important;padding:36px!important;border:0!important;border-radius:28px!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;box-shadow:12px 12px 24px var(--neo-dark),-12px -12px 24px var(--neo-light)!important}
+.admin-register-card:before{height:4px!important;background:linear-gradient(90deg,#4b8d35,#8fcb66,#4b8d35)!important}.register-brand{color:var(--neo-ink)!important}.register-brand b{color:var(--neo-green)!important}
+.register-shield{color:var(--neo-green)!important;border:0!important;background:var(--neo-bg)!important;box-shadow:inset 4px 4px 8px var(--neo-dark),inset -4px -4px 8px var(--neo-light)!important}
+.eyebrow{color:var(--neo-green)!important}.admin-register-card h1{color:var(--neo-ink)!important}.register-subtitle{color:var(--neo-muted)!important}
+.invite-badge{color:#436d2f!important;background:#e4eadf!important;border-color:#c8d7bf!important}.admin-register-card .field{margin-bottom:17px!important}.admin-register-card label{color:#505866!important}
+.admin-register-card input{height:50px!important;border:0!important;border-radius:14px!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;box-shadow:inset 4px 4px 8px var(--neo-dark),inset -4px -4px 8px var(--neo-light)!important}
+.admin-register-card input:focus{outline:2px solid rgba(75,141,53,.38)!important;box-shadow:inset 3px 3px 6px var(--neo-dark),inset -3px -3px 6px var(--neo-light)!important}
+.admin-register-card input::placeholder{color:#989eaa!important}.admin-register-card input:read-only{background:#e1e3e8!important;color:#6f7784!important}
+.password-toggle{color:#657080!important}.password-toggle:hover{background:#e1e5da!important;color:var(--neo-green)!important}
+.admin-register-card .warning{border:0!important;background:#f4e4e4!important;color:#8d3030!important;box-shadow:inset 3px 3px 6px #ddcaca,inset -3px -3px 6px #fff!important}.warning strong,.warning p{color:#8d3030!important}
+.admin-register-card .register-submit{min-height:52px!important;border:0!important;border-radius:14px!important;background:linear-gradient(110deg,#76b852,#4b8d35)!important;color:#fff!important;box-shadow:6px 6px 12px #c0c2c7,-5px -5px 12px #fff!important}
+.admin-register-card .register-submit:hover:not(:disabled){filter:brightness(1.04)!important;box-shadow:4px 4px 9px #c0c2c7,-4px -4px 9px #fff!important}.admin-register-card .register-submit:disabled{background:#a9b9a1!important;color:#f5f7f4!important;box-shadow:none!important}
+.admin-register-card .msg{background:#f5e7e7!important;color:#8d3030!important;border-color:#e6caca!important}.admin-register-card .msg.success{background:#e5eee1!important;color:#315e26!important;border-color:#c8d9c1!important}
+.back-link{color:#68717e!important}.back-link:hover{color:#3e752d!important;background:#dfe5d9!important}.register-footer{display:none!important}
+@media(max-width:520px){.admin-register-wrap{padding:18px 12px!important}.admin-register-card{padding:28px 22px!important;border-radius:22px!important}}
+</style>
 </head>
 
 <body class="admin-register-page">
@@ -438,7 +459,7 @@ body.admin-register-page .site-footer-wrapper {
     if (!invitationToken) {
       inviteWarning.classList.remove("hidden");
       submitButton.disabled = true;
-      message.textContent = "An Owner invitation is required to create an Admin account. Open the invitation link sent by the Owner.";
+      message.textContent = "This page needs the unique invitation link sent by the Owner. Open the full link from the invitation email, or ask the Owner to create and send a fresh invitation.";
       return;
     }
 
@@ -453,7 +474,7 @@ body.admin-register-page .site-footer-wrapper {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.valid || !data.email) {
-        throw new Error(data.error || "This admin invitation is invalid or expired. Please contact the Owner.");
+        throw new Error(data.error || "This invitation is invalid, expired, or already used. Ask the Owner to send a new invitation link.");
       }
       emailInput.value = data.email;
       emailInput.readOnly = true;
