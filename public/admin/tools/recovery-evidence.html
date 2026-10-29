@@ -163,21 +163,6 @@ function closeViewer(){$('viewer').classList.remove('open');$('viewer').setAttri
 $('search').addEventListener('input',renderCases);$('refresh').onclick=loadCases;$('closeViewer').onclick=closeViewer;$('viewer').onclick=e=>{if(e.target===$('viewer'))closeViewer()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer()});setInterval(async()=>{if(document.hidden||!selectedCaseId)return;try{const d=await api('/api/cases/admin/case/'+encodeURIComponent(selectedCaseId));if(d.case){const merged={...allCases.find(c=>c.caseId===selectedCaseId),...d.case};const idx=allCases.findIndex(c=>c.caseId===selectedCaseId);if(idx>=0)allCases[idx]=merged;renderDetail(merged);await loadActivity(selectedCaseId);renderCases()}}catch(e){console.warn('Live evidence refresh failed:',e)}},10000);
 (async()=>{try{const d=await api('/api/auth/verify');currentRole=String(d.user?.role||'').toLowerCase();if(!d.success||!['admin','owner'].includes(currentRole)){location.replace('/admin/login.html');return}await loadCases()}catch(e){location.replace('/admin/login.html')}})();
 </script>
-<footer class="manlung-footer" aria-label="Manlung Recovery footer">
-  <div class="manlung-footer-inner">
-    <div class="manlung-footer-grid">
-      <section class="manlung-footer-brand" aria-labelledby="footer-brand-title">
-        <div class="manlung-footer-brand-row"><a href="/" aria-label="Manlung Recovery Home"><img src="/icons/icon-512.png" alt="Manlung Recovery" class="manlung-footer-logo" width="46" height="46"></a><div><h2 id="footer-brand-title">Manlung Recovery</h2><p class="manlung-footer-brand-subtitle">Cyber Recovery &amp; Digital Investigation Portal</p></div></div>
-        <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
-      </section>
-      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
-      <section class="manlung-footer-column"><h3>Admin</h3><nav class="manlung-footer-links"><a href="/admin/dashboard.html">Admin Dashboard</a><a href="/admin/owner.html">Owner Portal</a><a href="/admin/reports.html">Reports</a><a href="/admin/tools/security.html">Security Center</a><a href="/contact.html">Support</a></nav></section>
-      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
-    </div>
-    <div class="manlung-footer-divider"></div>
-    <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer">GitHub</a></div></div>
-    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
-  </div>
-</footer>
+
 </body>
 </html>
