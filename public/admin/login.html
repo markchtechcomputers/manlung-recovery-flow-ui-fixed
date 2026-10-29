@@ -364,6 +364,19 @@ body:has(.center-wrap){
       .login-container .form-card{padding:22px 14px!important}
     }
   
+
+    .login-container .ml-password-wrap { position:relative; display:flex; align-items:center; }
+    .login-container .ml-password-wrap input { padding-right:52px!important; }
+    .login-container .ml-password-toggle {
+      position:absolute!important;right:8px!important;top:50%!important;transform:translateY(-50%)!important;
+      width:38px!important;height:38px!important;display:flex!important;align-items:center!important;justify-content:center!important;
+      padding:0!important;border:0!important;border-radius:10px!important;background:transparent!important;
+      color:#94a3b8!important;box-shadow:none!important;cursor:pointer!important;
+    }
+    .login-container .ml-password-toggle:hover { color:#4ade80!important;background:rgba(74,222,128,.08)!important; }
+    .login-container .ml-password-toggle i { font-size:16px!important; }
+    .login-container .ml-password-group label { margin-bottom:8px!important; }
+
 </style>
 </head>
 <body>
@@ -382,9 +395,12 @@ body:has(.center-wrap){
                     <label><i class="fas fa-user"></i> Username</label>
                     <input type="text" id="adminUsername" placeholder="Enter username" required autofocus>
                 </div>
-                <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Password</label>
-                    <input type="password" id="adminPassword" placeholder="Enter password" required>
+                <div class="form-group ml-password-group">
+                    <label for="adminPassword"><i class="fas fa-lock"></i> Password</label>
+                    <div class="ml-password-wrap">
+                      <input type="password" id="adminPassword" placeholder="Enter password" autocomplete="current-password" required>
+                      <button type="button" id="adminTogglePassword" class="ml-password-toggle" aria-label="Show password" aria-pressed="false"><i class="fas fa-eye" aria-hidden="true"></i></button>
+                    </div>
                 </div>
                 <section class="manlung-turnstile-box" id="adminTurnstileSection" aria-label="Cloudflare security verification" aria-describedby="adminTurnstileHelp"><div class="manlung-turnstile-heading"><span class="manlung-turnstile-icon" aria-hidden="true"><i class="fas fa-shield-halved"></i></span><div><p class="manlung-turnstile-title">Cloudflare security check</p><p class="manlung-turnstile-help" id="adminTurnstileHelp">Complete this check to help protect the admin sign-in.</p></div></div><div id="adminTurnstile" class="manlung-turnstile-widget" aria-live="polite"><span class="manlung-turnstile-loading">Loading secure verification…</span></div><p id="adminTurnstileStatus" class="manlung-turnstile-status" role="status" aria-live="polite">Connecting to Cloudflare…</p></section><div id="loginError" class="error-text"></div>
                 <div class="slot-base">
@@ -903,5 +919,21 @@ async function requestAdminReset(){
 </script>
 
 <script src="/js/pwa.js" defer></script>
+
+<script id="manlung-admin-password-toggle">
+(function(){
+ const input=document.getElementById('adminPassword');
+ const button=document.getElementById('adminTogglePassword');
+ if(!input||!button)return;
+ button.addEventListener('click',function(){
+  const showing=input.type==='password';
+  input.type=showing?'text':'password';
+  button.setAttribute('aria-label',showing?'Hide password':'Show password');
+  button.setAttribute('aria-pressed',String(showing));
+  const icon=button.querySelector('i');
+  if(icon)icon.className=showing?'fas fa-eye-slash':'fas fa-eye';
+ });
+})();
+</script>
 </body>
 </html>
