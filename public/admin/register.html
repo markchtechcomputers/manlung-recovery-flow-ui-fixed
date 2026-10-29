@@ -269,26 +269,42 @@ body.admin-register-page .site-footer-wrapper {
 }
 </style>
 
-<style id="manlung-admin-registration-neumorphic-refresh">
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-:root{--neo-bg:#e8e9ee;--neo-light:#fff;--neo-dark:#c3c4c9;--neo-ink:#343a46;--neo-muted:#737b89;--neo-green:#4b8d35}
-body.admin-register-page{min-height:100vh!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;font-family:Inter,sans-serif!important}
-.admin-register-wrap{min-height:100svh!important;padding:24px 16px!important}
-.admin-register-card{max-width:520px!important;padding:36px!important;border:0!important;border-radius:28px!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;box-shadow:12px 12px 24px var(--neo-dark),-12px -12px 24px var(--neo-light)!important}
-.admin-register-card:before{height:4px!important;background:linear-gradient(90deg,#4b8d35,#8fcb66,#4b8d35)!important}.register-brand{color:var(--neo-ink)!important}.register-brand b{color:var(--neo-green)!important}
-.register-shield{color:var(--neo-green)!important;border:0!important;background:var(--neo-bg)!important;box-shadow:inset 4px 4px 8px var(--neo-dark),inset -4px -4px 8px var(--neo-light)!important}
-.eyebrow{color:var(--neo-green)!important}.admin-register-card h1{color:var(--neo-ink)!important}.register-subtitle{color:var(--neo-muted)!important}
-.invite-badge{color:#436d2f!important;background:#e4eadf!important;border-color:#c8d7bf!important}.admin-register-card .field{margin-bottom:17px!important}.admin-register-card label{color:#505866!important}
-.admin-register-card input{height:50px!important;border:0!important;border-radius:14px!important;background:var(--neo-bg)!important;color:var(--neo-ink)!important;box-shadow:inset 4px 4px 8px var(--neo-dark),inset -4px -4px 8px var(--neo-light)!important}
-.admin-register-card input:focus{outline:2px solid rgba(75,141,53,.38)!important;box-shadow:inset 3px 3px 6px var(--neo-dark),inset -3px -3px 6px var(--neo-light)!important}
-.admin-register-card input::placeholder{color:#989eaa!important}.admin-register-card input:read-only{background:#e1e3e8!important;color:#6f7784!important}
-.password-toggle{color:#657080!important}.password-toggle:hover{background:#e1e5da!important;color:var(--neo-green)!important}
-.admin-register-card .warning{border:0!important;background:#f4e4e4!important;color:#8d3030!important;box-shadow:inset 3px 3px 6px #ddcaca,inset -3px -3px 6px #fff!important}.warning strong,.warning p{color:#8d3030!important}
-.admin-register-card .register-submit{min-height:52px!important;border:0!important;border-radius:14px!important;background:linear-gradient(110deg,#76b852,#4b8d35)!important;color:#fff!important;box-shadow:6px 6px 12px #c0c2c7,-5px -5px 12px #fff!important}
-.admin-register-card .register-submit:hover:not(:disabled){filter:brightness(1.04)!important;box-shadow:4px 4px 9px #c0c2c7,-4px -4px 9px #fff!important}.admin-register-card .register-submit:disabled{background:#a9b9a1!important;color:#f5f7f4!important;box-shadow:none!important}
-.admin-register-card .msg{background:#f5e7e7!important;color:#8d3030!important;border-color:#e6caca!important}.admin-register-card .msg.success{background:#e5eee1!important;color:#315e26!important;border-color:#c8d9c1!important}
-.back-link{color:#68717e!important}.back-link:hover{color:#3e752d!important;background:#dfe5d9!important}.register-footer{display:none!important}
-@media(max-width:520px){.admin-register-wrap{padding:18px 12px!important}.admin-register-card{padding:28px 22px!important;border-radius:22px!important}}
+<style id="manlung-admin-registration-glassmorphism-reference-design">
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+body.admin-register-page{min-height:100vh!important;padding:24px 16px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;background-image:linear-gradient(135deg,rgba(5,12,27,.78),rgba(5,40,29,.54)),url('https://images.unsplash.com/photo-1506744626753-eda818c6cce5?auto=format&fit=crop&w=1920&q=85')!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;color:#fff!important;font-family:Poppins,sans-serif!important}
+.admin-register-wrap{width:100%!important;min-height:calc(100vh - 48px)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;box-sizing:border-box!important}
+.admin-register-card{position:relative!important;isolation:isolate;width:100%!important;max-width:520px!important;margin:0 auto!important;padding:34px 32px!important;overflow:hidden!important;border:1px solid rgba(255,255,255,.3)!important;border-radius:24px!important;background:rgba(255,255,255,.12)!important;color:#fff!important;box-shadow:0 12px 36px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.22)!important;backdrop-filter:blur(17px) saturate(135%)!important;-webkit-backdrop-filter:blur(17px) saturate(135%)!important}
+.admin-register-card:before{height:3px!important;background:linear-gradient(90deg,transparent,#a8e063,#56ab2f,#a8e063,transparent)!important}
+.register-brand{justify-content:center!important;color:#fff!important;font-family:Poppins,sans-serif!important;font-size:12px!important;letter-spacing:.14em!important}
+.register-brand img{border:1px solid rgba(255,255,255,.35)!important;box-shadow:0 5px 18px rgba(0,0,0,.2)!important}
+.register-brand b{color:#c9f6a3!important}
+.register-shield{border:1px solid rgba(255,255,255,.25)!important;background:rgba(255,255,255,.12)!important;color:#c9f6a3!important;box-shadow:0 8px 22px rgba(0,0,0,.12)!important}
+.eyebrow{color:#c9f6a3!important;letter-spacing:.16em!important}
+.admin-register-card h1{color:#fff!important;font-family:Poppins,sans-serif!important;font-size:clamp(25px,4vw,31px)!important;font-weight:600!important;letter-spacing:-.4px!important}
+.register-subtitle{color:rgba(255,255,255,.82)!important;font-size:13px!important;line-height:1.7!important}
+.invite-badge{border:1px solid rgba(201,246,163,.38)!important;background:rgba(124,179,66,.18)!important;color:#e0ffca!important}
+.admin-register-card .warning{border:1px solid rgba(255,150,150,.35)!important;background:rgba(105,15,25,.45)!important;color:#fff!important;box-shadow:none!important}
+.admin-register-card .warning strong,.admin-register-card .warning p{color:#fff!important}
+.admin-register-card .field{margin-bottom:16px!important}
+.admin-register-card label{color:rgba(255,255,255,.94)!important;font-family:Poppins,sans-serif!important;font-size:13px!important;font-weight:500!important}
+.admin-register-card .field-hint,.admin-register-card .strength-caption{color:rgba(255,255,255,.72)!important}
+.admin-register-card .locked-label,.admin-register-card .optional-label{color:#d8f5c1!important}
+.admin-register-card .input-shell{position:relative!important}
+.admin-register-card .field-icon{color:rgba(255,255,255,.68)!important}
+.admin-register-card input{width:100%!important;min-height:49px!important;height:49px!important;border:1px solid rgba(255,255,255,.35)!important;border-radius:11px!important;background:rgba(255,255,255,.09)!important;color:#fff!important;font-family:Poppins,sans-serif!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.12)!important}
+.admin-register-card input::placeholder{color:rgba(255,255,255,.62)!important}
+.admin-register-card input:focus{outline:none!important;border-color:rgba(201,246,163,.95)!important;background:rgba(255,255,255,.14)!important;box-shadow:0 0 0 3px rgba(168,224,99,.16)!important}
+.admin-register-card input:read-only{background:rgba(255,255,255,.06)!important;color:rgba(255,255,255,.8)!important}
+.admin-register-card .password-toggle{color:rgba(255,255,255,.78)!important}
+.admin-register-card .strength-track{background:rgba(255,255,255,.15)!important}
+.admin-register-card .register-submit{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;width:100%!important;min-height:52px!important;border:0!important;border-radius:11px!important;background:linear-gradient(110deg,#a8e063,#56ab2f)!important;color:#10220b!important;font-family:Poppins,sans-serif!important;font-weight:700!important;box-shadow:0 8px 20px rgba(86,171,47,.24)!important}
+.admin-register-card .register-submit:hover:not(:disabled){filter:brightness(1.06)!important;box-shadow:0 0 18px rgba(86,171,47,.32)!important}
+.admin-register-card .msg{border:1px solid rgba(255,150,150,.3)!important;background:rgba(105,15,25,.42)!important;color:#fff!important}
+.admin-register-card .msg.success{border-color:rgba(201,246,163,.4)!important;background:rgba(39,91,35,.4)!important;color:#e6ffda!important}
+.back-link{color:#e0ffca!important}.back-link:hover{color:#fff!important;background:rgba(255,255,255,.1)!important}
+.register-footer{display:none!important}
+@media(max-width:520px){body.admin-register-page{padding:18px 12px!important}.admin-register-wrap{min-height:calc(100vh - 36px)!important}.admin-register-card{padding:28px 22px!important;border-radius:20px!important}}
+@media(prefers-reduced-motion:reduce){.admin-register-card,.admin-register-card *{animation:none!important;transition:none!important}}
 </style>
 </head>
 
