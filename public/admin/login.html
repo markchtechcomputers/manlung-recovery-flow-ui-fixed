@@ -168,6 +168,39 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
 @media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
 </style>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
+
+<style id="manlung-admin-login-motion-polish">
+/* Accessible rolling-panel entrance inspired by the supplied login reference.
+   Keep the real login form, Turnstile, MFA, and reset controls in the same DOM. */
+@keyframes adminPanelRollIn {
+  0% { opacity: 0; transform: translateY(22px) scale(.985); }
+  65% { opacity: 1; transform: translateY(-3px) scale(1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.login-container {
+  transform-origin: center bottom;
+  animation: adminPanelRollIn .72s cubic-bezier(.2,.8,.2,1) both;
+}
+.login-container .btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+.login-container .btn-primary:focus-visible,
+.login-container a:focus-visible {
+  outline: 3px solid rgba(20,184,166,.45);
+  outline-offset: 3px;
+}
+.login-container .form-group input {
+  min-width: 0;
+}
+.login-container .logo > i {
+  box-shadow: 0 8px 20px rgba(15,118,110,.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-container { animation: none !important; }
+}
+</style>
+
 </head>
 <body>
     <div class="center-wrap">
