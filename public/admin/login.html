@@ -70,7 +70,7 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
 .login-container{position:relative;isolation:isolate;overflow:visible;box-sizing:border-box;width:100%!important;max-width:440px!important;padding:40px!important;background:var(--login-card)!important;border:1px solid var(--login-line)!important;border-radius:16px!important;color:var(--login-ink)!important;box-shadow:0 10px 15px -3px rgba(0,0,0,.05),0 4px 6px -4px rgba(0,0,0,.05),0 20px 40px -10px rgba(0,0,0,.05)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;animation:adminLoginFadeIn .6s ease-out}
 .login-container:before,.login-container:after{display:none!important;content:none!important}
 .login-container .logo{position:relative;z-index:1;text-align:center;margin:0 0 30px!important}
-.login-container .logo>i{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;margin:0 0 20px!important;border:0!important;border-radius:12px!important;background:#eef2ff!important;color:var(--login-primary)!important;font-size:28px!important;text-shadow:none!important;box-shadow:none!important}
+.login-container .logo>.brand-logo{display:block;width:56px;height:56px;object-fit:contain;margin:0 auto 20px!important;border-radius:12px!important;background:#eef2ff!important;padding:6px;box-sizing:border-box;box-shadow:none!important}
 .login-container .logo h1{margin:0 0 8px!important;color:var(--login-ink)!important;font-family:inherit!important;font-size:24px!important;font-weight:700!important;letter-spacing:-.5px!important;text-shadow:none!important}
 .login-container .logo>span{display:block;color:var(--login-muted)!important;font-family:inherit!important;font-size:14px!important;font-weight:400!important;letter-spacing:0!important;text-transform:none!important;line-height:1.5!important}
 .login-container .admin-badge{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:5px 11px;border:1px solid #c7d2fe!important;border-radius:999px!important;background:#eef2ff!important;color:var(--login-primary)!important;font-family:inherit!important;font-size:11px!important;font-weight:700!important;letter-spacing:.04em!important;text-transform:uppercase}
@@ -111,7 +111,7 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
     <div class="center-wrap">
         <div class="login-container">
             <div class="logo">
-                <i class="fas fa-shield-halved"></i>
+                <img class="brand-logo" src="/icons/icon-512.png" alt="Manlung Recovery logo" width="56" height="56" fetchpriority="high">
                 <h1>Admin Portal</h1>
                 <span>Enter your credentials to access the dashboard</span>
                 <div><span class="admin-badge"><i class="fas fa-lock"></i> Restricted</span></div>
