@@ -378,6 +378,36 @@ body:has(.center-wrap){
     .login-container .ml-password-group label { margin-bottom:8px!important; }
 
 </style>
+
+<style id="manlung-admin-login-footer-only-fix">
+/* The public site footer is injected by shared site UI scripts on some deployments.
+   Scope this removal strictly to the admin login page. */
+body:has(.login-card-stack) footer,
+body:has(.login-card-stack) #footer,
+body:has(.login-card-stack) #siteFooter,
+body:has(.login-card-stack) #mainFooter,
+body:has(.login-card-stack) #footer-container,
+body:has(.login-card-stack) .footer,
+body:has(.login-card-stack) .site-footer,
+body:has(.login-card-stack) .public-footer,
+body:has(.login-card-stack) .global-footer,
+body:has(.login-card-stack) .main-footer,
+body:has(.login-card-stack) .footer-container,
+body:has(.login-card-stack) .footer-wrapper,
+body:has(.login-card-stack) .site-footer-wrapper {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+body:has(.login-card-stack) {
+  min-height: 100vh !important;
+  height: auto !important;
+}
+</style>
+
 </head>
 <body>
     <div class="center-wrap">
