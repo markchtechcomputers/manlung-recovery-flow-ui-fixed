@@ -245,6 +245,126 @@ body:has(.center-wrap){
 @media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
 </style>
 
+<style id="manlung-admin-phone-login-v2">
+
+    /* Manlung Recovery admin login — phone-style navy + neon green */
+    :root {
+      --ml-phone-bg:#0f172a;
+      --ml-phone-panel:#1e293b;
+      --ml-phone-line:#334155;
+      --ml-phone-input:#0f172a;
+      --ml-phone-ink:#f8fafc;
+      --ml-phone-muted:#94a3b8;
+      --ml-phone-green:#4ade80;
+      --ml-phone-green-hover:#22c55e;
+      --ml-phone-glow:rgba(74,222,128,.20);
+    }
+    html, body { min-height:100%; }
+    body:has(.center-wrap) {
+      min-height:100vh!important; margin:0!important; padding:20px!important;
+      display:flex!important; align-items:center!important; justify-content:center!important;
+      background:linear-gradient(135deg,#f1f5f9 0%,#cbd5e1 100%)!important;
+      color:var(--ml-phone-ink)!important;
+    }
+    .center-wrap {
+      width:100%!important; min-height:0!important; padding:0!important;
+      display:flex!important; align-items:center!important; justify-content:center!important;
+    }
+    .login-container.login-card-stack {
+      width:100%!important; max-width:400px!important; min-width:0!important;
+      padding:34px 16px 22px!important; border:8px solid #0f172a!important;
+      border-radius:40px!important;
+      background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%)!important;
+      box-shadow:0 25px 50px -12px rgba(0,0,0,.5),inset 0 1px 1px rgba(255,255,255,.1)!important;
+      color:#f8fafc!important; overflow:hidden!important; position:relative!important;
+    }
+    .login-container.login-card-stack:before {
+      content:"9:41                                      ●  ▰  ▮";
+      display:block; margin:0 8px 28px; color:#f8fafc; font-size:11px;
+      font-weight:600; letter-spacing:.02em; white-space:pre;
+    }
+    .login-container .form-card {
+      width:100%!important; padding:24px 18px!important; border:1px solid #334155!important;
+      border-radius:24px!important; background:#1e293b!important;
+      box-shadow:0 10px 25px rgba(0,0,0,.2)!important;
+    }
+    .login-container .logo { text-align:center!important; margin:0 0 24px!important; }
+    .login-container .logo>.brand-logo {
+      display:none!important;
+    }
+    .login-container .logo:before {
+      content:"\\f3ed"; font-family:"Font Awesome 6 Free","Font Awesome 5 Free"; font-weight:900;
+      width:72px;height:72px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;
+      box-sizing:border-box;border:1px solid var(--ml-phone-green);border-radius:20px;
+      background:#0f172a;color:var(--ml-phone-green);font-size:32px;
+      box-shadow:0 0 20px var(--ml-phone-glow);
+    }
+    .login-container .logo h1 {
+      color:#f8fafc!important;font-size:28px!important;font-weight:700!important;
+      letter-spacing:-.5px!important;margin:0 0 6px!important;text-shadow:none!important;
+    }
+    .login-container .logo>span {
+      display:block;color:#94a3b8!important;font-size:13px!important;font-weight:400!important;
+      line-height:1.5!important;letter-spacing:0!important;text-transform:none!important;
+    }
+    .login-container .admin-badge {
+      margin-top:14px!important;padding:5px 11px!important;border:1px solid #334155!important;
+      border-radius:999px!important;background:#0f172a!important;color:#4ade80!important;
+      font-size:11px!important;letter-spacing:.04em!important;
+    }
+    .login-container .form-group { position:relative!important;margin:0 0 16px!important; }
+    .login-container .form-group label {
+      display:block!important;margin:0 0 8px!important;color:#94a3b8!important;
+      font-size:12px!important;font-weight:600!important;letter-spacing:.02em!important;
+    }
+    .login-container .form-group label i { color:#94a3b8!important; }
+    .login-container input:not([type="checkbox"]) {
+      width:100%!important;height:56px!important;min-height:56px!important;
+      box-sizing:border-box!important;padding:0 16px!important;border:1px solid #334155!important;
+      border-radius:16px!important;background:#0f172a!important;color:#f8fafc!important;
+      font-size:15px!important;box-shadow:none!important;outline:none!important;
+    }
+    .login-container input:not([type="checkbox"])::placeholder { color:#94a3b8!important; }
+    .login-container input:not([type="checkbox"]):focus {
+      border-color:#4ade80!important;box-shadow:0 0 0 3px var(--ml-phone-glow)!important;
+    }
+    .login-container .manlung-turnstile-box {
+      margin:8px 0 16px!important;padding:12px!important;border:1px solid #334155!important;
+      border-radius:16px!important;background:#0f172a!important;
+    }
+    .login-container .manlung-turnstile-title { color:#4ade80!important; }
+    .login-container .manlung-turnstile-help,.login-container .manlung-turnstile-status { color:#94a3b8!important; }
+    .login-container .slot-base {
+      display:flex!important;flex-direction:column!important;gap:12px!important;
+      margin-top:8px!important;padding:0!important;background:transparent!important;border:0!important;
+    }
+    .login-container .slot-notch { display:none!important; }
+    .login-container .slot-login-button,.login-container button.btn-primary {
+      min-height:56px!important;width:100%!important;display:flex!important;align-items:center!important;
+      justify-content:center!important;gap:10px!important;border:0!important;border-radius:16px!important;
+      background:#4ade80!important;color:#0f172a!important;font-size:16px!important;font-weight:800!important;
+      box-shadow:0 8px 20px var(--ml-phone-glow)!important;transition:background .2s,transform .2s!important;
+    }
+    .login-container .slot-login-button:hover,.login-container button.btn-primary:hover {
+      background:#22c55e!important;transform:translateY(-1px);
+    }
+    .login-container .slot-forgot-link,#adminForgotPassword {
+      display:block!important;margin:0!important;color:#4ade80!important;font-size:13px!important;
+      text-align:center!important;text-decoration:none!important;
+    }
+    .login-container .slot-forgot-link:hover,#adminForgotPassword:hover { text-decoration:underline!important; }
+    .login-container .error-text { color:#fca5a5!important; }
+    #adminMfaEnroll>div,#adminMfaForm {
+      color:#f8fafc!important;border-color:#334155!important;background:#1e293b!important;
+    }
+    #adminMfaEnroll p,#adminMfaForm p { color:#94a3b8!important; }
+    @media(max-width:420px) {
+      body:has(.center-wrap){padding:10px!important}
+      .login-container.login-card-stack{padding:28px 10px 14px!important;border-radius:32px!important}
+      .login-container .form-card{padding:22px 14px!important}
+    }
+  
+</style>
 </head>
 <body>
     <div class="center-wrap">
