@@ -689,3 +689,17 @@ html.dark body textarea::placeholder{color:#8293ad!important}
   html body .site-header .header-actions a,
   html body .site-header .header-actions button{min-height:34px!important;padding:6px 8px!important;font-size:.7rem!important}
 }
+
+/* Remove shared and legacy footers throughout the admin portal only. */
+body:has(.admin-shell) .site-footer,
+body:has(.admin-shell) footer,
+body:has(.admin-page-bg) .site-footer,
+body:has(.admin-page-bg) footer,
+body:has(main[id*="admin"]) .site-footer,
+body:has(main[id*="admin"]) footer,
+body.admin-page .site-footer,
+body.admin-page footer,
+.manlung-admin-page .site-footer,
+.manlung-admin-page footer {
+  display: none !important;
+}
