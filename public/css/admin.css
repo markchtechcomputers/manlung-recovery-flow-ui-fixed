@@ -689,3 +689,29 @@ html.dark body textarea::placeholder{color:#8293ad!important}
   html body .site-header .header-actions a,
   html body .site-header .header-actions button{min-height:34px!important;padding:6px 8px!important;font-size:.7rem!important}
 }
+
+
+/* MANLUNG ADMIN: hide public/shared footer UI throughout every admin section. */
+body footer,
+body .site-footer,
+body .footer,
+body .footer-text,
+body .manlung-footer,
+body .manlung-footer-bottom,
+body .admin-footer,
+body .main-footer,
+body .public-footer,
+body .public-site-footer,
+body .site-footer-container,
+body #siteFooter,
+body #mainFooter,
+body #footer,
+body [data-site-footer] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
