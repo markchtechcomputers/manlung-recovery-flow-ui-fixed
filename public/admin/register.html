@@ -244,11 +244,28 @@ body.admin-register-page{min-height:100vh;color:#fff;background-color:#020b02;ba
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
 
 <style id="manlung-admin-register-footer-only-fix">
-/* Hide only the registration card's own footer note/link; preserve the invitation form and validation. */
-.app-container > .register-footer,
-.app-container > .footer,
-.app-container > footer {
+/* This stylesheet is loaded only by /admin/register.html. Hide the registration
+   page's own footer note and any shared public-site footer injected on this page. */
+.register-footer,
+body.admin-register-page footer,
+body.admin-register-page #footer,
+body.admin-register-page #siteFooter,
+body.admin-register-page #mainFooter,
+body.admin-register-page #footer-container,
+body.admin-register-page .footer,
+body.admin-register-page .site-footer,
+body.admin-register-page .public-footer,
+body.admin-register-page .global-footer,
+body.admin-register-page .main-footer,
+body.admin-register-page .footer-container,
+body.admin-register-page .footer-wrapper,
+body.admin-register-page .site-footer-wrapper {
   display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 </style>
 
