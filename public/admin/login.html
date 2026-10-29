@@ -443,6 +443,96 @@ body:has(.center-wrap){min-height:100vh!important;display:flex!important;align-i
 @media(max-width:480px){body:has(.center-wrap){padding:18px 14px!important}.center-wrap{min-height:calc(100vh - 36px)!important}.login-container.login-card-stack{padding:32px 24px!important;border-radius:24px!important}}
 @media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
 </style>
+
+<!-- Manlung Recovery: refined neumorphic login typography and layout -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style id="manlung-admin-login-neumorphic-final">
+:root{
+ --login-bg:#e8e9ee;--login-card:#e8e9ee;--login-ink:#3f4652;
+ --login-muted:#6d7480;--login-tertiary:#969da8;--login-line:transparent;
+ --login-primary:#22a06b;--login-hover:#188653;--login-ring:rgba(34,160,107,.18);
+}
+html,body{min-height:100%;margin:0}
+body:has(.center-wrap){
+ min-height:100vh;display:flex;align-items:center;justify-content:center;
+ padding:24px 16px;box-sizing:border-box;background:#e8e9ee!important;
+ color:var(--login-ink)!important;font-family:'Inter',sans-serif!important;
+ -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility
+}
+.center-wrap{width:100%;min-height:calc(100vh - 48px)!important;display:flex;align-items:center;justify-content:center;padding:0!important;box-sizing:border-box}
+.login-container{
+ position:relative;isolation:isolate;overflow:visible;box-sizing:border-box;
+ width:100%!important;max-width:420px!important;padding:42px 36px!important;
+ background:#e8e9ee!important;border:0!important;border-radius:28px!important;
+ color:#3f4652!important;
+ box-shadow:12px 12px 24px #c3c4c9,-12px -12px 24px #fff!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ animation:adminLoginFadeIn .45s ease-out
+}
+.login-container:before,.login-container:after{display:none!important;content:none!important}
+.login-container .logo{text-align:center;margin:0 0 30px!important}
+.login-container .logo>.brand-logo{
+ display:block;width:64px;height:64px;object-fit:contain;margin:0 auto 16px!important;
+ padding:7px;box-sizing:border-box;border:0!important;border-radius:18px!important;
+ background:#e8e9ee!important;box-shadow:5px 5px 10px #c3c4c9,-5px -5px 10px #fff!important
+}
+.login-container .logo h1{margin:0 0 8px!important;color:#3f4652!important;font-family:'Inter',sans-serif!important;font-size:26px!important;font-weight:800!important;letter-spacing:-.7px!important;line-height:1.2;text-shadow:none!important}
+.login-container .logo>span{display:block;color:#777e89!important;font-family:'Inter',sans-serif!important;font-size:13px!important;font-weight:500!important;letter-spacing:.01em!important;text-transform:none!important;line-height:1.6!important}
+.login-container .admin-badge{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:6px 12px;border:0!important;border-radius:999px!important;background:#e8e9ee!important;color:#168457!important;box-shadow:inset 3px 3px 6px #c3c4c9,inset -3px -3px 6px #fff!important;font:700 10px 'Inter',sans-serif!important;letter-spacing:.08em!important;text-transform:uppercase}
+.login-container .form-group{position:relative;z-index:1;margin:0 0 20px!important}
+.login-container label{display:block;margin:0 0 9px!important;color:#555d68!important;font-family:'Inter',sans-serif!important;font-size:13px!important;font-weight:600!important;letter-spacing:0!important;text-transform:none!important}
+.login-container label i{color:#7d8590!important;margin-right:6px}
+.login-container .input-wrapper{position:relative;display:flex;align-items:center}
+.login-container .input-icon{position:absolute;left:16px;width:18px;height:18px;color:#9299a4;pointer-events:none}
+.login-container input{
+ display:block;width:100%;height:52px;min-height:52px;box-sizing:border-box;
+ padding:0 16px 0 44px!important;border:0!important;border-radius:15px!important;
+ background:#e8e9ee!important;color:#3f4652!important;
+ font-family:'Inter',sans-serif!important;font-size:14px!important;font-weight:500!important;
+ box-shadow:inset 4px 4px 8px #c3c4c9,inset -4px -4px 8px #fff!important;
+ transition:box-shadow .2s!important
+}
+.login-container input::placeholder{color:#9a9fa8!important;font-weight:400!important}
+.login-container input:focus{outline:none!important;border:0!important;background:#e8e9ee!important;box-shadow:inset 3px 3px 6px #c3c4c9,inset -3px -3px 6px #fff,0 0 0 3px rgba(34,160,107,.12)!important}
+.login-container .toggle-password{position:absolute;right:10px;display:flex;align-items:center;justify-content:center;padding:7px;border:0;background:transparent;color:#858d98;cursor:pointer}
+.login-container .toggle-password svg{width:19px;height:19px}
+.login-container .manlung-turnstile-box{position:relative;z-index:1;margin:0 0 18px!important;padding:12px!important;border:0!important;border-radius:15px!important;background:#e8e9ee!important;box-shadow:inset 3px 3px 6px #c3c4c9,inset -3px -3px 6px #fff!important}
+.login-container .manlung-turnstile-title{color:#555d68!important}.login-container .manlung-turnstile-help{color:#777e89!important}
+.login-container .manlung-turnstile-widget{display:flex;justify-content:center;align-items:center;min-height:65px;overflow-x:auto}
+.login-container .manlung-turnstile-status{color:#777e89!important}
+.login-container .btn-primary{
+ position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:9px;
+ width:100%;min-height:52px;padding:13px 18px;border:0!important;border-radius:15px!important;
+ background:#22a06b!important;color:#fff!important;font-family:'Inter',sans-serif!important;
+ font-size:15px!important;font-weight:700!important;letter-spacing:.01em!important;
+ box-shadow:5px 5px 10px #c3c4c9,-5px -5px 10px #fff!important;
+ transition:background-color .2s,transform .2s,box-shadow .2s!important;cursor:pointer
+}
+.login-container .btn-primary:hover{background:#188653!important;transform:translateY(-1px);box-shadow:4px 4px 8px #c3c4c9,-4px -4px 8px #fff!important}
+.login-container .btn-primary:active{transform:translateY(0);box-shadow:inset 3px 3px 6px rgba(0,0,0,.12)!important}
+.login-container a{color:#188653!important;font-family:'Inter',sans-serif!important;font-size:12px!important;font-weight:600!important;text-decoration:none!important}
+.login-container a:hover{color:#116940!important;text-decoration:underline!important}
+.login-container .slot-base{display:flex;flex-direction:column;gap:12px}.login-container .slot-notch{display:none!important}
+.login-container .slot-forgot-link{align-self:center;margin-top:2px}
+.login-container .error-text,#loginError,#mfaLoginError,#mfaEnrollStatus{position:relative;z-index:1;margin-top:10px;color:#b42318!important;overflow-wrap:anywhere;font-size:12px!important}
+#adminMfaEnroll>div{border:0!important;border-radius:18px!important;background:#e8e9ee!important;color:#3f4652!important;box-shadow:inset 3px 3px 6px #c3c4c9,inset -3px -3px 6px #fff!important}
+#adminMfaEnroll h3{color:#3f4652!important}
+#adminMfaEnroll p,#adminMfaForm p,#adminForgotBox p{color:#6d7480!important}
+#adminForgotBox{position:relative;z-index:1;padding:16px!important;border:0!important;border-radius:16px!important;background:#e8e9ee!important;box-shadow:inset 3px 3px 6px #c3c4c9,inset -3px -3px 6px #fff!important}
+.login-container .admin-register-link{position:relative;z-index:1;margin:20px 0 0!important;text-align:center;color:#777e89!important;font-size:12px!important;line-height:1.7}
+.login-container .footer-text{display:none!important}
+@keyframes adminLoginFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){
+ body:has(.center-wrap){align-items:center;padding:18px 14px!important}
+ .center-wrap{min-height:calc(100vh - 36px)!important}
+ .login-container{padding:34px 24px!important;border-radius:24px!important;max-width:420px!important}
+}
+@media(max-width:360px){.login-container{padding:28px 18px!important}.login-container .logo h1{font-size:23px!important}}
+@media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
+</style>
+
 </head>
 <body>
     <div class="center-wrap">
