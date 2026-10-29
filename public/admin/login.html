@@ -408,26 +408,40 @@ body:has(.login-card-stack) {
 }
 </style>
 
-<style id="manlung-admin-login-glassmorphism-refresh">
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-body:has(.center-wrap){min-height:100vh!important;padding:24px 16px!important;background-image:linear-gradient(135deg,rgba(3,12,24,.68),rgba(5,35,27,.45)),url('https://images.unsplash.com/photo-1506744626753-eda818c6cce5?auto=format&fit=crop&w=1920&q=85')!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;font-family:'Poppins',sans-serif!important;color:#fff!important}
-.center-wrap{min-height:calc(100vh - 48px)!important}
-.login-container{width:100%!important;max-width:420px!important;padding:36px 30px!important;border:1px solid rgba(255,255,255,.28)!important;border-radius:24px!important;background:rgba(10,24,35,.52)!important;color:#fff!important;box-shadow:0 18px 55px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.18)!important;backdrop-filter:blur(18px) saturate(140%)!important;-webkit-backdrop-filter:blur(18px) saturate(140%)!important;overflow:visible!important}
-.login-container .logo h1{color:#fff!important;font-size:27px!important;letter-spacing:-.4px!important}.login-container .logo>span{color:rgba(255,255,255,.78)!important}
-.login-container .logo>.brand-logo{border:1px solid rgba(255,255,255,.35)!important;background:rgba(255,255,255,.14)!important;box-shadow:0 8px 24px rgba(0,0,0,.15)!important}
-.login-container .admin-badge{color:#d7ffb8!important;background:rgba(124,179,66,.18)!important;border-color:rgba(190,242,100,.45)!important}
-.login-container label{color:rgba(255,255,255,.92)!important}
-.login-container input{height:52px!important;min-height:52px!important;border:1px solid rgba(255,255,255,.34)!important;border-radius:12px!important;background:rgba(255,255,255,.09)!important;color:#fff!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.12)!important}
-.login-container input::placeholder{color:rgba(255,255,255,.62)!important}.login-container input:focus{border-color:#a8e063!important;background:rgba(255,255,255,.13)!important;box-shadow:0 0 0 3px rgba(168,224,99,.19)!important}
-.login-container .input-icon,.login-container .toggle-password{color:rgba(255,255,255,.75)!important}
-.login-container .manlung-turnstile-box,#adminForgotBox,#adminMfaEnroll>div{background:rgba(5,16,25,.4)!important;border-color:rgba(255,255,255,.22)!important;color:#fff!important}
-.login-container .manlung-turnstile-title,.login-container .manlung-turnstile-help,#adminMfaEnroll h3,#adminMfaEnroll p,#adminMfaForm p,#adminForgotBox p{color:rgba(255,255,255,.82)!important}
-.login-container .btn-primary{min-height:52px!important;border-radius:12px!important;background:linear-gradient(110deg,#a8e063,#56ab2f)!important;color:#10220b!important;font-weight:700!important;box-shadow:0 8px 22px rgba(86,171,47,.24)!important}
-.login-container .btn-primary:hover{background:linear-gradient(110deg,#b7ed76,#65bd3b)!important;box-shadow:0 0 20px rgba(86,171,47,.38)!important}
-.login-container a{color:#d4f7a1!important}.login-container a:hover{color:#fff!important}
-.login-container .error-text,#loginError,#mfaLoginError,#mfaEnrollStatus{color:#fecaca!important}
-@media(max-width:480px){body:has(.center-wrap){align-items:center!important;padding:18px 12px!important}.center-wrap{min-height:calc(100vh - 36px)!important}.login-container{padding:30px 22px!important;border:1px solid rgba(255,255,255,.28)!important;background:rgba(10,24,35,.62)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important}}
-@media(prefers-reduced-motion:reduce){.login-container{animation:none!important}}
+<style id="manlung-admin-login-neumorphic-reference-design">
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+:root{--ml-neo-bg:#e8e9ee;--ml-neo-light:#fff;--ml-neo-dark:#c3c4c9;--ml-neo-text:#666b75;--ml-neo-muted:#9297a0;--ml-neo-green:#4b8d35}
+body:has(.center-wrap){min-height:100vh!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:24px 16px!important;box-sizing:border-box!important;background:var(--ml-neo-bg)!important;color:var(--ml-neo-text)!important;font-family:Inter,sans-serif!important}
+.center-wrap{width:100%!important;min-height:calc(100vh - 48px)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important}
+.login-container.login-card-stack{width:100%!important;max-width:400px!important;margin:0!important;padding:42px 34px!important;border:0!important;border-radius:30px!important;background:var(--ml-neo-bg)!important;color:var(--ml-neo-text)!important;box-shadow:12px 12px 24px var(--ml-neo-dark),-12px -12px 24px var(--ml-neo-light)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;overflow:visible!important;animation:none!important}
+.login-container:before,.login-container:after{display:none!important;content:none!important}
+.login-container .form-card{width:100%!important}
+.login-container .logo{margin:0 0 28px!important;text-align:center!important}
+.login-container .logo>.brand-logo{display:block!important;width:56px!important;height:56px!important;object-fit:contain!important;margin:0 auto 18px!important;padding:7px!important;border:0!important;border-radius:16px!important;background:var(--ml-neo-bg)!important;box-shadow:inset 4px 4px 8px var(--ml-neo-dark),inset -4px -4px 8px var(--ml-neo-light)!important}
+.login-container .logo h1{margin:0 0 8px!important;color:#414650!important;font-family:Inter,sans-serif!important;font-size:26px!important;font-weight:700!important;letter-spacing:-.6px!important;text-shadow:none!important}
+.login-container .logo>span{display:block!important;color:var(--ml-neo-muted)!important;font-size:13px!important;line-height:1.6!important}
+.login-container .admin-badge{margin-top:14px!important;padding:5px 11px!important;border:0!important;border-radius:999px!important;background:var(--ml-neo-bg)!important;color:var(--ml-neo-green)!important;box-shadow:inset 3px 3px 6px var(--ml-neo-dark),inset -3px -3px 6px var(--ml-neo-light)!important;font-size:10px!important;letter-spacing:.08em!important}
+.login-container .form-group{margin:0 0 20px!important}
+.login-container label{margin:0 0 10px!important;color:#666b75!important;font-family:Inter,sans-serif!important;font-size:13px!important;font-weight:600!important}
+.login-container label i{color:var(--ml-neo-muted)!important}
+.login-container .ml-password-wrap{position:relative!important}
+.login-container input{display:block!important;width:100%!important;height:52px!important;min-height:52px!important;padding:0 44px 0 18px!important;border:0!important;border-radius:50px!important;background:var(--ml-neo-bg)!important;color:#4c525d!important;font-family:Inter,sans-serif!important;font-size:14px!important;box-shadow:inset 4px 4px 8px var(--ml-neo-dark),inset -4px -4px 8px var(--ml-neo-light)!important}
+.login-container input::placeholder{color:#a0a4ac!important}
+.login-container input:focus{outline:2px solid rgba(75,141,53,.32)!important;border:0!important;background:var(--ml-neo-bg)!important;box-shadow:inset 3px 3px 6px var(--ml-neo-dark),inset -3px -3px 6px var(--ml-neo-light)!important}
+.login-container .ml-password-toggle{right:12px!important;color:#858b95!important}
+.login-container .manlung-turnstile-box{margin:0 0 20px!important;padding:14px!important;border:0!important;border-radius:18px!important;background:var(--ml-neo-bg)!important;box-shadow:inset 4px 4px 8px var(--ml-neo-dark),inset -4px -4px 8px var(--ml-neo-light)!important}
+.login-container .manlung-turnstile-title{color:#505660!important}.login-container .manlung-turnstile-help,.login-container .manlung-turnstile-status{color:#7d838e!important}
+.login-container .btn-primary{min-height:52px!important;width:100%!important;border:0!important;border-radius:50px!important;background:linear-gradient(110deg,#75b852,#4b8d35)!important;color:#fff!important;font-family:Inter,sans-serif!important;font-size:15px!important;font-weight:700!important;box-shadow:6px 6px 12px var(--ml-neo-dark),-5px -5px 12px var(--ml-neo-light)!important;transition:transform .2s,filter .2s!important}
+.login-container .btn-primary:hover{background:linear-gradient(110deg,#82c65e,#559b3c)!important;transform:translateY(-1px)!important;box-shadow:4px 4px 9px var(--ml-neo-dark),-4px -4px 9px var(--ml-neo-light)!important}
+.login-container .btn-primary:active{transform:translateY(0)!important}
+.login-container a{color:var(--ml-neo-green)!important;font-family:Inter,sans-serif!important;font-size:13px!important;font-weight:600!important}
+.login-container .slot-base{display:flex!important;flex-direction:column!important;gap:14px!important}
+.login-container .slot-notch{display:none!important}.login-container .slot-forgot-link{align-self:center!important;margin-top:4px!important}
+.login-container .error-text,#loginError,#mfaLoginError,#mfaEnrollStatus{color:#b13b3b!important;overflow-wrap:anywhere}
+#adminMfaEnroll>div,#adminMfaForm{border-color:#d0d2d8!important;background:var(--ml-neo-bg)!important;color:#555b65!important;box-shadow:inset 3px 3px 7px #d1d2d7,inset -3px -3px 7px #fff!important}
+#adminMfaEnroll h3,#adminMfaEnroll p,#adminMfaForm p{color:#5d6470!important}
+@media(max-width:480px){body:has(.center-wrap){padding:18px 14px!important}.center-wrap{min-height:calc(100vh - 36px)!important}.login-container.login-card-stack{padding:32px 24px!important;border-radius:24px!important}}
+@media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
