@@ -408,6 +408,27 @@ body:has(.login-card-stack) {
 }
 </style>
 
+<style id="manlung-admin-login-glassmorphism-refresh">
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+body:has(.center-wrap){min-height:100vh!important;padding:24px 16px!important;background-image:linear-gradient(135deg,rgba(3,12,24,.68),rgba(5,35,27,.45)),url('https://images.unsplash.com/photo-1506744626753-eda818c6cce5?auto=format&fit=crop&w=1920&q=85')!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;font-family:'Poppins',sans-serif!important;color:#fff!important}
+.center-wrap{min-height:calc(100vh - 48px)!important}
+.login-container{width:100%!important;max-width:420px!important;padding:36px 30px!important;border:1px solid rgba(255,255,255,.28)!important;border-radius:24px!important;background:rgba(10,24,35,.52)!important;color:#fff!important;box-shadow:0 18px 55px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.18)!important;backdrop-filter:blur(18px) saturate(140%)!important;-webkit-backdrop-filter:blur(18px) saturate(140%)!important;overflow:visible!important}
+.login-container .logo h1{color:#fff!important;font-size:27px!important;letter-spacing:-.4px!important}.login-container .logo>span{color:rgba(255,255,255,.78)!important}
+.login-container .logo>.brand-logo{border:1px solid rgba(255,255,255,.35)!important;background:rgba(255,255,255,.14)!important;box-shadow:0 8px 24px rgba(0,0,0,.15)!important}
+.login-container .admin-badge{color:#d7ffb8!important;background:rgba(124,179,66,.18)!important;border-color:rgba(190,242,100,.45)!important}
+.login-container label{color:rgba(255,255,255,.92)!important}
+.login-container input{height:52px!important;min-height:52px!important;border:1px solid rgba(255,255,255,.34)!important;border-radius:12px!important;background:rgba(255,255,255,.09)!important;color:#fff!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.12)!important}
+.login-container input::placeholder{color:rgba(255,255,255,.62)!important}.login-container input:focus{border-color:#a8e063!important;background:rgba(255,255,255,.13)!important;box-shadow:0 0 0 3px rgba(168,224,99,.19)!important}
+.login-container .input-icon,.login-container .toggle-password{color:rgba(255,255,255,.75)!important}
+.login-container .manlung-turnstile-box,#adminForgotBox,#adminMfaEnroll>div{background:rgba(5,16,25,.4)!important;border-color:rgba(255,255,255,.22)!important;color:#fff!important}
+.login-container .manlung-turnstile-title,.login-container .manlung-turnstile-help,#adminMfaEnroll h3,#adminMfaEnroll p,#adminMfaForm p,#adminForgotBox p{color:rgba(255,255,255,.82)!important}
+.login-container .btn-primary{min-height:52px!important;border-radius:12px!important;background:linear-gradient(110deg,#a8e063,#56ab2f)!important;color:#10220b!important;font-weight:700!important;box-shadow:0 8px 22px rgba(86,171,47,.24)!important}
+.login-container .btn-primary:hover{background:linear-gradient(110deg,#b7ed76,#65bd3b)!important;box-shadow:0 0 20px rgba(86,171,47,.38)!important}
+.login-container a{color:#d4f7a1!important}.login-container a:hover{color:#fff!important}
+.login-container .error-text,#loginError,#mfaLoginError,#mfaEnrollStatus{color:#fecaca!important}
+@media(max-width:480px){body:has(.center-wrap){align-items:center!important;padding:18px 12px!important}.center-wrap{min-height:calc(100vh - 36px)!important}.login-container{padding:30px 22px!important;border:1px solid rgba(255,255,255,.28)!important;background:rgba(10,24,35,.62)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important}}
+@media(prefers-reduced-motion:reduce){.login-container{animation:none!important}}
+</style>
 </head>
 <body>
     <div class="center-wrap">
