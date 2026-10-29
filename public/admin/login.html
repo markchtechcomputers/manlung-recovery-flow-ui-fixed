@@ -656,6 +656,143 @@ body:has(.center-wrap) .login-container .footer-text{display:none!important}
 @media(prefers-reduced-motion:reduce){body:has(.center-wrap) .login-container,body:has(.center-wrap) .login-container *{animation:none!important;transition:none!important}}
 </style>
 
+
+<style id="manlung-admin-login-exact-neumorphic-design">
+/* Match the supplied Neumorphic Login reference while preserving the existing auth flow. */
+:root{
+ --neo-bg:#e8e9ee;--neo-light:#fff;--neo-dark:#c3c4c9;
+ --neo-text:#666;--neo-muted:#999;--neo-green:#20885b;
+}
+html,body{min-height:100%!important;margin:0!important}
+body:has(.center-wrap){
+ min-height:100vh!important;display:flex!important;align-items:center!important;justify-content:center!important;
+ padding:20px!important;box-sizing:border-box!important;background:var(--neo-bg)!important;
+ color:var(--neo-text)!important;font-family:Inter,sans-serif!important;-webkit-font-smoothing:antialiased!important;
+}
+body:has(.center-wrap) .center-wrap{
+ width:100%!important;min-height:calc(100vh - 40px)!important;padding:0!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;
+}
+body:has(.center-wrap) .login-container{
+ position:relative!important;isolation:isolate!important;display:block!important;overflow:visible!important;
+ width:100%!important;max-width:400px!important;margin:20px!important;padding:50px 40px!important;
+ box-sizing:border-box!important;border:0!important;border-radius:30px!important;
+ background:var(--neo-bg)!important;color:var(--neo-text)!important;
+ box-shadow:12px 12px 24px var(--neo-dark),-12px -12px 24px var(--neo-light)!important;
+ animation:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+body:has(.center-wrap) .login-container:before,
+body:has(.center-wrap) .login-container:after{display:none!important;content:none!important}
+body:has(.center-wrap) .login-container .logo{
+ display:block!important;text-align:center!important;margin:0 0 30px!important;
+}
+body:has(.center-wrap) .login-container .logo>.brand-logo{
+ display:block!important;width:56px!important;height:56px!important;object-fit:contain!important;
+ margin:0 auto 16px!important;padding:0!important;border:0!important;border-radius:12px!important;
+ background:transparent!important;box-shadow:none!important;
+}
+body:has(.center-wrap) .login-container .logo h1{
+ margin:0 0 8px!important;color:var(--neo-text)!important;
+ font-family:Inter,sans-serif!important;font-size:23px!important;font-weight:600!important;
+ line-height:1.3!important;letter-spacing:0!important;text-shadow:none!important;
+}
+body:has(.center-wrap) .login-container .logo>span{
+ display:block!important;color:var(--neo-muted)!important;font-family:Inter,sans-serif!important;
+ font-size:13px!important;font-weight:400!important;line-height:1.5!important;
+ letter-spacing:0!important;text-transform:none!important;
+}
+body:has(.center-wrap) .login-container .admin-badge{
+ display:inline-flex!important;align-items:center!important;gap:6px!important;margin-top:14px!important;
+ padding:6px 12px!important;border:0!important;border-radius:999px!important;
+ background:var(--neo-bg)!important;color:var(--neo-text)!important;
+ box-shadow:inset 2px 2px 4px var(--neo-dark),inset -2px -2px 4px var(--neo-light)!important;
+ font:500 11px Inter,sans-serif!important;letter-spacing:.03em!important;text-transform:uppercase!important;
+}
+body:has(.center-wrap) .login-container .form-group{margin:0 0 25px!important}
+body:has(.center-wrap) .login-container label{
+ display:block!important;margin:0 0 10px!important;color:var(--neo-text)!important;
+ font-family:Inter,sans-serif!important;font-size:14px!important;font-weight:500!important;
+ line-height:1.4!important;letter-spacing:0!important;text-transform:none!important;
+}
+body:has(.center-wrap) .login-container label i{color:var(--neo-muted)!important;margin-right:5px!important}
+body:has(.center-wrap) .login-container input{
+ display:block!important;width:100%!important;height:50px!important;min-height:50px!important;
+ box-sizing:border-box!important;padding:0 20px!important;border:0!important;border-radius:50px!important;
+ background:var(--neo-bg)!important;color:var(--neo-text)!important;
+ font:400 14px Inter,sans-serif!important;outline:none!important;
+ box-shadow:inset 4px 4px 8px var(--neo-dark),inset -4px -4px 8px var(--neo-light)!important;
+ transition:box-shadow .2s!important;
+}
+body:has(.center-wrap) .login-container input::placeholder{color:#a0a0a0!important;opacity:1!important}
+body:has(.center-wrap) .login-container input:focus{
+ border:0!important;background:var(--neo-bg)!important;
+ box-shadow:inset 4px 4px 8px var(--neo-dark),inset -4px -4px 8px var(--neo-light),0 0 0 2px rgba(32,136,91,.16)!important;
+}
+body:has(.center-wrap) .login-container .ml-password-wrap{position:relative!important;display:block!important}
+body:has(.center-wrap) .login-container .ml-password-wrap input{padding-right:54px!important}
+body:has(.center-wrap) .login-container .ml-password-toggle{
+ position:absolute!important;top:50%!important;right:12px!important;transform:translateY(-50%)!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:30px!important;height:30px!important;padding:0!important;border:0!important;border-radius:50%!important;
+ background:transparent!important;color:var(--neo-muted)!important;box-shadow:none!important;cursor:pointer!important;
+}
+body:has(.center-wrap) .login-container .ml-password-toggle i{font-size:15px!important}
+body:has(.center-wrap) .login-container .manlung-turnstile-box{
+ margin:0 0 20px!important;padding:12px!important;border:0!important;border-radius:16px!important;
+ background:var(--neo-bg)!important;
+ box-shadow:inset 3px 3px 6px var(--neo-dark),inset -3px -3px 6px var(--neo-light)!important;
+}
+body:has(.center-wrap) .login-container .manlung-turnstile-title{color:var(--neo-text)!important}
+body:has(.center-wrap) .login-container .manlung-turnstile-help,
+body:has(.center-wrap) .login-container .manlung-turnstile-status{color:var(--neo-muted)!important}
+body:has(.center-wrap) .login-container .manlung-turnstile-widget{display:flex!important;justify-content:center!important;align-items:center!important;min-height:65px!important;overflow-x:auto!important}
+body:has(.center-wrap) .login-container .btn-primary{
+ display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;
+ width:100%!important;min-height:50px!important;padding:13px 18px!important;margin:0!important;
+ border:0!important;border-radius:50px!important;background:var(--neo-bg)!important;color:var(--neo-text)!important;
+ font:600 14px Inter,sans-serif!important;letter-spacing:0!important;
+ box-shadow:5px 5px 10px var(--neo-dark),-5px -5px 10px var(--neo-light)!important;cursor:pointer!important;
+ transition:box-shadow .2s,transform .2s!important;
+}
+body:has(.center-wrap) .login-container .btn-primary:hover{
+ background:var(--neo-bg)!important;transform:translateY(-1px)!important;
+ box-shadow:7px 7px 12px var(--neo-dark),-7px -7px 12px var(--neo-light)!important;
+}
+body:has(.center-wrap) .login-container .btn-primary:active{
+ transform:translateY(0)!important;box-shadow:inset 3px 3px 6px var(--neo-dark),inset -3px -3px 6px var(--neo-light)!important;
+}
+body:has(.center-wrap) .login-container a{
+ color:var(--neo-muted)!important;font:400 13px Inter,sans-serif!important;text-decoration:none!important;
+}
+body:has(.center-wrap) .login-container a:hover{color:var(--neo-text)!important;text-decoration:none!important}
+body:has(.center-wrap) .login-container .slot-base{display:flex!important;flex-direction:column!important;gap:14px!important}
+body:has(.center-wrap) .login-container .slot-notch{display:none!important}
+body:has(.center-wrap) .login-container .slot-forgot-link{align-self:center!important;margin-top:10px!important}
+body:has(.center-wrap) .login-container .error-text,
+body:has(.center-wrap) .login-container #loginError,
+body:has(.center-wrap) .login-container #mfaLoginError,
+body:has(.center-wrap) .login-container #mfaEnrollStatus{color:#a52a2a!important;font-size:12px!important;overflow-wrap:anywhere!important}
+body:has(.center-wrap) .login-container #adminMfaEnroll>div,
+body:has(.center-wrap) .login-container #adminForgotBox{
+ border:0!important;border-radius:18px!important;background:var(--neo-bg)!important;color:var(--neo-text)!important;
+ box-shadow:inset 3px 3px 6px var(--neo-dark),inset -3px -3px 6px var(--neo-light)!important;
+}
+body:has(.center-wrap) .login-container #adminMfaEnroll h3{color:var(--neo-text)!important}
+body:has(.center-wrap) .login-container #adminMfaEnroll p,
+body:has(.center-wrap) .login-container #adminMfaForm p,
+body:has(.center-wrap) .login-container #adminForgotBox p{color:var(--neo-muted)!important}
+body:has(.center-wrap) .login-container .footer-text{display:none!important}
+@media(max-width:480px){
+ body:has(.center-wrap){padding:12px!important;align-items:center!important}
+ body:has(.center-wrap) .center-wrap{min-height:calc(100vh - 24px)!important}
+ body:has(.center-wrap) .login-container{max-width:400px!important;margin:10px!important;padding:38px 28px!important;border-radius:26px!important}
+}
+@media(max-width:360px){
+ body:has(.center-wrap) .login-container{padding:32px 22px!important}
+}
+@media(prefers-reduced-motion:reduce){body:has(.center-wrap) .login-container,body:has(.center-wrap) .login-container *{animation:none!important;transition:none!important}}
+</style>
+
 </head>
 <body>
     <div class="center-wrap">
