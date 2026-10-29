@@ -218,10 +218,49 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
 @media(max-width:420px){#adminTurnstileSection{padding:11px!important}#adminTurnstileSection .manlung-turnstile-heading{align-items:flex-start}}
 </style>
 
+<style id="manlung-admin-two-piece-login-reference">
+:root{--roll-ink:#17233d;--roll-muted:#64748b;--roll-line:#dbe4ee;--roll-blue:#5b9cf5}
+body:has(.login-card-stack){background:#f1f4f8!important;color:var(--roll-ink)!important;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;overflow-x:hidden}
+body:has(.login-card-stack):before,body:has(.login-card-stack):after{display:none!important}
+.center-wrap{min-height:100svh!important;padding:28px 16px 40px!important;align-items:center!important}
+.login-card-stack{width:min(100%,430px)!important;padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;color:var(--roll-ink)!important;animation:none!important;display:flex;flex-direction:column;align-items:stretch;gap:0}
+.login-card-stack:before,.login-card-stack:after{display:none!important;content:none!important}
+.login-card-stack .form-card{position:relative;z-index:2;padding:32px 30px 25px;border:1px solid #e1e7ef;border-radius:15px;background:#fff;color:var(--roll-ink);box-shadow:0 8px 24px rgba(31,49,77,.08);animation:rollCardDrop .72s cubic-bezier(.2,.75,.25,1) both;transform-origin:50% 0}
+@keyframes rollCardDrop{0%{opacity:0;transform:perspective(900px) rotateX(-13deg) translateY(-24px)}70%{opacity:1;transform:perspective(900px) rotateX(2deg) translateY(2px)}100%{opacity:1;transform:perspective(900px) rotateX(0) translateY(0)}}
+.login-card-stack .logo{margin-bottom:26px!important;text-align:left!important}
+.login-card-stack .logo>i{display:none!important}
+.login-card-stack .logo h1{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;color:#17233d!important;font-size:1.55rem!important;font-weight:750!important;letter-spacing:-.035em!important;text-shadow:none!important;margin:0 0 6px!important}
+.login-card-stack .logo>span{font-family:inherit!important;color:#7a8799!important;font-size:.88rem!important;letter-spacing:0!important;text-transform:none!important;line-height:1.5!important}
+.login-card-stack .admin-badge{display:none!important}
+.login-card-stack .form-group{margin-bottom:17px!important}
+.login-card-stack label{color:#344258!important;font-family:inherit!important;font-size:.84rem!important;font-weight:650!important;letter-spacing:0!important;text-transform:none!important}
+.login-card-stack label i{display:none!important}
+.login-card-stack input{min-height:46px!important;padding:11px 13px!important;border:1px solid #d9e0e9!important;border-radius:8px!important;background:#fff!important;color:#17233d!important;font:inherit!important;box-shadow:none!important}
+.login-card-stack input:focus{border-color:#78aef7!important;box-shadow:0 0 0 3px rgba(91,156,245,.14)!important;background:#fff!important}
+.login-card-stack .manlung-turnstile-box,#adminTurnstileSection{background:#f8fafc!important;border:1px solid #e2e8f0!important;border-radius:9px!important;box-shadow:none!important}
+.login-card-stack .manlung-turnstile-title,.login-card-stack .manlung-turnstile-help{color:#475569!important}
+.login-card-stack .slot-base{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;margin:-1px 13px 0;padding:27px 18px 19px;border:1px solid #e1e7ef;border-top:0;border-radius:0 0 15px 15px;background:#fff;box-shadow:0 12px 24px rgba(31,49,77,.06)}
+.login-card-stack .slot-notch{position:absolute;top:-1px;left:50%;width:30px;height:15px;transform:translateX(-50%);background:#f1f4f8;clip-path:polygon(0 0,100% 0,50% 100%)}
+.login-card-stack .slot-login-button{display:flex!important;align-items:center;justify-content:center;width:100%;min-height:45px!important;padding:11px 18px!important;border:1px solid #6ba3f3!important;border-radius:8px!important;background:#fff!important;color:#2868b7!important;font-family:inherit!important;font-size:.92rem!important;font-weight:700!important;letter-spacing:0!important;box-shadow:none!important;transition:background .18s,border-color .18s,transform .18s!important}
+.login-card-stack .slot-login-button:hover{background:#f4f8ff!important;border-color:#397fd6!important;box-shadow:none!important;transform:translateY(-1px)}
+.login-card-stack .slot-forgot-link{font-size:.82rem!important;font-weight:550!important;color:#6484ad!important}
+.login-card-stack .admin-register-link{margin:17px 0 0!important;text-align:center!important;font-size:.82rem!important;color:#7a8799!important}
+.login-card-stack .admin-register-link a{color:#497fc3!important;font-weight:600!important}
+.login-card-stack .footer-text{display:none!important}
+.login-card-stack #loginError{width:100%;overflow-wrap:anywhere}
+.login-card-stack #adminMfaEnroll>div{background:#f8fafc!important;border-color:#dbe4ee!important;color:#17233d!important}
+.login-card-stack #adminMfaEnroll h3{color:#17233d!important}
+.login-card-stack #adminMfaEnroll p,.login-card-stack #adminMfaForm p{color:#64748b!important}
+.login-card-stack #adminForgotBox{background:#fff!important;border-color:#dbe4ee!important}
+.login-card-stack #adminForgotBox p{color:#64748b!important}
+@media(max-width:480px){.center-wrap{padding:20px 12px 30px!important}.login-card-stack .form-card{padding:27px 21px 22px}.login-card-stack .slot-base{margin-left:9px;margin-right:9px;padding:25px 15px 17px}}
+@media(prefers-reduced-motion:reduce){.login-card-stack .form-card{animation:none!important}}
+</style>
 </head>
 <body>
     <div class="center-wrap">
-        <div class="login-container">
+        <div class="login-container login-card-stack">
+            <div class="form-card">
             <div class="logo">
                 <i class="fas fa-shield-halved"></i>
                 <h1>Admin Portal</h1>
@@ -238,11 +277,14 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
                     <label><i class="fas fa-lock"></i> Password</label>
                     <input type="password" id="adminPassword" placeholder="Enter password" required>
                 </div>
-                <section class="manlung-turnstile-box" id="adminTurnstileSection" aria-label="Cloudflare security verification" aria-describedby="adminTurnstileHelp"><div class="manlung-turnstile-heading"><span class="manlung-turnstile-icon" aria-hidden="true"><i class="fas fa-shield-halved"></i></span><div><p class="manlung-turnstile-title">Cloudflare security check</p><p class="manlung-turnstile-help" id="adminTurnstileHelp">Complete this check to help protect the admin sign-in.</p></div></div><div id="adminTurnstile" class="manlung-turnstile-widget" aria-live="polite"><span class="manlung-turnstile-loading">Loading secure verification…</span></div><p id="adminTurnstileStatus" class="manlung-turnstile-status" role="status" aria-live="polite">Connecting to Cloudflare…</p></section><button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
-                    <i class="fas fa-arrow-right-to-bracket"></i> Login
-                </button>
-                <div id="loginError" class="error-text"></div>
+                <section class="manlung-turnstile-box" id="adminTurnstileSection" aria-label="Cloudflare security verification" aria-describedby="adminTurnstileHelp"><div class="manlung-turnstile-heading"><span class="manlung-turnstile-icon" aria-hidden="true"><i class="fas fa-shield-halved"></i></span><div><p class="manlung-turnstile-title">Cloudflare security check</p><p class="manlung-turnstile-help" id="adminTurnstileHelp">Complete this check to help protect the admin sign-in.</p></div></div><div id="adminTurnstile" class="manlung-turnstile-widget" aria-live="polite"><span class="manlung-turnstile-loading">Loading secure verification…</span></div><p id="adminTurnstileStatus" class="manlung-turnstile-status" role="status" aria-live="polite">Connecting to Cloudflare…</p></section><div id="loginError" class="error-text"></div>
+                <div class="slot-base">
+                    <span class="slot-notch" aria-hidden="true"></span>
+                    <button type="submit" class="btn btn-primary slot-login-button">Login</button>
+                    <a href="#" id="adminForgotPassword" class="slot-forgot-link">Forgot your password?</a>
+                </div>
             </form>
+            </div>
 
             <section id="adminMfaEnroll" style="display:none;margin-top:1rem;">
                 <div style="padding:1rem;border:1px solid rgba(110,168,255,.35);border-radius:14px;background:rgba(20,40,75,.35);">
@@ -277,15 +319,7 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
                 <div id="mfaLoginError" class="error-text"></div>
             </form>
 
-<p style="margin-top:.8rem;text-align:center;">
-  <a
-    href="#"
-    id="adminForgotPassword"
-    style="font-size:.82rem;"
-  >
-    Forgot your password?
-  </a>
-</p>
+
 
 <div
   id="adminForgotBox"
@@ -319,7 +353,7 @@ body:has(.center-wrap):after{width:230px;height:230px;bottom:4%;left:-85px;filte
 </div>
 
 
-            <p style="text-align:center; margin-top:1rem;"><a href="/admin/register.html" style="color:#6ea8ff; font-size:0.85rem;">Have an Admin invitation? Create your account</a></p>
+            <p class="admin-register-link"><a href="/admin/register.html">Have an Admin invitation? Create your account</a></p>
             <div class="footer-text"><i class="fas fa-shield"></i> Protected by 256-bit encryption</div>
         </div>
     </div>
