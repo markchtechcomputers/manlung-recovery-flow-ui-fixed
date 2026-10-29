@@ -633,88 +633,7 @@ async function requestAdminReset(){
 <script src="/js/pwa.js" defer></script>
 
   <link rel="stylesheet" href="/css/product-polish.css?v=20261025">
-<style id="manlung-admin-portal-purple-reference">
-/* The supplied purple-glass Admin Portal design; overrides the previous login themes. */
-:root{color-scheme:dark}
-html,body{min-height:100%;margin:0}
-body:has(.center-wrap){
- min-height:100vh!important;display:flex!important;align-items:center!important;justify-content:center!important;
- overflow-x:hidden!important;overflow-y:auto!important;position:relative!important;isolation:isolate!important;
- padding:24px 14px!important;box-sizing:border-box!important;background:#05010a!important;
- color:#fff!important;font-family:'Poppins',sans-serif!important
-}
-body:has(.center-wrap)::before,body:has(.center-wrap)::after{
- content:"";position:fixed;z-index:-1;pointer-events:none;width:250vw;height:200px;
- background:linear-gradient(90deg,transparent,#3a0ca3,#7209b7,#3a0ca3,transparent);
- filter:blur(60px);opacity:.8
-}
-body:has(.center-wrap)::before{top:10%;left:-60%;transform:rotate(25deg)}
-body:has(.center-wrap)::after{bottom:10%;right:-60%;transform:rotate(-25deg)}
-.center-wrap{width:100%!important;min-height:calc(100vh - 48px)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important}
-.login-container,.login-card-stack{
- position:relative!important;z-index:1!important;width:100%!important;max-width:420px!important;
- margin:20px!important;padding:40px 35px!important;box-sizing:border-box!important;
- background:rgba(15,8,30,.45)!important;border:1.5px solid rgba(255,255,255,.4)!important;
- border-radius:40px!important;backdrop-filter:blur(25px)!important;-webkit-backdrop-filter:blur(25px)!important;
- box-shadow:0 20px 50px rgba(0,0,0,.7)!important;color:#fff!important;overflow:visible!important
-}
-.login-container::before,.login-container::after,.login-card-stack::before,.login-card-stack::after,
-.login-container .slot-notch{display:none!important;content:none!important}
-.login-container .form-card{width:100%!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
-.login-container .logo{display:block!important;text-align:center!important;margin:0 0 30px!important}
-.login-container .logo>.brand-logo{display:none!important}
-.login-container .logo h1{margin:0 0 8px!important;color:#fff!important;font:500 26px/1.3 'Poppins',sans-serif!important;letter-spacing:.5px!important;text-shadow:none!important}
-.login-container .logo>span{display:block!important;margin:0 0 15px!important;color:rgba(255,255,255,.7)!important;font:300 13px/1.6 'Poppins',sans-serif!important;text-transform:none!important}
-.login-container .admin-badge{display:inline-flex!important;align-items:center!important;gap:6px!important;margin:0!important;padding:4px 14px!important;
- background:rgba(239,68,68,.15)!important;border:1px solid rgba(239,68,68,.5)!important;border-radius:20px!important;
- color:#ff6b6b!important;box-shadow:none!important;font:600 11px/1.5 'Poppins',sans-serif!important;letter-spacing:1px!important;text-transform:uppercase!important}
-.login-container .form-group{margin:0 0 20px!important}
-.login-container label{display:block!important;margin:0 0 8px!important;padding-left:5px!important;color:#fff!important;font:300 14px/1.5 'Poppins',sans-serif!important;text-transform:none!important}
-.login-container label i{margin-right:0!important;color:inherit!important}
-.login-container input,.login-container input[type=text],.login-container input[type=password]{
- display:block!important;width:100%!important;min-height:0!important;height:auto!important;padding:16px 20px!important;
- box-sizing:border-box!important;background:transparent!important;border:1.5px solid rgba(255,255,255,.8)!important;
- border-radius:12px!important;color:#fff!important;font:400 15px 'Poppins',sans-serif!important;box-shadow:none!important
-}
-.login-container input::placeholder{color:rgba(255,255,255,.55)!important}
-.login-container input:focus{outline:none!important;border-color:#fff!important;box-shadow:0 0 15px rgba(255,255,255,.2)!important}
-.login-container .ml-password-wrap{display:block!important;position:relative!important}
-.login-container .ml-password-wrap input{padding-right:20px!important}
-.login-container .ml-password-toggle{display:none!important}
-.login-container .manlung-turnstile-box{
- display:block!important;margin:25px 0!important;padding:15px!important;background:rgba(255,255,255,.05)!important;
- border:1px solid rgba(255,255,255,.2)!important;border-radius:12px!important;box-shadow:none!important
-}
-.login-container .manlung-turnstile-heading{display:flex!important;align-items:flex-start!important;gap:10px!important;margin:0 0 10px!important}
-.login-container .manlung-turnstile-icon{color:#f38020!important;font-size:18px!important}
-.login-container .manlung-turnstile-title{margin:0 0 2px!important;color:#fff!important;font:500 13px/1.5 'Poppins',sans-serif!important}
-.login-container .manlung-turnstile-help{margin:0!important;color:rgba(255,255,255,.6)!important;font:300 11px/1.4 'Poppins',sans-serif!important}
-.login-container .manlung-turnstile-widget{display:flex!important;justify-content:center!important;align-items:center!important;min-height:65px!important;overflow-x:auto!important}
-.login-container .manlung-turnstile-loading{color:rgba(255,255,255,.7)!important;font-size:12px!important}
-.login-container .manlung-turnstile-status{margin:8px 0 0!important;color:#eab308!important;font:500 11px/1.5 'Poppins',sans-serif!important}
-.login-container .manlung-turnstile-status[data-state=success]{color:#22c55e!important}
-.login-container .manlung-turnstile-status[data-state=error]{color:#ff6b6b!important}
-.login-container .error-text,#loginError,#mfaLoginError,#mfaEnrollStatus{margin:8px 0!important;color:#ff6b6b!important;font-size:12px!important;overflow-wrap:anywhere}
-.login-container .slot-base{display:block!important}
-.login-container .btn-primary,.login-container .btn-login,.login-container .slot-login-button{
- display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;width:100%!important;
- min-height:0!important;padding:16px!important;margin:0 0 25px!important;border:1.5px solid rgba(255,255,255,.6)!important;
- border-radius:12px!important;background:#7b2cbf!important;color:#fff!important;
- font:500 20px/1.4 'Poppins',sans-serif!important;letter-spacing:0!important;box-shadow:none!important;cursor:pointer!important;transform:none!important
-}
-.login-container .btn-primary:hover,.login-container .btn-login:hover,.login-container .slot-login-button:hover{
- background:#9d4edd!important;box-shadow:0 0 15px rgba(157,78,221,.4)!important
-}
-.login-container a{color:rgba(255,255,255,.7)!important;font:300 14px 'Poppins',sans-serif!important;text-decoration:none!important}
-.login-container a:hover{color:#fff!important;text-decoration:underline!important}
-#adminForgotPassword,#adminForgotBox{display:none!important}
-#adminMfaEnroll>div{background:rgba(15,8,30,.45)!important;border:1px solid rgba(255,255,255,.4)!important;border-radius:20px!important;color:#fff!important;box-shadow:none!important}
-#adminMfaEnroll h3,#adminMfaEnroll p,#adminMfaForm p{color:#fff!important}
-#adminMfaEnroll input,#adminMfaForm input{margin-bottom:12px!important}
-#adminMfaEnroll button,#adminMfaForm button{font-size:15px!important}
-@media(max-width:480px){.login-container,.login-card-stack{padding:32px 24px!important;border-radius:30px!important;margin:10px!important}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
-</style>
+
 
 <style id="manlung-admin-login-light-input-fix">
 /* Clean black-and-white admin login. Keep the existing form, API, Turnstile, MFA and reset handlers intact. */
@@ -729,7 +648,7 @@ body:has(.center-wrap)::before,body:has(.center-wrap)::after{display:none!import
 .login-container .logo>.brand-logo{display:none!important}
 .login-container .logo h1{margin:0 0 7px!important;color:#fff!important;font-family:inherit!important;font-size:25px!important;line-height:1.3!important;font-weight:650!important;letter-spacing:-.35px!important;text-shadow:none!important}
 .login-container .logo>span{display:block!important;margin:0!important;color:#bdbdbd!important;font-family:inherit!important;font-size:13px!important;font-weight:400!important;line-height:1.55!important;letter-spacing:0!important;text-transform:none!important}
-.login-container .admin-badge{display:inline-flex!important;align-items:center!important;gap:6px!important;margin-top:14px!important;padding:4px 11px!important;background:#111!important;border:1px solid #525252!important;border-radius:999px!important;color:#e5e5e5!important;box-shadow:none!important;font:600 10px/1.5 inherit!important;letter-spacing:.08em!important;text-transform:uppercase!important}
+.login-container .admin-badge{display:inline-flex!important;align-items:center!important;gap:6px!important;margin-top:14px!important;padding:4px 11px!important;background:#111!important;border:1px solid #525252!important;border-radius:999px!important;color:#e5e5e5!important;box-shadow:none!important;font-family:inherit!important;font-size:10px!important;font-weight:600!important;line-height:1.5!important;letter-spacing:.08em!important;text-transform:uppercase!important}
 .login-container .form-group{position:relative!important;z-index:1!important;margin:0 0 18px!important}
 .login-container .label-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin-bottom:8px!important}
 .login-container label{display:block!important;margin:0 0 8px!important;padding:0!important;color:#f5f5f5!important;font-family:inherit!important;font-size:13px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important}
@@ -737,7 +656,7 @@ body:has(.center-wrap)::before,body:has(.center-wrap)::after{display:none!import
 .login-container label i{display:none!important}
 .login-container .input-wrapper{position:relative!important;display:flex!important;align-items:center!important;width:100%!important}
 .login-container .input-wrapper .input-icon{position:absolute!important;left:15px!important;top:50%!important;transform:translateY(-50%)!important;width:19px!important;height:19px!important;color:#a3a3a3!important;z-index:2!important;pointer-events:none!important}
-.login-container .input-wrapper input,.login-container .input-wrapper input[type=text],.login-container .input-wrapper input[type=password]{display:block!important;width:100%!important;min-width:0!important;height:50px!important;min-height:50px!important;box-sizing:border-box!important;padding:0 16px 0 48px!important;background:#0a0a0a!important;border:1px solid #525252!important;border-radius:10px!important;color:#fff!important;font:400 14px/1.4 inherit!important;box-shadow:none!important;transition:border-color .18s,box-shadow .18s!important}
+.login-container .input-wrapper input,.login-container .input-wrapper input[type=text],.login-container .input-wrapper input[type=password]{display:block!important;width:100%!important;min-width:0!important;height:50px!important;min-height:50px!important;box-sizing:border-box!important;padding:0 16px 0 48px!important;background:#0a0a0a!important;border:1px solid #525252!important;border-radius:10px!important;color:#fff!important;font-family:inherit!important;font-size:14px!important;font-weight:400!important;line-height:1.4!important;box-shadow:none!important;transition:border-color .18s,box-shadow .18s!important}
 .login-container .input-wrapper input[type=password]{padding-right:48px!important}
 .login-container .input-wrapper input::placeholder{color:#737373!important}
 .login-container .input-wrapper input:focus{outline:none!important;background:#0a0a0a!important;border-color:#d4d4d4!important;box-shadow:0 0 0 3px rgba(255,255,255,.09)!important}
