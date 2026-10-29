@@ -75,11 +75,14 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
 .login-container .logo>span{display:block;color:var(--login-muted)!important;font-family:inherit!important;font-size:14px!important;font-weight:400!important;letter-spacing:0!important;text-transform:none!important;line-height:1.5!important}
 .login-container .admin-badge{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:5px 11px;border:1px solid #c7d2fe!important;border-radius:999px!important;background:#eef2ff!important;color:var(--login-primary)!important;font-family:inherit!important;font-size:11px!important;font-weight:700!important;letter-spacing:.04em!important;text-transform:uppercase}
 .login-container .form-group{position:relative;z-index:1;margin:0 0 20px!important}
+.login-container .label-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.login-container .label-row label{margin:0!important}
+.login-container .label-row .forgot-link{font-size:13px!important;white-space:nowrap}
 .login-container label{display:block;margin:0 0 8px!important;color:var(--login-ink)!important;font-family:inherit!important;font-size:14px!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important}
 .login-container label i{color:var(--login-muted)!important}
 .login-container .input-wrapper{position:relative;display:flex;align-items:center}
 .login-container .input-icon{position:absolute;left:14px;width:20px;height:20px;color:var(--login-tertiary);pointer-events:none}
-.login-container input{display:block;width:100%;height:48px;min-height:48px;box-sizing:border-box;padding:0 16px 0 44px!important;border:1px solid var(--login-line)!important;border-radius:8px!important;background:#fff!important;color:var(--login-ink)!important;font:400 15px inherit!important;box-shadow:0 1px 2px rgba(0,0,0,.02)!important;transition:border-color .2s,box-shadow .2s!important}
+.login-container input{display:block;width:100%;height:48px;min-height:48px;box-sizing:border-box;padding:0 16px 0 44px!important;border:1px solid var(--login-line)!important;border-radius:8px!important;background:#fff!important;color:var(--login-ink)!important;font-family:inherit!important;font-size:15px!important;font-weight:400!important;box-shadow:0 1px 2px rgba(0,0,0,.02)!important;transition:border-color .2s,box-shadow .2s!important}
 .login-container input::placeholder{color:var(--login-tertiary)!important}
 .login-container input:focus{outline:none!important;border-color:var(--login-primary)!important;background:#fff!important;box-shadow:0 0 0 3px var(--login-ring)!important}
 .login-container .toggle-password{position:absolute;right:10px;display:flex;align-items:center;justify-content:center;padding:5px;border:0;background:transparent;color:var(--login-tertiary);cursor:pointer}
@@ -120,7 +123,7 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
                     <div class="input-wrapper"><svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20 21a8 8 0 0 0-16 0m8-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg><input type="text" id="adminUsername" placeholder="Enter username" required autofocus autocomplete="username"></div>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="label-row"><label><i class="fas fa-lock"></i> Password</label><a href="#" id="adminForgotPassword" class="forgot-link">Forgot your password?</a></div>
                     <div class="input-wrapper"><svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6Zm10-10V7a4 4 0 0 0-8 0v4h8Z"/></svg><input type="password" id="adminPassword" placeholder="Enter password" required autocomplete="current-password"><button type="button" class="toggle-password" id="toggleAdminPassword" aria-label="Show password"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
                 </div>
                 <div class="manlung-turnstile-box" aria-label="Cloudflare Turnstile"><div id="adminTurnstile" class="manlung-turnstile-widget"></div></div><button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
@@ -161,16 +164,6 @@ body:has(.center-wrap){min-height:100vh;display:flex;align-items:center;justify-
                 <button type="button" id="cancelMfaLoginBtn" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:.5rem;">Back</button>
                 <div id="mfaLoginError" class="error-text"></div>
             </form>
-
-<p style="margin-top:.8rem;text-align:center;">
-  <a
-    href="#"
-    id="adminForgotPassword"
-    style="font-size:.82rem;"
-  >
-    Forgot your password?
-  </a>
-</p>
 
 <div
   id="adminForgotBox"
