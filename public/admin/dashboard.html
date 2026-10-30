@@ -3411,131 +3411,183 @@ body.admin-page-bg .ml-admin-sidebar .header-actions .manlung-ai-tab{
 
   <link rel="stylesheet" href="/css/product-polish.css?v=20261025">
 
-<!-- Manlung Recovery dashboard layout enhancement: moves existing live widgets without replacing their logic. -->
-<style id="manlung-dashboard-layout-v2">
-/* Final cascade layer: overrides legacy header/sidebar rules without touching application styles. */
-body.admin-page-bg .site-header{left:0!important;right:auto!important;transform:translateX(-105%)!important}
-body.admin-page-bg .site-header.ml-sidebar-open{transform:translateX(0)!important}
-body.admin-page-bg .site-header .header-actions{display:flex!important}
-body.admin-page-bg .site-header>.container{flex-direction:column!important;align-items:stretch!important;flex-wrap:nowrap!important}
-body.admin-page-bg .site-header .brand{justify-content:flex-start!important}
-</style>
+<!-- Manlung Recovery dashboard layout: matches the approved reference while retaining live dashboard elements. -->
 <script id="manlung-dashboard-layout-script">
 (function(){
-  function enhanceManlungAdminDashboard(){
-    if(document.body.dataset.mlDashboardLayoutV2==='ready') return;
-    const header=document.querySelector('body.admin-page-bg>header.site-header');
-    const root=document.querySelector('body.admin-page-bg>div.container');
+  function setupDashboardLayout(){
+    if(document.body.dataset.mlDashboardLayoutV3==="ready") return;
+    const header=document.querySelector("body.admin-page-bg>header.site-header");
+    const root=document.querySelector("body.admin-page-bg>div.container");
     if(!header||!root) return;
-    document.body.dataset.mlDashboardLayoutV2='ready';
+    document.body.dataset.mlDashboardLayoutV3="ready";
 
-    const actions=header.querySelector('.header-actions');
-    if(actions){
-      const links=[
-        ['Dashboard','/admin/dashboard.html','fa-gauge-high'],
-        ['Cases','#cases','fa-folder-open'],
-        ['Donations','#donations','fa-heart'],
-        ['Call Admin','#call-admin','fa-phone-volume']
-      ];
-      links.reverse().forEach(([label,href,icon])=>{
-        const a=document.createElement('a');
-        a.className='btn btn-outline';
-        a.href=href;
-        a.innerHTML='<i class="fas '+icon+'" aria-hidden="true"></i> '+label;
-        actions.insertBefore(a,actions.firstChild);
-      });
-    }
+    const headerContainer=header.querySelector(":scope > .container");
+    const brand=headerContainer?.querySelector(".brand");
+    const oldActions=headerContainer?.querySelector(".header-actions");
+    if(!headerContainer||!brand||!oldActions) return;
 
-    const overlay=document.createElement('div');
-    overlay.className='ml-dashboard-overlay';
-    overlay.setAttribute('aria-hidden','true');
+    header.classList.add("ml-sidebar");
+    header.id="mlAdminSidebar";
+    header.setAttribute("aria-label","Main navigation");
+
+    const navLabel=document.createElement("div");
+    navLabel.className="ml-sidebar-label";
+    navLabel.textContent="Main Menu";
+    const nav=document.createElement("nav");
+    nav.className="ml-sidebar-nav";
+    nav.setAttribute("aria-label","Dashboard navigation");
+
+    const addLink=(label,href,icon,active)=>{
+      const a=document.createElement("a");
+      a.href=href;
+      a.className=active?"active":"";
+      a.innerHTML='<span class="ml-nav-icon"><i class="fas '+icon+'" aria-hidden="true"></i></span><span>'+label+'</span>';
+      if(active) a.setAttribute("aria-current","page");
+      nav.appendChild(a);
+      return a;
+    };
+    addLink("Dashboard","/admin/dashboard.html","fa-table-cells-large",true);
+    addLink("Cases","#cases","fa-folder-open");
+    addLink("Donations","#donations","fa-hand-holding-heart");
+    addLink("Call Admin","#call-admin","fa-phone-volume");
+
+    const existing=[...oldActions.children];
+    existing.forEach(el=>{
+      const text=(el.textContent||"").replace(/\s+/g," ").trim();
+      const href=el.getAttribute("href");
+      const icon=el.querySelector("i")?.className||"";
+      if(el.tagName==="A"){
+        el.classList.add("ml-sidebar-link");
+        const iconName=icon.match(/fa-[\w-]+/)?.[0]||(
+          /Admin Management/i.test(text)?"fa-users-gear":
+          /Reports/i.test(text)?"fa-chart-column":
+          /Operations/i.test(text)?"fa-gears":
+          /Music/i.test(text)?"fa-music":
+          /Tools/i.test(text)?"fa-screwdriver-wrench":
+          /WhatsApp/i.test(text)?"fa-comments":
+          /Home/i.test(text)?"fa-house":"fa-link"
+        );
+        el.innerHTML='<span class="ml-nav-icon"><i class="fas '+iconName+'" aria-hidden="true"></i></span><span>'+text+'</span>';
+        nav.appendChild(el);
+      }else if(el.tagName==="BUTTON"){
+        const bottom=document.createElement("div");
+        bottom.className="ml-sidebar-bottom";
+        el.classList.add("ml-sidebar-logout");
+        el.innerHTML='<span class="ml-nav-icon"><i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i></span><span>Logout</span>';
+        bottom.appendChild(el);
+        headerContainer.appendChild(bottom);
+      }
+    });
+    oldActions.remove();
+
+    const closeButton=document.createElement("button");
+    closeButton.type="button";
+    closeButton.className="ml-sidebar-close";
+    closeButton.id="mlSidebarClose";
+    closeButton.setAttribute("aria-label","Close navigation");
+    closeButton.innerHTML="&times;";
+    brand.appendChild(closeButton);
+
+    headerContainer.appendChild(navLabel);
+    headerContainer.appendChild(nav);
+
+    const overlay=document.createElement("div");
+    overlay.className="ml-sidebar-overlay";
+    overlay.id="mlSidebarOverlay";
+    overlay.setAttribute("aria-hidden","true");
     document.body.appendChild(overlay);
 
-    const topbar=document.createElement('div');
-    topbar.className='ml-dashboard-topbar';
-    topbar.innerHTML='<div class="ml-dashboard-topbar-left"><button type="button" class="ml-dashboard-menu-button" id="mlDashboardMenuToggle" aria-label="Open navigation" aria-expanded="false">☰</button><div class="ml-dashboard-heading"><strong>Welcome back, Admin!</strong><span>Dashboard Overview</span></div></div><div class="ml-dashboard-search" id="mlDashboardSearchSlot"></div>';
-    header.insertAdjacentElement('afterend',topbar);
+    const topbar=document.createElement("header");
+    topbar.className="ml-topbar";
+    topbar.innerHTML='<div class="ml-topbar-left"><button type="button" class="ml-hamburger" id="mlMenuToggle" aria-label="Open navigation" aria-expanded="false" aria-controls="mlAdminSidebar">☰</button><div class="ml-welcome"><h2>Welcome back, Admin!</h2><p>Dashboard Overview</p></div></div><div class="ml-search-box" id="mlSearchSlot"></div>';
+    header.insertAdjacentElement("afterend",topbar);
 
-    const search=document.getElementById('searchInput');
-    const searchSlot=topbar.querySelector('#mlDashboardSearchSlot');
-    if(search&&searchSlot){
-      search.placeholder='Search name, phone, email, case ID, IMEI…';
-      search.setAttribute('aria-label','Search cases');
-      searchSlot.appendChild(search);
+    const search=document.getElementById("searchInput");
+    if(search){
+      search.placeholder="Search name, phone, email, case ID, IMEI…";
+      search.setAttribute("aria-label","Search name, phone, email, case ID, IMEI");
+      topbar.querySelector("#mlSearchSlot").appendChild(search);
+      search.classList.add("ml-global-search");
     }
 
-    const cards=[...root.querySelectorAll(':scope > .card')];
-    const callCard=cards.find(card=>card.querySelector('#voiceLineStatus'));
-    const videoCard=cards.find(card=>card.querySelector('#videoControlCaseId'));
-    const donationCard=cards.find(card=>card.querySelector('#donationsBody'));
-    const casesCard=cards.find(card=>card.querySelector('#casesTableBody'));
-    const stats=document.getElementById('statsGrid');
+    root.classList.add("ml-dashboard-content");
+    const callCard=[...root.children].find(el=>el.querySelector?.("#voiceLineStatus"));
+    const videoCard=[...root.children].find(el=>el.querySelector?.("#videoControlCaseId"));
+    const donationCard=[...root.children].find(el=>el.querySelector?.("#donationsBody"));
+    const casesCard=[...root.children].find(el=>el.querySelector?.("#casesTableBody"));
+    const stats=document.getElementById("statsGrid");
 
-    const widgets=document.createElement('section');
-    widgets.className='ml-dashboard-widgets';
-    widgets.setAttribute('aria-label','Admin dashboard widgets');
+    const heading=document.createElement("div");
+    heading.className="ml-section-heading";
+    heading.innerHTML="<h1>Dashboard Overview</h1><p>Manage recovery cases, administrators and donations.</p>";
 
-    const profile=document.createElement('div');
-    profile.className='card ml-dashboard-profile';
-    profile.innerHTML='<div class="card-title"><i class="fas fa-user-circle" aria-hidden="true"></i> Admin Profile</div><div class="ml-profile-row"><div class="ml-profile-avatar" id="mlAdminProfileAvatar">MR</div><div><div class="ml-profile-name">Manlung Recovery</div><div class="ml-profile-caption">System Administrator</div></div></div><div class="ml-profile-actions"><input type="file" id="mlAdminProfilePhoto" accept="image/*" hidden><button type="button" class="btn btn-outline-dark" id="mlAdminChangePhoto">Change photo</button><button type="button" class="btn btn-primary" id="mlAdminSaveProfile">Save profile</button></div>';
+    const widgets=document.createElement("section");
+    widgets.className="ml-widget-grid";
+    widgets.setAttribute("aria-label","Dashboard widgets");
+
+    const profile=document.createElement("section");
+    profile.className="card ml-profile-card";
+    profile.innerHTML='<h3 class="card-title">Admin Profile</h3><div class="ml-profile-info"><div class="ml-avatar">MR</div><div><div class="ml-profile-name">Manlung Recovery</div><div class="ml-profile-role">System Administrator</div></div></div><div class="ml-profile-actions"><span class="ml-profile-note">Administrator account</span></div>';
     widgets.appendChild(profile);
+
     if(callCard){
-      callCard.id='call-admin';
+      callCard.id="call-admin";
+      callCard.classList.add("ml-widget-card","ml-call-card");
       widgets.appendChild(callCard);
     }
     if(donationCard){
-      donationCard.id='donations';
+      donationCard.id="donations";
+      donationCard.classList.add("ml-widget-card","ml-donation-card");
       widgets.appendChild(donationCard);
     }
-    root.insertBefore(widgets,root.firstChild);
-    if(stats) stats.classList.add('ml-dashboard-stats');
-    if(casesCard) casesCard.id='all-cases-card';
+
+    root.insertBefore(heading,root.firstChild);
+    heading.insertAdjacentElement("afterend",widgets);
+
+    if(stats){
+      stats.classList.add("ml-dashboard-stats");
+      widgets.insertAdjacentElement("afterend",stats);
+    }
+    if(casesCard){
+      casesCard.id="cases";
+      casesCard.classList.add("ml-cases-card");
+      if(stats) stats.insertAdjacentElement("afterend",casesCard);
+      else widgets.insertAdjacentElement("afterend",casesCard);
+    }
     if(videoCard){
-      videoCard.id='video-control-card';
-      if(casesCard) casesCard.insertAdjacentElement('afterend',videoCard);
-      else root.appendChild(videoCard);
+      videoCard.id="video-control-card";
+      videoCard.classList.add("ml-video-card");
+      if(casesCard) casesCard.insertAdjacentElement("afterend",videoCard);
+      else if(stats) stats.insertAdjacentElement("afterend",videoCard);
+      else widgets.insertAdjacentElement("afterend",videoCard);
     }
 
-    const menuButton=topbar.querySelector('#mlDashboardMenuToggle');
-    const closeMenu=()=>{
-      header.classList.remove('ml-sidebar-open');
-      overlay.classList.remove('is-visible');
-      document.body.classList.remove('ml-dashboard-menu-open');
-      menuButton.setAttribute('aria-expanded','false');
-      overlay.setAttribute('aria-hidden','true');
+    const toggle=document.getElementById("mlMenuToggle");
+    const close=document.getElementById("mlSidebarClose");
+    const closeSidebar=()=>{
+      header.classList.remove("active");
+      overlay.classList.remove("active");
+      document.body.classList.remove("ml-sidebar-open");
+      toggle.setAttribute("aria-expanded","false");
+      toggle.setAttribute("aria-label","Open navigation");
+      overlay.setAttribute("aria-hidden","true");
     };
-    const openMenu=()=>{
-      header.classList.add('ml-sidebar-open');
-      overlay.classList.add('is-visible');
-      document.body.classList.add('ml-dashboard-menu-open');
-      menuButton.setAttribute('aria-expanded','true');
-      overlay.setAttribute('aria-hidden','false');
+    const openSidebar=()=>{
+      header.classList.add("active");
+      overlay.classList.add("active");
+      document.body.classList.add("ml-sidebar-open");
+      toggle.setAttribute("aria-expanded","true");
+      toggle.setAttribute("aria-label","Close navigation");
+      overlay.setAttribute("aria-hidden","false");
     };
-    menuButton.addEventListener('click',openMenu);
-    overlay.addEventListener('click',closeMenu);
-    document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMenu();});
-    actions?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
-      if(a.getAttribute('href')?.startsWith('#')) closeMenu();
-    }));
-
-    const photoInput=profile.querySelector('#mlAdminProfilePhoto');
-    profile.querySelector('#mlAdminChangePhoto').addEventListener('click',()=>photoInput.click());
-    photoInput.addEventListener('change',()=>{
-      const file=photoInput.files&&photoInput.files[0];
-      if(!file||!file.type.startsWith('image/')) return;
-      const reader=new FileReader();
-      reader.onload=()=>{profile.querySelector('#mlAdminProfileAvatar').innerHTML='<img alt="Admin profile preview" style="width:100%;height:100%;object-fit:cover;border-radius:14px" src="'+reader.result+'">';};
-      reader.readAsDataURL(file);
-    });
-    profile.querySelector('#mlAdminSaveProfile').addEventListener('click',()=>{
-      const status=document.createElement('span');
-      status.textContent='Photo preview ready; connect to the existing profile-photo save endpoint to persist it.';
-      status.style.cssText='display:block;margin-top:10px;color:var(--text-muted);font-size:11px';
-      profile.querySelector('.ml-profile-caption').after(status);
-    });
+    toggle.addEventListener("click",()=>header.classList.contains("active")?closeSidebar():openSidebar());
+    close.addEventListener("click",closeSidebar);
+    overlay.addEventListener("click",closeSidebar);
+    document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSidebar();});
+    nav.querySelectorAll("a[href^='#']").forEach(a=>a.addEventListener("click",closeSidebar));
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',enhanceManlungAdminDashboard,{once:true});
-  else enhanceManlungAdminDashboard();
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",setupDashboardLayout,{once:true});
+  else setupDashboardLayout();
 })();
 </script>
 
