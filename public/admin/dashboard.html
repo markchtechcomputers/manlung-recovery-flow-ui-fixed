@@ -3452,6 +3452,7 @@ body.admin-page-bg .ml-admin-sidebar .header-actions .manlung-ai-tab{
     addLink("Call Admin","#call-admin","fa-phone-volume");
 
     const existing=[...oldActions.children];
+    let sidebarBottom=null;
     existing.forEach(el=>{
       const text=(el.textContent||"").replace(/\s+/g," ").trim();
       const href=el.getAttribute("href");
@@ -3470,12 +3471,11 @@ body.admin-page-bg .ml-admin-sidebar .header-actions .manlung-ai-tab{
         el.innerHTML='<span class="ml-nav-icon"><i class="fas '+iconName+'" aria-hidden="true"></i></span><span>'+text+'</span>';
         nav.appendChild(el);
       }else if(el.tagName==="BUTTON"){
-        const bottom=document.createElement("div");
-        bottom.className="ml-sidebar-bottom";
+        sidebarBottom=document.createElement("div");
+        sidebarBottom.className="ml-sidebar-bottom";
         el.classList.add("ml-sidebar-logout");
         el.innerHTML='<span class="ml-nav-icon"><i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i></span><span>Logout</span>';
-        bottom.appendChild(el);
-        headerContainer.appendChild(bottom);
+        sidebarBottom.appendChild(el);
       }
     });
     oldActions.remove();
@@ -3490,6 +3490,7 @@ body.admin-page-bg .ml-admin-sidebar .header-actions .manlung-ai-tab{
 
     headerContainer.appendChild(navLabel);
     headerContainer.appendChild(nav);
+    if(sidebarBottom) headerContainer.appendChild(sidebarBottom);
 
     const overlay=document.createElement("div");
     overlay.className="ml-sidebar-overlay";
