@@ -119,6 +119,88 @@
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}}
   </style>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
+
+<style id="music-admin-full-viewport-layout">
+/* Remove the centered, capped desktop player shell and use the full viewport. */
+html, body {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+}
+body.admin-page-bg {
+  display: block !important;
+  align-items: initial !important;
+  justify-content: initial !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+}
+body.admin-page-bg > .app-container {
+  display: flex !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  max-height: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-sizing: border-box !important;
+}
+body.admin-page-bg > .app-container > .sidebar {
+  flex: 0 0 260px !important;
+  width: 260px !important;
+  min-width: 0 !important;
+}
+body.admin-page-bg > .app-container > .main-content {
+  flex: 1 1 auto !important;
+  width: calc(100% - 260px) !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 100vh !important;
+  overflow-x: hidden !important;
+}
+@media (max-width: 1080px) {
+  body.admin-page-bg > .app-container > .sidebar {
+    flex-basis: 220px !important;
+    width: 220px !important;
+  }
+  body.admin-page-bg > .app-container > .main-content {
+    width: calc(100% - 220px) !important;
+  }
+}
+@media (max-width: 820px) {
+  body.admin-page-bg {
+    padding: 0 !important;
+  }
+  body.admin-page-bg > .app-container {
+    width: 100% !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    border-radius: 0 !important;
+  }
+  body.admin-page-bg > .app-container > .sidebar {
+    width: 100% !important;
+    flex: 0 0 auto !important;
+  }
+  body.admin-page-bg > .app-container > .main-content {
+    width: 100% !important;
+    min-height: 0 !important;
+  }
+}
+@media (max-width: 600px) {
+  body.admin-page-bg > .app-container {
+    min-height: 100vh !important;
+    border: 0 !important;
+  }
+}
+</style>
+
 </head>
 <body class="admin-page-bg">
   <div class="app-container">
