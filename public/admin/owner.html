@@ -2005,6 +2005,133 @@ html.dark .ml-admin-sidebar .header-actions a[href^="#"]:hover,body.dark .ml-adm
 .ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>i{flex:0 0 20px!important;width:20px!important;min-width:20px!important;margin:0!important;text-align:center!important}
 .ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*:not(i),
 .ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
+
+/* OWNER PAGE FULL-WIDTH LAYOUT FIX — overrides legacy 1180/1220/1440px containers */
+html,body,body.admin-page-bg{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+body.admin-page-bg{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  min-height:100vh!important;
+  margin:0!important;
+}
+body.admin-page-bg>.site-header{
+  display:block!important;
+  position:sticky!important;
+  top:0!important;
+  width:100vw!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:12px 30px!important;
+  box-sizing:border-box!important;
+}
+body.admin-page-bg>.site-header>.container{
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  flex-wrap:nowrap!important;
+  gap:16px!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.admin-page-bg>.site-header .brand{
+  display:flex!important;
+  flex:0 1 auto!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  width:auto!important;
+  max-width:calc(100% - 72px)!important;
+  min-width:0!important;
+  margin:0!important;
+  text-align:left!important;
+}
+body.admin-page-bg>.site-header .brand h1,
+body.admin-page-bg>.site-header .brand span{text-align:left!important}
+body.admin-page-bg>.site-header .ml-admin-menu-toggle{
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0 0 0 auto!important;
+}
+body.admin-page-bg>#pageContent,
+body.admin-page-bg>section.container{
+  display:block;
+  flex:1 0 auto!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:30px!important;
+  box-sizing:border-box!important;
+}
+body.admin-page-bg>#pageContent>.card,
+body.admin-page-bg>section.container>.card{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+#adminsList{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+.stats-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+.secondary-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+/* Closed navigation never reserves a phantom sidebar gutter. */
+body.admin-page-bg>#pageContent{margin-left:0!important}
+@media(min-width:761px){
+  body.admin-page-bg.ml-admin-menu-open>#pageContent{
+    width:calc(100% - 260px)!important;
+    margin-left:260px!important;
+  }
+}
+@media(max-width:1024px){
+  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:900px){
+  .secondary-grid{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(max-width:760px){
+  body.admin-page-bg>.site-header{padding:10px 16px!important}
+  body.admin-page-bg>.site-header>.container{flex-wrap:nowrap!important;align-items:center!important}
+  body.admin-page-bg>.site-header .brand{width:auto!important;max-width:calc(100% - 60px)!important;flex:1 1 auto!important}
+  body.admin-page-bg>#pageContent,
+  body.admin-page-bg>section.container{
+    width:100%!important;
+    margin:0!important;
+    padding:18px 16px 28px!important;
+  }
+  body.admin-page-bg.ml-admin-menu-open>#pageContent{
+    width:100%!important;margin-left:0!important;
+  }
+  #adminsList,.stats-grid{grid-template-columns:minmax(0,1fr)!important}
+  .secondary-grid{grid-template-columns:minmax(0,1fr)!important}
+}
+
 </style>
 <script id="manlung-admin-sidebar-nav-script">
 (function(){
