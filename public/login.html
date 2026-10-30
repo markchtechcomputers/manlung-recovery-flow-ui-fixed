@@ -21,7 +21,8 @@
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.webmanifest">
-    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261027-blue-shield-restore">
+    <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg?v=20261027-blue-shield-restore">
     <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png">
 
     <!-- Open Graph / WhatsApp / Facebook / Telegram -->
@@ -45,6 +46,9 @@
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/unified-ui.css">
     <link rel="stylesheet" href="/css/auth-premium.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="/js/support-fab.js"></script>
 <style id="manlung-auth-layout-clean-fix">
 /* Unified, design-preserving styles for the existing Manlung authentication page. */
@@ -1535,10 +1539,11 @@ html body.manlung-auth-page .manlung-auth-heading h2{line-height:1.15!important;
   <section class="manlung-auth-shell" aria-label="Manlung Recovery account access">
 
     <section class="manlung-auth-form">
+      <div class="manlung-login-logo" aria-label="Manlung Recovery logo"><img src="/favicon.svg?v=20261027-blue-shield-restore" alt="Manlung Recovery"></div>
       <div class="manlung-auth-tabs" role="tablist" aria-label="Account access"><button id="tabLogin" class="active" type="button" role="tab" aria-selected="true" onclick="showTab('login')">Sign In</button><button id="tabRegister" type="button" role="tab" aria-selected="false" onclick="showTab('register')">Create Account</button></div>
 
       <div id="loginPanel">
-        <div class="manlung-auth-heading"><h2>Welcome to Manlung Recovery Portal</h2><p>Sign in securely to access your client portal and case updates.</p></div>
+        <div class="manlung-auth-heading"><h2>Welcome Back</h2><p>Sign in to continue</p></div>
         <form id="loginForm" onsubmit="handleLogin(event)">
           <div class="form-group"><label for="loginEmail">Email address or phone number</label><input type="text" id="loginEmail" autocomplete="username" inputmode="text" placeholder="you@example.com or +254 7XX XXX XXX" required></div>
           <div class="form-group"><label for="loginPassword">Password</label><div class="manlung-password-field"><input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter your password" required><button type="button" class="manlung-password-toggle" data-password-target="loginPassword" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button></div></div>
@@ -2757,3 +2762,164 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:hover {
   html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe { height: 50px !important; min-height: 50px !important; }
 }
 </style>
+
+
+<style id="manlung-login-neumorphic-refresh-20261030">
+/* Login visual refresh based on the supplied Welcome Back concept.
+   Existing email/password, registration, OTP, Turnstile and OAuth controls remain intact. */
+html,body{width:100%;min-height:100%;margin:0}
+html body.manlung-auth-page{
+  min-height:100vh!important;min-height:100svh!important;overflow-x:hidden!important;overflow-y:auto!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  position:relative!important;padding:28px 14px!important;box-sizing:border-box!important;
+  font-family:'Inter',sans-serif!important;color:#1e293b!important;
+  background:
+    radial-gradient(circle at 8% 10%,rgba(59,130,246,.12),transparent 27%),
+    radial-gradient(circle at 92% 18%,rgba(96,165,250,.15),transparent 25%),
+    radial-gradient(circle at 18% 92%,rgba(59,130,246,.10),transparent 27%),
+    #eef2f9!important;
+}
+html body.manlung-auth-page .site-header,
+html body.manlung-auth-page>.manlung-footer{display:none!important}
+html body.manlung-auth-page .fa-floating-orb{position:fixed!important;z-index:0!important;pointer-events:none!important;border-radius:50%!important;filter:none!important;opacity:.72!important}
+html body.manlung-auth-page .fa-orb-1{width:390px!important;height:390px!important;top:-180px!important;left:-150px!important;background:linear-gradient(135deg,#e0eafc,#cfdef3)!important;box-shadow:inset 10px 10px 20px #fff,inset -10px -10px 20px #cbd5e1!important}
+html body.manlung-auth-page .fa-orb-2{width:300px!important;height:300px!important;top:5%!important;right:-150px!important;background:linear-gradient(135deg,#d4e4fc,#b0c8f0)!important;box-shadow:inset 10px 10px 20px #fff,inset -10px -10px 20px #a0b8d8!important}
+html body.manlung-auth-page .fa-orb-3{width:340px!important;height:340px!important;bottom:-190px!important;left:12%!important;background:linear-gradient(135deg,#e0eafc,#cfdef3)!important;box-shadow:10px 10px 20px #cbd5e1,-10px -10px 20px #fff!important}
+html body.manlung-auth-page .fa-theme-toggle{
+  position:fixed!important;z-index:20!important;top:24px!important;right:24px!important;
+  width:46px!important;height:46px!important;min-width:46px!important;padding:0!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  border:0!important;border-radius:13px!important;background:#eef2f9!important;
+  box-shadow:6px 6px 12px #cbd5e1,-6px -6px 12px #fff!important;color:#1e293b!important;
+}
+html body.manlung-auth-page .manlung-login-back{
+  position:fixed!important;z-index:20!important;top:26px!important;left:26px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:42px!important;height:42px!important;border-radius:12px!important;
+  color:#334155!important;background:#eef2f9!important;text-decoration:none!important;
+  box-shadow:5px 5px 10px #cbd5e1,-5px -5px 10px #fff!important;
+}
+html body.manlung-auth-page .manlung-auth-wrap{
+  position:relative!important;z-index:2!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;max-width:none!important;min-height:100vh!important;min-height:100svh!important;
+  margin:0!important;padding:0!important;box-sizing:border-box!important;
+}
+html body.manlung-auth-page .manlung-auth-shell{
+  width:100%!important;max-width:430px!important;min-width:0!important;margin:0 auto!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+}
+html body.manlung-auth-page .manlung-auth-form{
+  position:relative!important;isolation:isolate!important;display:flex!important;flex-direction:column!important;
+  align-items:stretch!important;gap:0!important;overflow:visible!important;box-sizing:border-box!important;
+  width:100%!important;max-width:430px!important;margin:0 auto!important;padding:34px 30px 30px!important;
+  border:0!important;border-radius:28px!important;background:#eef2f9!important;
+  box-shadow:14px 14px 28px #cbd5e1,-14px -14px 28px #fff!important;
+}
+html body.manlung-auth-page .manlung-auth-form:before{display:none!important;content:none!important}
+html body.manlung-auth-page .manlung-login-logo{
+  order:0!important;align-self:center!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  width:112px!important;height:112px!important;margin:0 auto 23px!important;padding:18px!important;
+  box-sizing:border-box!important;border-radius:28px!important;background:#eef2f9!important;
+  box-shadow:12px 12px 24px #cbd5e1,-12px -12px 24px #fff!important;
+}
+html body.manlung-auth-page .manlung-login-logo img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;border-radius:17px!important}
+html body.manlung-auth-page .manlung-auth-tabs{order:1!important;display:flex!important;gap:5px!important;width:100%!important;margin:0 0 22px!important;padding:5px!important;border:1px solid #dce4ef!important;border-radius:12px!important;background:#e8edf5!important}
+html body.manlung-auth-page .manlung-auth-tabs button{
+  flex:1 1 0!important;min-width:0!important;min-height:40px!important;padding:9px 10px!important;
+  border:0!important;border-radius:9px!important;background:transparent!important;color:#64748b!important;
+  font:600 .88rem/1.2 'Inter',sans-serif!important;white-space:normal!important;box-shadow:none!important;cursor:pointer!important;
+}
+html body.manlung-auth-page .manlung-auth-tabs button.active{background:#eef2f9!important;color:#1d4ed8!important;box-shadow:3px 3px 7px #cbd5e1,-3px -3px 7px #fff!important}
+html body.manlung-auth-page #loginPanel,
+html body.manlung-auth-page #registerPanel,
+html body.manlung-auth-page #emailOtpPanel,
+html body.manlung-auth-page #forgotForm{order:2!important;width:100%!important;min-width:0!important}
+html body.manlung-auth-page .manlung-auth-heading{margin:0 0 24px!important;padding:0!important;text-align:center!important;background:transparent!important}
+html body.manlung-auth-page .manlung-auth-heading h2{
+  margin:0 0 8px!important;color:#1e293b!important;font:800 clamp(1.8rem,5vw,2.1rem)/1.2 'Inter',sans-serif!important;
+  letter-spacing:-.045em!important;text-align:center!important;
+}
+html body.manlung-auth-page .manlung-auth-heading p{
+  margin:0!important;color:#94a3b8!important;font:500 .83rem/1.6 'Montserrat',sans-serif!important;
+  letter-spacing:.11em!important;text-transform:uppercase!important;text-align:center!important;
+}
+html body.manlung-auth-page .manlung-auth-form form{width:100%!important;margin:0!important;padding:0!important;background:transparent!important}
+html body.manlung-auth-page .manlung-auth-form .form-group{width:100%!important;margin:0 0 17px!important}
+html body.manlung-auth-page .manlung-auth-form label{display:block!important;margin:0 0 7px!important;color:#334155!important;font:600 .88rem/1.35 'Inter',sans-serif!important}
+html body.manlung-auth-page .manlung-auth-form input{
+  display:block!important;width:100%!important;min-width:0!important;min-height:54px!important;box-sizing:border-box!important;
+  padding:15px 17px!important;border:0!important;border-radius:14px!important;outline:none!important;
+  background:#eef2f9!important;color:#1e293b!important;font:500 .95rem 'Inter',sans-serif!important;
+  box-shadow:inset 6px 6px 12px #cbd5e1,inset -6px -6px 12px #fff!important;transition:box-shadow .2s,border-color .2s!important;
+}
+html body.manlung-auth-page .manlung-auth-form input::placeholder{color:#94a3b8!important;font-weight:400!important}
+html body.manlung-auth-page .manlung-auth-form input:focus{box-shadow:inset 3px 3px 7px #cbd5e1,inset -3px -3px 7px #fff,0 0 0 2px rgba(59,130,246,.25)!important}
+html body.manlung-auth-page .manlung-password-field{position:relative!important;width:100%!important}
+html body.manlung-auth-page .manlung-password-field input{padding-right:54px!important}
+html body.manlung-auth-page .manlung-password-toggle{right:8px!important;width:38px!important;height:38px!important;min-width:38px!important;border:0!important;border-radius:10px!important;background:transparent!important;color:#94a3b8!important;box-shadow:none!important}
+html body.manlung-auth-page .manlung-auth-links{display:flex!important;justify-content:flex-end!important;width:100%!important;margin:0 0 18px!important;font-size:.84rem!important}
+html body.manlung-auth-page .manlung-auth-links a{color:#2563eb!important;font-weight:650!important;text-decoration:none!important}
+html body.manlung-auth-page .manlung-auth-primary{
+  display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;
+  width:100%!important;min-height:56px!important;margin:12px 0 0!important;padding:15px 18px!important;
+  border:0!important;border-radius:14px!important;background:linear-gradient(135deg,#3b82f6,#1d4ed8)!important;
+  color:#fff!important;font:700 1rem 'Inter',sans-serif!important;
+  box-shadow:0 9px 20px rgba(59,130,246,.30)!important;cursor:pointer!important;transition:transform .2s,box-shadow .2s!important;
+}
+html body.manlung-auth-page .manlung-auth-primary:hover{transform:translateY(-2px)!important;box-shadow:0 12px 24px rgba(59,130,246,.36)!important}
+html body.manlung-auth-page .manlung-auth-primary:disabled{opacity:.65!important;cursor:wait!important;transform:none!important}
+html body.manlung-auth-page .manlung-auth-message{margin-top:13px!important;font-size:.84rem!important;line-height:1.5!important}
+html body.manlung-auth-page .manlung-auth-divider{display:flex!important;align-items:center!important;gap:12px!important;margin:24px 0 17px!important;color:#94a3b8!important;font:600 .68rem 'Montserrat',sans-serif!important;letter-spacing:.12em!important;text-transform:uppercase!important}
+html body.manlung-auth-page .manlung-auth-divider:before,html body.manlung-auth-page .manlung-auth-divider:after{content:""!important;display:block!important;flex:1!important;height:1px!important;background:#cbd5e1!important}
+html body.manlung-auth-page .manlung-social-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important;width:100%!important;margin:0 0 4px!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-btn,
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
+  position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;min-width:0!important;height:52px!important;min-height:52px!important;max-height:52px!important;
+  margin:0!important;padding:10px 48px!important;border:1px solid #d5deea!important;border-radius:13px!important;
+  background:#eef2f9!important;color:#334155!important;font:650 .9rem 'Inter',sans-serif!important;
+  box-shadow:5px 5px 10px #cbd5e1,-5px -5px 10px #fff!important;overflow:hidden!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-btn>i,
+html body.manlung-auth-page .manlung-social-grid .manlung-social-btn>svg{position:absolute!important;left:17px!important;top:50%!important;transform:translateY(-50%)!important;width:21px!important;height:21px!important;font-size:21px!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-btn span{display:block!important;flex:1 1 auto!important;text-align:center!important;white-space:nowrap!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{padding:0!important;background:#fff!important;box-shadow:5px 5px 10px #cbd5e1,-5px -5px 10px #fff!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe{display:block!important;width:100%!important;max-width:100%!important;height:52px!important;min-height:52px!important}
+html body.manlung-auth-page .manlung-social-grid #githubLoginBtn,
+html body.manlung-auth-page .manlung-social-grid #githubRegisterBtn{background:#202938!important;border-color:#202938!important;color:#fff!important}
+html body.manlung-auth-page .manlung-social-grid #discordLoginBtn,
+html body.manlung-auth-page .manlung-social-grid #discordRegisterBtn{background:#5865f2!important;border-color:#5865f2!important;color:#fff!important}
+html body.manlung-auth-page #clientTurnstile{display:flex!important;justify-content:center!important;max-width:100%!important;overflow:hidden!important}
+html body.manlung-auth-page #loginPanel[hidden],
+html body.manlung-auth-page #registerPanel[hidden],
+html body.manlung-auth-page #forgotForm[hidden],
+html body.manlung-auth-page #emailOtpPanel[hidden]{display:none!important}
+html body.manlung-auth-page .manlung-auth-form button:focus-visible,
+html body.manlung-auth-page .manlung-auth-form a:focus-visible{outline:3px solid rgba(59,130,246,.38)!important;outline-offset:3px!important}
+html body.manlung-auth-page.dark,html body.dark.manlung-auth-page{
+  background:radial-gradient(circle at 8% 10%,rgba(59,130,246,.12),transparent 27%),#0b1220!important;color:#f8fafc!important;
+}
+html body.dark.manlung-auth-page .manlung-auth-form,
+html body.dark.manlung-auth-page .manlung-login-logo,
+html body.dark.manlung-auth-page .fa-theme-toggle,
+html body.dark.manlung-auth-page .manlung-login-back{background:#111c2e!important;box-shadow:9px 9px 20px #070d17,-9px -9px 20px #1b2b43!important}
+html body.dark.manlung-auth-page .manlung-auth-heading h2,
+html body.dark.manlung-auth-page .manlung-auth-form label{color:#f1f5f9!important}
+html body.dark.manlung-auth-page .manlung-auth-heading p{color:#94a3b8!important}
+html body.dark.manlung-auth-page .manlung-auth-tabs{background:#0b1220!important;border-color:#27364b!important}
+html body.dark.manlung-auth-page .manlung-auth-tabs button.active{background:#17263c!important;color:#bfdbfe!important;box-shadow:inset 3px 3px 6px #070d17,inset -3px -3px 6px #1b2b43!important}
+html body.dark.manlung-auth-page .manlung-auth-form input{background:#0b1220!important;color:#f8fafc!important;box-shadow:inset 5px 5px 10px #070d17,inset -5px -5px 10px #17263c!important}
+html body.dark.manlung-auth-page .manlung-social-grid .manlung-social-btn{box-shadow:4px 4px 9px #070d17,-4px -4px 9px #1b2b43!important}
+@media(max-width:520px){
+ html body.manlung-auth-page{padding:76px 12px 24px!important;align-items:flex-start!important}
+ html body.manlung-auth-page .manlung-auth-wrap{min-height:auto!important;min-height:calc(100svh - 100px)!important}
+ html body.manlung-auth-page .manlung-auth-form{padding:26px 20px 24px!important;border-radius:23px!important}
+ html body.manlung-auth-page .manlung-login-logo{width:94px!important;height:94px!important;margin-bottom:20px!important;padding:15px!important;border-radius:24px!important}
+ html body.manlung-auth-page .manlung-auth-heading{margin-bottom:20px!important}
+ html body.manlung-auth-page .manlung-auth-heading h2{font-size:1.8rem!important}
+ html body.manlung-auth-page .fa-theme-toggle{top:16px!important;right:16px!important}
+ html body.manlung-auth-page .manlung-login-back{top:18px!important;left:16px!important}
+}
+@media(prefers-reduced-motion:reduce){html body.manlung-auth-page *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+
