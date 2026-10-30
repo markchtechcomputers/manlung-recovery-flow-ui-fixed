@@ -1051,6 +1051,97 @@ body.dark #mfaStatus,body.dark #mfaSetupBox,body.dark #mfaDisableBox,body.dark #
 
 
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
+
+<style id="owner-responsive-layout-20261030">
+/* Owner Management responsive layout — additive overrides; preserve all existing content. */
+*,*::before,*::after{box-sizing:border-box}
+html,body{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
+body.admin-page-bg{display:block;min-height:100vh}
+body.admin-page-bg>.site-header{width:100%;min-width:0}
+body.admin-page-bg .site-header>.container{width:100%;max-width:1440px;min-width:0}
+#pageContent,body.admin-page-bg>section.container{
+  width:min(1440px,calc(100% - 40px))!important;
+  max-width:1440px!important;min-width:0!important;
+  margin:24px auto 40px!important;
+}
+#pageContent>.card,body.admin-page-bg>section.container>.card{
+  min-width:0;max-width:100%;overflow:visible;
+}
+#pageContent .card-title,body.admin-page-bg>section.container>.card h2{
+  min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:.65rem;
+}
+#pageContent input,#pageContent select,#pageContent textarea,
+#pageContent button,body.admin-page-bg>section.container input,
+body.admin-page-bg>section.container select,body.admin-page-bg>section.container button{
+  max-width:100%;min-width:0;
+}
+#pageContent input,#pageContent select,#pageContent textarea{width:100%}
+#pageContent .form-group,#pageContent .case-info,#adminsList,
+#ownerCalls,#careerApplications,#auditLog{min-width:0;max-width:100%}
+#pageContent [style*="display:flex"],body.admin-page-bg>section.container [style*="display:flex"]{
+  min-width:0;flex-wrap:wrap;gap:.65rem;
+}
+#pageContent .btn,body.admin-page-bg>section.container .btn{
+  flex:0 1 auto;white-space:normal;overflow-wrap:anywhere;
+}
+#adminsList{grid-template-columns:repeat(2,minmax(0,1fr))}
+#adminsList .case-item,#ownerCalls .case-item,#careerApplications .case-item{
+  min-width:0;max-width:100%;flex-wrap:wrap;overflow-wrap:anywhere;
+}
+#adminsList .case-item>div,#ownerCalls .case-item>div,#careerApplications .case-item>div{
+  min-width:0;max-width:100%;
+}
+.table-responsive{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.table-responsive>table{width:100%;min-width:680px;border-collapse:collapse}
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;min-width:0}
+.secondary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;min-width:0}
+.widget-card,.stat-card,.content-card{min-width:0;max-width:100%}
+.widget-card>*{min-width:0;max-width:100%}
+.widget-card input,.widget-card select,.widget-card textarea{width:100%;min-width:0}
+.widget-card button{max-width:100%;white-space:normal}
+.ml-admin-menu-toggle{position:relative;z-index:2147483002;flex:0 0 auto}
+.ml-admin-menu-overlay{z-index:2147483000}
+.ml-admin-sidebar{
+  z-index:2147483001;visibility:hidden;pointer-events:none;
+  width:min(360px,88vw);max-width:100vw;
+  transform:translateX(105%);
+  box-shadow:-18px 0 48px rgba(2,6,23,.28);
+}
+.ml-admin-sidebar.is-open{visibility:visible;pointer-events:auto;transform:translateX(0)}
+.ml-admin-menu-overlay.is-open{visibility:visible;pointer-events:auto}
+@media(max-width:1024px){
+  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #adminsList{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:900px){
+  .secondary-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:700px){
+  #pageContent,body.admin-page-bg>section.container{
+    width:calc(100% - 24px)!important;margin:16px 12px 28px!important;
+  }
+  #pageContent>.card,body.admin-page-bg>section.container>.card{padding:16px!important}
+  .stats-grid{grid-template-columns:minmax(0,1fr)}
+  #adminsList{grid-template-columns:minmax(0,1fr)}
+  #pageContent .card-title{align-items:flex-start}
+  #pageContent .case-item,#ownerCalls .case-item,#careerApplications .case-item{
+    flex-direction:column;align-items:stretch;
+  }
+  #pageContent .case-item>div:last-child,#careerApplications .case-item>div:last-child{
+    justify-content:flex-start!important;
+  }
+  #pageContent .btn,body.admin-page-bg>section.container .btn{max-width:100%}
+}
+@media(max-width:420px){
+  #pageContent,body.admin-page-bg>section.container{width:calc(100% - 20px)!important;margin:12px 10px 24px!important}
+  #pageContent>.card,body.admin-page-bg>section.container>.card{padding:13px!important}
+  .ml-admin-sidebar{width:min(330px,90vw);padding-left:12px;padding-right:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .ml-admin-sidebar,.ml-admin-menu-overlay{transition:none!important}
+}
+</style>
+
 </head>
 <body class="admin-page-bg">
     <header class="site-header">
@@ -1996,6 +2087,37 @@ html.dark .ml-admin-sidebar .header-actions a[href^="#"]:hover,body.dark .ml-adm
   sidebar.addEventListener('click',function(e){if(e.target.closest('a'))setOpen(false)});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
+
+<script id="owner-responsive-table-wrapper-20261030">
+(function(){
+  function wrapTables(root){
+    (root||document).querySelectorAll('table').forEach(function(table){
+      if(table.closest('.table-responsive'))return;
+      var wrapper=document.createElement('div');
+      wrapper.className='table-responsive';
+      table.parentNode.insertBefore(wrapper,table);
+      wrapper.appendChild(table);
+    });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',function(){wrapTables(document);},{once:true});
+  }else{wrapTables(document);}
+  if('MutationObserver' in window){
+    var observer=new MutationObserver(function(records){
+      records.forEach(function(record){
+        record.addedNodes.forEach(function(node){
+          if(node.nodeType===1){
+            if(node.matches&&node.matches('table'))wrapTables(node.parentNode);
+            else if(node.querySelectorAll)wrapTables(node);
+          }
+        });
+      });
+    });
+    observer.observe(document.documentElement,{childList:true,subtree:true});
+  }
 })();
 </script>
 
