@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 /* Shared admin section cleanup: no public footer inside admin workspace. */
 footer.manlung-footer,
 footer.site-footer,
@@ -83,7 +84,6 @@ body.admin-page-bg > main.music-shell {
 
 
 /* Manlung Recovery admin workspace: consistent navigation, responsive layout and no public footer. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 body.admin-page-bg{
   min-height:100vh!important;
   background:radial-gradient(ellipse at 12% 5%,#dceeff 0,transparent 38%),linear-gradient(135deg,#eef5ff 0%,#f7faff 48%,#eaf2ff 100%)!important;
