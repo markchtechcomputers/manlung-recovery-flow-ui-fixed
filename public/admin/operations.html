@@ -3,7 +3,11 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Operations Dashboard · Manlung Recovery</title>
-<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">\n<link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261030">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261027-blue-shield-restore">
+<link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg?v=20261027-blue-shield-restore">
+<link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png">
+<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261030">
 <script src="/js/theme.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -47,18 +51,19 @@ body.admin-page-bg .shell>main{
   overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;
 }
 body.admin-page-bg .shell>main>.top{
-  position:sticky;top:0;width:100%;max-width:none;margin:0;
+  position:sticky;top:0;z-index:10;width:100%;max-width:none;margin:0;
+  padding:16px clamp(14px,2vw,30px);
   border-radius:0;box-sizing:border-box;
 }
 body.admin-page-bg .shell>main>.content{
   display:grid;width:100%;max-width:none;margin:0;
-  padding:22px clamp(14px,2vw,30px);gap:18px;
+  padding:22px clamp(14px,2vw,30px) 150px;gap:var(--ops-grid-gap,18px);
   box-sizing:border-box;
 }
 body.admin-page-bg .layout{
   display:grid;width:100%;min-width:0;
   grid-template-columns:minmax(0,2fr) minmax(0,1fr);
-  gap:20px;align-items:start;
+  gap:var(--ops-grid-gap,18px);align-items:start;
 }
 body.admin-page-bg .layout>.panel{min-width:0;width:100%}
 body.admin-page-bg .filters{
@@ -69,7 +74,7 @@ body.admin-page-bg .filters select{
 }
 body.admin-page-bg .header-right{min-width:0;max-width:100%;flex-wrap:wrap}
 body.admin-page-bg .top>*{min-width:0}
-body.admin-page-bg .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+body.admin-page-bg .kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--ops-grid-gap,18px)}
 body.admin-page-bg .gauge-wrap{width:100%;max-width:250px;min-width:0}
 body.admin-page-bg .tablewrap{width:100%;max-width:100%;overflow-x:auto}
 @media(max-width:1100px){
@@ -117,6 +122,27 @@ body.admin-page-bg .tablewrap{width:100%;max-width:100%;overflow-x:auto}
 }
 </style>
 
+<style id="operations-alignment-contact-fix-20261030">
+body.admin-page-bg{--ops-grid-gap:18px}
+body.admin-page-bg .shell>main>.top{width:100%!important;margin:0!important;padding-left:clamp(14px,2vw,30px)!important;padding-right:clamp(14px,2vw,30px)!important}
+body.admin-page-bg .shell>main>.content{width:100%!important;max-width:none!important;padding-left:clamp(14px,2vw,30px)!important;padding-right:clamp(14px,2vw,30px)!important;padding-bottom:160px!important;gap:var(--ops-grid-gap)!important}
+body.admin-page-bg .kpis{width:100%!important;min-width:0!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:var(--ops-grid-gap)!important}
+body.admin-page-bg .layout{width:100%!important;min-width:0!important;grid-template-columns:minmax(0,2fr) minmax(0,1fr)!important;gap:var(--ops-grid-gap)!important}
+body.admin-page-bg .kpi,body.admin-page-bg .layout>.panel{min-width:0!important}
+body.admin-page-bg .shell>.side{height:100vh!important;max-height:100vh!important;overflow-x:hidden!important;overflow-y:auto!important;scrollbar-width:none!important;-ms-overflow-style:none!important}
+body.admin-page-bg .shell>.side::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+body.admin-page-bg #callWidget,body.admin-page-bg #contactUsFab,body.admin-page-bg #contactUsButton,body.admin-page-bg .contact-us-fab,body.admin-page-bg .contact-fab,body.admin-page-bg .manlung-contact-fab{position:fixed!important;right:20px!important;bottom:calc(20px + env(safe-area-inset-bottom,0px))!important;z-index:40!important}
+body.admin-page-bg #callWidgetPanel,body.admin-page-bg #manlungContactMenu{z-index:60!important}
+@media(max-width:1100px){body.admin-page-bg .layout{grid-template-columns:minmax(0,1fr)!important}}
+@media(max-width:700px){
+body.admin-page-bg .shell>main>.top{padding-left:14px!important;padding-right:14px!important}
+body.admin-page-bg .shell>main>.content{padding-left:14px!important;padding-right:14px!important;padding-bottom:150px!important}
+body.admin-page-bg .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+body.admin-page-bg .layout{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+body.admin-page-bg #callWidget,body.admin-page-bg #contactUsFab,body.admin-page-bg #contactUsButton,body.admin-page-bg .contact-us-fab,body.admin-page-bg .contact-fab,body.admin-page-bg .manlung-contact-fab{right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))!important}
+}
+@media(max-width:420px){body.admin-page-bg .shell>main>.top{padding-left:10px!important;padding-right:10px!important}body.admin-page-bg .shell>main>.content{padding-left:10px!important;padding-right:10px!important}body.admin-page-bg .kpis{gap:8px!important}}
+</style>
 </head>
 <body class="admin-page-bg">
 <div class="shell">
