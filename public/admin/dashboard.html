@@ -757,7 +757,6 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
 <li><a href="#cases-section" class="nav-item"><i class="fa-solid fa-folder-open"></i>Cases</a></li>
 <li><a href="#donations-section" class="nav-item"><i class="fa-solid fa-hand-holding-dollar"></i>Donations</a></li>
 <li><a href="#call-admin-section" class="nav-item"><i class="fa-solid fa-phone"></i>Call Admin</a></li>
-<li><a href="/admin/owner.html" id="ownerLink" class="nav-item owner-only"><i class="fa-solid fa-users-gear"></i>Admin Management</a></li>
 <li><a href="/admin/reports.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Reports</a></li>
 <li><a href="/admin/operations.html" class="nav-item"><i class="fa-solid fa-gears"></i>Operations</a></li>
 <li><a href="/admin/music.html" class="nav-item"><i class="fa-solid fa-music"></i>Music</a></li>
@@ -1085,7 +1084,7 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
             console.log('[Manlung] Admin role:', role, 'Owner:', isOwner);
 
             const ownerElements = document.querySelectorAll(
-                '#ownerLink, #ownerManagementNav, .owner-only'
+                '#ownerManagementNav, .owner-only'
             );
 
             ownerElements.forEach(el => {
@@ -3053,7 +3052,6 @@ body.admin-page-bg .site-header .header-actions button:hover{
 }
 body.admin-page-bg .site-header .header-actions a i,
 body.admin-page-bg .site-header .header-actions button i{color:#fff!important;width:19px!important;min-width:19px!important;text-align:center!important}
-body.admin-page-bg .site-header .header-actions a[href="/admin/owner.html"]{background:rgba(255,255,255,.10)!important}
 body.admin-page-bg .site-header .header-actions button.btn-danger{margin-top:10px!important;background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.16)!important}
 body.admin-page-bg .site-header .header-actions button[data-theme-toggle]{border:1px solid rgba(255,255,255,.14)!important}
 body.admin-page-bg>.container{
@@ -3150,7 +3148,6 @@ body.admin-page-bg .admin-table tbody tr:hover{background:#faf9fc!important}
     else if(label==='Music')el.querySelector('i').className='fas fa-music';
     else if(label==='Tools')el.querySelector('i').className='fas fa-screwdriver-wrench';
     else if(label.indexOf('Community')>=0)el.querySelector('i').className='fas fa-users';
-    else if(label.indexOf('Management')>=0)el.querySelector('i').className='fas fa-user-shield';
     else if(label==='Home')el.querySelector('i').className='fas fa-house';
     else if(label==='Logout')el.querySelector('i').className='fas fa-right-from-bracket';
     else if(label.toLowerCase().indexOf('theme')>=0)el.querySelector('i').className='fas fa-circle-half-stroke';
@@ -3432,12 +3429,11 @@ html body.admin-page-bg { top:0!important; }
 .ml-admin-sidebar .header-actions a[href*="#cases-section"]{order:2!important}
 .ml-admin-sidebar .header-actions a[href*="#donations-section"]{order:3!important}
 .ml-admin-sidebar .header-actions a[href*="#call-admin-section"]{order:4!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/owner.html"]{order:5!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/reports.html"]{order:6!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/operations.html"]{order:7!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/music.html"]{order:8!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/tools.html"]{order:9!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/connect.html"]{order:10!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/reports.html"]{order:5!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/operations.html"]{order:6!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/music.html"]{order:7!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/tools.html"]{order:8!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/connect.html"]{order:9!important}
 .ml-admin-sidebar .header-actions a[href="/"],
 .ml-admin-sidebar .header-actions a[href$="/"]{order:11!important}
 .ml-admin-sidebar .header-actions [data-theme-toggle="true"]{order:12!important;align-self:stretch!important;width:100%!important;max-width:none!important}
