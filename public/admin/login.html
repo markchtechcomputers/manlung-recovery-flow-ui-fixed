@@ -167,12 +167,50 @@ body:has(.center-wrap){font-family:Inter,ui-sans-serif,system-ui,-apple-system,"
 @media(max-width:520px){.center-wrap{align-items:flex-start;padding:20px 12px!important}.login-container{padding:27px 21px!important;border-radius:21px!important}.login-container .logo{margin-bottom:23px}}
 @media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
 </style>
+
+<style id="manlung-admin-login-black-red-refresh">
+:root{color-scheme:dark;--auth-red:#e11d2e;--auth-red-bright:#ff3347;--auth-black:#070708;--auth-panel:#111113;--auth-line:#302024;--auth-muted:#b7a7aa}
+html,body{min-height:100%;margin:0}
+body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50% 0%,rgba(190,18,38,.2),transparent 42%),radial-gradient(ellipse at 100% 100%,rgba(120,10,25,.16),transparent 38%),#070708!important;color:#fff!important;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.center-wrap{min-height:100svh!important;box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:28px 16px!important}
+.login-container{position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;width:min(100%,450px)!important;margin:auto;padding:clamp(27px,5vw,42px)!important;border:1px solid rgba(225,29,46,.42)!important;border-radius:25px!important;background:linear-gradient(155deg,rgba(25,20,22,.98),rgba(10,10,11,.99))!important;color:#fff!important;box-shadow:0 30px 90px rgba(0,0,0,.72),0 0 45px rgba(225,29,46,.12),inset 0 1px rgba(255,255,255,.045)!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.login-container:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,#790b19,#e11d2e,#ff5362,#790b19)}
+.login-container:after{content:"";position:absolute;inset:12px;border:1px solid rgba(225,29,46,.13);border-radius:17px;pointer-events:none;z-index:-1}
+.login-container>*{position:relative;z-index:1}
+.login-container .logo{text-align:center;margin:0 0 29px}
+.login-container .logo .admin-app-icon{display:block;width:68px;height:68px;object-fit:cover;margin:0 auto 17px;border:1px solid rgba(255,70,87,.65);border-radius:19px;box-shadow:0 8px 26px rgba(225,29,46,.22)}
+.login-container .logo h1{margin:0 0 7px!important;color:#fff!important;font-size:clamp(25px,5vw,30px)!important;font-weight:850;letter-spacing:-.045em}
+.login-container .logo>span{display:block;color:#c8b9bc!important;font-size:12px;letter-spacing:.11em;text-transform:uppercase}
+.login-container .admin-badge{display:inline-flex!important;align-items:center;gap:6px;margin-top:13px;padding:5px 10px!important;border:1px solid rgba(225,29,46,.48)!important;border-radius:999px!important;background:rgba(225,29,46,.1)!important;color:#ff8792!important;font-size:9px!important;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.login-container .admin-badge i{font-size:9px}
+.login-container .form-group{margin:0 0 18px}
+.login-container label{display:block;margin:0 0 8px;color:#f0dfe2!important;font-size:12px;font-weight:750;letter-spacing:.04em}
+.login-container label i{color:#ff5362!important}
+.login-container input{display:block;width:100%;min-height:51px;box-sizing:border-box;padding:13px 15px;border:1px solid #493037!important;border-radius:12px!important;background:#09090a!important;color:#fff!important;font:500 14px inherit;transition:border-color .18s,box-shadow .18s}
+.login-container input::placeholder{color:#88777b}
+.login-container input:focus{outline:0;border-color:#f04455!important;box-shadow:0 0 0 4px rgba(225,29,46,.16)!important}
+.manlung-turnstile-box{margin:3px 0 18px!important;padding:12px!important;overflow:hidden;border:1px solid #493037!important;border-radius:13px!important;background:#0b0a0b!important}
+.manlung-turnstile-title,.manlung-turnstile-help{color:#e7cdd1!important}
+.manlung-turnstile-widget{justify-content:center;overflow-x:auto}
+.login-container .btn-primary{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:51px;padding:13px 18px;border:1px solid #f04455!important;border-radius:12px!important;background:linear-gradient(135deg,#a70f22,#e11d2e 58%,#b80f24)!important;color:#fff!important;font-size:14px;font-weight:850;letter-spacing:.035em;box-shadow:0 9px 24px rgba(225,29,46,.22)!important;transition:transform .18s,box-shadow .18s,filter .18s}
+.login-container .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.08);box-shadow:0 13px 30px rgba(225,29,46,.32)!important}
+.login-container a{color:#ff6675!important;font-weight:750;text-decoration:none}
+.login-container a:hover{color:#ff9aa4!important;text-decoration:underline}
+.login-container .error-text,#loginError,#mfaLoginError,#mfaEnrollStatus{color:#ff8792!important;font-size:12px;line-height:1.55}
+#adminMfaEnroll>div,#adminForgotBox{border:1px solid #493037!important;border-radius:14px!important;background:#0c0a0b!important;color:#fff!important}
+#adminMfaEnroll h3{color:#fff!important}
+#adminMfaEnroll p,#adminMfaForm p,#adminForgotBox p{color:#c8b9bc!important}
+#adminMfaEnroll img{border-radius:10px}
+.footer-text,footer,.site-footer,.manlung-footer,.manlung-footer-bottom{display:none!important}
+@media(max-width:520px){.center-wrap{align-items:center;padding:18px 12px!important}.login-container{padding:28px 21px!important;border-radius:21px!important}.login-container:after{inset:8px;border-radius:15px}}
+@media(prefers-reduced-motion:reduce){.login-container,.login-container *{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
     <div class="center-wrap">
         <div class="login-container">
             <div class="logo">
-                <i class="fas fa-shield-halved"></i>
+                <img class="admin-app-icon" src="/icons/icon-512.png" alt="Manlung Recovery app icon" width="72" height="72">
                 <h1>Admin Portal</h1>
                 <span>Manlung Recovery · Secure Access</span>
                 <div><span class="admin-badge"><i class="fas fa-lock"></i> Restricted</span></div>
