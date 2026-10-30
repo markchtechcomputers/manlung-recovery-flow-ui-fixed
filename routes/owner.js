@@ -354,7 +354,7 @@ router.post('/invitations', [body('email').trim().isEmail().normalizeEmail()], a
     const active = (await User.listAdminsAndOwner()).filter(x => x.role === 'admin' && x.admin_status === 'active').length;
     if (active >= MAX_ADMINS) return res.status(409).json({ error: `Maximum of ${MAX_ADMINS} active administrators reached.` });
     const invitation = await AdminInvitation.create({ email: req.body.email, invitedBy: req.user.id, ttlHours: 48 });
-    const baseUrl = String(process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke').replace(/\\/$/, '');
+    const baseUrl = String(process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke').replace(/\/$/, '');
     // The invitation token is the only credential in this URL. The invited
     // email is resolved server-side from the hashed token and is never trusted
     // from a query-string parameter.
