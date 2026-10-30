@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Operations Dashboard · Manlung Recovery</title>
-<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">\n<link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261030">
 <script src="/js/theme.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -27,14 +27,21 @@ main{flex:1;min-width:0}.top{position:sticky;top:0;z-index:10;background:var(--r
 </style>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
 </head>
-<body>
+<body class="admin-page-bg">
 <div class="shell">
-<aside class="side"><div class="brand"><span class="brand-mark">M</span>MANLUNG RECOVERY</div><div class="side-label">Operations</div><nav>
-<a href="/admin/dashboard.html"><i class="fa-solid fa-table-cells-large"></i>Dashboard</a>
-<a class="active" href="/admin/operations.html" aria-current="page"><i class="fa-solid fa-list-check"></i>Operations</a>
+<aside class="side"><div class="brand"><span class="brand-mark">M</span>MANLUNG RECOVERY</div><div class="side-label">Operations</div><nav aria-label="Admin navigation">
+<a href="/admin/dashboard.html"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+<a href="/admin/dashboard.html#cases-section"><i class="fa-solid fa-folder-open"></i>Cases</a>
+<a href="/admin/dashboard.html#donations-section"><i class="fa-solid fa-hand-holding-heart"></i>Donations</a>
+<a href="/admin/dashboard.html#call-admin-section"><i class="fa-solid fa-phone-volume"></i>Call Admin</a>
+<a href="/admin/owner.html"><i class="fa-solid fa-user-shield"></i>Admin Management</a>
 <a href="/admin/reports.html"><i class="fa-solid fa-chart-line"></i>Reports</a>
+<a class="active" href="/admin/operations.html" aria-current="page"><i class="fa-solid fa-list-check"></i>Operations</a>
+<a href="/admin/music.html"><i class="fa-solid fa-music"></i>Music</a>
 <a href="/admin/tools.html"><i class="fa-solid fa-toolbox"></i>Tools</a>
-<a href="/admin/owner.html"><i class="fa-solid fa-crown"></i>Owner Tools</a>
+<a href="/admin/connect.html"><i class="fa-solid fa-comments"></i>WhatsApp Chats</a>
+<a href="/"><i class="fa-solid fa-house"></i>Home</a>
+<a href="/api/auth/admin/logout"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
 </nav></aside>
 <main>
 <header class="top"><div><h1>Operations Dashboard</h1><p>Live case queue, SLA visibility and investigator workload</p></div><div class="header-right"><div class="live"><span class="dot"></span><span id="liveText">Connecting to live data…</span></div><button class="btn refresh" id="refresh"><i class="fa-solid fa-rotate-right"></i> Refresh</button></div></header>
