@@ -659,6 +659,93 @@ body.admin-page-bg{font-family:Inter,sans-serif!important;background:var(--bg-li
 body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
 @media(max-width:1050px){body.admin-page-bg{align-items:flex-start;padding:12px!important}#adminAppContainer{height:auto;min-height:calc(100vh - 24px)}#adminAppContainer>.main-content{padding:22px}#adminAppContainer .admin-dashboard-content{grid-template-columns:minmax(0,1fr)}#adminAppContainer .dashboard-call-card,#adminAppContainer .dashboard-cases-card,#adminAppContainer .dashboard-video-card,#adminAppContainer .dashboard-donations-card,#adminAppContainer .dashboard-stats-card{grid-column:1;grid-row:auto}}
 @media(max-width:700px){body.admin-page-bg{padding:0!important}#adminAppContainer{width:100%;min-height:100vh;border-radius:0;border:0;flex-direction:column}#adminAppContainer>.sidebar{width:100%;flex:0 0 auto;padding:13px 12px;border-right:0;border-bottom:1px solid var(--border-color)}#adminAppContainer .brand{margin:0 0 10px;font-size:16px}#adminAppContainer .nav-menu{flex-direction:row;overflow-x:auto;padding-bottom:4px}#adminAppContainer .nav-item{padding:9px 11px;font-size:12px}#adminAppContainer .logout-wrapper{margin-top:8px;padding-top:0}#adminAppContainer>.main-content{padding:18px 13px}#adminAppContainer .top-header{align-items:flex-start;flex-direction:column}#adminAppContainer .header-actions{width:100%;justify-content:space-between;flex-wrap:wrap}#adminAppContainer .search-bar{width:100%}#adminAppContainer .page-title{font-size:22px}#adminAppContainer #adminProfileEditor{flex-wrap:wrap}}
+
+/* Layout repair: strict grid tracks, no card overlap, no clipped controls. */
+#adminAppContainer{min-width:0}
+#adminAppContainer>.main-content{min-height:0;min-width:0;overscroll-behavior:contain}
+#adminAppContainer .admin-dashboard-content{
+ display:grid!important;
+ grid-template-columns:minmax(0,1.8fr) minmax(300px,1fr)!important;
+ grid-template-areas:
+  "profile profile"
+  "call donation"
+  "cases stats"
+  "cases video"!important;
+ grid-auto-rows:min-content!important;
+ align-items:start!important;
+ align-content:start!important;
+ gap:20px!important;
+ min-width:0!important;
+ width:100%!important;
+}
+#adminAppContainer #adminProfileEditor{grid-area:profile!important;min-width:0!important}
+#adminAppContainer .dashboard-call-card{grid-area:call!important;display:flex!important;align-items:flex-start!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:16px!important;min-width:0!important;min-height:150px!important;height:auto!important;overflow:visible!important}
+#adminAppContainer .dashboard-call-card>div{flex:1 1 320px!important;min-width:0!important}
+#adminAppContainer .dashboard-call-card #voiceLineBtn{flex:0 0 auto!important;align-self:center!important;white-space:nowrap!important;min-height:42px!important}
+#adminAppContainer .dashboard-donations-card{grid-area:donation!important;min-width:0!important;align-self:start!important}
+#adminAppContainer .dashboard-stats-card{grid-area:stats!important;min-width:0!important;align-self:start!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#adminAppContainer .dashboard-cases-card{grid-area:cases!important;min-width:0!important;align-self:start!important;overflow:visible!important}
+#adminAppContainer .dashboard-video-card{
+ grid-area:video!important;align-self:start!important;min-width:0!important;width:100%!important;
+ height:auto!important;min-height:0!important;overflow:visible!important;
+ display:flex!important;flex-direction:column!important;gap:12px!important;
+ padding:22px!important;box-sizing:border-box!important;
+ border-radius:16px!important;position:relative!important;inset:auto!important;
+}
+#adminAppContainer .dashboard-video-card .video-control-actions{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:10px!important;align-items:stretch!important;width:100%!important;min-width:0!important;
+ position:static!important;inset:auto!important;transform:none!important;float:none!important;
+}
+#adminAppContainer .dashboard-video-card .video-control-actions input{
+ grid-column:1/-1!important;width:100%!important;min-width:0!important;max-width:100%!important;
+ height:44px!important;box-sizing:border-box!important;flex:none!important;
+}
+#adminAppContainer .dashboard-video-card .video-control-actions button{
+ min-width:0!important;width:100%!important;min-height:42px!important;height:auto!important;
+ padding:10px 8px!important;white-space:normal!important;line-height:1.25!important;
+ box-sizing:border-box!important;position:static!important;inset:auto!important;
+ transform:none!important;float:none!important;
+}
+#adminAppContainer .dashboard-video-card #videoControlStatus{overflow-wrap:anywhere!important;min-width:0!important}
+#adminAppContainer .dashboard-cases-card .filters-bar{
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;
+ gap:10px!important;min-width:0!important;width:100%!important;
+ position:static!important;inset:auto!important;transform:none!important;
+}
+#adminAppContainer .dashboard-cases-card .filters-bar input:not([type=checkbox]),
+#adminAppContainer .dashboard-cases-card .filters-bar select{
+ flex:1 1 155px!important;width:auto!important;min-width:0!important;max-width:100%!important;
+ height:40px!important;box-sizing:border-box!important;
+}
+#adminAppContainer .dashboard-cases-card .filters-bar button{flex:0 0 auto!important;min-height:40px!important;white-space:nowrap!important}
+#adminAppContainer .dashboard-cases-card .filters-bar label{flex:0 1 auto!important;min-height:38px!important}
+#adminAppContainer .dashboard-cases-card .table-wrap{max-width:100%!important;overflow-x:auto!important}
+#adminAppContainer .dashboard-cases-card .admin-table{min-width:760px!important}
+#adminAppContainer .dashboard-call-card,#adminAppContainer .dashboard-video-card,
+#adminAppContainer .dashboard-cases-card,#adminAppContainer .dashboard-donations-card,
+#adminAppContainer .dashboard-stats-card{position:relative!important;inset:auto!important;transform:none!important;float:none!important}
+@media(max-width:1050px){
+ #adminAppContainer{height:auto!important;min-height:calc(100vh - 24px)!important}
+ #adminAppContainer>.main-content{overflow:visible!important}
+ #adminAppContainer .admin-dashboard-content{
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-areas:"profile" "call" "donation" "stats" "video" "cases"!important;
+  gap:16px!important;
+ }
+ #adminAppContainer .dashboard-video-card .video-control-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:560px){
+ #adminAppContainer .dashboard-call-card{align-items:stretch!important}
+ #adminAppContainer .dashboard-call-card #voiceLineBtn{align-self:stretch!important;width:100%!important}
+ #adminAppContainer .dashboard-video-card{padding:17px!important}
+ #adminAppContainer .dashboard-video-card .video-control-actions{grid-template-columns:minmax(0,1fr)!important}
+ #adminAppContainer .dashboard-video-card .video-control-actions input{grid-column:1!important}
+ #adminAppContainer .dashboard-video-card .video-control-actions button{width:100%!important}
+ #adminAppContainer .dashboard-cases-card .filters-bar>*{flex:1 1 100%!important;width:100%!important}
+ #adminAppContainer .dashboard-cases-card .filters-bar label{justify-content:flex-start!important}
+ #adminAppContainer .dashboard-stats-card{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
 </style></head>
 <body class="admin-page-bg">
     <div class="bg-shape-1" aria-hidden="true"></div><div class="bg-shape-2" aria-hidden="true"></div>
