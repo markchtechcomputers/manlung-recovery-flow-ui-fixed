@@ -1065,11 +1065,20 @@ body.dark #mfaStatus,body.dark #mfaSetupBox,body.dark #mfaDisableBox,body.dark #
 <h1> Admin Management</h1>
                 <span>Owner-only — assign, suspend, and remove admin access</span>
             </div>
-            <div class="header-actions">
-                <a href="/admin/dashboard.html" class="btn btn-outline"> Dashboard</a>
-                <a href="/admin/tools.html" class="btn btn-outline"> Tools</a>
-                <a class="btn btn-danger" id="ownerLogoutBtn" href="/api/auth/admin/logout"> Logout</a>
-            </div>
+            <nav class="header-actions" aria-label="Admin navigation">
+                <a class="btn btn-outline" href="/admin/dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+                <a class="btn btn-outline" href="/admin/dashboard.html#cases-section"><i class="fa-solid fa-folder-open"></i> Cases</a>
+                <a class="btn btn-outline" href="/admin/dashboard.html#donations-section"><i class="fa-solid fa-hand-holding-heart"></i> Donations</a>
+                <a class="btn btn-outline" href="/admin/dashboard.html#call-admin-section"><i class="fa-solid fa-phone-volume"></i> Call Admin</a>
+                <a class="btn btn-outline active" href="/admin/owner.html" aria-current="page"><i class="fa-solid fa-users-gear"></i> Admin Management</a>
+                <a class="btn btn-outline" href="/admin/reports.html"><i class="fa-solid fa-chart-line"></i> Reports</a>
+                <a class="btn btn-outline" href="/admin/operations.html"><i class="fa-solid fa-list-check"></i> Operations</a>
+                <a class="btn btn-outline" href="/admin/music.html"><i class="fa-solid fa-music"></i> Music</a>
+                <a class="btn btn-outline" href="/admin/tools.html"><i class="fa-solid fa-toolbox"></i> Tools</a>
+                <a class="btn btn-outline" href="/admin/connect.html"><i class="fa-solid fa-comments"></i> WhatsApp Chats</a>
+                <a class="btn btn-outline" href="/"><i class="fa-solid fa-house"></i> Home</a>
+                <a class="btn btn-danger" id="ownerLogoutBtn" href="/api/auth/admin/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </nav>
         </div>
     </header>
 
