@@ -144,6 +144,7 @@ body.admin-page-bg #callWidget,body.admin-page-bg #contactUsFab,body.admin-page-
 @media(max-width:420px){body.admin-page-bg .shell>main>.top{padding-left:10px!important;padding-right:10px!important}body.admin-page-bg .shell>main>.content{padding-left:10px!important;padding-right:10px!important}body.admin-page-bg .kpis{gap:8px!important}}
 
 
+</style>
 <style id="operations-remove-global-admin-gutter-20261030">
 /* This page has its own full-width shell; cancel the shared admin page gutter. */
 html:has(body.admin-page-bg){width:100%!important;height:100%!important;overflow:hidden!important}
@@ -171,6 +172,83 @@ body.admin-page-bg .side nav>a{
 @media(max-width:700px){body.admin-page-bg>.shell>main{margin-left:68px!important}}
 @media(max-width:420px){body.admin-page-bg>.shell>main{margin-left:56px!important}}
 </style>
+
+<style id="operations-live-data-readability-fix-20261030">
+/* Prevent inherited admin styles from collapsing live labels, counts and workload cells. */
+body.admin-page-bg .status{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:8px 18px!important;min-width:0!important;line-height:1.5!important;
+}
+body.admin-page-bg .status>span{display:inline-block!important;min-width:0!important;overflow-wrap:anywhere}
+body.admin-page-bg .kpis{align-items:stretch!important}
+body.admin-page-bg .kpi{
+ display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+ justify-content:flex-start!important;gap:0!important;min-width:0!important;
+ padding:clamp(13px,1.35vw,19px)!important;overflow:hidden!important;
+}
+body.admin-page-bg .kl{
+ display:flex!important;align-items:center!important;gap:9px!important;
+ min-width:0!important;width:100%!important;white-space:normal!important;
+ font-size:clamp(10px,.76vw,12px)!important;line-height:1.35!important;
+ letter-spacing:.035em!important;overflow-wrap:anywhere!important;
+}
+body.admin-page-bg .ki{flex:0 0 28px!important;width:28px!important;height:28px!important}
+body.admin-page-bg .kv{
+ display:block!important;width:100%!important;margin:10px 0 4px!important;
+ font-size:clamp(24px,2.1vw,32px)!important;line-height:1.12!important;
+ font-weight:850!important;font-variant-numeric:tabular-nums!important;
+}
+body.admin-page-bg .kpi>.muted{display:block!important;line-height:1.45!important;font-size:11px!important}
+body.admin-page-bg .panel{min-width:0!important;overflow:hidden!important}
+body.admin-page-bg .panel h2{
+ display:flex!important;align-items:baseline!important;flex-wrap:wrap!important;
+ gap:6px 10px!important;line-height:1.4!important;
+}
+body.admin-page-bg .panel h2 .muted{font-size:11px!important;font-weight:500!important;text-transform:none!important;letter-spacing:0!important}
+body.admin-page-bg .filters{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important}
+body.admin-page-bg .filters select{
+ flex:1 1 165px!important;width:auto!important;min-width:0!important;max-width:100%!important;
+ min-height:40px!important;line-height:1.35!important;white-space:normal!important;
+}
+body.admin-page-bg .queue,body.admin-page-bg .case{min-width:0!important}
+body.admin-page-bg .case-id{line-height:1.4!important;overflow-wrap:anywhere!important}
+body.admin-page-bg .meta{align-items:center!important;line-height:1.5!important}
+body.admin-page-bg .pill{display:inline-flex!important;align-items:center!important;max-width:100%!important;line-height:1.35!important;white-space:normal!important;overflow-wrap:anywhere!important}
+body.admin-page-bg .case-actions .btn{min-height:38px!important;white-space:normal!important}
+body.admin-page-bg .gauge-wrap{height:170px!important;min-height:170px!important}
+body.admin-page-bg .gauge-text{width:100%!important;line-height:1.3!important}
+body.admin-page-bg .gauge-text strong{display:block!important;font-size:clamp(23px,2vw,29px)!important;line-height:1.15!important;font-variant-numeric:tabular-nums!important}
+body.admin-page-bg .gauge-text span{display:block!important;margin-top:3px!important;line-height:1.35!important}
+body.admin-page-bg .sla{display:block!important;line-height:1.45!important;white-space:normal!important}
+body.admin-page-bg .tablewrap{width:100%!important;min-width:0!important;overflow-x:auto!important}
+body.admin-page-bg .table{width:100%!important;min-width:570px!important;table-layout:auto!important;border-spacing:0!important}
+body.admin-page-bg .table th,body.admin-page-bg .table td{
+ padding:11px 12px!important;line-height:1.4!important;vertical-align:middle!important;
+ white-space:normal!important;overflow-wrap:anywhere!important;
+}
+body.admin-page-bg .table th{font-size:10px!important;letter-spacing:.045em!important}
+body.admin-page-bg .table td strong{font-variant-numeric:tabular-nums!important}
+body.admin-page-bg .user{display:flex!important;align-items:center!important;gap:10px!important;min-width:150px!important;line-height:1.35!important}
+body.admin-page-bg .user .avatar{display:grid!important;flex:0 0 30px!important;margin:0!important}
+body.admin-page-bg .role{display:inline-flex!important;align-items:center!important;line-height:1.35!important}
+@media(max-width:1100px){
+ body.admin-page-bg .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ body.admin-page-bg .layout{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(max-width:700px){
+ body.admin-page-bg .kl{font-size:10px!important}
+ body.admin-page-bg .kv{font-size:25px!important}
+ body.admin-page-bg .panel h2{font-size:12px!important}
+ body.admin-page-bg .table th,body.admin-page-bg .table td{padding:9px!important}
+ body.admin-page-bg .table{min-width:540px!important}
+}
+@media(max-width:420px){
+ body.admin-page-bg .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ body.admin-page-bg .kpi{padding:10px!important}
+ body.admin-page-bg .kl{font-size:9px!important;gap:6px!important}
+ body.admin-page-bg .ki{width:24px!important;height:24px!important;flex-basis:24px!important}
+ body.admin-page-bg .kv{font-size:22px!important}
+}
 </style>
 </head>
 <body class="admin-page-bg">
