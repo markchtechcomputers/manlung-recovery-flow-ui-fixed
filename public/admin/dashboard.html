@@ -3528,7 +3528,7 @@ body.admin-page-bg .ml-admin-sidebar .header-actions .manlung-ai-tab{
 
     const profile=document.createElement("section");
     profile.className="card ml-profile-card";
-    profile.innerHTML='<h3 class="card-title">Admin Profile</h3><div class="ml-profile-info"><div class="ml-avatar">MR</div><div><div class="ml-profile-name">Manlung Recovery</div><div class="ml-profile-role">System Administrator</div></div></div><div class="ml-profile-actions"><span class="ml-profile-note">Administrator account</span></div>';
+    profile.innerHTML='<h3 class="card-title">Admin Profile</h3><div class="ml-profile-info"><div class="ml-avatar" id="mlAdminAvatar">MR</div><div><div class="ml-profile-name">Manlung Recovery</div><div class="ml-profile-role">System Administrator</div></div></div><div class="ml-profile-actions"><input type="file" id="mlProfilePhotoInput" accept="image/*" hidden><button type="button" class="btn btn-light" id="mlChangeProfilePhoto">Change Photo</button><button type="button" class="btn btn-primary" id="mlSaveProfile">Save Profile</button></div><p class="ml-profile-note" id="mlProfileMessage" aria-live="polite"></p>';
     widgets.appendChild(profile);
 
     if(callCard){
@@ -3562,6 +3562,20 @@ body.admin-page-bg .ml-admin-sidebar .header-actions .manlung-ai-tab{
       else if(stats) stats.insertAdjacentElement("afterend",videoCard);
       else widgets.insertAdjacentElement("afterend",videoCard);
     }
+
+    const profileInput=profile.querySelector("#mlProfilePhotoInput");
+    profile.querySelector("#mlChangeProfilePhoto").addEventListener("click",()=>profileInput.click());
+    profileInput.addEventListener("change",()=>{
+      const file=profileInput.files&&profileInput.files[0];
+      if(!file) return;
+      if(!file.type.startsWith("image/")){profile.querySelector("#mlProfileMessage").textContent="Please choose an image file.";return;}
+      const reader=new FileReader();
+      reader.onload=()=>{profile.querySelector("#mlAdminAvatar").innerHTML='<img alt="Profile photo preview" src="'+reader.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';profile.querySelector("#mlProfileMessage").textContent="Photo preview updated. Select Save Profile to continue.";};
+      reader.readAsDataURL(file);
+    });
+    profile.querySelector("#mlSaveProfile").addEventListener("click",()=>{
+      profile.querySelector("#mlProfileMessage").textContent="Preview updated. Persistent profile-photo saving is not connected to this dashboard yet.";
+    });
 
     const toggle=document.getElementById("mlMenuToggle");
     const close=document.getElementById("mlSidebarClose");
