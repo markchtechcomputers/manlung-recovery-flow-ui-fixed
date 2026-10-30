@@ -456,6 +456,37 @@ nav button span{display:grid;place-items:center;width:58px;height:30px;border-ra
 </style>
 
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
+
+<style id="ml-connect-full-viewport-fix-20261030">
+/* Use the entire browser viewport; keep the existing responsive chat panes. */
+html,body.admin-page-bg{
+  width:100%!important;max-width:none!important;min-width:0!important;
+  height:100%!important;min-height:100dvh!important;margin:0!important;
+  padding:0!important;overflow:hidden!important;
+}
+body.admin-page-bg{
+  display:block!important;position:relative!important;
+  background:#d1d7db!important;
+}
+body.admin-page-bg>.ml-connect-browserbar{display:none!important}
+body.admin-page-bg>#app{
+  position:fixed!important;inset:0!important;
+  width:100vw!important;max-width:none!important;
+  height:100dvh!important;min-height:100dvh!important;
+  margin:0!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;overflow:hidden!important;
+}
+@media(min-width:900px){
+ body.admin-page-bg>#app{
+  display:grid!important;
+  grid-template-columns:64px clamp(320px,32vw,400px) minmax(0,1fr)!important;
+  grid-template-rows:68px minmax(0,1fr)!important;
+ }
+}
+@media(max-width:899px){
+ body.admin-page-bg>#app{display:flex!important;flex-direction:column!important}
+}
+</style>
 </head><body class="admin-page-bg">
 <div class="ml-connect-browserbar" aria-hidden="true"><div class="mac-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="url"><span aria-hidden="true">🔒</span> manlungrecovery.manlungshop.co.ke/admin/connect.html</div></div>
 <div id="app"><header id="hd"><div class="logo">M</div><h1>Manlung Community</h1></header><main id="mn" aria-live="polite"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden><input type="file" id="status-media" accept="image/*,video/*" hidden></div>
