@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#100b17">
+  <meta name="theme-color" content="#f5f6fa">
   <meta name="description" content="Manlung Recovery Admin Music Center">
   <title>Admin Music Center · Manlung Recovery</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261022">
@@ -237,6 +237,103 @@ body.admin-page-bg .player-bar {
     width: 100% !important;
     padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
   }
+}
+</style>
+
+<style id="music-admin-light-mode">
+/* Light theme for the complete Music Center UI. */
+:root{
+  color-scheme:light;
+  --bg-dark:#f4f6fb;
+  --glass-bg:#ffffff;
+  --glass-border:#e2e7f0;
+  --text-main:#172033;
+  --text-muted:#687386;
+  --accent-purple:#7540a5;
+  --accent-glow:rgba(117,64,165,.16);
+  --hover-bg:#f1eafb;
+}
+html,body{background:#f4f6fb!important;color:#172033!important}
+body.admin-page-bg{background:linear-gradient(135deg,#f8faff 0%,#eef2f8 100%)!important}
+.app-container{
+  background:#fff!important;border:1px solid #e2e7f0!important;
+  box-shadow:0 16px 48px rgba(31,41,55,.08)!important;
+}
+.sidebar{background:#f8f9fc!important;border-right:1px solid #e4e8f0!important}
+.logo-icon{color:#172033!important}
+.logo-subtitle,.section-title{color:#7b8495!important}
+.nav-item{color:#657084!important}
+.nav-item:hover,.nav-item.active{
+  color:#4f2878!important;background:#f0e9fa!important;border-color:#e4d8f2!important;
+}
+.mood-btn{color:#5f6879!important;border-color:#d5dbe6!important;background:#fff!important}
+.mood-btn:hover,.mood-btn:focus-visible{color:#542d7c!important;border-color:#a982ce!important;background:#f4edfb!important}
+.genre-btn{color:#566174!important;background:#eef1f6!important;border-color:#e4e8ef!important}
+.genre-btn i{color:#7a8495!important}
+.genre-btn:hover{color:#4e2877!important;background:#f1eafa!important;border-color:#e3d5f1!important}
+.sidebar-art{border-color:#e0d9e8!important;box-shadow:0 8px 20px rgba(31,41,55,.12)!important}
+.art-overlay{background:linear-gradient(transparent,rgba(24,20,32,.88))!important}
+.main-content{background:#fff!important}
+.admin-warning{color:#8a4b08!important;background:#fff7e8!important;border-color:#f3d6a2!important}
+.title-area h1{color:#182235!important}
+.title-area p,.search-hint{color:#687386!important}
+.header-badge{color:#63358e!important;background:#f4edfb!important;border-color:#dfc9f0!important}
+.header-badge .dot{background:#8b55b6!important;box-shadow:0 0 8px #c3a3df!important}
+.search-box{background:#fff!important;border-color:#dce2ec!important}
+.search-box:focus-within{border-color:#a982ce!important;box-shadow:0 0 0 3px rgba(117,64,165,.1)!important}
+.search-icon{color:#788397!important}
+.search-box input{color:#1c2638!important}
+.search-box input::placeholder{color:#98a1b0!important}
+.btn-search{background:#6f3c9d!important;color:#fff!important}
+.btn-search:hover{background:#5d2e89!important}
+.status{color:#667287!important}
+.status.error{color:#c03945!important}
+.status.success{color:#26764c!important}
+.tracklist{scrollbar-color:#cbd2df transparent!important}
+.tracklist::-webkit-scrollbar-thumb{background:#cbd2df!important}
+.track-item{background:transparent!important;border-color:transparent!important}
+.track-item:hover{background:#f6f7fb!important}
+.track-item.active{background:#f2ecf8!important;border-color:#e4d6f0!important;box-shadow:0 4px 12px rgba(49,36,66,.07)!important}
+.track-number{color:#8993a3!important}
+.track-cover{background:#edf0f5!important}
+.track-info h4{color:#202b3d!important}
+.track-info p,.track-duration{color:#758094!important}
+.track-action{color:#4e596c!important;background:#fff!important;border-color:#dce2eb!important}
+.track-action:hover{color:#3e245c!important;background:#f3edf9!important}
+.track-action.primary{color:#fff!important;background:#7540a5!important;border-color:#7540a5!important}
+.track-action.primary:hover{background:#62318e!important}
+.track-action.audio{color:#65398c!important;background:#f5effb!important;border-color:#dfcbed!important}
+.empty-state{color:#778195!important}
+.empty-state i{color:#9a72b9!important}
+.empty-state h3{color:#354156!important}
+.empty-state p{color:#778195!important}
+.queue-heading{color:#7b8495!important}
+.queue-heading strong{color:#364156!important}
+.queue-heading button{color:#6c7484!important}
+.queue-chip{color:#4e596c!important;background:#f8f9fc!important;border-color:#e0e5ed!important}
+.queue-chip.active{color:#58307e!important;background:#f1eafa!important;border-color:#c9addf!important}
+.queue-empty{color:#8992a2!important}
+.player-bar{
+  background:rgba(255,255,255,.97)!important;border-top:1px solid #e1e6ef!important;
+  box-shadow:0 -8px 24px rgba(31,41,55,.06)!important;
+}
+.player-cover{background:#edf0f5!important;border-color:#e0e5ed!important}
+.player-text h4{color:#202b3d!important}
+.player-text p{color:#778195!important}
+.control-btn{color:#697589!important}
+.control-btn:hover{color:#4f2878!important}
+.play-btn{background:#6f3c9d!important;color:#fff!important;box-shadow:0 4px 12px rgba(111,60,157,.2)!important}
+.play-btn:hover{background:#5d2e89!important;box-shadow:0 5px 15px rgba(111,60,157,.25)!important}
+.mode-pill{color:#63358e!important;background:#f4edfb!important;border-color:#dfc9f0!important}
+.wave-bar{background:#b59acb!important}
+.playing .wave-bar{background:#8252a9!important}
+.volume-control{color:#6d7789!important}
+.volume-slider{accent-color:#7540a5!important}
+button:focus-visible,a:focus-visible,input:focus-visible{outline-color:#9462bc!important}
+@media(max-width:600px){
+  body{background:#f4f6fb!important}
+  .player-bar{background:rgba(255,255,255,.98)!important;border-top-color:#e1e6ef!important}
+  .player-right{border-top-color:#e8ebf1!important}
 }
 </style>
 
