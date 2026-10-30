@@ -582,6 +582,7 @@ body.admin-page-bg>section.container>.card h2 i{color:#a78bfa;}
   #adminsList .case-item>div:last-child,#careerApplications .case-item>div:last-child{justify-content:flex-start !important;}
   #pageContent>.card:nth-child(4)>.card-title::after{font-size:.52rem;}
 }
+</style>
 <style id="admins-section-3-redesign">
 /* Section 3 — Current Admins & Owner */
 #pageContent > .card:nth-child(3){
@@ -801,8 +802,6 @@ body.dark #adminsList .case-item .btn-danger{
 }
 </style>
 
-</style>
-
 <style id="owner-light-sections">
 /* Keep the Owner Management page white in light mode; dark styling remains under html.dark/body.dark. */
 body.admin-page-bg #pageContent > .card,
@@ -973,8 +972,8 @@ body.admin-page-bg .site-header .header-actions>button:hover{background:rgba(255
 body.admin-page-bg .site-header .header-actions .btn-danger,
 body.admin-page-bg .site-header .header-actions .btn-danger *{background:#dc2626!important;border-color:#b91c1c!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
 #pageContent,body.admin-page-bg>section.container{
-  width:min(1220px,calc(100% - 40px))!important;max-width:1220px!important;
-  margin:28px auto 40px!important;padding:0!important;
+  width:100%!important;max-width:none!important;min-width:0!important;
+  margin:0!important;padding:30px!important;box-sizing:border-box!important;
 }
 #pageContent>.card,body.admin-page-bg>section.container>.card{
   margin:0 0 20px!important;padding:22px!important;overflow:visible!important;
@@ -1043,7 +1042,7 @@ body.dark #mfaStatus,body.dark #mfaSetupBox,body.dark #mfaDisableBox,body.dark #
   body.admin-page-bg .site-header .brand{width:100%!important;justify-content:flex-start!important}
   body.admin-page-bg .site-header .header-actions{width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
   body.admin-page-bg .site-header .header-actions>a,body.admin-page-bg .site-header .header-actions>button{width:100%!important;min-height:42px!important;padding:8px!important}
-  #pageContent,body.admin-page-bg>section.container{width:calc(100% - 24px)!important;margin:18px 12px 28px!important}
+  #pageContent,body.admin-page-bg>section.container{width:100%!important;max-width:none!important;margin:0!important;padding:18px 16px 28px!important;box-sizing:border-box!important}
   #pageContent>.card,body.admin-page-bg>section.container>.card{padding:16px!important;border-radius:14px!important}
   #adminsList{grid-template-columns:minmax(0,1fr)!important}
 }
@@ -1058,11 +1057,10 @@ body.dark #mfaStatus,body.dark #mfaSetupBox,body.dark #mfaDisableBox,body.dark #
 html,body{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
 body.admin-page-bg{display:block;min-height:100vh}
 body.admin-page-bg>.site-header{width:100%;min-width:0}
-body.admin-page-bg .site-header>.owner-header-inner{width:100%;max-width:1440px;min-width:0}
+body.admin-page-bg .site-header>.owner-header-inner{width:100%;max-width:none;min-width:0}
 #pageContent,body.admin-page-bg>section.container{
-  width:min(1440px,calc(100% - 40px))!important;
-  max-width:1440px!important;min-width:0!important;
-  margin:24px auto 40px!important;
+  width:100%!important;max-width:none!important;min-width:0!important;
+  margin:0!important;box-sizing:border-box!important;
 }
 #pageContent>.card,body.admin-page-bg>section.container>.card{
   min-width:0;max-width:100%;overflow:visible;
@@ -1118,7 +1116,7 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
 }
 @media(max-width:700px){
   #pageContent,body.admin-page-bg>section.container{
-    width:calc(100% - 24px)!important;margin:16px 12px 28px!important;
+    width:100%!important;max-width:none!important;margin:0!important;padding-left:16px!important;padding-right:16px!important;
   }
   #pageContent>.card,body.admin-page-bg>section.container>.card{padding:16px!important}
   .stats-grid{grid-template-columns:minmax(0,1fr)}
@@ -1133,7 +1131,7 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
   #pageContent .btn,body.admin-page-bg>section.container .btn{max-width:100%}
 }
 @media(max-width:420px){
-  #pageContent,body.admin-page-bg>section.container{width:calc(100% - 20px)!important;margin:12px 10px 24px!important}
+  #pageContent,body.admin-page-bg>section.container{width:100%!important;max-width:none!important;margin:0!important;padding-left:12px!important;padding-right:12px!important}
   #pageContent>.card,body.admin-page-bg>section.container>.card{padding:13px!important}
   .ml-admin-sidebar{width:min(330px,90vw);padding-left:12px;padding-right:12px}
 }
@@ -2197,172 +2195,48 @@ body.admin-page-bg>#pageContent{margin-left:0!important}
 
 
 <style id="owner-full-viewport-layout-final">
-/* Full-viewport owner layout: override the site's shared centered containers. */
-html, body {
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  margin: 0 !important;
+/* Single source of truth for the Owner page's edge-to-edge layout. */
+*,*::before,*::after{box-sizing:border-box}
+html,body{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:0!important;overflow-x:hidden!important}
+body.admin-page-bg{display:block!important;position:relative!important;width:100%!important;max-width:none!important;min-width:0!important;min-height:100vh!important;margin:0!important;padding:0!important}
+body.admin-page-bg>.site-header{display:block!important;position:sticky!important;top:0!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:12px 24px!important}
+body.admin-page-bg>.site-header>.owner-header-inner{display:flex!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:0!important;justify-content:space-between!important}
+body.admin-page-bg>.site-header .brand{flex:1 1 auto!important;min-width:0!important;max-width:none!important;margin:0 auto 0 0!important;justify-content:flex-start!important;text-align:left!important}
+body.admin-page-bg>.site-header .ml-admin-menu-toggle{flex:0 0 auto!important;margin-left:auto!important}
+body.admin-page-bg>#pageContent,body.admin-page-bg>.owner-page-content#pageContent,body.admin-page-bg>#deniedContent,body.admin-page-bg>#ownerMfaSection{
+ display:block;position:relative;float:none;clear:both;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;box-sizing:border-box!important;
 }
-body.admin-page-bg {
-  display: block !important;
-  position: relative !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow-x: hidden !important;
-  box-sizing: border-box !important;
+body.admin-page-bg>#pageContent,body.admin-page-bg>.owner-page-content#pageContent{min-height:calc(100vh - 64px);padding:24px!important}
+body.admin-page-bg>#pageContent>.card,body.admin-page-bg>#deniedContent>.card,body.admin-page-bg>#ownerMfaSection>.card,body.admin-page-bg>#pageContent .card{
+ display:block;width:100%!important;max-width:none!important;min-width:0!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box!important;
 }
-body.admin-page-bg > .site-header {
-  display: block !important;
-  position: sticky !important;
-  inset: 0 0 auto 0 !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  margin: 0 !important;
-  padding: 12px 30px !important;
-  box-sizing: border-box !important;
+body.admin-page-bg>#ownerMfaSection{padding:0 24px 24px!important}
+body.admin-page-bg>#deniedContent{padding:24px!important}
+body.admin-page-bg #pageContent .container,body.admin-page-bg #pageContent .section-container,body.admin-page-bg #pageContent .content-container{
+ width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important;
 }
-body.admin-page-bg > .site-header > .owner-header-inner {
-  display: flex !important;
-  flex: none !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  flex-wrap: nowrap !important;
-  gap: 16px !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
+#adminsList{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important;max-width:none!important;min-width:0!important;gap:16px!important}
+.stats-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;width:100%!important;max-width:none!important;min-width:0!important}
+.secondary-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important;max-width:none!important;min-width:0!important}
+.table-responsive{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important}
+.table-responsive>table{width:100%;min-width:720px}
+.ml-admin-sidebar{position:fixed!important;z-index:3000!important;top:0!important;bottom:0!important;left:0!important;right:auto!important;width:260px!important;max-width:88vw!important;height:100vh!important;transform:translateX(-105%)!important;box-shadow:18px 0 48px rgba(2,6,23,.28)!important}
+.ml-admin-sidebar.is-open{transform:translateX(0)!important}
+.ml-admin-menu-overlay{z-index:2999!important}
+body.admin-page-bg.ml-admin-menu-open>#pageContent{width:100%!important;margin:0!important}
+@media(max-width:1024px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:900px){.secondary-grid{grid-template-columns:minmax(0,1fr)!important}}
+@media(max-width:760px){
+ body.admin-page-bg>.site-header{padding:10px 16px!important}
+ body.admin-page-bg>#pageContent,body.admin-page-bg>.owner-page-content#pageContent{width:100%!important;margin:0!important;padding:18px 16px 24px!important}
+ body.admin-page-bg>#ownerMfaSection{padding:0 16px 24px!important}
+ body.admin-page-bg>#deniedContent{padding:16px!important}
+ #adminsList,.stats-grid,.secondary-grid{grid-template-columns:minmax(0,1fr)!important}
 }
-body.admin-page-bg > .site-header .brand {
-  display: flex !important;
-  flex: 1 1 auto !important;
-  width: auto !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  margin: 0 auto 0 0 !important;
-  justify-content: flex-start !important;
-  text-align: left !important;
-}
-body.admin-page-bg > .site-header .brand h1,
-body.admin-page-bg > .site-header .brand span { text-align: left !important; }
-body.admin-page-bg > .site-header .ml-admin-menu-toggle {
-  display: inline-flex !important;
-  flex: 0 0 auto !important;
-  margin: 0 0 0 auto !important;
-}
-body.admin-page-bg > #pageContent,
-body.admin-page-bg > .owner-page-content#pageContent {
-  display: block !important;
-  position: relative !important;
-  float: none !important;
-  clear: both !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  min-height: calc(100vh - 64px) !important;
-  margin: 0 !important;
-  padding: 30px !important;
-  box-sizing: border-box !important;
-}
-body.admin-page-bg > #pageContent > .card {
-  display: block !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  box-sizing: border-box !important;
-}
-/* The two additional owner-only sections are also full-width page sections. */
-body.admin-page-bg > #deniedContent,
-body.admin-page-bg > #ownerMfaSection {
-  width: 100% !important;
-  max-width: none !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  box-sizing: border-box !important;
-}
-body.admin-page-bg > #ownerMfaSection { padding: 0 30px 30px !important; }
-#adminsList {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  gap: 16px !important;
-}
-.stats-grid {
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-}
-.secondary-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
-}
-.table-responsive {
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch;
-}
-.table-responsive > table { width: 100%; min-width: 720px; }
-.ml-admin-sidebar {
-  position: fixed !important;
-  z-index: 3000 !important;
-  top: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: auto !important;
-  width: 260px !important;
-  max-width: 88vw !important;
-  height: 100vh !important;
-  transform: translateX(-105%) !important;
-  box-shadow: 18px 0 48px rgba(2, 6, 23, .28) !important;
-}
-.ml-admin-sidebar.is-open { transform: translateX(0) !important; }
-.ml-admin-menu-overlay { z-index: 2999 !important; }
-body.admin-page-bg.ml-admin-menu-open > #pageContent {
-  width: calc(100% - 260px) !important;
-  margin-left: 260px !important;
-}
-@media (max-width: 1024px) {
-  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-}
-@media (max-width: 900px) {
-  .secondary-grid { grid-template-columns: minmax(0, 1fr) !important; }
-}
-@media (max-width: 760px) {
-  body.admin-page-bg > .site-header { padding: 10px 16px !important; }
-  body.admin-page-bg > #pageContent,
-  body.admin-page-bg > .owner-page-content#pageContent {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 18px 16px 28px !important;
-  }
-  body.admin-page-bg.ml-admin-menu-open > #pageContent {
-    width: 100% !important;
-    margin-left: 0 !important;
-  }
-  body.admin-page-bg > #ownerMfaSection { padding: 0 16px 24px !important; }
-  #adminsList, .stats-grid, .secondary-grid {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
+@media(max-width:420px){
+ body.admin-page-bg>#pageContent,body.admin-page-bg>.owner-page-content#pageContent{padding:14px 12px 22px!important}
+ #pageContent>.card,body.admin-page-bg>#ownerMfaSection>.card{padding:13px!important}
+ .ml-admin-sidebar{width:min(330px,90vw)!important}
 }
 </style>
 
