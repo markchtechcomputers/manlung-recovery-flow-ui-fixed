@@ -158,3 +158,8 @@ body.admin-page-bg .ml-dashboard-content~.footer{padding:20px!important;color:#9
 @media(prefers-reduced-motion:reduce){
  body.admin-page-bg>.site-header.ml-sidebar,body.admin-page-bg .ml-sidebar-overlay{transition:none!important}
 }
+
+/* Profile controls matching the approved reference */
+body.admin-page-bg .ml-profile-actions{display:flex!important;align-items:center!important;gap:9px!important;flex-wrap:wrap!important}
+body.admin-page-bg .ml-profile-actions button{min-height:36px!important}
+body.admin-page-bg .ml-profile-note{min-height:14px;margin:10px 0 0!important;color:var(--ml-muted)!important;font-size:10px!important;line-height:1.5!important;overflow-wrap:anywhere}
