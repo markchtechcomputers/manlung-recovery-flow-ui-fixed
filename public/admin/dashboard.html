@@ -4011,5 +4011,18 @@ body.admin-page-bg{
 })();
 </script>
 
+
+<style id="manlung-remove-admin-profile-call-donations-20261030">
+/* Keep these existing elements in the DOM for compatibility with their scripts,
+   but remove the profile, call-availability and donation panels from the dashboard UI. */
+#adminAppContainer #adminProfileEditor,
+#adminAppContainer #call-admin-section,
+#adminAppContainer #donations-section,
+#adminAppContainer .mrd-widget-grid,
+#adminAppContainer .top-header .profile{
+  display:none!important;
+}
+</style>
+
 </body>
 </html>
