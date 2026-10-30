@@ -181,25 +181,25 @@ body.ml-admin-menu-open{overflow:auto!important}
 <style id="access-accounts-grid-balance">#access-accounts-section .tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:650px){#access-accounts-section .tool-grid{grid-template-columns:1fr}}</style>
 
 <style id="tools-full-viewport-width-fix-20261030">
-/* Match the full-width admin dashboard instead of centering tools in a narrow column. */
-html,body.admin-page-bg{width:100%!important;max-width:none!important;margin:0!important}
+/* Full available admin canvas: fixed 110px navigation plus fluid content. */
+html,body.admin-page-bg{width:100%!important;max-width:none!important;margin:0!important;overflow-x:hidden!important}
 body.admin-page-bg{min-height:100vh!important}
-body.admin-page-bg .site-header,
-body.admin-page-bg .site-header>.container,
-body.admin-page-bg .tools-shell,
-body.admin-page-bg .manlung-footer,
-body.admin-page-bg .manlung-footer-inner{
-  width:100%!important;max-width:none!important;
-}
+body.admin-page-bg .ml-admin-sidebar{position:fixed!important;inset:0 auto 0 0!important;width:110px!important;height:100vh!important;max-height:100vh!important}
+body.admin-page-bg .site-header{display:none!important}
 body.admin-page-bg .tools-shell{
-  margin:0!important;padding-left:clamp(16px,2.2vw,34px)!important;
-  padding-right:clamp(16px,2.2vw,34px)!important;
+ width:calc(100% - 110px)!important;max-width:none!important;
+ margin:0 0 0 110px!important;
+ padding:28px clamp(18px,3vw,42px) 42px!important;
 }
-body.admin-page-bg .site-header>.container{
-  padding-left:clamp(16px,2.2vw,34px)!important;
-  padding-right:clamp(16px,2.2vw,34px)!important;
+body.admin-page-bg .manlung-footer{width:calc(100% - 110px)!important;margin-left:110px!important}
+body.admin-page-bg .manlung-footer-inner{width:100%!important;max-width:none!important}
+body.admin-page-bg .tools-shell .tool-grid{min-width:0!important}
+@media(max-width:700px){
+ body.admin-page-bg .ml-admin-sidebar{width:min(340px,88vw)!important}
+ body.admin-page-bg .tools-shell{width:100%!important;margin:0!important;padding:18px 16px 34px!important}
+ body.admin-page-bg .manlung-footer{width:100%!important;margin-left:0!important}
 }
-body.admin-page-bg .tool-grid{min-width:0}
+@media(max-width:560px){body.admin-page-bg .tools-shell{padding:13px 12px 25px!important}}
 </style>
 </head>
 <body class="admin-page-bg">
