@@ -72,7 +72,7 @@ async function sendClientWelcomeEmail(client, req) {
   const accountUsername = safe(client.username);
   const baseUrl = String(
     process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'
-  ).replace(/\\/$/, '');
+  ).replace(/\/$/, '');
   const portalUrl = `${baseUrl}/client/dashboard.html`;
   const logoUrl = `${baseUrl}/icons/icon-512.png`;
   const supportEmail = 'manlungrecovery@outlook.com';
