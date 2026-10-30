@@ -166,3 +166,93 @@ body.admin-page-bg #manlungDashboardBottomNote{display:none!important}
   body.admin-page-bg>main.tools-shell,
   body.admin-page-bg>main.music-shell{margin-left:68px!important}
 }
+
+
+/* Admin workspace shell refinement — consistent across every admin section. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+html:has(body.admin-page-bg){background:#edf4ff!important}
+body.admin-page-bg{
+  min-height:100vh!important; padding:22px 24px 28px 284px!important; box-sizing:border-box!important;
+  color:#17243b!important; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  background:
+    radial-gradient(ellipse at 12% 4%,rgba(96,165,250,.22),transparent 34%),
+    radial-gradient(ellipse at 92% 88%,rgba(147,197,253,.24),transparent 36%),
+    linear-gradient(135deg,#eaf2ff 0%,#f8fbff 52%,#e9f2ff 100%)!important;
+  background-attachment:fixed!important;
+}
+body.admin-page-bg .site-header{
+  position:fixed!important; inset:18px auto 18px 18px!important; width:244px!important;
+  height:auto!important; max-height:calc(100dvh - 36px)!important; overflow:auto!important;
+  box-sizing:border-box!important; padding:0!important; margin:0!important;
+  border:1px solid #dbe6f4!important; border-radius:22px!important;
+  background:rgba(255,255,255,.94)!important; color:#17243b!important;
+  box-shadow:0 18px 48px rgba(36,72,125,.13)!important; backdrop-filter:blur(16px)!important;
+}
+body.admin-page-bg .site-header>.container{
+  width:100%!important; max-width:none!important; min-height:100%!important; height:auto!important;
+  margin:0!important; padding:20px 14px!important; box-sizing:border-box!important;
+  display:flex!important; flex-direction:column!important; align-items:stretch!important;
+  justify-content:flex-start!important; gap:20px!important;
+}
+body.admin-page-bg .site-header .brand{display:flex!important;align-items:center!important;gap:11px!important;padding:2px 5px 15px!important;border-bottom:1px solid #e7edf5!important}
+body.admin-page-bg .site-header .brand h1,
+body.admin-page-bg .site-header .brand .manlung-brand-copy h1{color:#17243b!important;font-size:15px!important;font-weight:800!important}
+body.admin-page-bg .site-header .brand span,
+body.admin-page-bg .site-header .brand .manlung-brand-copy span{color:#64748b!important;font-size:11px!important}
+body.admin-page-bg .site-header .header-actions{
+  width:100%!important; display:flex!important; flex-direction:column!important;
+  align-items:stretch!important; justify-content:flex-start!important; gap:6px!important; margin:0!important;
+}
+body.admin-page-bg .site-header .header-actions>a,
+body.admin-page-bg .site-header .header-actions>button{
+  display:flex!important; align-items:center!important; justify-content:flex-start!important;
+  gap:11px!important; width:100%!important; min-width:0!important; min-height:43px!important;
+  margin:0!important; padding:10px 12px!important; box-sizing:border-box!important;
+  border:1px solid transparent!important; border-radius:11px!important;
+  background:transparent!important; color:#475569!important;
+  font:600 12.5px/1.25 Inter,system-ui,sans-serif!important; text-align:left!important;
+  text-decoration:none!important; white-space:normal!important; box-shadow:none!important;
+}
+body.admin-page-bg .site-header .header-actions>a:hover,
+body.admin-page-bg .site-header .header-actions>button:hover{background:#eff6ff!important;color:#1d4ed8!important}
+body.admin-page-bg .site-header .header-actions>a.active,
+body.admin-page-bg .site-header .header-actions>a[aria-current="page"]{background:#2563eb!important;color:#fff!important;border-color:#2563eb!important;box-shadow:0 7px 18px rgba(37,99,235,.18)!important}
+body.admin-page-bg .site-header .header-actions> a>i,
+body.admin-page-bg .site-header .header-actions>button>i{width:19px!important;min-width:19px!important;text-align:center!important;color:inherit!important}
+body.admin-page-bg>.container,
+body.admin-page-bg>main.container,
+body.admin-page-bg>main.wrap,
+body.admin-page-bg>main.tools-shell,
+body.admin-page-bg>main.music-shell{
+  width:100%!important; max-width:1400px!important; margin:0 auto!important;
+  padding:0 0 28px!important; box-sizing:border-box!important;
+}
+body.admin-page-bg>.container>.card,
+body.admin-page-bg>main>.card,
+body.admin-page-bg .card,
+body.admin-page-bg .stat-card,
+body.admin-page-bg .operations-card{
+  border:1px solid #e1eaf5!important; border-radius:17px!important;
+  background:rgba(255,255,255,.94)!important; color:#17243b!important;
+  box-shadow:0 9px 28px rgba(34,66,110,.065)!important;
+}
+body.admin-page-bg .table-wrap{max-width:100%!important;overflow:auto!important}
+body.admin-page-bg table{max-width:100%}
+body.admin-page-bg footer,body.admin-page-bg .site-footer,body.admin-page-bg .manlung-footer,
+body.admin-page-bg .manlung-footer-bottom,body.admin-page-bg #siteFooter,
+body.admin-page-bg #mainFooter,body.admin-page-bg #footer,
+body.admin-page-bg #manlungDashboardBottomNote{display:none!important}
+@media(max-width:760px){
+ body.admin-page-bg{padding:14px 12px 24px 78px!important}
+ body.admin-page-bg .site-header{inset:10px auto 10px 10px!important;width:58px!important;max-height:calc(100dvh - 20px)!important;border-radius:16px!important}
+ body.admin-page-bg .site-header>.container{padding:12px 5px!important;gap:12px!important}
+ body.admin-page-bg .site-header .brand{justify-content:center!important;padding:0 0 12px!important}
+ body.admin-page-bg .site-header .brand .manlung-brand-copy,
+ body.admin-page-bg .site-header .brand span{display:none!important}
+ body.admin-page-bg .site-header .brand img{width:38px!important;height:38px!important}
+ body.admin-page-bg .site-header .header-actions>a,
+ body.admin-page-bg .site-header .header-actions>button{justify-content:center!important;gap:0!important;padding:10px 3px!important;font-size:0!important}
+ body.admin-page-bg .site-header .header-actions>a>i,
+ body.admin-page-bg .site-header .header-actions>button>i{font-size:16px!important}
+}
+@media(max-width:420px){body.admin-page-bg{padding-left:76px!important;padding-right:8px!important}}
