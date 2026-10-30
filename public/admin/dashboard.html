@@ -641,41 +641,46 @@ html.dark .admin-song-meta,body.dark .admin-song-meta,html.dark .admin-music-sta
 html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;border-color:rgba(148,163,184,.16);}
 </style>    <link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261022">
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
-</head>
+<style id="manlung-reference-dashboard-v1">
+:root{--primary-blue:#0066ff;--primary-hover:#0052cc;--bg-light-blue:#e0f2fe;--bg-app:#f8fafc;--text-dark:#0f172a;--text-muted:#64748b;--border-color:#e2e8f0;--card-bg:#fff;--sidebar-width:260px}
+body.admin-page-bg{font-family:Inter,sans-serif!important;background:var(--bg-light-blue)!important;min-height:100vh!important;display:flex!important;justify-content:center!important;align-items:center!important;padding:20px!important;overflow:auto!important;color:var(--text-dark)}
+.bg-shape-1,.bg-shape-2{position:fixed;pointer-events:none;border-radius:50%;z-index:0}.bg-shape-1{top:-10%;right:-5%;width:50vw;height:50vw;background:#3b82f6;opacity:.55}.bg-shape-2{bottom:-20%;left:-10%;width:60vw;height:60vw;background:#fff;opacity:.45}
+#adminAppContainer{position:relative;z-index:1;width:100%;max-width:1400px;height:min(90vh,1100px);min-height:680px;background:rgba(255,255,255,.78);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.85);border-radius:24px;box-shadow:0 25px 50px -12px #0002;display:flex;overflow:hidden;margin:auto}
+#adminAppContainer>.sidebar{flex:0 0 260px;width:260px;background:#fff;border-right:1px solid var(--border-color);display:flex;flex-direction:column;padding:30px 18px;overflow-y:auto}
+#adminAppContainer .brand{font-size:18px;font-weight:800;color:var(--text-dark);margin:0 0 32px;padding:0 8px;display:flex;align-items:center;gap:10px}#adminAppContainer .brand i{color:var(--primary-blue);font-size:22px}
+#adminAppContainer .nav-menu{list-style:none;display:flex;flex-direction:column;gap:5px;margin:0;padding:0}#adminAppContainer .nav-item{display:flex;align-items:center;gap:13px;padding:11px 13px;color:var(--text-muted);text-decoration:none;font-size:13px;font-weight:600;border-radius:11px;white-space:nowrap}#adminAppContainer .nav-item:hover{background:var(--bg-app);color:var(--text-dark)}#adminAppContainer .nav-item.active{background:var(--primary-blue);color:#fff;box-shadow:0 4px 12px #0066ff4d}#adminAppContainer .nav-item i{width:20px;text-align:center;font-size:15px}#adminAppContainer .logout-wrapper{margin-top:auto;padding-top:20px}#adminAppContainer .admin-logout{color:#ef4444}
+#adminAppContainer>.main-content{flex:1;min-width:0;background:var(--bg-app);padding:28px 34px;overflow-y:auto;overflow-x:hidden}
+#adminAppContainer .top-header{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:0 0 25px;padding:0;background:transparent;border:0;box-shadow:none;position:static}
+#adminAppContainer .welcome-text{font-size:13px;color:var(--text-muted);margin:0 0 4px}#adminAppContainer .page-title{font-size:26px;font-weight:800;color:var(--text-dark);margin:0}#adminAppContainer .header-actions{display:flex;align-items:center;gap:18px}#adminAppContainer .search-bar{position:relative;width:min(300px,34vw)}#adminAppContainer .search-bar input{width:100%;padding:10px 14px 10px 38px;border:1px solid var(--border-color);border-radius:20px;background:#fff;font-size:12px}#adminAppContainer .search-bar>i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted)}#adminAppContainer .profile{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:var(--text-dark)}#adminAppContainer .profile img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+#adminAppContainer .admin-dashboard-content{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(280px,1fr);gap:20px;align-items:start}#adminAppContainer .admin-dashboard-content>.card{min-width:0;margin:0 0 0!important;border-radius:16px;background:#fff;border:1px solid #e2e8f0cc;box-shadow:0 4px 8px #0f172a08;padding:20px}
+#adminAppContainer #adminProfileEditor{grid-column:1/-1;display:flex!important;align-items:center;gap:14px;padding:14px 18px!important}#adminAppContainer .dashboard-call-card{grid-column:1;grid-row:2}#adminAppContainer .dashboard-cases-card{grid-column:1;grid-row:4}#adminAppContainer .dashboard-video-card{grid-column:2;grid-row:4;background:linear-gradient(135deg,#0066ff,#0044cc)!important;color:#fff!important}#adminAppContainer .dashboard-donations-card{grid-column:2;grid-row:2}#adminAppContainer .dashboard-stats-card{grid-column:2;grid-row:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0!important}
+#adminAppContainer .dashboard-stats-card .stat-card{background:#fff;border:1px solid var(--border-color);border-radius:14px;padding:15px;box-shadow:0 3px 8px #0f172a08}#adminAppContainer .card-title{font-size:15px;font-weight:700;color:var(--text-dark)}#adminAppContainer .filters-bar{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}#adminAppContainer .table-wrap{overflow-x:auto;max-width:100%}#adminAppContainer .admin-table{width:100%;border-collapse:collapse;font-size:12px;min-width:650px}#adminAppContainer .admin-table th{background:#f8fafc;color:var(--text-muted);font-weight:700;text-align:left;padding:11px 9px;border-bottom:1px solid var(--border-color)}#adminAppContainer .admin-table td{padding:12px 9px;border-bottom:1px solid var(--border-color);color:var(--text-dark)}
+#adminAppContainer .dashboard-video-card .card-title,#adminAppContainer .dashboard-video-card p{color:#fff!important}#adminAppContainer .dashboard-video-card input{background:#fff!important;color:#0f172a!important}#adminAppContainer .dashboard-video-card #videoControlStatus{color:#eaf2ff!important}#adminAppContainer #voiceLineStatus{color:var(--text-muted)!important}
+body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
+@media(max-width:1050px){body.admin-page-bg{align-items:flex-start;padding:12px!important}#adminAppContainer{height:auto;min-height:calc(100vh - 24px)}#adminAppContainer>.main-content{padding:22px}#adminAppContainer .admin-dashboard-content{grid-template-columns:minmax(0,1fr)}#adminAppContainer .dashboard-call-card,#adminAppContainer .dashboard-cases-card,#adminAppContainer .dashboard-video-card,#adminAppContainer .dashboard-donations-card,#adminAppContainer .dashboard-stats-card{grid-column:1;grid-row:auto}}
+@media(max-width:700px){body.admin-page-bg{padding:0!important}#adminAppContainer{width:100%;min-height:100vh;border-radius:0;border:0;flex-direction:column}#adminAppContainer>.sidebar{width:100%;flex:0 0 auto;padding:13px 12px;border-right:0;border-bottom:1px solid var(--border-color)}#adminAppContainer .brand{margin:0 0 10px;font-size:16px}#adminAppContainer .nav-menu{flex-direction:row;overflow-x:auto;padding-bottom:4px}#adminAppContainer .nav-item{padding:9px 11px;font-size:12px}#adminAppContainer .logout-wrapper{margin-top:8px;padding-top:0}#adminAppContainer>.main-content{padding:18px 13px}#adminAppContainer .top-header{align-items:flex-start;flex-direction:column}#adminAppContainer .header-actions{width:100%;justify-content:space-between;flex-wrap:wrap}#adminAppContainer .search-bar{width:100%}#adminAppContainer .page-title{font-size:22px}#adminAppContainer #adminProfileEditor{flex-wrap:wrap}}
+</style></head>
 <body class="admin-page-bg">
-    <header class="site-header">
-        <div class="container">
-            <div class="brand manlung-brand">
-                
-<img
-  class="manlung-site-logo admin-portal-logo"
-  src="/icons/icon-512.png"
-  alt="Manlung Recovery"
->
+    <div class="bg-shape-1" aria-hidden="true"></div><div class="bg-shape-2" aria-hidden="true"></div>
+<div class="app-container" id="adminAppContainer">
+<aside class="sidebar" aria-label="Admin sidebar">
+<div class="brand"><i class="fa-solid fa-shield-halved"></i><span>Manlung Recovery</span></div>
+<ul class="nav-menu">
+<li><a href="/admin/dashboard.html" class="nav-item active" aria-current="page"><i class="fa-solid fa-border-all"></i>Dashboard</a></li>
+<li><a href="#cases-section" class="nav-item"><i class="fa-solid fa-folder-open"></i>Cases</a></li>
+<li><a href="#donations-section" class="nav-item"><i class="fa-solid fa-hand-holding-dollar"></i>Donations</a></li>
+<li><a href="#call-admin-section" class="nav-item"><i class="fa-solid fa-phone"></i>Call Admin</a></li>
+<li><a href="/admin/owner.html" id="ownerLinkSidebar" class="nav-item owner-only"><i class="fa-solid fa-users-gear"></i>Admin Management</a></li>
+<li><a href="/admin/reports.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Reports</a></li>
+<li><a href="/admin/operations.html" class="nav-item"><i class="fa-solid fa-gears"></i>Operations</a></li>
+<li><a href="/admin/music.html" class="nav-item"><i class="fa-solid fa-music"></i>Music</a></li>
+<li><a href="/admin/tools.html" class="nav-item"><i class="fa-solid fa-screwdriver-wrench"></i>Tools</a></li>
+<li><a href="/admin/connect.html" class="nav-item"><i class="fa-brands fa-whatsapp"></i>WhatsApp Chats</a></li>
+<li><a href="/" class="nav-item"><i class="fa-solid fa-house"></i>Home</a></li>
+</ul><div class="logout-wrapper"><a href="/api/auth/admin/logout" class="nav-item admin-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i>Logout</a></div>
+</aside><main class="main-content"><header class="top-header"><div><p class="welcome-text">Welcome back, Admin!</p><h1 class="page-title">Dashboard Overview</h1></div><div class="header-actions"><label class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input id="dashboardQuickSearch" type="search" placeholder="Search name, phone, email, case ID, IMEI…" aria-label="Search cases"></label><div class="profile"><img class="admin-profile-avatar" src="/icons/icon-512.png" alt="Admin profile"><span class="admin-profile-name">Admin</span></div></div></header>
 
-                <div class="manlung-brand-copy">
-                    <h1>Manlung Recovery</h1>
-                    <span>Admin Dashboard · Case management</span>
-                </div>
-            </div>
-            <nav class="header-actions" aria-label="Admin navigation">
-                <a class="btn btn-outline active" href="/admin/dashboard.html" aria-current="page"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Dashboard</a>
-                <a class="btn btn-outline" href="#cases-section"><i class="fa-solid fa-folder-open" aria-hidden="true"></i> Cases</a>
-                <a class="btn btn-outline" href="#donations-section"><i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i> Donations</a>
-                <a class="btn btn-outline" href="#call-admin-section"><i class="fa-solid fa-phone-volume" aria-hidden="true"></i> Call Admin</a>
-                <a href="/admin/owner.html" id="ownerLink" class="btn btn-outline owner-only"><i class="fa-solid fa-user-shield" aria-hidden="true"></i> Admin Management</a>
-                <a class="btn btn-outline" href="/admin/reports.html"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Reports</a>
-                <a class="btn btn-outline" href="/admin/operations.html"><i class="fa-solid fa-list-check" aria-hidden="true"></i> Operations</a>
-                <a class="btn btn-outline" href="/admin/music.html"><i class="fa-solid fa-music" aria-hidden="true"></i> Music</a>
-                <a class="btn btn-outline" href="/admin/tools.html"><i class="fa-solid fa-toolbox" aria-hidden="true"></i> Tools</a>
-                <a class="btn btn-outline" href="/admin/connect.html" aria-label="Open WhatsApp Chats"><i class="fa-solid fa-comments" aria-hidden="true"></i> WhatsApp Chats</a>
-                <a href="/" class="btn btn-outline"><i class="fa-solid fa-house" aria-hidden="true"></i> Home</a>
-                <button class="btn btn-danger" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Logout</button>
-            </nav>
-        </div>
-    </header>
-
-    <div class="container">
+    <div class="admin-dashboard-content">
         <section id="adminProfileEditor" class="card" style="margin:0 0 1rem;padding:1rem 1.15rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
             <img id="adminProfilePreview" src="/icons/icon-512.png" alt="Admin profile picture" style="width:58px;height:58px;border-radius:50%;object-fit:cover;border:2px solid #dbeafe;background:#eff6ff">
             <div style="flex:1;min-width:180px">
@@ -688,7 +693,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             <button id="saveAdminProfile" type="button" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save profile</button>
             <span id="adminProfileStatus" role="status" aria-live="polite" style="flex-basis:100%;font-size:.82rem;color:#64748b"></span>
         </section>
-        <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div class="card dashboard-call-card" id="call-admin-section" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
             <div>
                 <div class="card-title" style="margin-bottom:0.2rem;"><i class="fas fa-phone-volume"></i> Call Admin — Availability</div>
                 <p style="color:var(--text-muted); font-size:0.85rem; margin:0;" id="voiceLineStatus">Go online to receive Call Admin requests. Calls are queued when all admins are busy; the first available admin can accept the next caller. Each Admin can actively manage up to 10 cases at a time.</p>
@@ -700,7 +705,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
 
 
         
-        <div class="card" style="margin-bottom:1rem; border:1px solid #bfdbfe;">
+        <div class="card dashboard-video-card" id="video-call-section" style="margin-bottom:1rem; border:1px solid #bfdbfe;">
             <div class="card-title"><i class="fas fa-video"></i> Case Video Call Control</div>
             <p style="color:var(--text-muted);margin:.35rem 0 .8rem;">Video calls are <strong>OFF by default</strong>. Enable them only for the specific case that needs a secure browser video connection.</p>
             <div class="video-control-actions">
@@ -712,7 +717,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             <div id="videoControlStatus" style="margin-top:.65rem;color:var(--text-muted);">No case selected.</div>
         </div>
 
-        <div class="card" style="margin-bottom:1rem;">
+        <div class="card dashboard-donations-card" id="donations-section" style="margin-bottom:1rem;">
             <div class="card-title"><i class="fas fa-heart"></i> Donation Dashboard</div>
             <div class="stats-grid" style="margin-top:0.8rem;">
                 <div class="stat-card"><div class="number" id="donationTotal">KES 0</div><div class="label">Confirmed donations</div></div>
@@ -726,7 +731,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             </div>
         </div>
 
-        <div class="stats-grid" id="statsGrid">
+        <div class="stats-grid dashboard-stats-card" id="statsGrid">
             <div class="stat-card"><div class="number" id="statTotal">0</div><div class="label">Total</div></div>
             <div class="stat-card" style="cursor:pointer;" onclick="quickFilter('unread')"><div class="number" id="statUnread" style="color:var(--accent);">0</div><div class="label">Unread</div></div>
             <div class="stat-card"><div class="number" id="statPending">0</div><div class="label">Pending</div></div>
@@ -735,7 +740,7 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             <div class="stat-card"><div class="number" id="statRejected">0</div><div class="label">Rejected</div></div>
         </div>
 
-        <div class="card">
+        <div class="card dashboard-cases-card" id="cases-section">
             <div class="card-title"><i class="fas fa-folder-open"></i> All Cases</div>
 
             <div class="filters-bar">
@@ -818,6 +823,8 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
             </div>
         </div>
     </div>
+
+    </main></div>
 
     <!-- Case detail modal -->
     <div id="modalOverlay" class="modal-overlay" style="display:none;" onclick="if(event.target===this) closeModal()">
@@ -3476,5 +3483,5 @@ body.admin-page-bg .ml-admin-sidebar .header-actions .manlung-ai-tab{
 })();
 </script>
 
-</body>
+<script id="admin-dashboard-search-bridge">(function(){var q=document.getElementById('dashboardQuickSearch'),s=document.getElementById('searchInput');if(q&&s){q.addEventListener('input',function(){s.value=q.value;s.dispatchEvent(new Event('input',{bubbles:true}));});q.addEventListener('keydown',function(e){if(e.key==='Enter'){s.value=q.value;if(typeof loadCases==='function')loadCases(1);}});}var n=document.querySelector('.admin-profile-name'),a=document.querySelector('.admin-profile-avatar'),en=document.getElementById('adminDisplayName'),ea=document.getElementById('adminProfilePreview');function sync(){if(n&&en&&en.value)n.textContent=en.value;if(a&&ea&&ea.src)a.src=ea.src;}if(en)en.addEventListener('input',sync);if(ea&&a)new MutationObserver(sync).observe(ea,{attributes:true,attributeFilter:['src']});document.addEventListener('DOMContentLoaded',sync);})();</script></body>
 </html>
