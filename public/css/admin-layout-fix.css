@@ -1,82 +1,157 @@
-/* Shared admin section cleanup: no public footer inside admin workspace. */
-footer.manlung-footer,
-footer.site-footer,
-.site-footer,
-.manlung-footer,
-#manlungDashboardBottomNote { display:none !important; }
+/* Manlung Recovery admin dashboard layout v2
+   Layout-only overrides. Existing dashboard functionality and IDs are preserved. */
+*,*::before,*::after{box-sizing:border-box}
+html,body{width:100%;max-width:100%;min-height:100%;margin:0;overflow-x:hidden}
+body.admin-page-bg{min-width:320px}
+body.admin-page-bg img,body.admin-page-bg svg,body.admin-page-bg video{max-width:100%}
 
-/* Keep the admin navigation stable and the content aligned beside it. */
-body.admin-page-bg .site-header {
-  position:fixed !important; inset:0 auto 0 0 !important;
-  width:260px !important; height:100dvh !important; max-height:100dvh !important;
-  overflow-x:hidden !important; overflow-y:auto !important;
-  z-index:1000 !important; margin:0 !important;
+/* Off-canvas navigation: hidden until the hamburger is pressed */
+body.admin-page-bg .site-header{
+  position:fixed!important;top:0!important;right:auto!important;bottom:0!important;left:0!important;
+  width:min(285px,88vw)!important;height:100dvh!important;max-height:100dvh!important;
+  margin:0!important;padding:18px 14px!important;overflow-x:hidden!important;overflow-y:auto!important;
+  z-index:2147483001!important;background:#0b1728!important;color:#f8fafc!important;
+  border:0!important;box-shadow:18px 0 48px rgba(2,6,23,.24)!important;
+  transform:translateX(-105%)!important;transition:transform .26s ease!important;
 }
-body.admin-page-bg .site-header > .container {
-  width:100% !important; max-width:none !important; min-height:100% !important;
-  height:auto !important; margin:0 !important; display:flex !important;
-  flex-direction:column !important; align-items:stretch !important;
-  justify-content:flex-start !important; flex-wrap:nowrap !important;
+body.admin-page-bg .site-header.ml-sidebar-open{transform:translateX(0)!important}
+body.admin-page-bg .site-header>.container{
+  width:100%!important;max-width:none!important;height:auto!important;min-height:100%!important;
+  margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;
+  align-items:stretch!important;justify-content:flex-start!important;gap:18px!important;flex-wrap:nowrap!important;
 }
-body.admin-page-bg .site-header .header-actions {
-  width:100% !important; display:flex !important; flex-direction:column !important;
-  align-items:stretch !important; justify-content:flex-start !important;
-  flex-wrap:nowrap !important; gap:5px !important; margin:0 !important;
+body.admin-page-bg .site-header .brand{
+  display:flex!important;align-items:center!important;gap:11px!important;width:100%!important;
+  max-width:100%!important;min-width:0!important;padding:4px 5px 18px!important;
+  border-bottom:1px solid rgba(148,163,184,.2)!important;
 }
-body.admin-page-bg .site-header .header-actions > a,
-body.admin-page-bg .site-header .header-actions > button {
-  width:100% !important; max-width:100% !important; min-width:0 !important;
-  min-height:44px !important; flex:0 0 auto !important; align-self:stretch !important;
-  display:flex !important; flex-direction:row !important; align-items:center !important;
-  justify-content:flex-start !important; gap:11px !important; margin:0 !important;
-  padding:11px 13px !important; text-align:left !important; white-space:normal !important;
-  transform:none !important;
+body.admin-page-bg .site-header .manlung-site-logo{width:42px!important;height:42px!important;flex:0 0 42px!important}
+body.admin-page-bg .site-header .manlung-brand-copy{display:block!important;min-width:0!important}
+body.admin-page-bg .site-header .brand h1{color:#fff!important;font-size:15px!important;line-height:1.25!important}
+body.admin-page-bg .site-header .brand span{display:block!important;color:#9fb1c8!important;font-size:11px!important}
+body.admin-page-bg .site-header .header-actions{
+  display:flex!important;flex:0 0 auto!important;flex-direction:column!important;align-items:stretch!important;
+  justify-content:flex-start!important;gap:6px!important;width:100%!important;max-width:100%!important;
+  margin:0!important;padding:0!important;flex-wrap:nowrap!important;
 }
-body.admin-page-bg .site-header .header-actions > a > i,
-body.admin-page-bg .site-header .header-actions > button > i {
-  flex:0 0 19px !important; width:19px !important; min-width:19px !important;
-  text-align:center !important; margin:0 !important;
+body.admin-page-bg .site-header .header-actions>a,
+body.admin-page-bg .site-header .header-actions>button{
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;min-height:43px!important;height:auto!important;
+  margin:0!important;padding:10px 12px!important;border:1px solid rgba(148,163,184,.15)!important;
+  border-radius:10px!important;background:rgba(255,255,255,.045)!important;color:#dbe7f5!important;
+  font-size:12px!important;font-weight:650!important;line-height:1.35!important;text-align:left!important;
+  text-decoration:none!important;white-space:normal!important;box-shadow:none!important;
 }
-body.admin-page-bg > .container,
-body.admin-page-bg > main.container,
-body.admin-page-bg > main.wrap,
-body.admin-page-bg > main.tools-shell,
-body.admin-page-bg > main.music-shell {
-  margin-left:260px !important; width:auto !important; max-width:none !important;
+body.admin-page-bg .site-header .header-actions>a:hover,
+body.admin-page-bg .site-header .header-actions>button:hover{background:#1e3a5f!important;color:#fff!important}
+body.admin-page-bg .site-header .header-actions i{display:inline-block!important;width:19px!important;min-width:19px!important;text-align:center!important;color:#93c5fd!important;font-size:14px!important}
+body.admin-page-bg .site-header .header-actions .btn-danger{background:rgba(185,28,28,.18)!important;color:#fecaca!important;border-color:rgba(248,113,113,.25)!important}
+
+/* Overlay and top navigation */
+.ml-dashboard-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(2,8,23,.52);opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease}
+.ml-dashboard-overlay.is-visible{opacity:1;visibility:visible}
+body.ml-dashboard-menu-open{overflow:hidden}
+.ml-dashboard-topbar{
+  position:sticky;top:0;z-index:900;width:100%;min-height:76px;padding:12px clamp(14px,2.4vw,30px);
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  background:rgba(255,255,255,.94);border-bottom:1px solid #e5eaf1;
+  box-shadow:0 4px 18px rgba(15,23,42,.035);backdrop-filter:blur(12px);
 }
-@media(max-width:700px) {
-  body.admin-page-bg .site-header { width:220px !important; }
-  body.admin-page-bg .site-header > .container { padding:14px 10px !important; }
-  body.admin-page-bg .site-header .brand { justify-content:flex-start !important; }
-  body.admin-page-bg .site-header .brand .manlung-brand-copy { display:block !important; }
-  body.admin-page-bg .site-header .header-actions > a,
-  body.admin-page-bg .site-header .header-actions > button {
-    justify-content:flex-start !important; padding:10px 11px !important;
-    font-size:12px !important; gap:9px !important;
-  }
-  body.admin-page-bg > .container,
-  body.admin-page-bg > main.container,
-  body.admin-page-bg > main.wrap,
-  body.admin-page-bg > main.tools-shell,
-  body.admin-page-bg > main.music-shell {
-    margin-left:220px !important; padding-left:12px !important; padding-right:12px !important;
-  }
+.ml-dashboard-topbar-left{display:flex;align-items:center;gap:14px;min-width:0}
+.ml-dashboard-menu-button{
+  display:inline-flex;align-items:center;justify-content:center;flex:0 0 42px;width:42px;height:42px;
+  border:1px solid #dce3ed;border-radius:11px;background:#fff;color:#17263b;
+  font-size:21px;cursor:pointer;box-shadow:0 2px 7px rgba(15,23,42,.04)
 }
-@media(max-width:420px) {
-  body.admin-page-bg .site-header { width:68px !important; }
-  body.admin-page-bg .site-header > .container { padding:12px 6px !important; }
-  body.admin-page-bg .site-header .brand .manlung-brand-copy,
-  body.admin-page-bg .site-header .brand span { display:none !important; }
-  body.admin-page-bg .site-header .brand { justify-content:center !important; padding-inline:0 !important; }
-  body.admin-page-bg .site-header .header-actions > a,
-  body.admin-page-bg .site-header .header-actions > button {
-    justify-content:center !important; padding:10px 4px !important; font-size:0 !important;
-  }
-  body.admin-page-bg .site-header .header-actions > a > i,
-  body.admin-page-bg .site-header .header-actions > button > i { font-size:15px !important; }
-  body.admin-page-bg > .container,
-  body.admin-page-bg > main.container,
-  body.admin-page-bg > main.wrap,
-  body.admin-page-bg > main.tools-shell,
-  body.admin-page-bg > main.music-shell { margin-left:68px !important; }
+.ml-dashboard-menu-button:hover{background:#f1f5f9}
+.ml-dashboard-heading{min-width:0}
+.ml-dashboard-heading strong{display:block;color:#17263b;font-size:15px;font-weight:800;line-height:1.35}
+.ml-dashboard-heading span{display:block;margin-top:3px;color:#718096;font-size:11px}
+.ml-dashboard-search{width:min(390px,40vw);min-width:210px}
+.ml-dashboard-search input{width:100%!important;min-width:0!important;height:42px!important;margin:0!important;padding:10px 13px!important;border:1px solid #dce3ed!important;border-radius:10px!important;background:#f8fafc!important;color:#17263b!important;font-size:12px!important;outline:none}
+.ml-dashboard-search input:focus{border-color:#3b82f6!important;background:#fff!important;box-shadow:0 0 0 3px rgba(59,130,246,.1)!important}
+
+/* Main dashboard canvas */
+body.admin-page-bg>.container{
+  display:block!important;width:100%!important;max-width:none!important;min-width:0!important;
+  margin:0!important;padding:24px clamp(14px,2.4vw,30px) 34px!important;
+}
+body.admin-page-bg>.container>.card{min-width:0}
+.ml-dashboard-widgets{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-items:stretch!important;gap:18px!important;margin:0 0 20px!important;width:100%!important;
+}
+.ml-dashboard-widgets>.card{min-width:0!important;width:100%!important;margin:0!important;overflow:hidden!important}
+.ml-dashboard-profile .ml-profile-row{display:flex;align-items:center;gap:13px;margin:8px 0 18px}
+.ml-dashboard-profile .ml-profile-avatar{width:48px;height:48px;flex:0 0 48px;border-radius:14px;display:grid;place-items:center;background:#e8f0ff;color:#1d4ed8;font-weight:900;font-size:17px}
+.ml-dashboard-profile .ml-profile-name{font-weight:800;font-size:14px;color:var(--text,#17263b)}
+.ml-dashboard-profile .ml-profile-caption{font-size:11px;color:var(--text-muted,#64748b);margin-top:4px}
+.ml-dashboard-profile .ml-profile-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ml-dashboard-profile .ml-profile-actions button{min-height:36px}
+#call-admin{min-width:0}
+#donations{min-width:0}
+#donations .table-wrap{max-width:100%;overflow-x:auto}
+#donations .admin-table{min-width:540px;width:100%}
+
+/* Statistics and full-width case table */
+body.admin-page-bg #statsGrid{
+  display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  gap:12px!important;width:100%!important;margin:0 0 20px!important;
+}
+body.admin-page-bg #statsGrid>.stat-card{min-width:0!important;margin:0!important}
+body.admin-page-bg #statsGrid .number{font-size:clamp(20px,2vw,28px)}
+body.admin-page-bg>.container>.card:has(#casesTableBody){display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0 0 20px!important}
+body.admin-page-bg .filters-bar{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important;min-width:0!important}
+body.admin-page-bg .filters-bar>*{min-width:0!important;max-width:100%}
+body.admin-page-bg .table-wrap.cases-scroll{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:auto!important;overflow-y:visible!important;overscroll-behavior-x:contain}
+body.admin-page-bg .cases-scroll>.admin-table{width:100%!important;min-width:1080px!important;table-layout:auto!important}
+body.admin-page-bg .cases-scroll .admin-table th,
+body.admin-page-bg .cases-scroll .admin-table td{white-space:normal;vertical-align:middle}
+body.admin-page-bg .cases-scroll .admin-table th:nth-child(1),
+body.admin-page-bg .cases-scroll .admin-table td:nth-child(1),
+body.admin-page-bg .cases-scroll .admin-table th:nth-child(2),
+body.admin-page-bg .cases-scroll .admin-table td:nth-child(2),
+body.admin-page-bg .cases-scroll .admin-table th:nth-child(7),
+body.admin-page-bg .cases-scroll .admin-table td:nth-child(7){white-space:nowrap}
+body.admin-page-bg .cases-scroll .admin-table td:last-child{min-width:140px}
+body.admin-page-bg .cases-scroll .admin-table button{white-space:nowrap}
+
+/* Video controls sit immediately after the cases card */
+#video-control-card{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important}
+#video-control-card .video-control-actions{
+  display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important;width:100%!important;min-width:0!important
+}
+#video-control-card .video-control-actions input{
+  flex:1 1 260px!important;width:auto!important;min-width:min(220px,100%)!important;max-width:100%!important
+}
+#video-control-card .video-control-actions button{flex:0 0 auto!important;min-height:40px!important;white-space:nowrap!important}
+#videoControlStatus{overflow-wrap:anywhere}
+
+/* General overflow safety */
+body.admin-page-bg .card{min-width:0;max-width:100%}
+body.admin-page-bg .card-title{line-height:1.4}
+body.admin-page-bg .admin-table{border-collapse:collapse}
+@media(max-width:1100px){
+  .ml-dashboard-widgets{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.admin-page-bg #statsGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:700px){
+  .ml-dashboard-topbar{min-height:68px;align-items:flex-start;flex-direction:column;gap:10px;padding:11px 13px}
+  .ml-dashboard-topbar-left{width:100%}
+  .ml-dashboard-search{width:100%;min-width:0}
+  body.admin-page-bg>.container{padding:15px 12px 26px!important}
+  .ml-dashboard-widgets{grid-template-columns:minmax(0,1fr)!important;gap:13px!important}
+  body.admin-page-bg #statsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  #video-control-card .video-control-actions{align-items:stretch!important;flex-direction:column!important}
+  #video-control-card .video-control-actions input,
+  #video-control-card .video-control-actions button{width:100%!important;min-width:0!important;flex:1 1 auto!important}
+}
+@media(max-width:380px){
+  .ml-dashboard-heading strong{font-size:13px}
+  .ml-dashboard-heading span{font-size:10px}
+  body.admin-page-bg #statsGrid{grid-template-columns:1fr 1fr!important}
+}
+@media(prefers-reduced-motion:reduce){
+  body.admin-page-bg .site-header,.ml-dashboard-overlay{transition:none!important}
 }
