@@ -1,10 +1,16 @@
 (() => {
   const DISMISS_KEY = 'manlung-app-install-dismissed-v3';
 
-  // Keep Android/mobile browser Back inside the website instead of closing
-  // the tab/app when a visitor opens a deep link or reaches the home page.
+  // Preserve the normal browser history inside the Admin Portal.
+  // The public-site back guard must never send an Admin page to the clients' home page.
+  function isAdminRoute() {
+    return window.location.pathname === '/admin' ||
+      window.location.pathname.startsWith('/admin/');
+  }
+
+  // Keep the public website's existing mobile Back behavior.
   function installMobileBackNavigation() {
-    if (window.__manlungBackNavigationInstalled) return;
+    if (window.__manlungBackNavigationInstalled || isAdminRoute()) return;
     window.__manlungBackNavigationInstalled = true;
 
     const homePath = '/';
@@ -37,7 +43,8 @@
   // only fall back to the homepage when there is no previous entry.
   function installCapacitorBackButton() {
     const appPlugin = window.Capacitor?.Plugins?.App;
-    if (!appPlugin || window.__manlungCapacitorBackInstalled) return;
+    // Admin navigation should follow its own page history, not fall back to public Home.
+    if (isAdminRoute() || !appPlugin || window.__manlungCapacitorBackInstalled) return;
     window.__manlungCapacitorBackInstalled = true;
 
     try {
