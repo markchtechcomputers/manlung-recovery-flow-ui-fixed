@@ -7,7 +7,7 @@
   <meta name="description" content="Manlung Recovery Admin Music Center">
   <title>Admin Music Center · Manlung Recovery</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261022">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-512.png?v=20261030">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="/css/admin-layout-fix.css?v=20261022">
@@ -120,7 +120,7 @@
   </style>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
 </head>
-<body>
+<body class="admin-page-bg">
   <div class="app-container">
     <aside class="sidebar">
       <div class="logo-area">
@@ -128,11 +128,18 @@
         <div><div class="logo-icon">MANLUNG</div><div class="logo-subtitle">RECOVERY · ADMIN</div></div>
       </div>
       <nav class="nav-menu" aria-label="Admin navigation">
-        <a href="/admin/dashboard.html" class="nav-item"><i class="fas fa-border-all"></i><span>Dashboard</span></a>
-        <a href="/admin/reports.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Reports</span></a>
-        <a href="/admin/operations.html" class="nav-item"><i class="fas fa-briefcase"></i><span>Operations</span></a>
-        <a href="/admin/tools.html" class="nav-item"><i class="fas fa-toolbox"></i><span>Tools</span></a>
-        <a href="/admin/music.html" class="nav-item active" aria-current="page"><i class="fas fa-music"></i><span>Music</span></a>
+        <a href="/admin/dashboard.html" class="nav-item"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+        <a href="/admin/dashboard.html#cases-section" class="nav-item"><i class="fa-solid fa-folder-open"></i><span>Cases</span></a>
+        <a href="/admin/dashboard.html#donations-section" class="nav-item"><i class="fa-solid fa-hand-holding-heart"></i><span>Donations</span></a>
+        <a href="/admin/dashboard.html#call-admin-section" class="nav-item"><i class="fa-solid fa-phone-volume"></i><span>Call Admin</span></a>
+        <a href="/admin/owner.html" class="nav-item"><i class="fa-solid fa-user-shield"></i><span>Admin Management</span></a>
+        <a href="/admin/reports.html" class="nav-item"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
+        <a href="/admin/operations.html" class="nav-item"><i class="fa-solid fa-list-check"></i><span>Operations</span></a>
+        <a href="/admin/music.html" class="nav-item active" aria-current="page"><i class="fa-solid fa-music"></i><span>Music</span></a>
+        <a href="/admin/tools.html" class="nav-item"><i class="fa-solid fa-toolbox"></i><span>Tools</span></a>
+        <a href="/admin/connect.html" class="nav-item"><i class="fa-solid fa-comments"></i><span>WhatsApp Chats</span></a>
+        <a href="/" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="/api/auth/admin/logout" class="nav-item"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
       </nav>
       <div class="section-title">Mood Selector</div>
       <div class="mood-grid">
