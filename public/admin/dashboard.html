@@ -676,6 +676,18 @@ html.dark .admin-music-queue,body.dark .admin-music-queue{background:#0a131e;bor
     </header>
 
     <div class="container">
+        <section id="adminProfileEditor" class="card" style="margin:0 0 1rem;padding:1rem 1.15rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+            <img id="adminProfilePreview" src="/icons/icon-512.png" alt="Admin profile picture" style="width:58px;height:58px;border-radius:50%;object-fit:cover;border:2px solid #dbeafe;background:#eff6ff">
+            <div style="flex:1;min-width:180px">
+                <strong style="display:block;margin-bottom:.35rem">Admin profile</strong>
+                <label for="adminDisplayName" style="font-size:.8rem;color:#64748b">Display name</label>
+                <input id="adminDisplayName" maxlength="80" autocomplete="name" placeholder="Your display name" style="width:100%;max-width:380px;display:block;margin-top:.25rem">
+            </div>
+            <label for="adminProfilePhoto" class="btn btn-outline" style="cursor:pointer"><i class="fa-solid fa-camera"></i> Change photo</label>
+            <input id="adminProfilePhoto" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+            <button id="saveAdminProfile" type="button" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save profile</button>
+            <span id="adminProfileStatus" role="status" aria-live="polite" style="flex-basis:100%;font-size:.82rem;color:#64748b"></span>
+        </section>
         <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
             <div>
                 <div class="card-title" style="margin-bottom:0.2rem;"><i class="fas fa-phone-volume"></i> Call Admin — Availability</div>
@@ -3413,6 +3425,56 @@ body.admin-page-bg .ml-admin-sidebar .header-actions .manlung-ai-tab{
  margin-inline:0!important;
 }
 </style>
+
+
+<script id="admin-profile-editor">
+(function(){
+ const nameEl=document.getElementById('adminDisplayName');
+ const photoEl=document.getElementById('adminProfilePhoto');
+ const preview=document.getElementById('adminProfilePreview');
+ const status=document.getElementById('adminProfileStatus');
+ const save=document.getElementById('saveAdminProfile');
+ if(!nameEl||!photoEl||!preview||!status||!save)return;
+ let avatar=null;
+ const say=(s,bad=false)=>{status.textContent=s;status.style.color=bad?'#b91c1c':'#64748b'};
+ async function load(){
+  try{
+   const r=await fetch('/api/community/profile',{credentials:'include',cache:'no-store'});
+   const d=await r.json();
+   if(!r.ok||!d.success)throw new Error(d.error||'Could not load profile');
+   nameEl.value=d.profile?.name||d.profile?.display_name||'';
+   if(d.profile?.avatar)preview.src=d.profile.avatar;
+   else if(d.profile?.avatar_url)preview.src=d.profile.avatar_url;
+  }catch(e){say('Profile could not be loaded. Sign in again if your session has expired.',true)}
+ }
+ photoEl.addEventListener('change',()=>{
+  const file=photoEl.files&&photoEl.files[0];if(!file)return;
+  if(!/^image\/(jpeg|png|webp)$/i.test(file.type)){say('Choose a JPG, PNG or WebP image.',true);photoEl.value='';return}
+  if(file.size>8*1024*1024){say('Choose an image smaller than 8 MB.',true);photoEl.value='';return}
+  const url=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{
+   const canvas=document.createElement('canvas'),scale=Math.min(1,512/Math.max(img.width,img.height));
+   canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
+   canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+   avatar=canvas.toDataURL('image/jpeg',.78);preview.src=avatar;URL.revokeObjectURL(url);say('Photo ready. Save profile to apply it.');
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);say('Could not read that image.',true)};
+  img.src=url;
+ });
+ save.addEventListener('click',async()=>{
+  const display_name=nameEl.value.trim();if(!display_name){say('Enter a display name.',true);return}
+  save.disabled=true;say('Saving profile…');
+  try{
+   const payload={display_name};if(avatar)payload.avatar_url=avatar;
+   const r=await fetch('/api/community/profile',{method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+   const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Profile save failed');
+   avatar=null;say('Profile saved successfully.');
+  }catch(e){say(e.message||'Could not save profile.',true)}
+  finally{save.disabled=false}
+ });
+ load();
+})();
+</script>
 
 </body>
 </html>
