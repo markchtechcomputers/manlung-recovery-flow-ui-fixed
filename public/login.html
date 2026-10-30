@@ -2352,54 +2352,44 @@ async function setupOfficialGoogleButtons(){
   }
 }
 
-async function startSocialSignup(provider){
-  if(!['github','discord'].includes(provider))return;
+const socialSignInLocks = new Set();
 
-  localStorage.removeItem('clientUser');
-  try { sessionStorage.setItem('manlungOAuthProvider', provider); } catch (_) {}
-
-  try{
-    const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
-
-    if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){
-      throw new Error('Supabase authentication is not configured.');
-    }
-
-    const supabase=window.supabase.createClient(
-      cfg.supabaseUrl,
-      cfg.supabaseAnonKey,
-      {
-        auth:{
-          persistSession:true,
-          autoRefreshToken:true,
-          detectSessionInUrl:true,
-          flowType:'implicit',
-          storage:window.localStorage
-        }
-      }
-    );
-
-    const {error}=await supabase.auth.signInWithOAuth({
-      provider,
-      options:{
-        redirectTo:window.location.origin+'/oauth-callback.html'
-      }
+async function startSocialSignup(provider, sourceButton){
+  if(!['github','discord'].includes(provider) || socialSignInLocks.has(provider)) return;
+  socialSignInLocks.add(provider);
+  const buttons = ['githubLoginBtn','githubRegisterBtn','discordLoginBtn','discordRegisterBtn']
+    .map(id => document.getElementById(id)).filter(Boolean);
+  const previous = buttons.map(button => ({button, disabled:button.disabled}));
+  buttons.forEach(button => { button.disabled = true; button.setAttribute('aria-busy','true'); });
+  const target = document.getElementById(document.getElementById('registerPanel')?.hidden ? 'loginError' : 'registerError');
+  try {
+    if(target) showMessage(target,'Connecting securely to '+(provider==='github'?'GitHub':'Discord')+'…','info');
+    localStorage.removeItem('clientUser');
+    try { sessionStorage.setItem('manlungOAuthProvider', provider); } catch (_) {}
+    const response = await fetch('/api/config/public',{cache:'no-store',headers:{Accept:'application/json'}});
+    const cfg = await response.json();
+    if(!response.ok || !cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error(cfg.error || 'Social sign-in is not configured.');
+    if(!window.supabase?.createClient) throw new Error('The secure sign-in library is still loading. Please try again.');
+    const client = window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit',storage:window.localStorage}
     });
-
-    if(error)throw error;
-  }catch(err){
-    const target=document.getElementById('loginError');
-    showMessage(
-      target,
-      err.message||'GitHub authentication could not be started.'
-    );
+    const {error}=await client.auth.signInWithOAuth({
+      provider,
+      options:{redirectTo:new URL('/oauth-callback.html',window.location.origin).href}
+    });
+    if(error) throw error;
+  } catch(err) {
+    try { sessionStorage.removeItem('manlungOAuthProvider'); } catch (_) {}
+    if(target) showMessage(target,err?.message || (provider==='github'?'GitHub':'Discord')+' sign-in could not be started.','error');
+    socialSignInLocks.delete(provider);
+    previous.forEach(({button,disabled})=>{button.disabled=disabled;button.removeAttribute('aria-busy');});
   }
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
   setupOfficialGoogleButtons();
-  ['githubLoginBtn','githubRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('github')));
-  ['discordLoginBtn','discordRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>startSocialSignup('discord')));
+  ['githubLoginBtn','githubRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',event=>startSocialSignup('github',event.currentTarget)));
+  ['discordLoginBtn','discordRegisterBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',event=>startSocialSignup('discord',event.currentTarget)));
 });
 async function handleSocialCallback(){
   if(!window.supabase?.createClient)return;
