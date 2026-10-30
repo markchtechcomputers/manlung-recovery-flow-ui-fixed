@@ -353,10 +353,70 @@ router.post('/invitations', [body('email').trim().isEmail().normalizeEmail()], a
   try {
     const active = (await User.listAdminsAndOwner()).filter(x => x.role === 'admin' && x.admin_status === 'active').length;
     if (active >= MAX_ADMINS) return res.status(409).json({ error: `Maximum of ${MAX_ADMINS} active administrators reached.` });
-    const invitation = await AdminInvitation.create({ email: req.body.email, invitedBy: req.user.id });
-    const link =
-      `https://manlungrecovery.manlungshop.co.ke/admin/register.html?token=${encodeURIComponent(invitation.token)}&email=${encodeURIComponent(req.body.email)}`;
-    const mail = await sendEmail({ to:req.body.email, subject:'Manlung Recovery admin invitation', html:`<p>You have been invited to join the Manlung Recovery Admin portal.</p><p><a href="${link}">Complete your Admin registration</a></p><p>This invitation expires in 48 hours.</p>` });
+    const invitation = await AdminInvitation.create({ email: req.body.email, invitedBy: req.user.id, ttlHours: 48 });
+    const baseUrl = String(process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke').replace(/\\/$/, '');
+    // The invitation token is the only credential in this URL. The invited
+    // email is resolved server-side from the hashed token and is never trusted
+    // from a query-string parameter.
+    const link = `${baseUrl}/admin/register.html?token=${encodeURIComponent(invitation.token)}`;
+    const safeEmail = String(req.body.email).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const expiryDate = new Date(invitation.expires_at);
+    const expiryLabel = expiryDate.toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Africa/Nairobi' });
+    const logoUrl = `${baseUrl}/icons/icon-512.png`;
+    const html = `
+      <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+      <body style="margin:0;padding:0;background:#08090c;font-family:Arial,Helvetica,sans-serif;color:#f5f5f5">
+        <div style="display:none;max-height:0;overflow:hidden;opacity:0">You have been invited to securely join the Manlung Recovery Admin Portal.</div>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#08090c;padding:34px 12px">
+          <tr><td align="center">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#111114;border:1px solid #302027;border-radius:18px;overflow:hidden">
+              <tr><td style="height:5px;background:#e11d2e;font-size:0;line-height:0">&nbsp;</td></tr>
+              <tr><td align="center" style="padding:30px 28px 22px">
+                <img src="${logoUrl}" width="62" height="62" alt="Manlung Recovery" style="display:block;width:62px;height:62px;border-radius:16px;border:1px solid #48242b">
+                <p style="margin:16px 0 0;color:#ff5261;font-size:11px;font-weight:700;letter-spacing:2.5px">MANLUNG RECOVERY</p>
+                <h1 style="margin:10px 0 0;color:#fff;font-size:27px;line-height:1.25">You’re invited to join the team</h1>
+                <p style="margin:9px 0 0;color:#c4b7ba;font-size:14px;line-height:1.7">Secure Admin Portal · Invitation from the Owner</p>
+              </td></tr>
+              <tr><td style="padding:8px 30px 30px">
+                <p style="margin:0 0 14px;color:#f1e9eb;font-size:15px;line-height:1.8">Hello,</p>
+                <p style="margin:0 0 20px;color:#c9c0c2;font-size:14px;line-height:1.85">The Owner has invited you to register for an administrator account at Manlung Recovery. Complete the secure registration process using the button below.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#191518;border:1px solid #3b252b;border-radius:12px;margin:0 0 22px">
+                  <tr><td style="padding:16px 18px">
+                    <p style="margin:0 0 5px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1.3px">INVITED EMAIL ADDRESS</p>
+                    <p style="margin:0;color:#fff;font-size:14px;word-break:break-word">${safeEmail}</p>
+                    <p style="margin:15px 0 5px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1.3px">INVITATION EXPIRES</p>
+                    <p style="margin:0;color:#ff8791;font-size:14px;font-weight:700">${expiryLabel} (East Africa Time)</p>
+                  </td></tr>
+                </table>
+                <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="margin:0 auto 22px"><tr><td align="center" bgcolor="#e11d2e" style="border-radius:10px">
+                  <a href="${link}" style="display:inline-block;padding:15px 26px;color:#fff;text-decoration:none;font-size:14px;font-weight:700">Accept Admin Invitation&nbsp; →</a>
+                </td></tr></table>
+                <p style="margin:0 0 9px;color:#c9c0c2;font-size:13px;line-height:1.75"><strong style="color:#fff">What happens next?</strong></p>
+                <ol style="margin:0 0 20px;padding-left:20px;color:#c9c0c2;font-size:13px;line-height:1.9">
+                  <li>Open the secure invitation link before it expires.</li>
+                  <li>Choose your admin username and a strong password.</li>
+                  <li>Submit your details. The Owner must approve your account before admin access is enabled.</li>
+                </ol>
+                <div style="padding:14px 15px;border-left:3px solid #e11d2e;background:#1b1417;border-radius:7px">
+                  <p style="margin:0;color:#e7dadd;font-size:12px;line-height:1.75"><strong style="color:#ff8791">Security notice:</strong> This invitation is private and can be used once. Do not forward it. Manlung Recovery will never ask you to email your password or one-time security codes.</p>
+                </div>
+                <p style="margin:20px 0 0;color:#9f9295;font-size:12px;line-height:1.75">If the button does not work, copy this address into your browser:<br><a href="${link}" style="color:#ff7884;word-break:break-all">${link}</a></p>
+                <p style="margin:20px 0 0;color:#b8aaad;font-size:12px;line-height:1.7">If you were not expecting this invitation, you can safely ignore this email and contact the Owner.</p>
+              </td></tr>
+              <tr><td align="center" style="padding:18px 24px;background:#0c0c0e;border-top:1px solid #302027">
+                <p style="margin:0;color:#a99b9e;font-size:11px;line-height:1.7">© ${new Date().getFullYear()} Manlung Recovery · Automated security notification</p>
+                <p style="margin:5px 0 0;color:#817579;font-size:11px">Please do not reply to this email.</p>
+              </td></tr>
+            </table>
+          </td></tr>
+        </table>
+      </body></html>`;
+    let mail = { sent: false, configured: false };
+    try {
+      mail = await sendEmail({ to: req.body.email, subject: 'You’re invited: Manlung Recovery Admin Portal', html });
+    } catch (emailError) {
+      console.error('Admin invitation email delivery failed:', emailError?.message || emailError);
+    }
     await AdminAuditLog.record({ actor:req.user, target:{ id:req.user.id, username:req.user.username }, action:'invited_admin' });
     res.status(201).json({
       success: true,
@@ -364,7 +424,7 @@ router.post('/invitations', [body('email').trim().isEmail().normalizeEmail()], a
         email: req.body.email,
         expiresAt: invitation.expires_at,
         link,
-        emailSent: mail.sent
+        emailSent: Boolean(mail.sent)
       }
     });
   } catch (error) { console.error('Invite admin error:', error); res.status(500).json({ error:error.message || 'Could not create invitation' }); }
