@@ -1513,6 +1513,22 @@ html body.manlung-auth-page .manlung-auth-form,html body.manlung-auth-page .manl
 html body.manlung-auth-page .manlung-auth-heading h2{line-height:1.15!important;text-wrap:balance}
 @media(max-width:640px){html body.manlung-auth-page .manlung-auth-wrap{padding:16px 12px 28px!important}html body.manlung-auth-page .manlung-auth-form{padding:22px 18px!important}html body.manlung-auth-page .manlung-social-grid{grid-template-columns:minmax(0,1fr)!important}html body.manlung-auth-page .manlung-social-grid .manlung-google-btn,html body.manlung-auth-page .manlung-social-grid .manlung-social-btn{min-height:48px!important;height:auto!important}}
 </style>
+<style id="manlung-social-squircles-20261030">
+html body.manlung-auth-page .manlung-social-grid{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:20px!important;width:100%!important;margin:0 auto 18px!important;padding:8px 0!important;flex-wrap:nowrap!important}
+html body.manlung-auth-page .manlung-social-grid .social-btn,html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 70px!important;width:70px!important;min-width:70px!important;max-width:70px!important;height:70px!important;min-height:70px!important;max-height:70px!important;margin:0!important;padding:0!important;border:0!important;border-radius:24px!important;background:#eef2f9!important;color:#24292e!important;box-shadow:8px 8px 16px #cbd5e1,-8px -8px 16px #fff!important;cursor:pointer!important;overflow:hidden!important;text-decoration:none!important;transition:transform .18s ease,box-shadow .18s ease!important}
+html body.manlung-auth-page .manlung-social-grid .social-btn:hover,html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:hover{transform:translateY(-2px)!important;box-shadow:10px 10px 20px #cbd5e1,-10px -10px 20px #fff!important;filter:none!important}
+html body.manlung-auth-page .manlung-social-grid .social-btn:active,html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:active{transform:translateY(0)!important;box-shadow:inset 5px 5px 10px #cbd5e1,inset -5px -5px 10px #fff!important}
+html body.manlung-auth-page .manlung-social-grid .social-brand-icon{display:block!important;position:static!important;flex:0 0 30px!important;width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;max-width:30px!important;max-height:30px!important;margin:0!important;padding:0!important;transform:none!important;object-fit:contain!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{border-radius:24px!important;background:#eef2f9!important;box-shadow:8px 8px 16px #cbd5e1,-8px -8px 16px #fff!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe{display:block!important;width:70px!important;height:70px!important;min-height:70px!important;max-width:70px!important;margin:0!important;border:0!important;border-radius:24px!important}
+html body.manlung-auth-page .manlung-social-grid #githubLoginBtn,html body.manlung-auth-page .manlung-social-grid #githubRegisterBtn,html body.manlung-auth-page .manlung-social-grid #discordLoginBtn,html body.manlung-auth-page .manlung-social-grid #discordRegisterBtn{border:0!important;background:#eef2f9!important;color:#24292e!important}
+html body.manlung-auth-page .manlung-social-grid #discordLoginBtn .discord-brand-mark path,html body.manlung-auth-page .manlung-social-grid #discordRegisterBtn .discord-brand-mark path{fill:#5865f2!important}
+html body.dark.manlung-auth-page .manlung-social-grid .social-btn,html body.dark.manlung-auth-page .manlung-social-grid .manlung-google-btn{background:#111c2e!important;box-shadow:8px 8px 16px #070d17,-8px -8px 16px #1b2b43!important}
+html body.dark.manlung-auth-page .manlung-social-grid .social-btn:active,html body.dark.manlung-auth-page .manlung-social-grid .manlung-google-btn:active{box-shadow:inset 5px 5px 10px #070d17,inset -5px -5px 10px #1b2b43!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-visible,html body.manlung-auth-page .manlung-social-grid .social-btn:focus-visible{outline:3px solid rgba(59,130,246,.45)!important;outline-offset:4px!important}
+@media(max-width:360px){html body.manlung-auth-page .manlung-social-grid{gap:14px!important}}
+@media(prefers-reduced-motion:reduce){html body.manlung-auth-page .manlung-social-grid .social-btn,html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{transition:none!important}}
+</style>
 </head>
 <body class="manlung-auth-page">
 <div class="fa-floating-orb fa-orb-1" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-2" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-3" aria-hidden="true"></div>
@@ -1565,14 +1581,14 @@ html body.manlung-auth-page .manlung-auth-heading h2{line-height:1.15!important;
         <div class="manlung-auth-divider">or continue with</div>
         <div class="manlung-social-grid" aria-label="Social sign-in options">
           <div id="googleLoginBtn" class="manlung-google-btn" aria-label="Continue with Google"></div>
-          <button type="button" id="githubLoginBtn" class="manlung-social-btn" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i><span>Continue with GitHub</span></button>
-          <button type="button" id="discordLoginBtn" class="manlung-social-btn manlung-discord-icon" aria-label="Continue with Discord" title="Continue with Discord"><svg class="discord-brand-mark" viewBox="0 0 127.14 96.36" width="22" height="22" aria-hidden="true" focusable="false"><path fill="#5865F2" d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.1 0A72.37 72.37 0 0 0 45.65 0a105.89 105.89 0 0 0-26.25 8.09C2.8 32.65-1.7 56.6.55 80.21A105.73 105.73 0 0 0 32.7 96.36a77.7 77.7 0 0 0 6.9-11.16 68.42 68.42 0 0 1-10.86-5.18c.91-.66 1.8-1.34 2.66-2.04a75.76 75.76 0 0 0 64.34 0c.87.7 1.76 1.38 2.66 2.04a68.68 68.68 0 0 1-10.88 5.19 77.1 77.1 0 0 0 6.9 11.15 105.25 105.25 0 0 0 32.17-16.14c2.64-27.38-4.52-51.11-18.89-72.15ZM42.45 65.69c-6.27 0-11.43-5.74-11.43-12.78s5.05-12.78 11.43-12.78 11.54 5.8 11.43 12.78c0 7.04-5.05 12.78-11.43 12.78Zm42.24 0c-6.27 0-11.43-5.74-11.43-12.78s5.05-12.78 11.43-12.78 11.54 5.8 11.43 12.78c0 7.04-5.05 12.78-11.43 12.78Z"/></svg><span>Continue with Discord</span></button>
+          <button type="button" id="githubLoginBtn" class="manlung-social-btn social-btn" aria-label="Continue with GitHub" title="Continue with GitHub"><svg class="social-brand-icon github-brand-mark" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path fill="#24292e" d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.54v-2.1c-3.14.68-3.8-1.33-3.8-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 1.72 2.62 1.22 3.26.93.1-.73.39-1.22.71-1.5-2.5-.29-5.13-1.25-5.13-5.57 0-1.23.44-2.24 1.16-3.03-.12-.29-.5-1.44.11-3 0 0 .95-.3 3.1 1.15a10.8 10.8 0 0 1 5.64 0c2.15-1.45 3.1-1.15 3.1-1.15.62 1.56.23 2.71.12 3 .72.79 1.15 1.8 1.15 3.03 0 4.33-2.63 5.28-5.14 5.56.4.35.76 1.04.76 2.1v3.1c0 .3.2.65.78.54A11.25 11.25 0 0 0 12 .75Z"/></svg></button>
+          <button type="button" id="discordLoginBtn" class="manlung-social-btn social-btn" aria-label="Continue with Discord" title="Continue with Discord"><svg class="discord-brand-mark social-brand-icon" viewBox="0 0 127.14 96.36" width="30" height="30" aria-hidden="true" focusable="false"><path fill="#5865F2" d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.1 0A72.37 72.37 0 0 0 45.65 0a105.89 105.89 0 0 0-26.25 8.09C2.8 32.65-1.7 56.6.55 80.21A105.73 105.73 0 0 0 32.7 96.36a77.7 77.7 0 0 0 6.9-11.16 68.42 68.42 0 0 1-10.86-5.18c.91-.66 1.8-1.34 2.66-2.04a75.76 75.76 0 0 0 64.34 0c.87.7 1.76 1.38 2.66 2.04a68.68 68.68 0 0 1-10.88 5.19 77.1 77.1 0 0 0 6.9 11.15 105.25 105.25 0 0 0 32.17-16.14c2.64-27.38-4.52-51.11-18.89-72.15ZM42.45 65.69c-6.27 0-11.43-5.74-11.43-12.78s5.05-12.78 11.43-12.78 11.54 5.8 11.43 12.78c0 7.04-5.05 12.78-11.43 12.78Zm42.24 0c-6.27 0-11.43-5.74-11.43-12.78s5.05-12.78 11.43-12.78 11.54 5.8 11.43 12.78c0 7.04-5.05 12.78-11.43 12.78Z"/></svg></button>
         </div>
       </div>
 
       <div id="registerPanel" hidden>
         <div class="manlung-auth-heading"><h2>Create your portal account</h2><p>Set up secure access before submitting a recovery request or tracking a case.</p></div>
-        <div class="manlung-social-grid" aria-label="Social account creation options"><div id="googleRegisterBtn" class="manlung-google-btn" aria-label="Continue with Google"></div><button type="button" id="githubRegisterBtn" class="manlung-social-btn" aria-label="Continue with GitHub" title="Continue with GitHub"><i class="fab fa-github" aria-hidden="true"></i><span>Continue with GitHub</span></button><button type="button" id="discordRegisterBtn" class="manlung-social-btn manlung-discord-icon" aria-label="Continue with Discord" title="Continue with Discord"><svg class="discord-brand-mark" viewBox="0 0 127.14 96.36" width="22" height="22" aria-hidden="true" focusable="false"><path fill="#5865F2" d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.1 0A72.37 72.37 0 0 0 45.65 0a105.89 105.89 0 0 0-26.25 8.09C2.8 32.65-1.7 56.6.55 80.21A105.73 105.73 0 0 0 32.7 96.36a77.7 77.7 0 0 0 6.9-11.16 68.42 68.42 0 0 1-10.86-5.18c.91-.66 1.8-1.34 2.66-2.04a75.76 75.76 0 0 0 64.34 0c.87.7 1.76 1.38 2.66 2.04a68.68 68.68 0 0 1-10.88 5.19 77.1 77.1 0 0 0 6.9 11.15 105.25 105.25 0 0 0 32.17-16.14c2.64-27.38-4.52-51.11-18.89-72.15ZM42.45 65.69c-6.27 0-11.43-5.74-11.43-12.78s5.05-12.78 11.43-12.78 11.54 5.8 11.43 12.78c0 7.04-5.05 12.78-11.43 12.78Zm42.24 0c-6.27 0-11.43-5.74-11.43-12.78s5.05-12.78 11.43-12.78 11.54 5.8 11.43 12.78c0 7.04-5.05 12.78-11.43 12.78Z"/></svg><span>Continue with Discord</span></button></div>
+        <div class="manlung-social-grid" aria-label="Social account creation options"><div id="googleRegisterBtn" class="manlung-google-btn" aria-label="Continue with Google"></div><button type="button" id="githubRegisterBtn" class="manlung-social-btn social-btn" aria-label="Continue with GitHub" title="Continue with GitHub"><svg class="social-brand-icon github-brand-mark" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path fill="#24292e" d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.54v-2.1c-3.14.68-3.8-1.33-3.8-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 1.72 2.62 1.22 3.26.93.1-.73.39-1.22.71-1.5-2.5-.29-5.13-1.25-5.13-5.57 0-1.23.44-2.24 1.16-3.03-.12-.29-.5-1.44.11-3 0 0 .95-.3 3.1 1.15a10.8 10.8 0 0 1 5.64 0c2.15-1.45 3.1-1.15 3.1-1.15.62 1.56.23 2.71.12 3 .72.79 1.15 1.8 1.15 3.03 0 4.33-2.63 5.28-5.14 5.56.4.35.76 1.04.76 2.1v3.1c0 .3.2.65.78.54A11.25 11.25 0 0 0 12 .75Z"/></svg></button><button type="button" id="discordRegisterBtn" class="manlung-social-btn social-btn" aria-label="Continue with Discord" title="Continue with Discord"><svg class="discord-brand-mark social-brand-icon" viewBox="0 0 127.14 96.36" width="30" height="30" aria-hidden="true" focusable="false"><path fill="#5865F2" d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.1 0A72.37 72.37 0 0 0 45.65 0a105.89 105.89 0 0 0-26.25 8.09C2.8 32.65-1.7 56.6.55 80.21A105.73 105.73 0 0 0 32.7 96.36a77.7 77.7 0 0 0 6.9-11.16 68.42 68.42 0 0 1-10.86-5.18c.91-.66 1.8-1.34 2.66-2.04a75.76 75.76 0 0 0 64.34 0c.87.7 1.76 1.38 2.66 2.04a68.68 68.68 0 0 1-10.88 5.19 77.1 77.1 0 0 0 6.9 11.15 105.25 105.25 0 0 0 32.17-16.14c2.64-27.38-4.52-51.11-18.89-72.15ZM42.45 65.69c-6.27 0-11.43-5.74-11.43-12.78s5.05-12.78 11.43-12.78 11.54 5.8 11.43 12.78c0 7.04-5.05 12.78-11.43 12.78Zm42.24 0c-6.27 0-11.43-5.74-11.43-12.78s5.05-12.78 11.43-12.78 11.54 5.8 11.43 12.78c0 7.04-5.05 12.78-11.43 12.78Z"/></svg></button></div>
         <div class="manlung-auth-divider">or create with email verification</div>
         <form id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group"><label for="regName">Full name</label><input id="regName" autocomplete="name" maxlength="200" placeholder="Your full name" required></div>
@@ -2183,7 +2199,7 @@ async function setupOfficialGoogleButtons(){
       button.type = 'button';
       button.className = 'manlung-social-btn manlung-google-btn';
       button.style.width = '100%';
-      button.innerHTML = '<span aria-hidden="true" style="font-weight:800;color:#4285f4">G</span> Continue with Google';
+      button.innerHTML = '<svg class="social-brand-icon google-brand-mark" viewBox="0 0 48 48" width="30" height="30" aria-hidden="true" focusable="false"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.13-2.75-.36-4.05H24v7.67h11a9.4 9.4 0 0 1-4.08 6.17v5.02h6.62c3.88-3.58 6.06-8.85 6.06-14.81Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.83 13.47-4.96l-6.62-5.02c-1.83 1.23-4.17 1.96-6.85 1.96-5.27 0-9.74-3.56-11.34-8.36H5.82v5.18A20.34 20.34 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.66 27.62a12.2 12.2 0 0 1 0-7.24V15.2H5.82a20.02 20.02 0 0 0 0 17.6l6.84-5.18Z"/><path fill="#EA4335" d="M24 11.99c3 0 5.7 1.03 7.82 3.07l5.86-5.86C34.09 5.83 29.5 4 24 4A20.34 20.34 0 0 0 5.82 15.2l6.84 5.18C14.26 15.55 18.73 11.99 24 11.99Z"/></svg>';
       button.addEventListener('click', async () => {
         const target = document.getElementById(id === 'googleRegisterBtn' ? 'registerError' : 'loginError');
         try {
@@ -2316,13 +2332,13 @@ async function setupOfficialGoogleButtons(){
       host.setAttribute('aria-label','Continue with Google');
       host.setAttribute('title','Continue with Google');
       host.dataset.googleErrorTarget=errorTarget;
-      host.style.width='100%';
-      host.style.minWidth='0';
-      host.style.height='54px';
-      host.style.minHeight='54px';
+      host.style.width='70px';
+      host.style.minWidth='70px';
+      host.style.height='70px';
+      host.style.minHeight='70px';
       host.style.display='flex';
       host.style.alignItems='center';
-      host.style.justifyContent='flex-start';
+      host.style.justifyContent='center';
       host.style.overflow='visible';
       host.style.padding='0';
       host.style.border='0';
@@ -2333,16 +2349,11 @@ async function setupOfficialGoogleButtons(){
       // One Tap trigger made the visual button unreliable/non-clickable.
       // GIS supports button widths up to 400px; size it to the available host
       // width so it fills the social-button column without clipping.
-      const measuredWidth=Math.floor(host.getBoundingClientRect().width || host.parentElement?.getBoundingClientRect().width || 400);
-      const availableWidth=Math.max(200,Math.min(400,measuredWidth));
       google.accounts.id.renderButton(host,{
-        type:'standard',
+        type:'icon',
         theme:'outline',
         size:'large',
-        text:'continue_with',
-        shape:'rectangular',
-        logo_alignment:'left',
-        width:availableWidth,
+        shape:'square',
         locale:'en'
       });
       const iframe=host.querySelector('iframe');
