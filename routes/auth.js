@@ -65,50 +65,71 @@ function escapeEmailHtml(value) {
 
 async function sendClientWelcomeEmail(client, req) {
   if (!client?.email) return;
-  const displayName = escapeEmailHtml(client.username || client.full_name || 'there');
-  const accountEmail = escapeEmailHtml(client.email);
+  const safe = value => escapeEmailHtml(value == null || value === '' ? 'Not provided' : value);
+  const displayName = safe(client.full_name || client.username || 'there');
+  const accountEmail = safe(client.email);
+  const accountPhone = safe(client.phone);
+  const accountUsername = safe(client.username);
   const baseUrl = String(
     process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'
-  ).replace(/\/$/, '');
+  ).replace(/\\/$/, '');
   const portalUrl = `${baseUrl}/client/dashboard.html`;
+  const logoUrl = `${baseUrl}/icons/icon-512.png`;
   const supportEmail = 'manlungrecovery@outlook.com';
+  const createdAt = client.created_at
+    ? new Date(client.created_at).toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Africa/Nairobi' })
+    : new Date().toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Africa/Nairobi' });
+  const provider = safe(client.auth_provider || 'Email and password');
 
   const html = `
     <!doctype html>
     <html lang="en">
-      <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
-      <body style="margin:0;padding:0;background:#f3f6fb;font-family:Arial,Helvetica,sans-serif;color:#172033;">
-        <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Your Manlung Recovery account has been created successfully. Your Client Portal is ready.</div>
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f6fb;padding:32px 12px;">
+      <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+      <body style="margin:0;padding:0;background:#08090c;font-family:Arial,Helvetica,sans-serif;color:#f5f5f5">
+        <div style="display:none;max-height:0;overflow:hidden;opacity:0">Welcome to Manlung Recovery. Your email is verified and your secure Client Portal is ready.</div>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#08090c;padding:34px 12px">
           <tr><td align="center">
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #e4eaf2;border-radius:16px;overflow:hidden;">
-              <tr><td style="background:#101b2d;padding:28px 32px;text-align:center;">
-                <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#9de7c1;font-weight:700;">MANLUNG RECOVERY</div>
-                <h1 style="margin:12px 0 0;color:#ffffff;font-size:27px;line-height:1.25;">Account created successfully</h1>
-                <p style="margin:10px 0 0;color:#d3dce9;font-size:15px;line-height:1.6;">Welcome to your secure Client Portal.</p>
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#111114;border:1px solid #302027;border-radius:18px;overflow:hidden">
+              <tr><td style="height:5px;background:#e11d2e;font-size:0;line-height:0">&nbsp;</td></tr>
+              <tr><td align="center" style="padding:30px 28px 24px">
+                <img src="${logoUrl}" width="62" height="62" alt="Manlung Recovery" style="display:block;width:62px;height:62px;border-radius:16px;border:1px solid #48242b">
+                <p style="margin:16px 0 0;color:#ff5261;font-size:11px;font-weight:700;letter-spacing:2.5px">MANLUNG RECOVERY</p>
+                <h1 style="margin:10px 0 0;color:#fff;font-size:27px;line-height:1.25">Welcome aboard, ${displayName}</h1>
+                <p style="margin:9px 0 0;color:#c4b7ba;font-size:14px;line-height:1.7">Your Client Portal account is ready.</p>
               </td></tr>
-              <tr><td style="padding:30px 32px;">
-                <p style="margin:0 0 16px;font-size:16px;line-height:1.7;">Hello ${displayName},</p>
-                <p style="margin:0 0 18px;font-size:15px;line-height:1.8;color:#435066;">Your Manlung Recovery account has been created successfully. You can now access your Client Portal to manage your recovery requests and follow updates related to your cases.</p>
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:22px 0;background:#f7f9fc;border:1px solid #e5ebf3;border-radius:10px;">
-                  <tr><td style="padding:16px 18px;">
-                    <div style="font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:#66758b;font-weight:700;">ACCOUNT EMAIL</div>
-                    <div style="margin-top:6px;font-size:15px;color:#172033;word-break:break-word;">${accountEmail}</div>
-                    <div style="margin-top:12px;font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:#66758b;font-weight:700;">ACCOUNT STATUS</div>
-                    <div style="margin-top:6px;font-size:14px;color:#137547;font-weight:700;">Created successfully</div>
+              <tr><td style="padding:6px 30px 30px">
+                <p style="margin:0 0 14px;color:#f1e9eb;font-size:15px;line-height:1.8">Thanks for joining Manlung Recovery. Your email address has been verified and your account has been created successfully.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#191518;border:1px solid #3b252b;border-radius:12px;margin:20px 0">
+                  <tr><td style="padding:17px 18px">
+                    <p style="margin:0 0 5px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1.3px">ACCOUNT SUMMARY</p>
+                    <p style="margin:12px 0 4px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1px">FULL NAME / DISPLAY NAME</p>
+                    <p style="margin:0;color:#fff;font-size:14px">${displayName}</p>
+                    <p style="margin:12px 0 4px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1px">USERNAME</p>
+                    <p style="margin:0;color:#fff;font-size:14px;word-break:break-word">${accountUsername}</p>
+                    <p style="margin:12px 0 4px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1px">EMAIL ADDRESS</p>
+                    <p style="margin:0;color:#fff;font-size:14px;word-break:break-word">${accountEmail}</p>
+                    <p style="margin:12px 0 4px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1px">PHONE NUMBER</p>
+                    <p style="margin:0;color:#fff;font-size:14px">${accountPhone}</p>
+                    <p style="margin:12px 0 4px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1px">SIGN-IN METHOD</p>
+                    <p style="margin:0;color:#fff;font-size:14px">${provider}</p>
+                    <p style="margin:12px 0 4px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1px">ACCOUNT CREATED</p>
+                    <p style="margin:0;color:#fff;font-size:14px">${safe(createdAt)} EAT</p>
+                    <p style="margin:12px 0 4px;color:#a9959a;font-size:10px;font-weight:700;letter-spacing:1px">EMAIL STATUS</p>
+                    <p style="margin:0;color:#ff8791;font-size:14px;font-weight:700">Verified</p>
                   </td></tr>
                 </table>
-                <p style="margin:0 0 22px;font-size:15px;line-height:1.8;color:#435066;">From your portal, you can submit a recovery request, review case progress, and check messages or updates shared with you.</p>
-                <p style="margin:26px 0;text-align:center;">
-                  <a href="${portalUrl}" style="display:inline-block;padding:14px 24px;background:#157347;color:#ffffff;text-decoration:none;border-radius:8px;font-size:15px;font-weight:700;">Open My Client Portal</a>
-                </p>
-                <div style="border-top:1px solid #e7edf4;padding-top:18px;margin-top:24px;">
-                  <p style="margin:0 0 10px;font-size:13px;line-height:1.7;color:#66758b;"><strong>Security reminder:</strong> Keep your password private. Manlung Recovery will never ask you to send your password by email.</p>
-                  <p style="margin:0;font-size:13px;line-height:1.7;color:#66758b;">Need help? Contact <a href="mailto:${supportEmail}" style="color:#1769aa;text-decoration:none;">${supportEmail}</a>.</p>
+                <p style="margin:0 0 20px;color:#c9c0c2;font-size:14px;line-height:1.85">Inside your Client Portal, you can submit a recovery request, track case progress, review messages and receive important updates about your account and cases.</p>
+                <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="margin:0 auto 22px"><tr><td align="center" bgcolor="#e11d2e" style="border-radius:10px">
+                  <a href="${portalUrl}" style="display:inline-block;padding:15px 26px;color:#fff;text-decoration:none;font-size:14px;font-weight:700">Open My Client Portal&nbsp; →</a>
+                </td></tr></table>
+                <div style="padding:14px 15px;border-left:3px solid #e11d2e;background:#1b1417;border-radius:7px">
+                  <p style="margin:0;color:#e7dadd;font-size:12px;line-height:1.75"><strong style="color:#ff8791">Keep your account safe:</strong> Use a unique password, never share verification codes, and sign out on devices you do not control. Manlung Recovery will never ask you to email your password or payment PIN.</p>
                 </div>
+                <p style="margin:20px 0 0;color:#b8aaad;font-size:12px;line-height:1.75">Need help? Contact <a href="mailto:${supportEmail}" style="color:#ff7884;text-decoration:none">${supportEmail}</a>.</p>
               </td></tr>
-              <tr><td style="padding:18px 28px;background:#f8fafc;border-top:1px solid #e7edf4;text-align:center;">
-                <p style="margin:0;font-size:12px;line-height:1.7;color:#8390a3;">© ${new Date().getFullYear()} Manlung Recovery. Please do not reply to this automated message.</p>
+              <tr><td align="center" style="padding:18px 24px;background:#0c0c0e;border-top:1px solid #302027">
+                <p style="margin:0;color:#a99b9e;font-size:11px;line-height:1.7">© ${new Date().getFullYear()} Manlung Recovery · Automated account notification</p>
+                <p style="margin:5px 0 0;color:#817579;font-size:11px">Please do not reply to this email.</p>
               </td></tr>
             </table>
           </td></tr>
@@ -120,7 +141,7 @@ async function sendClientWelcomeEmail(client, req) {
   try {
     await sendEmail({
       to: client.email,
-      subject: 'Your Manlung Recovery account was created successfully',
+      subject: 'Welcome to Manlung Recovery — your account is ready',
       html,
     });
   } catch (error) {
