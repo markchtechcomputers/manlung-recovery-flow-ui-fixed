@@ -258,6 +258,65 @@ body.admin-register-page{background:radial-gradient(ellipse at 12% 8%,rgba(20,18
 .admin-register-card .register-submit:hover:not(:disabled){box-shadow:0 11px 24px rgba(15,118,110,.27)!important}
 @media(max-width:520px){.admin-register-wrap{align-items:flex-start;padding:18px 12px!important}.admin-register-card{padding:26px 20px 22px!important;border-radius:21px!important}}
 </style>
+
+<style id="manlung-admin-register-black-red-refresh">
+:root{color-scheme:dark;--auth-red:#e11d2e;--auth-red-bright:#ff3347;--auth-black:#070708;--auth-panel:#111113;--auth-line:#302024;--auth-muted:#b7a7aa}
+html,body{min-height:100%;margin:0}
+body.admin-register-page{min-height:100vh!important;color:#fff!important;background:radial-gradient(ellipse at 50% 0%,rgba(190,18,38,.2),transparent 42%),radial-gradient(ellipse at 100% 100%,rgba(120,10,25,.16),transparent 38%),#070708!important;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;-webkit-font-smoothing:antialiased}
+.admin-register-wrap{min-height:100svh!important;box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:28px 16px!important}
+.admin-register-card{position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;width:100%;max-width:540px!important;padding:30px clamp(22px,5vw,38px) 25px!important;border:1px solid rgba(225,29,46,.42)!important;border-radius:25px!important;background:linear-gradient(155deg,rgba(25,20,22,.98),rgba(10,10,11,.99))!important;color:#fff!important;box-shadow:0 30px 90px rgba(0,0,0,.72),0 0 45px rgba(225,29,46,.12),inset 0 1px rgba(255,255,255,.045)!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.admin-register-card:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,#790b19,#e11d2e,#ff5362,#790b19)!important}
+.admin-register-card:after{content:"";position:absolute;inset:12px;border:1px solid rgba(225,29,46,.13);border-radius:17px;pointer-events:none;z-index:-1}
+.admin-register-card>*{position:relative;z-index:1}
+.register-brand{justify-content:center;margin:0 0 25px!important;color:#fff!important;font-size:12px!important;letter-spacing:.16em!important}
+.register-brand img{width:43px!important;height:43px!important;border:1px solid rgba(255,70,87,.65);border-radius:13px!important;box-shadow:0 8px 24px rgba(225,29,46,.2)!important}
+.register-brand b{color:#ff5362!important}
+.register-header{margin:0 0 24px!important;text-align:center}
+.register-shield{width:54px!important;height:54px!important;margin:0 auto 13px!important;border:1px solid rgba(225,29,46,.5)!important;border-radius:16px!important;background:rgba(225,29,46,.1)!important;color:#ff5362!important;box-shadow:0 8px 24px rgba(225,29,46,.12)!important}
+.register-shield svg{width:27px!important;height:27px!important}
+.eyebrow{margin:0 0 8px!important;color:#ff6675!important;font-size:10px!important;font-weight:850;letter-spacing:.19em!important}
+.admin-register-card h1{margin:0 0 9px!important;color:#fff!important;font-size:clamp(23px,4vw,28px)!important;font-weight:850;letter-spacing:-.04em!important;line-height:1.2}
+.register-subtitle{max-width:390px;margin:0 auto!important;color:#c8b9bc!important;font-size:13px!important;line-height:1.65!important}
+.invite-badge{display:inline-flex;align-items:center;gap:7px;margin-top:14px!important;padding:6px 11px!important;border:1px solid rgba(225,29,46,.48)!important;border-radius:999px!important;background:rgba(225,29,46,.1)!important;color:#ff9aa4!important;font-size:10px!important;font-weight:800}
+.invite-badge span{color:#ff5362!important}
+.admin-register-card .warning{display:flex;align-items:flex-start;gap:11px;margin:0 0 21px!important;padding:13px!important;border:1px solid rgba(225,29,46,.55)!important;border-radius:12px!important;background:rgba(120,10,25,.2)!important;color:#ffd7dc!important;font-size:12px!important;line-height:1.55}
+.warning strong{display:block;margin:0 0 4px!important;color:#ff7b88!important;font-size:12px!important}
+.warning p{margin:0;color:#e7cdd1!important}
+.notice-icon{flex:0 0 22px;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:#b80f24!important;color:#fff!important;font-weight:900}
+.admin-register-card .field{margin:0 0 15px!important}
+.admin-register-card label{display:block;margin:0 0 7px!important;color:#f0dfe2!important;font-size:11px!important;font-weight:800;letter-spacing:.055em}
+.locked-label,.optional-label{color:#c8aeb3!important;font-size:10px!important}
+.locked-label svg{color:#ff6675!important}
+.input-shell{position:relative;display:flex;align-items:center}
+.input-shell .field-icon{position:absolute;left:13px;width:17px;height:17px;color:#a98b91!important;pointer-events:none}
+.admin-register-card input{display:block;width:100%;min-width:0;height:47px!important;box-sizing:border-box;padding:0 13px 0 41px!important;border:1px solid #493037!important;border-radius:11px!important;outline:none;background:#09090a!important;color:#fff!important;font:500 13px/1.4 Inter,ui-sans-serif,system-ui,sans-serif!important;transition:border-color .18s,box-shadow .18s}
+.admin-register-card input::placeholder{color:#88777b!important}
+.admin-register-card input:focus{border-color:#f04455!important;box-shadow:0 0 0 4px rgba(225,29,46,.16)!important}
+.admin-register-card .input-locked input,.admin-register-card input:read-only{background:#171113!important;color:#c8b9bc!important;cursor:not-allowed}
+.field-hint{display:block;margin-top:6px;color:#a98b91!important;font-size:10px!important;line-height:1.5}
+.password-shell input{padding-right:47px!important}
+.password-toggle{position:absolute;right:7px;display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:8px;color:#c8aeb3!important;background:transparent!important;cursor:pointer}
+.password-toggle:hover{background:rgba(225,29,46,.13)!important;color:#ff6675!important}
+.password-toggle:focus-visible{outline:2px solid #f04455;outline-offset:1px}
+.password-toggle svg{width:18px;height:18px}
+.strength-track{display:flex;gap:5px;margin-top:10px}
+.strength-track span{flex:1;height:4px;border-radius:999px;background:#38272b;transition:background .2s ease}
+.strength-caption{display:flex;justify-content:space-between;gap:8px;margin-top:6px;color:#a98b91!important;font-size:10px}
+.strength-caption #strengthLabel{color:#f0dfe2!important;font-weight:700}
+.admin-register-card .register-submit{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:49px;margin-top:8px!important;padding:12px 16px;border:1px solid #f04455!important;border-radius:12px!important;color:#fff!important;background:linear-gradient(135deg,#a70f22,#e11d2e 58%,#b80f24)!important;box-shadow:0 9px 24px rgba(225,29,46,.22)!important;font-size:13px;font-weight:850;cursor:pointer;transition:transform .18s,box-shadow .18s,filter .18s}
+.admin-register-card .register-submit svg{width:17px;height:17px}
+.admin-register-card .register-submit:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.08);box-shadow:0 13px 30px rgba(225,29,46,.32)!important}
+.admin-register-card .register-submit:disabled{color:#e7cdd1!important;background:#542027!important;border-color:#69303a!important;box-shadow:none!important;cursor:not-allowed}
+.admin-register-card .msg{display:none;margin-top:14px!important;padding:12px 13px!important;border:1px solid rgba(225,29,46,.55)!important;border-radius:11px!important;color:#ffd7dc!important;background:rgba(120,10,25,.2)!important;white-space:pre-wrap;font-size:12px;line-height:1.6}
+.admin-register-card .msg:not(:empty){display:block}
+.admin-register-card .msg.success{color:#fff!important;background:rgba(90,20,28,.35)!important;border-color:#8e2635!important}
+.back-link{display:flex;align-items:center;justify-content:center;gap:7px;margin:13px auto 0!important;padding:8px;color:#ff7b88!important;text-decoration:none;font-size:12px;font-weight:750;border-radius:8px;transition:color .18s,background .18s}
+.back-link:hover{color:#fff!important;background:rgba(225,29,46,.12)!important}
+.register-footer{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:16px!important;padding-top:14px!important;border-top:1px solid #302024!important;color:#a98b91!important;text-align:center;font-size:10px;line-height:1.5}
+.register-footer svg{flex:0 0 14px;width:14px;height:14px;color:#ff6675!important}
+@media(max-width:520px){.admin-register-wrap{align-items:center;padding:18px 12px!important}.admin-register-card{padding:27px 20px 21px!important;border-radius:21px!important}.admin-register-card:after{inset:8px;border-radius:15px}.register-brand{margin-bottom:21px!important}.register-header{margin-bottom:21px!important}}
+@media(prefers-reduced-motion:reduce){.admin-register-card,.admin-register-card *{animation:none!important;transition:none!important}}
+</style>
 </head>
 
 <body class="admin-register-page">
