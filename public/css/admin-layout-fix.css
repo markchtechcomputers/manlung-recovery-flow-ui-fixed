@@ -80,3 +80,89 @@ body.admin-page-bg > main.music-shell {
   body.admin-page-bg > main.tools-shell,
   body.admin-page-bg > main.music-shell { margin-left:68px !important; }
 }
+
+
+/* Manlung Recovery admin workspace: consistent navigation, responsive layout and no public footer. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+body.admin-page-bg{
+  min-height:100vh!important;
+  background:radial-gradient(ellipse at 12% 5%,#dceeff 0,transparent 38%),linear-gradient(135deg,#eef5ff 0%,#f7faff 48%,#eaf2ff 100%)!important;
+  color:#17243b!important;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;
+}
+body.admin-page-bg .site-header{
+  background:rgba(255,255,255,.94)!important;color:#17243b!important;
+  border:1px solid #dce7f5!important;border-radius:0 22px 22px 0!important;
+  box-shadow:0 12px 36px rgba(37,75,130,.12)!important;
+}
+body.admin-page-bg .site-header .brand h1,
+body.admin-page-bg .site-header .brand .manlung-brand-copy h1{color:#17243b!important}
+body.admin-page-bg .site-header .brand span,
+body.admin-page-bg .site-header .brand .manlung-brand-copy span{color:#64748b!important}
+body.admin-page-bg .site-header .header-actions>a,
+body.admin-page-bg .site-header .header-actions>button{
+  border:1px solid transparent!important;border-radius:11px!important;
+  color:#475569!important;background:transparent!important;
+  font:600 13px/1.25 Inter,system-ui,sans-serif!important;
+  text-decoration:none!important;box-shadow:none!important;
+}
+body.admin-page-bg .site-header .header-actions>a:hover,
+body.admin-page-bg .site-header .header-actions>button:hover{
+  background:#eff6ff!important;color:#1d4ed8!important;border-color:#dbeafe!important;
+}
+body.admin-page-bg .site-header .header-actions>a.active,
+body.admin-page-bg .site-header .header-actions>a[aria-current="page"]{
+  background:#2563eb!important;color:#fff!important;border-color:#2563eb!important;
+  box-shadow:0 7px 18px rgba(37,99,235,.2)!important;
+}
+body.admin-page-bg .site-header .header-actions>a>i,
+body.admin-page-bg .site-header .header-actions>button>i{color:inherit!important}
+body.admin-page-bg>.container,
+body.admin-page-bg>main.container,
+body.admin-page-bg>main.wrap,
+body.admin-page-bg>main.tools-shell,
+body.admin-page-bg>main.music-shell{
+  padding-top:24px!important;padding-bottom:36px!important;
+}
+body.admin-page-bg .card,
+body.admin-page-bg .stat-card,
+body.admin-page-bg .operations-card{
+  border-radius:16px!important;border-color:#e0e9f5!important;
+  box-shadow:0 8px 26px rgba(34,66,110,.06)!important;
+}
+body.admin-page-bg .table-wrap{max-width:100%;overflow:auto}
+body.admin-page-bg table{min-width:640px}
+body.admin-page-bg .manlung-site-logo,
+body.admin-page-bg .admin-portal-logo{
+  width:46px!important;height:46px!important;object-fit:contain!important;
+  border-radius:13px!important;background:#fff!important;
+}
+body.admin-page-bg footer,
+body.admin-page-bg .site-footer,
+body.admin-page-bg .manlung-footer,
+body.admin-page-bg .manlung-footer-bottom,
+body.admin-page-bg #siteFooter,
+body.admin-page-bg #mainFooter,
+body.admin-page-bg #footer,
+body.admin-page-bg #manlungDashboardBottomNote{display:none!important}
+@media(max-width:700px){
+  body.admin-page-bg .site-header{width:220px!important}
+  body.admin-page-bg .site-header>.container{padding:14px 10px!important}
+  body.admin-page-bg>.container,
+  body.admin-page-bg>main.container,
+  body.admin-page-bg>main.wrap,
+  body.admin-page-bg>main.tools-shell,
+  body.admin-page-bg>main.music-shell{margin-left:220px!important;padding-left:12px!important;padding-right:12px!important}
+}
+@media(max-width:420px){
+  body.admin-page-bg .site-header{width:68px!important}
+  body.admin-page-bg .site-header>.container{padding:12px 6px!important}
+  body.admin-page-bg .site-header .brand .manlung-brand-copy,
+  body.admin-page-bg .site-header .brand span{display:none!important}
+  body.admin-page-bg .site-header .header-actions>a,
+  body.admin-page-bg .site-header .header-actions>button{justify-content:center!important;padding:10px 4px!important;font-size:0!important}
+  body.admin-page-bg>.container,
+  body.admin-page-bg>main.container,
+  body.admin-page-bg>main.wrap,
+  body.admin-page-bg>main.tools-shell,
+  body.admin-page-bg>main.music-shell{margin-left:68px!important}
+}
