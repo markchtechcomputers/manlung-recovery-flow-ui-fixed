@@ -179,6 +179,28 @@ body.ml-admin-menu-open{overflow:auto!important}
 
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
 <style id="access-accounts-grid-balance">#access-accounts-section .tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:650px){#access-accounts-section .tool-grid{grid-template-columns:1fr}}</style>
+
+<style id="tools-full-viewport-width-fix-20261030">
+/* Match the full-width admin dashboard instead of centering tools in a narrow column. */
+html,body.admin-page-bg{width:100%!important;max-width:none!important;margin:0!important}
+body.admin-page-bg{min-height:100vh!important}
+body.admin-page-bg .site-header,
+body.admin-page-bg .site-header>.container,
+body.admin-page-bg .tools-shell,
+body.admin-page-bg .manlung-footer,
+body.admin-page-bg .manlung-footer-inner{
+  width:100%!important;max-width:none!important;
+}
+body.admin-page-bg .tools-shell{
+  margin:0!important;padding-left:clamp(16px,2.2vw,34px)!important;
+  padding-right:clamp(16px,2.2vw,34px)!important;
+}
+body.admin-page-bg .site-header>.container{
+  padding-left:clamp(16px,2.2vw,34px)!important;
+  padding-right:clamp(16px,2.2vw,34px)!important;
+}
+body.admin-page-bg .tool-grid{min-width:0}
+</style>
 </head>
 <body class="admin-page-bg">
 <header class="site-header">
