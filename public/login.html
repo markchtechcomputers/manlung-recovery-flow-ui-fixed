@@ -2605,11 +2605,22 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
       const callback = new URL(callbackUrl);
       const oauthError = callback.searchParams.get('error_description') || callback.searchParams.get('error');
       if (oauthError) throw new Error(oauthError);
-      const code = callback.searchParams.get('code');
-      if (!code) throw new Error('The provider returned without an authorization code. Please try again.');
-      const { data: exchanged, error: exchangeError } = await client.auth.exchangeCodeForSession(callbackUrl);
-      if (exchangeError) throw exchangeError;
-      let session = exchanged?.session;
+      // OAuth providers may return an implicit access token (Google's native
+      // WebView bridge) or a PKCE authorization code (GitHub/Discord). Accept
+      // both callback shapes and validate the resulting session server-side.
+      const fragment = new URLSearchParams(callback.hash.replace(/^#/, ''));
+      const accessToken = callback.searchParams.get('access_token') || fragment.get('access_token');
+      const code = callback.searchParams.get('code') || fragment.get('code');
+      let session = null;
+      if (accessToken) {
+        session = { access_token: accessToken, token_type: callback.searchParams.get('token_type') || fragment.get('token_type') || 'bearer' };
+      } else if (code) {
+        const { data: exchanged, error: exchangeError } = await client.auth.exchangeCodeForSession(callbackUrl);
+        if (exchangeError) throw exchangeError;
+        session = exchanged?.session || null;
+      } else {
+        throw new Error('The provider returned without a secure sign-in token. Please try again.');
+      }
       if (!session?.access_token) {
         const { data, error } = await client.auth.getSession();
         if (error) throw error;
