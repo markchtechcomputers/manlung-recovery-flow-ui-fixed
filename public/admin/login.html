@@ -640,9 +640,9 @@ body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50
             document.getElementById('adminMfaCode').value = '';
         }
 
-        fetch('/api/auth/verify', { credentials: 'include' }).then(async (res) => {
-            if (res.ok) window.location.href = '/admin/dashboard.html';
-        }).catch(() => {});
+        // Do not silently bypass the login screen on page load. Admins must
+        // intentionally start a fresh sign-in; MFA is only completed after
+        // the password step and a valid authenticator/recovery code.
     </script>
 <script id="admin-forgot-password-script">
 (function(){
