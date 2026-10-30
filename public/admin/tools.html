@@ -179,22 +179,27 @@ body.ml-admin-menu-open{overflow:auto!important}
 
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
 </head>
-<body>
+<body class="admin-page-bg">
 <header class="site-header">
   <div class="container">
     <div class="brand manlung-brand">
       <img class="manlung-site-logo admin-portal-logo" src="/icons/icon-512.png" alt="Manlung Recovery">
       <div class="manlung-brand-copy"><h1>Manlung Recovery</h1><span>Admin Tools · Investigation &amp; Operations Center</span></div>
     </div>
-    <div class="header-actions" aria-label="Admin navigation">
-      <a class="btn btn-primary dashboard-header-btn" href="/admin/dashboard.html" aria-label="Go to Dashboard"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
-      <a class="btn btn-outline" href="/admin/reports.html"><i class="fas fa-chart-column"></i> Reports</a>
-      <a class="btn btn-outline" href="/admin/operations.html"><i class="fas fa-list-check"></i> Operations</a>
-      <a class="btn btn-outline" href="/admin/tools.html" aria-current="page"><i class="fas fa-toolbox"></i> Tools</a>
-      <a class="btn btn-outline" href="/admin/music.html"><i class="fas fa-music"></i> Music</a>
-      <button class="btn btn-outline" data-theme-toggle="true" aria-label="Toggle theme"></button>
-      <a class="btn btn-danger" href="/admin/login.html?logout=1" onclick="logoutFromTools(event)"><i class="fas fa-right-from-bracket"></i> Logout</a>
-    </div>
+    <nav class="header-actions" aria-label="Admin navigation">
+      <a class="btn btn-outline" href="/admin/dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+      <a class="btn btn-outline" href="/admin/dashboard.html#cases-section"><i class="fa-solid fa-folder-open"></i> Cases</a>
+      <a class="btn btn-outline" href="/admin/dashboard.html#donations-section"><i class="fa-solid fa-hand-holding-heart"></i> Donations</a>
+      <a class="btn btn-outline" href="/admin/dashboard.html#call-admin-section"><i class="fa-solid fa-phone-volume"></i> Call Admin</a>
+      <a class="btn btn-outline" href="/admin/owner.html"><i class="fa-solid fa-user-shield"></i> Admin Management</a>
+      <a class="btn btn-outline" href="/admin/reports.html"><i class="fa-solid fa-chart-line"></i> Reports</a>
+      <a class="btn btn-outline" href="/admin/operations.html"><i class="fa-solid fa-list-check"></i> Operations</a>
+      <a class="btn btn-outline" href="/admin/music.html"><i class="fa-solid fa-music"></i> Music</a>
+      <a class="btn btn-outline active" href="/admin/tools.html" aria-current="page"><i class="fa-solid fa-toolbox"></i> Tools</a>
+      <a class="btn btn-outline" href="/admin/connect.html"><i class="fa-solid fa-comments"></i> WhatsApp Chats</a>
+      <a class="btn btn-outline" href="/"><i class="fa-solid fa-house"></i> Home</a>
+      <a class="btn btn-danger" href="/admin/login.html?logout=1" onclick="logoutFromTools(event)"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
   </div>
 </header>
 <main class="tools-shell">
