@@ -1543,13 +1543,18 @@ html body.manlung-auth-page .manlung-social-grid button.manlung-google-native-bu
   max-width:30px!important;max-height:30px!important;overflow:visible!important;
   flex:0 0 30px!important;filter:none!important;-webkit-filter:none!important;
 }
-html body.manlung-auth-page .manlung-social-grid button.manlung-google-native-button > svg.google-brand-mark > path:nth-child(1){fill:#4285F4!important;fill-opacity:1!important}
-html body.manlung-auth-page .manlung-social-grid button.manlung-google-native-button > svg.google-brand-mark > path:nth-child(2){fill:#34A853!important;fill-opacity:1!important}
-html body.manlung-auth-page .manlung-social-grid button.manlung-google-native-button > svg.google-brand-mark > path:nth-child(3){fill:#FBBC05!important;fill-opacity:1!important}
-html body.manlung-auth-page .manlung-social-grid button.manlung-google-native-button > svg.google-brand-mark > path:nth-child(4){fill:#EA4335!important;fill-opacity:1!important}
-html body.manlung-auth-page .manlung-social-grid button.manlung-google-native-button > svg.google-brand-mark,
-html body.manlung-auth-page .manlung-social-grid button.manlung-google-native-button > svg.google-brand-mark *{
+html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark > path:nth-child(1){fill:#4285F4!important;fill-opacity:1!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark > path:nth-child(2){fill:#34A853!important;fill-opacity:1!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark > path:nth-child(3){fill:#FBBC05!important;fill-opacity:1!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark > path:nth-child(4){fill:#EA4335!important;fill-opacity:1!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark,
+html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark *{
   visibility:visible!important;opacity:1!important;stroke:none!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark{
+  filter:none!important;-webkit-filter:none!important;mix-blend-mode:normal!important;
+  forced-color-adjust:none!important;-webkit-print-color-adjust:exact!important;
+  print-color-adjust:exact!important;
 }
 </style>
 
@@ -2281,6 +2286,28 @@ async function setupOfficialGoogleButtons(){
   const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.() ||
     window.Capacitor?.getPlatform?.() === 'android' ||
     /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator?.userAgent || ''));
+
+  // Apply the official four-colour G to BOTH native and browser/GIS render paths.
+  // Android WebView can apply inherited SVG fill/forced-dark styling unless each path
+  // receives an explicit important fill at the element level.
+  const applyGoogleBrandColours = mark => {
+    if (!mark) return;
+    const colours = ['#4285F4', '#34A853', '#FBBC05', '#EA4335'];
+    mark.style.setProperty('display', 'block', 'important');
+    mark.style.setProperty('visibility', 'visible', 'important');
+    mark.style.setProperty('opacity', '1', 'important');
+    mark.style.setProperty('filter', 'none', 'important');
+    mark.style.setProperty('-webkit-filter', 'none', 'important');
+    mark.style.setProperty('mix-blend-mode', 'normal', 'important');
+    mark.style.setProperty('forced-color-adjust', 'none', 'important');
+    mark.querySelectorAll('path').forEach((path, index) => {
+      if (colours[index]) path.style.setProperty('fill', colours[index], 'important');
+      path.style.setProperty('fill-opacity', '1', 'important');
+      path.style.setProperty('stroke', 'none', 'important');
+      path.style.setProperty('opacity', '1', 'important');
+    });
+  };
+
   if (nativeApp) {
     const googleHosts = ['googleLoginBtn', 'googleRegisterBtn'];
     googleHosts.forEach(id => {
@@ -2292,21 +2319,11 @@ async function setupOfficialGoogleButtons(){
       button.className = 'manlung-social-btn manlung-google-btn manlung-google-native-button';
       button.style.width = '100%';
       button.innerHTML = '<svg class="social-brand-icon google-brand-mark manlung-google-visible-mark" viewBox="0 0 48 48" width="30" height="30" aria-hidden="true" focusable="false"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.13-2.75-.36-4.05H24v7.67h11a9.4 9.4 0 0 1-4.08 6.17v5.02h6.62c3.88-3.58 6.06-8.85 6.06-14.81Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.83 13.47-4.96l-6.62-5.02c-1.83 1.23-4.17 1.96-6.85 1.96-5.27 0-9.74-3.56-11.34-8.36H5.82v5.18A20.34 20.34 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.66 27.62a12.2 12.2 0 0 1 0-7.24V15.2H5.82a20.02 20.02 0 0 0 0 17.6l6.84-5.18Z"/><path fill="#EA4335" d="M24 11.99c3 0 5.7 1.03 7.82 3.07l5.86-5.86C34.09 5.83 29.5 4 24 4A20.34 20.34 0 0 0 5.82 15.2l6.84 5.18C14.26 15.55 18.73 11.99 24 11.99Z"/></svg>';
-      // Apply brand fills as inline !important styles so broad WebView SVG rules cannot whiten the mark.
       const googleMark = button.querySelector('svg.google-brand-mark');
-      const googleBrandColours = ['#4285F4', '#34A853', '#FBBC05', '#EA4335'];
+      applyGoogleBrandColours(googleMark);
       if (googleMark) {
-        googleMark.style.setProperty('display', 'block', 'important');
-        googleMark.style.setProperty('visibility', 'visible', 'important');
-        googleMark.style.setProperty('opacity', '1', 'important');
-        googleMark.style.setProperty('filter', 'none', 'important');
         googleMark.style.setProperty('width', '30px', 'important');
         googleMark.style.setProperty('height', '30px', 'important');
-        googleMark.querySelectorAll('path').forEach((path, index) => {
-          if (googleBrandColours[index]) path.style.setProperty('fill', googleBrandColours[index], 'important');
-          path.style.setProperty('fill-opacity', '1', 'important');
-          path.style.setProperty('stroke', 'none', 'important');
-        });
       }
       button.addEventListener('click', async () => {
         const target = document.getElementById(id === 'googleRegisterBtn' ? 'registerError' : 'loginError');
@@ -2472,6 +2489,7 @@ async function setupOfficialGoogleButtons(){
         mark.setAttribute('aria-hidden','true');
         mark.style.cssText='position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;display:block!important;width:29px!important;height:29px!important;z-index:5!important;pointer-events:none!important;opacity:1!important;visibility:visible!important';
         mark.innerHTML='<path fill="#4285F4" d="M43.6 24.5c0-1.4-.13-2.75-.36-4.05H24v7.67h11a9.4 9.4 0 0 1-4.08 6.17v5.02h6.62c3.88-3.58 6.06-8.85 6.06-14.81Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.83 13.47-4.96l-6.62-5.02c-1.83 1.23-4.17 1.96-6.85 1.96-5.27 0-9.74-3.56-11.34-8.36H5.82v5.18A20.34 20.34 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.66 27.62a12.2 12.2 0 0 1 0-7.24V15.2H5.82a20.02 20.02 0 0 0 0 17.6l6.84-5.18Z"/><path fill="#EA4335" d="M24 11.99c3 0 5.7 1.03 7.82 3.07l5.86-5.86C34.09 5.83 29.5 4 24 4A20.34 20.34 0 0 0 5.82 15.2l6.84 5.18C14.26 15.55 18.73 11.99 24 11.99Z"/>';
+        applyGoogleBrandColours(mark);
         host.appendChild(mark);
       }
       // Watch for GIS's delayed iframe and keep it as the actual click target,
