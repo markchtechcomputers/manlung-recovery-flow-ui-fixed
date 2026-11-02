@@ -262,8 +262,11 @@
 
   function isAndroidApp() {
     try {
+      const platform = window.Capacitor?.getPlatform?.();
+      const userAgent = window.navigator?.userAgent || '';
       return Boolean(window.Capacitor?.isNativePlatform?.()) ||
-        /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator.userAgent);
+        platform === 'android' ||
+        /Capacitor|ManlungRecoveryAndroid/i.test(userAgent);
     } catch (_) {
       return false;
     }
@@ -385,6 +388,8 @@
         /* APK-only chrome: remove every website footer and every browser APK/install promotion. */
         html.manlung-android-app body footer,
         html.manlung-android-app body [role="contentinfo"],
+        html.manlung-android-app body [class*="footer"],
+        html.manlung-android-app body [id*="footer"],
         html.manlung-android-app body .site-footer,
         html.manlung-android-app body .manlung-footer,
         html.manlung-android-app body #footer,
@@ -401,6 +406,7 @@
         html.manlung-android-app body .apk-download-prompt,
         html.manlung-android-app body .mr-hero-android-link,
         html.manlung-android-app body .mr-apk-download-button,
+        html.manlung-android-app body .mr-hero-download-card,
         html.manlung-android-app body #manlung-pwa-banner,
         html.manlung-android-app body a[href*="/api/download-apk"],
         html.manlung-android-app body a[href*="download-apk"],
@@ -417,7 +423,7 @@
 
     const removeAppOnlyPromos = () => {
       document.querySelectorAll(
-        '#manlung-pwa-banner, [data-pwa-install], .pwa-install-prompt, .apk-download-prompt, .mr-hero-android-link, .mr-apk-download-button'
+        '#manlung-pwa-banner, [data-pwa-install], .pwa-install-prompt, .apk-download-prompt, .mr-hero-android-link, .mr-apk-download-button, .mr-hero-download-card, footer, [role="contentinfo"], [class*="footer"], [id*="footer"]'
       ).forEach(node => node.remove());
       document.querySelectorAll(
         'a[href*="/api/download-apk"], a[href*="download-apk"], a[href*="download-app.html"], a[href*="ManlungRecovery.apk"], a[href*="/releases/download/android-latest/"]'
