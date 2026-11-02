@@ -2500,6 +2500,12 @@ const socialSignInLocks = new Set();
 
 async function startSocialSignup(provider, sourceButton){
   if(!['github','discord'].includes(provider) || socialSignInLocks.has(provider)) return;
+  const nativeSocialApp = Boolean(window.Capacitor?.isNativePlatform?.()) ||
+    window.Capacitor?.getPlatform?.() === 'android' ||
+    /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator?.userAgent || '');
+  if(nativeSocialApp && typeof window.startManlungNativeOAuth === 'function'){
+    return window.startManlungNativeOAuth(provider);
+  }
   socialSignInLocks.add(provider);
   const buttons = ['githubLoginBtn','githubRegisterBtn','discordLoginBtn','discordRegisterBtn']
     .map(id => document.getElementById(id)).filter(Boolean);
