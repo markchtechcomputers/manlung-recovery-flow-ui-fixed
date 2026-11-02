@@ -2358,9 +2358,23 @@ async function setupOfficialGoogleButtons(){
       });
       const iframe=host.querySelector('iframe');
       if(iframe){
-        iframe.style.display='block';
-        iframe.style.width='100%';
-        iframe.style.maxWidth='100%';
+        // Keep Google's official interactive iframe as the click target, but do
+        // not rely on its cross-origin icon painting correctly in every browser.
+        // A local SVG is layered underneath it as a guaranteed visible brand mark.
+        host.style.position='relative';
+        host.style.overflow='hidden';
+        iframe.style.cssText += ';display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:100%!important;opacity:0.01!important;z-index:2!important;border:0!important;cursor:pointer!important';
+        if(!host.querySelector('.manlung-google-visible-mark')){
+          const mark=document.createElementNS('http://www.w3.org/2000/svg','svg');
+          mark.setAttribute('class','manlung-google-visible-mark');
+          mark.setAttribute('viewBox','0 0 48 48');
+          mark.setAttribute('width','29');
+          mark.setAttribute('height','29');
+          mark.setAttribute('aria-hidden','true');
+          mark.style.cssText='position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;display:block!important;width:29px!important;height:29px!important;z-index:1!important;pointer-events:none!important;opacity:1!important;visibility:visible!important';
+          mark.innerHTML='<path fill="#4285F4" d="M43.6 24.5c0-1.4-.13-2.75-.36-4.05H24v7.67h11a9.4 9.4 0 0 1-4.08 6.17v5.02h6.62c3.88-3.58 6.06-8.85 6.06-14.81Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.83 13.47-4.96l-6.62-5.02c-1.83 1.23-4.17 1.96-6.85 1.96-5.27 0-9.74-3.56-11.34-8.36H5.82v5.18A20.34 20.34 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.66 27.62a12.2 12.2 0 0 1 0-7.24V15.2H5.82a20.02 20.02 0 0 0 0 17.6l6.84-5.18Z"/><path fill="#EA4335" d="M24 11.99c3 0 5.7 1.03 7.82 3.07l5.86-5.86C34.09 5.83 29.5 4 24 4A20.34 20.34 0 0 0 5.82 15.2l6.84 5.18C14.26 15.55 18.73 11.99 24 11.99Z"/>';
+          host.insertBefore(mark,iframe);
+        }
       }
     });
   }catch(err){
@@ -3243,3 +3257,28 @@ html body.dark.manlung-auth-page .manlung-social-grid > #discordRegisterBtn{
 }
 </style>
 
+
+
+<style id="manlung-social-provider-icon-hard-fix-20261102">
+/* Provider artwork is local inline SVG; no Font Awesome brand font or sprite is required. */
+html body.manlung-auth-page .manlung-social-grid > #discordLoginBtn > svg,
+html body.manlung-auth-page .manlung-social-grid > #discordRegisterBtn > svg{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  position:relative!important;z-index:3!important;flex:0 0 29px!important;
+  width:29px!important;height:29px!important;min-width:29px!important;min-height:29px!important;
+  max-width:29px!important;max-height:29px!important;overflow:visible!important;
+}
+html body.manlung-auth-page #discordLoginBtn .discord-brand-mark path,
+html body.manlung-auth-page #discordRegisterBtn .discord-brand-mark path{
+  fill:#fff!important;fill-opacity:1!important;opacity:1!important;visibility:visible!important;
+}
+html body.manlung-auth-page .manlung-google-visible-mark,
+html body.manlung-auth-page .manlung-google-visible-mark path{
+  display:block!important;visibility:visible!important;opacity:1!important;
+}
+html body.manlung-auth-page #googleLoginBtn iframe,
+html body.manlung-auth-page #googleRegisterBtn iframe{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  opacity:.01!important;z-index:2!important;border:0!important;
+}
+</style>
