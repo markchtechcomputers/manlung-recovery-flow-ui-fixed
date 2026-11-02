@@ -308,13 +308,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          while IFS=
-\\t' read -r artifact_id artifact_name; do
+          while read -r artifact_id artifact_name; do
             [ -z "$artifact_id" ] && continue
             [ "$artifact_name" = "$CURRENT_APK_ARTIFACT" ] && continue
             gh api --method DELETE "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id"
             echo "Deleted obsolete APK build artifact: $artifact_name"
           done < <(
             gh api --paginate "repos/$GITHUB_REPOSITORY/actions/artifacts?per_page=100" \
-              --jq '.artifacts[] | select(.name | startswith("ManlungRecovery-test-apk-")) | [.id, .name] | @tsv'
+              --jq '.artifacts[] | select(.name | startswith("ManlungRecovery-test-apk-")) | "\(.id) \(.name)"'
           )
