@@ -2325,15 +2325,14 @@ async function setupOfficialGoogleButtons(){
         googleMark.style.setProperty('width', '30px', 'important');
         googleMark.style.setProperty('height', '30px', 'important');
       }
-      button.addEventListener('click', async () => {
-        const target = document.getElementById(id === 'googleRegisterBtn' ? 'registerError' : 'loginError');
-        try {
-          if (!window.supabase?.createClient) throw new Error('Google sign-in is loading. Please try again.');
-          const cfg = await fetch('/api/config/public', { cache: 'no-store' }).then(async r => {
-            const d = await r.json();
-            if (!r.ok || !d.supabaseUrl || !d.supabaseAnonKey) throw new Error('Google sign-in is not configured.');
-            return d;
-          });
+      button.addEventListener('click', () => {
+        if (typeof window.startManlungNativeOAuth === 'function') {
+          window.startManlungNativeOAuth('google');
+        } else {
+          const target = document.getElementById(id === 'googleRegisterBtn' ? 'registerError' : 'loginError');
+          if (target) showMessage(target, 'Secure Android sign-in is still loading. Please try again.', 'error');
+        }
+      });
           const client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
             auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storage: window.localStorage }
           });
@@ -2672,10 +2671,16 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
 (function () {
   const APP_REDIRECT = 'co.manlungrecovery.app://auth/callback';
   const isNativeAndroid = () => {
+    const userAgent = window.navigator?.userAgent || '';
     try {
       const cap = window.Capacitor;
-      return !!cap && (typeof cap.isNativePlatform === 'function' ? cap.isNativePlatform() : cap.getPlatform?.() === 'android');
-    } catch (_) { return false; }
+      return Boolean(
+        (cap && (typeof cap.isNativePlatform === 'function' ? cap.isNativePlatform() : cap.getPlatform?.() === 'android')) ||
+        /Capacitor|ManlungRecoveryAndroid/i.test(userAgent)
+      );
+    } catch (_) {
+      return /Capacitor|ManlungRecoveryAndroid/i.test(userAgent);
+    }
   };
   const plugins = () => window.Capacitor?.Plugins || {};
   let callbackBusy = false;
@@ -2773,6 +2778,8 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
   // Google sign-in must use the site's direct Google Identity Services flow
   // and POST its verified Google credential to /api/auth/google. Do not route
   // the Google button through Supabase OAuth on Android.
+  // Expose one native OAuth entry point for Google, GitHub and Discord.
+  window.startManlungNativeOAuth = startNativeOAuth;
   const originalSocialSignup = window.startSocialSignup;
   if (typeof originalSocialSignup === 'function') {
     window.startSocialSignup = function (provider) {
@@ -2912,6 +2919,30 @@ html body.manlung-auth-page.dark .manlung-social-grid .manlung-social-btn{
 }
 </style>
 
+
+<style id="manlung-native-social-touch-fix">
+/* Keep provider controls above decorative layers and make every APK tap reach its handler. */
+html body.manlung-auth-page .manlung-social-grid{position:relative!important;z-index:20!important;isolation:isolate!important}
+html body.manlung-auth-page .manlung-social-grid > #googleLoginBtn,
+html body.manlung-auth-page .manlung-social-grid > #googleRegisterBtn,
+html body.manlung-auth-page .manlung-social-grid > #githubLoginBtn,
+html body.manlung-auth-page .manlung-social-grid > #githubRegisterBtn,
+html body.manlung-auth-page .manlung-social-grid > #discordLoginBtn,
+html body.manlung-auth-page .manlung-social-grid > #discordRegisterBtn{
+  position:relative!important;z-index:21!important;display:flex!important;
+  visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+  cursor:pointer!important;touch-action:manipulation!important;
+}
+html body.manlung-auth-page .manlung-social-grid > #googleLoginBtn > button,
+html body.manlung-auth-page .manlung-social-grid > #googleRegisterBtn > button{
+  position:relative!important;z-index:22!important;width:100%!important;height:100%!important;
+  min-width:0!important;min-height:0!important;margin:0!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  pointer-events:auto!important;touch-action:manipulation!important;cursor:pointer!important;
+}
+html body.manlung-auth-page .manlung-social-grid > *::before,
+html body.manlung-auth-page .manlung-social-grid > *::after{pointer-events:none!important}
+</style>
 </body>
 </html>
 
