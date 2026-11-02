@@ -162,7 +162,7 @@ jobs:
           marker = "super.onCreate(savedInstanceState);"
           if marker not in source:
               raise SystemExit("Could not find MainActivity onCreate marker")
-          line = marker + chr(10) + "        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);" + chr(10) + "        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {" + chr(10) + "            getBridge().getWebView().getSettings().setAlgorithmicDarkeningAllowed(false);" + chr(10) + "        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {" + chr(10) + "            getBridge().getWebView().getSettings().setForceDark(android.webkit.WebSettings.FORCE_DARK_OFF);" + chr(10) + "        }"
+          line = marker + chr(10) + "        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);" + chr(10) + "        getBridge().getWebView().getSettings().setUserAgentString(getBridge().getWebView().getSettings().getUserAgentString() + \" ManlungRecoveryAndroid\");" + chr(10) + "        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {" + chr(10) + "            getBridge().getWebView().getSettings().setAlgorithmicDarkeningAllowed(false);" + chr(10) + "        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {" + chr(10) + "            getBridge().getWebView().getSettings().setForceDark(android.webkit.WebSettings.FORCE_DARK_OFF);" + chr(10) + "        }"
           if "setMediaPlaybackRequiresUserGesture(false)" not in source:
               source = source.replace(marker, line, 1)
           activity.write_text(source)
