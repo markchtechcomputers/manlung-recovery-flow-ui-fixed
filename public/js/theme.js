@@ -38,7 +38,8 @@
   function manlungCurrentCurrency(){try{if(localStorage.getItem('manlung-currency-manual')==='true'){const saved=localStorage.getItem('manlung-currency');if(saved&&MANLUNG_CURRENCY_RATES[saved])return saved}}catch(_){}return MANLUNG_LANGUAGE_CURRENCY[manlungLanguageCode()]||'KES'}
   function manlungSetCurrency(currency,manual=true){if(!MANLUNG_CURRENCY_RATES[currency])return;try{localStorage.setItem('manlung-currency',currency);localStorage.setItem('manlung-currency-manual',manual?'true':'false')}catch(_){}window.dispatchEvent(new CustomEvent('manlung:currencychange',{detail:{currency}}))}
   window.ManlungCurrency={rates:MANLUNG_CURRENCY_RATES,options:[['KES','Kenyan shilling (KSh)'],['USD','US dollar ($)'],['EUR','Euro (€)'],['GBP','British pound (£)'],['UGX','Ugandan shilling'],['TZS','Tanzanian shilling'],['NGN','Nigerian naira (₦)'],['INR','Indian rupee (₹)'],['ZAR','South African rand'],['AED','UAE dirham'],['CAD','Canadian dollar'],['AUD','Australian dollar'],['JPY','Japanese yen'],['CNY','Chinese yuan'],['GHS','Ghanaian cedi'],['RUB','Russian ruble']],current:manlungCurrentCurrency,set:manlungSetCurrency,toKes:(amount,currency=manlungCurrentCurrency)=>Number(amount||0)*(MANLUNG_CURRENCY_RATES[currency]||1),fromKes:(amount,currency=manlungCurrentCurrency)=>Number(amount||0)/(MANLUNG_CURRENCY_RATES[currency]||1),format:(amount,currency=manlungCurrentCurrency)=>{try{return new Intl.NumberFormat(undefined,{style:'currency',currency,maximumFractionDigits:['KES','UGX','TZS','NGN','JPY'].includes(currency)?0:2}).format(Number(amount||0))}catch(_){return currency+' '+Number(amount||0).toLocaleString()}}};
-  manlungRefreshCurrencyRates();
+  // The auth screen avoids nonessential currency network requests during sign-in.
+  if (!/\/login(?:\.html)?\/?$/.test(location.pathname)) manlungRefreshCurrencyRates();
 
   function readTheme() {
     try { return localStorage.getItem(STORAGE_KEY) === DARK ? DARK : LIGHT; }
@@ -638,8 +639,10 @@
   }
 
   function boot() {
+    const isAuthPage = document.body?.classList.contains('manlung-auth-page') ||
+      /\/login(?:\.html)?\/?$/.test(location.pathname);
     installAndroidAppMode();
-    installGlobalLanguageSelector();
+    if (!isAuthPage) installGlobalLanguageSelector();
     removeLegacyNavigationColours();
     convertLegacyButtons();
     installHeaderPolish();
@@ -649,8 +652,10 @@
     normalizeThemeButtons();
     installCallIconFix();
     loadAdminCallIcons();
-    loadContactFab();
-    loadManlungAI();
+    if (!isAuthPage) {
+      loadContactFab();
+      loadManlungAI();
+    }
     loadClientCaseChat();
     installHeroVideoPlaylist();
   }
