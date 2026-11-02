@@ -382,24 +382,34 @@
             transition-duration: 0.01ms !important;
           }
         }
+        /* APK-only chrome: remove every website footer and every browser APK/install promotion. */
         html.manlung-android-app body footer,
         html.manlung-android-app body [role="contentinfo"],
         html.manlung-android-app body .site-footer,
         html.manlung-android-app body .manlung-footer,
         html.manlung-android-app body #footer,
         html.manlung-android-app body #site-footer,
+        html.manlung-android-app body .footer,
+        html.manlung-android-app body .footer-container,
+        html.manlung-android-app body .footer-wrapper,
+        html.manlung-android-app body [data-footer],
         html.manlung-android-app body [data-desktop-only],
         html.manlung-android-app body .desktop-only,
         html.manlung-android-app body .desktop-only-section,
         html.manlung-android-app body .website-only,
         html.manlung-android-app body .pwa-install-prompt,
-        html.manlung-android-app body #manlung-pwa-banner {
-          display: none !important;
-        }
+        html.manlung-android-app body .apk-download-prompt,
+        html.manlung-android-app body .mr-hero-android-link,
+        html.manlung-android-app body .mr-apk-download-button,
+        html.manlung-android-app body #manlung-pwa-banner,
+        html.manlung-android-app body a[href*="/api/download-apk"],
+        html.manlung-android-app body a[href*="download-apk"],
         html.manlung-android-app body a[href*="download-app.html"],
         html.manlung-android-app body a[href*="ManlungRecovery.apk"],
         html.manlung-android-app body a[href*="/releases/download/android-latest/"] {
           display: none !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
         }
       `;
       document.head.appendChild(style);
@@ -407,14 +417,11 @@
 
     const removeAppOnlyPromos = () => {
       document.querySelectorAll(
-        '#manlung-pwa-banner, [data-pwa-install], .pwa-install-prompt, .apk-download-prompt'
+        '#manlung-pwa-banner, [data-pwa-install], .pwa-install-prompt, .apk-download-prompt, .mr-hero-android-link, .mr-apk-download-button'
       ).forEach(node => node.remove());
       document.querySelectorAll(
-        'a[href*="download-app.html"], a[href*="ManlungRecovery.apk"], a[href*="/releases/download/android-latest/"]'
-      ).forEach(link => {
-        link.setAttribute('aria-hidden', 'true');
-        link.setAttribute('tabindex', '-1');
-      });
+        'a[href*="/api/download-apk"], a[href*="download-apk"], a[href*="download-app.html"], a[href*="ManlungRecovery.apk"], a[href*="/releases/download/android-latest/"]'
+      ).forEach(link => link.remove());
     };
     removeAppOnlyPromos();
     if (!window.__manlungAppModeObserver && document.body) {
