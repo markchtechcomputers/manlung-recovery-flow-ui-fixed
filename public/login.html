@@ -2345,8 +2345,14 @@ async function setupOfficialGoogleButtons(){
       host.style.background='transparent';
       host.style.boxShadow='none';
 
-      // Paint our own Google mark immediately. GIS inserts its iframe asynchronously
-      // in some browsers, so querying for it synchronously can miss it entirely.
+      google.accounts.id.renderButton(host,{
+        type:'icon',
+        theme:'outline',
+        size:'large',
+        shape:'square',
+        locale:'en'
+      });
+      // GIS may clear the host while rendering; append the local logo afterwards.
       host.style.position='relative';
       host.style.overflow='hidden';
       if(!host.querySelector('.manlung-google-visible-mark')){
@@ -2360,13 +2366,6 @@ async function setupOfficialGoogleButtons(){
         mark.innerHTML='<path fill="#4285F4" d="M43.6 24.5c0-1.4-.13-2.75-.36-4.05H24v7.67h11a9.4 9.4 0 0 1-4.08 6.17v5.02h6.62c3.88-3.58 6.06-8.85 6.06-14.81Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.83 13.47-4.96l-6.62-5.02c-1.83 1.23-4.17 1.96-6.85 1.96-5.27 0-9.74-3.56-11.34-8.36H5.82v5.18A20.34 20.34 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.66 27.62a12.2 12.2 0 0 1 0-7.24V15.2H5.82a20.02 20.02 0 0 0 0 17.6l6.84-5.18Z"/><path fill="#EA4335" d="M24 11.99c3 0 5.7 1.03 7.82 3.07l5.86-5.86C34.09 5.83 29.5 4 24 4A20.34 20.34 0 0 0 5.82 15.2l6.84 5.18C14.26 15.55 18.73 11.99 24 11.99Z"/>';
         host.appendChild(mark);
       }
-      google.accounts.id.renderButton(host,{
-        type:'icon',
-        theme:'outline',
-        size:'large',
-        shape:'square',
-        locale:'en'
-      });
       // Watch for GIS's delayed iframe and keep it as the actual click target,
       // while placing it beneath the locally rendered, non-interactive logo.
       const styleGoogleFrame=()=>{
@@ -3276,8 +3275,12 @@ html body.manlung-auth-page .manlung-social-grid > #discordRegisterBtn > svg{
 }
 html body.manlung-auth-page #discordLoginBtn .discord-brand-mark path,
 html body.manlung-auth-page #discordRegisterBtn .discord-brand-mark path{
-  fill:#fff!important;fill-opacity:1!important;opacity:1!important;visibility:visible!important;
+  fill:#fff!important;fill-opacity:1!important;stroke:#fff!important;stroke-width:0!important;opacity:1!important;visibility:visible!important;
 }
+html body.manlung-auth-page #discordLoginBtn,
+html body.manlung-auth-page #discordRegisterBtn{color:#fff!important;}
+html body.manlung-auth-page #discordLoginBtn > svg.discord-brand-mark,
+html body.manlung-auth-page #discordRegisterBtn > svg.discord-brand-mark{overflow:visible!important;transform:translateZ(0)!important;}
 html body.manlung-auth-page #discordLoginBtn > svg.discord-brand-mark,
 html body.manlung-auth-page #discordRegisterBtn > svg.discord-brand-mark{
   display:block!important;visibility:visible!important;opacity:1!important;
