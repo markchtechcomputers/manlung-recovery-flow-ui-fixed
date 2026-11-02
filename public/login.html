@@ -2255,7 +2255,8 @@ async function setupOfficialGoogleButtons(){
   // In the Android APK, run Google OAuth in the system browser and return through
   // the registered Capacitor deep link. GIS popups are unreliable inside Android WebView.
   const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.() ||
-    window.Capacitor?.getPlatform?.() === 'android');
+    window.Capacitor?.getPlatform?.() === 'android' ||
+    /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator?.userAgent || ''));
   if (nativeApp) {
     const googleHosts = ['googleLoginBtn', 'googleRegisterBtn'];
     googleHosts.forEach(id => {
