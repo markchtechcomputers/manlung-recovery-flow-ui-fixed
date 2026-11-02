@@ -3137,3 +3137,109 @@ html body.dark.manlung-auth-page .manlung-social-grid .manlung-google-btn{backgr
  html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{transition:none!important}
 }
 </style>
+
+
+<style id="manlung-client-social-row-reference-20261102">
+/* Client login + account creation: one consistent row of real provider controls. */
+html body.manlung-auth-page #loginPanel .manlung-social-grid,
+html body.manlung-auth-page #registerPanel .manlung-social-grid{
+  display:flex!important;display:flex!important;
+  flex-flow:row nowrap!important;
+  align-items:center!important;justify-content:center!important;
+  gap:16px!important;width:100%!important;min-width:0!important;
+  margin:0 auto 16px!important;padding:8px 0!important;
+}
+html body.manlung-auth-page #loginPanel .manlung-social-grid > #googleLoginBtn,
+html body.manlung-auth-page #registerPanel .manlung-social-grid > #googleRegisterBtn,
+html body.manlung-auth-page #loginPanel .manlung-social-grid > #githubLoginBtn,
+html body.manlung-auth-page #registerPanel .manlung-social-grid > #githubRegisterBtn,
+html body.manlung-auth-page #loginPanel .manlung-social-grid > #discordLoginBtn,
+html body.manlung-auth-page #registerPanel .manlung-social-grid > #discordRegisterBtn{
+  position:relative!important;box-sizing:border-box!important;
+  display:flex!important;flex:0 0 56px!important;
+  align-items:center!important;justify-content:center!important;
+  width:56px!important;min-width:56px!important;max-width:56px!important;
+  height:56px!important;min-height:56px!important;max-height:56px!important;
+  margin:0!important;padding:0!important;
+  border:1px solid #d7e0ee!important;border-radius:15px!important;
+  overflow:hidden!important;cursor:pointer!important;
+  box-shadow:6px 6px 12px #cbd5e1,-6px -6px 12px #fff!important;
+  transition:transform .16s ease,box-shadow .16s ease!important;
+}
+html body.manlung-auth-page #loginPanel .manlung-social-grid > #googleLoginBtn,
+html body.manlung-auth-page #registerPanel .manlung-social-grid > #googleRegisterBtn{
+  order:1!important;background:#fff!important;border-color:#d7e0ee!important;
+}
+html body.manlung-auth-page #loginPanel .manlung-social-grid > #githubLoginBtn,
+html body.manlung-auth-page #registerPanel .manlung-social-grid > #githubRegisterBtn{
+  order:2!important;background:#202938!important;border-color:#202938!important;
+}
+html body.manlung-auth-page #loginPanel .manlung-social-grid > #discordLoginBtn,
+html body.manlung-auth-page #registerPanel .manlung-social-grid > #discordRegisterBtn{
+  order:3!important;background:#5865f2!important;border-color:#5865f2!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-social-btn > svg{
+  position:static!important;display:block!important;flex:0 0 29px!important;
+  width:29px!important;height:29px!important;min-width:29px!important;min-height:29px!important;
+  max-width:29px!important;max-height:29px!important;
+  margin:0!important;padding:0!important;transform:none!important;object-fit:contain!important;
+}
+html body.manlung-auth-page .manlung-social-grid .github-brand-mark path{fill:#fff!important}
+html body.manlung-auth-page .manlung-social-grid .discord-brand-mark path{fill:#fff!important}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{
+  padding:0!important;background:#fff!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn > div{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;height:100%!important;margin:0!important;padding:0!important;
+}
+html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe{
+  display:block!important;flex:0 0 40px!important;
+  width:40px!important;min-width:40px!important;max-width:40px!important;
+  height:40px!important;min-height:40px!important;max-height:40px!important;
+  margin:0 auto!important;padding:0!important;border:0!important;
+}
+html body.manlung-auth-page .manlung-social-grid > #googleLoginBtn:hover,
+html body.manlung-auth-page .manlung-social-grid > #googleRegisterBtn:hover,
+html body.manlung-auth-page .manlung-social-grid > #githubLoginBtn:hover,
+html body.manlung-auth-page .manlung-social-grid > #githubRegisterBtn:hover,
+html body.manlung-auth-page .manlung-social-grid > #discordLoginBtn:hover,
+html body.manlung-auth-page .manlung-social-grid > #discordRegisterBtn:hover{
+  transform:translateY(-2px)!important;
+  box-shadow:8px 8px 15px #cbd5e1,-8px -8px 15px #fff!important;
+}
+html body.manlung-auth-page .manlung-social-grid > button:focus-visible,
+html body.manlung-auth-page .manlung-social-grid > div:focus-within{
+  outline:3px solid rgba(59,130,246,.45)!important;outline-offset:3px!important;
+}
+html body.dark.manlung-auth-page .manlung-social-grid > #githubLoginBtn,
+html body.dark.manlung-auth-page .manlung-social-grid > #githubRegisterBtn,
+html body.dark.manlung-auth-page .manlung-social-grid > #discordLoginBtn,
+html body.dark.manlung-auth-page .manlung-social-grid > #discordRegisterBtn{
+  box-shadow:6px 6px 12px #070d17,-6px -6px 12px #1b2b43!important;
+}
+@media(max-width:520px){
+  html body.manlung-auth-page #loginPanel .manlung-social-grid,
+  html body.manlung-auth-page #registerPanel .manlung-social-grid{gap:12px!important}
+  html body.manlung-auth-page #loginPanel .manlung-social-grid > #googleLoginBtn,
+  html body.manlung-auth-page #registerPanel .manlung-social-grid > #googleRegisterBtn,
+  html body.manlung-auth-page #loginPanel .manlung-social-grid > #githubLoginBtn,
+  html body.manlung-auth-page #registerPanel .manlung-social-grid > #githubRegisterBtn,
+  html body.manlung-auth-page #loginPanel .manlung-social-grid > #discordLoginBtn,
+  html body.manlung-auth-page #registerPanel .manlung-social-grid > #discordRegisterBtn{
+    flex-basis:48px!important;width:48px!important;min-width:48px!important;max-width:48px!important;
+    height:48px!important;min-height:48px!important;max-height:48px!important;border-radius:13px!important;
+  }
+  html body.manlung-auth-page .manlung-social-grid .manlung-social-btn > svg{
+    width:25px!important;height:25px!important;min-width:25px!important;min-height:25px!important;
+  }
+  html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe{
+    width:36px!important;min-width:36px!important;max-width:36px!important;
+    height:36px!important;min-height:36px!important;max-height:36px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body.manlung-auth-page .manlung-social-grid > *{transition:none!important}
+}
+</style>
+
