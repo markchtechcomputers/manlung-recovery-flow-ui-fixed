@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://accounts.google.com" crossorigin>
   <link rel="dns-prefetch" href="//challenges.cloudflare.com">
   <link rel="dns-prefetch" href="//accounts.google.com">
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async></script>
+  <!-- Turnstile is loaded on demand only when server config enables it. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Secure Manlung Recovery client sign in and account registration.">
   <title>Client Access · Manlung Recovery</title>
@@ -1540,7 +1540,7 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-visib
       <div class="manlung-brand-copy"><h1> Manlung Recovery</h1><span>Cyber Recovery &amp; Digital Investigation Portal</span></div>
     </div>
     <div class="header-actions">
-      <button class="btn btn-outline" data-theme-toggle="true"> Dark</button>
+      
       <a href="/client/dashboard.html" class="btn btn-outline"> My Cases</a>
       <a href="/blog.html" class="btn btn-outline"> Blog</a>
       <a href="/donate.html" class="btn btn-outline"> Donate</a>
@@ -1748,58 +1748,125 @@ async function handleForgot(event) {
 }
 let clientTurnstileEnabled = false;
 let clientTurnstileWidget = null;
+let clientTurnstileSiteKey = '';
+let clientTurnstileApiPromise = null;
+let clientTurnstileRetryButton = null;
+
+function loadClientTurnstileApi() {
+  if (window.turnstile) return Promise.resolve(window.turnstile);
+  if (clientTurnstileApiPromise) return clientTurnstileApiPromise;
+
+  clientTurnstileApiPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    let settled = false;
+    const timeout = window.setTimeout(() => finish(new Error('Cloudflare verification is taking too long. Check your connection and retry.')), 7000);
+    function finish(error) {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeout);
+      script.onload = null;
+      script.onerror = null;
+      if (error) {
+        script.remove();
+        clientTurnstileApiPromise = null;
+        reject(error);
+      } else if (window.turnstile) {
+        resolve(window.turnstile);
+      } else {
+        clientTurnstileApiPromise = null;
+        reject(new Error('Cloudflare verification did not initialize. Please retry.'));
+      }
+    }
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => finish();
+    script.onerror = () => finish(new Error('Cloudflare verification could not connect. Check your network or content blocker and retry.'));
+    document.head.appendChild(script);
+  });
+  return clientTurnstileApiPromise;
+}
+
+function setTurnstileRetryVisible(visible) {
+  if (!clientTurnstileRetryButton) {
+    const host = document.getElementById('clientTurnstile');
+    if (!host) return;
+    clientTurnstileRetryButton = document.createElement('button');
+    clientTurnstileRetryButton.type = 'button';
+    clientTurnstileRetryButton.className = 'manlung-turnstile-retry';
+    clientTurnstileRetryButton.textContent = 'Retry security check';
+    clientTurnstileRetryButton.hidden = true;
+    clientTurnstileRetryButton.addEventListener('click', async () => {
+      clientTurnstileRetryButton.hidden = true;
+      showMessage(document.getElementById('loginError'), '');
+      try {
+        const api = await loadClientTurnstileApi();
+        if (clientTurnstileWidget !== null) {
+          try { api.reset(clientTurnstileWidget); return; } catch (_) {}
+          try { api.remove(clientTurnstileWidget); } catch (_) {}
+          clientTurnstileWidget = null;
+        }
+        renderClientTurnstile(api);
+      } catch (error) {
+        showMessage(document.getElementById('loginError'), error?.message || 'Security verification could not load. Please retry.');
+        setTurnstileRetryVisible(true);
+      }
+    });
+    host.insertAdjacentElement('afterend', clientTurnstileRetryButton);
+  }
+  clientTurnstileRetryButton.hidden = !visible;
+}
+
+function renderClientTurnstile(api) {
+  const host = document.getElementById('clientTurnstile');
+  if (!host || !clientTurnstileSiteKey) return;
+  host.innerHTML = '';
+  clientTurnstileWidget = api.render(host, {
+    sitekey: clientTurnstileSiteKey,
+    theme: 'auto',
+    size: 'normal',
+    appearance: 'always',
+    'error-callback': (code) => {
+      console.warn('Cloudflare Turnstile challenge error:', code || 'unknown');
+      showMessage(document.getElementById('loginError'), 'Cloudflare security verification could not complete. Check your connection, then retry the security check.');
+      setTurnstileRetryVisible(true);
+    },
+    'expired-callback': () => {
+      showMessage(document.getElementById('loginError'), 'Security verification expired. Please complete it again.');
+      setTurnstileRetryVisible(false);
+    },
+    callback: () => {
+      showMessage(document.getElementById('loginError'), '');
+      setTurnstileRetryVisible(false);
+    }
+  });
+}
+
 async function setupClientTurnstile() {
-  // Start the public-config request and Cloudflare SDK readiness check together.
-  // We only wait for Cloudflare if the server confirms Turnstile is enabled.
-  const configPromise = fetch('/api/config/public', {
-    cache: 'no-store',
-    credentials: 'same-origin'
-  }).then(async response => {
+  // Fetch the small same-origin config first. Do not download Cloudflare's SDK
+  // at all when Turnstile is disabled; this keeps the sign-in page responsive.
+  try {
+    const response = await fetch('/api/config/public', {
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' }
+    });
     const raw = await response.text();
     let config = {};
     try { config = raw ? JSON.parse(raw) : {}; }
-    catch (_) {
-      throw new Error('Security verification configuration returned an invalid response (HTTP '+response.status+').');
-    }
-    if (!response.ok) {
-      throw new Error(typeof config.error === 'string' ? config.error : 'Security verification configuration failed (HTTP '+response.status+').');
-    }
-    return config;
-  });
+    catch (_) { throw new Error('Security verification configuration returned an invalid response.'); }
+    if (!response.ok) throw new Error(config.error || 'Security verification configuration could not be loaded.');
 
-  const turnstileApiPromise = (async () => {
-    if (window.turnstile) return window.turnstile;
-    return new Promise((resolve, reject) => {
-      const start = Date.now();
-      const timer = setInterval(() => {
-        if (window.turnstile) {
-          clearInterval(timer);
-          resolve(window.turnstile);
-        } else if (Date.now() - start > 10000) {
-          clearInterval(timer);
-          reject(new Error('Cloudflare Turnstile did not load. Check that challenges.cloudflare.com is allowed by your browser or network.'));
-        }
-      }, 100);
-    });
-  })();
-
-  try {
-    const config = await configPromise;
     clientTurnstileEnabled = Boolean(config.turnstileEnabled && config.turnstileSiteKey);
     if (!clientTurnstileEnabled) return;
 
-    const turnstileApi = await turnstileApiPromise;
-    clientTurnstileWidget = turnstileApi.render('#clientTurnstile', {
-      sitekey: config.turnstileSiteKey,
-      theme: 'auto',
-      size: 'normal',
-      appearance: 'always',
-      'error-callback': () => showMessage(document.getElementById('loginError'), 'Cloudflare security verification could not load. Refresh the page and try again.'),
-      'expired-callback': () => showMessage(document.getElementById('loginError'), 'Security verification expired. Please complete it again.')
-    });
+    clientTurnstileSiteKey = config.turnstileSiteKey;
+    const api = await loadClientTurnstileApi();
+    renderClientTurnstile(api);
   } catch (error) {
     console.error('Turnstile setup failed:', error);
     showMessage(document.getElementById('loginError'), error?.message || 'Cloudflare security verification could not be initialized.');
+    setTurnstileRetryVisible(true);
   }
 }
 document.addEventListener('DOMContentLoaded', setupClientTurnstile);
@@ -2493,45 +2560,7 @@ async function handleSocialCallback(){
 
 /* Login page never auto-redirects. Users must explicitly choose Google, GitHub, or email/password. */
 </script>
-<script>
-/* Use the site's shared theme controller; only customize its icon artwork on this page. */
-(function(){
-  function syncLoginThemeIcons(){
-    const dark=document.documentElement.classList.contains('dark') || document.body.classList.contains('dark');
-    document.querySelectorAll('[data-theme-toggle="true"]').forEach(button=>{
-      let icon=button.querySelector('.manlung-theme-icon');
-      if(!icon){
-        button.querySelector('svg')?.remove();
-        icon=document.createElement('img');
-        icon.className='manlung-theme-icon';
-        icon.alt='';
-        icon.width=22;
-        icon.height=22;
-        button.appendChild(icon);
-      }
-      icon.src=dark
-        ? 'https://i.postimg.cc/SNFZhBHx/icons8-sun-50.png'
-        : 'https://i.postimg.cc/mrv99sY9/icons8-moon-symbol-48.png';
-      icon.style.cssText='display:block;width:22px;height:22px;max-width:22px;max-height:22px;object-fit:contain';
-      button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');
-      button.setAttribute('title',dark?'Switch to light mode':'Switch to dark mode');
-    });
-  }
-  function init(){
-    syncLoginThemeIcons();
-    document.querySelectorAll('[data-theme-toggle="true"]').forEach(button=>{
-      if(button.dataset.loginIconSyncBound==='true')return;
-      button.dataset.loginIconSyncBound='true';
-      button.addEventListener('click',syncLoginThemeIcons);
-    });
-    const observer=new MutationObserver(syncLoginThemeIcons);
-    observer.observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme']});
-    observer.observe(document.body,{attributes:true,attributeFilter:['class']});
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
-  else init();
-})();
-</script>
+
 
 <script>
 /* Discord buttons use the configured Supabase OAuth provider flow. */
@@ -3313,3 +3342,45 @@ html body.manlung-auth-page .manlung-social-grid img.discord-brand-mark{
  filter:none!important;transform:translateZ(0)!important;
 }
 </style>
+
+
+<style id="manlung-auth-theme-and-speed-fix-20261102">
+/* One theme control, anchored inside the auth card for both Sign In and Create Account. */
+html body.manlung-auth-page .manlung-auth-form{position:relative!important;padding-top:36px!important}
+html body.manlung-auth-page .fa-theme-toggle{
+  position:absolute!important;top:14px!important;right:14px!important;left:auto!important;
+  z-index:30!important;width:40px!important;height:40px!important;min-width:40px!important;
+  min-height:40px!important;padding:0!important;margin:0!important;border:1px solid #d5deea!important;
+  border-radius:12px!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  background:#eef2f9!important;color:#334155!important;box-shadow:4px 4px 9px #cbd5e1,-4px -4px 9px #fff!important;
+  cursor:pointer!important;touch-action:manipulation!important
+}
+html body.manlung-auth-page .fa-theme-toggle svg{
+  display:block!important;width:21px!important;height:21px!important;fill:none!important;
+  stroke:currentColor!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important
+}
+html body.dark.manlung-auth-page .manlung-auth-form{background:#111c2e!important}
+html body.dark.manlung-auth-page .fa-theme-toggle{
+  background:#17263c!important;border-color:#40516b!important;color:#facc15!important;
+  box-shadow:4px 4px 9px #070d17,-4px -4px 9px #1b2b43!important
+}
+html body.dark.manlung-auth-page .manlung-auth-tabs{background:#0b1220!important;border-color:#27364b!important}
+html body.dark.manlung-auth-page .manlung-auth-tabs button{color:#cbd5e1!important}
+html body.dark.manlung-auth-page .manlung-auth-tabs button.active{color:#bfdbfe!important}
+html body.dark.manlung-auth-page .manlung-auth-heading h2{color:#f8fafc!important}
+html body.dark.manlung-auth-page .manlung-auth-heading p{color:#aab8ca!important}
+html body.dark.manlung-auth-page .manlung-auth-form label{color:#e2e8f0!important}
+html body.dark.manlung-auth-page .manlung-auth-form input{background:#0b1220!important;color:#f8fafc!important;border-color:#334155!important}
+html body.dark.manlung-auth-page .manlung-auth-divider{color:#94a3b8!important}
+html body.manlung-auth-page .manlung-turnstile-retry{
+  display:inline-flex;align-items:center;justify-content:center;min-height:38px;margin:8px auto 0;padding:8px 14px;
+  border:1px solid #2563eb;border-radius:9px;background:#eff6ff;color:#1d4ed8;font:600 .85rem Inter,sans-serif;cursor:pointer
+}
+html body.manlung-auth-page .manlung-turnstile-retry[hidden]{display:none!important}
+html body.dark.manlung-auth-page .manlung-turnstile-retry{background:#17263c;color:#bfdbfe;border-color:#3b82f6}
+@media(max-width:520px){
+  html body.manlung-auth-page .manlung-auth-form{padding-top:36px!important}
+  html body.manlung-auth-page .fa-theme-toggle{top:12px!important;right:12px!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important}
+}
+</style>
+
