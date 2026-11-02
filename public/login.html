@@ -2333,22 +2333,6 @@ async function setupOfficialGoogleButtons(){
           if (target) showMessage(target, 'Secure Android sign-in is still loading. Please try again.', 'error');
         }
       });
-          const client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
-            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storage: window.localStorage }
-          });
-          const { data, error } = await client.auth.signInWithOAuth({
-            provider: 'google',
-            options: { redirectTo: window.location.origin + '/oauth-callback.html?native=1', skipBrowserRedirect: true }
-          });
-          if (error) throw error;
-          if (!data?.url) throw new Error('Google sign-in could not be started.');
-          const browser = window.Capacitor?.Plugins?.Browser;
-          if (!browser?.open) throw new Error('This APK needs an update to enable secure Google sign-in.');
-          await browser.open({ url: data.url });
-        } catch (e) {
-          if (target) showMessage(target, e?.message || 'Google sign-in failed. Please try again.', 'error');
-        }
-      });
       host.appendChild(button);
     });
     return;
