@@ -109,7 +109,8 @@
         z-index: 2147482000 !important;
         width: 100% !important;
       }
-      html.manlung-android-app footer.manlung-footer {
+      html.manlung-android-app footer.manlung-footer,
+      html.manlung-android-app .mr-hero-android-link {
         display: none !important;
       }
       html.manlung-android-app {
