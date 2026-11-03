@@ -1626,15 +1626,15 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark{
           <div class="form-group">
             <label for="regPassword">Create password</label>
             <div class="manlung-password-field">
-              <input id="regPassword" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="At least 8 characters" required>
+              <input id="regPassword" type="password" autocomplete="new-password" minlength="12" maxlength="72" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{12,72}" title="Use 12–72 characters with uppercase, lowercase, a number, and a special character." placeholder="At least 12 characters" required>
               <button type="button" class="manlung-password-toggle" data-password-target="regPassword" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button>
             </div>
-            <small style="display:block;margin-top:5px;color:var(--text-muted);">Use at least 8 characters. Never reuse a password from another service.</small>
+            <small style="display:block;margin-top:5px;color:var(--text-muted);">Use 12–72 characters with uppercase, lowercase, a number, and a special character. Never reuse a password from another service.</small>
           </div>
           <div class="form-group">
             <label for="regPasswordConfirm">Confirm password</label>
             <div class="manlung-password-field">
-              <input id="regPasswordConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="Re-enter your password" required>
+              <input id="regPasswordConfirm" type="password" autocomplete="new-password" minlength="12" maxlength="72" placeholder="Re-enter your password" required>
               <button type="button" class="manlung-password-toggle" data-password-target="regPasswordConfirm" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button>
             </div>
           </div>
@@ -2186,7 +2186,8 @@ async function handleRegister(event) {
   const errorEl=document.getElementById('registerError');
 
   showMessage(errorEl,'');
-  if(password.length < 8 || password.length > 72){ showMessage(errorEl,'Password must be between 8 and 72 characters.'); return; }
+  if(password.length < 12 || password.length > 72){ showMessage(errorEl,'Password must be between 12 and 72 characters.'); return; }
+  if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{12,72}$/.test(password)){ showMessage(errorEl,'Password must include uppercase and lowercase letters, a number, and a special character.'); return; }
   if(password !== passwordConfirm){ showMessage(errorEl,'Passwords do not match.'); return; }
 
   try {
