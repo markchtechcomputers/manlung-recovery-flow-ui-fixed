@@ -84,7 +84,10 @@ jobs:
               "allowNavigation": [
                 "manlungrecovery.manlungshop.co.ke",
                 "accounts.google.com",
-                "github.com"
+                "github.com",
+                "discord.com",
+                "discordapp.com",
+                "discord.gg"
               ]
             },
             "android": {
