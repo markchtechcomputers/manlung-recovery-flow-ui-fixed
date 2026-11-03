@@ -139,6 +139,17 @@ jobs:
           import re
           manifest = Path("android/app/src/main/AndroidManifest.xml")
           source = manifest.read_text()
+          manifest_tag = re.search(r'<manifest\\b[^>]*>', source)
+          if not manifest_tag:
+              raise SystemExit("Could not locate Android manifest root")
+          permissions = [
+              "android.permission.INTERNET",
+              "android.permission.ACCESS_NETWORK_STATE"
+          ]
+          for permission in permissions:
+              if f'android:name="{permission}"' not in source:
+                  source = source[:manifest_tag.end()] + f'\\n    <uses-permission android:name="{permission}" />' + source[manifest_tag.end():]
+                  manifest_tag = re.search(r'<manifest\\b[^>]*>', source)
           activity = re.search(r'(<activity\b[^>]*android:name="[^"]*MainActivity"[^>]*>)([\s\S]*?)(</activity>)', source)
           if not activity:
               raise SystemExit("Could not locate the Capacitor MainActivity in AndroidManifest.xml")
