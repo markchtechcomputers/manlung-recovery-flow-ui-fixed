@@ -170,6 +170,10 @@
       "dest": "/api/config-public.js"
     },
     {
+      "src": "/api/download-apk",
+      "dest": "/public/install.html"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
