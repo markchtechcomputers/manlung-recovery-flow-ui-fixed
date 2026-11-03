@@ -153,7 +153,7 @@ jobs:
               manifest.write_text(source)
           print("Registered co.manlungrecovery.app://auth/callback for OAuth return")
           PY
-          # Android WebView may block muted background-video autoplay unless this is disabled.
+          # Preserve Capacitor's BridgeActivity while applying the native WebView settings.
           python3 - <<'PY'
           from pathlib import Path
           import re
@@ -162,14 +162,30 @@ jobs:
               raise SystemExit(f"Expected exactly one MainActivity.java, found {len(candidates)}")
           activity = candidates[0]
           source = activity.read_text()
-          marker = "super.onCreate(savedInstanceState);"
-          if marker not in source:
-              raise SystemExit("Could not find MainActivity onCreate marker")
-          line = marker + chr(10) + "        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);" + chr(10) + "        getBridge().getWebView().getSettings().setUserAgentString(\"ManlungRecoveryAndroid \" + getBridge().getWebView().getSettings().getUserAgentString());" + chr(10) + "        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {" + chr(10) + "            getBridge().getWebView().getSettings().setAlgorithmicDarkeningAllowed(false);" + chr(10) + "        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {" + chr(10) + "            getBridge().getWebView().getSettings().setForceDark(android.webkit.WebSettings.FORCE_DARK_OFF);" + chr(10) + "        }"
+          settings = """        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);
+                  getBridge().getWebView().getSettings().setUserAgentString("ManlungRecoveryAndroid " + getBridge().getWebView().getSettings().getUserAgentString());
+                  if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                      getBridge().getWebView().getSettings().setAlgorithmicDarkeningAllowed(false);
+                  } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                      getBridge().getWebView().getSettings().setForceDark(android.webkit.WebSettings.FORCE_DARK_OFF);
+                  }"""
           if "setMediaPlaybackRequiresUserGesture(false)" not in source:
-              source = source.replace(marker, line, 1)
+              marker = "super.onCreate(savedInstanceState);"
+              if marker in source:
+                  source = source.replace(marker, marker + "\\n" + settings, 1)
+              else:
+                  class_match = re.search(r"public\\s+class\\s+MainActivity\\s+extends\\s+BridgeActivity\\s*\\{", source)
+                  if not class_match:
+                      raise SystemExit("Could not locate generated Capacitor MainActivity class")
+                  method = """\n    @Override
+              public void onCreate(android.os.Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+              """ + settings + """
+              }
+              """
+                  source = source[:class_match.end()] + method + source[class_match.end():]
           activity.write_text(source)
-          print(f"Enabled inline autoplay in {activity}")
+          print(f"Configured Capacitor WebView settings in {activity}")
           PY
           python3 - <<'PY'
           import os, re
