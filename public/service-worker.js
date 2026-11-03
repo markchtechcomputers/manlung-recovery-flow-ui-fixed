@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v45';
+const CACHE_NAME = 'manlung-recovery-static-v46';
 const OFFLINE_PAGE = '/offline.html';
 const STATIC_ASSETS = [
   OFFLINE_PAGE,
@@ -22,7 +22,6 @@ async function cachedOfflinePage() {
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    // The offline page is mandatory: do not activate this worker unless it is safely cached.
     await cache.add(OFFLINE_PAGE);
     await Promise.allSettled(STATIC_ASSETS.filter(path => path !== OFFLINE_PAGE).map(path => cache.add(path)));
     await self.skipWaiting();
@@ -42,10 +41,7 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
-
-  // Let the offline screen test the real network, not a cached service-worker response.
   if (url.searchParams.has('__manlung_probe')) return;
-
   if (request.mode === 'navigate' || request.destination === 'document') {
     event.respondWith((async () => {
       if (url.pathname === OFFLINE_PAGE) {
@@ -71,7 +67,6 @@ self.addEventListener('fetch', event => {
     })());
     return;
   }
-
   if (STATIC_ASSETS.includes(url.pathname)) {
     event.respondWith((async () => {
       try {
