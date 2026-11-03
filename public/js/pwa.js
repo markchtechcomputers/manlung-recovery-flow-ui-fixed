@@ -58,6 +58,84 @@
       window.navigator.standalone === true;
   }
 
+  // Installed-app shell: hide website chrome, normalize viewport sizing, and
+  // show a short branded welcome only when the PWA is launched at its start page.
+  function setupPwaShell() {
+    if (!isStandalone()) return;
+
+    if (!document.getElementById('manlung-pwa-shell-style')) {
+      const style = document.createElement('style');
+      style.id = 'manlung-pwa-shell-style';
+      style.textContent = `
+        html,html body{width:100%;max-width:100%;min-width:0;min-height:100%;overflow-x:clip}
+        html body{min-height:100vh;min-height:100dvh;padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box}
+        html body *,html body *::before,html body *::after{box-sizing:border-box}
+        html body img,html body video,html body iframe,html body canvas{max-width:100%}
+        html body input,html body select,html body textarea,html body button{max-width:100%;min-width:0}
+        html body main,html body #page,html body .page,html body .admin-shell,html body .tools-shell{min-width:0;max-width:100%}
+        html body .manlung-footer,html body footer.manlung-footer,html body>footer{display:none!important}
+        #manlung-pwa-welcome{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 35%,#173d62 0%,#0b2340 42%,#061326 100%);color:#f8fafc;text-align:center;opacity:1;visibility:visible;transition:opacity .42s ease,visibility .42s ease}
+        #manlung-pwa-welcome.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+        #manlung-pwa-welcome .mr-welcome-content{width:min(100%,440px);display:flex;flex-direction:column;align-items:center;gap:18px;animation:mrWelcomeIn .65s cubic-bezier(.2,.75,.25,1) both}
+        #manlung-pwa-welcome img{display:block;width:clamp(88px,22vw,126px);height:clamp(88px,22vw,126px);object-fit:cover;border-radius:28px;background:#fff;box-shadow:0 18px 50px #0007,0 0 0 1px #ffffff35}
+        #manlung-pwa-welcome h1{margin:8px 0 0;color:#fff;font:800 clamp(1.45rem,5vw,2rem)/1.2 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.035em}
+        #manlung-pwa-welcome p{max-width:340px;margin:0;color:#d7e5f4;font:500 clamp(.9rem,3.2vw,1.02rem)/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+        #manlung-pwa-welcome .mr-welcome-rule{width:54px;height:3px;border-radius:99px;background:linear-gradient(90deg,#22c55e,#38bdf8)}
+        @keyframes mrWelcomeIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @media(prefers-reduced-motion:reduce){#manlung-pwa-welcome,#manlung-pwa-welcome .mr-welcome-content{transition:none;animation:none}}
+      `;
+      document.head.appendChild(style);
+    }
+
+    const home = location.pathname === '/' || location.pathname === '/index.html';
+    if (home) {
+      let alreadyWelcomed = false;
+      try { alreadyWelcomed = sessionStorage.getItem('manlung-pwa-welcomed') === '1'; } catch (_) {}
+      if (!alreadyWelcomed && !document.getElementById('manlung-pwa-welcome')) {
+        try { sessionStorage.setItem('manlung-pwa-welcomed', '1'); } catch (_) {}
+        const splash = document.createElement('div');
+        splash.id = 'manlung-pwa-welcome';
+        splash.setAttribute('role', 'status');
+        splash.setAttribute('aria-label', 'Welcome to Manlung Recovery');
+        splash.innerHTML = '<div class="mr-welcome-content"><img src="/icons/icon-192.png" alt="Manlung Recovery app icon"><div class="mr-welcome-rule"></div><h1>Welcome to Manlung Recovery</h1><p>where Technology meets your expectation</p></div>';
+        document.body.appendChild(splash);
+        window.setTimeout(() => {
+          splash.classList.add('is-leaving');
+          window.setTimeout(() => splash.remove(), 480);
+        }, 1750);
+      }
+    }
+  }
+
+  // Remove only explicit third-party ChatGPT/OpenAI sign-in branding. The
+  // Manlung AI assistant and its own controls are deliberately left untouched.
+  function removeThirdPartyChatGPTBranding(root = document) {
+    const selector = [
+      '[data-provider="openai"]','[data-provider="chatgpt"]',
+      '[aria-label*="ChatGPT" i]','[aria-label*="OpenAI" i]',
+      '[title*="ChatGPT" i]','[title*="OpenAI" i]',
+      'a[href*="chatgpt.com"]','a[href*="openai.com"]',
+      'img[alt*="ChatGPT" i]','img[alt*="OpenAI" i]',
+      'img[src*="chatgpt" i]','img[src*="openai" i]'
+    ].join(',');
+    root.querySelectorAll?.(selector).forEach(node => {
+      const control = node.closest('a,button,[role="button"]') || node;
+      if (control.id === 'manlungAiButton' || control.closest('#manlungAiWindow,#manlung-ai-chat')) return;
+      control.remove();
+    });
+  }
+
+  function hasUnsavedPwaInput() {
+    return Array.from(document.querySelectorAll('form')).some(form => {
+      if (form.dataset.allowPwaAutoRefresh === 'true') return false;
+      return Array.from(form.elements).some(field => {
+        if (!field || field.disabled || field.type === 'hidden' || field.type === 'submit' || field.type === 'button') return false;
+        if (field.type === 'checkbox' || field.type === 'radio') return field.checked !== field.defaultChecked;
+        return String(field.value ?? '') !== String(field.defaultValue ?? '');
+      });
+    });
+  }
+
   function wasRecentlyDismissed() {
     try {
       const value = localStorage.getItem(DISMISS_KEY);
@@ -547,7 +625,14 @@
     if (!('serviceWorker' in navigator)) return;
 
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (pwaHadController) offerPwaRefresh();
+      if (pwaHadController) {
+        // Refresh immediately when safe; keep the update prompt if a form has edits.
+        if (hasUnsavedPwaInput()) offerPwaRefresh();
+        else {
+          try { sessionStorage.setItem('manlung-pwa-controller-refresh', '1'); } catch (_) {}
+          window.location.reload();
+        }
+      }
       pwaHadController = true;
     });
 
@@ -568,6 +653,14 @@
       if (!document.hidden) updatePwaRegistration();
     });
     window.setInterval(updatePwaRegistration, 15 * 60 * 1000);
+  }
+
+  setupPwaShell();
+  removeThirdPartyChatGPTBranding();
+  if (document.body && 'MutationObserver' in window) {
+    const brandingObserver = new MutationObserver(() => removeThirdPartyChatGPTBranding());
+    brandingObserver.observe(document.body, { childList: true, subtree: true });
+    window.setTimeout(() => brandingObserver.disconnect(), 12000);
   }
 
   setupUpdateBell();
