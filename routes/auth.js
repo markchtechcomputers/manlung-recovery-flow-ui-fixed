@@ -966,8 +966,7 @@ router.post(
       .isLength({ min: 12, max: 72 })
       .withMessage('Password must be between 12 and 72 characters')
       .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
-      .withMessage('Password must include uppercase, lowercase, number, and special character')
-      .withMessage('Password must be between 8 and 72 characters'),
+      .withMessage('Password must include uppercase, lowercase, number, and special character'),
 
     body('fullName')
       .optional()
