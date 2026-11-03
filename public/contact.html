@@ -73,6 +73,77 @@
     @media(max-width:850px){.contact-hero{grid-template-columns:1fr}.contact-hero-side{display:none}.contact-methods{grid-template-columns:1fr 1fr}.contact-shortcuts{grid-template-columns:1fr 1fr}}
     @media(max-width:560px){.contact-page{padding-top:.6rem}.contact-hero{padding:1.5rem;border-radius:20px}.contact-hero h2{font-size:2.15rem}.contact-hero-copy{font-size:.93rem}.contact-hero-actions{display:grid;grid-template-columns:1fr}.contact-hero-actions .btn{justify-content:center}.contact-methods,.contact-shortcuts{grid-template-columns:1fr}.contact-method{min-height:0}.contact-shortcut{padding:.9rem}.contact-safety{padding:1rem;gap:.7rem}.contact-social{align-items:flex-start;flex-direction:column}}
     @media(prefers-reduced-motion:reduce){.contact-method,.contact-shortcut,.contact-social-links a{transition:none}.contact-method:hover,.contact-shortcut:hover,.contact-social-links a:hover{transform:none}}
+  
+    /* Compact phone layout: browser tabs and the Android APK share these rules. */
+    @media(max-width:700px){
+      html,body{width:100%;overflow-x:hidden}
+      .site-header .container,.site-header .manlung-header-inner{
+        padding: .55rem .8rem !important;gap:.45rem !important;min-height:54px !important;
+      }
+      .site-header .brand{gap:.45rem!important;min-width:0}
+      .site-header .manlung-site-logo{width:32px!important;height:32px!important;max-width:32px!important}
+      .site-header .brand h1{font-size:.88rem!important;line-height:1.15!important}
+      .site-header .brand span{font-size:.58rem!important;line-height:1.25!important;margin-top:.08rem!important}
+      .site-header .header-actions{
+        width:100%;display:flex!important;flex-wrap:nowrap!important;gap:.35rem!important;
+        overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding:0 0 .1rem;
+      }
+      .site-header .header-actions::-webkit-scrollbar{display:none}
+      .site-header .header-actions a,.site-header .header-actions button{
+        flex:0 0 auto;min-height:31px!important;padding:.3rem .55rem!important;
+        font-size:.68rem!important;white-space:nowrap;
+      }
+      .site-header .header-actions a[href="/blog.html"],
+      .site-header .header-actions a[href="/donate.html"]{display:none!important}
+      .contact-page{max-width:680px;padding:.55rem .8rem 1.5rem!important}
+      .contact-breadcrumb{font-size:.72rem;margin-bottom:.65rem}
+      .contact-hero{display:block;padding:1.1rem 1.15rem!important;border-radius:17px!important;margin-bottom:1rem}
+      .contact-eyebrow{font-size:.62rem;padding:.34rem .58rem;letter-spacing:.04em}
+      .contact-hero h2{font-size:1.55rem!important;line-height:1.12!important;margin:.65rem 0 .45rem!important;letter-spacing:-.025em}
+      .contact-hero-copy{font-size:.82rem!important;line-height:1.48!important}
+      .contact-hero-actions{display:flex!important;flex-wrap:wrap;gap:.45rem!important;margin-top:.8rem!important}
+      .contact-hero-actions .btn{width:auto;min-height:36px!important;padding:.48rem .7rem!important;font-size:.74rem!important;justify-content:center}
+      .contact-section-heading{margin:1.2rem 0 .65rem!important}
+      .contact-section-heading .eyebrow{font-size:.62rem;letter-spacing:.09em}
+      .contact-section-heading h3{font-size:1.15rem!important;margin:.2rem 0!important}
+      .contact-section-heading p{font-size:.79rem;line-height:1.45}
+      .contact-methods{grid-template-columns:1fr!important;gap:.55rem!important}
+      .contact-method{
+        min-height:0!important;display:grid!important;
+        grid-template-columns:38px minmax(0,1fr);column-gap:.7rem;row-gap:.18rem;
+        align-items:center;padding:.75rem .8rem!important;border-radius:14px!important;
+      }
+      .contact-method-icon{grid-column:1;grid-row:1 / span 3;width:36px!important;height:36px!important;
+        border-radius:11px!important;font-size:1rem!important;margin:0!important}
+      .contact-method h4{grid-column:2;font-size:.88rem!important;margin:0!important}
+      .contact-method p{grid-column:2;font-size:.73rem!important;line-height:1.35!important;margin:0!important}
+      .contact-method .contact-detail{grid-column:2;font-size:.7rem!important;margin:.08rem 0!important}
+      .contact-method .btn{grid-column:2;justify-self:start;margin:.25rem 0 0!important;min-height:32px!important;
+        padding:.38rem .65rem!important;font-size:.7rem!important}
+      .contact-shortcuts{grid-template-columns:1fr 1fr!important;gap:.45rem!important}
+      .contact-shortcut{gap:.5rem!important;padding:.62rem!important;border-radius:12px!important;min-width:0}
+      .contact-shortcut>i{width:30px!important;height:30px!important;flex:0 0 30px!important;border-radius:9px!important;font-size:.85rem!important}
+      .contact-shortcut strong{font-size:.72rem!important;line-height:1.25}
+      .contact-shortcut span{font-size:.63rem!important;line-height:1.3!important}
+      .contact-safety{grid-template-columns:22px minmax(0,1fr);gap:.55rem!important;margin-top:1rem!important;padding:.8rem!important;border-radius:13px!important}
+      .contact-safety>i{font-size:1rem!important}
+      .contact-safety h3{font-size:.8rem!important}
+      .contact-safety p{font-size:.7rem!important;line-height:1.42!important}
+      .contact-social{margin-top:1rem!important;padding:.8rem 0!important;gap:.65rem!important}
+      .contact-social-copy strong{font-size:.8rem!important}
+      .contact-social-copy span{font-size:.68rem!important}
+      .contact-social-links a{width:34px!important;height:34px!important;border-radius:10px!important;font-size:.95rem!important}
+      .contact-footer-note{font-size:.66rem;margin-top:.55rem}
+      html.manlung-android-app .contact-page{padding-bottom:1rem!important}
+    }
+    @media(max-width:380px){
+      .contact-hero h2{font-size:1.42rem!important}
+      .contact-hero-actions .btn{font-size:.68rem!important;padding:.42rem .55rem!important}
+      .contact-shortcut{padding:.52rem!important;gap:.4rem!important}
+      .contact-shortcut>i{width:27px!important;height:27px!important;flex-basis:27px!important}
+      .contact-shortcut strong{font-size:.68rem!important}
+    }
+
   </style>
 </head>
 <body>
