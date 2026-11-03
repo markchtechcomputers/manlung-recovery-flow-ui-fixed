@@ -57,8 +57,13 @@ async function requireGroupMember(groupId, userId) {
   return Boolean(data);
 }
 function handleDbError(res, error, context) {
-  if (error?.code === '42P01' || /recovery_chat_|recovery_community_messages|recovery_peer_calls|recovery_peer_call_signals/.test(error?.message || '')) {
-    return fail(res, 503, 'Chat database SQL has not been applied yet. Run the supplied Manlung Chat SQL in Supabase.');
+  const code = String(error?.code || '');
+  const message = String(error?.message || '');
+  const schemaMissing = ['42P01', '42703', 'PGRST204', 'PGRST205'].includes(code)
+    || /schema cache|column .* does not exist|relation .* does not exist/i.test(message);
+  if (schemaMissing) {
+    console.error(context, { code, message, hint: error?.hint || null });
+    return fail(res, 503, 'The chat database schema is missing or out of date. Apply the latest Manlung Chat SQL migrations in the main Supabase project, then refresh.');
   }
   console.error(context, error?.message || error);
   return fail(res, 500, 'The request could not be completed.');
@@ -894,17 +899,23 @@ router.patch('/groups/:groupId/approval', async (req,res) => {
     const patch=status==='approved'
       ? {approval_status:'approved',approved_by:req.user.id,approved_at:new Date().toISOString(),rejection_reason:null}
       : {approval_status:'rejected',approved_by:req.user.id,approved_at:new Date().toISOString(),rejection_reason:cleanText(req.body?.reason,500)||'Not approved by an admin.'};
-    if(status==='approved'&&pending.created_by){
-      const {error:me}=await supabase.from('recovery_chat_group_members')
-        .upsert({group_id:gid,user_id:pending.created_by,archived:false},{onConflict:'group_id,user_id'});
-      if(me) throw me;
-    }
+    // Claim the pending request first. This prevents a concurrent reject/approve
+    // race from leaving a membership row behind on a rejected group.
     const {data:updated,error:ue}=await supabase.from('recovery_chat_groups').update(patch).eq('id',gid).eq('approval_status','pending')
       .select('id,name,approval_status,created_by').maybeSingle();
     if(ue) throw ue;
     if(!updated) return fail(res,409,'This group request was already reviewed.');
+    let creatorJoined = status !== 'approved' || !updated.created_by;
+    if(status==='approved'&&updated.created_by){
+      const {error:me}=await supabase.from('recovery_chat_group_members')
+        .upsert({group_id:gid,user_id:updated.created_by,archived:false},{onConflict:'group_id,user_id'});
+      creatorJoined = !me;
+      // Approval is already committed. If membership sync fails, keep the group
+      // published; its creator can still join through POST /groups/:groupId/join.
+      if(me) console.error('Approved group creator membership sync failed:',me.message||me);
+    }
     res.set('Cache-Control','no-store');
-    res.json({success:true,group:updated});
+    res.json({success:true,group:updated,creatorJoined});
   } catch(error) { return handleDbError(res,error,'Group approval update error:'); }
 });
 
