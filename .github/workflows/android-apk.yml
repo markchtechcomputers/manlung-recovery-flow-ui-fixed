@@ -90,10 +90,7 @@ jobs:
               "cleartext": false,
               "allowNavigation": [
                 "manlungrecovery.manlungshop.co.ke",
-                "accounts.google.com",
-                "github.com",
-                "discord.com",
-                "discordapp.com"
+                "accounts.google.com"
               ]
             },
             "android": {
