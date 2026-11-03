@@ -2187,7 +2187,7 @@ async function handleRegister(event) {
 
   showMessage(errorEl,'');
   if(password.length < 12 || password.length > 72){ showMessage(errorEl,'Password must be between 12 and 72 characters.'); return; }
-  if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{12,72}$/.test(password)){ showMessage(errorEl,'Password must include uppercase and lowercase letters, a number, and a special character.'); return; }
+  if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,72}$/.test(password)){ showMessage(errorEl,'Password must include uppercase and lowercase letters, a number, and a special character.'); return; }
   if(password !== passwordConfirm){ showMessage(errorEl,'Passwords do not match.'); return; }
 
   try {
