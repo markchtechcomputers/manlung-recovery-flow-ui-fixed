@@ -5,9 +5,7 @@
 
   // Shared browser offline handling: covers every page that loads theme.js, not only PWA install pages.
   (function installManlungBrowserOfflineSupport() {
-    const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.()) ||
-      /Capacitor|ManlungRecoveryAndroid/i.test(navigator.userAgent || '');
-    if (nativeApp || window.__manlungBrowserOfflineSupportInstalled) return;
+    if (window.__manlungBrowserOfflineSupportInstalled) return;
     window.__manlungBrowserOfflineSupportInstalled = true;
 
     function openOfflinePage() {
@@ -84,18 +82,12 @@
 
   function readTheme() {
     try {
-      if (isAndroidApp() && localStorage.getItem('manlung-android-dark-theme-migration-v1') !== 'done') {
-        // One-time migration: replace the old bright APK default with dark chrome.
-        localStorage.setItem(STORAGE_KEY, DARK);
-        localStorage.setItem('manlung-android-dark-theme-migration-v1', 'done');
-        return DARK;
-      }
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === DARK) return DARK;
       if (saved === LIGHT) return LIGHT;
-      return isAndroidApp() ? DARK : LIGHT;
+      return LIGHT;
     } catch (_) {
-      return isAndroidApp() ? DARK : LIGHT;
+      return LIGHT;
     }
   }
 
@@ -311,182 +303,6 @@
     video.src = CLIPS[0];
     video.load();
     play();
-  }
-
-  function isAndroidApp() {
-    try {
-      const platform = window.Capacitor?.getPlatform?.();
-      const userAgent = window.navigator?.userAgent || '';
-      return Boolean(window.Capacitor?.isNativePlatform?.()) ||
-        platform === 'android' ||
-        /Capacitor|ManlungRecoveryAndroid/i.test(userAgent);
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function installAndroidAppMode() {
-    if (!isAndroidApp()) return;
-    document.documentElement.classList.add('manlung-android-app');
-    document.body?.classList.add('manlung-android-app');
-
-    if (!document.getElementById('manlung-android-app-mode-style')) {
-      const style = document.createElement('style');
-      style.id = 'manlung-android-app-mode-style';
-      style.textContent = `
-        /* Keep the live site inside the visible Android app viewport. */
-        html.manlung-android-app,
-        body.manlung-android-app {
-          width: 100%;
-          min-width: 0 !important;
-          max-width: 100%;
-          overflow-x: clip !important;
-          overscroll-behavior-x: none;
-        }
-        html.manlung-android-app body {
-          box-sizing: border-box;
-          padding-left: env(safe-area-inset-left, 0px);
-          padding-right: env(safe-area-inset-right, 0px);
-          padding-bottom: env(safe-area-inset-bottom, 0px);
-        }
-        html.manlung-android-app body *,
-        html.manlung-android-app body *::before,
-        html.manlung-android-app body *::after {
-          box-sizing: border-box;
-        }
-        html.manlung-android-app body img,
-        html.manlung-android-app body video,
-        html.manlung-android-app body iframe,
-        html.manlung-android-app body canvas,
-        html.manlung-android-app body table {
-          max-width: 100%;
-        }
-        html.manlung-android-app body .container,
-        html.manlung-android-app body main,
-        html.manlung-android-app body section,
-        html.manlung-android-app body .card,
-        html.manlung-android-app body .panel {
-          min-width: 0;
-        }
-        html.manlung-android-app body input,
-        html.manlung-android-app body select,
-        html.manlung-android-app body textarea,
-        html.manlung-android-app body button {
-          max-width: 100%;
-        }
-        html.manlung-android-app body .site-header,
-        html.manlung-android-app body .mobile-friendly-header {
-          padding-top: env(safe-area-inset-top, 0px);
-        }
-        @media (max-width: 700px) {
-          html.manlung-android-app body .container,
-          html.manlung-android-app body .page-container,
-          html.manlung-android-app body .content-container {
-            width: 100% !important;
-            max-width: 100% !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            padding-left: 12px !important;
-            padding-right: 12px !important;
-          }
-          html.manlung-android-app body .header-actions {
-            max-width: 100%;
-            min-width: 0;
-          }
-        }
-        /* Native-app polish: consistent spacing, readable surfaces and touch targets. */
-        html.manlung-android-app body {
-          -webkit-tap-highlight-color: transparent;
-          text-rendering: optimizeLegibility;
-          -webkit-font-smoothing: antialiased;
-        }
-        html.manlung-android-app body button,
-        html.manlung-android-app body .btn,
-        html.manlung-android-app body [role="button"],
-        html.manlung-android-app body input[type="submit"] {
-          min-height: 44px;
-          border-radius: 12px;
-          touch-action: manipulation;
-        }
-        html.manlung-android-app body input:not([type="checkbox"]):not([type="radio"]),
-        html.manlung-android-app body select,
-        html.manlung-android-app body textarea {
-          min-height: 44px;
-          border-radius: 10px;
-          font-size: 16px;
-        }
-        html.manlung-android-app body .card,
-        html.manlung-android-app body .panel,
-        html.manlung-android-app body .service-card {
-          border-radius: 16px;
-        }
-        html.manlung-android-app body a {
-          overflow-wrap: anywhere;
-          -webkit-tap-highlight-color: transparent;
-        }
-        html.manlung-android-app body :focus-visible {
-          outline: 2px solid #38bdf8;
-          outline-offset: 3px;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          html.manlung-android-app body *,
-          html.manlung-android-app body *::before,
-          html.manlung-android-app body *::after {
-            scroll-behavior: auto !important;
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-          }
-        }
-        /* APK-only chrome: remove every website footer and every browser APK/install promotion. */
-        html.manlung-android-app body footer,
-        html.manlung-android-app body [role="contentinfo"],
-        html.manlung-android-app body [class*="footer"],
-        html.manlung-android-app body [id*="footer"],
-        html.manlung-android-app body .site-footer,
-        html.manlung-android-app body .manlung-footer,
-        html.manlung-android-app body #footer,
-        html.manlung-android-app body #site-footer,
-        html.manlung-android-app body .footer,
-        html.manlung-android-app body .footer-container,
-        html.manlung-android-app body .footer-wrapper,
-        html.manlung-android-app body [data-footer],
-        html.manlung-android-app body [data-desktop-only],
-        html.manlung-android-app body .desktop-only,
-        html.manlung-android-app body .desktop-only-section,
-        html.manlung-android-app body .website-only,
-        html.manlung-android-app body .pwa-install-prompt,
-        html.manlung-android-app body .apk-download-prompt,
-        html.manlung-android-app body .mr-hero-android-link,
-        html.manlung-android-app body .mr-apk-download-button,
-        html.manlung-android-app body .mr-hero-download-card,
-        html.manlung-android-app body #manlung-pwa-banner,
-        html.manlung-android-app body a[href*="/api/download-apk"],
-        html.manlung-android-app body a[href*="download-apk"],
-        html.manlung-android-app body a[href*="download-app.html"],
-        html.manlung-android-app body a[href*="ManlungRecovery.apk"],
-        html.manlung-android-app body a[href*="/releases/download/android-latest/"] {
-          display: none !important;
-          visibility: hidden !important;
-          pointer-events: none !important;
-        }
-      `;
-      document.head.appendChild(style);
-    }
-
-    const removeAppOnlyPromos = () => {
-      document.querySelectorAll(
-        '#manlung-pwa-banner, [data-pwa-install], .pwa-install-prompt, .apk-download-prompt, .mr-hero-android-link, .mr-apk-download-button, .mr-hero-download-card, footer, [role="contentinfo"], [class*="footer"], [id*="footer"]'
-      ).forEach(node => node.remove());
-      document.querySelectorAll(
-        'a[href*="/api/download-apk"], a[href*="download-apk"], a[href*="download-app.html"], a[href*="ManlungRecovery.apk"], a[href*="/releases/download/android-latest/"]'
-      ).forEach(link => link.remove());
-    };
-    removeAppOnlyPromos();
-    if (!window.__manlungAppModeObserver && document.body) {
-      window.__manlungAppModeObserver = new MutationObserver(removeAppOnlyPromos);
-      window.__manlungAppModeObserver.observe(document.body, { childList: true, subtree: true });
-    }
   }
 
   function installGlobalLanguageSelector() {
@@ -707,7 +523,6 @@
   function boot() {
     const isAuthPage = document.body?.classList.contains('manlung-auth-page') ||
       /\/login(?:\.html)?\/?$/.test(location.pathname);
-    installAndroidAppMode();
     if (!isAuthPage) installGlobalLanguageSelector();
     removeLegacyNavigationColours();
     convertLegacyButtons();
