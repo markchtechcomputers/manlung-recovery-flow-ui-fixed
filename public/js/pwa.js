@@ -38,41 +38,6 @@
 
   installMobileBackNavigation();
 
-  // Browser tabs need the same immediate offline transition as the installed APK.
-  // The Android wrapper has a native ConnectivityManager monitor, so this runs only in browsers.
-  function installBrowserOfflineMonitor() {
-    if (isAndroidApp() || window.__manlungBrowserOfflineMonitorInstalled) return;
-    window.__manlungBrowserOfflineMonitorInstalled = true;
-    let failedProbes = 0;
-    let redirecting = false;
-
-    function showOfflinePage() {
-      if (redirecting || location.pathname === '/offline.html') return;
-      redirecting = true;
-      const target = new URL('/offline.html', location.origin);
-      target.searchParams.set('return', location.href);
-      location.replace(target.href);
-    }
-
-    function probeWebsite() {
-      if (redirecting || document.hidden || location.pathname === '/offline.html') return;
-      const probe = new Image();
-      probe.onload = () => { failedProbes = 0; };
-      probe.onerror = () => {
-        failedProbes += 1;
-        if (failedProbes >= 2) showOfflinePage();
-      };
-      probe.src = '/favicon.svg?__manlung_probe=' + Date.now();
-    }
-
-    window.addEventListener('offline', showOfflinePage);
-    window.addEventListener('online', () => { failedProbes = 0; probeWebsite(); });
-    probeWebsite();
-    window.setInterval(probeWebsite, 15000);
-  }
-
-  installBrowserOfflineMonitor();
-
   // Handle the Android system Back button through Capacitor when the native
   // App plugin is available. Prefer the WebView's real navigation history;
   // only fall back to the homepage when there is no previous entry.
