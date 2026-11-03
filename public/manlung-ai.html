@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#071321">
+  <meta name="theme-color" content="#f3f7fb">
   <meta name="description" content="Meet Manlung AI, the official assistant for Manlung Recovery. Get guidance on digital recovery, lost devices, compromised accounts, scams and case tracking.">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://manlungrecovery.manlungshop.co.ke/manlung-ai.html">
@@ -120,23 +120,106 @@
   const history=[];let voiceOn=false,fixedLanguage='',recognition=null,listening=false,busy=false;
   const welcomeText='Habari! I’m Manlung AI, the digital support assistant for Manlung Recovery. I can explain our services, guide you through a recovery request, help you understand case tracking, and suggest safe steps after a digital incident. What would you like help with today?';
   const root=document.documentElement,themeToggle=$('themeToggle');
-  const savedTheme=localStorage.getItem('manlung-ai-theme');if(savedTheme==='light'||savedTheme==='dark')root.dataset.theme=savedTheme;
+  try{const savedTheme=localStorage.getItem('manlung-ai-theme');if(savedTheme==='light'||savedTheme==='dark')root.dataset.theme=savedTheme;}catch(_){}
   function syncThemeIcon(){const icon=themeToggle.querySelector('i');icon.className=root.dataset.theme==='dark'?'fa-solid fa-sun':'fa-solid fa-moon';}
-  syncThemeIcon();themeToggle.addEventListener('click',()=>{root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('manlung-ai-theme',root.dataset.theme);syncThemeIcon();});
-  function addMessage(text,who,withListen=false){const row=document.createElement('div');row.className='message-row '+(who==='user'?'user':'ai');if(who!=='user'){const avatar=document.createElement('div');avatar.className='ai-avatar';avatar.innerHTML='<i class="fa-solid fa-robot"></i>';row.appendChild(avatar);}const stack=document.createElement('div');stack.className='message-stack';const bubble=document.createElement('div');bubble.className='message-content';bubble.textContent=text;stack.appendChild(bubble);if(withListen){const listen=document.createElement('button');listen.className='voice-btn';listen.type='button';listen.innerHTML='<i class="fa-solid fa-volume-high"></i> Listen';listen.addEventListener('click',()=>speak(text));stack.appendChild(listen);}row.appendChild(stack);body.appendChild(row);body.scrollTop=body.scrollHeight;return bubble;}
-  function setBusy(value){busy=value;send.disabled=value;input.disabled=value;$('statusText').textContent=value?'Thinking…':'Online · Support assistant';}
-  function speak(text){if(!('speechSynthesis'in window)){$('helperText').textContent='Spoken responses are not supported by this browser.';return;}window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(text);utter.lang=fixedLanguage||(/[\u0600-\u06FF]/.test(text)?'ar':/[\u1200-\u137F]/.test(text)?'am-ET':'en-KE');utter.rate=1;window.speechSynthesis.speak(utter);}
-  function detectLanguage(text){if(fixedLanguage)return fixedLanguage;if(/[\u0600-\u06FF]/.test(text))return'ar';if(/\b(habari|nisaidie|tafadhali|kesi|msaada|pole)\b/i.test(text))return'sw';return'en';}
-  function parseChunk(raw){let s=String(raw||'').trim();if(!s||s==='[DONE]')return'';try{const j=JSON.parse(s);return String(j.token??j.text??j.delta??j.answer??j.content??'');}catch(_){return s;}}
-  async function requestAI(message){const payload={message,history:history.slice(-14),language:detectLanguage(message),pagePath:location.pathname};try{const res=await fetch('/api/ai-live/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(payload)});if(!res.ok||!res.body)throw new Error('Live chat unavailable');const reader=res.body.getReader(),decoder=new TextDecoder();let buffer='',answer='';const consume=packet=>{for(const line of packet.split(/\r?\n/))if(line.startsWith('data:'))answer+=parseChunk(line.slice(5));};while(true){const part=await reader.read();if(part.done)break;buffer+=decoder.decode(part.value,{stream:true});const packets=buffer.split(/\r?\n\r?\n/);buffer=packets.pop()||'';packets.forEach(consume);}if(buffer.trim())consume(buffer);if(answer.trim())return answer.trim();throw new Error('Empty live response');}catch(err){const res=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});const data=await res.json().catch(()=>({}));if(!res.ok||!data.success||!String(data.answer||'').trim())throw new Error(data.error||'AI service unavailable');return String(data.answer).trim();}}
-  async function sendMessage(text){text=String(text||'').trim();if(!text||busy)return;addMessage(text,'user');history.push({role:'user',content:text});input.value='';setBusy(true);const row=document.createElement('div');row.className='message-row ai';row.id='typingRow';const avatar=document.createElement('div');avatar.className='ai-avatar';avatar.innerHTML='<i class="fa-solid fa-robot"></i>';const stack=document.createElement('div');stack.className='message-stack';const typing=document.createElement('div');typing.className='message-content typing';typing.textContent='Manlung AI is thinking…';stack.appendChild(typing);row.append(avatar,stack);body.appendChild(row);body.scrollTop=body.scrollHeight;try{const answer=await requestAI(text);row.remove();addMessage(answer,'ai',true);history.push({role:'assistant',content:answer});if(history.length>20)history.splice(0,history.length-20);if(voiceOn)speak(answer);}catch(err){row.remove();addMessage('I’m having trouble connecting to the live assistant right now. Please try again, or use New Request or Human Support below.','ai',true);$('helperText').textContent='Connection issue: '+(err.message||'please try again in a moment.');}finally{setBusy(false);input.focus();}}
+  syncThemeIcon();
+  themeToggle.addEventListener('click',()=>{root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('manlung-ai-theme',root.dataset.theme);}catch(_){}syncThemeIcon();});
+  function addMessage(text,who,withListen=false){
+    const row=document.createElement('div');row.className='message-row '+(who==='user'?'user':'ai');
+    if(who!=='user'){const avatar=document.createElement('div');avatar.className='ai-avatar';avatar.innerHTML='<i class="fa-solid fa-robot"></i>';row.appendChild(avatar);}
+    const stack=document.createElement('div');stack.className='message-stack';
+    const bubble=document.createElement('div');bubble.className='message-content';bubble.textContent=text;stack.appendChild(bubble);
+    if(withListen)addListenButton(stack,text);
+    row.appendChild(stack);body.appendChild(row);body.scrollTop=body.scrollHeight;return bubble;
+  }
+  function addListenButton(stack,text){
+    const listen=document.createElement('button');listen.className='voice-btn';listen.type='button';listen.innerHTML='<i class="fa-solid fa-volume-high"></i> Listen';listen.addEventListener('click',()=>speak(text));stack.appendChild(listen);
+  }
+  function setBusy(value){busy=value;send.disabled=value;input.disabled=value;$('micButton').disabled=value;$('statusText').textContent=value?'Generating reply…':'Ready · Live AI chat';}
+  function speak(text){if(!('speechSynthesis'in window)){$('helperText').textContent='Spoken responses are not supported by this browser.';return;}window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(text);utter.lang=fixedLanguage||(/[\\u0600-\\u06FF]/.test(text)?'ar':/[\\u1200-\\u137F]/.test(text)?'am-ET':'en-KE');utter.rate=1;window.speechSynthesis.speak(utter);}
+  function detectLanguage(text){if(fixedLanguage)return fixedLanguage;if(/[\\u0600-\\u06FF]/.test(text))return'ar';if(/\\b(habari|nisaidie|tafadhali|kesi|msaada|pole)\\b/i.test(text))return'sw';return'en';}
+  function parseChunk(raw){
+    const value=String(raw||'').trim();if(!value||value==='[DONE]')return'';
+    try{const data=JSON.parse(value);return String(data.content??data.token??data.text??data.delta??data.answer??'');}catch(_){return value;}
+  }
+  async function requestAI(message,onChunk){
+    // The current message is already in local history; the API appends it separately.
+    const payload={message,history:history.slice(0,-1).slice(-14),language:detectLanguage(message),pagePath:location.pathname};
+    let answer='';
+    const append=part=>{if(!part)return;answer+=part;if(typeof onChunk==='function')onChunk(part,answer);};
+    try{
+      const res=await fetch('/api/ai-live/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(payload)});
+      if(!res.ok||!res.body)throw new Error('Live chat unavailable (HTTP '+res.status+')');
+      const reader=res.body.getReader(),decoder=new TextDecoder();let buffer='';
+      const consume=packet=>{
+        for(const line of packet.split(/\\r?\\n/)){
+          if(!line.startsWith('data:'))continue;
+          const raw=line.slice(5).trim();if(raw==='[DONE]')continue;
+          append(parseChunk(raw));
+        }
+      };
+      while(true){
+        const part=await reader.read();if(part.done)break;
+        buffer+=decoder.decode(part.value,{stream:true});
+        const packets=buffer.split(/\\r?\\n\\r?\\n/);buffer=packets.pop()||'';
+        packets.forEach(consume);
+      }
+      buffer+=decoder.decode();if(buffer.trim())consume(buffer);
+      if(answer.trim())return answer.trim();
+      throw new Error('The live assistant returned an empty reply.');
+    }catch(liveError){
+      // Use the JSON-backed assistant only if streaming did not already produce text.
+      if(answer.trim())return answer.trim()+'\n\n(Connection interrupted; this is the reply received so far.)';
+      const res=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok||!data.success||!String(data.answer||'').trim())throw new Error(data.error||liveError.message||'AI service unavailable');
+      const fallback=String(data.answer).trim();append(fallback);return fallback;
+    }
+  }
+  async function sendMessage(text){
+    text=String(text||'').trim();if(!text||busy)return;
+    addMessage(text,'user');history.push({role:'user',content:text});input.value='';setBusy(true);
+    const bubble=addMessage('Manlung AI is thinking…','ai'),stack=bubble.parentElement;
+    let received=false,answer='';
+    try{
+      const result=await requestAI(text,(part,full)=>{
+        if(!received){received=true;bubble.textContent='';}
+        bubble.textContent=full;answer=full;body.scrollTop=body.scrollHeight;
+      });
+      answer=result||answer;
+      if(!received)bubble.textContent=answer;else bubble.textContent=answer;
+      if(answer){addListenButton(stack,answer);history.push({role:'assistant',content:answer});if(history.length>20)history.splice(0,history.length-20);if(voiceOn)speak(answer);}
+      $('statusText').textContent='Connected · Live AI chat';
+      $('helperText').textContent='Reply received. You can ask a follow-up or start a new conversation.';
+    }catch(err){
+      bubble.textContent='I’m having trouble connecting to the AI service right now. Please try again in a moment, or use New Request or Human Support below.';
+      $('statusText').textContent='Connection unavailable';
+      $('helperText').textContent='Chat connection issue: '+(err.message||'please try again in a moment.');
+    }finally{setBusy(false);input.focus();body.scrollTop=body.scrollHeight;}
+  }
   form.addEventListener('submit',e=>{e.preventDefault();sendMessage(input.value);});
   document.querySelectorAll('[data-prompt]').forEach(button=>button.addEventListener('click',()=>sendMessage(button.dataset.prompt)));
   document.querySelectorAll('[data-listen="welcome"]').forEach(button=>button.addEventListener('click',()=>speak(welcomeText)));
-  $('clearChat').addEventListener('click',()=>{history.length=0;const footerLinks=body.querySelector('.chat-footer-links');body.innerHTML='';const row=document.createElement('div');row.className='message-row ai';const avatar=document.createElement('div');avatar.className='ai-avatar';avatar.innerHTML='<i class="fa-solid fa-robot"></i>';const stack=document.createElement('div');stack.className='message-stack';const bubble=document.createElement('div');bubble.className='message-content';bubble.textContent='New conversation started. How can I help you with Manlung Recovery today?';stack.appendChild(bubble);row.append(avatar,stack);body.appendChild(row);if(footerLinks)body.appendChild(footerLinks);input.focus();});
+  $('clearChat').addEventListener('click',()=>{
+    if(busy)return;
+    history.length=0;const footerLinks=body.querySelector('.chat-footer-links');body.innerHTML='';
+    const row=document.createElement('div');row.className='message-row ai';const avatar=document.createElement('div');avatar.className='ai-avatar';avatar.innerHTML='<i class="fa-solid fa-robot"></i>';
+    const stack=document.createElement('div');stack.className='message-stack';const bubble=document.createElement('div');bubble.className='message-content';bubble.textContent='New conversation started. How can I help you with Manlung Recovery today?';
+    stack.appendChild(bubble);row.append(avatar,stack);body.appendChild(row);if(footerLinks)body.appendChild(footerLinks);$('statusText').textContent='Ready · Live AI chat';input.focus();
+  });
   $('languageToggle').addEventListener('click',()=>{fixedLanguage=fixedLanguage?'':'sw';$('languageLabel').textContent=fixedLanguage?'Kiswahili':'Auto language';$('helperText').textContent=fixedLanguage?'Kiswahili responses selected. Tap again for automatic language detection.':'Automatic language detection enabled.';});
   $('voiceToggle').addEventListener('click',()=>{voiceOn=!voiceOn;$('voiceToggle').setAttribute('aria-pressed',String(voiceOn));$('voiceLabel').textContent=voiceOn?'Voice on':'Voice off';if(!voiceOn&&'speechSynthesis'in window)speechSynthesis.cancel();else speak('Manlung AI voice is on.');});
-  $('micButton').addEventListener('click',()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){$('helperText').textContent='Voice input is not supported by this browser. Try Chrome or Edge.';return;}if(recognition&&listening){recognition.stop();return;}recognition=new SR();recognition.lang=fixedLanguage==='sw'?'sw-KE':'en-KE';recognition.continuous=false;recognition.interimResults=false;recognition.onstart=()=>{listening=true;$('micButton').setAttribute('aria-pressed','true');$('helperText').textContent='Listening… speak now. Tap the microphone to stop.';};recognition.onresult=e=>{const transcript=e.results?.[0]?.[0]?.transcript||'';if(transcript){input.value=transcript;sendMessage(transcript);}};recognition.onerror=e=>{$('helperText').textContent=e.error==='not-allowed'?'Microphone permission was blocked. Allow microphone access in browser settings.':'Could not capture voice. Please try again or type your message.';};recognition.onend=()=>{listening=false;$('micButton').setAttribute('aria-pressed','false');recognition=null;if(!busy)input.focus();};try{recognition.start();}catch(_){$('helperText').textContent='Could not start microphone. Please try again.';}});
+  $('micButton').addEventListener('click',()=>{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){$('helperText').textContent='Voice input is not supported by this browser. Try Chrome or Edge.';return;}
+    if(recognition&&listening){recognition.stop();return;}
+    recognition=new SR();recognition.lang=fixedLanguage==='sw'?'sw-KE':'en-KE';recognition.continuous=false;recognition.interimResults=false;
+    recognition.onstart=()=>{listening=true;$('micButton').setAttribute('aria-pressed','true');$('helperText').textContent='Listening… speak now. Tap the microphone to stop.';};
+    recognition.onresult=e=>{const transcript=e.results?.[0]?.[0]?.transcript||'';if(transcript){input.value=transcript;sendMessage(transcript);}};
+    recognition.onerror=e=>{$('helperText').textContent=e.error==='not-allowed'?'Microphone permission was blocked. Allow microphone access in browser settings.':'Could not capture voice. Please try again or type your message.';};
+    recognition.onend=()=>{listening=false;$('micButton').setAttribute('aria-pressed','false');recognition=null;if(!busy)input.focus();};
+    try{recognition.start();}catch(_){$('helperText').textContent='Could not start microphone. Please try again.';}
+  });
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&'speechSynthesis'in window)speechSynthesis.cancel();});
 })();
 </script>
