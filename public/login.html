@@ -2660,6 +2660,7 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
 <script id="manlung-capacitor-oauth-bridge">
 (function () {
   const APP_REDIRECT = 'co.manlungrecovery.app://auth/callback';
+  const OAUTH_REDIRECT = new URL('/oauth-callback.html?native=1', window.location.origin).href;
   const isNativeAndroid = () => {
     const userAgent = window.navigator?.userAgent || '';
     try {
@@ -2732,7 +2733,7 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
       const client = await supabaseClient();
       const { data, error } = await client.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: APP_REDIRECT, skipBrowserRedirect: true }
+        options: { redirectTo: OAUTH_REDIRECT, skipBrowserRedirect: true }
       });
       if (error) throw error;
       if (!data?.url) throw new Error('The sign-in provider did not return a secure login link.');
