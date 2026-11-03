@@ -464,6 +464,30 @@ body{background:var(--bg-body);color:var(--tx)}
  .ml-group-review-actions{flex-direction:column}
  .ml-group-review-actions .btn{min-width:82px}
 }
+
+/* Keep the existing dark/system theme available with the refreshed layout. */
+:root[data-theme=dark]{--bg-body:#0b141a;--bg:#0b141a;--sf:#111b21;--sf2:#202c33;--tx:#e9edef;--mu:#8696a0;--bd:#222d34;--chat-incoming:#202c33}
+:root[data-theme=dark] body,:root[data-theme=dark] #app{background:#0b141a;color:#e9edef}
+:root[data-theme=dark] #hd,:root[data-theme=dark] #mn,:root[data-theme=dark] #chat,:root[data-theme=dark] #msgs,:root[data-theme=dark] .compose{background:#111b21}
+:root[data-theme=dark] #hd h1,:root[data-theme=dark] #chat header h1{color:#e9edef}
+:root[data-theme=dark] #nv{background:#111b21;border-color:#222d34}
+:root[data-theme=dark] .row:hover{background:#202c33}
+:root[data-theme=dark] .search,:root[data-theme=dark] .compose input{background:#202c33;color:#e9edef;border-color:#2b3a42}
+:root[data-theme=dark] .b.th{background:#202c33;color:#e9edef}
+:root[data-theme=dark] .ml-community-hero,:root[data-theme=dark] .ml-community-room{background:#16232b;border-color:#26363f}
+:root[data-theme=dark] .ml-profile-update-notice{background:#332a17;border-color:#735a25;color:#f6dfaa}
+:root[data-theme=dark] .ml-profile-update-notice p{color:#d6bd85}
+@media(prefers-color-scheme:dark){
+ :root:not([data-theme=light]){--bg-body:#0b141a;--bg:#0b141a;--sf:#111b21;--sf2:#202c33;--tx:#e9edef;--mu:#8696a0;--bd:#222d34;--chat-incoming:#202c33}
+ :root:not([data-theme=light]) body,:root:not([data-theme=light]) #app{background:#0b141a;color:#e9edef}
+ :root:not([data-theme=light]) #hd,:root:not([data-theme=light]) #mn,:root:not([data-theme=light]) #chat,:root:not([data-theme=light]) #msgs,:root:not([data-theme=light]) .compose{background:#111b21}
+ :root:not([data-theme=light]) #hd h1,:root:not([data-theme=light]) #chat header h1{color:#e9edef}
+ :root:not([data-theme=light]) #nv{background:#111b21;border-color:#222d34}
+ :root:not([data-theme=light]) .row:hover{background:#202c33}
+ :root:not([data-theme=light]) .search,:root:not([data-theme=light]) .compose input{background:#202c33;color:#e9edef;border-color:#2b3a42}
+ :root:not([data-theme=light]) .b.th{background:#202c33;color:#e9edef}
+ :root:not([data-theme=light]) .ml-community-hero,:root:not([data-theme=light]) .ml-community-room{background:#16232b;border-color:#26363f}
+}
 </style>
 
 </head><body>
