@@ -7,6 +7,7 @@ on:
       - main
       - fix-current-deployment-20261022
       - fix-auth-and-admin-ui-20261030
+      - cookie-consent-polish-20261103
 
 permissions:
   contents: write
@@ -99,20 +100,20 @@ jobs:
             },
             "android": {
               "allowMixedContent": false,
-              "backgroundColor": "#071629"
+              "backgroundColor": "#07111f"
             },
             "plugins": {
               "SplashScreen": {
                 "launchShowDuration": 350,
                 "launchAutoHide": true,
-                "backgroundColor": "#071629",
+                "backgroundColor": "#07111f",
                 "showSpinner": false,
                 "spinnerColor": "#38bdf8",
                 "androidScaleType": "CENTER_CROP"
               },
               "StatusBar": {
                 "style": "LIGHT",
-                "backgroundColor": "#071629",
+                "backgroundColor": "#07111f",
                 "overlaysWebView": false
               },
               "Keyboard": {
@@ -282,6 +283,47 @@ jobs:
               source = source[:last_brace] + members + nl + source[last_brace:]
           activity.write_text(source)
           print(f"Configured WebView connectivity fallback in {activity}")
+          PY
+          # Force dark native Android status/navigation bars and white system icons.
+          # This is native APK chrome; website CSS cannot style Android's system buttons.
+          python3 - <<'PY'
+          from pathlib import Path
+          activity = next(Path("android/app/src/main/java").rglob("MainActivity.java"))
+          source = activity.read_text()
+          nl = chr(10)
+          if "manlungApplySystemBars" not in source:
+              marker = "super.onCreate(savedInstanceState);"
+              if marker not in source:
+                  raise SystemExit("Could not locate MainActivity.onCreate for system bar setup")
+              source = source.replace(marker, marker + nl + "        manlungApplySystemBars();", 1)
+              members = nl.join([
+                  "",
+                  "    private void manlungApplySystemBars() {",
+                  '        int dark = android.graphics.Color.parseColor("#07111f");',
+                  "        getWindow().setStatusBarColor(dark);",
+                  "        getWindow().setNavigationBarColor(dark);",
+                  "        getWindow().getDecorView().setSystemUiVisibility(0);",
+                  "        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {",
+                  "            getWindow().setNavigationBarContrastEnforced(false);",
+                  "            getWindow().setStatusBarContrastEnforced(false);",
+                  "        }",
+                  "        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {",
+                  "            android.view.WindowInsetsController controller = getWindow().getInsetsController();",
+                  "            if (controller != null) controller.setSystemBarsAppearance(0,",
+                  "                android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS |",
+                  "                android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);",
+                  "        }",
+                  "    }",
+                  "",
+                  "    @Override",
+                  "    public void onResume() {",
+                  "        super.onResume();",
+                  "        manlungApplySystemBars();",
+                  "    }"
+              ])
+              source = source[:source.rfind("}")] + members + nl + source[source.rfind("}"):]
+              activity.write_text(source)
+          print("Configured dark native status/navigation bars with light system icons")
           PY
           python3 - <<'PY'
           import os, re
