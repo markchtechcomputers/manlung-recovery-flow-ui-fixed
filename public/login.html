@@ -2521,7 +2521,7 @@ async function startSocialSignup(provider, sourceButton){
     if(!response.ok || !cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error(cfg.error || 'Social sign-in is not configured.');
     if(!window.supabase?.createClient) throw new Error('The secure sign-in library is still loading. Please try again.');
     const client = window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{
-      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit',storage:window.localStorage}
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce',storage:window.localStorage}
     });
     const {error}=await client.auth.signInWithOAuth({
       provider,
