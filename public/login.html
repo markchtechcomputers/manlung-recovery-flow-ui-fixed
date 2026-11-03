@@ -2724,24 +2724,34 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
     if (target && typeof showMessage === 'function') showMessage(target, message, kind || 'info');
   }
 
+  const nativeOAuthProviders = new Set(['google', 'github', 'discord']);
+  let nativeOAuthStartPromise = null;
+
   async function startNativeOAuth(provider) {
-    if (provider !== 'google') return;
-    try {
-      const { Browser } = await plugins();
-      showNativeStatus('Opening secure ' + (provider === 'google' ? 'Google' : provider === 'discord' ? 'Discord' : 'GitHub') + ' sign-in…', 'info');
-      localStorage.removeItem('clientUser');
-      const client = await supabaseClient();
-      const { data, error } = await client.auth.signInWithOAuth({
-        provider,
-        options: { redirectTo: OAUTH_REDIRECT, skipBrowserRedirect: true }
-      });
-      if (error) throw error;
-      if (!data?.url) throw new Error('The sign-in provider did not return a secure login link.');
-      await Browser.open({ url: data.url, presentationStyle: 'fullscreen' });
-    } catch (error) {
-      console.error('Native OAuth start failed:', error);
-      showNativeStatus(error?.message || 'Could not start sign-in. Please try again.', 'error');
-    }
+    // All three native buttons use the same supported external-browser handoff.
+    // Previously this guard silently rejected GitHub and Discord taps.
+    if (!nativeOAuthProviders.has(provider) || nativeOAuthStartPromise) return;
+    nativeOAuthStartPromise = (async () => {
+      const providerName = provider === 'google' ? 'Google' : provider === 'github' ? 'GitHub' : 'Discord';
+      try {
+        const { Browser } = await plugins();
+        showNativeStatus('Opening secure ' + providerName + ' sign-in…', 'info');
+        localStorage.removeItem('clientUser');
+        const client = await supabaseClient();
+        const { data, error } = await client.auth.signInWithOAuth({
+          provider,
+          options: { redirectTo: OAUTH_REDIRECT, skipBrowserRedirect: true }
+        });
+        if (error) throw error;
+        if (!data?.url) throw new Error(providerName + ' did not return a secure login link.');
+        await Browser.open({ url: data.url, presentationStyle: 'fullscreen' });
+      } catch (error) {
+        console.error('Native ' + providerName + ' OAuth start failed:', error);
+        showNativeStatus(error?.message || providerName + ' sign-in could not be started. Please try again.', 'error');
+      }
+    })();
+    try { await nativeOAuthStartPromise; }
+    finally { nativeOAuthStartPromise = null; }
   }
 
   async function finishNativeOAuth(callbackUrl) {
