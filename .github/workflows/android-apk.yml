@@ -136,7 +136,7 @@ jobs:
           import re
           manifest = Path("android/app/src/main/AndroidManifest.xml")
           source = manifest.read_text()
-          activity = re.search(r'(<activity\\b[^>]*android:name="[^"]*MainActivity"[^>]*>)([\\s\\S]*?)(</activity>)', source)
+          activity = re.search(r'(<activity\b[^>]*android:name="[^"]*MainActivity"[^>]*>)([\s\S]*?)(</activity>)', source)
           if not activity:
               raise SystemExit("Could not locate Capacitor MainActivity in AndroidManifest.xml")
           if "co.manlungrecovery.app" not in activity.group(2):
