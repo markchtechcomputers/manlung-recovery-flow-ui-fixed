@@ -76,6 +76,9 @@ jobs:
             <body><p>Opening Manlung Recovery…</p></body>
           </html>
           HTML
+          # Use the exact same offline page in the browser PWA and the native Capacitor APK.
+          cp ../public/offline.html www/offline.html
+          test -s www/offline.html
           cat > capacitor.config.json <<'JSON'
           {
             "appId": "co.manlungrecovery.app",
