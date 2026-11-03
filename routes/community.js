@@ -729,23 +729,37 @@ router.post('/reports', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Chat report error:'); }
 });
 
+router.get('/groups/requests', async (req,res) => {
+  try {
+    let query=supabase.from('recovery_chat_groups')
+      .select('id,slug,name,description,avatar_url,created_by,created_at,approval_status,rejection_reason')
+      .order('created_at',{ascending:false}).limit(100);
+    if(isAdmin(req.user)) query=query.eq('approval_status','pending');
+    else query=query.eq('created_by',req.user.id).in('approval_status',['pending','rejected']);
+    const {data,error}=await query;
+    if(error) throw error;
+    res.set('Cache-Control','no-store');
+    res.json({success:true,requests:data||[]});
+  } catch(error) { return handleDbError(res,error,'Group approval request list error:'); }
+});
+
 router.get('/groups', async (req, res) => {
   try {
     // Ensure every authenticated community member is included in the shared recovery group.
     let { data: defaults, error: defaultError } = await supabase.from('recovery_chat_groups')
-      .select('id,slug,name,description,is_default,avatar_url').eq('is_default', true).limit(1);
+      .select('id,slug,name,description,is_default,avatar_url,approval_status').eq('is_default', true).eq('approval_status','approved').limit(1);
     if (defaultError) throw defaultError;
     let shared = defaults?.[0] || null;
     if (!shared) {
       const created = await supabase.from('recovery_chat_groups').insert({
         slug: 'manlung-members', name: 'Manlung Members',
         description: 'For registered members: talk, love, and friendly chatter. No hate speech, harassment, threats, or discrimination. We build each other up. Main-app admins remain group admins and can remove members who break the rules.',
-        is_default: true, avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png'
+        is_default: true, approval_status: 'approved', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png'
       }).select('id,slug,name,description,is_default,avatar_url').single();
       if (created.error && created.error.code !== '23505') throw created.error;
       if (created.data) shared = created.data;
       else {
-        const retry = await supabase.from('recovery_chat_groups').select('id,slug,name,description,is_default,avatar_url').eq('is_default', true).limit(1);
+        const retry = await supabase.from('recovery_chat_groups').select('id,slug,name,description,is_default,avatar_url,approval_status').eq('is_default', true).eq('approval_status','approved').limit(1);
         if (retry.error) throw retry.error;
         shared = retry.data?.[0] || null;
       }
@@ -755,23 +769,23 @@ router.get('/groups', async (req, res) => {
       const { data: updatedShared, error: updateSharedError } = await supabase.from('recovery_chat_groups')
         .update({ slug: 'manlung-members', name: 'Manlung Members',
           description: 'For registered members: talk, love, and friendly chatter. No hate speech, harassment, threats, or discrimination. We build each other up. Main-app admins remain group admins and can remove members who break the rules.',
-          avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png' })
-        .eq('id', shared.id).select('id,slug,name,description,is_default,avatar_url').single();
+          approval_status: 'approved', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png' })
+        .eq('id', shared.id).select('id,slug,name,description,is_default,avatar_url,approval_status').single();
       if (updateSharedError) throw updateSharedError;
       shared = updatedShared || shared;
     }
     // Seed the official team room and read-only announcements channel once.
     const officialGroups = [
-      { slug: 'manlung-team', name: 'Manlung Team', description: 'The official Manlung team room for registered members. Be respectful and build each other up.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false },
-      { slug: 'manlung-updates', name: 'Manlung Updates', description: 'Official news about new features and website updates. Members can read and react; comments and member posts are disabled.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false }
+      { slug: 'manlung-team', name: 'Manlung Team', description: 'The official Manlung team room for registered members. Be respectful and build each other up.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false, approval_status: 'approved' },
+      { slug: 'manlung-updates', name: 'Manlung Updates', description: 'Official news about new features and website updates. Members can read and react; comments and member posts are disabled.', avatar_url: 'https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png', is_default: false, approval_status: 'approved' }
     ];
     for (const item of officialGroups) {
       const { data: existing, error: findError } = await supabase.from('recovery_chat_groups')
-        .select('id,slug,name,description,is_default,avatar_url').eq('slug', item.slug).maybeSingle();
+        .select('id,slug,name,description,is_default,avatar_url,approval_status').eq('slug', item.slug).maybeSingle();
       if (findError) throw findError;
       if (existing) {
         const { error: updateError } = await supabase.from('recovery_chat_groups').update({
-          name: item.name, description: item.description, avatar_url: item.avatar_url
+          name: item.name, description: item.description, avatar_url: item.avatar_url, approval_status: 'approved'
         }).eq('id', existing.id);
         if (updateError) throw updateError;
       } else {
@@ -787,13 +801,13 @@ router.get('/groups', async (req, res) => {
       shared = { ...shared, joined: Boolean(membership), archived: Boolean(membership?.archived) };
     }
     const { data: groups, error } = await supabase.from('recovery_chat_group_members')
-      .select('group_id,archived,muted,unarchive_on_mention,recovery_chat_groups(id,slug,name,description,is_default,avatar_url)')
+      .select('group_id,archived,muted,unarchive_on_mention,recovery_chat_groups(id,slug,name,description,is_default,avatar_url,approval_status)')
       .eq('user_id', req.user.id);
     if (error) throw error;
-    const joined=(groups||[]).filter(x=>x.recovery_chat_groups).map(x=>({ ...x.recovery_chat_groups, joined:true, archived:x.archived, muted:x.muted, unarchiveOnMention:x.unarchive_on_mention }));
+    const joined=(groups||[]).filter(x=>x.recovery_chat_groups&&x.recovery_chat_groups.approval_status==='approved').map(x=>({ ...x.recovery_chat_groups, joined:true, archived:x.archived, muted:x.muted, unarchiveOnMention:x.unarchive_on_mention }));
     if(shared&&!joined.some(x=>x.id===shared.id)) joined.unshift(shared);
     const { data: official, error: officialError } = await supabase.from('recovery_chat_groups')
-      .select('id,slug,name,description,is_default,avatar_url').order('created_at', { ascending: true }).limit(100);
+      .select('id,slug,name,description,is_default,avatar_url,approval_status').eq('approval_status','approved').order('created_at', { ascending: true }).limit(100);
     if (officialError) throw officialError;
     for (const group of (official || [])) {
       let { data: membership, error: membershipError } = await supabase.from('recovery_chat_group_members')
@@ -838,34 +852,70 @@ router.get('/groups', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Group list error:'); }
 });
 
-router.post('/groups', async (req,res) => {
+router.post('/groups', messageLimiter, async (req,res) => {
   try {
     const name=cleanText(req.body?.name,100);
     const description=String(req.body?.description||'').trim();
+    const avatar=String(req.body?.avatar_url||'').trim();
+    const isStaff=isAdmin(req.user);
     if(name.length<2) return fail(res,400,'Group name must contain at least 2 characters.');
     if(description.length>2000) return fail(res,400,'Group description must be 2000 characters or fewer.');
+    if(avatar.length>180000 || (avatar && !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/i.test(avatar) && !/^https:\/\//i.test(avatar) && !(avatar.startsWith('/')&&!avatar.startsWith('//'))) return fail(res,400,'Group picture must be a PNG, JPEG or WebP image, secure HTTPS URL, or same-site path.');
     const slug='community-'+crypto.randomUUID();
+    const approval_status=isStaff?'approved':'pending';
     const {data:group,error}=await supabase.from('recovery_chat_groups')
-      .insert({slug,name,description,created_by:req.user.id,is_default:false,allow_member_invites:true,admin_only_announcements:false})
-      .select('id,slug,name,description,is_default,avatar_url,created_at').single();
+      .insert({slug,name,description,avatar_url:avatar||null,created_by:req.user.id,is_default:false,allow_member_invites:true,admin_only_announcements:false,approval_status,approved_by:isStaff?req.user.id:null,approved_at:isStaff?new Date().toISOString():null})
+      .select('id,slug,name,description,is_default,avatar_url,created_at,created_by,approval_status').single();
     if(error) throw error;
-    const {error:memberError}=await supabase.from('recovery_chat_group_members')
-      .insert({group_id:group.id,user_id:req.user.id,archived:false});
-    if(memberError) {
-      await supabase.from('recovery_chat_groups').delete().eq('id',group.id);
-      throw memberError;
+    let joined=false;
+    if(isStaff){
+      const {error:memberError}=await supabase.from('recovery_chat_group_members')
+        .insert({group_id:group.id,user_id:req.user.id,archived:false});
+      if(memberError) {
+        await supabase.from('recovery_chat_groups').delete().eq('id',group.id);
+        throw memberError;
+      }
+      joined=true;
     }
-    res.status(201).json({success:true,group:{...group,joined:true,archived:false}});
-  } catch(error) { return handleDbError(res,error,'Community group create error:'); }
+    res.status(201).json({success:true,group:{...group,joined,archived:false},requiresApproval:!isStaff});
+  } catch(error) { return handleDbError(res,error,'Community group request error:'); }
+});
+
+router.patch('/groups/:groupId/approval', async (req,res) => {
+  try {
+    if(!isAdmin(req.user)) return fail(res,403,'Only a Manlung admin can approve or reject group requests.');
+    const gid=String(req.params.groupId||''), status=String(req.body?.status||'');
+    if(!validId(gid)||!['approved','rejected'].includes(status)) return fail(res,400,'Choose approve or reject for a valid group request.');
+    const {data:pending,error:pe}=await supabase.from('recovery_chat_groups')
+      .select('id,created_by,approval_status').eq('id',gid).maybeSingle();
+    if(pe) throw pe;
+    if(!pending) return fail(res,404,'Group request not found.');
+    if(pending.approval_status!=='pending') return fail(res,409,'This group request has already been reviewed.');
+    const patch=status==='approved'
+      ? {approval_status:'approved',approved_by:req.user.id,approved_at:new Date().toISOString(),rejection_reason:null}
+      : {approval_status:'rejected',approved_by:req.user.id,approved_at:new Date().toISOString(),rejection_reason:cleanText(req.body?.reason,500)||'Not approved by an admin.'};
+    if(status==='approved'&&pending.created_by){
+      const {error:me}=await supabase.from('recovery_chat_group_members')
+        .upsert({group_id:gid,user_id:pending.created_by,archived:false},{onConflict:'group_id,user_id'});
+      if(me) throw me;
+    }
+    const {data:updated,error:ue}=await supabase.from('recovery_chat_groups').update(patch).eq('id',gid).eq('approval_status','pending')
+      .select('id,name,approval_status,created_by').maybeSingle();
+    if(ue) throw ue;
+    if(!updated) return fail(res,409,'This group request was already reviewed.');
+    res.set('Cache-Control','no-store');
+    res.json({success:true,group:updated});
+  } catch(error) { return handleDbError(res,error,'Group approval update error:'); }
 });
 
 router.post('/groups/:groupId/join', async (req,res) => {
   try {
     const gid=String(req.params.groupId||'');
     if(!validId(gid)) return fail(res,400,'Invalid group ID.');
-    const {data:group,error:ge}=await supabase.from('recovery_chat_groups').select('id,is_default').eq('id',gid).maybeSingle();
+    const {data:group,error:ge}=await supabase.from('recovery_chat_groups').select('id,is_default,approval_status').eq('id',gid).maybeSingle();
     if(ge) throw ge;
     if(!group) return fail(res,404,'Group not found.');
+    if(group.approval_status!=='approved') return fail(res,404,'This group is awaiting admin approval.');
     const {data:groupDetails,error:detailError}=await supabase.from('recovery_chat_groups').select('slug').eq('id',gid).maybeSingle();
     if(detailError) throw detailError;
     if(groupDetails?.slug==='manlung-team'&&!isAdmin(req.user)) return fail(res,403,'Manlung Team is available to admins and the owner only.');
@@ -977,9 +1027,9 @@ router.get('/groups/:groupId/messages', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
-    const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups').select('id,slug').eq('id', gid).maybeSingle();
+    const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups').select('id,slug,approval_status').eq('id', gid).maybeSingle();
     if (targetError) throw targetError;
-    if (!targetGroup) return fail(res, 404, 'Group not found.');
+    if (!targetGroup || targetGroup.approval_status!=='approved') return fail(res, 404, 'Approved group not found.');
     if (targetGroup.slug === 'manlung-team' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Team is available to admins and the owner only.');
     if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
     // Fetch the newest 100 messages first, then return them oldest-to-newest for the chat UI.
@@ -1001,9 +1051,9 @@ router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
     if (!message || message.length > 5000) return fail(res, 400, 'Messages must be 1–5000 characters.');
     const { data: targetGroup, error: targetGroupError } = await supabase.from('recovery_chat_groups')
-      .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
+      .select('id,slug,admin_only_announcements,approval_status').eq('id', gid).maybeSingle();
     if (targetGroupError) throw targetGroupError;
-    if (!targetGroup) return fail(res, 404, 'Group not found.');
+    if (!targetGroup || targetGroup.approval_status!=='approved') return fail(res, 404, 'Approved group not found.');
     if ((targetGroup.slug === 'manlung-updates' || targetGroup.slug === 'manlung-official-updates' || targetGroup.admin_only_announcements) && !isAdmin(req.user)) return fail(res, 403, 'This is an official read-only channel. Only admins can publish announcements.');
     if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
     if (replyTo && !validId(replyTo)) return fail(res, 400, 'Invalid reply target.');
