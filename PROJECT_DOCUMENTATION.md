@@ -30,7 +30,6 @@ The codebase is a multi-part application:
 | `server.js` | Express app, middleware, HTTPS enforcement, route mounting, and shared backend entry point. |
 | `api/index.js` | Vercel function entry point that re-exports the Express app. |
 | `api/config-public.js` | Public client configuration endpoint. Only publish values intended for browsers. |
-| `api/app-version.js` | App-version/update metadata endpoint. |
 | `api/ai.js`, `api/ai-live.js` | Vercel entry points for AI-related endpoints. |
 | `api/auth-google.js`, `api/auth-github.js` | OAuth callback/authentication entry points. |
 | `routes/` | API endpoint groups and request handling. |
@@ -47,7 +46,7 @@ The codebase is a multi-part application:
 | `public/js/` | Shared browser features such as auth helpers, PWA, WebRTC, AI, navigation, live location, and scanning. |
 | `tests/` | Unit, integration, regression, call, Owner/RBAC, platform-security, and scanner tests. |
 | `scripts/` | Project maintenance and automation scripts. |
-| `.github/workflows/` | CI tests, security audits, APK workflows, and completion/repair automation. |
+| `.github/workflows/` | CI tests, security audits, and completion/repair automation. |
 | `.env.example` | Names and descriptions of supported environment variables; values here must be placeholders only. |
 | `package.json`, `package-lock.json` | Node package metadata, scripts, dependencies, and lockfile. |
 | `vercel.json` | Vercel build definitions, URL rewrites, headers, and cache policy. |
@@ -114,7 +113,6 @@ Features represented in the source tree and project notes include:
 - About, services, contact, FAQ, blog, careers, knowledge, trust, privacy, and terms pages.
 - Donation information and donation workflows.
 - Link-scanning and website-scanning tools.
-- Download-app page and Android APK/update workflow.
 - PWA manifest, service worker, icons, favicon, sitemap and robots file.
 - Shared theme, responsive navigation, onboarding, support/contact floating controls and UI components.
 
@@ -282,7 +280,7 @@ A successful GitHub push is not proof that production changed. Compare:
 If Vercel reports Ready but the domain shows old code, verify the production alias/domain and browser/service-worker cache. Do not repeatedly create empty commits as a substitute for identifying a failed Git integration, build, or alias assignment.
 
 ### Security headers and caching
-`vercel.json` sets headers such as CSP, HSTS, frame protection, content-type sniffing protection, referrer policy and permissions policy. It also applies no-cache rules to HTML and API responses with a special app-version cache policy. When adding a new third-party provider, update CSP deliberately and test the actual feature; avoid broadening policy without need.
+`vercel.json` sets headers such as CSP, HSTS, frame protection, content-type sniffing protection, referrer policy and permissions policy. It also applies no-cache rules to HTML and API responses with explicit cache policies for static assets and API responses. When adding a new third-party provider, update CSP deliberately and test the actual feature; avoid broadening policy without need.
 
 ## 9. Database and migrations
 
@@ -370,17 +368,17 @@ The Express route groups are mounted by `server.js`. The following is a **module
 
 To enumerate the exact API surface locally, search route files for `router.get`, `router.post`, `router.put`, `router.patch`, `router.delete`, and inspect where each router is mounted in `server.js`.
 
-## 12. PWA and Android application
+## 12. Progressive Web App (PWA)
 
-The web frontend includes PWA-related files such as:
+Manlung Recovery is distributed as a browser-based Progressive Web App. Users can install it directly from a supported browser.
+
+The PWA files include:
 - `public/manifest.webmanifest`
 - `public/service-worker.js`
 - `public/js/pwa.js`
 - icons under `public/icons/`
-- Android APK/update workflow under `.github/workflows/android-apk.yml`
-- setup notes in `APK_UPDATE_SETUP.md`
 
-Check the manifest start URL, scope, icon paths, service-worker cache/versioning, and update behavior after changing routes or static assets. Test installability and updates on a real Android device. If an APK is built or distributed, document its source, version, signing process, and release location; do not commit private signing keys.
+When changing routes or static assets, verify the manifest start URL and scope, icon paths, service-worker cache/versioning, offline fallback, install prompt, and update behavior. Test installability and updates in supported mobile and desktop browsers.
 
 ## 13. Automated testing and quality checks
 
