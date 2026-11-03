@@ -801,10 +801,10 @@ router.get('/groups', async (req, res) => {
       shared = { ...shared, joined: Boolean(membership), archived: Boolean(membership?.archived) };
     }
     const { data: groups, error } = await supabase.from('recovery_chat_group_members')
-      .select('group_id,archived,muted,unarchive_on_mention,recovery_chat_groups(id,slug,name,description,is_default,avatar_url)')
+      .select('group_id,archived,muted,unarchive_on_mention,recovery_chat_groups(id,slug,name,description,is_default,avatar_url,approval_status)')
       .eq('user_id', req.user.id);
     if (error) throw error;
-    const joined=(groups||[]).filter(x=>x.recovery_chat_groups).map(x=>({ ...x.recovery_chat_groups, joined:true, archived:x.archived, muted:x.muted, unarchiveOnMention:x.unarchive_on_mention }));
+    const joined=(groups||[]).filter(x=>x.recovery_chat_groups&&x.recovery_chat_groups.approval_status==='approved').map(x=>({ ...x.recovery_chat_groups, joined:true, archived:x.archived, muted:x.muted, unarchiveOnMention:x.unarchive_on_mention }));
     if(shared&&!joined.some(x=>x.id===shared.id)) joined.unshift(shared);
     const { data: official, error: officialError } = await supabase.from('recovery_chat_groups')
       .select('id,slug,name,description,is_default,avatar_url,approval_status').eq('approval_status','approved').order('created_at', { ascending: true }).limit(100);
@@ -852,7 +852,7 @@ router.get('/groups', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Group list error:'); }
 });
 
-router.post('/groups', async (req,res) => {
+router.post('/groups', messageLimiter, async (req,res) => {
   try {
     const name=cleanText(req.body?.name,100);
     const description=String(req.body?.description||'').trim();
@@ -894,15 +894,15 @@ router.patch('/groups/:groupId/approval', async (req,res) => {
     const patch=status==='approved'
       ? {approval_status:'approved',approved_by:req.user.id,approved_at:new Date().toISOString(),rejection_reason:null}
       : {approval_status:'rejected',approved_by:req.user.id,approved_at:new Date().toISOString(),rejection_reason:cleanText(req.body?.reason,500)||'Not approved by an admin.'};
+    if(status==='approved'&&pending.created_by){
+      const {error:me}=await supabase.from('recovery_chat_group_members')
+        .upsert({group_id:gid,user_id:pending.created_by,archived:false},{onConflict:'group_id,user_id'});
+      if(me) throw me;
+    }
     const {data:updated,error:ue}=await supabase.from('recovery_chat_groups').update(patch).eq('id',gid).eq('approval_status','pending')
       .select('id,name,approval_status,created_by').maybeSingle();
     if(ue) throw ue;
     if(!updated) return fail(res,409,'This group request was already reviewed.');
-    if(status==='approved'&&updated.created_by){
-      const {error:me}=await supabase.from('recovery_chat_group_members')
-        .upsert({group_id:gid,user_id:updated.created_by,archived:false},{onConflict:'group_id,user_id'});
-      if(me) throw me;
-    }
     res.set('Cache-Control','no-store');
     res.json({success:true,group:updated});
   } catch(error) { return handleDbError(res,error,'Group approval update error:'); }
