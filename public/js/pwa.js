@@ -10,7 +10,7 @@
     document.head.appendChild(consentScript);
   }
 
-  const DISMISS_KEY = 'manlung-app-install-dismissed-v3';
+  const DISMISS_KEY = 'manlung-pwa-install-dismissed-v4';
 
   // Preserve the normal browser history inside the Admin Portal.
   // The public-site back guard must never send an Admin page to the clients' home page.
@@ -49,138 +49,14 @@
 
   installMobileBackNavigation();
 
-  // Handle the Android system Back button through Capacitor when the native
-  // App plugin is available. Prefer the WebView's real navigation history;
-  // only fall back to the homepage when there is no previous entry.
-  function installCapacitorBackButton() {
-    const appPlugin = window.Capacitor?.Plugins?.App;
-    // Admin navigation should follow its own page history, not fall back to public Home.
-    if (isAdminRoute() || !appPlugin || window.__manlungCapacitorBackInstalled) return;
-    window.__manlungCapacitorBackInstalled = true;
-
-    try {
-      appPlugin.addListener('backButton', ({ canGoBack } = {}) => {
-        const isHome = window.location.pathname === '/' ||
-          window.location.pathname === '/index.html';
-
-        if (canGoBack && window.history.length > 1) {
-          window.history.back();
-          return;
-        }
-
-        if (!isHome) {
-          window.location.replace('/');
-          return;
-        }
-
-        // At the homepage, consume Back rather than allowing the WebView to
-        // close the activity immediately.
-        try {
-          window.history.pushState({ manlungBackGuard: true }, '', window.location.href);
-        } catch (_) {}
-      });
-    } catch (error) {
-      console.warn('Manlung Android Back handler could not be installed:', error);
-    }
-  }
-
-  installCapacitorBackButton();
-
-
-  // Prefer the browser's native PWA install prompt, with the existing APK page as fallback.
+  // Prefer the browser's native PWA install prompt.
   const DISMISS_DAYS = 7;
   const IS_HOME = window.location.pathname === '/' || window.location.pathname === '/index.html';
-
-  function isAndroidApp() {
-    try {
-      const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.()) ||
-        /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator.userAgent);
-      if (nativeApp) document.documentElement.classList.add('manlung-android-app');
-      return nativeApp;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  // Mark the document before the page finishes rendering so browser-only
-  // download controls stay hidden inside the installed Android app.
-  isAndroidApp();
-
-  // Native APK presentation is intentionally different from the browser site:
-  // keep the app header visible while scrolling and hide the browser marketing footer.
-  function applyNativeAppLayout() {
-    if (!isAndroidApp() || document.getElementById('manlung-native-app-layout-style')) return;
-    const style = document.createElement('style');
-    style.id = 'manlung-native-app-layout-style';
-    style.textContent = `
-      html.manlung-android-app .site-header,
-      html.manlung-android-app header.site-header {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 2147482000 !important;
-        width: 100% !important;
-      }
-      html.manlung-android-app footer.manlung-footer,
-      html.manlung-android-app .mr-hero-android-link {
-        display: none !important;
-      }
-      html.manlung-android-app {
-        scroll-padding-top: 76px;
-      }
-    `;
-    (document.head || document.documentElement).appendChild(style);
-  }
-  applyNativeAppLayout();
 
   function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches ||
       window.navigator.standalone === true;
   }
-
-  // Keep social sign-in available in normal browser tabs, but use email/password
-  // only in the native APK and installed browser PWA.
-  function isInstalledBrowserPwa() {
-    try {
-      return !isAndroidApp() && (window.navigator.standalone === true ||
-        ['standalone', 'minimal-ui', 'fullscreen', 'window-controls-overlay'].some(mode =>
-          window.matchMedia('(display-mode: ' + mode + ')').matches
-        ));
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function applyAppAuthVisibility() {
-    const nativeApk = isAndroidApp();
-    const installedPwa = isInstalledBrowserPwa();
-    if ((!nativeApk && !installedPwa) ||
-        document.getElementById('manlung-app-email-only-auth-style')) return;
-
-    document.documentElement.classList.add('manlung-app-email-only-auth');
-    if (installedPwa) document.documentElement.classList.add('manlung-installed-browser-pwa');
-    const style = document.createElement('style');
-    style.id = 'manlung-app-email-only-auth-style';
-    style.textContent = `
-      html.manlung-app-email-only-auth body.manlung-auth-page #googleLoginBtn,
-      html.manlung-app-email-only-auth body.manlung-auth-page #googleRegisterBtn,
-      html.manlung-app-email-only-auth body.manlung-auth-page #githubLoginBtn,
-      html.manlung-app-email-only-auth body.manlung-auth-page #githubRegisterBtn,
-      html.manlung-app-email-only-auth body.manlung-auth-page #discordLoginBtn,
-      html.manlung-app-email-only-auth body.manlung-auth-page #discordRegisterBtn,
-      html.manlung-app-email-only-auth body.manlung-auth-page #openaiLoginBtn,
-      html.manlung-app-email-only-auth body.manlung-auth-page #openaiRegisterBtn {
-        display: none !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-      }
-      html.manlung-app-email-only-auth body.manlung-auth-page .manlung-auth-divider {
-        display: none !important;
-      }
-    `;
-    (document.head || document.documentElement).appendChild(style);
-  }
-
-  applyAppAuthVisibility();
 
   function wasRecentlyDismissed() {
     try {
@@ -442,12 +318,8 @@
     return banner;
   }
 
-  // Keep browser PWA files fresh, but never run a service worker inside the remote-site Android WebView.
+  // Keep browser PWA files fresh and notify users when a new service worker is ready.
   const UPDATE_NOTICE_ID = 'manlung-runtime-update-notice';
-  const APK_CHECK_KEY = 'manlung-apk-update-check-at-v1';
-  // Check frequently, and always check again when the Android app returns to the foreground.
-  const APK_CHECK_INTERVAL = 5 * 60 * 1000;
-  let nativeApkCheckInFlight = false;
   let pwaRegistration = null;
   let pwaHadController = Boolean(navigator.serviceWorker && navigator.serviceWorker.controller);
 
@@ -518,9 +390,7 @@
       badge.textContent = available ? '1' : '';
       trigger.setAttribute('aria-label', available ? 'App update available' : 'App updates');
       title.textContent = updateBellState?.title || 'Manlung Recovery updates';
-      copy.textContent = updateBellState?.message || (isAndroidApp()
-        ? 'No update notice yet. Tap Check updates to check for the latest Android app.'
-        : 'Website refresh notices and app update information will appear here.');
+      copy.textContent = updateBellState?.message || 'Website refresh notices will appear here.';
       primary.textContent = updateBellState?.actionLabel || 'Check updates';
     }
 
@@ -545,16 +415,8 @@
       primary.disabled = true;
       primary.textContent = 'Checking…';
       try {
-        if (isAndroidApp()) {
-          await checkNativeApkUpdate(true);
-        } else {
-          await updatePwaRegistration();
-        }
-        if (!updateBellState) {
-          copy.textContent = isAndroidApp()
-            ? 'No newer Android APK was detected. Try again when you are online.'
-            : 'Website update check completed. Reload the page if you notice outdated content.';
-        }
+        await updatePwaRegistration();
+        if (!updateBellState) copy.textContent = 'Website update check completed. Reload the page if you notice outdated content.';
       } finally {
         primary.disabled = false;
         renderBell();
@@ -682,7 +544,7 @@
   }
 
   function setupPwaAutoUpdates() {
-    if (isAndroidApp() || !('serviceWorker' in navigator)) return;
+    if (!('serviceWorker' in navigator)) return;
 
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (pwaHadController) offerPwaRefresh();
@@ -708,122 +570,8 @@
     window.setInterval(updatePwaRegistration, 15 * 60 * 1000);
   }
 
-  async function checkNativeApkUpdate(force = false) {
-    if (!isAndroidApp() || nativeApkCheckInFlight) return;
-
-    const appPlugin = window.Capacitor?.Plugins?.App;
-    if (!appPlugin || typeof appPlugin.getInfo !== 'function') return;
-
-    let checkedAt = 0;
-    try { checkedAt = Number(localStorage.getItem(APK_CHECK_KEY) || 0); } catch (_) {}
-    if (!force && Date.now() - checkedAt < APK_CHECK_INTERVAL) return;
-
-    nativeApkCheckInFlight = true;
-    try {
-      const appInfo = await appPlugin.getInfo();
-      const currentCode = Number.parseInt(String(appInfo?.build || appInfo?.versionCode || ''), 10);
-      if (!Number.isFinite(currentCode) || currentCode < 1) return;
-
-      const response = await fetch('/api/app-version', {
-        method: 'GET',
-        credentials: 'same-origin',
-        cache: 'no-store',
-        headers: { Accept: 'application/json' }
-      });
-      if (!response.ok) return;
-      const release = await response.json();
-      const latestCode = Number.parseInt(String(release?.versionCode || ''), 10);
-      if (!Number.isFinite(latestCode) || latestCode <= currentCode || !release?.downloadUrl) {
-        try { localStorage.setItem(APK_CHECK_KEY, String(Date.now())); } catch (_) {}
-        return;
-      }
-
-      try { localStorage.setItem(APK_CHECK_KEY, String(Date.now())); } catch (_) {}
-      const reinstallNote = release.requiresReinstall
-        ? ' This first permanently signed APK cannot replace older copies signed with a different key. You may need to uninstall the old app before installing it; your online account records remain on the server, but local preferences may reset.'
-        : ' Android will ask you to approve installation; the app cannot install an APK silently.';
-      showRuntimeUpdateNotice({
-        title: 'A new Android app update is available',
-        message: 'Installed ' + String(appInfo.version || 'current version') + '; latest ' + String(release.versionName || ('build ' + latestCode)) + '.' + reinstallNote,
-        actionLabel: 'Get update',
-        onAction: async () => {
-          const browserPlugin = window.Capacitor?.Plugins?.Browser;
-          if (browserPlugin && typeof browserPlugin.open === 'function') {
-            await browserPlugin.open({ url: release.downloadUrl });
-            return;
-          }
-          window.location.assign('/download-app.html?update=available&reinstall=' + (release.requiresReinstall ? '1' : '0'));
-        }
-      });
-    } catch (error) {
-      console.warn('Manlung Android update check failed:', error);
-    } finally {
-      nativeApkCheckInFlight = false;
-    }
-  }
-
-  // The APK loads the live website, so refresh its web UI after a long
-  // background period. Never auto-reload after the user edits a form on this
-  // page; that avoids discarding unsaved work. Native APK updates are checked
-  // separately below because Android package changes still require approval.
-  let nativePageEdited = false;
-  let nativeHiddenAt = 0;
-  const NATIVE_REFRESH_AFTER = 2 * 60 * 1000;
-
-  document.addEventListener('input', event => {
-    if (isAndroidApp() && event.target?.matches?.('input, textarea, select, [contenteditable="true"]')) {
-      nativePageEdited = true;
-    }
-  }, true);
-  document.addEventListener('change', event => {
-    if (isAndroidApp() && event.target?.matches?.('input, textarea, select, [contenteditable="true"]')) {
-      nativePageEdited = true;
-    }
-  }, true);
-
   setupUpdateBell();
   setupPwaAutoUpdates();
-  function startNativeApkUpdateChecks() {
-    if (!isAndroidApp()) return;
-    // Force a fresh check on each app startup; don't wait for the old six-hour cache window.
-    checkNativeApkUpdate(true);
-    window.setInterval(() => checkNativeApkUpdate(false), APK_CHECK_INTERVAL);
-  }
-
-  if (document.readyState === 'complete') {
-    startNativeApkUpdateChecks();
-  } else {
-    window.addEventListener('load', startNativeApkUpdateChecks, { once: true });
-  }
-  window.addEventListener('online', () => {
-    if (!isAndroidApp()) return;
-    // The APK uses the live website for its UI. Refresh it as soon as network
-    // access returns so a newly deployed website version appears without a
-    // separate APK download. Never reload a form the user has edited.
-    window.setTimeout(() => {
-      checkNativeApkUpdate(true);
-      if (!nativePageEdited && document.visibilityState === 'visible') {
-        window.location.reload();
-      }
-    }, 1200);
-  });
-  document.addEventListener('visibilitychange', () => {
-    if (!isAndroidApp()) return;
-    if (document.hidden) {
-      nativeHiddenAt = Date.now();
-      return;
-    }
-
-    // Always re-check when the Android app returns to the foreground.
-    checkNativeApkUpdate(true);
-    const wasAwayLongEnough = nativeHiddenAt && Date.now() - nativeHiddenAt >= NATIVE_REFRESH_AFTER;
-    nativeHiddenAt = 0;
-    if (wasAwayLongEnough && !nativePageEdited) {
-      // HTML and scripts are configured on the server to revalidate; this
-      // reload gets the newest deployed website without needing a new APK.
-      window.location.reload();
-    }
-  });
 
   // Capture the browser-native PWA install prompt when the browser offers it.
   let deferredInstallPrompt = null;
@@ -834,10 +582,10 @@
     if (button) button.textContent = 'INSTALL';
   });
 
-  // Offer installation on the homepage. If the browser has no native prompt,
-  // the existing app-download page remains available as a fallback.
+  // Offer installation on the homepage. Browsers without an install prompt
+  // can use their own menu to add this PWA to the home screen.
   window.addEventListener('load', () => {
-    if (isAndroidApp() || isStandalone() || !IS_HOME || wasRecentlyDismissed()) return;
+    if (isStandalone() || !IS_HOME || wasRecentlyDismissed()) return;
     const banner = createBanner();
     window.requestAnimationFrame(() => banner.classList.add('is-visible'));
   });
@@ -852,7 +600,6 @@
   });
 
   document.addEventListener('click', async event => {
-    if (isAndroidApp()) return;
     const button = event.target.closest('.manlung-pwa-download');
     if (!button) return;
 
@@ -868,9 +615,10 @@
       return;
     }
 
-    // Browsers that do not expose beforeinstallprompt can still use the APK
-    // page or their browser's built-in "Install app / Add to Home Screen" menu.
-    window.location.assign('/download-app.html');
+    const banner = document.getElementById('manlung-pwa-banner');
+    const copy = banner?.querySelector('.manlung-pwa-text');
+    if (copy) copy.textContent = 'Open your browser menu and choose Install app or Add to Home screen.';
+    button.textContent = 'BROWSER MENU';
   });
 
   /*
