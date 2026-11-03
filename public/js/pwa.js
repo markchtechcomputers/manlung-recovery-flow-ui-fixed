@@ -58,6 +58,16 @@
       window.navigator.standalone === true;
   }
 
+  // Keep the CSS viewport unit synchronized with Android/iOS browser chrome and keyboards.
+  function syncVisualViewportHeight() {
+    const height = window.visualViewport?.height || window.innerHeight;
+    if (height > 0) document.documentElement.style.setProperty('--mr-viewport-height', Math.round(height) + 'px');
+  }
+  syncVisualViewportHeight();
+  window.addEventListener('resize', syncVisualViewportHeight, { passive: true });
+  window.addEventListener('orientationchange', syncVisualViewportHeight, { passive: true });
+  window.visualViewport?.addEventListener('resize', syncVisualViewportHeight, { passive: true });
+
   // Installed-app shell: hide website chrome, normalize viewport sizing, and
   // show a short branded welcome once at the start of each installed-app session.
   function setupPwaShell() {
