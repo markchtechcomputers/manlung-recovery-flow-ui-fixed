@@ -39,29 +39,29 @@
     style.id = 'manlung-cookie-consent-style';
     style.textContent = [
       '#manlung-cookie-consent,#manlung-cookie-consent *{box-sizing:border-box}',
-      '#manlung-cookie-consent{position:fixed;inset:auto 16px 16px 16px;z-index:2147483001;font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eaf1fb}',
-      '#manlung-cookie-consent .mcc-panel{width:min(100%,720px);margin:0 auto;background:linear-gradient(145deg,#08182b,#102b49);border:1px solid rgba(148,163,184,.35);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.38);padding:20px}',
-      '#manlung-cookie-consent .mcc-head{display:flex;align-items:flex-start;gap:12px}',
-      '#manlung-cookie-consent .mcc-icon{width:42px;height:42px;flex:0 0 42px;border-radius:13px;display:grid;place-items:center;background:rgba(59,130,246,.18);color:#93c5fd;font-size:21px}',
-      '#manlung-cookie-consent h2{margin:0 0 5px;color:#fff;font-size:18px;line-height:1.25;font-weight:850}',
-      '#manlung-cookie-consent p{margin:0;color:#cbd5e1;font-size:13px;line-height:1.55}',
-      '#manlung-cookie-consent a{color:#93c5fd;text-decoration:underline;text-underline-offset:2px}',
-      '#manlung-cookie-consent .mcc-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:17px}',
+      '#manlung-cookie-consent{position:fixed;inset:0;z-index:2147483001;display:flex;align-items:flex-end;pointer-events:none;font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827}',
+      '#manlung-cookie-consent .mcc-panel{pointer-events:auto;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;width:100%;margin:0;background:#fff;color:#111827;border:1px solid #e5e7eb;border-left:0;border-right:0;border-bottom:0;border-radius:0;box-shadow:0 -12px 36px rgba(15,23,42,.14);padding:clamp(16px,2.4vw,28px) clamp(16px,3vw,40px) calc(clamp(16px,2.4vw,28px) + env(safe-area-inset-bottom))}',
+      '#manlung-cookie-consent .mcc-head{grid-column:1;display:flex;align-items:flex-start;gap:16px;min-width:0}',
+      '#manlung-cookie-consent .mcc-icon{width:54px;height:54px;flex:0 0 54px;border-radius:16px;display:grid;place-items:center;background:#f3f4f6;color:#111827}',
+      '#manlung-cookie-consent h2{margin:0 0 6px;color:#111827;font-size:clamp(17px,1.4vw,20px);line-height:1.25;font-weight:850;letter-spacing:-.02em}',
+      '#manlung-cookie-consent p{margin:0;color:#4b5563;font-size:13px;line-height:1.6;max-width:900px}',
+      '#manlung-cookie-consent a{color:#111827;font-weight:750;text-decoration:underline;text-underline-offset:3px}',
+      '#manlung-cookie-consent .mcc-actions{grid-column:2;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:9px;margin:0}',
       '#manlung-cookie-consent button{font:inherit;cursor:pointer}',
-      '#manlung-cookie-consent .mcc-btn{min-height:42px;padding:10px 15px;border-radius:10px;border:1px solid #475569;background:#172b43;color:#f8fafc;font-weight:750}',
-      '#manlung-cookie-consent .mcc-primary{background:#2563eb;border-color:#3b82f6;color:#fff}',
-      '#manlung-cookie-consent .mcc-btn:hover{filter:brightness(1.12)}',
-      '#manlung-cookie-consent button:focus-visible,#manlung-cookie-settings:focus-visible{outline:3px solid #fbbf24;outline-offset:3px}',
-      '#manlung-cookie-consent .mcc-detail{display:none;margin-top:16px;padding-top:14px;border-top:1px solid rgba(148,163,184,.25)}',
+      '#manlung-cookie-consent .mcc-btn{min-height:44px;padding:11px 17px;border-radius:10px;border:1px solid #111827;background:#fff;color:#111827;font-weight:800;white-space:nowrap}',
+      '#manlung-cookie-consent .mcc-primary{background:#111827;border-color:#111827;color:#fff}',
+      '#manlung-cookie-consent .mcc-btn:hover{background:#f3f4f6;color:#111827}#manlung-cookie-consent .mcc-primary:hover{background:#374151;color:#fff}',
+      '#manlung-cookie-consent button:focus-visible,#manlung-cookie-settings:focus-visible{outline:3px solid #6b7280;outline-offset:3px}',
+      '#manlung-cookie-consent .mcc-detail{grid-column:1/-1;display:none;margin-top:2px;padding-top:14px;border-top:1px solid #e5e7eb}',
       '#manlung-cookie-consent .mcc-detail.is-open{display:block}',
-      '#manlung-cookie-consent .mcc-choice{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:11px 0;border-bottom:1px solid rgba(148,163,184,.18)}',
+      '#manlung-cookie-consent .mcc-choice{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:11px 0;border-bottom:1px solid #e5e7eb}',
       '#manlung-cookie-consent .mcc-choice:last-child{border-bottom:0}',
-      '#manlung-cookie-consent .mcc-choice strong{display:block;color:#f8fafc;font-size:13px}',
-      '#manlung-cookie-consent .mcc-choice small{display:block;color:#b7c5d7;font-size:12px;line-height:1.4;margin-top:2px}',
-      '#manlung-cookie-consent input[type=checkbox]{width:20px;height:20px;accent-color:#3b82f6;flex:0 0 20px}',
+      '#manlung-cookie-consent .mcc-choice strong{display:block;color:#111827;font-size:13px}',
+      '#manlung-cookie-consent .mcc-choice small{display:block;color:#6b7280;font-size:12px;line-height:1.45;margin-top:2px}',
+      '#manlung-cookie-consent input[type=checkbox]{width:20px;height:20px;accent-color:#111827;flex:0 0 20px}',
       '#manlung-cookie-consent input[disabled]{opacity:.65}',
-      '#manlung-cookie-settings{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:2147482999;border:1px solid #64748b;border-radius:999px;padding:9px 13px;background:#10243b;color:#eaf1fb;font:700 12px/1.2 system-ui,sans-serif;box-shadow:0 5px 18px #0003;cursor:pointer}',
-      '@media(max-width:560px){#manlung-cookie-consent{inset:auto 9px 9px}#manlung-cookie-consent .mcc-panel{padding:16px;border-radius:16px}#manlung-cookie-consent .mcc-actions{display:grid;grid-template-columns:1fr 1fr}#manlung-cookie-consent .mcc-btn{padding:10px 8px;font-size:12px}#manlung-cookie-consent .mcc-primary{grid-column:1/-1;grid-row:1}#manlung-cookie-settings{right:10px;bottom:calc(10px + env(safe-area-inset-bottom))}}',
+      '#manlung-cookie-settings{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:2147482999;border:1px solid #111827;border-radius:999px;padding:10px 15px;background:#111827;color:#fff;font:750 12px/1.2 system-ui,sans-serif;box-shadow:0 5px 18px #0002;cursor:pointer}',
+      '@media(max-width:700px){#manlung-cookie-consent .mcc-panel{grid-template-columns:minmax(0,1fr);gap:14px;padding:17px 16px calc(17px + env(safe-area-inset-bottom))}#manlung-cookie-consent .mcc-head,#manlung-cookie-consent .mcc-actions{grid-column:1}#manlung-cookie-consent .mcc-head{gap:12px}#manlung-cookie-consent .mcc-icon{width:46px;height:46px;flex-basis:46px;border-radius:13px}#manlung-cookie-consent .mcc-actions{display:grid;grid-template-columns:1fr 1fr;justify-content:stretch}#manlung-cookie-consent .mcc-btn{min-height:42px;padding:10px 8px;font-size:12px}#manlung-cookie-consent .mcc-primary{grid-column:1/-1;grid-row:1}#manlung-cookie-settings{right:10px;bottom:calc(10px + env(safe-area-inset-bottom))}}',
       '@media(prefers-reduced-motion:no-preference){#manlung-cookie-consent .mcc-panel{animation:mcc-enter .2s ease-out}@keyframes mcc-enter{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}}'
     ].join('');
     document.head.appendChild(style);
@@ -86,7 +86,7 @@
     dialog.setAttribute('aria-modal', 'false');
     dialog.setAttribute('aria-labelledby', 'mcc-title');
     dialog.innerHTML =
-      '<div class="mcc-panel"><div class="mcc-head"><div class="mcc-icon" aria-hidden="true">🍪</div><div>' +
+      '<div class="mcc-panel"><div class="mcc-head"><div class="mcc-icon" aria-hidden="true"><svg viewBox="0 0 48 48" width="31" height="31" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M42 25.2A18 18 0 1 1 22.8 6c-.5 4.2 2.8 7.6 7 7.6.2 4.5 4.1 7.8 8.6 7.1A18 18 0 0 1 42 25.2Z"/><path d="M16 17h.1M25 28h.1M14 31h.1M30 17h.1" stroke-width="4"/></svg></div><div class="mcc-copy">'+
       '<h2 id="mcc-title">Your privacy matters</h2>' +
       '<p>Manlung Recovery uses essential storage to keep the website secure, remember your settings and support sign-in. Optional analytics and advertising tools are not currently activated by this consent manager. You can choose whether to allow optional categories and change your choice at any time.</p>' +
       '<p style="margin-top:7px"><a href="/privacy.html#cookies">Read our cookie and storage notice</a>.</p></div></div>' +
