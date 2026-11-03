@@ -73,7 +73,7 @@
         </div>
         <section class="chat-card" id="chat" aria-label="Manlung AI conversation">
           <header class="chat-head">
-            <div class="assistant-id"><div class="assistant-mark"><i class="fa-solid fa-robot"></i></div><div><strong>Manlung AI</strong><small><span class="status-dot"></span><span id="statusText">Online · Support assistant</span></small></div></div>
+            <div class="assistant-id"><div class="assistant-mark"><i class="fa-solid fa-robot"></i></div><div><strong>Manlung AI</strong><small><span class="status-dot"></span><span id="statusText">Ready · Live AI chat</span></small></div></div>
             <div class="chat-tools"><button class="tool-btn" id="clearChat" type="button" title="Start a new conversation"><i class="fa-solid fa-rotate-left"></i> New chat</button></div>
           </header>
           <div class="chat-body" id="chatBody" aria-live="polite" aria-relevant="additions text">
@@ -135,7 +135,7 @@
   function addListenButton(stack,text){
     const listen=document.createElement('button');listen.className='voice-btn';listen.type='button';listen.innerHTML='<i class="fa-solid fa-volume-high"></i> Listen';listen.addEventListener('click',()=>speak(text));stack.appendChild(listen);
   }
-  function setBusy(value){busy=value;send.disabled=value;input.disabled=value;$('micButton').disabled=value;$('statusText').textContent=value?'Generating reply…':'Ready · Live AI chat';}
+  function setBusy(value){busy=value;send.disabled=value;input.disabled=value;$('micButton').disabled=value;if(value)$('statusText').textContent='Generating reply…';}
   function speak(text){if(!('speechSynthesis'in window)){$('helperText').textContent='Spoken responses are not supported by this browser.';return;}window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(text);utter.lang=fixedLanguage||(/[\u0600-\u06FF]/.test(text)?'ar':/[\u1200-\u137F]/.test(text)?'am-ET':'en-KE');utter.rate=1;window.speechSynthesis.speak(utter);}
   function detectLanguage(text){if(fixedLanguage)return fixedLanguage;if(/[\u0600-\u06FF]/.test(text))return'ar';if(/\b(habari|nisaidie|tafadhali|kesi|msaada|pole)\b/i.test(text))return'sw';return'en';}
   function parseChunk(raw){
