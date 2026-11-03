@@ -121,7 +121,7 @@
   const welcomeText='Habari! I’m Manlung AI, the digital support assistant for Manlung Recovery. I can explain our services, guide you through a recovery request, help you understand case tracking, and suggest safe steps after a digital incident. What would you like help with today?';
   const root=document.documentElement,themeToggle=$('themeToggle');
   try{const savedTheme=localStorage.getItem('manlung-ai-theme');if(savedTheme==='light'||savedTheme==='dark')root.dataset.theme=savedTheme;}catch(_){}
-  function syncThemeIcon(){const icon=themeToggle.querySelector('i');icon.className=root.dataset.theme==='dark'?'fa-solid fa-sun':'fa-solid fa-moon';}
+  function syncThemeIcon(){const dark=root.dataset.theme==='dark';const icon=themeToggle.querySelector('i');icon.className=dark?'fa-solid fa-sun':'fa-solid fa-moon';const themeColor=document.querySelector('meta[name="theme-color"]');if(themeColor)themeColor.content=dark?'#071321':'#f3f7fb';}
   syncThemeIcon();
   themeToggle.addEventListener('click',()=>{root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('manlung-ai-theme',root.dataset.theme);}catch(_){}syncThemeIcon();});
   function addMessage(text,who,withListen=false){
