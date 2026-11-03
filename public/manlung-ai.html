@@ -136,8 +136,8 @@
     const listen=document.createElement('button');listen.className='voice-btn';listen.type='button';listen.innerHTML='<i class="fa-solid fa-volume-high"></i> Listen';listen.addEventListener('click',()=>speak(text));stack.appendChild(listen);
   }
   function setBusy(value){busy=value;send.disabled=value;input.disabled=value;$('micButton').disabled=value;$('statusText').textContent=value?'Generating reply…':'Ready · Live AI chat';}
-  function speak(text){if(!('speechSynthesis'in window)){$('helperText').textContent='Spoken responses are not supported by this browser.';return;}window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(text);utter.lang=fixedLanguage||(/[\\u0600-\\u06FF]/.test(text)?'ar':/[\\u1200-\\u137F]/.test(text)?'am-ET':'en-KE');utter.rate=1;window.speechSynthesis.speak(utter);}
-  function detectLanguage(text){if(fixedLanguage)return fixedLanguage;if(/[\\u0600-\\u06FF]/.test(text))return'ar';if(/\\b(habari|nisaidie|tafadhali|kesi|msaada|pole)\\b/i.test(text))return'sw';return'en';}
+  function speak(text){if(!('speechSynthesis'in window)){$('helperText').textContent='Spoken responses are not supported by this browser.';return;}window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(text);utter.lang=fixedLanguage||(/[\u0600-\u06FF]/.test(text)?'ar':/[\u1200-\u137F]/.test(text)?'am-ET':'en-KE');utter.rate=1;window.speechSynthesis.speak(utter);}
+  function detectLanguage(text){if(fixedLanguage)return fixedLanguage;if(/[\u0600-\u06FF]/.test(text))return'ar';if(/\b(habari|nisaidie|tafadhali|kesi|msaada|pole)\b/i.test(text))return'sw';return'en';}
   function parseChunk(raw){
     const value=String(raw||'').trim();if(!value||value==='[DONE]')return'';
     try{const data=JSON.parse(value);return String(data.content??data.token??data.text??data.delta??data.answer??'');}catch(_){return value;}
@@ -152,7 +152,7 @@
       if(!res.ok||!res.body)throw new Error('Live chat unavailable (HTTP '+res.status+')');
       const reader=res.body.getReader(),decoder=new TextDecoder();let buffer='';
       const consume=packet=>{
-        for(const line of packet.split(/\\r?\\n/)){
+        for(const line of packet.split(/\r?\n/)){
           if(!line.startsWith('data:'))continue;
           const raw=line.slice(5).trim();if(raw==='[DONE]')continue;
           append(parseChunk(raw));
@@ -161,7 +161,7 @@
       while(true){
         const part=await reader.read();if(part.done)break;
         buffer+=decoder.decode(part.value,{stream:true});
-        const packets=buffer.split(/\\r?\\n\\r?\\n/);buffer=packets.pop()||'';
+        const packets=buffer.split(/\r?\n\r?\n/);buffer=packets.pop()||'';
         packets.forEach(consume);
       }
       buffer+=decoder.decode();if(buffer.trim())consume(buffer);
