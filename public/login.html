@@ -1530,34 +1530,6 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-visib
 @media(prefers-reduced-motion:reduce){html body.manlung-auth-page .manlung-social-grid .social-btn,html body.manlung-auth-page .manlung-social-grid .manlung-google-btn{transition:none!important}}
 </style>
 
-<style id="manlung-android-google-icon-color-fix-20261102">
-/* Android WebView: keep the four Google brand colours visible above generic social-icon rules. */
-html body.manlung-auth-page .manlung-social-grid button.manlung-google-native-button{
-  display:flex!important;align-items:center!important;justify-content:center!important;
-  background:#fff!important;background-image:none!important;
-  color:#202124!important;filter:none!important;-webkit-filter:none!important;
-}
-html body.manlung-auth-page .manlung-social-grid button.manlung-google-native-button > svg.google-brand-mark{
-  display:block!important;visibility:visible!important;opacity:1!important;
-  width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;
-  max-width:30px!important;max-height:30px!important;overflow:visible!important;
-  flex:0 0 30px!important;filter:none!important;-webkit-filter:none!important;
-}
-html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark > path:nth-child(1){fill:#4285F4!important;fill-opacity:1!important}
-html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark > path:nth-child(2){fill:#34A853!important;fill-opacity:1!important}
-html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark > path:nth-child(3){fill:#FBBC05!important;fill-opacity:1!important}
-html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark > path:nth-child(4){fill:#EA4335!important;fill-opacity:1!important}
-html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark,
-html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark *{
-  visibility:visible!important;opacity:1!important;stroke:none!important;
-}
-html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark{
-  filter:none!important;-webkit-filter:none!important;mix-blend-mode:normal!important;
-  forced-color-adjust:none!important;-webkit-print-color-adjust:exact!important;
-  print-color-adjust:exact!important;
-}
-</style>
-
 </head>
 <body class="manlung-auth-page">
 <div class="fa-floating-orb fa-orb-1" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-2" aria-hidden="true"></div><div class="fa-floating-orb fa-orb-3" aria-hidden="true"></div>
@@ -2356,43 +2328,8 @@ function readableAuthError(value, fallback='Authentication could not be complete
 }
 
 
-// Reopen the web sign-in callback inside the APK when Google/Supabase returns
-// to the custom co.manlungrecovery.app://auth/callback URI.
-(function registerNativeOAuthReturn() {
-  const app = window.Capacitor?.Plugins?.App;
-  if (!app?.addListener) return;
-  app.addListener('appUrlOpen', ({ url }) => {
-    if (typeof url !== 'string' || !url.startsWith('co.manlungrecovery.app://auth/callback')) return;
-    const parsed = new URL(url);
-    const callback = new URL('/oauth-callback.html', window.location.origin);
-    callback.search = parsed.search;
-    callback.hash = parsed.hash;
-    window.location.replace(callback.href);
-  }).catch(() => {});
-})();
-
 async function setupOfficialGoogleButtons(){
-  // In the Android APK, run Google OAuth in the system browser and return through
-  // the registered Capacitor deep link. GIS popups are unreliable inside Android WebView.
-  const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.() ||
-    window.Capacitor?.getPlatform?.() === 'android' ||
-    /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator?.userAgent || ''));
-
-  // Android APK uses email/password only. Hide provider options on BOTH access tabs
-  // and skip loading/initializing the Google Identity button inside the WebView.
-  if (nativeApp) {
-    document.body.classList.add('manlung-native-email-only');
-    document.querySelectorAll('.manlung-social-grid, .manlung-auth-divider').forEach(element => {
-      element.hidden = true;
-      element.style.setProperty('display', 'none', 'important');
-      element.setAttribute('aria-hidden', 'true');
-    });
-    return;
-  }
-
-  // Apply the official four-colour G to BOTH native and browser/GIS render paths.
-  // Android WebView can apply inherited SVG fill/forced-dark styling unless each path
-  // receives an explicit important fill at the element level.
+  // Apply the official four-colour Google mark to browser sign-in controls.
   const applyGoogleBrandColours = mark => {
     if (!mark) return;
     const colours = ['#4285F4', '#34A853', '#FBBC05', '#EA4335'];
@@ -2410,36 +2347,6 @@ async function setupOfficialGoogleButtons(){
       path.style.setProperty('opacity', '1', 'important');
     });
   };
-
-  if (nativeApp) {
-    const googleHosts = ['googleLoginBtn', 'googleRegisterBtn'];
-    googleHosts.forEach(id => {
-      const host = document.getElementById(id);
-      if (!host) return;
-      host.innerHTML = '';
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'manlung-social-btn manlung-google-btn manlung-google-native-button';
-      button.style.width = '100%';
-      button.innerHTML = '<svg class="social-brand-icon google-brand-mark manlung-google-visible-mark" viewBox="0 0 48 48" width="30" height="30" aria-hidden="true" focusable="false"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.13-2.75-.36-4.05H24v7.67h11a9.4 9.4 0 0 1-4.08 6.17v5.02h6.62c3.88-3.58 6.06-8.85 6.06-14.81Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.83 13.47-4.96l-6.62-5.02c-1.83 1.23-4.17 1.96-6.85 1.96-5.27 0-9.74-3.56-11.34-8.36H5.82v5.18A20.34 20.34 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.66 27.62a12.2 12.2 0 0 1 0-7.24V15.2H5.82a20.02 20.02 0 0 0 0 17.6l6.84-5.18Z"/><path fill="#EA4335" d="M24 11.99c3 0 5.7 1.03 7.82 3.07l5.86-5.86C34.09 5.83 29.5 4 24 4A20.34 20.34 0 0 0 5.82 15.2l6.84 5.18C14.26 15.55 18.73 11.99 24 11.99Z"/></svg>';
-      const googleMark = button.querySelector('svg.google-brand-mark');
-      applyGoogleBrandColours(googleMark);
-      if (googleMark) {
-        googleMark.style.setProperty('width', '30px', 'important');
-        googleMark.style.setProperty('height', '30px', 'important');
-      }
-      button.addEventListener('click', () => {
-        if (typeof window.startManlungNativeOAuth === 'function') {
-          window.startManlungNativeOAuth('google');
-        } else {
-          const target = document.getElementById(id === 'googleRegisterBtn' ? 'registerError' : 'loginError');
-          if (target) showMessage(target, 'Secure Android sign-in is still loading. Please try again.', 'error');
-        }
-      });
-      host.appendChild(button);
-    });
-    return;
-  }
 
   try{
     // Start loading Google's library and the lightweight config endpoint concurrently.
@@ -2603,12 +2510,6 @@ const socialSignInLocks = new Set();
 
 async function startSocialSignup(provider, sourceButton){
   if(!['github','discord'].includes(provider) || socialSignInLocks.has(provider)) return;
-  const nativeSocialApp = Boolean(window.Capacitor?.isNativePlatform?.()) ||
-    window.Capacitor?.getPlatform?.() === 'android' ||
-    /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator?.userAgent || '');
-  if(nativeSocialApp && typeof window.startManlungNativeOAuth === 'function'){
-    return window.startManlungNativeOAuth(provider);
-  }
   socialSignInLocks.add(provider);
   const buttons = ['githubLoginBtn','githubRegisterBtn','discordLoginBtn','discordRegisterBtn']
     .map(id => document.getElementById(id)).filter(Boolean);
@@ -2759,188 +2660,6 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
 }
 </style></footer>
 
-<!-- Capacitor Android external-browser OAuth return support -->
-<script id="manlung-capacitor-oauth-bridge">
-(function () {
-  const APP_REDIRECT = 'co.manlungrecovery.app://auth/callback';
-  const OAUTH_REDIRECT = new URL('/oauth-callback.html?native=1', window.location.origin).href;
-  const isNativeAndroid = () => {
-    const userAgent = window.navigator?.userAgent || '';
-    try {
-      const cap = window.Capacitor;
-      return Boolean(
-        (cap && (typeof cap.isNativePlatform === 'function' ? cap.isNativePlatform() : cap.getPlatform?.() === 'android')) ||
-        /Capacitor|ManlungRecoveryAndroid/i.test(userAgent)
-      );
-    } catch (_) {
-      return /Capacitor|ManlungRecoveryAndroid/i.test(userAgent);
-    }
-  };
-
-  // Capacitor 7 does not expose plugins through the old Capacitor.Plugins
-  // global. Register the installed native plugins through their supported JS
-  // entry points before attempting OAuth or listening for the return link.
-  let nativePluginsPromise = null;
-  async function plugins() {
-    if (!nativePluginsPromise) {
-      nativePluginsPromise = Promise.all([
-        import('https://cdn.jsdelivr.net/npm/@capacitor/browser@7/+esm'),
-        import('https://cdn.jsdelivr.net/npm/@capacitor/app@7/+esm')
-      ]).then(([browserModule, appModule]) => {
-        const registered = { Browser: browserModule.Browser, App: appModule.App };
-        if (!registered.Browser?.open || !registered.App?.addListener) {
-          throw new Error('The Android sign-in bridge is unavailable. Please install the latest Manlung APK.');
-        }
-        window.ManlungNativePlugins = registered;
-        return registered;
-      }).catch(error => {
-        nativePluginsPromise = null;
-        throw error;
-      });
-    }
-    return nativePluginsPromise;
-  }
-
-  let callbackBusy = false;
-  let callbackListenerReady = false;
-
-  async function supabaseClient() {
-    const response = await fetch('/api/config/public', { cache: 'no-store' });
-    if (!response.ok) throw new Error('Could not load secure sign-in settings.');
-    const cfg = await response.json();
-    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !window.supabase?.createClient) {
-      throw new Error('Secure social sign-in is not configured.');
-    }
-    return window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: false,
-        flowType: 'pkce',
-        storage: window.localStorage
-      }
-    });
-  }
-
-  function showNativeStatus(message, kind) {
-    const registerPanel = document.getElementById('registerPanel');
-    const targetId = registerPanel && !registerPanel.hidden ? 'registerError' : 'loginError';
-    const target = document.getElementById(targetId);
-    if (target && typeof showMessage === 'function') showMessage(target, message, kind || 'info');
-  }
-
-  const nativeOAuthProviders = new Set(['google', 'github', 'discord']);
-  let nativeOAuthStartPromise = null;
-
-  async function startNativeOAuth(provider) {
-    // All three native buttons use the same supported external-browser handoff.
-    // Previously this guard silently rejected GitHub and Discord taps.
-    if (!nativeOAuthProviders.has(provider) || nativeOAuthStartPromise) return;
-    nativeOAuthStartPromise = (async () => {
-      const providerName = provider === 'google' ? 'Google' : provider === 'github' ? 'GitHub' : 'Discord';
-      try {
-        const { Browser } = await plugins();
-        showNativeStatus('Opening secure ' + providerName + ' sign-in…', 'info');
-        localStorage.removeItem('clientUser');
-        const client = await supabaseClient();
-        const { data, error } = await client.auth.signInWithOAuth({
-          provider,
-          options: { redirectTo: OAUTH_REDIRECT, skipBrowserRedirect: true }
-        });
-        if (error) throw error;
-        if (!data?.url) throw new Error(providerName + ' did not return a secure login link.');
-        await Browser.open({ url: data.url, presentationStyle: 'fullscreen' });
-      } catch (error) {
-        console.error('Native ' + providerName + ' OAuth start failed:', error);
-        showNativeStatus(error?.message || providerName + ' sign-in could not be started. Please try again.', 'error');
-      }
-    })();
-    try { await nativeOAuthStartPromise; }
-    finally { nativeOAuthStartPromise = null; }
-  }
-
-  async function finishNativeOAuth(callbackUrl) {
-    if (callbackBusy || typeof callbackUrl !== 'string' ||
-        !callbackUrl.toLowerCase().startsWith(APP_REDIRECT.toLowerCase())) return;
-    callbackBusy = true;
-    try {
-      const { Browser } = await plugins();
-      try { await Browser.close(); } catch (_) {}
-      const client = await supabaseClient();
-      const callback = new URL(callbackUrl);
-      const oauthError = callback.searchParams.get('error_description') || callback.searchParams.get('error');
-      if (oauthError) throw new Error(oauthError);
-
-      const fragment = new URLSearchParams(callback.hash.replace(/^#/, ''));
-      const accessToken = callback.searchParams.get('access_token') || fragment.get('access_token');
-      const code = callback.searchParams.get('code') || fragment.get('code');
-      let session = null;
-
-      if (code) {
-        // exchangeCodeForSession accepts the authorization code itself, not
-        // the complete callback URL.
-        const { data, error } = await client.auth.exchangeCodeForSession(code);
-        if (error) throw error;
-        session = data?.session || null;
-      } else if (accessToken) {
-        session = { access_token: accessToken };
-      } else {
-        throw new Error('The provider returned without a secure sign-in token. Please try again.');
-      }
-
-      if (!session?.access_token) {
-        const { data, error } = await client.auth.getSession();
-        if (error) throw error;
-        session = data?.session || null;
-      }
-      if (!session?.access_token) throw new Error('Sign-in returned to the app, but the secure session is missing.');
-
-      const response = await fetch('/api/auth/client/oauth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store',
-        credentials: 'same-origin',
-        body: JSON.stringify({ accessToken: session.access_token })
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.success || !result.user) {
-        throw new Error(result.error || 'The server could not finish signing you in.');
-      }
-
-      localStorage.setItem('clientUser', JSON.stringify(result.user));
-      try { await client.auth.signOut(); } catch (_) {}
-      window.location.replace('/client/dashboard.html?session=1');
-    } catch (error) {
-      console.error('Native OAuth callback failed:', error);
-      showNativeStatus(error?.message || 'Sign-in could not return to Manlung. Please try again.', 'error');
-    } finally {
-      callbackBusy = false;
-    }
-  }
-
-  window.startManlungNativeOAuth = startNativeOAuth;
-
-  document.addEventListener('DOMContentLoaded', async function () {
-    if (!isNativeAndroid() || callbackListenerReady) return;
-    try {
-      const { App } = await plugins();
-      await App.addListener('appUrlOpen', event => {
-        if (event?.url) finishNativeOAuth(event.url);
-      });
-      callbackListenerReady = true;
-
-      // Also handle an OAuth deep link that launched the app from a stopped state.
-      const launch = await App.getLaunchUrl?.();
-      if (launch?.url) finishNativeOAuth(launch.url);
-    } catch (error) {
-      console.error('Native app callback listener could not initialize:', error);
-      showNativeStatus(error?.message || 'Android sign-in support could not initialize. Update the app and retry.', 'error');
-    }
-  });
-})();
-</script>
-
-
 <style id="manlung-social-provider-icon-tiles-fix-20261030">
 /* Keep the existing login/register layout; normalize only the three provider icons. */
 html body.manlung-auth-page .manlung-social-grid{
@@ -3059,7 +2778,7 @@ html body.manlung-auth-page.dark .manlung-social-grid .manlung-social-btn{
 
 
 <style id="manlung-native-social-touch-fix">
-/* Keep provider controls above decorative layers and make every APK tap reach its handler. */
+/* Keep provider controls above decorative layers and make every tap reach its handler. */
 html body.manlung-auth-page .manlung-social-grid{position:relative!important;z-index:20!important;isolation:isolate!important}
 html body.manlung-auth-page .manlung-social-grid > #googleLoginBtn,
 html body.manlung-auth-page .manlung-social-grid > #googleRegisterBtn,
@@ -3080,18 +2799,6 @@ html body.manlung-auth-page .manlung-social-grid > #googleRegisterBtn > button{
 }
 html body.manlung-auth-page .manlung-social-grid > *::before,
 html body.manlung-auth-page .manlung-social-grid > *::after{pointer-events:none!important}
-</style>
-<style id="manlung-android-google-svg-final">
-/* Final Android WebView safeguard: keep the local Google G in its four official colours. */
-html body.manlung-auth-page button.manlung-google-native-button > svg.manlung-google-visible-mark{
-  display:block!important;visibility:visible!important;opacity:1!important;
-  width:30px!important;height:30px!important;flex:0 0 30px!important;
-  pointer-events:none!important;filter:none!important;-webkit-filter:none!important;
-}
-html body.manlung-auth-page button.manlung-google-native-button > svg.manlung-google-visible-mark > path:nth-child(1){fill:#4285F4!important;fill-opacity:1!important;stroke:none!important}
-html body.manlung-auth-page button.manlung-google-native-button > svg.manlung-google-visible-mark > path:nth-child(2){fill:#34A853!important;fill-opacity:1!important;stroke:none!important}
-html body.manlung-auth-page button.manlung-google-native-button > svg.manlung-google-visible-mark > path:nth-child(3){fill:#FBBC05!important;fill-opacity:1!important;stroke:none!important}
-html body.manlung-auth-page button.manlung-google-native-button > svg.manlung-google-visible-mark > path:nth-child(4){fill:#EA4335!important;fill-opacity:1!important;stroke:none!important}
 </style>
 </body>
 </html>
