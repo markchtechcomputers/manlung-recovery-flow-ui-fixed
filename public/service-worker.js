@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v39';
+const CACHE_NAME = 'manlung-recovery-static-v40';
 const OFFLINE_PAGE = '/offline.html';
 const STATIC_ASSETS = [
   OFFLINE_PAGE,
