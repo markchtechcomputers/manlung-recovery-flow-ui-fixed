@@ -632,3 +632,40 @@ html body .manlung-footer .manlung-footer-grid {
     width: calc(100% - 28px) !important;
   }
 }
+
+
+/* Installed PWA shell: use the available viewport and keep website footers out
+   of every installed-app section, without changing the browser website layout. */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 100%;
+    overflow-x: clip;
+  }
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  body > .manlung-footer,
+  body > footer.manlung-footer,
+  body > footer {
+    display: none !important;
+  }
+  body main,
+  body #page,
+  body .page,
+  body .admin-shell,
+  body .tools-shell {
+    min-width: 0;
+    max-width: 100%;
+  }
+  body img,
+  body video,
+  body iframe,
+  body canvas {
+    max-width: 100%;
+  }
+}
