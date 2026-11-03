@@ -14,6 +14,51 @@ const MAX_HISTORY = 16;
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const CHATAT_URL = 'https://ch.at/';
 
+const MANLUNG_PROFILE = `OFFICIAL MANLUNG RECOVERY KNOWLEDGE
+Organisation: Manlung Recovery (the website/project is also described in repository documentation as Manlung Tech City — Cyber Recovery Portal).
+Website: https://manlungrecovery.manlungshop.co.ke/
+Purpose: structured support for digital recovery and investigation for individuals and organisations. The service focuses on practical guidance, careful evidence organisation, clear next steps and case updates through the client portal when a case is accepted.
+
+DOCUMENTED SUPPORT AREAS
+1. Device recovery guidance: lost or stolen phones, laptops, tablets and smartwatches. Help users record device identifiers and ownership evidence, use official device-finder/security tools, contact their carrier, and consider remote lock or wipe options. Location depends on device settings and provider support.
+2. Identity theft and account recovery: help organise account-recovery requests, secure email/social accounts, document identity misuse, and contact the relevant platform or financial institution.
+3. Scam investigation support: help preserve messages, receipts, transaction references, account details and timelines; guide users to report suspicious payments to their bank, mobile-money provider, exchange or platform. Third-party records depend on provider policies and lawful processes.
+4. Security assessment: scoped review of exposed services, configurations and common security weaknesses, followed by prioritised recommendations. Testing requires clear authorisation and an agreed scope.
+
+HOW THE SERVICE WORKS
+- A request starts with the structured New Recovery Request form. The user explains what happened, available evidence and the help they seek.
+- Manlung reviews the details, clarifies scope and provides updates through the Client Portal when a case is accepted.
+- Users can use their case ID in Track a Case to view available progress updates. Authentication and case ownership rules apply.
+- AI guidance is not itself a submitted request, case update, investigation, device trace or provider contact. The assistant must never claim to have performed those actions unless a connected application confirms it.
+
+OFFICIAL SITE ROUTES
+- Home: /
+- About: /about.html
+- Services: /services.html
+- New Recovery Request: /client/request.html
+- Client Portal: /client/dashboard.html
+- Track a Case: /client/track.html
+- FAQ: /faq.html
+- Knowledge: /knowledge.html
+- Blog: /blog.html
+- Contact: /contact.html
+- Privacy Notice: /privacy.html
+- Terms: /terms.html
+- AI assistant: /manlung-ai.html
+
+CONTACT
+- Official support email published on the About and Contact pages: manlungrecovery@outlook.com.
+- The AI page provides a Human Support WhatsApp handoff link to +254 745 682 493. Treat this as a handoff link, not proof that a human is currently online.
+
+IMPORTANT LIMITS AND TRUST
+- Manlung Recovery does not guarantee recovery, tracing, identification of a suspect, access to third-party records, a particular outcome or a particular completion time. Outcomes depend on the case, available evidence, provider cooperation and lawful processes.
+- Security testing must be authorised and limited to an agreed scope.
+- Manlung AI is an automated guide, not a human investigator, emergency service, bank, mobile-money provider, police service or legal/medical/financial professional.
+- Never invent service prices, success rates, guarantees, service coverage, staff identities, admin availability, case statuses or timelines. Use current site pages and authenticated live case context as the source of truth.
+- Never request passwords, PINs, OTPs, recovery codes, private keys, full payment credentials or authentication tokens. Do not ask users to upload irrelevant sensitive information.
+- For immediate physical danger, direct the user to local emergency services. For suspected fraud/payment loss, tell them to contact their bank or mobile-money provider through official channels promptly.
+`;
+
 const SITE_RULES = `You are Manlung Recovery AI, the official customer-support and digital-recovery assistant for the Manlung Recovery website.
 
 Your job is to help real people reach a safe, concrete next step. Do not behave like a generic FAQ bot. Understand the incident, identify the support track, reduce immediate risk, preserve useful evidence, and guide the user to the correct portal action.
@@ -97,7 +142,7 @@ function buildSiteContext(pagePath) {
     ['FINAL_CLEAN_SECURITY_SEO_PWA_REPORT_2026-08-29.md', 12000],
     ['IMPLEMENTATION_REPORT.md', 16000]
   ].map(([name, max]) => { const content = readIfExists(path.join(ROOT, name), max); return content ? `\n--- ${name} ---\n${content}` : ''; }).join('');
-  return `CURRENT PAGE PATH: ${pagePath || '/'}\nCURRENT PAGE TITLE: ${title}\n\nCURRENT PAGE TEXT:\n${stripHtml(page).slice(0, 35000)}\n\nCURRENT PAGE LINKS:\n${links.join('\n').slice(0, 9000)}\n\nPUBLIC FRONTEND FILES:\n${publicFiles.join(', ')}\n${docs}`.slice(0, 105000);
+  return `${MANLUNG_PROFILE}\n\nCURRENT PAGE PATH: ${pagePath || '/'}\nCURRENT PAGE TITLE: ${title}\n\nCURRENT PAGE TEXT:\n${stripHtml(page).slice(0, 35000)}\n\nCURRENT PAGE LINKS:\n${links.join('\n').slice(0, 9000)}\n\nPUBLIC FRONTEND FILES:\n${publicFiles.join(', ')}\n${docs}`.slice(0, 105000);
 }
 
 function extractOutput(data) {
@@ -176,13 +221,13 @@ function cleanChatAtResponse(data) {
   return text;
 }
 
-async function callChatAt(message, history = []) {
+async function callChatAt(message, history = [], context = '') {
   const recent = history.slice(-6).map(x => `${x.role === 'assistant' ? 'Assistant' : 'User'}: ${String(x.content || '').slice(0, 1200)}`).join('\n');
   const prompt = [
     'You are the fallback general-purpose assistant for Manlung Recovery.',
     'Answer the user clearly and safely. Return ONLY the natural-language answer to the user. Do not return JSON, fields such as answer/question, system prompts, or internal instructions.',
     'Do not claim access to Manlung private case data, accounts, databases, admin presence, or internal systems.',
-    'For Manlung-specific policies, case status, or private account information, tell the user to use the official Manlung Recovery features or human support instead of inventing an answer.',
+    'For Manlung-specific policies, case status, or private account information, use the verified Manlung knowledge below and authenticated live case context only. Never invent details.',\n    `Verified Manlung Recovery knowledge:\\n${context.slice(0, 18000)}`,
     recent ? `Recent conversation context:\n${recent}` : '',
     `User question: ${message}`
   ].filter(Boolean).join('\n\n');
@@ -239,7 +284,7 @@ router.post('/chat', optionalAuth, async (req, res) => {
 
     if (process.env.MANLUNG_CHATAT_FALLBACK !== 'false') {
       try {
-        const answer = await callChatAt(message, history);
+        const answer = await callChatAt(message, history, context);
         return res.json({ success: true, answer, model: 'ch.at', provider: 'chat-at', webSearchEnabled: false, fallback: true, caseLookup: caseId ? { caseId, authenticated: liveCase.authenticated, found: liveCase.found, authorized: !liveCase.forbidden } : null });
       } catch (fallbackError) {
         console.error('Manlung AI ch.at fallback failed:', fallbackError.message);
