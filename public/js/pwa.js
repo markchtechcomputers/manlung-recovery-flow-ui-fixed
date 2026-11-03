@@ -1,6 +1,9 @@
 (() => {
-  // Load the shared consent manager on every page that includes the PWA runtime.
-  if (!document.querySelector('script[data-manlung-cookie-consent]')) {
+  // Show the cookie consent banner and floating preferences icon on the homepage only.
+  const IS_COOKIE_CONSENT_HOME = window.location.pathname === '/' ||
+    window.location.pathname === '/index.html';
+  if (IS_COOKIE_CONSENT_HOME &&
+      !document.querySelector('script[data-manlung-cookie-consent]')) {
     const consentScript = document.createElement('script');
     consentScript.src = '/js/cookie-consent.js';
     consentScript.dataset.manlungCookieConsent = 'true';
@@ -134,47 +137,50 @@
       window.navigator.standalone === true;
   }
 
-  // Hide selected social providers only when this site is launched as an
-  // installed browser PWA. Ordinary browser tabs and the native Capacitor APK
-  // retain their separate existing behavior.
+  // Keep social sign-in available in normal browser tabs, but use email/password
+  // only in the native APK and installed browser PWA.
   function isInstalledBrowserPwa() {
-    if (isAndroidApp()) return false;
     try {
-      return window.navigator.standalone === true ||
+      return !isAndroidApp() && (window.navigator.standalone === true ||
         ['standalone', 'minimal-ui', 'fullscreen', 'window-controls-overlay'].some(mode =>
           window.matchMedia('(display-mode: ' + mode + ')').matches
-        );
+        ));
     } catch (_) {
       return false;
     }
   }
 
-  function applyInstalledPwaAuthVisibility() {
-    if (!isInstalledBrowserPwa() ||
-        document.getElementById('manlung-installed-pwa-auth-style')) return;
+  function applyAppAuthVisibility() {
+    const nativeApk = isAndroidApp();
+    const installedPwa = isInstalledBrowserPwa();
+    if ((!nativeApk && !installedPwa) ||
+        document.getElementById('manlung-app-email-only-auth-style')) return;
 
-    document.documentElement.classList.add('manlung-installed-browser-pwa');
+    document.documentElement.classList.add('manlung-app-email-only-auth');
+    if (installedPwa) document.documentElement.classList.add('manlung-installed-browser-pwa');
     const style = document.createElement('style');
-    style.id = 'manlung-installed-pwa-auth-style';
+    style.id = 'manlung-app-email-only-auth-style';
     style.textContent = `
-      html.manlung-installed-browser-pwa body.manlung-auth-page #googleLoginBtn,
-      html.manlung-installed-browser-pwa body.manlung-auth-page #googleRegisterBtn,
-      html.manlung-installed-browser-pwa body.manlung-auth-page #githubLoginBtn,
-      html.manlung-installed-browser-pwa body.manlung-auth-page #githubRegisterBtn,
-      html.manlung-installed-browser-pwa body.manlung-auth-page #discordLoginBtn,
-      html.manlung-installed-browser-pwa body.manlung-auth-page #discordRegisterBtn {
+      html.manlung-app-email-only-auth body.manlung-auth-page #googleLoginBtn,
+      html.manlung-app-email-only-auth body.manlung-auth-page #googleRegisterBtn,
+      html.manlung-app-email-only-auth body.manlung-auth-page #githubLoginBtn,
+      html.manlung-app-email-only-auth body.manlung-auth-page #githubRegisterBtn,
+      html.manlung-app-email-only-auth body.manlung-auth-page #discordLoginBtn,
+      html.manlung-app-email-only-auth body.manlung-auth-page #discordRegisterBtn,
+      html.manlung-app-email-only-auth body.manlung-auth-page #openaiLoginBtn,
+      html.manlung-app-email-only-auth body.manlung-auth-page #openaiRegisterBtn {
         display: none !important;
         visibility: hidden !important;
         pointer-events: none !important;
       }
-      html.manlung-installed-browser-pwa body.manlung-auth-page .manlung-auth-divider {
+      html.manlung-app-email-only-auth body.manlung-auth-page .manlung-auth-divider {
         display: none !important;
       }
     `;
     (document.head || document.documentElement).appendChild(style);
   }
 
-  applyInstalledPwaAuthVisibility();
+  applyAppAuthVisibility();
 
   function wasRecentlyDismissed() {
     try {
