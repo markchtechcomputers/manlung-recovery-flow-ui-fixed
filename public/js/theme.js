@@ -2,6 +2,47 @@
   const STORAGE_KEY = 'theme';
   const LIGHT = 'light';
   const DARK = 'dark';
+
+  // Shared browser offline handling: covers every page that loads theme.js, not only PWA install pages.
+  (function installManlungBrowserOfflineSupport() {
+    const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.()) ||
+      /Capacitor|ManlungRecoveryAndroid/i.test(navigator.userAgent || '');
+    if (nativeApp || window.__manlungBrowserOfflineSupportInstalled) return;
+    window.__manlungBrowserOfflineSupportInstalled = true;
+
+    function openOfflinePage() {
+      if (location.pathname === '/offline.html') return;
+      const offlineUrl = new URL('/offline.html', location.origin);
+      offlineUrl.searchParams.set('return', location.href);
+      location.replace(offlineUrl.href);
+    }
+
+    let failedProbes = 0;
+    function checkSiteReachability() {
+      if (document.hidden || location.pathname === '/offline.html') return;
+      const probe = new Image();
+      probe.onload = () => { failedProbes = 0; };
+      probe.onerror = () => {
+        failedProbes += 1;
+        if (failedProbes >= 2) openOfflinePage();
+      };
+      probe.src = '/favicon.svg?__manlung_probe=' + Date.now();
+    }
+
+    window.addEventListener('offline', openOfflinePage);
+    window.addEventListener('online', () => { failedProbes = 0; checkSiteReachability(); });
+    checkSiteReachability();
+    window.setInterval(checkSiteReachability, 15000);
+
+    if ('serviceWorker' in navigator) {
+      const register = () => navigator.serviceWorker.register('/service-worker.js', {
+        scope: '/',
+        updateViaCache: 'none'
+      }).catch(error => console.warn('Manlung offline service worker registration failed:', error));
+      if (document.readyState === 'complete') register();
+      else window.addEventListener('load', register, { once: true });
+    }
+  })();
   const CLIPS = [
     'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/Futuristic%20HUD%20Interface%20Sound%20Design%20-%20Binary%20Code%203%20Example%20(1).mp4',
     'https://raw.githubusercontent.com/markchtechcomputers/galary-/main/YTDown.com_YouTube_cyber-security-stock-footage-free-video-_Media_Z4F3AXvrLKo_001_1080p.mp4',
