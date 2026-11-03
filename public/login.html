@@ -1493,15 +1493,15 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn iframe {
           <div class="form-group">
             <label for="regPassword">Create password</label>
             <div class="manlung-password-field">
-              <input id="regPassword" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="At least 8 characters" required>
+              <input id="regPassword" type="password" autocomplete="new-password" minlength="12" maxlength="72" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{12,72}" title="Use 12–72 characters with uppercase, lowercase, a number, and a special character." placeholder="At least 12 characters" required>
               <button type="button" class="manlung-password-toggle" data-password-target="regPassword" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button>
             </div>
-            <small style="display:block;margin-top:5px;color:var(--text-muted);">Use at least 8 characters. Never reuse a password from another service.</small>
+            <small style="display:block;margin-top:5px;color:var(--text-muted);">Use 12–72 characters with uppercase, lowercase, a number, and a special character. Never reuse a password from another service.</small>
           </div>
           <div class="form-group">
             <label for="regPasswordConfirm">Confirm password</label>
             <div class="manlung-password-field">
-              <input id="regPasswordConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="Re-enter your password" required>
+              <input id="regPasswordConfirm" type="password" autocomplete="new-password" minlength="12" maxlength="72" placeholder="Re-enter your password" required>
               <button type="button" class="manlung-password-toggle" data-password-target="regPasswordConfirm" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button>
             </div>
           </div>
@@ -1986,7 +1986,8 @@ async function handleRegister(event) {
   const errorEl=document.getElementById('registerError');
 
   showMessage(errorEl,'');
-  if(password.length < 8 || password.length > 72){ showMessage(errorEl,'Password must be between 8 and 72 characters.'); return; }
+  if(password.length < 12 || password.length > 72){ showMessage(errorEl,'Password must be between 12 and 72 characters.'); return; }
+  if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,72}$/.test(password)){ showMessage(errorEl,'Password must include uppercase and lowercase letters, a number, and a special character.'); return; }
   if(password !== passwordConfirm){ showMessage(errorEl,'Passwords do not match.'); return; }
 
   try {
@@ -2190,6 +2191,12 @@ async function startSocialSignup(provider, errorTarget='loginError'){
   if(!allowedProviders.has(provider)) return;
   const errorNode=document.getElementById(errorTarget);
   const showSocialError=(message)=>showMessage(errorNode,message,'error');
+  const nativeAndroid = Boolean(window.Capacitor?.isNativePlatform?.() || window.Capacitor?.getPlatform?.()==='android' || /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator?.userAgent || ''));
+  if(nativeAndroid){
+    if(typeof window.startManlungNativeOAuth==='function') return window.startManlungNativeOAuth(provider);
+    showSocialError('Secure Android sign-in is still loading. Please try again.');
+    return;
+  }
   try{
     if(!window.supabase?.createClient){
       await new Promise((resolve,reject)=>{
@@ -2369,5 +2376,187 @@ async function handleSocialCallback(){
   </div>
 <style id="manlung-footer-social-icons-v2">.manlung-footer-social{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap}.manlung-footer-social a{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:4px;border-radius:12px;background:rgba(255,255,255,.04);transition:transform .18s ease,background .18s ease}.manlung-footer-social a:hover{transform:translateY(-2px);background:rgba(37,99,235,.14)}.manlung-footer-social a img{display:block;width:32px;height:32px;object-fit:contain}.manlung-footer-social a:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}@media(max-width:600px){.manlung-footer-social{gap:10px}.manlung-footer-social a{width:40px;height:40px}}</style></footer>
   <link rel="stylesheet" href="/css/product-polish.css?v=20261025">
+<style id="manlung-android-google-icon-fix">
+html body.manlung-auth-page .manlung-google-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;overflow:hidden!important;background:#fff!important;color:#202124!important}
+html body.manlung-auth-page .manlung-google-btn>svg.manlung-google-mark{display:block!important;visibility:visible!important;opacity:1!important;filter:none!important;-webkit-filter:none!important;forced-color-adjust:none!important;mix-blend-mode:normal!important;width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;max-width:30px!important;max-height:30px!important;flex:0 0 30px!important;object-fit:contain!important}
+html body.manlung-auth-page .manlung-google-btn>svg.manlung-google-mark path{opacity:1!important;fill-opacity:1!important;stroke:none!important}
+</style>
+<script id="manlung-capacitor-oauth-bridge">
+(function () {
+  const APP_REDIRECT = 'co.manlungrecovery.app://auth/callback';
+  const OAUTH_REDIRECT = new URL('/oauth-callback.html?native=1', window.location.origin).href;
+  const isNativeAndroid = () => {
+    const userAgent = window.navigator?.userAgent || '';
+    try {
+      const cap = window.Capacitor;
+      return Boolean(
+        (cap && (typeof cap.isNativePlatform === 'function' ? cap.isNativePlatform() : cap.getPlatform?.() === 'android')) ||
+        /Capacitor|ManlungRecoveryAndroid/i.test(userAgent)
+      );
+    } catch (_) {
+      return /Capacitor|ManlungRecoveryAndroid/i.test(userAgent);
+    }
+  };
+
+  // Capacitor 7 does not expose plugins through the old Capacitor.Plugins
+  // global. Register the installed native plugins through their supported JS
+  // entry points before attempting OAuth or listening for the return link.
+  let nativePluginsPromise = null;
+  async function plugins() {
+    if (!nativePluginsPromise) {
+      nativePluginsPromise = Promise.all([
+        import('https://cdn.jsdelivr.net/npm/@capacitor/browser@7/+esm'),
+        import('https://cdn.jsdelivr.net/npm/@capacitor/app@7/+esm')
+      ]).then(([browserModule, appModule]) => {
+        const registered = { Browser: browserModule.Browser, App: appModule.App };
+        if (!registered.Browser?.open || !registered.App?.addListener) {
+          throw new Error('The Android sign-in bridge is unavailable. Please install the latest Manlung APK.');
+        }
+        window.ManlungNativePlugins = registered;
+        return registered;
+      }).catch(error => {
+        nativePluginsPromise = null;
+        throw error;
+      });
+    }
+    return nativePluginsPromise;
+  }
+
+  let callbackBusy = false;
+  let callbackListenerReady = false;
+
+  async function supabaseClient() {
+    const response = await fetch('/api/config/public', { cache: 'no-store' });
+    if (!response.ok) throw new Error('Could not load secure sign-in settings.');
+    const cfg = await response.json();
+    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !window.supabase?.createClient) {
+      throw new Error('Secure social sign-in is not configured.');
+    }
+    return window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+        flowType: 'pkce',
+        storage: window.localStorage
+      }
+    });
+  }
+
+  function showNativeStatus(message, kind) {
+    const target = document.getElementById(document.getElementById('registerPanel')?.hidden ? 'loginError' : 'registerError');
+    if (target && typeof showMessage === 'function') showMessage(target, message, kind || 'info');
+  }
+
+  const nativeOAuthProviders = new Set(['google', 'github', 'discord']);
+  let nativeOAuthStartPromise = null;
+
+  async function startNativeOAuth(provider) {
+    // All three native buttons use the same supported external-browser handoff.
+    // Previously this guard silently rejected GitHub and Discord taps.
+    if (!nativeOAuthProviders.has(provider) || nativeOAuthStartPromise) return;
+    nativeOAuthStartPromise = (async () => {
+      const providerName = provider === 'google' ? 'Google' : provider === 'github' ? 'GitHub' : 'Discord';
+      try {
+        const { Browser } = await plugins();
+        showNativeStatus('Opening secure ' + providerName + ' sign-in…', 'info');
+        localStorage.removeItem('clientUser');
+        const client = await supabaseClient();
+        const { data, error } = await client.auth.signInWithOAuth({
+          provider,
+          options: { redirectTo: OAUTH_REDIRECT, skipBrowserRedirect: true }
+        });
+        if (error) throw error;
+        if (!data?.url) throw new Error(providerName + ' did not return a secure login link.');
+        await Browser.open({ url: data.url, presentationStyle: 'fullscreen' });
+      } catch (error) {
+        console.error('Native ' + providerName + ' OAuth start failed:', error);
+        showNativeStatus(error?.message || providerName + ' sign-in could not be started. Please try again.', 'error');
+      }
+    })();
+    try { await nativeOAuthStartPromise; }
+    finally { nativeOAuthStartPromise = null; }
+  }
+
+  async function finishNativeOAuth(callbackUrl) {
+    if (callbackBusy || typeof callbackUrl !== 'string' ||
+        !callbackUrl.toLowerCase().startsWith(APP_REDIRECT.toLowerCase())) return;
+    callbackBusy = true;
+    try {
+      const { Browser } = await plugins();
+      try { await Browser.close(); } catch (_) {}
+      const client = await supabaseClient();
+      const callback = new URL(callbackUrl);
+      const oauthError = callback.searchParams.get('error_description') || callback.searchParams.get('error');
+      if (oauthError) throw new Error(oauthError);
+
+      const fragment = new URLSearchParams(callback.hash.replace(/^#/, ''));
+      const accessToken = callback.searchParams.get('access_token') || fragment.get('access_token');
+      const code = callback.searchParams.get('code') || fragment.get('code');
+      let session = null;
+
+      if (code) {
+        // exchangeCodeForSession accepts the authorization code itself, not
+        // the complete callback URL.
+        const { data, error } = await client.auth.exchangeCodeForSession(code);
+        if (error) throw error;
+        session = data?.session || null;
+      } else if (accessToken) {
+        session = { access_token: accessToken };
+      } else {
+        throw new Error('The provider returned without a secure sign-in token. Please try again.');
+      }
+
+      if (!session?.access_token) {
+        const { data, error } = await client.auth.getSession();
+        if (error) throw error;
+        session = data?.session || null;
+      }
+      if (!session?.access_token) throw new Error('Sign-in returned to the app, but the secure session is missing.');
+
+      const response = await fetch('/api/auth/client/oauth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        credentials: 'same-origin',
+        body: JSON.stringify({ accessToken: session.access_token })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success || !result.user) {
+        throw new Error(result.error || 'The server could not finish signing you in.');
+      }
+
+      localStorage.setItem('clientUser', JSON.stringify(result.user));
+      try { await client.auth.signOut(); } catch (_) {}
+      window.location.replace('/client/dashboard.html?session=1');
+    } catch (error) {
+      console.error('Native OAuth callback failed:', error);
+      showNativeStatus(error?.message || 'Sign-in could not return to Manlung. Please try again.', 'error');
+    } finally {
+      callbackBusy = false;
+    }
+  }
+
+  window.startManlungNativeOAuth = startNativeOAuth;
+
+  document.addEventListener('DOMContentLoaded', async function () {
+    if (!isNativeAndroid() || callbackListenerReady) return;
+    try {
+      const { App } = await plugins();
+      await App.addListener('appUrlOpen', event => {
+        if (event?.url) finishNativeOAuth(event.url);
+      });
+      callbackListenerReady = true;
+
+      // Also handle an OAuth deep link that launched the app from a stopped state.
+      const launch = await App.getLaunchUrl?.();
+      if (launch?.url) finishNativeOAuth(launch.url);
+    } catch (error) {
+      console.error('Native app callback listener could not initialize:', error);
+      showNativeStatus(error?.message || 'Android sign-in support could not initialize. Update the app and retry.', 'error');
+    }
+  });
+})();
+</script>
 </body>
 </html>
