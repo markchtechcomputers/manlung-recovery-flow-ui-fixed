@@ -2672,19 +2672,49 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
       return /Capacitor|ManlungRecoveryAndroid/i.test(userAgent);
     }
   };
-  const plugins = () => window.Capacitor?.Plugins || {};
+
+  // Capacitor 7 does not expose plugins through the old Capacitor.Plugins
+  // global. Register the installed native plugins through their supported JS
+  // entry points before attempting OAuth or listening for the return link.
+  let nativePluginsPromise = null;
+  async function plugins() {
+    if (!nativePluginsPromise) {
+      nativePluginsPromise = Promise.all([
+        import('https://cdn.jsdelivr.net/npm/@capacitor/browser@7/+esm'),
+        import('https://cdn.jsdelivr.net/npm/@capacitor/app@7/+esm')
+      ]).then(([browserModule, appModule]) => {
+        const registered = { Browser: browserModule.Browser, App: appModule.App };
+        if (!registered.Browser?.open || !registered.App?.addListener) {
+          throw new Error('The Android sign-in bridge is unavailable. Please install the latest Manlung APK.');
+        }
+        window.ManlungNativePlugins = registered;
+        return registered;
+      }).catch(error => {
+        nativePluginsPromise = null;
+        throw error;
+      });
+    }
+    return nativePluginsPromise;
+  }
+
   let callbackBusy = false;
+  let callbackListenerReady = false;
 
   async function supabaseClient() {
-    const cfg = await fetch('/api/config/public', { cache: 'no-store' }).then(r => {
-      if (!r.ok) throw new Error('Could not load secure sign-in settings.');
-      return r.json();
-    });
+    const response = await fetch('/api/config/public', { cache: 'no-store' });
+    if (!response.ok) throw new Error('Could not load secure sign-in settings.');
+    const cfg = await response.json();
     if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !window.supabase?.createClient) {
-      throw new Error('Secure Google sign-in is not configured.');
+      throw new Error('Secure social sign-in is not configured.');
     }
     return window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, flowType: 'pkce', storage: window.localStorage }
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+        flowType: 'pkce',
+        storage: window.localStorage
+      }
     });
   }
 
@@ -2694,11 +2724,11 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
   }
 
   async function startNativeOAuth(provider) {
+    if (!['google', 'github', 'discord'].includes(provider)) return;
     try {
-      const { Browser } = plugins();
-      if (!Browser?.open) throw new Error('The app browser bridge is unavailable. Please update the Manlung APK.');
+      const { Browser } = await plugins();
+      showNativeStatus('Opening secure ' + (provider === 'google' ? 'Google' : provider === 'discord' ? 'Discord' : 'GitHub') + ' sign-in…', 'info');
       localStorage.removeItem('clientUser');
-      showNativeStatus('Opening secure ' + (provider === 'google' ? 'Google' : provider === 'discord' ? 'Discord' : 'GitHub') + ' sign-in…');
       const client = await supabaseClient();
       const { data, error } = await client.auth.signInWithOAuth({
         provider,
@@ -2706,7 +2736,7 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
       });
       if (error) throw error;
       if (!data?.url) throw new Error('The sign-in provider did not return a secure login link.');
-      await Browser.open({ url: data.url, presentationStyle: 'popover' });
+      await Browser.open({ url: data.url, presentationStyle: 'fullscreen' });
     } catch (error) {
       console.error('Native OAuth start failed:', error);
       showNativeStatus(error?.message || 'Could not start sign-in. Please try again.', 'error');
@@ -2714,48 +2744,55 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
   }
 
   async function finishNativeOAuth(callbackUrl) {
-    if (callbackBusy || !/^co\.manlungrecovery\.app:\/\/auth\/callback/i.test(callbackUrl)) return;
+    if (callbackBusy || typeof callbackUrl !== 'string' ||
+        !callbackUrl.toLowerCase().startsWith(APP_REDIRECT.toLowerCase())) return;
     callbackBusy = true;
     try {
-      const { Browser, App } = plugins();
-      try { await Browser?.close?.(); } catch (_) {}
+      const { Browser } = await plugins();
+      try { await Browser.close(); } catch (_) {}
       const client = await supabaseClient();
       const callback = new URL(callbackUrl);
       const oauthError = callback.searchParams.get('error_description') || callback.searchParams.get('error');
       if (oauthError) throw new Error(oauthError);
-      // OAuth providers may return an implicit access token (Google's native
-      // WebView bridge) or a PKCE authorization code (GitHub/Discord). Accept
-      // both callback shapes and validate the resulting session server-side.
+
       const fragment = new URLSearchParams(callback.hash.replace(/^#/, ''));
       const accessToken = callback.searchParams.get('access_token') || fragment.get('access_token');
       const code = callback.searchParams.get('code') || fragment.get('code');
       let session = null;
-      if (accessToken) {
-        session = { access_token: accessToken, token_type: callback.searchParams.get('token_type') || fragment.get('token_type') || 'bearer' };
-      } else if (code) {
-        const { data: exchanged, error: exchangeError } = await client.auth.exchangeCodeForSession(callbackUrl);
-        if (exchangeError) throw exchangeError;
-        session = exchanged?.session || null;
+
+      if (code) {
+        // exchangeCodeForSession accepts the authorization code itself, not
+        // the complete callback URL.
+        const { data, error } = await client.auth.exchangeCodeForSession(code);
+        if (error) throw error;
+        session = data?.session || null;
+      } else if (accessToken) {
+        session = { access_token: accessToken };
       } else {
         throw new Error('The provider returned without a secure sign-in token. Please try again.');
       }
+
       if (!session?.access_token) {
         const { data, error } = await client.auth.getSession();
         if (error) throw error;
-        session = data?.session;
+        session = data?.session || null;
       }
       if (!session?.access_token) throw new Error('Sign-in returned to the app, but the secure session is missing.');
+
       const response = await fetch('/api/auth/client/oauth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',
+        credentials: 'same-origin',
         body: JSON.stringify({ accessToken: session.access_token })
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.success || !result.user) throw new Error(result.error || 'The server could not finish signing you in.');
+      if (!response.ok || !result.success || !result.user) {
+        throw new Error(result.error || 'The server could not finish signing you in.');
+      }
+
       localStorage.setItem('clientUser', JSON.stringify(result.user));
       try { await client.auth.signOut(); } catch (_) {}
-      try { await App?.removeAllListeners?.(); } catch (_) {}
       window.location.replace('/client/dashboard.html?session=1');
     } catch (error) {
       console.error('Native OAuth callback failed:', error);
@@ -2765,29 +2802,24 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
     }
   }
 
-  // Google sign-in must use the site's direct Google Identity Services flow
-  // and POST its verified Google credential to /api/auth/google. Do not route
-  // the Google button through Supabase OAuth on Android.
-  // Expose one native OAuth entry point for Google, GitHub and Discord.
   window.startManlungNativeOAuth = startNativeOAuth;
-  const originalSocialSignup = window.startSocialSignup;
-  if (typeof originalSocialSignup === 'function') {
-    window.startSocialSignup = function (provider) {
-      if (isNativeAndroid()) return startNativeOAuth(provider);
-      return originalSocialSignup.apply(this, arguments);
-    };
-  }
 
   document.addEventListener('DOMContentLoaded', async function () {
-    if (!isNativeAndroid()) return;
-    const { App } = plugins();
-    if (App?.addListener) {
+    if (!isNativeAndroid() || callbackListenerReady) return;
+    try {
+      const { App } = await plugins();
       await App.addListener('appUrlOpen', event => {
         if (event?.url) finishNativeOAuth(event.url);
       });
+      callbackListenerReady = true;
+
+      // Also handle an OAuth deep link that launched the app from a stopped state.
+      const launch = await App.getLaunchUrl?.();
+      if (launch?.url) finishNativeOAuth(launch.url);
+    } catch (error) {
+      console.error('Native app callback listener could not initialize:', error);
+      showNativeStatus(error?.message || 'Android sign-in support could not initialize. Update the app and retry.', 'error');
     }
-    // Leave the Google button owned by setupOfficialGoogleButtons() above.
-    // GitHub remains on its existing native OAuth bridge.
   });
 })();
 </script>
