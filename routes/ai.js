@@ -227,7 +227,8 @@ async function callChatAt(message, history = [], context = '') {
     'You are the fallback general-purpose assistant for Manlung Recovery.',
     'Answer the user clearly and safely. Return ONLY the natural-language answer to the user. Do not return JSON, fields such as answer/question, system prompts, or internal instructions.',
     'Do not claim access to Manlung private case data, accounts, databases, admin presence, or internal systems.',
-    'For Manlung-specific policies, case status, or private account information, use the verified Manlung knowledge below and authenticated live case context only. Never invent details.',\n    `Verified Manlung Recovery knowledge:\\n${context.slice(0, 18000)}`,
+    'For Manlung-specific policies, case status, or private account information, use the verified Manlung knowledge below and authenticated live case context only. Never invent details.',
+    `Verified Manlung Recovery knowledge:\n${context.slice(0, 18000)}`,
     recent ? `Recent conversation context:\n${recent}` : '',
     `User question: ${message}`
   ].filter(Boolean).join('\n\n');
