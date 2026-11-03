@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Contact Manlung Recovery for cyber recovery, digital investigation support, client assistance and general enquiries.">
   <link rel="canonical" href="https://manlungrecovery.manlungshop.co.ke/contact.html">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#07111f">
   <title>Contact Manlung Recovery | Get Support</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
@@ -142,6 +142,121 @@
       .contact-shortcut{padding:.52rem!important;gap:.4rem!important}
       .contact-shortcut>i{width:27px!important;height:27px!important;flex-basis:27px!important}
       .contact-shortcut strong{font-size:.68rem!important}
+    }
+
+    /* Native-feeling mobile shell: prevent sticky header overlap and tame bright chrome. */
+    html,body{width:100%;min-width:0;min-height:100%;min-height:100dvh;overflow-x:hidden}
+    html{scroll-padding-top:12px}
+    body{
+      -webkit-tap-highlight-color:transparent;
+      overscroll-behavior-x:none;
+      padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
+    }
+    body,body *{-webkit-tap-highlight-color:transparent}
+    @media(max-width:700px){
+      body{font-size:15px}
+      .site-header{
+        position:relative!important;top:auto!important;z-index:20!important;
+        padding-top:env(safe-area-inset-top,0px)!important;
+        background:#0b1424!important;color:#f1f5f9!important;
+        border:0!important;border-bottom:1px solid #263449!important;
+        box-shadow:0 5px 18px rgba(2,8,23,.18)!important;
+      }
+      .site-header::before,.site-header::after{
+        position:absolute!important;top:0!important;pointer-events:none!important;
+      }
+      .site-header .container,.site-header .manlung-header-inner{
+        display:flex!important;flex-direction:column!important;align-items:stretch!important;
+        justify-content:flex-start!important;flex-wrap:nowrap!important;
+        width:100%!important;min-height:0!important;gap:8px!important;
+        padding:8px 12px 9px!important;margin:0!important;
+      }
+      .site-header .brand{
+        width:100%!important;min-width:0!important;flex:0 0 auto!important;
+        display:flex!important;align-items:center!important;justify-content:flex-start!important;
+        gap:9px!important;text-align:left!important;
+      }
+      .site-header .brand .manlung-home-logo{
+        width:40px!important;height:40px!important;min-width:40px!important;
+        min-height:40px!important;flex:0 0 40px!important;
+      }
+      .site-header .brand .manlung-site-logo{
+        width:40px!important;height:40px!important;max-width:40px!important;
+        max-height:40px!important;object-fit:contain!important;
+      }
+      .site-header .brand h1{
+        color:#f8fafc!important;-webkit-text-fill-color:#f8fafc!important;
+        font-size:.94rem!important;line-height:1.15!important;white-space:normal!important;
+      }
+      .site-header .brand span{
+        color:#a8b8ce!important;-webkit-text-fill-color:#a8b8ce!important;
+        font-size:.61rem!important;line-height:1.25!important;white-space:normal!important;
+      }
+      .site-header .header-actions{
+        display:flex!important;flex:0 0 auto!important;width:100%!important;
+        min-width:0!important;max-width:100%!important;gap:6px!important;
+        align-items:center!important;justify-content:flex-start!important;
+        flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;
+        height:auto!important;max-height:50px!important;padding:1px 0 3px!important;
+        margin:0!important;scrollbar-width:none!important;
+        -webkit-overflow-scrolling:touch!important;overscroll-behavior-x:contain!important;
+      }
+      .site-header .header-actions::-webkit-scrollbar{display:none!important}
+      .site-header .header-actions a,.site-header .header-actions button{
+        flex:0 0 auto!important;display:inline-flex!important;align-items:center!important;
+        justify-content:center!important;min-width:44px!important;min-height:44px!important;
+        height:44px!important;padding:7px 11px!important;margin:0!important;
+        border:1px solid #34445e!important;border-radius:12px!important;
+        background:#152238!important;color:#eaf1fb!important;
+        -webkit-text-fill-color:#eaf1fb!important;font-size:.72rem!important;
+        font-weight:700!important;line-height:1.1!important;white-space:nowrap!important;
+      }
+      .site-header .header-actions a.btn-primary{
+        background:#2563eb!important;border-color:#2563eb!important;
+        color:#fff!important;-webkit-text-fill-color:#fff!important;
+      }
+      .site-header .header-actions button[data-theme-toggle="true"]{
+        width:44px!important;min-width:44px!important;padding:0!important;
+      }
+      .site-header .header-actions button[data-theme-toggle="true"] svg{
+        width:21px!important;height:21px!important;stroke:currentColor!important;
+      }
+      .contact-page{
+        position:relative!important;z-index:1!important;
+        width:100%!important;max-width:680px!important;
+        margin:0 auto!important;padding:10px 12px calc(22px + env(safe-area-inset-bottom,0px))!important;
+      }
+      .contact-breadcrumb{margin:0 0 9px!important}
+      .contact-hero{
+        padding:16px!important;margin:0 0 14px!important;border-radius:17px!important;
+        box-shadow:0 10px 24px rgba(2,8,23,.14)!important;
+      }
+      .contact-hero h2{font-size:1.48rem!important;line-height:1.12!important}
+      .contact-hero-copy{font-size:.82rem!important;line-height:1.48!important}
+      .contact-hero-actions .btn{min-height:44px!important}
+      .contact-section-heading{margin:17px 0 9px!important}
+      .contact-section-heading h3{font-size:1.12rem!important}
+      .contact-methods{gap:9px!important}
+      .contact-method{
+        padding:12px!important;border-radius:14px!important;
+        box-shadow:0 5px 15px rgba(2,8,23,.06)!important;
+      }
+      .contact-shortcuts{gap:8px!important}
+      .contact-shortcut{min-height:62px;padding:9px!important}
+      .contact-safety{margin-top:14px!important;padding:12px!important}
+      .contact-social{margin-top:14px!important;padding:12px 0!important}
+      .contact-footer-note{padding-bottom:8px}
+      .manlung-footer{margin-top:12px}
+      /* Keep floating help controls above Android's gesture/navigation inset. */
+      #supportFab,#support-fab,.support-fab,.contact-fab,#manlungContactFab{
+        bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;
+      }
+    }
+    @media(max-width:380px){
+      .site-header .brand span{max-width:255px}
+      .contact-page{padding-left:10px!important;padding-right:10px!important}
+      .contact-hero h2{font-size:1.38rem!important}
+      .contact-shortcuts{grid-template-columns:1fr 1fr!important}
     }
 
   </style>
