@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v38';
+const CACHE_NAME = 'manlung-recovery-static-v39';
 const OFFLINE_PAGE = '/offline.html';
 const STATIC_ASSETS = [
   OFFLINE_PAGE,
@@ -6,7 +6,7 @@ const STATIC_ASSETS = [
   '/knowledge.html', '/services.html', '/terms.html', '/privacy.html', '/login.html',
   '/reset-password.html', '/oauth-callback.html', '/client/request.html', '/client/track.html',
   '/manifest.webmanifest', '/favicon.svg', '/css/style.css', '/css/theme.css', '/js/theme.js',
-  '/js/pwa.js', '/js/call-webrtc.js', '/js/call-widget.js', '/js/contact-fab.js',
+  '/js/pwa.js', '/js/cookie-consent.js', '/js/call-webrtc.js', '/js/call-widget.js', '/js/contact-fab.js',
   '/js/support-fab.js', '/js/manlung-ai-v2.js', '/js/manlung-ai.js',
   '/css/case-flow-animation.css', '/js/case-flow-animation.js', '/css/home-premium.css',
   '/js/home-premium.js', '/icons/icon-192.png', '/icons/icon-512.png'
