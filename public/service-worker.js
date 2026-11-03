@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v37';
+const CACHE_NAME = 'manlung-recovery-static-v38';
 const OFFLINE_PAGE = '/offline.html';
 const STATIC_ASSETS = [
   OFFLINE_PAGE,
@@ -22,7 +22,7 @@ async function cachedOfflinePage() {
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await Promise.allSettled(STATIC_ASSETS.map(path => cache.add(path)));
+    // The offline page is mandatory: do not activate this worker unless it is safely cached.\n    await cache.add(OFFLINE_PAGE);\n    await Promise.allSettled(STATIC_ASSETS.filter(path => path !== OFFLINE_PAGE).map(path => cache.add(path)));
     await self.skipWaiting();
   })());
 });
