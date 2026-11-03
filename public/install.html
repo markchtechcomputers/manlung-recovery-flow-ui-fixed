@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071629">
+  <meta name="description" content="Install Manlung Recovery on your device for quick access to secure case tracking and recovery support.">
+  <meta name="application-name" content="Manlung Recovery">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-512.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <title>Install Manlung Recovery</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(145deg,#061426,#102b49);color:#f8fafc;font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+    main{width:min(100%,480px);padding:30px;border:1px solid #294766;border-radius:24px;background:#0b1d33;box-shadow:0 24px 70px #0006;text-align:center}
+    .app-icon{width:96px;height:96px;object-fit:cover;border-radius:22px;background:#fff;box-shadow:0 8px 24px #0004}
+    h1{margin:20px 0 8px;font-size:clamp(1.7rem,6vw,2.2rem);line-height:1.15}
+    p{color:#cbd5e1}
+    button{width:100%;min-height:52px;margin:18px 0 8px;border:0;border-radius:12px;background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;font-size:1rem;font-weight:800;cursor:pointer}
+    button:focus-visible{outline:3px solid #93c5fd;outline-offset:3px}
+    .status{min-height:48px;margin:12px 0 0;padding:12px;border-radius:12px;background:#132b46;color:#dbeafe}
+    .steps{margin:20px 0 0;padding:16px;text-align:left;border:1px solid #294766;border-radius:14px;background:#0a192b}
+    .steps h2{margin:0 0 8px;font-size:1rem}
+    .steps ol{margin:0;padding-left:22px;color:#cbd5e1}
+    .back{display:inline-block;margin-top:18px;color:#93c5fd;text-decoration:none}
+  </style>
+</head>
+<body>
+  <main>
+    <img class="app-icon" src="/icons/icon-512.png" alt="Manlung Recovery app icon" width="96" height="96">
+    <h1>Install Manlung Recovery</h1>
+    <p>Add Manlung Recovery to your device's home screen for quick access to case tracking and recovery support. This installs the website as an app—there is no APK download.</p>
+    <button id="install-button" type="button">Install Manlung Recovery</button>
+    <div id="install-status" class="status" role="status" aria-live="polite">Preparing the install option…</div>
+    <section class="steps" aria-label="Manual installation instructions">
+      <h2>If the install button is unavailable</h2>
+      <ol>
+        <li><strong>Android (Chrome):</strong> open the browser menu (⋮), then choose <em>Install app</em> or <em>Add to Home screen</em>.</li>
+        <li><strong>iPhone/iPad (Safari):</strong> tap Share, then <em>Add to Home Screen</em>.</li>
+        <li><strong>Desktop:</strong> use the install icon in the address bar or choose <em>Install Manlung Recovery</em> from the browser menu.</li>
+      </ol>
+    </section>
+    <a class="back" href="/">Back to Manlung Recovery</a>
+  </main>
+  <script>
+    (() => {
+      const button = document.getElementById('install-button');
+      const status = document.getElementById('install-status');
+      let installPrompt = null;
+      const isStandalone = () =>
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+
+      if (isStandalone()) {
+        button.hidden = true;
+        status.textContent = 'Manlung Recovery is already installed on this device.';
+      }
+
+      window.addEventListener('beforeinstallprompt', event => {
+        event.preventDefault();
+        installPrompt = event;
+        button.hidden = false;
+        status.textContent = 'Ready to install. Tap the button above to continue.';
+      });
+
+      button.addEventListener('click', async () => {
+        if (isStandalone()) {
+          status.textContent = 'Manlung Recovery is already installed.';
+          button.hidden = true;
+          return;
+        }
+        if (!installPrompt) {
+          status.textContent = 'Your browser has not offered the install prompt. Follow the instructions below and choose Install app or Add to Home screen.';
+          return;
+        }
+        button.disabled = true;
+        try {
+          await installPrompt.prompt();
+          const choice = await installPrompt.userChoice;
+          status.textContent = choice && choice.outcome === 'accepted'
+            ? 'Installation accepted. Look for Manlung Recovery on your home screen.'
+            : 'Installation was not completed. You can try again from your browser menu.';
+          installPrompt = null;
+        } catch (error) {
+          status.textContent = 'The browser could not open the install prompt. Use the browser menu instructions below.';
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      window.addEventListener('appinstalled', () => {
+        installPrompt = null;
+        button.hidden = true;
+        status.textContent = 'Manlung Recovery has been installed successfully.';
+      });
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js', {
+            scope: '/',
+            updateViaCache: 'none'
+          }).then(() => {
+            if (!isStandalone() && !installPrompt) {
+              status.textContent = 'The app is ready. If your browser does not show an install prompt, use the instructions below.';
+            }
+          }).catch(() => {
+            status.textContent = 'Open this page in a supported browser and use its Install app or Add to Home screen option.';
+          });
+        });
+      } else if (!isStandalone()) {
+        status.textContent = 'This browser does not support app installation. Open this page in Chrome, Edge, or Safari and use Add to Home screen.';
+      }
+    })();
+  </script>
+</body>
+</html>
