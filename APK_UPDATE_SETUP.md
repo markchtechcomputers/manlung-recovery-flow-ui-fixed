@@ -35,3 +35,22 @@ Website and PWA content updates do not require an APK reinstall. The Android wra
 The existing release workflow used a debug APK. If earlier APK copies were signed with temporary keys, Android may refuse to install the first permanent-key release over those copies. That first transition is explicitly flagged in the app update prompt. Affected users may need to uninstall the old APK and then install the new signed APK. Account records are server-side, but local preferences can reset on uninstall. After the permanent key is in use, future signed APK updates can install over the existing app normally (with Android's approval).
 
 Until these secrets are configured, the workflow deliberately does **not** replace the published APK with another temporary-key build. Website/PWA deployments can still proceed independently.
+
+
+## Android social sign-in return URL
+
+The Android app opens Google, GitHub, and Discord sign-in in the system browser. The provider returns first to the website callback, which then opens the installed app using the Android deep link.
+
+In the Supabase project used by Manlung Recovery, open **Authentication → URL Configuration → Redirect URLs** and allow:
+
+```
+https://manlungrecovery.manlungshop.co.ke/oauth-callback.html?native=1
+```
+
+Keep the existing website callback URL too. The Android app handles this deep link internally:
+
+```
+co.manlungrecovery.app://auth/callback
+```
+
+The Android build workflow registers that URI in the generated manifest. The custom URI is the app handoff after the HTTPS callback; the Supabase OAuth redirect target is the HTTPS URL above. Also confirm Google, GitHub, and Discord are enabled under **Authentication → Providers** and that each provider's OAuth app is configured with the Supabase callback URL shown in its provider settings.
