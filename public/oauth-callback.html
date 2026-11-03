@@ -89,6 +89,16 @@
             return data;
         }
 
+        // Native Android OAuth returns through this HTTPS callback, then deep-links
+        // back into the installed app. Keep the query/hash intact for PKCE exchange.
+        const nativeOAuthReturn = (() => {
+            const callbackUrl = new URL(window.location.href);
+            if (callbackUrl.searchParams.get('native') !== '1') return false;
+            callbackUrl.searchParams.delete('native');
+            window.location.replace('co.manlungrecovery.app://auth/callback' + callbackUrl.search + callbackUrl.hash);
+            return true;
+        })();
+
         async function processCallback() {
             const config = await fetchJson('/api/config/public', { cache: 'no-store' });
             if (!config.supabaseUrl || !config.supabaseAnonKey) throw new Error('Social sign-in is not configured.');
@@ -147,6 +157,7 @@
             window.location.replace('/client/dashboard.html');
         }
 
+        if (!nativeOAuthReturn) {
         (async function runCallback() {
             try {
                 await Promise.race([
@@ -158,6 +169,7 @@
                 showError(error?.message || 'Authentication failed. Please try again.', error?.redirect || '');
             }
         })();
+        }
     </script>
   <link rel="stylesheet" href="/css/product-polish.css?v=20261025">
 </body>
