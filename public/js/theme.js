@@ -83,8 +83,15 @@
   if (!/\/login(?:\.html)?\/?$/.test(location.pathname)) manlungRefreshCurrencyRates();
 
   function readTheme() {
-    try { return localStorage.getItem(STORAGE_KEY) === DARK ? DARK : LIGHT; }
-    catch (_) { return LIGHT; }
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved === DARK) return DARK;
+      if (saved === LIGHT) return LIGHT;
+      // The Android app starts in dark mode to avoid a glaring white first screen.
+      return isAndroidApp() ? DARK : LIGHT;
+    } catch (_) {
+      return isAndroidApp() ? DARK : LIGHT;
+    }
   }
 
   function writeTheme(theme) {
@@ -131,7 +138,7 @@
     root.style.colorScheme = next;
     if (document.body) document.body.classList.toggle('dark', next === DARK);
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', next === DARK ? '#050b16' : '#ffffff');
+    if (meta) meta.setAttribute('content', next === DARK ? '#07111f' : '#f3f6fb');
     normalizeThemeButtons();
     if (persist) writeTheme(next);
     return next;
