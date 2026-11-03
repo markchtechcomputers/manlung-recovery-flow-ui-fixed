@@ -136,13 +136,12 @@ function buildSiteContext(pagePath) {
     links = extractLinks(page);
   }
   const publicFiles = fs.existsSync(PUBLIC_ROOT) ? fs.readdirSync(PUBLIC_ROOT).filter(name => /\.(html|js)$/i.test(name)).slice(0, 160) : [];
-  const docs = [
-    ['README.md', 30000],
-    ['WEBSITE_SCANNER_UPGRADE.md', 16000],
-    ['FINAL_CLEAN_SECURITY_SEO_PWA_REPORT_2026-08-29.md', 12000],
-    ['IMPLEMENTATION_REPORT.md', 16000]
-  ].map(([name, max]) => { const content = readIfExists(path.join(ROOT, name), max); return content ? `\n--- ${name} ---\n${content}` : ''; }).join('');
-  return `${MANLUNG_PROFILE}\n\nCURRENT PAGE PATH: ${pagePath || '/'}\nCURRENT PAGE TITLE: ${title}\n\nCURRENT PAGE TEXT:\n${stripHtml(page).slice(0, 35000)}\n\nCURRENT PAGE LINKS:\n${links.join('\n').slice(0, 9000)}\n\nPUBLIC FRONTEND FILES:\n${publicFiles.join(', ')}\n${docs}`.slice(0, 105000);
+  const referencePages = ['about.html', 'services.html', 'faq.html', 'knowledge.html', 'blog.html', 'contact.html', 'privacy.html', 'terms.html']
+    .map(name => {
+      const source = readIfExists(path.join(PUBLIC_ROOT, name), 18000);
+      return source ? `\\n--- PUBLIC PAGE: /${name} ---\\n${stripHtml(source).slice(0, 6500)}` : '';
+    }).filter(Boolean).join('').slice(0, 52000);
+  return `${MANLUNG_PROFILE}\n\nCURRENT PAGE PATH: ${pagePath || '/'}\nCURRENT PAGE TITLE: ${title}\n\nCURRENT PAGE TEXT:\n${stripHtml(page).slice(0, 35000)}\n\nCURRENT PAGE LINKS:\n${links.join('\n').slice(0, 9000)}\n\nPUBLIC FRONTEND FILES:\n${publicFiles.join(', ')}\n\nPUBLIC REFERENCE PAGES:\n${referencePages}`.slice(0, 105000);
 }
 
 function extractOutput(data) {
