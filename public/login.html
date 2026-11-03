@@ -2288,6 +2288,18 @@ async function setupOfficialGoogleButtons(){
     window.Capacitor?.getPlatform?.() === 'android' ||
     /Capacitor|ManlungRecoveryAndroid/i.test(window.navigator?.userAgent || ''));
 
+  // Android APK uses email/password only. Hide provider options on BOTH access tabs
+  // and skip loading/initializing the Google Identity button inside the WebView.
+  if (nativeApp) {
+    document.body.classList.add('manlung-native-email-only');
+    document.querySelectorAll('.manlung-social-grid, .manlung-auth-divider').forEach(element => {
+      element.hidden = true;
+      element.style.setProperty('display', 'none', 'important');
+      element.setAttribute('aria-hidden', 'true');
+    });
+    return;
+  }
+
   // Apply the official four-colour G to BOTH native and browser/GIS render paths.
   // Android WebView can apply inherited SVG fill/forced-dark styling unless each path
   // receives an explicit important fill at the element level.
