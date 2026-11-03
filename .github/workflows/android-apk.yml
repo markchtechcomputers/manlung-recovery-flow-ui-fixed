@@ -156,7 +156,7 @@ jobs:
               manifest.write_text(source)
           print("Registered co.manlungrecovery.app://auth/callback for OAuth return")
           PY
-          # Preserve Capacitor's BridgeActivity while applying the native WebView settings.
+          # Add WebView settings and a native connectivity monitor to Capacitor's BridgeActivity.
           python3 - <<'PY'
           from pathlib import Path
           candidates = list(Path("android/app/src/main/java").rglob("MainActivity.java"))
@@ -165,24 +165,24 @@ jobs:
           activity = candidates[0]
           source = activity.read_text()
           nl = chr(10)
-          settings = nl.join([
-              "        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);",
-              '        getBridge().getWebView().getSettings().setUserAgentString("ManlungRecoveryAndroid " + getBridge().getWebView().getSettings().getUserAgentString());',
-              "        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {",
-              "            getBridge().getWebView().getSettings().setAlgorithmicDarkeningAllowed(false);",
-              "        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {",
-              "            getBridge().getWebView().getSettings().setForceDark(android.webkit.WebSettings.FORCE_DARK_OFF);",
-              "        }"
-          ])
+          class_start = source.find("public class MainActivity extends BridgeActivity")
+          brace = source.find("{", class_start) if class_start >= 0 else -1
+          if brace < 0:
+              raise SystemExit("Could not locate generated Capacitor MainActivity class")
           if "setMediaPlaybackRequiresUserGesture(false)" not in source:
+              settings = nl.join([
+                  "        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);",
+                  '        getBridge().getWebView().getSettings().setUserAgentString("ManlungRecoveryAndroid " + getBridge().getWebView().getSettings().getUserAgentString());',
+                  "        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {",
+                  "            getBridge().getWebView().getSettings().setAlgorithmicDarkeningAllowed(false);",
+                  "        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {",
+                  "            getBridge().getWebView().getSettings().setForceDark(android.webkit.WebSettings.FORCE_DARK_OFF);",
+                  "        }"
+              ])
               marker = "super.onCreate(savedInstanceState);"
               if marker in source:
                   source = source.replace(marker, marker + nl + settings, 1)
               else:
-                  class_start = source.find("public class MainActivity extends BridgeActivity")
-                  brace = source.find("{", class_start) if class_start >= 0 else -1
-                  if brace < 0:
-                      raise SystemExit("Could not locate generated Capacitor MainActivity class")
                   method = nl.join([
                       "    @Override",
                       "    public void onCreate(android.os.Bundle savedInstanceState) {",
@@ -191,8 +191,83 @@ jobs:
                       "    }"
                   ])
                   source = source[:brace + 1] + nl + method + nl + source[brace + 1:]
+          if "manlungNetworkCallback" not in source:
+              members = nl.join([
+                  "    private android.net.ConnectivityManager manlungConnectivityManager;",
+                  "    private android.net.ConnectivityManager.NetworkCallback manlungNetworkCallback;",
+                  "    private boolean manlungOfflinePageShowing = false;",
+                  "",
+                  "    private boolean manlungHasValidatedNetwork() {",
+                  "        if (manlungConnectivityManager == null) return false;",
+                  "        android.net.Network active = manlungConnectivityManager.getActiveNetwork();",
+                  "        android.net.NetworkCapabilities caps = manlungConnectivityManager.getNetworkCapabilities(active);",
+                  "        return caps != null && caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)",
+                  "            && caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED);",
+                  "    }",
+                  "",
+                  "    private void manlungShowOfflinePage() {",
+                  "        if (manlungOfflinePageShowing) return;",
+                  "        manlungOfflinePageShowing = true;",
+                  "        runOnUiThread(() -> {",
+                  "            if (getBridge() != null && getBridge().getWebView() != null)",
+                  '                getBridge().getWebView().loadUrl("file:///android_asset/public/offline.html");',
+                  "        });",
+                  "    }",
+                  "",
+                  "    private void manlungReloadLiveSite() {",
+                  "        if (!manlungOfflinePageShowing) return;",
+                  "        manlungOfflinePageShowing = false;",
+                  "        runOnUiThread(() -> {",
+                  "            if (getBridge() != null && getBridge().getWebView() != null)",
+                  '                getBridge().getWebView().loadUrl("https://manlungrecovery.manlungshop.co.ke/");',
+                  "        });",
+                  "    }",
+                  "",
+                  "    @Override",
+                  "    public void onStart() {",
+                  "        super.onStart();",
+                  "        manlungConnectivityManager = (android.net.ConnectivityManager) getSystemService(android.content.Context.CONNECTIVITY_SERVICE);",
+                  "        manlungNetworkCallback = new android.net.ConnectivityManager.NetworkCallback() {",
+                  "            @Override public void onAvailable(android.net.Network network) {",
+                  "                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {",
+                  "                    if (manlungHasValidatedNetwork()) manlungReloadLiveSite();",
+                  "                }, 500);",
+                  "            }",
+                  "            @Override public void onCapabilitiesChanged(android.net.Network network, android.net.NetworkCapabilities caps) {",
+                  "                if (caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)",
+                  "                    && caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED))",
+                  "                    manlungReloadLiveSite();",
+                  "                else manlungShowOfflinePage();",
+                  "            }",
+                  "            @Override public void onLost(android.net.Network network) {",
+                  "                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {",
+                  "                    if (!manlungHasValidatedNetwork()) manlungShowOfflinePage();",
+                  "                }, 350);",
+                  "            }",
+                  "        };",
+                  "        try {",
+                  "            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)",
+                  "                manlungConnectivityManager.registerDefaultNetworkCallback(manlungNetworkCallback);",
+                  "            else",
+                  "                manlungConnectivityManager.registerNetworkCallback(new android.net.NetworkRequest.Builder().addCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET).build(), manlungNetworkCallback);",
+                  "        } catch (Exception error) { android.util.Log.w(\"ManlungRecovery\", \"Network monitor registration failed\", error); }",
+                  "        if (!manlungHasValidatedNetwork()) manlungShowOfflinePage();",
+                  "    }",
+                  "",
+                  "    @Override",
+                  "    public void onStop() {",
+                  "        if (manlungConnectivityManager != null && manlungNetworkCallback != null) {",
+                  "            try { manlungConnectivityManager.unregisterNetworkCallback(manlungNetworkCallback); }",
+                  "            catch (Exception ignored) {}",
+                  "            manlungNetworkCallback = null;",
+                  "        }",
+                  "        super.onStop();",
+                  "    }"
+              ])
+              last_brace = source.rfind("}")
+              source = source[:last_brace] + members + nl + source[last_brace:]
           activity.write_text(source)
-          print(f"Configured Capacitor WebView settings in {activity}")
+          print(f"Configured WebView connectivity fallback in {activity}")
           PY
           python3 - <<'PY'
           import os, re
