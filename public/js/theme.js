@@ -84,10 +84,15 @@
 
   function readTheme() {
     try {
+      if (isAndroidApp() && localStorage.getItem('manlung-android-dark-theme-migration-v1') !== 'done') {
+        // One-time migration: replace the old bright APK default with dark chrome.
+        localStorage.setItem(STORAGE_KEY, DARK);
+        localStorage.setItem('manlung-android-dark-theme-migration-v1', 'done');
+        return DARK;
+      }
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === DARK) return DARK;
       if (saved === LIGHT) return LIGHT;
-      // The Android app starts in dark mode to avoid a glaring white first screen.
       return isAndroidApp() ? DARK : LIGHT;
     } catch (_) {
       return isAndroidApp() ? DARK : LIGHT;
