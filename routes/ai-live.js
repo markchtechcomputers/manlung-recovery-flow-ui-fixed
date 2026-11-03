@@ -125,10 +125,10 @@ router.post('/chat',optionalAuth,async(req,res)=>{
       if(isJson){rawBody+=value;return;}
       if(!isEventStream){if(value){emit(res,value);sent=true;}return;}
       buffer+=value;
-      const events=buffer.split(/\\r?\\n\\r?\\n/);
+      const events=buffer.split(/\r?\n\r?\n/);
       buffer=events.pop()||'';
       for(const event of events){
-        const data=event.split(/\\r?\\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trim()).join('');
+        const data=event.split(/\r?\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trim()).join('');
         if(!data||data==='[DONE]')continue;
         const text=extractText(data);
         if(text){emit(res,text);sent=true;}
@@ -141,12 +141,12 @@ router.post('/chat',optionalAuth,async(req,res)=>{
         try{text=extractText(JSON.parse(rawBody));}catch(_){text=rawBody.trim();}
         if(text){emit(res,text);sent=true;}
       }else if(isEventStream&&buffer.trim()){
-        const data=buffer.split(/\\r?\\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trim()).join('');
+        const data=buffer.split(/\r?\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trim()).join('');
         const text=extractText(data);
         if(text){emit(res,text);sent=true;}
       }
       if(!sent)emit(res,'I’m sorry, I could not generate a response right now. Please try again.');
-      res.write('data: [DONE]\\n\\n');
+      res.write('data: [DONE]\n\n');
       res.end();
     });
     upstream.data.on('error',()=>{
