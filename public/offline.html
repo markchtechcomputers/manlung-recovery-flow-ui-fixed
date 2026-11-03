@@ -64,38 +64,38 @@ small{margin-top:18px;color:#8298b2;font-size:12px}
     statusText.textContent=message;
     statusBox.classList.toggle("ok",!!ok);
   }
-  async function checkConnection(){
+  function checkConnection(){
     if(checking||reloading)return;
     checking=true;
-    var controller=new AbortController();
-    var timeout=setTimeout(function(){controller.abort();},7000);
-    try{
-      var probe=new URL(siteUrl);
-      probe.searchParams.set("__manlung_probe",String(Date.now()));
-      var sameOrigin=location.origin===probe.origin;
-      var response=await fetch(probe.href,{
-        method:"GET",
-        mode:sameOrigin?"same-origin":"no-cors",
-        cache:"no-store",
-        credentials:sameOrigin?"same-origin":"omit",
-        signal:controller.signal
-      });
-      if(sameOrigin&&!response.ok)throw new Error("Website did not return a successful response");
+    var finished=false;
+    var probe=new Image();
+    var timeout=setTimeout(function(){finish(false);},7000);
+    function finish(online){
+      if(finished)return;
+      finished=true;
+      clearTimeout(timeout);
+      probe.onload=probe.onerror=null;
+      checking=false;
+      if(!online){
+        setStatus("Still waiting for Manlung Recovery. Checking again automatically…",false);
+        return;
+      }
       reloading=true;
       setStatus("Connection restored. Reopening Manlung Recovery…",true);
       button.disabled=true;
       setTimeout(function(){location.replace(returnTo);},500);
-    }catch(error){
-      setStatus("Still waiting for Manlung Recovery. Checking again automatically…",false);
-    }finally{
-      clearTimeout(timeout);
-      checking=false;
     }
+    probe.onload=function(){finish(true);};
+    probe.onerror=function(){finish(false);};
+    var ping=new URL("/favicon.svg",siteUrl);
+    ping.searchParams.set("__manlung_probe",String(Date.now()));
+    probe.src=ping.href;
   }
   button.addEventListener("click",function(){
     button.disabled=true;
     setStatus("Checking your connection…",false);
-    checkConnection().finally(function(){if(!reloading)button.disabled=false;});
+    checkConnection();
+    setTimeout(function(){if(!reloading)button.disabled=false;},7500);
   });
   window.addEventListener("online",checkConnection);
   document.addEventListener("visibilitychange",function(){if(!document.hidden)checkConnection();});
