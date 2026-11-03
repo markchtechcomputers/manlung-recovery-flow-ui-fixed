@@ -59,7 +59,7 @@
   }
 
   // Installed-app shell: hide website chrome, normalize viewport sizing, and
-  // show a short branded welcome only when the PWA is launched at its start page.
+  // show a short branded welcome once at the start of each installed-app session.
   function setupPwaShell() {
     if (!isStandalone()) return;
 
@@ -87,23 +87,20 @@
       document.head.appendChild(style);
     }
 
-    const home = location.pathname === '/' || location.pathname === '/index.html';
-    if (home) {
-      let alreadyWelcomed = false;
-      try { alreadyWelcomed = sessionStorage.getItem('manlung-pwa-welcomed') === '1'; } catch (_) {}
-      if (!alreadyWelcomed && !document.getElementById('manlung-pwa-welcome')) {
-        try { sessionStorage.setItem('manlung-pwa-welcomed', '1'); } catch (_) {}
-        const splash = document.createElement('div');
-        splash.id = 'manlung-pwa-welcome';
-        splash.setAttribute('role', 'status');
-        splash.setAttribute('aria-label', 'Welcome to Manlung Recovery');
-        splash.innerHTML = '<div class="mr-welcome-content"><img src="/icons/icon-192.png" alt="Manlung Recovery app icon"><div class="mr-welcome-rule"></div><h1>Welcome to Manlung Recovery</h1><p>where Technology meets your expectation</p></div>';
-        document.body.appendChild(splash);
-        window.setTimeout(() => {
-          splash.classList.add('is-leaving');
-          window.setTimeout(() => splash.remove(), 480);
-        }, 1750);
-      }
+    let alreadyWelcomed = false;
+    try { alreadyWelcomed = sessionStorage.getItem('manlung-pwa-welcomed') === '1'; } catch (_) {}
+    if (!alreadyWelcomed && !document.getElementById('manlung-pwa-welcome')) {
+      try { sessionStorage.setItem('manlung-pwa-welcomed', '1'); } catch (_) {}
+      const splash = document.createElement('div');
+      splash.id = 'manlung-pwa-welcome';
+      splash.setAttribute('role', 'status');
+      splash.setAttribute('aria-label', 'Welcome to Manlung Recovery');
+      splash.innerHTML = '<div class="mr-welcome-content"><img src="/icons/icon-192.png" alt="Manlung Recovery app icon"><div class="mr-welcome-rule"></div><h1>Welcome to Manlung Recovery</h1><p>where Technology meets your expectation</p></div>';
+      document.body.appendChild(splash);
+      window.setTimeout(() => {
+        splash.classList.add('is-leaving');
+        window.setTimeout(() => splash.remove(), 480);
+      }, 1750);
     }
   }
 
