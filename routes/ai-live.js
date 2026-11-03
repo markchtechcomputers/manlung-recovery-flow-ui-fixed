@@ -116,13 +116,19 @@ router.post('/chat',optionalAuth,async(req,res)=>{
     });
     if(res.flushHeaders)res.flushHeaders();
 
-    let buffer='',sent=false;
+    const contentType=String(upstream.headers?.['content-type']||'').toLowerCase();
+    const isEventStream=contentType.includes('text/event-stream');
+    const isJson=contentType.includes('application/json');
+    let buffer='',rawBody='',sent=false;
     const process=chunk=>{
-      buffer+=Buffer.isBuffer(chunk)?chunk.toString('utf8'):String(chunk||'');
-      const events=buffer.split(/\r?\n\r?\n/);
+      const value=Buffer.isBuffer(chunk)?chunk.toString('utf8'):String(chunk||'');
+      if(isJson){rawBody+=value;return;}
+      if(!isEventStream){if(value){emit(res,value);sent=true;}return;}
+      buffer+=value;
+      const events=buffer.split(/\\r?\\n\\r?\\n/);
       buffer=events.pop()||'';
       for(const event of events){
-        const data=event.split(/\r?\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trim()).join('');
+        const data=event.split(/\\r?\\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trim()).join('');
         if(!data||data==='[DONE]')continue;
         const text=extractText(data);
         if(text){emit(res,text);sent=true;}
@@ -130,17 +136,26 @@ router.post('/chat',optionalAuth,async(req,res)=>{
     };
     upstream.data.on('data',process);
     upstream.data.on('end',()=>{
-      if(buffer.trim()){
-        const data=buffer.split(/\r?\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trim()).join('');
+      if(isJson&&rawBody.trim()){
+        let text='';
+        try{text=extractText(JSON.parse(rawBody));}catch(_){text=rawBody.trim();}
+        if(text){emit(res,text);sent=true;}
+      }else if(isEventStream&&buffer.trim()){
+        const data=buffer.split(/\\r?\\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trim()).join('');
         const text=extractText(data);
         if(text){emit(res,text);sent=true;}
       }
       if(!sent)emit(res,'I’m sorry, I could not generate a response right now. Please try again.');
-      res.write('data: [DONE]\n\n');
+      res.write('data: [DONE]\\n\\n');
       res.end();
     });
-    upstream.data.on('error',()=>res.end());
-    req.on('close',()=>{try{upstream.data.destroy();}catch(_){}});
+    upstream.data.on('error',()=>{
+      if(!res.writableEnded)res.end();
+    });
+    // Only stop upstream work when the browser actually disconnects mid-response.
+    res.on('close',()=>{
+      if(!res.writableEnded){try{upstream.data.destroy();}catch(_){}}
+    });
   }catch(e){
     console.error('Manlung Riple AI error:',e.response?.status||e.message);
 
