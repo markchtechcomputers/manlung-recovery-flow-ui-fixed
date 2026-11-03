@@ -3,15 +3,19 @@
 begin;
 
 alter table public.recovery_chat_groups
-  add column if not exists approval_status text not null default 'pending',
+  add column if not exists approval_status text not null default 'approved',
   add column if not exists approved_by uuid references public.recovery_users(id) on delete set null,
   add column if not exists approved_at timestamptz,
   add column if not exists rejection_reason text;
 
+-- New groups default to pending; existing rows were backfilled as approved
+-- when the column was first added. This remains safe if the migration is rerun.
+alter table public.recovery_chat_groups
+  alter column approval_status set default 'pending';
+
 update public.recovery_chat_groups
-set approval_status='approved',
-    approved_at=coalesce(approved_at,created_at)
-where approval_status='pending';
+set approved_at=coalesce(approved_at,created_at)
+where approval_status='approved';
 
 alter table public.recovery_chat_groups
   drop constraint if exists recovery_chat_groups_approval_status_check;
