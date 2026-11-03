@@ -669,3 +669,36 @@ html body .manlung-footer .manlung-footer-grid {
     max-width: 100%;
   }
 }
+
+
+/* FINAL INSTALLED-PWA FOOTER REMOVAL.
+   This must stay at the very end: earlier desktop footer layout rules use
+   display:block!important and must never override the installed-app shell. */
+@media (display-mode: standalone),
+       (display-mode: fullscreen),
+       (display-mode: minimal-ui),
+       (display-mode: window-controls-overlay) {
+  html body footer,
+  html body footer *,
+  html body [role="contentinfo"],
+  html body .manlung-footer,
+  html body #site-footer,
+  html body .site-footer {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+  html body footer,
+  html body [role="contentinfo"],
+  html body .manlung-footer,
+  html body #site-footer,
+  html body .site-footer {
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+  }
+}
