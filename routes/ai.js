@@ -139,7 +139,7 @@ function buildSiteContext(pagePath) {
   const referencePages = ['about.html', 'services.html', 'faq.html', 'knowledge.html', 'blog.html', 'contact.html', 'privacy.html', 'terms.html']
     .map(name => {
       const source = readIfExists(path.join(PUBLIC_ROOT, name), 18000);
-      return source ? `\\n--- PUBLIC PAGE: /${name} ---\\n${stripHtml(source).slice(0, 6500)}` : '';
+      return source ? `\n--- PUBLIC PAGE: /${name} ---\n${stripHtml(source).slice(0, 6500)}` : '';
     }).filter(Boolean).join('').slice(0, 52000);
   return `${MANLUNG_PROFILE}\n\nCURRENT PAGE PATH: ${pagePath || '/'}\nCURRENT PAGE TITLE: ${title}\n\nCURRENT PAGE TEXT:\n${stripHtml(page).slice(0, 35000)}\n\nCURRENT PAGE LINKS:\n${links.join('\n').slice(0, 9000)}\n\nPUBLIC FRONTEND FILES:\n${publicFiles.join(', ')}\n\nPUBLIC REFERENCE PAGES:\n${referencePages}`.slice(0, 105000);
 }
