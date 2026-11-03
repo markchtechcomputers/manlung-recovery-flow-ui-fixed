@@ -982,6 +982,7 @@ router.post(
   ],
   async (req, res) => {
     if (!checkValidation(req, res)) return;
+    if (!(await requireTurnstile(req, res))) return;
 
     try {
       const {
