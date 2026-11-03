@@ -60,8 +60,9 @@
       '#manlung-cookie-consent .mcc-choice small{display:block;color:#6b7280;font-size:12px;line-height:1.45;margin-top:2px}',
       '#manlung-cookie-consent input[type=checkbox]{width:20px;height:20px;accent-color:#111827;flex:0 0 20px}',
       '#manlung-cookie-consent input[disabled]{opacity:.65}',
-      '#manlung-cookie-settings{position:fixed;left:16px;right:auto;bottom:calc(16px + env(safe-area-inset-bottom));z-index:2147482999;border:1px solid #111827;border-radius:999px;padding:10px 15px;background:#111827;color:#fff;font:750 12px/1.2 system-ui,sans-serif;box-shadow:0 5px 18px #0002;cursor:pointer}',
-      '@media(max-width:700px){#manlung-cookie-consent .mcc-panel{grid-template-columns:minmax(0,1fr);gap:14px;padding:17px 16px calc(17px + env(safe-area-inset-bottom))}#manlung-cookie-consent .mcc-head,#manlung-cookie-consent .mcc-actions{grid-column:1}#manlung-cookie-consent .mcc-head{gap:12px}#manlung-cookie-consent .mcc-icon{width:46px;height:46px;flex-basis:46px;border-radius:13px}#manlung-cookie-consent .mcc-actions{display:grid;grid-template-columns:1fr 1fr;justify-content:stretch}#manlung-cookie-consent .mcc-btn{min-height:42px;padding:10px 8px;font-size:12px}#manlung-cookie-consent .mcc-primary{grid-column:1/-1;grid-row:1}#manlung-cookie-settings{left:10px;right:auto;bottom:calc(10px + env(safe-area-inset-bottom))}}',
+      '#manlung-cookie-settings{position:fixed;left:16px;right:auto;bottom:calc(16px + env(safe-area-inset-bottom));z-index:2147482999;width:58px;height:58px;display:grid;place-items:center;padding:4px;border:1px solid #e5e7eb;border-radius:50%;background:#fff;box-shadow:0 5px 18px #0003;cursor:pointer}',
+      '#manlung-cookie-settings img{display:block;width:46px;height:46px;object-fit:contain}',
+      '@media(max-width:700px){#manlung-cookie-consent .mcc-panel{grid-template-columns:minmax(0,1fr);gap:14px;padding:17px 16px calc(17px + env(safe-area-inset-bottom))}#manlung-cookie-consent .mcc-head,#manlung-cookie-consent .mcc-actions{grid-column:1}#manlung-cookie-consent .mcc-head{gap:12px}#manlung-cookie-consent .mcc-icon{width:46px;height:46px;flex-basis:46px;border-radius:13px}#manlung-cookie-consent .mcc-actions{display:grid;grid-template-columns:1fr 1fr;justify-content:stretch}#manlung-cookie-consent .mcc-btn{min-height:42px;padding:10px 8px;font-size:12px}#manlung-cookie-consent .mcc-primary{grid-column:1/-1;grid-row:1}#manlung-cookie-settings{left:10px;right:auto;bottom:calc(10px + env(safe-area-inset-bottom));width:54px;height:54px}#manlung-cookie-settings img{width:44px;height:44px}}',
       '@media(prefers-reduced-motion:no-preference){#manlung-cookie-consent .mcc-panel{animation:mcc-enter .2s ease-out}@keyframes mcc-enter{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}}'
     ].join('');
     document.head.appendChild(style);
@@ -71,7 +72,7 @@
     const button = document.createElement('button');
     button.id = 'manlung-cookie-settings';
     button.type = 'button';
-    button.textContent = 'Cookie settings';
+    button.innerHTML = '<img src="https://i.postimg.cc/7hFXFL2g/icons8-cookie-48.png" alt="" aria-hidden="true" width="46" height="46" loading="eager" decoding="async">';
     button.setAttribute('aria-label', 'Open cookie preferences');
     button.addEventListener('click', () => openDialog(true));
     document.body.appendChild(button);
