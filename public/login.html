@@ -2721,7 +2721,9 @@ html body.manlung-auth-page #googleRegisterBtn iframe{
   }
 
   function showNativeStatus(message, kind) {
-    const target = document.getElementById('loginError');
+    const registerPanel = document.getElementById('registerPanel');
+    const targetId = registerPanel && !registerPanel.hidden ? 'registerError' : 'loginError';
+    const target = document.getElementById(targetId);
     if (target && typeof showMessage === 'function') showMessage(target, message, kind || 'info');
   }
 
