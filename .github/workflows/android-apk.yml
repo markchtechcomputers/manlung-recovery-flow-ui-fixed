@@ -156,34 +156,38 @@ jobs:
           # Preserve Capacitor's BridgeActivity while applying the native WebView settings.
           python3 - <<'PY'
           from pathlib import Path
-          import re
           candidates = list(Path("android/app/src/main/java").rglob("MainActivity.java"))
           if len(candidates) != 1:
               raise SystemExit(f"Expected exactly one MainActivity.java, found {len(candidates)}")
           activity = candidates[0]
           source = activity.read_text()
-          settings = """        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);
-                  getBridge().getWebView().getSettings().setUserAgentString("ManlungRecoveryAndroid " + getBridge().getWebView().getSettings().getUserAgentString());
-                  if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                      getBridge().getWebView().getSettings().setAlgorithmicDarkeningAllowed(false);
-                  } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                      getBridge().getWebView().getSettings().setForceDark(android.webkit.WebSettings.FORCE_DARK_OFF);
-                  }"""
+          nl = chr(10)
+          settings = nl.join([
+              "        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);",
+              '        getBridge().getWebView().getSettings().setUserAgentString("ManlungRecoveryAndroid " + getBridge().getWebView().getSettings().getUserAgentString());',
+              "        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {",
+              "            getBridge().getWebView().getSettings().setAlgorithmicDarkeningAllowed(false);",
+              "        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {",
+              "            getBridge().getWebView().getSettings().setForceDark(android.webkit.WebSettings.FORCE_DARK_OFF);",
+              "        }"
+          ])
           if "setMediaPlaybackRequiresUserGesture(false)" not in source:
               marker = "super.onCreate(savedInstanceState);"
               if marker in source:
-                  source = source.replace(marker, marker + "\\n" + settings, 1)
+                  source = source.replace(marker, marker + nl + settings, 1)
               else:
-                  class_match = re.search(r"public\\s+class\\s+MainActivity\\s+extends\\s+BridgeActivity\\s*\\{", source)
-                  if not class_match:
+                  class_start = source.find("public class MainActivity extends BridgeActivity")
+                  brace = source.find("{", class_start) if class_start >= 0 else -1
+                  if brace < 0:
                       raise SystemExit("Could not locate generated Capacitor MainActivity class")
-                  method = """\n    @Override
-              public void onCreate(android.os.Bundle savedInstanceState) {
-                  super.onCreate(savedInstanceState);
-              """ + settings + """
-              }
-              """
-                  source = source[:class_match.end()] + method + source[class_match.end():]
+                  method = nl.join([
+                      "    @Override",
+                      "    public void onCreate(android.os.Bundle savedInstanceState) {",
+                      "        super.onCreate(savedInstanceState);",
+                      settings,
+                      "    }"
+                  ])
+                  source = source[:brace + 1] + nl + method + nl + source[brace + 1:]
           activity.write_text(source)
           print(f"Configured Capacitor WebView settings in {activity}")
           PY
