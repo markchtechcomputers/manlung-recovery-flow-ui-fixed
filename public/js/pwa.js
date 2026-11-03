@@ -83,7 +83,8 @@
         html body img,html body video,html body iframe,html body canvas{max-width:100%}
         html body input,html body select,html body textarea,html body button{max-width:100%;min-width:0}
         html body main,html body #page,html body .page,html body .admin-shell,html body .tools-shell{min-width:0;max-width:100%}
-        html body .manlung-footer,html body footer.manlung-footer,html body>footer{display:none!important}
+        html body footer,html body footer *,html body [role="contentinfo"],html body .manlung-footer,html body #site-footer,html body .site-footer{display:none!important;visibility:hidden!important;pointer-events:none!important}
+        html body footer,html body [role="contentinfo"],html body .manlung-footer,html body #site-footer,html body .site-footer{height:0!important;min-height:0!important;max-height:0!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important}
         #manlung-pwa-welcome{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 35%,#173d62 0%,#0b2340 42%,#061326 100%);color:#f8fafc;text-align:center;opacity:1;visibility:visible;transition:opacity .42s ease,visibility .42s ease}
         #manlung-pwa-welcome.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
         #manlung-pwa-welcome .mr-welcome-content{width:min(100%,440px);display:flex;flex-direction:column;align-items:center;gap:18px;animation:mrWelcomeIn .65s cubic-bezier(.2,.75,.25,1) both}
