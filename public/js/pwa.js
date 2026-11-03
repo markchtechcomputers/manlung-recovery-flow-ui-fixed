@@ -126,6 +126,48 @@
       window.navigator.standalone === true;
   }
 
+  // Hide selected social providers only when this site is launched as an
+  // installed browser PWA. Ordinary browser tabs and the native Capacitor APK
+  // retain their separate existing behavior.
+  function isInstalledBrowserPwa() {
+    if (isAndroidApp()) return false;
+    try {
+      return window.navigator.standalone === true ||
+        ['standalone', 'minimal-ui', 'fullscreen', 'window-controls-overlay'].some(mode =>
+          window.matchMedia('(display-mode: ' + mode + ')').matches
+        );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function applyInstalledPwaAuthVisibility() {
+    if (!isInstalledBrowserPwa() ||
+        document.getElementById('manlung-installed-pwa-auth-style')) return;
+
+    document.documentElement.classList.add('manlung-installed-browser-pwa');
+    const style = document.createElement('style');
+    style.id = 'manlung-installed-pwa-auth-style';
+    style.textContent = `
+      html.manlung-installed-browser-pwa body.manlung-auth-page #googleLoginBtn,
+      html.manlung-installed-browser-pwa body.manlung-auth-page #googleRegisterBtn,
+      html.manlung-installed-browser-pwa body.manlung-auth-page #githubLoginBtn,
+      html.manlung-installed-browser-pwa body.manlung-auth-page #githubRegisterBtn,
+      html.manlung-installed-browser-pwa body.manlung-auth-page #discordLoginBtn,
+      html.manlung-installed-browser-pwa body.manlung-auth-page #discordRegisterBtn {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+      html.manlung-installed-browser-pwa body.manlung-auth-page .manlung-auth-divider {
+        display: none !important;
+      }
+    `;
+    (document.head || document.documentElement).appendChild(style);
+  }
+
+  applyInstalledPwaAuthVisibility();
+
   function wasRecentlyDismissed() {
     try {
       const value = localStorage.getItem(DISMISS_KEY);
