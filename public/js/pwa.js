@@ -1,4 +1,12 @@
 (() => {
+  // Load the shared consent manager on every page that includes the PWA runtime.
+  if (!document.querySelector('script[data-manlung-cookie-consent]')) {
+    const consentScript = document.createElement('script');
+    consentScript.src = '/js/cookie-consent.js';
+    consentScript.dataset.manlungCookieConsent = 'true';
+    document.head.appendChild(consentScript);
+  }
+
   const DISMISS_KEY = 'manlung-app-install-dismissed-v3';
 
   // Preserve the normal browser history inside the Admin Portal.
