@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - fix-current-deployment-20261022
+      - fix-auth-and-admin-ui-20261030
 
 permissions:
   contents: write
@@ -82,6 +83,7 @@ jobs:
             "webDir": "www",
             "server": {
               "url": "https://manlungrecovery.manlungshop.co.ke/",
+              "errorPath": "offline.html",
               "cleartext": false,
               "allowNavigation": [
                 "manlungrecovery.manlungshop.co.ke",
