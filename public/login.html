@@ -1706,8 +1706,16 @@ function showTab(tab) {
   document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
   document.getElementById('tabLogin').setAttribute('aria-selected', String(tab === 'login'));
   document.getElementById('tabRegister').setAttribute('aria-selected', String(tab === 'register'));
-  if (tab === 'register' && clientTurnstileEnabled && clientTurnstileApi && clientRegisterTurnstileWidget === null) {
-    renderClientRegisterTurnstile(clientTurnstileApi);
+  if (tab === 'register' && clientTurnstileEnabled && clientRegisterTurnstileWidget === null) {
+    (async () => {
+      try {
+        clientTurnstileApi = clientTurnstileApi || await loadClientTurnstileApi();
+        renderClientRegisterTurnstile(clientTurnstileApi);
+      } catch (error) {
+        showMessage(document.getElementById('registerError'), error?.message || 'Security verification could not load. Please retry.');
+        setRegisterTurnstileRetryVisible(true);
+      }
+    })();
   }
 }
 function showForgot(event) {
