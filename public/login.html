@@ -1638,6 +1638,11 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-visible-mark{
               <button type="button" class="manlung-password-toggle" data-password-target="regPasswordConfirm" aria-label="Show password" title="Show password"><i class="fas fa-eye"></i></button>
             </div>
           </div>
+          <div class="manlung-turnstile-box" aria-label="Cloudflare Turnstile security verification">
+            <div class="manlung-turnstile-title">Security verification</div>
+            <div id="clientRegisterTurnstile" class="manlung-turnstile-widget"></div>
+            <div class="manlung-turnstile-help">Complete this check to create your account.</div>
+          </div>
           <button type="submit" class="btn btn-primary manlung-auth-primary"><i class="fas fa-user-plus" aria-hidden="true"></i> Create Account</button>
           <div id="registerError" class="manlung-auth-message error-text" role="alert"></div>
         </form>
@@ -1701,6 +1706,9 @@ function showTab(tab) {
   document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
   document.getElementById('tabLogin').setAttribute('aria-selected', String(tab === 'login'));
   document.getElementById('tabRegister').setAttribute('aria-selected', String(tab === 'register'));
+  if (tab === 'register' && clientTurnstileEnabled && clientTurnstileApi && clientRegisterTurnstileWidget === null) {
+    renderClientRegisterTurnstile(clientTurnstileApi);
+  }
 }
 function showForgot(event) {
   event.preventDefault();
@@ -1777,9 +1785,12 @@ async function handleForgot(event) {
 }
 let clientTurnstileEnabled = false;
 let clientTurnstileWidget = null;
+let clientRegisterTurnstileWidget = null;
 let clientTurnstileSiteKey = '';
+let clientTurnstileApi = null;
 let clientTurnstileApiPromise = null;
 let clientTurnstileRetryButton = null;
+let clientRegisterTurnstileRetryButton = null;
 
 function loadClientTurnstileApi() {
   if (window.turnstile) return Promise.resolve(window.turnstile);
@@ -1871,6 +1882,67 @@ function renderClientTurnstile(api) {
   });
 }
 
+function setRegisterTurnstileRetryVisible(visible) {
+  const host = document.getElementById('clientRegisterTurnstile');
+  if (!host) return;
+  if (!clientRegisterTurnstileRetryButton) {
+    clientRegisterTurnstileRetryButton = document.createElement('button');
+    clientRegisterTurnstileRetryButton.type = 'button';
+    clientRegisterTurnstileRetryButton.className = 'manlung-turnstile-retry';
+    clientRegisterTurnstileRetryButton.textContent = 'Retry security check';
+    clientRegisterTurnstileRetryButton.hidden = true;
+    clientRegisterTurnstileRetryButton.addEventListener('click', async () => {
+      clientRegisterTurnstileRetryButton.hidden = true;
+      showMessage(document.getElementById('registerError'), '');
+      try {
+        const api = clientTurnstileApi || await loadClientTurnstileApi();
+        if (clientRegisterTurnstileWidget !== null) {
+          try { api.reset(clientRegisterTurnstileWidget); return; } catch (_) {}
+          try { api.remove(clientRegisterTurnstileWidget); } catch (_) {}
+          clientRegisterTurnstileWidget = null;
+        }
+        renderClientRegisterTurnstile(api);
+      } catch (error) {
+        showMessage(document.getElementById('registerError'), error?.message || 'Security verification could not load. Please retry.');
+        setRegisterTurnstileRetryVisible(true);
+      }
+    });
+    host.insertAdjacentElement('afterend', clientRegisterTurnstileRetryButton);
+  }
+  clientRegisterTurnstileRetryButton.hidden = !visible;
+}
+
+function renderClientRegisterTurnstile(api) {
+  const host = document.getElementById('clientRegisterTurnstile');
+  if (!host || !clientTurnstileSiteKey || clientRegisterTurnstileWidget !== null) return;
+  host.innerHTML = '';
+  clientRegisterTurnstileWidget = api.render(host, {
+    sitekey: clientTurnstileSiteKey,
+    theme: 'auto',
+    size: 'normal',
+    appearance: 'always',
+    'error-callback': (code) => {
+      console.warn('Cloudflare registration Turnstile challenge error:', code || 'unknown');
+      showMessage(document.getElementById('registerError'), 'Cloudflare security verification could not complete. Check your connection, then retry the security check.');
+      setRegisterTurnstileRetryVisible(true);
+    },
+    'expired-callback': () => {
+      showMessage(document.getElementById('registerError'), 'Security verification expired. Please complete it again.');
+      setRegisterTurnstileRetryVisible(false);
+    },
+    callback: () => {
+      showMessage(document.getElementById('registerError'), '');
+      setRegisterTurnstileRetryVisible(false);
+    }
+  });
+}
+
+function resetClientRegisterTurnstile() {
+  if (clientTurnstileApi && clientRegisterTurnstileWidget !== null) {
+    try { clientTurnstileApi.reset(clientRegisterTurnstileWidget); } catch (_) {}
+  }
+}
+
 async function setupClientTurnstile() {
   // Fetch the small same-origin config first. Do not download Cloudflare's SDK
   // at all when Turnstile is disabled; this keeps the sign-in page responsive.
@@ -1891,7 +1963,9 @@ async function setupClientTurnstile() {
 
     clientTurnstileSiteKey = config.turnstileSiteKey;
     const api = await loadClientTurnstileApi();
+    clientTurnstileApi = api;
     renderClientTurnstile(api);
+    if (!document.getElementById('registerPanel').hidden) renderClientRegisterTurnstile(api);
   } catch (error) {
     console.error('Turnstile setup failed:', error);
     showMessage(document.getElementById('loginError'), error?.message || 'Cloudflare security verification could not be initialized.');
@@ -2186,6 +2260,12 @@ async function handleRegister(event) {
   const errorEl=document.getElementById('registerError');
 
   showMessage(errorEl,'');
+  const turnstileToken = clientTurnstileEnabled && window.turnstile && clientRegisterTurnstileWidget !== null
+    ? window.turnstile.getResponse(clientRegisterTurnstileWidget) : null;
+  if (clientTurnstileEnabled && !turnstileToken) {
+    showMessage(errorEl, 'Please complete the Cloudflare security check before creating your account.');
+    return;
+  }
   if(password.length < 12 || password.length > 72){ showMessage(errorEl,'Password must be between 12 and 72 characters.'); return; }
   if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,72}$/.test(password)){ showMessage(errorEl,'Password must include uppercase and lowercase letters, a number, and a special character.'); return; }
   if(password !== passwordConfirm){ showMessage(errorEl,'Passwords do not match.'); return; }
@@ -2194,7 +2274,7 @@ async function handleRegister(event) {
     const res=await fetch('/api/auth/client/register',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({fullName,email,phone,password})
+      body:JSON.stringify({fullName,email,phone,password,turnstileToken})
     });
 
     const data=await res.json();
@@ -2217,11 +2297,13 @@ async function handleRegister(event) {
       return;
     }
 
+    resetClientRegisterTurnstile();
     showMessage(
       errorEl,
       data.error||'Could not create account'
     );
   } catch(err){
+    resetClientRegisterTurnstile();
     showMessage(
       errorEl,
       'Could not reach the server ('+err.message+'). Is it running?'
