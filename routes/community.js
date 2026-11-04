@@ -1576,7 +1576,7 @@ async function peerParticipant(callId,userId) {
  const {data,error}=await supabase.from('recovery_peer_calls').select('*').eq('id',callId).maybeSingle();
  if(error) throw error;
  if(!data) return {call:null,participant:false};
- return {call:data,participant:data.caller_user_id===userId||data.callee_user_id===userId};
+ return {call:data,participant:String(data.caller_user_id)===String(userId)||String(data.callee_user_id)===String(userId)};
 }
 router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
  try{
@@ -1616,7 +1616,7 @@ router.get('/peer-calls/incoming',async(req,res)=>{
   const ids=[...new Set((data||[]).map(x=>x.caller_user_id))];
   const {data:users,error:ue}=ids.length?await supabase.from('recovery_users').select('id,username').in('id',ids):{data:[],error:null};
   if(ue) throw ue;
-  const {data:profiles,error:pe}=ids.length?await supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url').in('user_id',ids):{data:[],error:null};
+  const {data:profiles,error:pe}=ids.length?await supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility').in('user_id',ids):{data:[],error:null};
   if(pe) throw pe;
   const um=new Map((users||[]).map(x=>[x.id,x])),pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
   res.set('Cache-Control','no-store');
@@ -1648,9 +1648,9 @@ router.post('/peer-calls/:callId/signals',peerCallLimiter,async(req,res)=>{
   if(['ended','rejected','missed'].includes(call.status)) return fail(res,409,'This call has already ended.');
   const payload=req.body?.payload&&typeof req.body.payload==='object'&&!Array.isArray(req.body.payload)?req.body.payload:{};
   if(JSON.stringify(payload).length>30000) return fail(res,413,'Call signal is too large.');
-  if(type==='offer'&&req.user.id!==call.caller_user_id) return fail(res,403,'Only the caller can send an offer.');
-  if(type==='answer'&&req.user.id!==call.callee_user_id) return fail(res,403,'Only the recipient can send an answer.');
-  if(type==='accept'&&req.user.id!==call.callee_user_id) return fail(res,403,'Only the recipient can accept this call.');
+  if(type==='offer'&&String(req.user.id)!==String(call.caller_user_id)) return fail(res,403,'Only the caller can send an offer.');
+  if(type==='answer'&&String(req.user.id)!==String(call.callee_user_id)) return fail(res,403,'Only the recipient can send an answer.');
+  if(type==='accept'&&String(req.user.id)!==String(call.callee_user_id)) return fail(res,403,'Only the recipient can accept this call.');
   const {data,error}=await supabase.from('recovery_peer_call_signals').insert({call_id:id,sender_user_id:req.user.id,signal_type:type,payload})
     .select('id,call_id,sender_user_id,signal_type,payload,created_at').single();
   if(error) throw error;
