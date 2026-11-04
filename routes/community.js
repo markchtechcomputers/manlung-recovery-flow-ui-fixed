@@ -389,6 +389,7 @@ router.get('/messages/:memberId/reactions', async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
     if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
     const { data: messages, error: messageError } = await supabase.from('recovery_community_messages')
       .select('id').or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
       .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
@@ -408,6 +409,7 @@ router.post('/messages/:memberId/:messageId/reactions', messageLimiter, async (r
     const other = String(req.params.memberId || ''), id = String(req.params.messageId || '');
     const reaction = String(req.body?.reaction || '').trim();
     if (!validId(other) || !validId(id) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
     if (reaction && (Array.from(reaction).length > 16 || !/\p{Emoji}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
     const { data: message, error: messageError } = await supabase.from('recovery_community_messages')
       .select('id').eq('id', id)
