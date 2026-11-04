@@ -66,7 +66,9 @@ test('direct and group reactions are persisted, replaceable and removable', () =
   assert.match(routes, /router\.get\('\/groups\/:groupId\/reactions'/);
   assert.match(routes, /router\.post\('\/groups\/:groupId\/messages\/:messageId\/reactions'/);
   assert.match(routes, /onConflict: 'message_id,user_id'/);
-  assert.match(routes, /\\p\{Emoji\}/);
+  assert.match(routes, /function isSingleEmojiReaction/);
+  assert.match(routes, /Intl\\.Segmenter/);
+  assert.match(routes, /Extended_Pictographic/);
   assert.match(migration, /recovery_chat_message_reactions_one_per_user_idx/);
   assert.match(migration, /recovery_chat_group_reactions_one_per_user_idx/);
 });
