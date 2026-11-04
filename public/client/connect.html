@@ -819,7 +819,67 @@ function showIncomingMessageNotice(c,last){
  }catch(_){}
 }
 // Keep chat previews, unread counts, and community statuses current without a manual refresh.
-let __mlPollBusy=false;async function liveSync(){if(__mlPollBusy||document.hidden||!ML.me)return;__mlPollBusy=true;try{const inbox=await apiReq('/inbox');const inboxRows=Array.isArray(inbox.messages)?inbox.messages:[];const byPeer=new Map();for(const row of inboxRows){const peer=String(row.sender_user_id)===String(ML.me)?String(row.recipient_user_id):String(row.sender_user_id);if(!peer||peer===String(ML.me))continue;if(!byPeer.has(peer))byPeer.set(peer,[]);byPeer.get(peer).push(row)}for(const [peer,rows] of byPeer){if(S.blocked.includes(nm(member(peer)||{name:''})))continue;const person=member(peer)||{id:peer,name:'Member'};const c=chat(person);const oldIds=new Set(c.m.map(x=>String(x[12])));const next=rows.slice().sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0)).map(x=>[String(x.sender_user_id)===String(ML.me)?'me':'th',String(x.message||'').startsWith('VOICE::')?'Voice message':x.message,time(x.created_at),x.read_at?2:(x.delivered_at?1:0),null,String(x.sender_user_id)===String(ML.me)?'You':nm(person),null,null,0,new Date(x.created_at).getTime(),0,0,x.id]);const incoming=next.filter(x=>x[0]==='th'&&!oldIds.has(String(x[12])));const unreadRows=rows.filter(x=>String(x.recipient_user_id)===String(ML.me)&&!x.read_at);const oldLast=c.m.length?c.m[c.m.length-1][12]:null;const newLast=next.length?next[next.length-1][12]:null;if(incoming.length||oldLast!==newLast||c.un!==unreadRows.length){c.m=next;if(String(open)===peer){c.un=0;paint(c);if(incoming.length||unreadRows.length)apiReq('/messages/'+encodeURIComponent(peer)+'/read',{method:'POST',body:'{}'}).catch(()=>{})}else{c.un=unreadRows.length;if(incoming.some(x=>unreadRows.some(r=>String(r.id)===String(x[12])))){ding();showIncomingMessageNotice(c,incoming[incoming.length-1]);if(S.notif&&'Notification'in window&&Notification.permission==='granted'){const last=incoming[incoming.length-1];new Notification(c.n,{body:S.preview?(last[1]||'New message'):'New message',icon:'/client/favicon.svg'})}}}save()}}const ids=S.chats.filter(c=>c.remote&&c.memberId).map(c=>c.memberId);await Promise.all(ids.map(async id=>{const c=S.chats.find(x=>x.memberId===id);if(!c)return;const oldIds=new Set(c.m.map(x=>String(x[12])));const d=await apiReq('/messages/'+encodeURIComponent(id));const next=(d.messages||[]).map(x=>[x.sender_user_id===ML.me?'me':'th',x.message,time(x.created_at),x.read_at?2:(x.delivered_at?1:0),x.attachment?(x.attachment.isVoice?{k:'voice',src:x.attachment.url,dur:fmt(x.attachment.duration),mime:x.attachment.mime}:x.attachment.isImage?{k:'img',src:x.attachment.url,url:x.attachment.url,name:x.attachment.name,size:x.attachment.size}:{k:'doc',url:x.attachment.url,name:x.attachment.name,size:(x.attachment.size/1024/1024).toFixed(2)+' MB'}):null,x.sender_user_id===ML.me?'You':nm(member(x.sender_user_id)||{name:c.n}),null,null,0,new Date(x.created_at).getTime(),0,0,x.id]);const newest=next.length?next[next.length-1]:null;const oldLast=c.m.length?c.m[c.m.length-1][12]:null;const oldReceiptSignature=JSON.stringify(c.m.map(x=>[x[12],x[3]]));const nextReceiptSignature=JSON.stringify(next.map(x=>[x[12],x[3]]));const changed=next.length!==c.m.length||(newest&&newest[12]!==oldLast)||oldReceiptSignature!==nextReceiptSignature;if(changed){const incoming=next.filter(x=>x[0]==='th'&&!oldIds.has(String(x[12])));c.m=next;if(open===id){paint(c);if(incoming.length)ding()}else if(incoming.length){c.un=(c.un||0)+incoming.length;ding();if(S.notif&&'Notification'in window&&Notification.permission==='granted'&&incoming.length){const last=incoming[incoming.length-1];new Notification(c.n,{body:S.preview?(last[1]||'New message'):'New message',icon:'/client/favicon.svg'})}}}}));if(tab==='chats'&&!open)render();}catch(e){}finally{__mlPollBusy=false}}
+function mlCursorOf(row){return {at:new Date(row.created_at||0).getTime(),id:String(row.id||'')}}
+function mlAfterCursor(row,cursor){if(!cursor)return false;const a=mlCursorOf(row);return a.at>Number(cursor.at||0)||(a.at===Number(cursor.at||0)&&a.id>String(cursor.id||''))}
+function showIncomingMessageNotice(c,last){
+ if(!S.notif||c.mu)return;
+ try{
+  const peer=String(c.memberId||c.id);let host=document.getElementById('ml-new-message-notices');
+  if(!host){host=document.createElement('div');host.id='ml-new-message-notices';host.setAttribute('aria-live','polite');host.setAttribute('aria-label','New messages');host.style.cssText='position:fixed;right:14px;top:14px;z-index:2147483000;display:flex;flex-direction:column;gap:8px;width:min(360px,calc(100vw - 28px));pointer-events:none';document.body.appendChild(host)}
+  let card=host.querySelector('[data-peer="'+peer+'"]');
+  if(!card){card=document.createElement('button');card.type='button';card.dataset.peer=peer;card.style.cssText='pointer-events:auto;text-align:left;width:100%;padding:13px 15px;border:1px solid var(--ac,#2563eb);border-radius:14px;background:var(--sf,#fff);color:var(--tx,#111827);box-shadow:0 10px 32px #0003;display:block;cursor:pointer;font:inherit';host.appendChild(card)}
+  card.innerHTML='';const title=document.createElement('strong');title.textContent='New message · '+(c.n||'Member');title.style.cssText='display:block;font-weight:800;margin-bottom:4px';
+  const body=document.createElement('span');body.textContent=String(last&&last[1]||'You received a new message');body.style.cssText='display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.92em';
+  const hint=document.createElement('span');hint.textContent='Tap to open conversation';hint.style.cssText='display:block;margin-top:5px;font-size:.78em;opacity:.75';
+  card.append(title,body,hint);card.onclick=()=>{window.focus();openChat(c.id);card.remove()};
+  setTimeout(()=>{if(!card.isConnected)return;card.style.transition='opacity .25s';card.style.opacity='0';setTimeout(()=>card.remove(),300)},9000);
+ }catch(_){}
+}
+function showNativeChatNotification(c,last,peer){
+ if(!S.notif||c.mu||!('Notification'in window)||Notification.permission!=='granted')return;
+ try{window.__mlChatNotifications=window.__mlChatNotifications||{};const n=new Notification(c.n||'New message',{body:S.preview?(last[1]||'New message'):'New message',icon:'/icons/icon-512.png',tag:'manlung-chat-'+peer,renotify:false});window.__mlChatNotifications[String(peer)]=n;n.onclick=()=>{window.focus();openChat(c.id);n.close();delete window.__mlChatNotifications[String(peer)]};n.onclose=()=>{if(window.__mlChatNotifications[String(peer)]===n)delete window.__mlChatNotifications[String(peer)]}}catch(_){}
+}
+let __mlPollBusy=false;
+async function liveSync(){
+ if(__mlPollBusy||document.hidden||!ML.me)return;
+ __mlPollBusy=true;
+ try{
+  const inbox=await apiReq('/inbox'),inboxRows=Array.isArray(inbox.messages)?inbox.messages:[];
+  const prefMap=new Map((inbox.preferences||[]).map(p=>[String(p.other_user_id),p]));
+  const byPeer=new Map();
+  for(const row of inboxRows){const peer=String(row.sender_user_id)===String(ML.me)?String(row.recipient_user_id):String(row.sender_user_id);if(!peer||peer===String(ML.me))continue;if(!byPeer.has(peer))byPeer.set(peer,[]);byPeer.get(peer).push(row)}
+  S.notifyCursors=S.notifyCursors||{};let changedList=false;
+  for(const [peer,unsorted] of byPeer){
+   if(S.blocked.includes(nm(member(peer)||{name:''})))continue;
+   const rows=unsorted.slice().sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0));
+   const person=member(peer)||{id:peer,name:'Member'},c=chat(person),pref=prefMap.get(peer)||{};
+   c.mu=pref.muted?1:0;c.pin=pref.pinned?1:0;c.ar=pref.archived?1:0;
+   c.chatThemeId=pref.chat_theme_id||c.chatThemeId||'mint';c.backgroundColor=pref.background_color||null;c.backgroundImageUrl=pref.background_image_url||null;
+   c.manualUnread=Boolean(pref.manual_unread);c.manualUnreadAt=pref.manual_unread_at||null;
+   const previous=c.m||[],oldById=new Map(previous.map(m=>[String(m[12]),m]));
+   const next=rows.slice(-100).map(x=>{const old=oldById.get(String(x.id));const body=String(x.message||'').startsWith('VOICE::')?'Voice message':String(x.message||'');return [String(x.sender_user_id)===String(ML.me)?'me':'th',body,time(x.created_at),x.read_at?2:(x.delivered_at?1:0),old?old[4]:null,String(x.sender_user_id)===String(ML.me)?'You':nm(person),old?old[6]:null,old?old[7]:null,Boolean(x.edited_at),new Date(x.created_at).getTime(),old?old[10]:0,old?old[11]:0,x.id,old?old[13]||[]:[]]});
+   const cutoff=c.manualUnreadAt?new Date(c.manualUnreadAt).getTime():0;
+   const unreadRows=rows.filter(x=>String(x.recipient_user_id)===String(ML.me)&&!x.read_at&&new Date(x.created_at).getTime()>cutoff);
+   c.un=unreadRows.length||(c.manualUnread?1:0);
+   const cursor=S.notifyCursors[peer];let notifyRows=[];
+   if(cursor)notifyRows=rows.filter(x=>String(x.sender_user_id)===peer&&!x.read_at&&mlAfterCursor(x,cursor)&&unreadRows.some(u=>String(u.id)===String(x.id)));
+   else{const oldLast=previous.length?previous[previous.length-1]:null;S.notifyCursors[peer]=oldLast?{at:Number(oldLast[9])||0,id:String(oldLast[12]||'')}:mlCursorOf(rows[rows.length-1]||{})}
+   const newest=rows[rows.length-1];
+   if(String(open)===peer&&document.visibilityState==='visible'){
+    if(unreadRows.length||c.manualUnread)apiReq('/messages/'+encodeURIComponent(peer)+'/read',{method:'POST',body:'{}'}).then(result=>{c.un=0;c.manualUnread=false;c.manualUnreadAt=null;clearChatNotifications(peer);const ids=new Set(result.messageIds||[]);for(const m of c.m)if(ids.has(String(m[12]))&&m[0]==='th')m[3]=2;save();if(String(open)===peer)paint(c)}).catch(()=>{});
+    c.un=0;c.manualUnread=false;c.manualUnreadAt=null;clearChatNotifications(peer);
+    if(JSON.stringify(previous.map(m=>[m[12],m[1],m[3]]))!==JSON.stringify(next.map(m=>[m[12],m[1],m[3]]))){c.m=next;paint(c);changedList=true}
+   }else{
+    if(notifyRows.length&&!c.mu&&S.notif){const lastRow=notifyRows[notifyRows.length-1],lastMessage=next.find(m=>String(m[12])===String(lastRow.id));if(lastMessage){ding();showIncomingMessageNotice(c,lastMessage);showNativeChatNotification(c,lastMessage,peer)}}
+    if(JSON.stringify(previous.map(m=>[m[12],m[1],m[3]]))!==JSON.stringify(next.map(m=>[m[12],m[1],m[3]]))||c.un!==unreadRows.length){c.m=next;changedList=true}
+   }
+   if(newest)S.notifyCursors[peer]=mlCursorOf(newest);
+  }
+  if(changedList||byPeer.size)save();
+  if(tab==='chats'&&!open)render();
+ }catch(error){console.warn('Message sync failed:',error&&error.message)}
+ finally{__mlPollBusy=false}
+}
 setInterval(liveSync,1500);
 let __mlProfileSyncBusy=false;async function syncCommunityProfiles(){if(__mlProfileSyncBusy||document.hidden||!ML.me)return;__mlProfileSyncBusy=true;try{const d=await apiReq('/members');const fresh=d.members||[];let changed=false;ML.members=fresh;window.__mlMembers=fresh;for(const m of fresh){const url=m.avatar||m.avatar_url||m.profile_photo_url||m.profile_picture_url||null;for(const s of S.stat||[]){if(String(s.userId)===String(m.id)){if(s.n!==nm(m)){s.n=nm(m);changed=true}if((s.avatar||null)!==(url||null)){s.avatar=url;changed=true}}}const x=S.chats.find(c=>String(c.memberId)===String(m.id));if(x){if((x.avatar||null)!==(url||null)||x.n!==nm(m)||Boolean(x.verified)!==Boolean(m.verified)){x.avatar=url;x.n=nm(m);x.verified=Boolean(m.verified);changed=true}}}if(changed){save();render()}}catch(e){}finally{__mlProfileSyncBusy=false}}
 setInterval(syncCommunityProfiles,5000);
