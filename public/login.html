@@ -2258,47 +2258,53 @@ async function handleSocialCallback(){
   if(!window.supabase?.createClient)return;
 
   try{
-    const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(r=>r.json());
+    const cfg=await fetch('/api/config/public',{cache:'no-store'}).then(async response=>{
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(data.error||'Could not load social sign-in configuration.');
+      return data;
+    });
 
     if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)return;
 
     const supabase=window.supabase.createClient(
       cfg.supabaseUrl,
-      cfg.supabaseAnonKey
+      cfg.supabaseAnonKey,
+      {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce',storage:window.localStorage}}
     );
 
-    const {data,error}=await supabase.auth.getSession();
+    const url=new URL(window.location.href);
+    const code=url.searchParams.get('code');
+    let session=null;
 
-    if(error||!data?.session?.access_token)return;
+    if(code){
+      const {data,error}=await supabase.auth.exchangeCodeForSession(code);
+      if(error)throw error;
+      session=data?.session||null;
+    }else{
+      const {data,error}=await supabase.auth.getSession();
+      if(error)throw error;
+      session=data?.session||null;
+    }
+
+    if(!session?.access_token)throw new Error('Social sign-in completed, but the session could not be restored. Please try again.');
 
     const res=await fetch('/api/auth/client/oauth',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        accessToken:data.session.access_token
-      })
+      credentials:'same-origin',
+      cache:'no-store',
+      body:JSON.stringify({accessToken:session.access_token})
     });
 
-    const result=await res.json();
+    const result=await res.json().catch(()=>({}));
+    if(!res.ok||!result.success||!result.user)throw new Error(result.error||'Could not complete social sign-in.');
 
-    if(result.success){
-      localStorage.setItem('clientUser',JSON.stringify(result.user));
-
-      window.history.replaceState(
-        {},
-        document.title,
-        window.location.pathname
-      );
-
-      window.location.href='/client/dashboard.html';
-    }else{
-      showMessage(
-        document.getElementById('loginError'),
-        result.error||'Social sign-in failed.'
-      );
-    }
+    localStorage.setItem('clientUser',JSON.stringify(result.user));
+    await supabase.auth.signOut();
+    window.history.replaceState({},document.title,window.location.pathname);
+    window.location.replace('/client/dashboard.html');
   }catch(err){
-    console.error('Social callback error:',err);
+    console.error('Social OAuth callback failed:',err?.message||'Authentication failed.');
     showMessage(
       document.getElementById('loginError'),
       err.message||'Social sign-in failed.'
