@@ -178,6 +178,14 @@ router.post('/voice/upload-url', messageLimiter, async (req, res) => {
 
 router.get('/inbox', async (req, res) => {
   try {
+    const deliveredAt = new Date().toISOString();
+    const { error: deliveryError } = await supabase.from('recovery_community_messages')
+      .update({ delivered_at: deliveredAt })
+      .eq('recipient_user_id', req.user.id)
+      .is('delivered_at', null)
+      .is('deleted_at', null);
+    if (deliveryError) throw deliveryError;
+
     const { data, error } = await supabase.from('recovery_community_messages')
       .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
       .or('sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + req.user.id)
@@ -194,8 +202,17 @@ router.get('/messages/:memberId', async (req, res) => {
     if (!validId(other)) return fail(res, 400, 'Invalid member ID.');
     if (other === String(req.user.id)) return fail(res, 400, 'Choose another member.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const deliveredAt = new Date().toISOString();
+    const { error: deliveryError } = await supabase.from('recovery_community_messages')
+      .update({ delivered_at: deliveredAt })
+      .eq('sender_user_id', other)
+      .eq('recipient_user_id', req.user.id)
+      .is('delivered_at', null)
+      .is('deleted_at', null);
+    if (deliveryError) throw deliveryError;
+
     const { data, error } = await supabase.from('recovery_community_messages')
-      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id')
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
       .is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
     if (error) throw error;
@@ -217,6 +234,27 @@ router.get('/messages/:memberId', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
 });
 
+router.post('/messages/:memberId/read', messageLimiter, async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Invalid member ID.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+
+    const readAt = new Date().toISOString();
+    const { data, error } = await supabase.from('recovery_community_messages')
+      .update({ delivered_at: readAt, read_at: readAt })
+      .eq('sender_user_id', other)
+      .eq('recipient_user_id', req.user.id)
+      .is('read_at', null)
+      .is('deleted_at', null)
+      .select('id');
+    if (error) throw error;
+
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, readCount: (data || []).length, readAt });
+  } catch (error) { return handleDbError(res, error, 'Community message read receipt error:'); }
+});
+
 
  // Direct-message reactions: counts and individual member reactions are visible to both participants.
  router.get('/messages/:memberId/reactions', async (req, res) => {
@@ -235,7 +273,7 @@ router.patch('/messages/:memberId/:messageId', messageLimiter, async (req, res) 
     if (!message || message.length > 5000 || message.startsWith('VOICE::')) return fail(res, 400, 'Messages must contain 1–5000 characters.');
     const { data, error } = await supabase.from('recovery_community_messages').update({ message, edited_at: new Date().toISOString() })
       .eq('id', id).eq('sender_user_id', req.user.id).eq('recipient_user_id', other).is('deleted_at', null)
-      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id').maybeSingle();
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at').maybeSingle();
     if (error) throw error;
     if (!data) return fail(res, 404, 'Message not found or you cannot edit it.');
     return res.json({ success: true, message: data });
@@ -279,7 +317,7 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
     }
     const { data, error } = await supabase.from('recovery_community_messages')
       .insert({ sender_user_id: req.user.id, recipient_user_id: other, message })
-      .select('id,sender_user_id,recipient_user_id,message,created_at').single();
+      .select('id,sender_user_id,recipient_user_id,message,created_at,delivered_at,read_at').single();
     if (error) throw error;
     res.status(201).json({ success: true, message: data });
   } catch (error) { return handleDbError(res, error, 'Community message send error:'); }
