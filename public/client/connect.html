@@ -620,7 +620,7 @@ window.mlPickSticker=function(g){var a=['😀','😂','🥹','😍','😎','😭
 window.mlFindGif=function(g){var f=document.getElementById('ml-local-gif');f.onchange=function(){var file=f.files&&f.files[0];f.value='';if(!file)return;if(file.type!=='image/gif'||file.size>1200000)return toast('Choose a GIF under 1.2 MB from your phone');var rd=new FileReader();rd.onload=function(){window.mlSendRichMessage('GIF::'+String(rd.result),g)};rd.readAsDataURL(file)};f.click()};
 window.mlSendRichMessage=function(v,g){if(g){var i=document.getElementById('ml-group-input'),f=document.getElementById('ml-group-form');if(!i||!f||f.hidden){toast('Open a group chat first.');return}i.value=v;f.requestSubmit();return}var i=document.getElementById('in');if(!i){toast('Open a direct chat first.');return}i.value=v;send()};const tk=s=>`<svg class="tk ${s>1?'rd':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l4 4L16 7"/>${s>0?'<path d="M10 14l3 3L22 7"/>':''}</svg>`;
 
-const ML_OFFICIAL_CHANNEL_REACTION_EMOJIS=['👍','❤️','😂','😮','😢','🙏','🔥','🎉','👏','💚'];
+
 function mlIsOfficialUpdatesChatRecord(c){return !!(c&&(c.official||c.ch||String(c.id)==='manlung-official-updates'||String(c.id)==='101'||String(c.n||'').trim().toLowerCase()==='manlung updates'))}
 function mlIsCurrentOfficialUpdatesChat(){return mlIsOfficialUpdatesChatRecord(S.chats.find(c=>String(c.id)===String(open)))}
 function mlOfficialUpdatesGroupId(){const groups=window.ML&&Array.isArray(window.ML.groups)?window.ML.groups:[];const channel=groups.find(g=>['manlung-updates','manlung-official-updates'].includes(String(g.slug||'')));return channel&&channel.id?String(channel.id):''}
@@ -637,12 +637,12 @@ async function refreshOfficialChannelReactions(c,repaint=true){
    const mid=String(message[12]||'');if(!mid)continue;
    const counts=new Map();
    for(const row of byMessage.get(mid)||[]){
-    const emoji=String(row.reaction||'');if(!ML_OFFICIAL_CHANNEL_REACTION_EMOJIS.includes(emoji))continue;
+    const emoji=String(row.reaction||'');if(!emoji)continue;
     const value=counts.get(emoji)||{emoji,count:0,mine:false};value.count++;
     if(String(row.user_id)===String(window.ML&&window.ML.me))value.mine=true;
     counts.set(emoji,value);
    }
-   const next=ML_OFFICIAL_CHANNEL_REACTION_EMOJIS.filter(e=>counts.has(e)).map(e=>counts.get(e));
+   const next=Array.from(counts.values());
    if(JSON.stringify(message[13]||[])!==JSON.stringify(next)){message[13]=next;changed=true}
   }
   if(changed&&repaint&&String(open)===String(c.id))paint(c);
