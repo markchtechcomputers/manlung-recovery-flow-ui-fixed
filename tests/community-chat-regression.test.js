@@ -131,6 +131,8 @@ test('messaging migration is additive and keeps browser access server-mediated',
   assert.match(migration, /recovery_chat_notification_cursors/);
   assert.match(migration, /recovery_chat_group_message_receipts/);
   assert.match(migration, /marked_unread_at/);
+  assert.match(migration, /set last_read_at = now\(\)/);
+  assert.match(routes, /last_read_at: new Date\(\)\.toISOString\(\)/);
   assert.match(migration, /theme_background_image_url/);
   assert.match(migration, /revoke all on table public\.recovery_chat_notification_cursors from anon, authenticated/);
   assert.match(migration, /notify pgrst, 'reload schema'/);
