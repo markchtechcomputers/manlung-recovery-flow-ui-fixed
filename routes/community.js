@@ -31,6 +31,7 @@ function publicProfile(profile, user, presence) {
     role: user.role,
     avatar: profile?.avatar_visibility === 'private' ? null : (profile?.avatar_url || null),
     avatarVisibility: profile?.avatar_visibility === 'private' ? 'private' : 'public',
+    avatarUpdatedAt: profile?.updated_at || profile?.avatar_updated_at || null,
     bio: profile?.bio || '',
     createdAt: user.created_at || null,
     discoverable: profile?.discoverable !== false,
