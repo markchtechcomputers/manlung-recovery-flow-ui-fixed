@@ -71,7 +71,7 @@ Stores per-message/per-member `delivered_at` and `read_at`.
 - Conversation unread: server unread count or a manual unread marker.
 - Notification candidate: server-provided new message ID, not a frontend diff of message history. IDs are deduplicated in the current page session.
 - Notification eligibility: app notifications enabled, chat not muted, chat notifications enabled, browser permission granted for OS notification. The in-app notice is shown only while app notifications are enabled.
-- Avatar: versioned profile photo if available; neutral 👤 fallback for missing/failed images.
+- Avatar: versioned profile photo if available; neutral 👤 fallback for missing/failed images, including the notification card and browser notification icon.
 - Reaction chips: absent when no persisted reaction exists; otherwise grouped by emoji and count, with the current user's reaction highlighted.
 - Theme: per-chat preset/custom color/image; direct chats also expose an explicit Apply to all action and Reset.
 
