@@ -5,6 +5,7 @@ begin;
 alter table public.recovery_chat_preferences
   add column if not exists manual_unread boolean not null default false,
   add column if not exists manual_unread_at timestamptz,
+  add column if not exists last_read_at timestamptz,
   add column if not exists chat_theme_id text not null default 'mint',
   add column if not exists background_color text,
   add column if not exists background_image_url text;
