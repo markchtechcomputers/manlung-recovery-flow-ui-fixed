@@ -28,37 +28,33 @@ create table if not exists public.recovery_chat_message_receipts (
 create index if not exists recovery_chat_message_receipts_user_read_idx
   on public.recovery_chat_message_receipts(user_id, read_at, delivered_at);
 
--- One reaction per member per message: selecting the same emoji toggles it off;
--- selecting another emoji replaces the member's previous reaction.
-with ranked as (
-  select ctid,
-         row_number() over (
-           partition by message_id, user_id
-           order by created_at desc, reaction desc
-         ) as rn
-  from public.recovery_chat_message_reactions
-)
-delete from public.recovery_chat_message_reactions r
-using ranked d
-where r.ctid = d.ctid and d.rn > 1;
+-- Keep legacy reaction rows intact. Copy each member's most recent reaction
+-- into v2 tables with one row per member/message; this avoids destructive cleanup.
+create table if not exists public.recovery_chat_message_reactions_v2 (
+  message_id uuid not null references public.recovery_community_messages(id) on delete cascade,
+  user_id uuid not null references public.recovery_users(id) on delete cascade,
+  reaction text not null,
+  created_at timestamptz not null default now(),
+  primary key (message_id, user_id)
+);
+insert into public.recovery_chat_message_reactions_v2 (message_id,user_id,reaction,created_at)
+select distinct on (message_id,user_id) message_id,user_id,reaction,created_at
+from public.recovery_chat_message_reactions
+order by message_id,user_id,created_at desc,reaction desc
+on conflict (message_id,user_id) do nothing;
 
-create unique index if not exists recovery_chat_message_reactions_one_per_user_idx
-  on public.recovery_chat_message_reactions(message_id, user_id);
-
-with ranked as (
-  select ctid,
-         row_number() over (
-           partition by message_id, user_id
-           order by created_at desc, reaction desc
-         ) as rn
-  from public.recovery_chat_group_reactions
-)
-delete from public.recovery_chat_group_reactions r
-using ranked d
-where r.ctid = d.ctid and d.rn > 1;
-
-create unique index if not exists recovery_chat_group_reactions_one_per_user_idx
-  on public.recovery_chat_group_reactions(message_id, user_id);
+create table if not exists public.recovery_chat_group_reactions_v2 (
+  message_id uuid not null references public.recovery_chat_group_messages(id) on delete cascade,
+  user_id uuid not null references public.recovery_users(id) on delete cascade,
+  reaction text not null,
+  created_at timestamptz not null default now(),
+  primary key (message_id, user_id)
+);
+insert into public.recovery_chat_group_reactions_v2 (message_id,user_id,reaction,created_at)
+select distinct on (message_id,user_id) message_id,user_id,reaction,created_at
+from public.recovery_chat_group_reactions
+order by message_id,user_id,created_at desc,reaction desc
+on conflict (message_id,user_id) do nothing;
 
 -- Per-member group chat preferences and read cursor.
 alter table public.recovery_chat_group_members
@@ -104,8 +100,12 @@ create index if not exists recovery_chat_group_message_receipts_user_read_idx
 
 alter table public.recovery_chat_message_receipts enable row level security;
 alter table public.recovery_chat_group_message_receipts enable row level security;
+alter table public.recovery_chat_message_reactions_v2 enable row level security;
+alter table public.recovery_chat_group_reactions_v2 enable row level security;
 revoke all on table public.recovery_chat_message_receipts from anon, authenticated;
 revoke all on table public.recovery_chat_group_message_receipts from anon, authenticated;
+revoke all on table public.recovery_chat_message_reactions_v2 from anon, authenticated;
+revoke all on table public.recovery_chat_group_reactions_v2 from anon, authenticated;
 
 notify pgrst, 'reload schema';
 commit;
