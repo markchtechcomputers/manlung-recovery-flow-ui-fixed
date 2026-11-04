@@ -1050,6 +1050,59 @@ body.dark #mfaStatus,body.dark #mfaSetupBox,body.dark #mfaDisableBox,body.dark #
 </style>
 
 
+<style id="manlung-branded-admin-invitation">
+#inviteAdminSection.invite-admin-card{
+  padding:1.35rem!important;
+  border:1px solid #cbdff0!important;
+  border-radius:20px!important;
+  background:linear-gradient(145deg,#ffffff 0%,#f4f9ff 100%)!important;
+  box-shadow:0 14px 34px rgba(15,45,75,.09)!important;
+  color:#18334f!important;
+}
+.invite-admin-heading{display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem}
+.invite-admin-logo{width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center;border:1px solid #d8e7f4;border-radius:16px;background:#fff;box-shadow:0 5px 16px rgba(19,74,120,.1)}
+.invite-admin-logo img{width:46px;height:46px;object-fit:contain;border-radius:11px}
+.invite-admin-heading .card-title{margin:0;color:#102d4b!important;font-size:1.08rem;font-weight:850}
+.invite-admin-heading .card-title i{color:#1675b9!important}
+.invite-admin-heading p{margin:.35rem 0 0;color:#61758a!important;font-size:.82rem;line-height:1.55}
+.invite-admin-form label{display:block;margin:0 0 .45rem;color:#294866;font-size:.76rem;font-weight:800}
+.invite-admin-controls{display:flex;align-items:stretch;gap:.65rem}
+.invite-admin-controls input{flex:1;min-width:0;min-height:48px;padding:.7rem .85rem!important;border:1px solid #cbd9e7!important;border-radius:11px!important;background:#fff!important;color:#17324d!important;font-size:.88rem}
+.invite-admin-controls input:focus{outline:0;border-color:#2484c4!important;box-shadow:0 0 0 4px rgba(36,132,196,.12)!important}
+.invite-admin-controls button{min-height:48px;padding:.7rem 1rem!important;border:0!important;border-radius:11px!important;background:linear-gradient(110deg,#12558e,#1683a2)!important;color:#fff!important;font-weight:800!important;white-space:nowrap}
+.invite-admin-controls button:disabled{opacity:.65;cursor:wait}
+.invite-admin-security{display:flex;align-items:flex-start;gap:.55rem;margin-top:.9rem;padding:.75rem .85rem;border:1px solid #dceaf5;border-radius:11px;background:#edf6fc;color:#47637d;font-size:.73rem;line-height:1.55}
+.invite-admin-security i{margin-top:2px;color:#1675b9}
+.invite-admin-result{display:none;align-items:flex-start;gap:.7rem;margin-top:.85rem;padding:.85rem;border:1px solid transparent;border-radius:12px;font-size:.8rem;line-height:1.5}
+.invite-admin-result:not(:empty){display:flex}
+.invite-admin-result>i{margin-top:2px;font-size:1.05rem}
+.invite-admin-result strong,.invite-admin-result span{display:block}
+.invite-admin-result strong{margin-bottom:2px;font-weight:850}
+.invite-admin-result span{opacity:.88}
+.invite-admin-result.is-loading{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}
+.invite-admin-result.is-success{background:#ecfdf5;border-color:#bbf7d0;color:#166534}
+.invite-admin-result.is-warning{background:#fffbeb;border-color:#fde68a;color:#92400e}
+.invite-admin-result.is-error{background:#fff1f2;border-color:#fecdd3;color:#9f1239}
+.invite-admin-result-actions{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+.invite-admin-result-actions a{color:#155e9a;font-weight:800;text-decoration:underline}
+.invite-admin-result-actions .btn{min-height:34px;padding:.35rem .65rem!important;border-radius:8px!important;font-size:.72rem}
+html.dark #inviteAdminSection.invite-admin-card,body.dark #inviteAdminSection.invite-admin-card{background:linear-gradient(145deg,#102236,#0c1928)!important;border-color:rgba(96,165,250,.25)!important;color:#eaf4ff!important}
+html.dark .invite-admin-heading .card-title,body.dark .invite-admin-heading .card-title{color:#f0f7ff!important}
+html.dark .invite-admin-heading p,body.dark .invite-admin-heading p{color:#a8bfd4!important}
+html.dark .invite-admin-form label,body.dark .invite-admin-form label{color:#c6d9eb}
+html.dark .invite-admin-logo,body.dark .invite-admin-logo{background:#fff;border-color:#38516a}
+html.dark .invite-admin-controls input,body.dark .invite-admin-controls input{background:#091522!important;color:#eaf4ff!important;border-color:#38516a!important}
+html.dark .invite-admin-security,body.dark .invite-admin-security{background:#102b40;border-color:#244761;color:#bdd8eb}
+@media(max-width:620px){
+  #inviteAdminSection.invite-admin-card{padding:1rem!important}
+  .invite-admin-heading{align-items:flex-start;gap:.75rem}
+  .invite-admin-logo{width:48px;height:48px;flex-basis:48px;border-radius:13px}
+  .invite-admin-logo img{width:39px;height:39px}
+  .invite-admin-controls{flex-direction:column}
+  .invite-admin-controls button{width:100%}
+}
+</style>
+
 </head>
 <body class="admin-page-bg">
     <header class="site-header">
@@ -1080,11 +1133,23 @@ body.dark #mfaStatus,body.dark #mfaSetupBox,body.dark #mfaDisableBox,body.dark #
             <div id="pendingAdminNotice" style="margin-top:.8rem;"></div>
         </div>
 
-        <div class="card" id="inviteAdminSection">
-            <div class="card-title"><i class="fas fa-envelope"></i> Invite Admin</div>
-            <p style="color:var(--text-muted);font-size:.85rem;">The Owner sends an invitation. The invited person creates their own Admin username and password.</p>
-            <div style="display:flex;gap:.6rem;"><input id="inviteEmail" type="email" placeholder="admin@example.com" style="flex:1"><button class="btn btn-primary" onclick="inviteAdmin()">Send Invitation</button></div>
-            <div id="inviteResult" style="margin-top:.7rem;color:var(--text-muted);font-size:.85rem;"></div>
+        <div class="card invite-admin-card" id="inviteAdminSection">
+            <div class="invite-admin-heading">
+                <div class="invite-admin-logo"><img src="/icons/icon-512.png" alt="Manlung Recovery"></div>
+                <div>
+                    <div class="card-title"><i class="fas fa-user-plus"></i> Invite a new Admin</div>
+                    <p>Send a secure, branded invitation. The invited person creates their own login details.</p>
+                </div>
+            </div>
+            <div class="invite-admin-form">
+                <label for="inviteEmail">Admin email address</label>
+                <div class="invite-admin-controls">
+                    <input id="inviteEmail" type="email" autocomplete="email" placeholder="name@example.com" required>
+                    <button class="btn btn-primary" id="sendAdminInviteButton" type="button" onclick="inviteAdmin()"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send invitation</button>
+                </div>
+            </div>
+            <div class="invite-admin-security"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>Invitation links expire after 48 hours. New Admin accounts remain pending until you approve them.</span></div>
+            <div id="inviteResult" class="invite-admin-result" aria-live="polite"></div>
         </div>
 
         <div class="card" id="currentAdminsSection">
@@ -1177,10 +1242,81 @@ body.dark #mfaStatus,body.dark #mfaSetupBox,body.dark #mfaDisableBox,body.dark #
         }
 
         async function inviteAdmin() {
-            const email=document.getElementById('inviteEmail').value.trim(); const out=document.getElementById('inviteResult');
-            if(!email){out.textContent='Enter an email.';return;} out.textContent='Sending…';
-            const res=await fetch('/api/owner/invitations',{method:'POST',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify({email})});
-            const d=await res.json(); if(d.success){out.innerHTML=d.emailSent?'Invitation email sent.':`Email provider is not configured. Secure invitation link: <a href="${d.invitation.link}" target="_blank">Open invitation</a>`;document.getElementById('inviteEmail').value='';}else out.textContent=d.error||'Could not send invitation';
+            const input = document.getElementById('inviteEmail');
+            const button = document.getElementById('sendAdminInviteButton');
+            const out = document.getElementById('inviteResult');
+            const email = input.value.trim();
+
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                return;
+            }
+
+            out.replaceChildren();
+            out.className = 'invite-admin-result is-loading';
+            out.textContent = 'Preparing secure invitation…';
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Sending…';
+
+            try {
+                const res = await fetch('/api/owner/invitations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Could not send invitation.');
+
+                out.replaceChildren();
+                out.className = 'invite-admin-result ' + (data.emailSent ? 'is-success' : 'is-warning');
+
+                const icon = document.createElement('i');
+                icon.className = data.emailSent ? 'fas fa-circle-check' : 'fas fa-link';
+                icon.setAttribute('aria-hidden', 'true');
+
+                const message = document.createElement('div');
+                const heading = document.createElement('strong');
+                heading.textContent = data.emailSent ? 'Invitation email sent' : 'Invitation created';
+                const detail = document.createElement('span');
+                detail.textContent = data.emailSent
+                    ? 'A branded invitation has been sent to ' + email + '. It expires in 48 hours.'
+                    : 'Email delivery is not configured. Copy the secure link below and share it directly.';
+                message.append(heading, detail);
+                out.append(icon, message);
+
+                if (!data.emailSent && data.invitation && data.invitation.link) {
+                    const actions = document.createElement('div');
+                    actions.className = 'invite-admin-result-actions';
+                    const openLink = document.createElement('a');
+                    openLink.href = data.invitation.link;
+                    openLink.target = '_blank';
+                    openLink.rel = 'noopener noreferrer';
+                    openLink.textContent = 'Open invitation';
+                    const copyButton = document.createElement('button');
+                    copyButton.type = 'button';
+                    copyButton.className = 'btn btn-outline';
+                    copyButton.innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i> Copy link';
+                    copyButton.addEventListener('click', async () => {
+                        try {
+                            await navigator.clipboard.writeText(data.invitation.link);
+                            copyButton.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied';
+                        } catch (error) {
+                            copyButton.textContent = 'Copy unavailable';
+                        }
+                    });
+                    actions.append(openLink, copyButton);
+                    out.append(actions);
+                }
+
+                input.value = '';
+            } catch (error) {
+                out.replaceChildren();
+                out.className = 'invite-admin-result is-error';
+                out.textContent = error.message || 'Could not send invitation. Please try again.';
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send invitation';
+            }
         }
 
         async function loadAdmins() {
