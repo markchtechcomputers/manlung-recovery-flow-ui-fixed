@@ -7,6 +7,7 @@ const root = path.join(__dirname, '..');
 const frontend = fs.readFileSync(path.join(root, 'public/client/connect.html'), 'utf8');
 const routes = fs.readFileSync(path.join(root, 'routes/community.js'), 'utf8');
 const migration = fs.readFileSync(path.join(root, 'db/migrations/032_whatsapp_messaging_consistency.sql'), 'utf8');
+const avatarPlaceholder = fs.readFileSync(path.join(root, 'public/client/avatar-placeholder.svg'), 'utf8');
 
 test('unread state and notification delivery use separate cursors', () => {
   assert.match(routes, /router\.post\('\/notifications\/session'/);
@@ -97,6 +98,8 @@ test('default avatars and cache-busted profile photos cover broken-image cases',
   assert.match(frontend, /avatarVersion/);
   assert.match(frontend, /document\.addEventListener\('error',event=>/);
   assert.match(frontend, /img\.remove\(\);parent\.classList\.add\('ml-default-avatar'\)/);
+  assert.match(frontend, /avatar-placeholder\.svg/);
+  assert.match(avatarPlaceholder, /<svg/);
   assert.match(routes, /avatarUpdatedAt/);
 });
 
@@ -113,6 +116,7 @@ test('notification UI respects app setting, chat mute and browser permission', (
   assert.match(frontend, /if\(S\.notif\)/);
   assert.match(frontend, /pref\.muted===true\|\|pref\.notification_enabled===false/);
   assert.match(frontend, /Notification\.permission==='granted'/);
+  assert.match(frontend, /icon:\(c\.avatar\|\|c\.avatar_url\)\?avatarSrc/);
   assert.match(frontend, /note\.onclick=\(\)=>/);
   assert.match(frontend, /clearChatNotifications/);
 });
