@@ -54,6 +54,7 @@ revoke all on table public.recovery_chat_notification_cursors from anon, authent
 revoke all on table public.recovery_chat_group_message_receipts from anon, authenticated;
 
 alter table public.recovery_chat_group_members
+  add column if not exists updated_at timestamptz not null default now(),
   add column if not exists last_read_at timestamptz,
   add column if not exists marked_unread_at timestamptz,
   add column if not exists notification_enabled boolean not null default true,
