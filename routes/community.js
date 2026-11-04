@@ -159,7 +159,8 @@ function validateChatThemePatch(body, patch) {
   }
   if (Object.hasOwn(body, 'background_image_url')) {
     const url = String(body.background_image_url || '').trim();
-    if (url.length > 1200 || (url && !/^https:\/\//i.test(url) && !(url.startsWith('/') && !url.startsWith('//'))) return 'Background image must be a secure HTTPS URL or same-site path.';
+    const validBackgroundUrl = !url || /^https:\/\//i.test(url) || (url.startsWith('/') && !url.startsWith('//'));
+    if (url.length > 1200 || !validBackgroundUrl) return 'Background image must be a secure HTTPS URL or same-site path.';
     patch.background_image_url = url || null;
   }
   return null;
