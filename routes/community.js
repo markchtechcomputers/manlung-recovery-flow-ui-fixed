@@ -327,12 +327,34 @@ router.get('/group-inbox', async (req, res) => {
     if (membershipError) throw membershipError;
     const groupIds = (memberships || []).map(x => x.group_id);
     if (!groupIds.length) return res.json({ success: true, messages: [], preferences: [], groups: [] });
-    const { data: messages, error } = await supabase.from('recovery_chat_group_messages')
-      .select('id,group_id,sender_user_id,message,created_at,edited_at,deleted_at')
-      .in('group_id', groupIds).neq('sender_user_id', req.user.id).is('deleted_at', null)
-      .order('created_at', { ascending: false }).limit(500);
-    if (error) throw error;
-    const rows = (messages || []).reverse(), ids = rows.map(x => x.id);
+    const rowMap = new Map();
+    for (const membership of memberships || []) {
+      const gid = String(membership.group_id);
+      const cutoff = Math.max(membership.last_read_at ? new Date(membership.last_read_at).getTime() : 0,
+        membership.manual_unread_at ? new Date(membership.manual_unread_at).getTime() : 0);
+      let offset = 0;
+      while (true) {
+        let query = supabase.from('recovery_chat_group_messages')
+          .select('id,group_id,sender_user_id,message,created_at,edited_at,deleted_at')
+          .eq('group_id', gid).neq('sender_user_id', req.user.id).is('deleted_at', null)
+          .order('created_at', { ascending: true }).range(offset, offset + 499);
+        if (cutoff) query = query.gt('created_at', new Date(cutoff).toISOString());
+        const { data: page, error: pageError } = await query;
+        if (pageError) throw pageError;
+        const batch = page || [];
+        batch.forEach(row => rowMap.set(String(row.id), row));
+        if (batch.length < 500) break;
+        offset += batch.length;
+      }
+      const { data: recent, error: recentError } = await supabase.from('recovery_chat_group_messages')
+        .select('id,group_id,sender_user_id,message,created_at,edited_at,deleted_at')
+        .eq('group_id', gid).neq('sender_user_id', req.user.id).is('deleted_at', null)
+        .order('created_at', { ascending: false }).limit(100);
+      if (recentError) throw recentError;
+      (recent || []).forEach(row => rowMap.set(String(row.id), row));
+    }
+    const rows = Array.from(rowMap.values()).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    const ids = rows.map(x => x.id);
     let receipts = [];
     if (ids.length) {
       const existingResult = await supabase.from('recovery_chat_group_message_receipts')
