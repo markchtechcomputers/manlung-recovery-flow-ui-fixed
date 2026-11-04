@@ -35,3 +35,69 @@ test('group message mutations check membership and ownership', () => {
   assert.match(mutations, /edited_at: new Date\(\)\.toISOString\(\)/);
   assert.match(mutations, /deleted_at: new Date\(\)\.toISOString\(\)/);
 });
+
+
+test('notification cursors suppress history and expose only post-session messages', () => {
+  assert.match(routes, /router\.post\('\/notifications\/session'/);
+  assert.match(routes, /notificationCursor/);
+  assert.match(routes, /notification_messages/);
+  assert.match(frontend, /startNotificationSession/);
+  assert.match(frontend, /\/inbox\?device_id=/);
+  assert.doesNotMatch(frontend, /incoming=next\.filter/);
+});
+
+test('mark-as-unread uses a separate cutoff and does not rewrite old messages', () => {
+  assert.match(frontend, /function markChatUnread\(/);
+  assert.match(routes, /marked_unread_at/);
+  assert.match(routes, /body\.mark_unread === true/);
+  assert.match(routes, /Math\.max\(a, b\)/);
+  assert.match(frontend, /Marked as unread/);
+});
+
+test('direct read receipts are persisted and ticks distinguish delivered from read', () => {
+  assert.match(routes, /router\.post\('\/messages\/:memberId\/read'/);
+  assert.match(routes, /delivered_at: new Date\(\)\.toISOString\(\)/);
+  assert.match(routes, /read_at: now/);
+  assert.match(frontend, /tk\(m\[3\]\|0\)/);
+  assert.match(frontend, /s>1\?'rd'/);
+});
+
+test('per-chat preferences include mute, notifications and theme settings', () => {
+  assert.match(routes, /router\.put\('\/preferences\/:memberId'/);
+  assert.match(routes, /theme_background_image_url/);
+  assert.match(frontend, /openChatThemePicker/);
+  assert.match(frontend, /markChatUnread/);
+  assert.match(frontend, /notification_enabled/);
+});
+
+test('reactions render only persisted chips and support arbitrary Unicode emoji', () => {
+  const start = frontend.indexOf('const bub=(m,i)=>');
+  const end = frontend.indexOf('async function refreshDirectReactions', start);
+  const renderer = frontend.slice(start, end);
+  assert.ok(start >= 0 && end > start);
+  assert.match(renderer, /m\[13\]/);
+  assert.doesNotMatch(renderer, /m\[7\]&&m\[7\]\.length/);
+  assert.doesNotMatch(renderer, /ml-channel-reaction-picker/);
+  assert.match(routes, /Extended_Pictographic|\\\\p\{Emoji\}/);
+  assert.match(frontend, /inputmode="text"/);
+});
+
+test('group reactions, group themes and aggregate group receipts are supported', () => {
+  assert.match(routes, /router\.get\('\/groups\/:groupId\/preferences'/);
+  assert.match(routes, /router\.put\('\/groups\/:groupId\/preferences'/);
+  assert.match(routes, /recovery_chat_group_message_receipts/);
+  assert.match(routes, /recipient_count: activeRecipientCount/);
+  assert.match(frontend, /ml-group-theme/);
+  assert.match(frontend, /ml-group-mark-unread/);
+  assert.match(frontend, /ml-group-receipt/);
+});
+
+test('messaging migration adds notification cursors, read state and theme fields', () => {
+  const migration = fs.readFileSync(path.join(root, 'db/migrations/032_whatsapp_messaging_consistency.sql'), 'utf8');
+  assert.match(migration, /recovery_chat_notification_cursors/);
+  assert.match(migration, /recovery_chat_group_message_receipts/);
+  assert.match(migration, /marked_unread_at/);
+  assert.match(migration, /theme_background_image_url/);
+  assert.match(migration, /delivered_at timestamptz/);
+  assert.match(migration, /read_at timestamptz/);
+});
