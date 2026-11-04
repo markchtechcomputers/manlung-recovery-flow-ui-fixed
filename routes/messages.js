@@ -257,6 +257,8 @@ router.post('/:messageId/read', auth, async (req, res) => {
     }
 
     if (updated.case_id) {
+      // A read receipt implies delivery; fill only missing delivery timestamps.
+      await CaseMessage.markDeliveredForRecipient(updated.case_id, req.user.id);
       await Notification.markCaseMessagesRead(updated.case_id, req.user.id);
     }
 
