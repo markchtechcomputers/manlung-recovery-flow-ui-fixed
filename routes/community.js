@@ -420,12 +420,13 @@ router.post('/messages/:memberId/:messageId/reactions', messageLimiter, async (r
     if (messageError) throw messageError;
     if (!message) return fail(res, 404, 'Message not found in this conversation.');
 
-    const { error: deleteError } = await supabase.from('recovery_chat_message_reactions')
-      .delete().eq('message_id', id).eq('user_id', req.user.id);
-    if (deleteError) throw deleteError;
-    if (reaction) {
+    if (!reaction) {
       const { error } = await supabase.from('recovery_chat_message_reactions')
-        .insert({ message_id: id, user_id: req.user.id, reaction });
+        .delete().eq('message_id', id).eq('user_id', req.user.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from('recovery_chat_message_reactions')
+        .upsert({ message_id: id, user_id: req.user.id, reaction }, { onConflict: 'message_id,user_id' });
       if (error) throw error;
     }
     res.set('Cache-Control', 'no-store');
@@ -1355,6 +1356,10 @@ router.post('/groups/:groupId/read', messageLimiter, async (req, res) => {
     if (messageError) throw messageError;
     const ids = (messages || []).map(x => x.id);
     const now = new Date().toISOString();
+    const { data: profile, error: profileError } = await supabase.from('recovery_chat_profiles')
+      .select('read_receipts_enabled').eq('user_id', req.user.id).maybeSingle();
+    if (profileError) throw profileError;
+    const canExposeRead = profile?.read_receipts_enabled !== false;
     if (ids.length) {
       const { data: existingReceipts, error: existingError } = await supabase.from('recovery_chat_group_message_receipts')
         .select('message_id').eq('user_id', req.user.id).in('message_id', ids);
@@ -1363,11 +1368,11 @@ router.post('/groups/:groupId/read', messageLimiter, async (req, res) => {
       const missingIds = ids.filter(id => !existingIds.has(String(id)));
       if (missingIds.length) {
         const { error: insertError } = await supabase.from('recovery_chat_group_message_receipts')
-          .upsert(missingIds.map(message_id => ({ message_id, user_id: req.user.id, delivered_at: now, read_at: now })), { onConflict: 'message_id,user_id', ignoreDuplicates: true });
+          .upsert(missingIds.map(message_id => ({ message_id, user_id: req.user.id, delivered_at: now, ...(canExposeRead ? { read_at: now } : {}) })), { onConflict: 'message_id,user_id', ignoreDuplicates: true });
         if (insertError) throw insertError;
       }
       const { error } = await supabase.from('recovery_chat_group_message_receipts')
-        .update({ delivered_at: now, read_at: now }).eq('user_id', req.user.id).in('message_id', ids);
+        .update(canExposeRead ? { delivered_at: now, read_at: now } : { delivered_at: now }).eq('user_id', req.user.id).in('message_id', ids);
       if (error) throw error;
     }
     const { error: preferenceError } = await supabase.from('recovery_chat_group_members')
