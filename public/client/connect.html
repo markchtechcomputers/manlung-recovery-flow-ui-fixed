@@ -367,7 +367,7 @@ nav button span{display:grid;place-items:center;width:58px;height:30px;border-ra
 
 
 /* Per-conversation theme and safe image fallbacks */
-#chat[data-chat-theme] #msgs{background-color:var(--ml-chat-panel)!important;color:var(--ml-chat-ink)!important}
+#chat[data-chat-theme] #msgs{background-color:var(--ml-chat-panel)!important;color:var(--ml-chat-panel-ink)!important}
 #chat[data-chat-theme] .b.th{background:var(--ml-chat-incoming)!important;color:#17212b!important}
 #chat[data-chat-theme] .b.me{background:var(--ml-chat-outgoing)!important;color:var(--ml-chat-ink)!important}
 #chat[data-chat-theme] .b small{color:inherit;opacity:.72}
@@ -456,7 +456,7 @@ function imageAvatar(name,url,version,extra=''){const src=avatarSrc(url,version)
 const av=(n,x='')=>n===S.name&&S.pic?imageAvatar(n,S.pic,S.avatarVersion,x):'<div class="av '+x+' ml-default-avatar ml-profile-avatar-fallback" role="img" aria-label="'+esc(n||'Member')+' profile photo not added" style="--avatar-hue:'+ (avatarSeed(n)%360) +'deg"><span>👤</span>'+(n===S.name?'<i class="ml-profile-avatar-flag" aria-label="Profile needs an update">✎</i>':'')+'</div>';
 document.addEventListener('error',event=>{
  const img=event.target;if(!img||img.tagName!=='IMG')return;
- const parent=img.closest('.av,.ml-member-avatar,.ml-profile-preview,.ml-group-sender-avatar,.ml-call-avatar');
+ const parent=img.closest('.av,.ml-member-avatar,.ml-profile-preview,.ml-group-sender-avatar,.ml-group-header-icon,.ml-call-avatar');
  if(!parent)return;
  img.remove();parent.classList.add('ml-default-avatar');parent.setAttribute('role','img');
  if(parent.classList.contains('ml-group-sender-avatar'))parent.classList.add('ml-group-sender-fallback');
@@ -472,8 +472,8 @@ function mlReadableText(hex){const h=String(hex||'#ffffff').replace('#','');if(!
 function applyChatTheme(c){
  const host=document.getElementById('chat'),messages=document.getElementById('msgs');if(!host||!c)return;
  const key=ML_CHAT_PALETTES[c.themeKey]?c.themeKey:(S.chatTheme||'mint'),p=ML_CHAT_PALETTES[key]||ML_CHAT_PALETTES.mint;
- const panel=c.themeColor||p[0],incoming=p[1],outgoing=p[2],ink=c.themeColor?mlReadableText(panel):p[3];
- host.dataset.chatTheme=key;host.style.setProperty('--ml-chat-panel',panel);host.style.setProperty('--ml-chat-incoming',incoming);host.style.setProperty('--ml-chat-outgoing',outgoing);host.style.setProperty('--ml-chat-ink',ink);
+ const panel=c.themeColor||p[0],incoming=p[1],outgoing=p[2],ink=p[3],panelInk=mlReadableText(panel);
+ host.dataset.chatTheme=key;host.style.setProperty('--ml-chat-panel',panel);host.style.setProperty('--ml-chat-incoming',incoming);host.style.setProperty('--ml-chat-outgoing',outgoing);host.style.setProperty('--ml-chat-ink',ink);host.style.setProperty('--ml-chat-panel-ink',panelInk);
  if(messages){messages.style.backgroundImage=c.themeImage?'linear-gradient(#ffffffcc,#ffffffcc),url("'+mlCssUrl(c.themeImage)+'")':'';messages.style.backgroundSize=c.themeImage?'cover':'';messages.style.backgroundPosition=c.themeImage?'center':''}
 }
 async function saveChatPreferences(c,patch){
@@ -552,7 +552,7 @@ function ensureSpecialChats(){
 async function loadOfficialUpdates(c){
  try{const r=await apiReq('/updates');const items=Array.isArray(r.updates)?r.updates:[];c.m=items.map(x=>['th',String(x.body||x.message||x.content||x.title||''),new Date(x.created_at||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),0,null,x.author_name||'Manlung Admin',null,null,0,Date.parse(x.created_at||Date.now()),0,0,x.id]).filter(m=>m[1]);await refreshOfficialChannelReactions(c,false);if(!c.m.length)c.m=[['th','Welcome to Manlung Updates. Official news and announcements from the admins.','',0]];save()}catch(e){if(!c.m.length)c.m=[['th','Welcome to Manlung Updates. Official news and announcements from the admins.','',0]]}
 }
-function openChat(id){const special=ensureSpecialChats();let c=S.chats.find(c=>String(c.id)===String(id)||String(c.n||'').toLowerCase()===String(id).toLowerCase());if(String(id)==='102'||String(id).toLowerCase()==='saved messages')c=special.saved;if(String(id)==='101'||String(id)==='manlung-official-updates'||String(id).toLowerCase()==='manlung updates')c=special.updates;if(!c)return toast('This chat is unavailable.');if(c.groupId){if(typeof openSharedGroup==='function')return openSharedGroup(c.groupId);return toast('Group chat is loading. Please refresh and try again.')}open=c.id;purge(c);c.un=0;save();render();if(c.official||c.ch||String(c.id)==='manlung-official-updates')loadOfficialUpdates(c).then(()=>{if(String(open)===String(c.id))render()})}
+function openChat(id){const special=ensureSpecialChats();let c=S.chats.find(c=>String(c.id)===String(id)||String(c.n||'').toLowerCase()===String(id).toLowerCase());if(String(id)==='102'||String(id).toLowerCase()==='saved messages')c=special.saved;if(String(id)==='101'||String(id)==='manlung-official-updates'||String(id).toLowerCase()==='manlung updates')c=special.updates;if(!c)return toast('This chat is unavailable.');if(c.groupId){if(typeof openSharedGroup==='function')return openSharedGroup(c.groupId);return toast('Group chat is loading. Please refresh and try again.')}open=c.id;purge(c);c.un=0;clearChatNotifications(c.memberId||c.id);save();render();if(c.remote&&c.memberId)loadMsgs(c.memberId,true);if(c.official||c.ch||String(c.id)==='manlung-official-updates')loadOfficialUpdates(c).then(()=>{if(String(open)===String(c.id))render()})}
 function drawChat(){const c=S.chats.find(c=>c.id===open);const d=document.createElement('div');d.id='chat';
  if(!c)return;const readOnlyOfficial=!!(c.official||c.id==='manlung-official-updates');
  d.innerHTML=`<header><button class="backb" onclick="back()" aria-label="Back to chats">${ic(I.back)}${(u=>u?`<span class="badge">${u}</span>`:'')(S.chats.reduce((a,x)=>a+(x.id!==open?x.un:0),0))}</button>${c.remote?communityAvatar(c):sav(c.n)}<div class="grow"><div class="nm">${esc(c.n)}${window.verifiedBadge(window.chatMember(c)||c)}</div><div class="sub" id="pst">${sub()}</div></div>${c.g||c.ch?'':`<button class="ib" onclick="call('${esc(c.n)}',1)" aria-label="Video call">${ic(I.video)}</button><button class="ib" onclick="call('${esc(c.n)}',0)" aria-label="Voice call">${ic(I.phone)}</button>`}<button class="ib" onclick="pop=!pop;drawPop()" aria-label="More">${ic(I.more)}</button></header>
@@ -903,7 +903,7 @@ async function liveSync(){
   const byNotifyPeer=new Map();
   for(const row of candidates){
    const id=String(row.id||'');if(!id||window.__mlNotifiedMessageIds.has(id))continue;
-   window.__mlNotifiedMessageIds.add(id);
+   window.__mlNotifiedMessageIds.add(id);if(window.__mlNotifiedMessageIds.size>2000){const oldest=window.__mlNotifiedMessageIds.values().next().value;window.__mlNotifiedMessageIds.delete(oldest)}
    const peer=String(row.peer_id||row.sender_user_id||'');if(!peer||peer===String(open))continue;if(row.kind==='group'&&String(document.getElementById('ml-shared-group-chat')?.dataset.groupId||'')===String(row.group_id))continue;
    const isGroup=row.kind==='group',pref=isGroup?groupPrefs.get(String(row.group_id))||{}:prefs.get(peer)||{};if(pref.muted===true||pref.notification_enabled===false)continue;
    if(!byNotifyPeer.has(peer))byNotifyPeer.set(peer,[]);
