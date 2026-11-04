@@ -40,6 +40,11 @@ test('mark as unread changes a conversation boundary, not message history', () =
 });
 
 test('opening a direct conversation marks only messages newer than the read cutoff', () => {
+  const directGetStart = routes.indexOf("router.get('/messages/:memberId'");
+  const directGetEnd = routes.indexOf("router.post('/messages/:memberId/read'", directGetStart);
+  assert.ok(directGetStart >= 0 && directGetEnd > directGetStart);
+  assert.match(routes.slice(directGetStart, directGetEnd), /order\('created_at', \{ ascending: false \}\)\.limit\(100\)/);
+  assert.match(routes.slice(directGetStart, directGetEnd), /messageRows = \(data \|\| \[\]\)\.reverse\(\)/);
   assert.match(routes, /router\.post\('\/messages\/:memberId\/read'/);
   assert.match(routes, /\.gt\('created_at', new Date\(cutoff\)\.toISOString\(\)\)/);
   assert.match(routes, /read_at: now/);
