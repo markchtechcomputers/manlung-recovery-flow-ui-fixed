@@ -148,7 +148,7 @@
   "routes": [
     {
       "src": "^/verification/([^/]+)/?$",
-      "dest": "/public/selfie.html?id=$1",
+      "dest": "/selfie.html?id=$1",
       "continue": false
     },
     {
