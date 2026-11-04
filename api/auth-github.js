@@ -48,7 +48,7 @@ app.get('/callback',async(req,res)=>{
   const state=String(req.query.state||'');
   const expected=readCookie(req,STATE_COOKIE);
   clearStateCookie(res);
-  if(!state||!expected||!crypto.timingSafeEqual(Buffer.from(state),Buffer.from(expected)))return res.redirect('/login.html?oauth=github-error');
+  if(!state||!expected||state.length!==expected.length||!crypto.timingSafeEqual(Buffer.from(state),Buffer.from(expected)))return res.redirect('/login.html?oauth=github-error');
   if(req.query.error)return res.redirect('/login.html?oauth=github-cancelled');
   const code=String(req.query.code||'');
   if(!code)return res.redirect('/login.html?oauth=github-error');
@@ -71,7 +71,11 @@ app.get('/callback',async(req,res)=>{
       if(await User.findByUsername(username))username=(username+'-'+String(userRes.data.id)).slice(0,80);
       client=await User.create({username,email,phone:null,password:crypto.randomBytes(32).toString('base64url') + 'A!1',role:'client'});
     }
-    callbackPage(res,signToken(client));
+    // Match the password and Google sign-in policy: issue a token against the
+    // newly persisted session version so the first dashboard check succeeds.
+    const session=await User.bumpSessionVersion(client.id);
+    if(!session)return res.redirect('/login.html?oauth=github-error');
+    callbackPage(res,signToken({...client,session_version:session.session_version}));
   }catch(e){
     console.error('GitHub OAuth error:',e.response?.data||e.message);
     res.redirect('/login.html?oauth=github-error');
