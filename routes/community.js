@@ -1236,22 +1236,94 @@ router.get('/groups/:groupId/messages', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
-    const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups').select('id,slug,approval_status').eq('id', gid).maybeSingle();
+    const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups')
+      .select('id,slug,approval_status').eq('id', gid).maybeSingle();
     if (targetError) throw targetError;
-    if (!targetGroup || targetGroup.approval_status!=='approved') return fail(res, 404, 'Approved group not found.');
+    if (!targetGroup || targetGroup.approval_status !== 'approved') return fail(res, 404, 'Approved group not found.');
     if (targetGroup.slug === 'manlung-team' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Team is available to admins and the owner only.');
-    if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
-    // Fetch the newest 100 messages first, then return them oldest-to-newest for the chat UI.
-    // An ascending query with limit(100) would permanently hide every message after the first 100.
-    const { data, error } = await supabase.from('recovery_chat_group_messages')
-      .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at')
-      .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+    const isMember = await requireGroupMember(gid, req.user.id);
+    if (!isAdmin(req.user) && !isMember) return fail(res, 403, 'You are not a member of this group.');
+
+    const [{ data, error }, { data: members, error: memberError }] = await Promise.all([
+      supabase.from('recovery_chat_group_messages')
+        .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at')
+        .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(100),
+      supabase.from('recovery_chat_group_members').select('user_id')
+        .eq('group_id', gid).or('archived.is.null,archived.eq.false')
+    ]);
     if (error) throw error;
+    if (memberError) throw memberError;
+    const rows = (data || []).reverse();
+    const now = new Date().toISOString();
+    const receivedIds = rows.filter(x => String(x.sender_user_id) !== String(req.user.id)).map(x => x.id);
+    if (isMember && receivedIds.length) {
+      const { data: existing, error: receiptReadError } = await supabase.from('recovery_chat_group_message_receipts')
+        .select('message_id,delivered_at,read_at').eq('user_id', req.user.id).in('message_id', receivedIds);
+      if (receiptReadError) throw receiptReadError;
+      const seen = new Set((existing || []).map(x => String(x.message_id)));
+      const missing = receivedIds.filter(id => !seen.has(String(id)));
+      if (missing.length) {
+        const { error: insertError } = await supabase.from('recovery_chat_group_message_receipts')
+          .insert(missing.map(message_id => ({ message_id, user_id: req.user.id, delivered_at: now })));
+        if (insertError) throw insertError;
+      }
+      const undelivered = (existing || []).filter(x => !x.delivered_at).map(x => x.message_id);
+      if (undelivered.length) {
+        const { error: deliveryError } = await supabase.from('recovery_chat_group_message_receipts')
+          .update({ delivered_at: now }).eq('user_id', req.user.id).in('message_id', undelivered);
+        if (deliveryError) throw deliveryError;
+      }
+    }
+
+    const ownIds = rows.filter(x => String(x.sender_user_id) === String(req.user.id)).map(x => x.id);
+    const [{ data: receipts, error: receiptError }] = ownIds.length ? await Promise.all([
+      supabase.from('recovery_chat_group_message_receipts')
+        .select('message_id,user_id,delivered_at,read_at').in('message_id', ownIds)
+    ]) : [{ data: [], error: null }];
+    if (receiptError) throw receiptError;
+    const activeRecipientCount = Math.max(0, (members || []).filter(x => String(x.user_id) !== String(req.user.id)).length);
+    const byMessage = new Map();
+    for (const receipt of receipts || []) {
+      const key = String(receipt.message_id);
+      if (!byMessage.has(key)) byMessage.set(key, { delivered: 0, read: 0 });
+      const value = byMessage.get(key);
+      if (receipt.delivered_at) value.delivered++;
+      if (receipt.read_at) value.read++;
+    }
+    const messages = rows.map(message => {
+      if (String(message.sender_user_id) !== String(req.user.id)) return message;
+      const value = byMessage.get(String(message.id)) || { delivered: 0, read: 0 };
+      const status = activeRecipientCount > 0 && value.read >= activeRecipientCount ? 2 : value.delivered > 0 ? 1 : 0;
+      return { ...message, receipt_summary: {
+        delivered_count: value.delivered, read_count: value.read,
+        recipient_count: activeRecipientCount, status
+      }};
+    });
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages: (data || []).reverse() });
+    return res.json({ success: true, messages });
   } catch (error) { return handleDbError(res, error, 'Group message list error:'); }
 });
 
+router.post('/groups/:groupId/read', messageLimiter, async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || '');
+    if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to mark messages read.');
+    const { data: messages, error: messageError } = await supabase.from('recovery_chat_group_messages')
+      .select('id').eq('group_id', gid).neq('sender_user_id', req.user.id)
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+    if (messageError) throw messageError;
+    const ids = (messages || []).map(x => x.id);
+    if (ids.length) {
+      const now = new Date().toISOString();
+      const { error } = await supabase.from('recovery_chat_group_message_receipts')
+        .update({ delivered_at: now, read_at: now }).eq('user_id', req.user.id).in('message_id', ids);
+      if (error) throw error;
+    }
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, read_count: ids.length });
+  } catch (error) { return handleDbError(res, error, 'Group read receipt error:'); }
+});
 router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
