@@ -50,6 +50,78 @@ async function blockedEitherWay(a, b) {
   if (error && error.code !== '42P01') throw error;
   return Boolean(data?.length);
 }
+async function attachDirectReceiptState(messages, currentUserId, markDelivered) {
+  const rows = Array.isArray(messages) ? messages : [];
+  const ids = rows.map(x => x.id).filter(Boolean);
+  if (!ids.length) return rows.map(x => ({ ...x, delivered_at: null, read_at: null }));
+
+  const incomingIds = markDelivered
+    ? rows.filter(x => String(x.recipient_user_id) === String(currentUserId)).map(x => x.id)
+    : [];
+  if (incomingIds.length) {
+    const { data: existing, error: existingError } = await supabase
+      .from('recovery_chat_message_receipts')
+      .select('message_id,delivered_at,read_at')
+      .eq('user_id', currentUserId).in('message_id', incomingIds);
+    if (existingError) throw existingError;
+    const byId = new Map((existing || []).map(x => [String(x.message_id), x]));
+    const now = new Date().toISOString();
+    const missing = incomingIds.filter(id => !byId.has(String(id))).map(message_id => ({
+      message_id, user_id: currentUserId, delivered_at: now
+    }));
+    if (missing.length) {
+      const { error } = await supabase.from('recovery_chat_message_receipts').insert(missing);
+      if (error) throw error;
+    }
+    const undelivered = incomingIds.filter(id => byId.has(String(id)) && !byId.get(String(id)).delivered_at);
+    if (undelivered.length) {
+      const { error } = await supabase.from('recovery_chat_message_receipts')
+        .update({ delivered_at: now }).eq('user_id', currentUserId)
+        .in('message_id', undelivered).is('delivered_at', null);
+      if (error) throw error;
+    }
+  }
+
+  const { data: receipts, error: receiptError } = await supabase
+    .from('recovery_chat_message_receipts')
+    .select('message_id,user_id,delivered_at,read_at').in('message_id', ids);
+  if (receiptError) throw receiptError;
+  const byMessage = new Map((receipts || []).map(x => [String(x.message_id), x]));
+  return rows.map(row => {
+    const receipt = byMessage.get(String(row.id));
+    return { ...row, delivered_at: receipt?.delivered_at || null, read_at: receipt?.read_at || null };
+  });
+}
+
+async function saveDirectPreference(userId, otherUserId, patch) {
+  const { data, error } = await supabase.from('recovery_chat_preferences')
+    .upsert({ user_id: userId, other_user_id: otherUserId, ...patch, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id,other_user_id' })
+    .select('user_id,other_user_id,archived,muted,pinned,starred,manual_unread,manual_unread_at,chat_theme_id,background_color,background_image_url')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+function validateChatThemePatch(body, patch) {
+  if (Object.hasOwn(body, 'chat_theme_id')) {
+    const theme = String(body.chat_theme_id || '');
+    if (!['mint','classic','ocean','lavender','rose','forest','custom'].includes(theme)) return 'Choose a valid chat theme.';
+    patch.chat_theme_id = theme;
+  }
+  if (Object.hasOwn(body, 'background_color')) {
+    const color = body.background_color == null || body.background_color === '' ? null : String(body.background_color);
+    if (color && !/^#[0-9a-f]{6}$/i.test(color)) return 'Background color must be a six-digit hex color.';
+    patch.background_color = color;
+  }
+  if (Object.hasOwn(body, 'background_image_url')) {
+    const url = String(body.background_image_url || '').trim();
+    if (url.length > 1200 || (url && !/^https:\/\//i.test(url) && !(url.startsWith('/') && !url.startsWith('//'))) return 'Background image must be a secure HTTPS URL or same-site path.';
+    patch.background_image_url = url || null;
+  }
+  return null;
+}
+
 async function requireGroupMember(groupId, userId) {
   const { data, error } = await supabase.from('recovery_chat_group_members').select('group_id')
     .eq('group_id', groupId).eq('user_id', userId).maybeSingle();
@@ -184,54 +256,185 @@ router.post('/voice/upload-url', messageLimiter, async (req, res) => {
 router.get('/inbox', async (req, res) => {
   try {
     const { data, error } = await supabase.from('recovery_community_messages')
-      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id')
       .or('sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + req.user.id)
       .is('deleted_at', null).order('created_at', { ascending: false }).limit(500);
     if (error) throw error;
+    const messages = await attachDirectReceiptState((data || []).reverse(), req.user.id, true);
+    const peers = Array.from(new Set(messages.map(row => String(row.sender_user_id) === String(req.user.id)
+      ? String(row.recipient_user_id) : String(row.sender_user_id)).filter(id => id && id !== String(req.user.id))));
+    let preferences = [];
+    if (peers.length) {
+      const result = await supabase.from('recovery_chat_preferences')
+        .select('other_user_id,archived,muted,pinned,starred,manual_unread,manual_unread_at,chat_theme_id,background_color,background_image_url')
+        .eq('user_id', req.user.id).in('other_user_id', peers);
+      if (result.error) throw result.error;
+      preferences = result.data || [];
+    }
     res.set('Cache-Control', 'no-store');
-    return res.json({ success: true, messages: (data || []).reverse() });
+    return res.json({ success: true, messages, preferences });
   } catch (error) { return handleDbError(res, error, 'Community inbox error:'); }
 });
 
 router.get('/messages/:memberId', async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
-    if (!validId(other)) return fail(res, 400, 'Invalid member ID.');
-    if (other === String(req.user.id)) return fail(res, 400, 'Choose another member.');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid other member.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
     const { data, error } = await supabase.from('recovery_community_messages')
       .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
-      .is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
-    const messages = await Promise.all((data || []).map(async row => {
+    const withReceipts = await attachDirectReceiptState((data || []).reverse(), req.user.id, true);
+    const messages = await Promise.all(withReceipts.map(async row => {
       const raw = String(row.message || '');
       if (!raw.startsWith('VOICE::')) return row;
       const parts = raw.slice(7).split('|');
       const path = String(parts[0] || '');
       const duration = Math.max(1, Math.min(3600, Number.parseInt(parts[1] || '1', 10) || 1));
       const mime = String(parts[2] || 'audio/webm');
-      // Only issue signed links for voice objects owned by the original sender.
       if (!path.startsWith(String(row.sender_user_id) + '/') || path.includes('..') || path.startsWith('/')) return { ...row, message: '[Voice message unavailable]' };
       const { data: signed, error: signedError } = await supabase.storage.from(VOICE_MEDIA_BUCKET).createSignedUrl(path, 3600);
       if (signedError || !signed?.signedUrl) return { ...row, message: '[Voice message unavailable]' };
       return { ...row, message: '', attachment: { isVoice: true, url: signed.signedUrl, duration, mime } };
     }));
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages });
+    return res.json({ success: true, messages });
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
 });
 
-
- // Direct-message reactions: counts and individual member reactions are visible to both participants.
- router.get('/messages/:memberId/reactions', async (req, res) => {
+router.post('/messages/:memberId/read', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid other member.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
+    const { data: pref, error: prefError } = await supabase.from('recovery_chat_preferences')
+      .select('manual_unread_at').eq('user_id', req.user.id).eq('other_user_id', other).maybeSingle();
+    if (prefError) throw prefError;
+    let query = supabase.from('recovery_community_messages').select('id,created_at')
+      .eq('sender_user_id', other).eq('recipient_user_id', req.user.id).is('deleted_at', null)
+      .order('created_at', { ascending: true }).limit(500);
+    const { data: incoming, error } = await query;
+    if (error) throw error;
+    const cutoff = pref?.manual_unread_at ? new Date(pref.manual_unread_at).getTime() : 0;
+    const eligible = (incoming || []).filter(row => new Date(row.created_at).getTime() > cutoff);
+    const ids = eligible.map(row => row.id);
+    const now = new Date().toISOString();
+    if (ids.length) {
+      const { data: existing, error: receiptError } = await supabase.from('recovery_chat_message_receipts')
+        .select('message_id').eq('user_id', req.user.id).in('message_id', ids);
+      if (receiptError) throw receiptError;
+      const existingIds = new Set((existing || []).map(row => String(row.message_id)));
+      const missing = ids.filter(id => !existingIds.has(String(id))).map(message_id => ({
+        message_id, user_id: req.user.id, delivered_at: now, read_at: now
+      }));
+      if (missing.length) {
+        const { error: insertError } = await supabase.from('recovery_chat_message_receipts').insert(missing);
+        if (insertError) throw insertError;
+      }
+      const existingUnread = ids.filter(id => existingIds.has(String(id)));
+      if (existingUnread.length) {
+        const { error: updateError } = await supabase.from('recovery_chat_message_receipts')
+          .update({ delivered_at: now, read_at: now }).eq('user_id', req.user.id)
+          .in('message_id', existingUnread).is('read_at', null);
+        if (updateError) throw updateError;
+      }
+    }
+    await saveDirectPreference(req.user.id, other, { manual_unread: false, manual_unread_at: null });
     res.set('Cache-Control', 'no-store');
-    return res.json({ success: true, reactions: [] });
-  });
+    return res.json({ success: true, readAt: now, messageIds: ids });
+  } catch (error) { return handleDbError(res, error, 'Direct message read receipt error:'); }
+});
+
+router.post('/messages/:memberId/unread', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid other member.');
+    const now = new Date().toISOString();
+    const preference = await saveDirectPreference(req.user.id, other, { manual_unread: true, manual_unread_at: now });
+    return res.json({ success: true, preference, unread: true });
+  } catch (error) { return handleDbError(res, error, 'Direct message unread marker error:'); }
+});
+
+router.get('/messages/:memberId/preferences', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid other member.');
+    const { data, error } = await supabase.from('recovery_chat_preferences')
+      .select('other_user_id,archived,muted,pinned,starred,manual_unread,manual_unread_at,chat_theme_id,background_color,background_image_url')
+      .eq('user_id', req.user.id).eq('other_user_id', other).maybeSingle();
+    if (error) throw error;
+    return res.json({ success: true, preference: data || { other_user_id: other, manual_unread: false, chat_theme_id: 'mint' } });
+  } catch (error) { return handleDbError(res, error, 'Direct chat preferences read error:'); }
+});
+
+router.patch('/messages/:memberId/preferences', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || ''), body = req.body || {}, patch = {};
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid other member.');
+    for (const key of ['archived','muted','pinned','starred']) {
+      if (Object.hasOwn(body, key)) {
+        if (typeof body[key] !== 'boolean') return fail(res, 400, key + ' must be true or false.');
+        patch[key] = body[key];
+      }
+    }
+    const themeError = validateChatThemePatch(body, patch);
+    if (themeError) return fail(res, 400, themeError);
+    const preference = await saveDirectPreference(req.user.id, other, patch);
+    return res.json({ success: true, preference });
+  } catch (error) { return handleDbError(res, error, 'Direct chat preferences update error:'); }
+});
+
+// Direct-message reactions are visible to both participants and are one-per-user/message.
+router.get('/messages/:memberId/reactions', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid other member.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
+    const { data: messages, error: messageError } = await supabase.from('recovery_community_messages')
+      .select('id').or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+    if (messageError) throw messageError;
+    const ids = (messages || []).map(x => x.id);
+    if (!ids.length) return res.json({ success: true, reactions: [] });
+    const { data, error } = await supabase.from('recovery_chat_message_reactions')
+      .select('message_id,user_id,reaction,created_at').in('message_id', ids).order('created_at', { ascending: true });
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, reactions: data || [] });
+  } catch (error) { return handleDbError(res, error, 'Direct message reactions list error:'); }
+});
 
 router.post('/messages/:memberId/:messageId/reactions', messageLimiter, async (req, res) => {
-    return fail(res, 403, 'Reactions are available in official channels only.');
-  });
+  try {
+    const other = String(req.params.memberId || ''), id = String(req.params.messageId || '');
+    const reaction = cleanText(req.body?.reaction, 16);
+    if (!validId(other) || !validId(id) || !reaction) return fail(res, 400, 'Choose one emoji reaction.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
+    const { data: message, error: messageError } = await supabase.from('recovery_community_messages')
+      .select('id').eq('id', id)
+      .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
+      .is('deleted_at', null).maybeSingle();
+    if (messageError) throw messageError;
+    if (!message) return fail(res, 404, 'Message not found in this conversation.');
+    const { data: existing, error: existingError } = await supabase.from('recovery_chat_message_reactions')
+      .select('reaction').eq('message_id', id).eq('user_id', req.user.id).maybeSingle();
+    if (existingError) throw existingError;
+    if (existing?.reaction === reaction) {
+      const { error } = await supabase.from('recovery_chat_message_reactions')
+        .delete().eq('message_id', id).eq('user_id', req.user.id);
+      if (error) throw error;
+      return res.json({ success: true, reacted: false, reaction: null });
+    }
+    const { data, error } = await supabase.from('recovery_chat_message_reactions')
+      .upsert({ message_id: id, user_id: req.user.id, reaction }, { onConflict: 'message_id,user_id' })
+      .select('message_id,user_id,reaction,created_at').single();
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.status(201).json({ success: true, reacted: true, reaction: data });
+  } catch (error) { return handleDbError(res, error, 'Direct message reaction update error:'); }
+});
 
 router.patch('/messages/:memberId/:messageId', messageLimiter, async (req, res) => {
   try {
