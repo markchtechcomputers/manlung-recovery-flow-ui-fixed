@@ -396,7 +396,7 @@ router.get('/messages/:memberId/preferences', async (req, res) => {
     const other = String(req.params.memberId || '');
     if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid other member.');
     const { data, error } = await supabase.from('recovery_chat_preferences')
-      .select('other_user_id,archived,muted,pinned,starred,manual_unread,manual_unread_at,chat_theme_id,background_color,background_image_url')
+      .select('other_user_id,archived,muted,pinned,starred,manual_unread,manual_unread_at,last_read_at,chat_theme_id,background_color,background_image_url')
       .eq('user_id', req.user.id).eq('other_user_id', other).maybeSingle();
     if (error) throw error;
     return res.json({ success: true, preference: data || { other_user_id: other, manual_unread: false, chat_theme_id: 'mint' } });
@@ -1491,7 +1491,7 @@ router.get('/groups/:groupId/preferences', async (req, res) => {
     const gid = String(req.params.groupId || '');
     if (!validId(gid) || !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Group membership is required.');
     const { data, error } = await supabase.from('recovery_chat_group_members')
-      .select('group_id,muted,archived,manual_unread,manual_unread_at,chat_theme_id,background_color,background_image_url')
+      .select('group_id,muted,archived,manual_unread,manual_unread_at,last_read_at,chat_theme_id,background_color,background_image_url')
       .eq('group_id', gid).eq('user_id', req.user.id).maybeSingle();
     if (error) throw error;
     return res.json({ success: true, preference: data || { group_id: gid, chat_theme_id: 'mint' } });
