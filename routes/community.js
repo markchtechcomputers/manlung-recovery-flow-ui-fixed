@@ -1347,7 +1347,7 @@ router.get('/groups/:groupId/messages', async (req, res) => {
     const [{ data, error }, { data: members, error: memberError }] = await Promise.all([
       supabase.from('recovery_chat_group_messages')
         .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at')
-        .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(100),
+        .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(500),
       supabase.from('recovery_chat_group_members').select('user_id')
         .eq('group_id', gid).or('archived.is.null,archived.eq.false')
     ]);
@@ -1411,9 +1411,16 @@ router.post('/groups/:groupId/read', messageLimiter, async (req, res) => {
     const gid = String(req.params.groupId || '');
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
     if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to mark messages read.');
-    const { data: messages, error: messageError } = await supabase.from('recovery_chat_group_messages')
+    const { data: preference, error: preferenceReadError } = await supabase.from('recovery_chat_group_members')
+      .select('last_read_at,marked_unread_at').eq('group_id', gid).eq('user_id', req.user.id).maybeSingle();
+    if (preferenceReadError) throw preferenceReadError;
+    const cutoff = [preference?.last_read_at, preference?.marked_unread_at].filter(Boolean)
+      .map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
+    let messageQuery = supabase.from('recovery_chat_group_messages')
       .select('id').eq('group_id', gid).neq('sender_user_id', req.user.id)
-      .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(500);
+    if (cutoff) messageQuery = messageQuery.gt('created_at', new Date(cutoff).toISOString());
+    const { data: messages, error: messageError } = await messageQuery;
     if (messageError) throw messageError;
     const ids = (messages || []).map(x => x.id);
     const now = new Date().toISOString();
