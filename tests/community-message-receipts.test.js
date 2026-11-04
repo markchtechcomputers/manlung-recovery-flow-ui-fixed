@@ -26,7 +26,7 @@ test('direct chat uses server receipt states for single, double and blue double 
   assert.match(frontend, /x\.read_at\?2:\(x\.delivered_at\?1:0\)/);
   assert.match(frontend, /tk\(S\.receipts\?m\[3\]:Math\.min\(m\[3\]\|0,1\)\)/);
   assert.match(frontend, /\.tk\.rd\{color:#34b7f1\}/);
-  assert.match(frontend, /\/messages\/\+encodeURIComponent\(id\)\+'\/read'/);
+  assert.match(frontend, /apiReq\('\/messages\/'\+encodeURIComponent\(id\)\+'\/read'/);
 });
 
 test('active direct conversations mark incoming messages read', () => {
