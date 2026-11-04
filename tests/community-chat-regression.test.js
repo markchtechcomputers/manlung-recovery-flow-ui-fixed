@@ -104,6 +104,7 @@ test('group delivery/read receipts follow the documented active-recipient aggreg
   assert.match(routes, /recovery_chat_group_message_receipts/);
   assert.match(routes, /recipient_count: activeRecipientCount/);
   assert.match(routes, /status = activeRecipientCount > 0 && value\.read >= activeRecipientCount \? 2 : value\.delivered > 0 \? 1 : 0/);
+  assert.match(routes, /canExposeRead = profile\?\.read_receipts_enabled !== false/);
   assert.match(frontend, /ml-group-receipt/);
   assert.match(frontend, /\/groups\/.*\/read/);
 });
