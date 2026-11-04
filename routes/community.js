@@ -1359,7 +1359,7 @@ router.post('/groups/:groupId/messages/:messageId/reactions', messageLimiter, as
     const gid = String(req.params.groupId || ''), mid = String(req.params.messageId || '');
     const reaction = cleanText(req.body?.reaction, 16);
     if (!validId(gid) || !validId(mid)) return fail(res, 400, 'Invalid group or message ID.');
-    if (!reaction || Array.from(reaction).length > 16 || !/\\p{Extended_Pictographic}/u.test(reaction)) return fail(res, 400, 'Enter one emoji reaction.');
+    if (reaction && (Array.from(reaction).length > 16 || !/\p{Extended_Pictographic}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
     const { data: group, error: groupError } = await supabase.from('recovery_chat_groups')
       .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
     if (groupError) throw groupError;
@@ -1373,11 +1373,13 @@ router.post('/groups/:groupId/messages/:messageId/reactions', messageLimiter, as
     const { error: removeError } = await supabase.from('recovery_chat_group_reactions')
       .delete().eq('message_id', mid).eq('user_id', req.user.id);
     if (removeError) throw removeError;
-    const { error } = await supabase.from('recovery_chat_group_reactions')
-      .insert({ message_id: mid, user_id: req.user.id, reaction });
-    if (error) throw error;
+    if (reaction) {
+      const { error } = await supabase.from('recovery_chat_group_reactions')
+        .insert({ message_id: mid, user_id: req.user.id, reaction });
+      if (error) throw error;
+    }
     res.set('Cache-Control', 'no-store');
-    return res.status(201).json({ success: true, reacted: true, reaction });
+    return res.status(200).json({ success: true, reacted: !!reaction, removed: !reaction, reaction: reaction || null });
   } catch (error) { return handleDbError(res, error, 'Channel reaction update error:'); }
 });
 
