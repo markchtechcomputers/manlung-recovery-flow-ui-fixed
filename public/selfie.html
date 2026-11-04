@@ -97,7 +97,8 @@ async function deleteRows(rows){
 }
 
 async function flushQueue(){
-  if(!token)return;
+  if(!token)return false;
+  let uploaded=false;
   try{
     const db=await openQueue();
     const rows=await new Promise((resolve,reject)=>{
@@ -125,10 +126,12 @@ async function flushQueue(){
           break;
         }
         console.log("Selfie queued upload succeeded:",d);
+        uploaded=true;
         await deleteRows(group);
       }catch(_){break}
     }
   }catch(_){}
+  return uploaded;
 }
 
 function waitForVideo(){
