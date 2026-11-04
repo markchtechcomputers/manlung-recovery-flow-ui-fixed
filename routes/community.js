@@ -448,7 +448,7 @@ router.post('/messages/:memberId/unread', async (req, res) => {
     if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid other member.');
     const now = new Date().toISOString();
     const preference = await saveDirectPreference(req.user.id, other, { manual_unread: true, manual_unread_at: now });
-    return res.json({ success: true, preference, unread: true });
+    return res.json({ success: true, preference, unread: true, manualUnreadAt: now });
   } catch (error) { return handleDbError(res, error, 'Direct message unread marker error:'); }
 });
 
@@ -1563,7 +1563,7 @@ router.patch('/groups/:groupId/preferences', async (req, res) => {
       .select('group_id,muted,archived,chat_theme_id,background_color,background_image_url').maybeSingle();
     if (error) throw error;
     if (!data) return fail(res, 404, 'Group membership not found.');
-    return res.json({ success: true, preference: data });
+    return res.json({ success: true, preference: data, manualUnreadAt: now });
   } catch (error) { return handleDbError(res, error, 'Group chat preferences update error:'); }
 });
 
