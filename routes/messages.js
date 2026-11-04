@@ -116,6 +116,11 @@ router.get('/case/:caseId', auth, async (req, res) => {
       });
     }
 
+    await CaseMessage.markDeliveredForRecipient(
+      req.params.caseId,
+      req.user.id
+    );
+
     const messages =
       await CaseMessage.listForCase(
         req.params.caseId
@@ -245,6 +250,10 @@ router.post('/:messageId/read', auth, async (req, res) => {
         success: false,
         error: 'Message not found.',
       });
+    }
+
+    if (updated.case_id) {
+      await Notification.markCaseMessagesRead(updated.case_id, req.user.id);
     }
 
     res.json({
