@@ -40,7 +40,7 @@
     <main class="container oauth-callback-wrap">
         <section class="card oauth-callback-card" aria-live="polite">
             <h2 id="title">Signing you in securely…</h2>
-            <p id="status" style="color:var(--text-muted);">Verifying your GitHub account securely.</p>
+            <p id="status" style="color:var(--text-muted);">Verifying your social account securely.</p>
             <a id="backLink" class="btn btn-primary oauth-back" href="/login.html" style="display:none;">Back to Sign In</a>
         </section>
     </main>
@@ -62,7 +62,7 @@
                 return;
             }
 
-            title.textContent = 'GitHub sign-in failed';
+            title.textContent = 'Social sign-in failed';
             status.textContent = message || 'Please return to sign in and try again.';
             status.classList.add('oauth-error');
             backLink.href = '/login.html';
