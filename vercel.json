@@ -2,57 +2,201 @@
   "version": 2,
   "cleanUrls": true,
   "builds": [
-    { "src": "api/index.js", "use": "@vercel/node" },
-    { "src": "api/config-public.js", "use": "@vercel/node" },
-    { "src": "api/ai.js", "use": "@vercel/node" },
-    { "src": "api/auth-github.js", "use": "@vercel/node" },
-    { "src": "api/auth-google.js", "use": "@vercel/node" },
-    { "src": "api/ai-live.js", "use": "@vercel/node" },
-    { "src": "public/**", "use": "@vercel/static" }
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/config-public.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/ai.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/auth-github.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/auth-google.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/ai-live.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    }
   ],
   "headers": [
-    { "source": "/css/(.*\\.css)", "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }] },
-    { "source": "/js/(.*\\.js)", "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }] },
-    { "source": "/manifest.webmanifest", "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }] },
-    { "source": "/service-worker.js", "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }] },
-    { "source": "/(.*\\.html)", "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }] },
-    { "source": "/", "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }] },
+    {
+      "source": "/css/(.*\\.css)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/js/(.*\\.js)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/service-worker.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(self), microphone=(self), geolocation=(self), payment=()" },
-        { "key": "X-Permitted-Cross-Domain-Policies", "value": "none" },
-        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups" },
-        { "key": "Cross-Origin-Resource-Policy", "value": "cross-origin" },
-        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://accounts.google.com https://js.paystack.co https://unpkg.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com https://accounts.google.com; font-src 'self' https://cdnjs.cloudflare.com data:; img-src 'self' data: blob: https:; media-src 'self' https: blob:; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://*.supabase.co https://api.paystack.co https://challenges.cloudflare.com wss: https:; frame-src 'self' https://js.paystack.co https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com https://challenges.cloudflare.com; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self), microphone=(self), geolocation=(self), payment=()"
+        },
+        {
+          "key": "X-Permitted-Cross-Domain-Policies",
+          "value": "none"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        },
+        {
+          "key": "Cross-Origin-Resource-Policy",
+          "value": "cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://accounts.google.com https://js.paystack.co https://unpkg.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com https://accounts.google.com; font-src 'self' https://cdnjs.cloudflare.com data:; img-src 'self' data: blob: https:; media-src 'self' https: blob:; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://*.supabase.co https://api.paystack.co https://challenges.cloudflare.com wss: https:; frame-src 'self' https://js.paystack.co https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com https://challenges.cloudflare.com; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests"
+        }
       ]
     },
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, proxy-revalidate"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        },
+        {
+          "key": "Expires",
+          "value": "0"
+        }
       ]
     }
   ],
   "routes": [
-    { "src": "/api/auth/github(?:/(.*))?", "dest": "/api/auth-github.js" },
-    { "src": "/oauth-callback(?:\\\\.html)?", "dest": "/public/oauth-callback.html" },
-    { "src": "/api/auth/google(?:/(.*))?", "dest": "/api/auth-google.js" },
-    { "src": "/api/ai-live(?:/(.*))?", "dest": "/api/ai-live.js" },
-    { "src": "/api/ai(?:/(.*))?", "dest": "/api/ai.js" },
-    { "src": "/api/config/public", "dest": "/api/config-public.js" },
-    { "src": "/api/download-apk", "dest": "/public/install.html" },
-    { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "src": "/admin", "dest": "/public/admin/login.html" },
-    { "src": "/verification/([^/]+)", "dest": "/public/selfie.html" },
-    { "src": "/admin/(.*)", "dest": "/public/admin/$1" },
-    { "src": "/client/connect/?", "dest": "/public/client/connect.html" },
-    { "src": "/(.*)", "dest": "/public/$1" }
+    {
+      "src": "/api/auth/github(?:/(.*))?",
+      "dest": "/api/auth-github.js"
+    },
+    {
+      "src": "/oauth-callback(?:\\\\.html)?",
+      "dest": "/public/oauth-callback.html"
+    },
+    {
+      "src": "/api/auth/google(?:/(.*))?",
+      "dest": "/api/auth-google.js"
+    },
+    {
+      "src": "/api/ai-live(?:/(.*))?",
+      "dest": "/api/ai-live.js"
+    },
+    {
+      "src": "/api/ai(?:/(.*))?",
+      "dest": "/api/ai.js"
+    },
+    {
+      "src": "/api/config/public",
+      "dest": "/api/config-public.js"
+    },
+    {
+      "src": "/api/download-apk",
+      "dest": "/public/install.html"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/admin",
+      "dest": "/public/admin/login.html"
+    },
+    {
+      "src": "/verification/([^/]+)",
+      "dest": "/public/selfie.html"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "/public/admin/$1"
+    },
+    {
+      "src": "/client/connect/?",
+      "dest": "/public/client/connect.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
   ]
 }
