@@ -242,7 +242,7 @@ router.post('/messages/:memberId/read', messageLimiter, async (req, res) => {
 
     const readAt = new Date().toISOString();
     const { data, error } = await supabase.from('recovery_community_messages')
-      .update({ delivered_at: readAt, read_at: readAt })
+      .update({ read_at: readAt })
       .eq('sender_user_id', other)
       .eq('recipient_user_id', req.user.id)
       .is('read_at', null)
