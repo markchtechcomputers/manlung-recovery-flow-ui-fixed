@@ -40,7 +40,7 @@ Stores per-message/per-member `delivered_at` and `read_at`.
 
 **Group aggregate rule (sender excluded; only active, non-archived members count):**
 - Single gray tick: no other active member has fetched/delivered the message.
-- Double gray tick: at least one other active member has received it, but not all active recipients have read it.
+- Double gray tick: at least one other active member has received it through an online inbox poll or by opening the group, but not all active recipients have read it.
 - Double blue tick: every other active member has read it.
 - The sender also sees a read/recipient count. Archived members are excluded from the denominator. A member with read receipts disabled does not publish a read timestamp; the group remains conservatively not-all-read rather than inferring that member's read state.
 
