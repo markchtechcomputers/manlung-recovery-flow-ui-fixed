@@ -120,6 +120,9 @@ router.get('/case/:caseId', auth, async (req, res) => {
       req.params.caseId,
       req.user.id
     );
+    // Opening the case conversation also clears any stale "new message" alert,
+    // including notifications left unread by an earlier version of the chat UI.
+    await Notification.markCaseMessagesRead(req.params.caseId, req.user.id);
 
     const messages =
       await CaseMessage.listForCase(
@@ -134,6 +137,7 @@ router.get('/case/:caseId', auth, async (req, res) => {
         sender_user_id: item.sender_user_id,
         recipient_user_id: item.recipient_user_id,
         message: item.message,
+        delivered_at: item.delivered_at,
         read_at: item.read_at,
         created_at: item.created_at,
       })),
