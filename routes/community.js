@@ -17,6 +17,17 @@ const statusLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, standardHea
 function fail(res, status, error) { return res.status(status).json({ success: false, error }); }
 function cleanText(value, max) { return String(value == null ? '' : value).trim().slice(0, max); }
 function validId(value) { return UUID.test(String(value || '')); }
+function isSingleEmojiReaction(value) {
+  const text = String(value || '').trim();
+  if (!text || Array.from(text).length > 16) return false;
+  const containsEmoji = /\p{Extended_Pictographic}|\p{Regional_Indicator}/u.test(text)
+    || /[0-9#*]\uFE0F?\u20E3/u.test(text);
+  if (!containsEmoji) return false;
+  if (typeof Intl.Segmenter === 'function') {
+    return Array.from(new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(text)).length === 1;
+  }
+  return !/\s/u.test(text);
+}
 function isAdmin(user) { return user && ['admin', 'owner'].includes(user.role); }
 function publicProfile(profile, user, presence) {
   const name = cleanText(profile?.display_name, 80) || cleanText(user.username, 80) || 'Member';
@@ -463,7 +474,7 @@ router.post('/messages/:memberId/:messageId/reactions', messageLimiter, async (r
     const reaction = String(req.body?.reaction || '').trim();
     if (!validId(other) || !validId(id) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
-    if (reaction && (Array.from(reaction).length > 16 || !/\p{Emoji}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
+    if (reaction && !isSingleEmojiReaction(reaction)) return fail(res, 400, 'Enter one emoji reaction.');
     const { data: message, error: messageError } = await supabase.from('recovery_community_messages')
       .select('id').eq('id', id)
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
@@ -1530,7 +1541,7 @@ router.post('/groups/:groupId/messages/:messageId/reactions', messageLimiter, as
     const gid = String(req.params.groupId || ''), mid = String(req.params.messageId || '');
     const reaction = cleanText(req.body?.reaction, 16);
     if (!validId(gid) || !validId(mid)) return fail(res, 400, 'Invalid group or message ID.');
-    if (reaction && (Array.from(reaction).length > 16 || !/\p{Emoji}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
+    if (reaction && !isSingleEmojiReaction(reaction)) return fail(res, 400, 'Enter one emoji reaction.');
     const { data: group, error: groupError } = await supabase.from('recovery_chat_groups')
       .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
     if (groupError) throw groupError;
