@@ -94,6 +94,48 @@ async function attachDirectReceiptState(messages, currentUserId, markDelivered) 
   });
 }
 
+async function collectUnreadMessageIds(table, filters, userId, cutoff) {
+  const ids = [];
+  let offset = 0;
+  while (true) {
+    let query = supabase.from(table).select('id,created_at')
+      .is('deleted_at', null).order('created_at', { ascending: true }).range(offset, offset + 499);
+    for (const [key, value] of Object.entries(filters || {})) query = query.eq(key, value);
+    if (cutoff) query = query.gt('created_at', new Date(cutoff).toISOString());
+    const { data, error } = await query;
+    if (error) throw error;
+    const page = data || [];
+    ids.push(...page.map(row => row.id));
+    if (page.length < 500) break;
+    offset += page.length;
+  }
+  return ids;
+}
+
+async function markReceiptRowsRead(table, userId, ids, now) {
+  for (let offset = 0; offset < ids.length; offset += 500) {
+    const batch = ids.slice(offset, offset + 500);
+    const { data: existing, error: existingError } = await supabase.from(table)
+      .select('message_id,read_at').eq('user_id', userId).in('message_id', batch);
+    if (existingError) throw existingError;
+    const existingIds = new Set((existing || []).map(row => String(row.message_id)));
+    const missing = batch.filter(id => !existingIds.has(String(id))).map(message_id => ({
+      message_id, user_id: userId, delivered_at: now, read_at: now
+    }));
+    if (missing.length) {
+      const { error } = await supabase.from(table).insert(missing);
+      if (error) throw error;
+    }
+    const alreadyTrackedUnread = batch.filter(id => existingIds.has(String(id))
+      && !(existing || []).find(row => String(row.message_id) === String(id))?.read_at);
+    if (alreadyTrackedUnread.length) {
+      const { error } = await supabase.from(table).update({ delivered_at: now, read_at: now })
+        .eq('user_id', userId).in('message_id', alreadyTrackedUnread).is('read_at', null);
+      if (error) throw error;
+    }
+  }
+}
+
 async function saveDirectPreference(userId, otherUserId, patch) {
   const { data, error } = await supabase.from('recovery_chat_preferences')
     .upsert({ user_id: userId, other_user_id: otherUserId, ...patch, updated_at: new Date().toISOString() },
@@ -365,35 +407,12 @@ router.post('/messages/:memberId/read', async (req, res) => {
     const { data: pref, error: prefError } = await supabase.from('recovery_chat_preferences')
       .select('manual_unread_at,last_read_at').eq('user_id', req.user.id).eq('other_user_id', other).maybeSingle();
     if (prefError) throw prefError;
-    let query = supabase.from('recovery_community_messages').select('id,created_at')
-      .eq('sender_user_id', other).eq('recipient_user_id', req.user.id).is('deleted_at', null)
-      .order('created_at', { ascending: true }).limit(500);
-    const { data: incoming, error } = await query;
-    if (error) throw error;
-    const cutoff = Math.max(pref?.manual_unread_at ? new Date(pref.manual_unread_at).getTime() : 0, pref?.last_read_at ? new Date(pref.last_read_at).getTime() : 0);
-    const eligible = (incoming || []).filter(row => new Date(row.created_at).getTime() > cutoff);
-    const ids = eligible.map(row => row.id);
+    const cutoff = Math.max(pref?.manual_unread_at ? new Date(pref.manual_unread_at).getTime() : 0,
+      pref?.last_read_at ? new Date(pref.last_read_at).getTime() : 0);
+    const ids = await collectUnreadMessageIds('recovery_community_messages',
+      { sender_user_id: other, recipient_user_id: req.user.id }, req.user.id, cutoff);
     const now = new Date().toISOString();
-    if (ids.length) {
-      const { data: existing, error: receiptError } = await supabase.from('recovery_chat_message_receipts')
-        .select('message_id').eq('user_id', req.user.id).in('message_id', ids);
-      if (receiptError) throw receiptError;
-      const existingIds = new Set((existing || []).map(row => String(row.message_id)));
-      const missing = ids.filter(id => !existingIds.has(String(id))).map(message_id => ({
-        message_id, user_id: req.user.id, delivered_at: now, read_at: now
-      }));
-      if (missing.length) {
-        const { error: insertError } = await supabase.from('recovery_chat_message_receipts').insert(missing);
-        if (insertError) throw insertError;
-      }
-      const existingUnread = ids.filter(id => existingIds.has(String(id)));
-      if (existingUnread.length) {
-        const { error: updateError } = await supabase.from('recovery_chat_message_receipts')
-          .update({ delivered_at: now, read_at: now }).eq('user_id', req.user.id)
-          .in('message_id', existingUnread).is('read_at', null);
-        if (updateError) throw updateError;
-      }
-    }
+    if (ids.length) await markReceiptRowsRead('recovery_chat_message_receipts', req.user.id, ids, now);
     await saveDirectPreference(req.user.id, other, { manual_unread: false, manual_unread_at: null, last_read_at: now });
     res.set('Cache-Control', 'no-store');
     return res.json({ success: true, readAt: now, messageIds: ids });
@@ -1325,28 +1344,17 @@ router.get('/groups/:groupId/messages', async (req, res) => {
       if (membershipError) throw membershipError;
       memberIds = (membership || []).map(x => String(x.user_id));
       const self = (membership || []).find(x => String(x.user_id) === String(req.user.id));
-      const cutoff = self?.manual_unread_at ? new Date(self.manual_unread_at).getTime() : 0;
-      const incomingIds = messages.filter(x => String(x.sender_user_id) !== String(req.user.id)
-        && new Date(x.created_at).getTime() > cutoff).map(x => x.id);
+      const cutoff = Math.max(self?.manual_unread_at ? new Date(self.manual_unread_at).getTime() : 0,
+        self?.last_read_at ? new Date(self.last_read_at).getTime() : 0);
+      const incomingIds = await collectUnreadMessageIds('recovery_chat_group_messages',
+        { group_id: gid }, req.user.id, cutoff);
+      // Exclude the current member's own messages from the group read cursor.
       if (incomingIds.length) {
-        const now = new Date().toISOString();
-        const { data: existing, error: receiptError } = await supabase.from('recovery_chat_group_message_receipts')
-          .select('message_id').eq('user_id', req.user.id).in('message_id', incomingIds);
-        if (receiptError) throw receiptError;
-        const existingIds = new Set((existing || []).map(x => String(x.message_id)));
-        const missing = incomingIds.filter(id => !existingIds.has(String(id))).map(message_id => ({
-          message_id, user_id: req.user.id, delivered_at: now, read_at: now
-        }));
-        if (missing.length) {
-          const { error: insertError } = await supabase.from('recovery_chat_group_message_receipts').insert(missing);
-          if (insertError) throw insertError;
-        }
-        const alreadyTracked = incomingIds.filter(id => existingIds.has(String(id)));
-        if (alreadyTracked.length) {
-          const { error: updateError } = await supabase.from('recovery_chat_group_message_receipts')
-            .update({ delivered_at: now, read_at: now }).eq('user_id', req.user.id).in('message_id', alreadyTracked);
-          if (updateError) throw updateError;
-        }
+        const { data: incomingRows, error: incomingError } = await supabase.from('recovery_chat_group_messages')
+          .select('id').in('id', incomingIds).neq('sender_user_id', req.user.id);
+        if (incomingError) throw incomingError;
+        const idsToRead = (incomingRows || []).map(x => x.id);
+        if (idsToRead.length) await markReceiptRowsRead('recovery_chat_group_message_receipts', req.user.id, idsToRead, new Date().toISOString());
       }
       const { error: clearError } = await supabase.from('recovery_chat_group_members')
         .update({ manual_unread: false, manual_unread_at: null, last_read_at: new Date().toISOString() })
