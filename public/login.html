@@ -2197,6 +2197,14 @@ async function startSocialSignup(provider, errorTarget='loginError'){
     showSocialError('Secure Android sign-in is still loading. Please try again.');
     return;
   }
+
+  // Web GitHub sign-in uses the server-side OAuth route so the state cookie,
+  // callback exchange, and Manlung HttpOnly session are handled together.
+  if(provider==='github'){
+    window.location.assign('/api/auth/github/start');
+    return;
+  }
+
   try{
     if(!window.supabase?.createClient){
       await new Promise((resolve,reject)=>{
