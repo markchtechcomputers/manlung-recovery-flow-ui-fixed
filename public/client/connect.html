@@ -386,6 +386,14 @@ nav button span{display:grid;place-items:center;width:58px;height:30px;border-ra
 #ml-shared-group-chat #ml-group-messages{background-color:var(--ml-group-panel,var(--bg))!important}
 #ml-shared-group-chat .ml-group-message-content{background:var(--ml-group-incoming,var(--sf))!important;color:#17212b}
 #ml-shared-group-chat .ml-group-message-row.is-own .ml-group-message-content{background:var(--ml-group-outgoing,var(--out))!important;color:var(--ml-group-text,#111b21)}
+
+/* Profile photos/default avatars in direct-message bubble rows. */
+#chat .ml-message-row{display:flex;align-items:flex-end;gap:7px;width:100%;margin:7px 0}
+#chat .ml-message-row.th{justify-content:flex-start}
+#chat .ml-message-row.me{justify-content:flex-end}
+#chat .ml-message-row .b{margin:0;max-width:calc(100% - 38px);min-width:0}
+#chat .ml-bubble-avatar{width:28px;height:28px;min-width:28px;max-width:28px;border-radius:50%;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;flex:none;background:#e5eaf0}
+#chat .ml-bubble-avatar img{width:100%;height:100%;object-fit:cover}
 </style>
 <style id="ml-channel-reactions-mobile-fix">
 .ml-channel-reactions{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:6px}
@@ -649,12 +657,14 @@ document.addEventListener('click',async event=>{
 const bub=(m,i)=>{
  const current=S.chats.find(x=>String(x.id)===String(open)),canReact=!!(m[12]&&m[0]!=='system'&&(current&&(current.remote&&current.memberId||mlIsOfficialUpdatesChatRecord(current))));
  const chips=Array.isArray(m[13])&&m[13].length?'<div class="ml-message-reactions">'+m[13].map(r=>'<button type="button" class="ml-message-reaction '+(r.mine?'mine':'')+'" data-message-react="'+esc(m[12])+'" aria-label="'+esc(r.emoji+' '+r.count+' reactions')+'">'+esc(r.emoji)+' <small>'+r.count+'</small></button>').join('')+'</div>':'';
- return '<div class="b '+m[0]+(cq&&!(m[1]||'').toLowerCase().includes(cq)?' dim':'')+'" data-msg-index="'+i+'" role="button" tabindex="0" aria-label="Message actions; swipe to reply">'+
+ const mine=m[0]==='me',avatar=imageAvatar(mine?(S.name||'You'):(current?.n||'Member'),mine?S.pic:(current?.avatar||current?.avatar_url),mine?S.avatarVersion:current?.avatarVersion,'ml-bubble-avatar');
+ return '<div class="ml-message-row '+(mine?'me':'th')+'">'+(mine?'':' '+avatar)+
+ '<div class="b '+m[0]+(cq&&!(m[1]||'').toLowerCase().includes(cq)?' dim':'')+'" data-msg-index="'+i+'" role="button" tabindex="0" aria-label="Message actions; swipe to reply">'+
  (m[5]?'<div class="sn" style="color:'+cols[m[5].length%cols.length]+'">'+esc(m[5])+'</div>':'')+
  (m[6]?'<div class="qt"><b>'+esc(m[6].n)+'</b><div>'+esc(m[6].t)+'</div></div>':'')+
  att(m[4],i)+(m[1]?window.mlRenderRichMessage(m[1]):'')+chips+
  (canReact?'<button type="button" class="ml-message-react-open" data-message-react="'+esc(m[12])+'" aria-label="Add or change reaction" title="React">☺</button>':'')+
- '<small>'+(m[10]?'★ ':'')+(m[8]?'edited · ':'')+m[2]+(m[0]==='me'?tk(m[3]|0):'')+'</small></div>'
+ '<small>'+(m[10]?'★ ':'')+(m[8]?'edited · ':'')+m[2]+(mine?tk(m[3]|0):'')+'</small></div>'+(mine?avatar:'')+'</div>'
 };
 async function refreshDirectReactions(c, repaint=true){if(!c||!c.remote||!c.memberId)return;try{const d=await apiReq('/messages/'+encodeURIComponent(c.memberId)+'/reactions');const rows=Array.isArray(d.reactions)?d.reactions:[];const grouped=new Map();for(const r of rows){const k=String(r.message_id);if(!grouped.has(k))grouped.set(k,[]);grouped.get(k).push(r)}let changed=false;for(const m of c.m||[]){const id=String(m[12]||'');const rs=grouped.get(id)||[];const byEmoji=new Map();for(const r of rs){const e=r.reaction;const v=byEmoji.get(e)||{emoji:e,count:0,mine:false};v.count++;if(String(r.user_id)===String(ML.me))v.mine=true;byEmoji.set(e,v)}const next=Array.from(byEmoji.values());if(JSON.stringify(m[13]||[])!==JSON.stringify(next)){m[13]=next;changed=true}}if(changed&&repaint&&String(open)===String(c.id))paint(c)}catch(e){console.warn('Direct message reactions unavailable:',e.message)}}
 function openMessageReactionPicker(messageId){
