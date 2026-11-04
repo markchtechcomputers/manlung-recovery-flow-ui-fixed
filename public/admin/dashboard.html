@@ -310,6 +310,10 @@
   color:#dbeafe;
 }
 
+.manlung-message-status.delivered{
+  color:#cbd5e1;
+}
+
 .manlung-message-status.read{
   color:#7dd3fc;
 }
@@ -2405,6 +2409,10 @@ async function loadAdminCaseMessages(caseId) {
             const mine =
                 String(m.sender_user_id) === String(user.id);
 
+            const receiptState = m.read_at ? 'read' : (m.delivered_at ? 'delivered' : 'sent');
+            const receiptTitle = m.read_at ? 'Read' : (m.delivered_at ? 'Delivered' : 'Sent');
+            const receiptTicks = receiptState === 'sent' ? '✓' : '✓✓';
+
             return `
                 <article class="manlung-message ${mine ? 'mine' : ''}">
                     <div class="manlung-message-meta">
@@ -2415,9 +2423,10 @@ async function loadAdminCaseMessages(caseId) {
                             ${
                                 mine
                                     ? `<span
-                                         class="manlung-message-status ${m.read_at ? 'read' : 'sent'}"
-                                         title="${m.read_at ? 'Read' : 'Sent'}"
-                                       >${m.read_at ? '✓✓' : '✓'}</span>`
+                                         class="manlung-message-status ${receiptState}"
+                                         title="${receiptTitle}"
+                                         aria-label="${receiptTitle}"
+                                       >${receiptTicks}</span>`
                                     : ''
                             }
                         </span>
@@ -2431,6 +2440,19 @@ async function loadAdminCaseMessages(caseId) {
         }).join('');
 
         list.scrollTop = list.scrollHeight;
+
+        const unreadIncoming = messages.filter((m) =>
+            String(m.recipient_user_id) === String(user.id) && !m.read_at
+        );
+        if (unreadIncoming.length) {
+            await Promise.all(unreadIncoming.map((m) =>
+                fetch(`/api/messages/${encodeURIComponent(m.id)}/read`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    cache: 'no-store'
+                }).catch(() => null)
+            ));
+        }
     } catch (error) {
         console.error('Admin messages load error:', error);
         list.innerHTML =
