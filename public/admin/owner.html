@@ -1267,24 +1267,25 @@ html.dark .invite-admin-security,body.dark .invite-admin-security{background:#10
                 const data = await res.json();
                 if (!res.ok || !data.success) throw new Error(data.error || 'Could not send invitation.');
 
+                const emailSent = Boolean(data.invitation && data.invitation.emailSent);
                 out.replaceChildren();
-                out.className = 'invite-admin-result ' + (data.emailSent ? 'is-success' : 'is-warning');
+                out.className = 'invite-admin-result ' + (emailSent ? 'is-success' : 'is-warning');
 
                 const icon = document.createElement('i');
-                icon.className = data.emailSent ? 'fas fa-circle-check' : 'fas fa-link';
+                icon.className = emailSent ? 'fas fa-circle-check' : 'fas fa-link';
                 icon.setAttribute('aria-hidden', 'true');
 
                 const message = document.createElement('div');
                 const heading = document.createElement('strong');
-                heading.textContent = data.emailSent ? 'Invitation email sent' : 'Invitation created';
+                heading.textContent = emailSent ? 'Invitation email sent' : 'Invitation created';
                 const detail = document.createElement('span');
-                detail.textContent = data.emailSent
+                detail.textContent = emailSent
                     ? 'A branded invitation has been sent to ' + email + '. It expires in 48 hours.'
                     : 'Email delivery is not configured. Copy the secure link below and share it directly.';
                 message.append(heading, detail);
                 out.append(icon, message);
 
-                if (!data.emailSent && data.invitation && data.invitation.link) {
+                if (!emailSent && data.invitation && data.invitation.link) {
                     const actions = document.createElement('div');
                     actions.className = 'invite-admin-result-actions';
                     const openLink = document.createElement('a');
