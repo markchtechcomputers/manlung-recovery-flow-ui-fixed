@@ -16,7 +16,7 @@ async function create({
       recipient_user_id: recipientUserId,
       message,
     })
-       .select('id,case_id,sender_user_id,recipient_user_id,message,read_at,created_at')
+       .select('id,case_id,sender_user_id,recipient_user_id,message,delivered_at,read_at,created_at')
     .single();
 
   if (error) throw error;
@@ -26,7 +26,7 @@ async function create({
 async function listForCase(caseId) {
   const { data, error } = await supabase
     .from(TABLE)
-    .select('id,case_id,sender_user_id,recipient_user_id,message,read_at,created_at')
+    .select('id,case_id,sender_user_id,recipient_user_id,message,delivered_at,read_at,created_at')
     .eq('case_id', caseId)
     .order('created_at', { ascending: true });
 
@@ -42,11 +42,24 @@ async function markRead(id, userId) {
     })
     .eq('id', id)
     .eq('recipient_user_id', userId)
-    .select('id,case_id,sender_user_id,recipient_user_id,message,read_at,created_at')
+    .select('id,case_id,sender_user_id,recipient_user_id,message,delivered_at,read_at,created_at')
     .maybeSingle();
 
   if (error) throw error;
   return data;
+}
+
+async function markDeliveredForRecipient(caseId, userId) {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .update({ delivered_at: new Date().toISOString() })
+    .eq('case_id', caseId)
+    .eq('recipient_user_id', userId)
+    .is('delivered_at', null)
+    .select('id');
+
+  if (error) throw error;
+  return data || [];
 }
 
 async function unreadCount(userId, caseId = null) {
@@ -70,5 +83,6 @@ module.exports = {
   create,
   listForCase,
   markRead,
+  markDeliveredForRecipient,
   unreadCount,
 };
