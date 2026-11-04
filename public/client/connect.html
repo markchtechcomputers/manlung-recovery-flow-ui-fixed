@@ -678,12 +678,12 @@ async function refreshOfficialChannelReactions(c,repaint=true){
    const mid=String(message[12]||'');if(!mid)continue;
    const counts=new Map();
    for(const row of byMessage.get(mid)||[]){
-    const emoji=String(row.reaction||'');if(!ML_OFFICIAL_CHANNEL_REACTION_EMOJIS.includes(emoji))continue;
+    const emoji=String(row.reaction||'');if(!emoji)continue;
     const value=counts.get(emoji)||{emoji,count:0,mine:false};value.count++;
     if(String(row.user_id)===String(window.ML&&window.ML.me))value.mine=true;
     counts.set(emoji,value);
    }
-   const next=ML_OFFICIAL_CHANNEL_REACTION_EMOJIS.filter(e=>counts.has(e)).map(e=>counts.get(e));
+   const next=Array.from(counts.values());
    if(JSON.stringify(message[13]||[])!==JSON.stringify(next)){message[13]=next;changed=true}
   }
   if(changed&&repaint&&String(open)===String(c.id))paint(c);
@@ -710,8 +710,37 @@ document.addEventListener('click',async event=>{
  finally{if(button.isConnected)button.disabled=false}
 },true);
 
-const bub=(m,i)=>`<div class="b ${m[0]}${cq&&!(m[1]||'').toLowerCase().includes(cq)?' dim':''}" data-msg-index="${i}" role="button" tabindex="0" aria-label="Message actions; swipe to reply">${m[5]?`<div class="sn" style="color:${cols[m[5].length%cols.length]}">${esc(m[5])}</div>`:''}${m[6]?`<div class="qt"><b>${esc(m[6].n)}</b><div>${esc(m[6].t)}</div></div>`:''}${att(m[4],i)}${m[1]?window.mlRenderRichMessage(m[1]):''}${mlIsCurrentOfficialUpdatesChat()&&m[13]&&m[13].length?`<div class="ml-channel-reactions">${m[13].map(r=>`<button type="button" class="ml-direct-reaction ${r.mine?'mine':''}" data-channel-reaction="${esc(r.emoji)}" data-channel-message="${esc(m[12])}" aria-label="${esc(r.emoji+' '+r.count+' reactions')}">${r.emoji} <small>${r.count}</small></button>`).join('')}</div>`:''}${mlIsCurrentOfficialUpdatesChat()&&m[12]&&m[0]!=='system'?`<div class="ml-channel-reaction-picker" role="toolbar" aria-label="Channel reactions">${["👍","❤️","😂","😮","😢","🙏","🔥","🎉","👏","💚"].map(e=>`<button type="button" data-channel-reaction="${e}" data-channel-message="${esc(m[12])}" aria-label="React ${e}">${e}</button>`).join('')}</div>`:''}${m[7]&&m[7].length?`<div><span class="rx">${m[7].join('')}</span></div>`:''}<small>${m[10]?'★ ':''}${m[8]?'edited · ':''}${m[2]}${m[0]==='me'?tk(S.receipts?m[3]:Math.min(m[3]|0,1)):''}</small></div>`;
+const bub=(m,i)=>{
+ const current=S.chats.find(x=>String(x.id)===String(open)),canReact=!!(m[12]&&m[0]!=='system'&&(current&&(current.remote&&current.memberId||mlIsOfficialUpdatesChatRecord(current))));
+ const chips=Array.isArray(m[13])&&m[13].length?'<div class="ml-message-reactions">'+m[13].map(r=>'<button type="button" class="ml-message-reaction '+(r.mine?'mine':'')+'" data-message-react="'+esc(m[12])+'" aria-label="'+esc(r.emoji+' '+r.count+' reactions')+'">'+esc(r.emoji)+' <small>'+r.count+'</small></button>').join('')+'</div>':'';
+ return '<div class="b '+m[0]+(cq&&!(m[1]||'').toLowerCase().includes(cq)?' dim':'')+'" data-msg-index="'+i+'" role="button" tabindex="0" aria-label="Message actions; swipe to reply">'+
+ (m[5]?'<div class="sn" style="color:'+cols[m[5].length%cols.length]+'">'+esc(m[5])+'</div>':'')+
+ (m[6]?'<div class="qt"><b>'+esc(m[6].n)+'</b><div>'+esc(m[6].t)+'</div></div>':'')+
+ att(m[4],i)+(m[1]?window.mlRenderRichMessage(m[1]):'')+chips+
+ (canReact?'<button type="button" class="ml-message-react-open" data-message-react="'+esc(m[12])+'" aria-label="Add or change reaction" title="React">☺</button>':'')+
+ '<small>'+(m[10]?'★ ':'')+(m[8]?'edited · ':'')+m[2]+(m[0]==='me'?tk(m[3]|0):'')+'</small></div>'
+};
 async function refreshDirectReactions(c, repaint=true){if(!c||!c.remote||!c.memberId)return;try{const d=await apiReq('/messages/'+encodeURIComponent(c.memberId)+'/reactions');const rows=Array.isArray(d.reactions)?d.reactions:[];const grouped=new Map();for(const r of rows){const k=String(r.message_id);if(!grouped.has(k))grouped.set(k,[]);grouped.get(k).push(r)}let changed=false;for(const m of c.m||[]){const id=String(m[12]||'');const rs=grouped.get(id)||[];const byEmoji=new Map();for(const r of rs){const e=r.reaction;const v=byEmoji.get(e)||{emoji:e,count:0,mine:false};v.count++;if(String(r.user_id)===String(ML.me))v.mine=true;byEmoji.set(e,v)}const next=Array.from(byEmoji.values());if(JSON.stringify(m[13]||[])!==JSON.stringify(next)){m[13]=next;changed=true}}if(changed&&repaint&&String(open)===String(c.id))paint(c)}catch(e){console.warn('Direct message reactions unavailable:',e.message)}}
+function openMessageReactionPicker(messageId){
+ const c=S.chats.find(x=>String(x.id)===String(open));if(!c||!messageId)return;
+ const official=mlIsOfficialUpdatesChatRecord(c),direct=!!(c.remote&&c.memberId);
+ if(!official&&!direct)return;
+ const quick=['👍','❤️','😂','😮','😢','🙏','🔥','🎉','👏','💚'];
+ const d=modal('<b>React to message</b><p class="sub">Use your phone’s emoji keyboard or paste any emoji. The quick reactions are only shortcuts.</p><div class="ml-reaction-entry"><input id="ml-reaction-input" class="search" type="text" inputmode="text" autocomplete="off" maxlength="32" placeholder="Choose any emoji…"><button type="button" class="btn" id="ml-reaction-send">Send</button></div><div class="ml-sticker-grid">'+quick.map(e=>'<button type="button" class="em" data-quick-emoji="'+e+'">'+e+'</button>').join('')+'</div><button type="button" class="btn ghost" id="ml-reaction-remove" style="margin-top:10px">Remove my reaction</button>');
+ const input=d.querySelector('#ml-reaction-input');
+ const submit=async emoji=>{const value=String(emoji||'').trim();if(value&&(Array.from(value).length>16||!/\p{Extended_Pictographic}/u.test(value)))return toast('Choose one emoji from your device keyboard.');const route=official?('/groups/'+encodeURIComponent(mlOfficialUpdatesGroupId())+'/messages/'+encodeURIComponent(messageId)+'/reactions'):('/messages/'+encodeURIComponent(c.memberId)+'/'+encodeURIComponent(messageId)+'/reactions');try{await apiReq(route,{method:'POST',body:JSON.stringify({reaction:value})});d.remove();if(official)await refreshOfficialChannelReactions(c,true);else await refreshDirectReactions(c,true)}catch(e){toast(e.message||'Could not save reaction')}};
+ d.querySelector('#ml-reaction-send').onclick=()=>submit(input.value);
+ d.querySelector('#ml-reaction-remove').onclick=()=>submit('');
+ d.querySelectorAll('[data-quick-emoji]').forEach(b=>b.onclick=()=>submit(b.dataset.quickEmoji));
+ input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submit(input.value)}});
+ input.focus();
+}
+document.addEventListener('click',event=>{
+ const button=event.target&&event.target.closest?event.target.closest('[data-message-react]'):null;if(!button)return;
+ event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+ openMessageReactionPicker(button.getAttribute('data-message-react'));
+},true);
+
 if(!window.__mlDirectReactionPoll)window.__mlDirectReactionPoll=setInterval(()=>{if(document.hidden)return;const c=S.chats.find(x=>String(x.id)===String(open));if(c&&c.remote&&c.memberId)refreshDirectReactions(c,true)},4000);
 function paint(c){const ms=$('#msgs');if(!ms)return;const wasNearBottom=ms.scrollHeight-ms.scrollTop-ms.clientHeight<90;const oldTop=ms.scrollTop;const oldHeight=ms.scrollHeight;const pm=c.m.find(x=>x[11]);ms.innerHTML=(pm?`<div class="pinb">${ic(I.pin,14)}<span class="grow sub">${esc(pm[1]||'Attachment')}</span></div>`:'')+(cq?`<div class="pinb" onclick="cq='';paint(S.chats.find(c=>c.id===open))"><span class="grow">Searching "${esc(cq)}" · tap to clear</span></div>`:'')+'<div class="dsep"><span>Today</span></div>'+c.m.map(bub).join('');if(wasNearBottom)ms.scrollTop=ms.scrollHeight;else ms.scrollTop=oldTop+(ms.scrollHeight-oldHeight)}
 function setTyping(on){const p=$('#pst');if(!p)return;p.textContent=on?'typing…':sub();p.style.color=on?'var(--ac2)':''}
