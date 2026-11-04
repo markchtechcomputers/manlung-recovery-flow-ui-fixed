@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 
 const root = path.join(__dirname, '..');
 const frontend = fs.readFileSync(path.join(root, 'public/client/connect.html'), 'utf8');
@@ -133,4 +134,14 @@ test('messaging migration is additive and keeps browser access server-mediated',
   assert.match(migration, /theme_background_image_url/);
   assert.match(migration, /revoke all on table public\.recovery_chat_notification_cursors from anon, authenticated/);
   assert.match(migration, /notify pgrst, 'reload schema'/);
+});
+
+test('community route and embedded chat scripts parse without syntax errors', () => {
+  assert.doesNotThrow(() => new vm.Script(routes, { filename: 'routes/community.js' }));
+  const scripts = Array.from(frontend.matchAll(/<script\\b[^>]*>([\\s\\S]*?)<\\/script>/gi))
+    .map(match => match[1]).filter(source => source.trim());
+  assert.ok(scripts.length > 0, 'connect page must contain its app scripts');
+  scripts.forEach((source, index) => {
+    assert.doesNotThrow(() => new vm.Script(source, { filename: 'connect.html:inline-' + index }));
+  });
 });
