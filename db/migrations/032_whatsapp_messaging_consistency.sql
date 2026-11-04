@@ -100,6 +100,12 @@ alter table public.recovery_chat_group_members
   add column if not exists theme_background_color text,
   add column if not exists theme_background_image_url text;
 
+-- Older group memberships had no persisted read cursor; baseline them at
+-- migration time so historical group messages do not become unread backlog.
+update public.recovery_chat_group_members
+set last_read_at = now(), updated_at = now()
+where last_read_at is null;
+
 alter table public.recovery_chat_group_members
   drop constraint if exists recovery_chat_group_members_theme_key_check;
 alter table public.recovery_chat_group_members
