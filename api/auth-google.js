@@ -70,7 +70,8 @@ app.post('*',async(req,res)=>{
   const sessionToken=token({...user,session_version:session.session_version});
   setClientCookie(res,sessionToken);
   const profilePicture = /^https:\/\/[^\s"'<>]+$/i.test(String(p.picture || '')) ? String(p.picture) : null;
-  res.json({success:true,user:{id:user.id,email:user.email,username:user.username,role:user.role,profilePicture}});
+  res.set('Cache-Control','no-store');
+  res.json({success:true,sessionToken,user:{id:user.id,email:user.email,username:user.username,role:user.role,profilePicture}});
  }catch(e){
   console.error('Google Cloud auth error:',e.response?.data||e.message);
   const message = !process.env.JWT_SECRET

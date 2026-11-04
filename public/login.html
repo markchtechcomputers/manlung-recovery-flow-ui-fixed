@@ -1771,6 +1771,8 @@ let clientTurnstileApi = null;
 let clientTurnstileApiPromise = null;
 let clientTurnstileRetryButton = null;
 let clientRegisterTurnstileRetryButton = null;
+let clientTurnstileSetupPromise = null;
+let clientTurnstileSetupError = null;
 
 function loadClientTurnstileApi() {
   if (window.turnstile) return Promise.resolve(window.turnstile);
@@ -1942,17 +1944,38 @@ async function setupClientTurnstile() {
     if (!clientTurnstileEnabled) return;
 
     clientTurnstileSiteKey = config.turnstileSiteKey;
-    const api = await loadClientTurnstileApi();
-    clientTurnstileApi = api;
-    renderClientTurnstile(api);
-    if (!document.getElementById('registerPanel').hidden) renderClientRegisterTurnstile(api);
+    // Load Cloudflare's third-party challenge only for password login or registration.
+    // Google sign-in is independent of Turnstile and should not be held up by it.
   } catch (error) {
-    console.error('Turnstile setup failed:', error);
-    showMessage(document.getElementById('loginError'), error?.message || 'Cloudflare security verification could not be initialized.');
-    setTurnstileRetryVisible(true);
+    clientTurnstileSetupError = error;
+    console.warn('Turnstile configuration unavailable until password login:', error);
   }
 }
-document.addEventListener('DOMContentLoaded', setupClientTurnstile);
+document.addEventListener('DOMContentLoaded', () => {
+  clientTurnstileSetupPromise = setupClientTurnstile();
+});
+
+async function ensureClientLoginTurnstile() {
+  if (clientTurnstileSetupPromise) await clientTurnstileSetupPromise;
+  if (!clientTurnstileEnabled) {
+    if (clientTurnstileSetupError) {
+      showMessage(document.getElementById('loginError'), 'Security verification could not be initialized. Refresh the page or use Google sign-in.');
+      return false;
+    }
+    return true;
+  }
+  if (clientTurnstileWidget !== null) return true;
+  try {
+    const api = clientTurnstileApi || await loadClientTurnstileApi();
+    clientTurnstileApi = api;
+    renderClientTurnstile(api);
+    showMessage(document.getElementById('loginError'), 'Complete the security check, then press Sign In again.', 'info');
+  } catch (error) {
+    showMessage(document.getElementById('loginError'), error?.message || 'Security verification could not be loaded. You can still use Google sign-in.');
+    setTurnstileRetryVisible(true);
+  }
+  return false;
+}
 
 async function handleLogin(event) {
   event.preventDefault();
@@ -1966,13 +1989,13 @@ async function handleLogin(event) {
     return;
   }
 
-  // The active client session is stored in an HttpOnly cookie.
-  // Remove legacy browser tokens so an older account cannot leak a
-  // malformed/stale Bearer token into the next account session.
+  // Prefer the HttpOnly session cookie. Clear any temporary fallback from an earlier tab.
   localStorage.removeItem('clientToken');
   localStorage.removeItem('clientUser');
+  try { sessionStorage.removeItem('manlung_client_session_token'); } catch (_) {}
 
   try {
+    if (!(await ensureClientLoginTurnstile())) return;
     const turnstileToken = clientTurnstileEnabled && window.turnstile && clientTurnstileWidget !== null
       ? window.turnstile.getResponse(clientTurnstileWidget) : null;
     if (clientTurnstileEnabled && !turnstileToken) {
@@ -2428,7 +2451,22 @@ async function setupOfficialGoogleButtons(){
           let sessionData={};
           try{sessionData=sessionText?JSON.parse(sessionText):{};}catch(_){}
           if(!sessionResponse.ok||!sessionData.success||!sessionData.user||sessionData.user.role!=='client'){
-            throw new Error(readableAuthError(sessionData.error,'Google sign-in completed, but the secure session was not saved. Please allow cookies for this site and try again.'));
+            const fallbackToken=String(data.sessionToken||'').trim();
+            if(!fallbackToken) throw new Error('Google verified your account, but the browser could not establish a secure session. Please retry.');
+            const fallbackResponse=await fetch('/api/auth/verify',{
+              method:'GET',credentials:'same-origin',cache:'no-store',
+              headers:{'Accept':'application/json','Authorization':'Bearer '+fallbackToken}
+            });
+            const fallbackText=await fallbackResponse.text();
+            let fallbackData={};try{fallbackData=fallbackText?JSON.parse(fallbackText):{};}catch(_){}
+            if(!fallbackResponse.ok||!fallbackData.success||fallbackData.user?.role!=='client'){
+              throw new Error(readableAuthError(fallbackData.error,'Google verified your account, but the secure session could not be established. Please retry.'));
+            }
+            try{sessionStorage.setItem('manlung_client_session_token',fallbackToken);}catch(storageError){
+              throw new Error('Your browser is blocking both cookies and temporary session storage. Open this site in a regular browser tab and try again.');
+            }
+          }else{
+            try{sessionStorage.removeItem('manlung_client_session_token');}catch(_){}
           }
           setGoogleStatus('Sign-in successful. Opening your dashboard…','success');
           // Use an absolute same-origin URL to avoid relative-path or base-URL issues on mobile.

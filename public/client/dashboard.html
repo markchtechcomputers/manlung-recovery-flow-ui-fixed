@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script id="manlung-client-session-bridge">
+(function(){
+  if(window.__manlungClientSessionBridge)return;
+  window.__manlungClientSessionBridge=true;
+  const originalFetch=window.fetch.bind(window);
+  window.fetch=function(input,init){
+    let target;try{target=new URL(typeof input==='string'?input:input.url,window.location.href);}catch(_){}
+    let token='';try{token=sessionStorage.getItem('manlung_client_session_token')||'';}catch(_){}
+    if(!target||target.origin!==window.location.origin||!target.pathname.startsWith('/api/'))return originalFetch(input,init);
+    const headers=new Headers(input instanceof Request?input.headers:undefined);
+    new Headers(init&&init.headers||{}).forEach((value,key)=>headers.set(key,value));
+    if(token&&!headers.has('Authorization'))headers.set('Authorization','Bearer '+token);
+    const request=originalFetch(input,{...(init||{}),headers});
+    if(target.pathname==='/api/auth/client/logout')return request.finally(()=>{try{sessionStorage.removeItem('manlung_client_session_token')}catch(_){}});
+    return request;
+  };
+})();
+</script>
   <meta charset="UTF-8">
   <meta name="manlung-dashboard-build" content="light-layout-20261027-v1">
   <script src="/js/theme.js"></script>
@@ -1149,6 +1167,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         if (!res.ok || !data.success) {
           fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).catch(()=>{});
           localStorage.removeItem('clientUser');
+          try{sessionStorage.removeItem('manlung_client_session_token')}catch(_){}
           window.location.href = '/login';
           return false;
         }
@@ -1274,6 +1293,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       applyTheme();
     })();
     function logout(){
+      try{sessionStorage.removeItem('manlung_client_session_token')}catch(_){}
       fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).finally(()=>window.location.href='/login');
     }
     function renderCases(cases){

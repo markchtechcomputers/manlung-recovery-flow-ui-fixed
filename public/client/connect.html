@@ -1,4 +1,22 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
+<!doctype html><html lang="en"><head>
+<script id="manlung-client-session-bridge">
+(function(){
+  if(window.__manlungClientSessionBridge)return;
+  window.__manlungClientSessionBridge=true;
+  const originalFetch=window.fetch.bind(window);
+  window.fetch=function(input,init){
+    let target;try{target=new URL(typeof input==='string'?input:input.url,window.location.href);}catch(_){}
+    let token='';try{token=sessionStorage.getItem('manlung_client_session_token')||'';}catch(_){}
+    if(!target||target.origin!==window.location.origin||!target.pathname.startsWith('/api/'))return originalFetch(input,init);
+    const headers=new Headers(input instanceof Request?input.headers:undefined);
+    new Headers(init&&init.headers||{}).forEach((value,key)=>headers.set(key,value));
+    if(token&&!headers.has('Authorization'))headers.set('Authorization','Bearer '+token);
+    const request=originalFetch(input,{...(init||{}),headers});
+    if(target.pathname==='/api/auth/client/logout')return request.finally(()=>{try{sessionStorage.removeItem('manlung_client_session_token')}catch(_){}});
+    return request;
+  };
+})();
+</script><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manlung Community</title>
 <link rel="canonical" href="https://manlungrecovery.manlungshop.co.ke/client/connect">
