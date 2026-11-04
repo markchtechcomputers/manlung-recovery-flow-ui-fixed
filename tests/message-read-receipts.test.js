@@ -21,6 +21,7 @@ test('case messages record delivery separately from read receipts', () => {
 
 test('opening and reading a case message clears its matching unread notification', () => {
   assert.match(notifications, /markCaseMessagesRead/);
+  assert.match(routes, /CaseMessage\\.markDeliveredForRecipient\\(updated\\.case_id, req\\.user\\.id\\)/);
   assert.match(notifications, /\.eq\('type', 'new_message'\)/);
   assert.match(routes, /Notification\.markCaseMessagesRead\(updated\.case_id, req\.user\.id\)/);
 });
