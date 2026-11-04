@@ -13,7 +13,14 @@ body{overflow:hidden;display:grid;place-items:center}
 .status-box{display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px}
 .spinner{width:42px;height:42px;border:4px solid #e5e7eb;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
 .status-title{font:600 18px/1.3 system-ui,-apple-system,Segoe UI,sans-serif}
-.status-text{font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:#666;max-width:300px}\n.consent-screen{position:fixed;inset:0;z-index:5;display:none;place-items:center;padding:24px;background:#fff;text-align:center}\n.consent-card{width:min(100%,420px);padding:28px 24px;border:1px solid #e5e7eb;border-radius:18px;box-shadow:0 12px 36px rgba(15,23,42,.08)}\n.consent-card h1{font:650 22px/1.25 system-ui;margin:0 0 12px;color:#111}\n.consent-card p{font:14px/1.6 system-ui;color:#555;margin:0 0 12px}\n.consent-card button{width:100%;min-height:48px;border:0;border-radius:10px;background:#111;color:#fff;font:600 15px system-ui;cursor:pointer;margin-top:10px}\n.consent-card button:disabled{opacity:.55;cursor:wait}\n.error-text{color:#b42318!important}
+.status-text{font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:#666;max-width:300px}
+.consent-screen{position:fixed;inset:0;z-index:5;display:none;place-items:center;padding:24px;background:#fff;text-align:center}
+.consent-card{width:min(100%,420px);padding:28px 24px;border:1px solid #e5e7eb;border-radius:18px;box-shadow:0 12px 36px rgba(15,23,42,.08)}
+.consent-card h1{font:650 22px/1.25 system-ui;margin:0 0 12px;color:#111}
+.consent-card p{font:14px/1.6 system-ui;color:#555;margin:0 0 12px}
+.consent-card button{width:100%;min-height:48px;border:0;border-radius:10px;background:#111;color:#fff;font:600 15px system-ui;cursor:pointer;margin-top:10px}
+.consent-card button:disabled{opacity:.55;cursor:wait}
+.error-text{color:#b42318!important}
 @keyframes spin{to{transform:rotate(360deg)}}
 video,canvas{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
 </style>
@@ -22,7 +29,8 @@ video,canvas{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
 <div class="status-screen" id="statusScreen" aria-live="polite">
   <div class="status-box"><div class="spinner" aria-hidden="true"></div><div class="status-title" id="statusTitle">Please wait</div><div class="status-text" id="statusText">Checking your secure verification request…</div></div>
 </div>
-<section class="consent-screen" id="consentScreen"><div class="consent-card"><h1>Photo verification</h1><p>This secure request asks you to submit four camera images for your Manlung Recovery case.</p><p>When you continue, your browser will ask for camera permission. The four images will be uploaded to the case. Location access is optional and may be declined.</p><button type="button" id="startVerification">Start verification</button></div></section>\n<video id="video" autoplay muted playsinline></video>
+<section class="consent-screen" id="consentScreen"><div class="consent-card"><h1>Photo verification</h1><p>This secure request asks you to submit four camera images for your Manlung Recovery case.</p><p>When you continue, your browser will ask for camera permission. The four images will be uploaded to the case. Location access is optional and may be declined.</p><button type="button" id="startVerification">Start verification</button></div></section>
+<video id="video" autoplay muted playsinline></video>
 <canvas id="canvas"></canvas>
 <script>
 (()=>{"use strict";
@@ -32,7 +40,12 @@ const token=pathToken||queryToken;
 const video=document.getElementById("video");
 const canvas=document.getElementById("canvas");
 let stream=null,busy=false;
-function setStatus(message,title){\n  const titleNode=document.getElementById("statusTitle");\n  const textNode=document.getElementById("statusText");\n  if(titleNode&&title)titleNode.textContent=title;\n  if(textNode&&message)textNode.textContent=message;\n}
+function setStatus(message,title){
+  const titleNode=document.getElementById("statusTitle");
+  const textNode=document.getElementById("statusText");
+  if(titleNode&&title)titleNode.textContent=title;
+  if(textNode&&message)textNode.textContent=message;
+}
 
 const DB_NAME="manlung-selfie-queue";
 const DB_STORE="uploads";
@@ -217,13 +230,15 @@ async function captureFour(){
     await video.play().catch(()=>{});
     await waitForVideo();
 
-    setStatus("Camera ready. Capturing four images…","Please wait");\n    // Four rapid captures. Nothing is uploaded between captures.
+    setStatus("Camera ready. Capturing four images…","Please wait");
+    // Four rapid captures. Nothing is uploaded between captures.
     for(let i=0;i<4;i++){
       blobs.push(await frameBlob(i+1,metadata));
       if(i<3)await pause(80);
     }
 
-    setStatus("Preparing your four images for secure submission…","Please wait");\n    // Persist the complete four-photo batch BEFORE any network upload attempt.
+    setStatus("Preparing your four images for secure submission…","Please wait");
+    // Persist the complete four-photo batch BEFORE any network upload attempt.
     metadata=await enrichMetadata();
     let requestData={};
     if(navigator.onLine){
@@ -247,7 +262,9 @@ async function captureFour(){
     try{window.close();}catch(_){}
     setTimeout(()=>{try{window.close();}catch(_){}},500);
   }catch(error){
-    console.error("Selfie evidence pipeline error:",error);\n    setStatus(error?.message||"We could not complete this verification. Please contact the case administrator.","Verification could not be completed");\n    document.querySelector(".spinner").style.display="none";
+    console.error("Selfie evidence pipeline error:",error);
+    setStatus(error?.message||"We could not complete this verification. Please contact the case administrator.","Verification could not be completed");
+    document.querySelector(".spinner").style.display="none";
 
     // If four frames exist, save them even when the network is unavailable.
     if(blobs.length===4){
@@ -263,7 +280,21 @@ async function captureFour(){
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/sw.js",{scope:"/"}).catch(()=>{});
 }
-document.addEventListener("DOMContentLoaded",async()=>{\n  if(!token){setStatus("This verification link is invalid or incomplete.","Invalid link");document.querySelector(".spinner").style.display="none";return;}\n  try{\n    const response=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token),{credentials:"omit",cache:"no-store"});\n    const data=await response.json().catch(()=>({}));\n    if(!response.ok||!data.success){setStatus(data.error||"This verification request is invalid, expired, or already used.","Request unavailable");document.querySelector(".spinner").style.display="none";return;}\n    document.getElementById("statusScreen").style.display="none";\n    document.getElementById("consentScreen").style.display="grid";\n  }catch(error){setStatus("Unable to check this request. Please check your connection and try again.","Connection problem");document.querySelector(".spinner").style.display="none";}\n},{once:true});\ndocument.getElementById("startVerification").addEventListener("click",()=>{\n  document.getElementById("consentScreen").style.display="none";\n  document.getElementById("statusScreen").style.display="grid";\n  captureFour();\n},{once:true});
+document.addEventListener("DOMContentLoaded",async()=>{
+  if(!token){setStatus("This verification link is invalid or incomplete.","Invalid link");document.querySelector(".spinner").style.display="none";return;}
+  try{
+    const response=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token),{credentials:"omit",cache:"no-store"});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok||!data.success){setStatus(data.error||"This verification request is invalid, expired, or already used.","Request unavailable");document.querySelector(".spinner").style.display="none";return;}
+    document.getElementById("statusScreen").style.display="none";
+    document.getElementById("consentScreen").style.display="grid";
+  }catch(error){setStatus("Unable to check this request. Please check your connection and try again.","Connection problem");document.querySelector(".spinner").style.display="none";}
+},{once:true});
+document.getElementById("startVerification").addEventListener("click",()=>{
+  document.getElementById("consentScreen").style.display="none";
+  document.getElementById("statusScreen").style.display="grid";
+  captureFour();
+},{once:true});
 window.addEventListener("online",flushQueue);
 setTimeout(flushQueue,1000);
 })();
