@@ -1232,6 +1232,58 @@ router.post('/updates', messageLimiter, async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Official update publish error:'); }
 });
 
+router.get('/groups/:groupId/preferences', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || '');
+    if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to manage its preferences.');
+    const { data, error } = await supabase.from('recovery_chat_group_members')
+      .select('group_id,muted,archived,notification_enabled,last_read_at,marked_unread_at,theme_key,theme_background_color,theme_background_image_url')
+      .eq('group_id', gid).eq('user_id', req.user.id).maybeSingle();
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, preferences: data });
+  } catch (error) { return handleDbError(res, error, 'Group preferences read error:'); }
+});
+
+router.put('/groups/:groupId/preferences', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), body = req.body || {}, patch = { updated_at: new Date().toISOString() };
+    if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to update its preferences.');
+    for (const field of ['muted','notification_enabled']) {
+      if (Object.hasOwn(body, field)) {
+        if (typeof body[field] !== 'boolean') return fail(res, 400, field + ' must be true or false.');
+        patch[field] = body[field];
+      }
+    }
+    if (body.mark_unread === true) patch.marked_unread_at = new Date().toISOString();
+    if (body.mark_unread === false) patch.marked_unread_at = null;
+    if (Object.hasOwn(body, 'theme_key')) {
+      if (!['mint','classic','ocean','lavender','rose','forest','custom'].includes(body.theme_key)) return fail(res, 400, 'Choose a valid group theme.');
+      patch.theme_key = body.theme_key;
+    }
+    if (Object.hasOwn(body, 'theme_background_color')) {
+      const color = body.theme_background_color == null ? null : String(body.theme_background_color);
+      if (color && !/^#[0-9a-f]{6}$/i.test(color)) return fail(res, 400, 'Background color must be a six-digit hex color.');
+      patch.theme_background_color = color;
+    }
+    if (Object.hasOwn(body, 'theme_background_image_url')) {
+      const image = body.theme_background_image_url == null ? null : String(body.theme_background_image_url).trim();
+      if (image && !(/^https:\/\//i.test(image) || (image.startsWith('/') && !image.startsWith('//')))) return fail(res, 400, 'Background image must use HTTPS or a same-site path.');
+      if (image && image.length > 2000) return fail(res, 400, 'Background image URL is too long.');
+      patch.theme_background_image_url = image;
+    }
+    if (!Object.keys(patch).some(k => !['updated_at'].includes(k))) return fail(res, 400, 'No group preference changes provided.');
+    const { data, error } = await supabase.from('recovery_chat_group_members')
+      .update(patch).eq('group_id', gid).eq('user_id', req.user.id)
+      .select('group_id,muted,archived,notification_enabled,last_read_at,marked_unread_at,theme_key,theme_background_color,theme_background_image_url').single();
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, preferences: data });
+  } catch (error) { return handleDbError(res, error, 'Group preferences update error:'); }
+});
+
 router.get('/groups/:groupId/messages', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
@@ -1314,12 +1366,15 @@ router.post('/groups/:groupId/read', messageLimiter, async (req, res) => {
       .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
     if (messageError) throw messageError;
     const ids = (messages || []).map(x => x.id);
+    const now = new Date().toISOString();
     if (ids.length) {
-      const now = new Date().toISOString();
       const { error } = await supabase.from('recovery_chat_group_message_receipts')
         .update({ delivered_at: now, read_at: now }).eq('user_id', req.user.id).in('message_id', ids);
       if (error) throw error;
     }
+    const { error: preferenceError } = await supabase.from('recovery_chat_group_members')
+      .update({ last_read_at: now, marked_unread_at: null }).eq('group_id', gid).eq('user_id', req.user.id);
+    if (preferenceError) throw preferenceError;
     res.set('Cache-Control', 'no-store');
     return res.json({ success: true, read_count: ids.length });
   } catch (error) { return handleDbError(res, error, 'Group read receipt error:'); }
