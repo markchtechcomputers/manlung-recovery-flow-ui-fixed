@@ -14,7 +14,7 @@ Assumptions:
 ## Data model
 
 ### 1:1 messages
-`recovery_community_messages`:
+`recovery_community_messages` (new `delivered_at` / `read_at` fields are backfilled from the earlier `recovery_chat_message_receipts` table):
 - `delivered_at`: first successful delivery while the recipient has a fresh presence heartbeat.
 - `read_at`: recipient read event. Once set, it remains set regardless of later presence changes.
 
