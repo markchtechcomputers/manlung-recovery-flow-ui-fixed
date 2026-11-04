@@ -234,12 +234,6 @@ router.get('/inbox', async (req, res) => {
       .select('last_seen_at').eq('user_id', req.user.id).maybeSingle();
     if (presenceError) throw presenceError;
     const online = Boolean(presence?.last_seen_at && Date.now() - new Date(presence.last_seen_at).getTime() < 60000);
-    if (online) {
-      const { error: deliveryError } = await supabase.from('recovery_community_messages')
-        .update({ delivered_at: now }).eq('recipient_user_id', req.user.id)
-        .is('delivered_at', null).is('deleted_at', null);
-      if (deliveryError) throw deliveryError;
-    }
 
     const [{ data, error }, { data: preferences, error: preferencesError }] = await Promise.all([
       supabase.from('recovery_community_messages')
@@ -253,8 +247,20 @@ router.get('/inbox', async (req, res) => {
     if (error) throw error;
     if (preferencesError) throw preferencesError;
 
+    let inboxRows = data || [];
+    if (online) {
+      const pendingIds = inboxRows.filter(row => String(row.recipient_user_id) === String(req.user.id) && !row.delivered_at).map(row => row.id);
+      if (pendingIds.length) {
+        const { error: deliveryError } = await supabase.from('recovery_community_messages')
+          .update({ delivered_at: now }).in('id', pendingIds).is('delivered_at', null);
+        if (deliveryError) throw deliveryError;
+        const deliveredIds = new Set(pendingIds.map(String));
+        inboxRows = inboxRows.map(row => deliveredIds.has(String(row.id)) ? { ...row, delivered_at: now } : row);
+      }
+    }
+
     const prefMap = new Map((preferences || []).map(p => [String(p.other_user_id), p]));
-    const rows = (data || []).reverse();
+    const rows = inboxRows.reverse();
     const unreadByPeer = {};
     for (const row of rows) {
       if (String(row.recipient_user_id) !== String(req.user.id) || row.read_at) continue;
@@ -290,6 +296,25 @@ router.get('/inbox', async (req, res) => {
           .order('created_at', { ascending: false }).limit(500)
       : { data: [], error: null };
     if (groupRowsError) throw groupRowsError;
+    if (online && (groupRows || []).length) {
+      const incomingGroupIds = groupRows.map(row => row.id);
+      const { data: existingReceipts, error: receiptReadError } = await supabase.from('recovery_chat_group_message_receipts')
+        .select('message_id,delivered_at').eq('user_id', req.user.id).in('message_id', incomingGroupIds);
+      if (receiptReadError) throw receiptReadError;
+      const existingIds = new Set((existingReceipts || []).map(row => String(row.message_id)));
+      const missingIds = incomingGroupIds.filter(id => !existingIds.has(String(id)));
+      if (missingIds.length) {
+        const { error: insertError } = await supabase.from('recovery_chat_group_message_receipts')
+          .upsert(missingIds.map(message_id => ({ message_id, user_id: req.user.id, delivered_at: now })), { onConflict: 'message_id,user_id', ignoreDuplicates: true });
+        if (insertError) throw insertError;
+      }
+      const undeliveredIds = (existingReceipts || []).filter(row => !row.delivered_at).map(row => row.message_id);
+      if (undeliveredIds.length) {
+        const { error: deliveryError } = await supabase.from('recovery_chat_group_message_receipts')
+          .update({ delivered_at: now }).eq('user_id', req.user.id).in('message_id', undeliveredIds);
+        if (deliveryError) throw deliveryError;
+      }
+    }
     const unreadByGroup = {};
     for (const row of groupRows || []) {
       const gid = String(row.group_id), pref = groupPrefMap.get(gid) || {};
@@ -339,20 +364,24 @@ router.get('/messages/:memberId', async (req, res) => {
     if (presenceError) throw presenceError;
     const recipientOnline = Boolean(presence?.last_seen_at
       && Date.now() - new Date(presence.last_seen_at).getTime() < 60000);
-    if (recipientOnline) {
-      const { error: deliveryError } = await supabase.from('recovery_community_messages')
-        .update({ delivered_at: new Date().toISOString() })
-        .eq('sender_user_id', other).eq('recipient_user_id', req.user.id)
-        .is('delivered_at', null).is('deleted_at', null);
-      if (deliveryError) throw deliveryError;
-    }
-
     const { data, error } = await supabase.from('recovery_community_messages')
       .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
       .is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
     if (error) throw error;
-    const messages = await Promise.all((data || []).map(async row => {
+    let messageRows = data || [];
+    if (recipientOnline) {
+      const pendingIds = messageRows.filter(row => String(row.recipient_user_id) === String(req.user.id) && !row.delivered_at).map(row => row.id);
+      if (pendingIds.length) {
+        const now = new Date().toISOString();
+        const { error: deliveryError } = await supabase.from('recovery_community_messages')
+          .update({ delivered_at: now }).in('id', pendingIds).is('delivered_at', null);
+        if (deliveryError) throw deliveryError;
+        const deliveredIds = new Set(pendingIds.map(String));
+        messageRows = messageRows.map(row => deliveredIds.has(String(row.id)) ? { ...row, delivered_at: now } : row);
+      }
+    }
+    const messages = await Promise.all(messageRows.map(async row => {
       const raw = String(row.message || '');
       if (!raw.startsWith('VOICE::')) return row;
       const parts = raw.slice(7).split('|');
