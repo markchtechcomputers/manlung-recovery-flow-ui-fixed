@@ -29,7 +29,7 @@ test('admin and client chat display sent, delivered and read tick states', () =>
   for (const source of [admin, client]) {
     assert.match(source, /m\.read_at \? 'read' : \(m\.delivered_at \? 'delivered' : 'sent'\)/);
     assert.match(source, /receiptTicks/);
-    assert.match(source, /'✓✓' : '✓'/);
+    assert.match(source, /'✓' : '✓✓'/);
     assert.match(source, /\/api\/messages\//);
   }
 });
