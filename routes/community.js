@@ -1268,9 +1268,9 @@ router.get('/groups/:groupId/messages', async (req, res) => {
     const gid = String(req.params.groupId || '');
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
     const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups')
-      .select('id,slug,approval_status').eq('id', gid).maybeSingle();
+      .select('id,slug').eq('id', gid).maybeSingle();
     if (targetError) throw targetError;
-    if (!targetGroup || targetGroup.approval_status !== 'approved') return fail(res, 404, 'Approved group not found.');
+    if (!targetGroup) return fail(res, 404, 'Group not found.');
     if (targetGroup.slug === 'manlung-team' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Team is available to admins and the owner only.');
     const isMember = await requireGroupMember(gid, req.user.id);
     if (!isAdmin(req.user) && !isMember) return fail(res, 403, 'You are not a member of this group.');
@@ -1295,7 +1295,7 @@ router.get('/groups/:groupId/messages', async (req, res) => {
       const missing = receivedIds.filter(id => !seen.has(String(id)));
       if (missing.length) {
         const { error: insertError } = await supabase.from('recovery_chat_group_message_receipts')
-          .insert(missing.map(message_id => ({ message_id, user_id: req.user.id, delivered_at: now })));
+          .upsert(missing.map(message_id => ({ message_id, user_id: req.user.id, delivered_at: now })), { onConflict: 'message_id,user_id', ignoreDuplicates: true });
         if (insertError) throw insertError;
       }
       const undelivered = (existing || []).filter(x => !x.delivered_at).map(x => x.message_id);
@@ -1356,6 +1356,16 @@ router.post('/groups/:groupId/read', messageLimiter, async (req, res) => {
     const ids = (messages || []).map(x => x.id);
     const now = new Date().toISOString();
     if (ids.length) {
+      const { data: existingReceipts, error: existingError } = await supabase.from('recovery_chat_group_message_receipts')
+        .select('message_id').eq('user_id', req.user.id).in('message_id', ids);
+      if (existingError) throw existingError;
+      const existingIds = new Set((existingReceipts || []).map(x => String(x.message_id)));
+      const missingIds = ids.filter(id => !existingIds.has(String(id)));
+      if (missingIds.length) {
+        const { error: insertError } = await supabase.from('recovery_chat_group_message_receipts')
+          .upsert(missingIds.map(message_id => ({ message_id, user_id: req.user.id, delivered_at: now, read_at: now })), { onConflict: 'message_id,user_id', ignoreDuplicates: true });
+        if (insertError) throw insertError;
+      }
       const { error } = await supabase.from('recovery_chat_group_message_receipts')
         .update({ delivered_at: now, read_at: now }).eq('user_id', req.user.id).in('message_id', ids);
       if (error) throw error;
