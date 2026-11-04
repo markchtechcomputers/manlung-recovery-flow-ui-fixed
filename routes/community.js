@@ -241,6 +241,16 @@ router.post('/messages/:memberId/read', messageLimiter, async (req, res) => {
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
 
     const readAt = new Date().toISOString();
+    // A read receipt necessarily means the recipient has received the message.
+    // Fill delivery timestamps only when absent so the original delivery time is preserved.
+    const { error: deliveryError } = await supabase.from('recovery_community_messages')
+      .update({ delivered_at: readAt })
+      .eq('sender_user_id', other)
+      .eq('recipient_user_id', req.user.id)
+      .is('delivered_at', null)
+      .is('deleted_at', null);
+    if (deliveryError) throw deliveryError;
+
     const { data, error } = await supabase.from('recovery_community_messages')
       .update({ read_at: readAt })
       .eq('sender_user_id', other)
