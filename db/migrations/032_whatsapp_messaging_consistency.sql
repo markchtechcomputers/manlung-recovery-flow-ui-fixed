@@ -6,6 +6,14 @@ alter table public.recovery_community_messages
   add column if not exists delivered_at timestamptz,
   add column if not exists read_at timestamptz;
 
+-- Preserve existing per-recipient receipts created by the earlier chat platform migration.
+update public.recovery_community_messages m
+set delivered_at = coalesce(m.delivered_at, r.delivered_at),
+    read_at = coalesce(m.read_at, r.read_at)
+from public.recovery_chat_message_receipts r
+where r.message_id = m.id and r.user_id = m.recipient_user_id
+  and (m.delivered_at is null or m.read_at is null);
+
 alter table public.recovery_chat_preferences
   add column if not exists last_read_at timestamptz,
   add column if not exists marked_unread_at timestamptz,
