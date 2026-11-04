@@ -24,7 +24,7 @@ Added fields:
 - `notification_enabled`: per-chat notification preference.
 - `theme_key`, `theme_background_color`, `theme_background_image_url`: per-chat appearance.
 
-Unread counts use incoming, not-yet-read messages newer than the later of `last_read_at` and `marked_unread_at`. If the user manually marks a chat unread but there is no newer message, the inbox returns a manual unread marker (count 1). Marking unread does not update message rows, alter old receipts or move the conversation's last-message timestamp. The device notification cursor is deliberately not reset by this action.
+Unread counts use incoming, not-yet-read messages newer than the later of `last_read_at` and `marked_unread_at`. If the user manually marks a chat unread but there is no newer message, the inbox returns a manual unread marker (count 1). Marking unread does not update message rows, alter old receipts or move the conversation's last-message timestamp. The device notification cursor is deliberately not reset by this action. Because the previous schema did not persist a conversation-level read cursor, migration 032 establishes a one-time `last_read_at = now()` baseline for pre-existing direct conversations (and existing group memberships); it first copies any known per-message read receipts. This prevents historical backlog from being reclassified as unread/new. Pre-migration unread badges that were never persisted cannot be reconstructed; new messages after migration are tracked normally. New group memberships also start their read boundary at join time.
 
 ### Device notification cursor — `recovery_chat_notification_cursors`
 
@@ -80,7 +80,7 @@ Stores per-message/per-member `delivered_at` and `read_at`.
 1. Mark a conversation with old read history as unread. Confirm only the manual unread marker appears; no old message is rewritten, reordered or popped up.
 2. Send a new message after the mark. Confirm only the new message increments unread and can produce a notice.
 3. Open the conversation. Confirm the badge clears and only messages newer than the read/manual-unread boundary receive a read event.
-4. Reload, reconnect and return from background with old messages present. Confirm old history does not produce pop-ups; existing unread state remains represented by the read cursor.
+4. Reload, reconnect and return from background with old messages present. Confirm pre-migration history does not produce unread badges or pop-ups; messages received after migration are tracked from the new read cursor.
 5. Send while recipient is offline: sender sees one gray tick. Bring recipient online and allow inbox polling: double gray. Open/read: double blue. Take recipient offline and restart sender app: double blue remains.
 6. Disable recipient read receipts: online delivery may become double gray, but no blue tick is inferred from presence.
 7. Independently disable app notifications, mute one chat, disable notifications for one chat and deny browser permission. Confirm each setting suppresses the appropriate in-app/OS notice.
