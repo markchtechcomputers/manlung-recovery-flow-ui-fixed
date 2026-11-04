@@ -53,5 +53,19 @@ alter table public.recovery_chat_group_message_receipts enable row level securit
 revoke all on table public.recovery_chat_notification_cursors from anon, authenticated;
 revoke all on table public.recovery_chat_group_message_receipts from anon, authenticated;
 
+alter table public.recovery_chat_group_members
+  add column if not exists last_read_at timestamptz,
+  add column if not exists marked_unread_at timestamptz,
+  add column if not exists notification_enabled boolean not null default true,
+  add column if not exists theme_key text not null default 'mint',
+  add column if not exists theme_background_color text,
+  add column if not exists theme_background_image_url text;
+
+alter table public.recovery_chat_group_members
+  drop constraint if exists recovery_chat_group_members_theme_key_check;
+alter table public.recovery_chat_group_members
+  add constraint recovery_chat_group_members_theme_key_check
+  check (theme_key in ('mint','classic','ocean','lavender','rose','forest','custom'));
+
 notify pgrst, 'reload schema';
 commit;
