@@ -277,6 +277,39 @@ router.get('/inbox', async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Community inbox error:'); }
 });
 
+router.get('/group-inbox', async (req, res) => {
+  try {
+    const { data: memberships, error: membershipError } = await supabase.from('recovery_chat_group_members')
+      .select('group_id,muted,manual_unread,manual_unread_at,last_read_at').eq('user_id', req.user.id);
+    if (membershipError) throw membershipError;
+    const groupIds = (memberships || []).map(x => x.group_id);
+    if (!groupIds.length) return res.json({ success: true, messages: [], preferences: [], groups: [] });
+    const { data: messages, error } = await supabase.from('recovery_chat_group_messages')
+      .select('id,group_id,sender_user_id,message,created_at,edited_at,deleted_at')
+      .in('group_id', groupIds).neq('sender_user_id', req.user.id).is('deleted_at', null)
+      .order('created_at', { ascending: false }).limit(500);
+    if (error) throw error;
+    const rows = (messages || []).reverse(), ids = rows.map(x => x.id);
+    let receipts = [];
+    if (ids.length) {
+      const result = await supabase.from('recovery_chat_group_message_receipts')
+        .select('message_id,delivered_at,read_at').eq('user_id', req.user.id).in('message_id', ids);
+      if (result.error) throw result.error;
+      receipts = result.data || [];
+    }
+    const receiptMap = new Map(receipts.map(x => [String(x.message_id), x]));
+    const { data: groups, error: groupError } = await supabase.from('recovery_chat_groups')
+      .select('id,name,slug,avatar_url').in('id', groupIds);
+    if (groupError) throw groupError;
+    const result = rows.map(row => {
+      const receipt = receiptMap.get(String(row.id));
+      return { ...row, delivered_at: receipt?.delivered_at || null, read_at: receipt?.read_at || null };
+    });
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, messages: result, preferences: memberships || [], groups: groups || [] });
+  } catch (error) { return handleDbError(res, error, 'Community group inbox error:'); }
+});
+
 router.get('/messages/:memberId', async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
@@ -1292,7 +1325,7 @@ router.get('/groups/:groupId/messages', async (req, res) => {
         }
       }
       const { error: clearError } = await supabase.from('recovery_chat_group_members')
-        .update({ manual_unread: false, manual_unread_at: null })
+        .update({ manual_unread: false, manual_unread_at: null, last_read_at: new Date().toISOString() })
         .eq('group_id', gid).eq('user_id', req.user.id);
       if (clearError) throw clearError;
     }
