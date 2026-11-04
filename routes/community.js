@@ -519,6 +519,11 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
       if (passError) throw passError;
       if (!pass?.length) return fail(res,403,'Accept the friend request or purchase an active Chat pass to message this member.');
     }
+    const { error: preferenceError } = await supabase.from('recovery_chat_preferences').upsert([
+      { user_id: req.user.id, other_user_id: other },
+      { user_id: other, other_user_id: req.user.id }
+    ], { onConflict: 'user_id,other_user_id', ignoreDuplicates: true });
+    if (preferenceError) throw preferenceError;
     const { data, error } = await supabase.from('recovery_community_messages')
       .insert({ sender_user_id: req.user.id, recipient_user_id: other, message })
       .select('id,sender_user_id,recipient_user_id,message,created_at').single();
