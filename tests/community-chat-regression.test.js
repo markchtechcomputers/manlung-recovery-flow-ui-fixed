@@ -27,7 +27,14 @@ test('mark as unread changes a conversation boundary, not message history', () =
   assert.match(routes, /marked_unread_at/);
   assert.match(routes, /last_read_at/);
   assert.match(frontend, /Marked as unread/);
-  assert.doesNotMatch(routes, /update\(\{\s*read_at:/);
+  const directPrefsStart = routes.indexOf("router.put('/preferences/:memberId'");
+  const directPrefsEnd = routes.indexOf("router.post('/blocks/:memberId'", directPrefsStart);
+  const groupPrefsStart = routes.indexOf("router.put('/groups/:groupId/preferences'");
+  const groupPrefsEnd = routes.indexOf("router.get('/groups/:groupId/messages'", groupPrefsStart);
+  assert.ok(directPrefsStart >= 0 && directPrefsEnd > directPrefsStart);
+  assert.ok(groupPrefsStart >= 0 && groupPrefsEnd > groupPrefsStart);
+  assert.doesNotMatch(routes.slice(directPrefsStart, directPrefsEnd), /recovery_community_messages|read_at:\\s*now/);
+  assert.doesNotMatch(routes.slice(groupPrefsStart, groupPrefsEnd), /recovery_chat_group_message_receipts|read_at:\\s*now/);
 });
 
 test('opening a direct conversation marks only messages newer than the read cutoff', () => {
@@ -67,7 +74,7 @@ test('message content renders reaction chips only when persisted reactions exist
   assert.doesNotMatch(frontend, /rr\.className='rxr'/);
   assert.match(frontend, /function openMessageReactionPicker/);
   assert.match(frontend, /inputmode="text"/);
-  assert.match(frontend, /function openPicker\(mid\)/);
+  assert.match(frontend, /const openPicker=\\(mid\\)=>/);
 });
 
 test('per-chat themes, mute and notification preferences persist through the API', () => {
@@ -85,7 +92,7 @@ test('per-chat themes, mute and notification preferences persist through the API
 });
 
 test('default avatars and cache-busted profile photos cover broken-image cases', () => {
-  assert.match(frontend, /function defaultAvatar\(/);
+  assert.match(frontend, /const defaultAvatar=/);
   assert.match(frontend, /function avatarSrc\(/);
   assert.match(frontend, /avatarVersion/);
   assert.match(frontend, /document\.addEventListener\('error',event=>/);
