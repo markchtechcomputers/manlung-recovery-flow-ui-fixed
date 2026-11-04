@@ -367,9 +367,9 @@ router.get('/messages/:memberId', async (req, res) => {
     const { data, error } = await supabase.from('recovery_community_messages')
       .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
-      .is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
-    let messageRows = data || [];
+    let messageRows = (data || []).reverse();
     if (recipientOnline) {
       const pendingIds = messageRows.filter(row => String(row.recipient_user_id) === String(req.user.id) && !row.delivered_at).map(row => row.id);
       if (pendingIds.length) {
