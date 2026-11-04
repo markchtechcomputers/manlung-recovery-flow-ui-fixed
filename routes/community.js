@@ -470,7 +470,7 @@ router.get('/messages/:memberId/reactions', async (req, res) => {
     if (messageError) throw messageError;
     const ids = (messages || []).map(x => x.id);
     if (!ids.length) return res.json({ success: true, reactions: [] });
-    const { data, error } = await supabase.from('recovery_chat_message_reactions')
+    const { data, error } = await supabase.from('recovery_chat_message_reactions_v2')
       .select('message_id,user_id,reaction,created_at').in('message_id', ids).order('created_at', { ascending: true });
     if (error) throw error;
     res.set('Cache-Control', 'no-store');
@@ -490,16 +490,16 @@ router.post('/messages/:memberId/:messageId/reactions', messageLimiter, async (r
       .is('deleted_at', null).maybeSingle();
     if (messageError) throw messageError;
     if (!message) return fail(res, 404, 'Message not found in this conversation.');
-    const { data: existing, error: existingError } = await supabase.from('recovery_chat_message_reactions')
+    const { data: existing, error: existingError } = await supabase.from('recovery_chat_message_reactions_v2')
       .select('reaction').eq('message_id', id).eq('user_id', req.user.id).maybeSingle();
     if (existingError) throw existingError;
     if (existing?.reaction === reaction) {
-      const { error } = await supabase.from('recovery_chat_message_reactions')
+      const { error } = await supabase.from('recovery_chat_message_reactions_v2')
         .delete().eq('message_id', id).eq('user_id', req.user.id);
       if (error) throw error;
       return res.json({ success: true, reacted: false, reaction: null });
     }
-    const { data, error } = await supabase.from('recovery_chat_message_reactions')
+    const { data, error } = await supabase.from('recovery_chat_message_reactions_v2')
       .upsert({ message_id: id, user_id: req.user.id, reaction }, { onConflict: 'message_id,user_id' })
       .select('message_id,user_id,reaction,created_at').single();
     if (error) throw error;
@@ -1455,7 +1455,7 @@ router.delete('/groups/:groupId/messages/:messageId', messageLimiter, async (req
       .select('id').maybeSingle();
     if (error) throw error;
     if (!data) return fail(res, 404, 'Message not found.');
-    const { error: reactionError } = await supabase.from('recovery_chat_group_reactions').delete().eq('message_id', mid);
+    const { error: reactionError } = await supabase.from('recovery_chat_group_reactions_v2').delete().eq('message_id', mid);
     if (reactionError) throw reactionError;
     res.set('Cache-Control', 'no-store');
     return res.json({ success: true, unsent: true, messageId: mid });
@@ -1478,7 +1478,7 @@ router.get('/groups/:groupId/reactions', async (req, res) => {
     if (messageError) throw messageError;
     const ids = (messages || []).map(x => x.id);
     if (!ids.length) return res.json({ success: true, reactions: [] });
-    const { data, error } = await supabase.from('recovery_chat_group_reactions')
+    const { data, error } = await supabase.from('recovery_chat_group_reactions_v2')
       .select('message_id,user_id,reaction,created_at').in('message_id', ids).order('created_at', { ascending: true });
     if (error) throw error;
     res.set('Cache-Control', 'no-store');
@@ -1500,16 +1500,16 @@ router.post('/groups/:groupId/messages/:messageId/reactions', messageLimiter, as
       .select('id,group_id').eq('id', mid).eq('group_id', gid).is('deleted_at', null).maybeSingle();
     if (messageError) throw messageError;
     if (!message) return fail(res, 404, 'Message not found in this group.');
-    const { data: existing, error: existingError } = await supabase.from('recovery_chat_group_reactions')
+    const { data: existing, error: existingError } = await supabase.from('recovery_chat_group_reactions_v2')
       .select('reaction').eq('message_id', mid).eq('user_id', req.user.id).maybeSingle();
     if (existingError) throw existingError;
     if (existing?.reaction === reaction) {
-      const { error } = await supabase.from('recovery_chat_group_reactions')
+      const { error } = await supabase.from('recovery_chat_group_reactions_v2')
         .delete().eq('message_id', mid).eq('user_id', req.user.id);
       if (error) throw error;
       return res.json({ success: true, reacted: false, reaction: null });
     }
-    const { data, error } = await supabase.from('recovery_chat_group_reactions')
+    const { data, error } = await supabase.from('recovery_chat_group_reactions_v2')
       .upsert({ message_id: mid, user_id: req.user.id, reaction }, { onConflict: 'message_id,user_id' })
       .select('message_id,user_id,reaction,created_at').single();
     if (error) throw error;
