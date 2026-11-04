@@ -292,6 +292,25 @@ router.get('/group-inbox', async (req, res) => {
     const rows = (messages || []).reverse(), ids = rows.map(x => x.id);
     let receipts = [];
     if (ids.length) {
+      const existingResult = await supabase.from('recovery_chat_group_message_receipts')
+        .select('message_id,delivered_at,read_at').eq('user_id', req.user.id).in('message_id', ids);
+      if (existingResult.error) throw existingResult.error;
+      const existing = existingResult.data || [];
+      const byId = new Map(existing.map(x => [String(x.message_id), x]));
+      const now = new Date().toISOString();
+      const missing = ids.filter(id => !byId.has(String(id))).map(message_id => ({
+        message_id, user_id: req.user.id, delivered_at: now
+      }));
+      if (missing.length) {
+        const { error: insertError } = await supabase.from('recovery_chat_group_message_receipts').insert(missing);
+        if (insertError) throw insertError;
+      }
+      const undelivered = ids.filter(id => byId.has(String(id)) && !byId.get(String(id)).delivered_at);
+      if (undelivered.length) {
+        const { error: updateError } = await supabase.from('recovery_chat_group_message_receipts')
+          .update({ delivered_at: now }).eq('user_id', req.user.id).in('message_id', undelivered).is('delivered_at', null);
+        if (updateError) throw updateError;
+      }
       const result = await supabase.from('recovery_chat_group_message_receipts')
         .select('message_id,delivered_at,read_at').eq('user_id', req.user.id).in('message_id', ids);
       if (result.error) throw result.error;
