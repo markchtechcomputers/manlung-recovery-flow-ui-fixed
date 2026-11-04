@@ -1382,8 +1382,10 @@ router.get('/groups/:groupId/messages', async (req, res) => {
     ]) : [{ data: [], error: null }];
     if (receiptError) throw receiptError;
     const activeRecipientCount = Math.max(0, (members || []).filter(x => String(x.user_id) !== String(req.user.id)).length);
+    const activeMemberIds = new Set((members || []).map(x => String(x.user_id)));
     const byMessage = new Map();
     for (const receipt of receipts || []) {
+      if (!activeMemberIds.has(String(receipt.user_id)) || String(receipt.user_id) === String(req.user.id)) continue;
       const key = String(receipt.message_id);
       if (!byMessage.has(key)) byMessage.set(key, { delivered: 0, read: 0 });
       const value = byMessage.get(key);
