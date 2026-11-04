@@ -78,7 +78,7 @@ test('reactions render only persisted chips and support arbitrary Unicode emoji'
   assert.match(renderer, /m\[13\]/);
   assert.doesNotMatch(renderer, /m\[7\]&&m\[7\]\.length/);
   assert.doesNotMatch(renderer, /ml-channel-reaction-picker/);
-  assert.match(routes, /Extended_Pictographic|\\\\p\{Emoji\}/);
+  assert.match(routes, /Extended_Pictographic|\\p\{Emoji\}/);
   assert.match(frontend, /inputmode="text"/);
 });
 
