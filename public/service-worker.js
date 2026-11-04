@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manlung-recovery-static-v54';
+const CACHE_NAME = 'manlung-recovery-static-v55';
 const OFFLINE_PAGE = '/offline';
 const STATIC_ASSETS = [
   OFFLINE_PAGE,
@@ -13,11 +13,10 @@ const STATIC_ASSETS = [
 ];
 async function cachedOfflinePage() {
   const cache = await caches.open(CACHE_NAME);
-  return await cache.match(OFFLINE_PAGE) ||
-    new Response('Manlung Recovery is offline. Reconnect and try again.', {
-      status: 503,
-      headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' }
-    });
+  return await cache.match(OFFLINE_PAGE) || new Response('Manlung Recovery is offline. Reconnect and try again.', {
+    status: 503,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' }
+  });
 }
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
@@ -30,9 +29,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key =>
-      key.startsWith('manlung-recovery-static-') && key !== CACHE_NAME
-    ).map(key => caches.delete(key)));
+    await Promise.all(keys.filter(key => key.startsWith('manlung-recovery-static-') && key !== CACHE_NAME).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -40,8 +37,7 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
-  if (url.searchParams.has('__manlung_probe')) return;
+  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/') || url.searchParams.has('__manlung_probe')) return;
   if (request.mode === 'navigate' || request.destination === 'document') {
     event.respondWith((async () => {
       if (url.pathname === OFFLINE_PAGE) {
@@ -50,15 +46,17 @@ self.addEventListener('fetch', event => {
           if (response.ok) {
             const cache = await caches.open(CACHE_NAME);
             await cache.put(OFFLINE_PAGE, response.clone());
-            return response;
           }
-        } catch (_) {}
-        return await cachedOfflinePage();
+          // HTTP errors are server responses, not proof of lost connectivity.
+          return response;
+        } catch (_) {
+          return await cachedOfflinePage();
+        }
       }
       try {
-        const response = await fetch(request, { cache: 'no-store' });
-        if (response && response.ok) return response;
-        throw new Error('Navigation request failed');
+        // Preserve 4xx/5xx responses for the browser; only network failures
+        // should redirect to the offline fallback.
+        return await fetch(request, { cache: 'no-store' });
       } catch (_) {
         const offlineUrl = new URL(OFFLINE_PAGE, self.location.origin);
         offlineUrl.searchParams.set('return', request.url);
