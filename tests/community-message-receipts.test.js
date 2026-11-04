@@ -1,0 +1,34 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const root = path.join(__dirname, '..');
+const routes = fs.readFileSync(path.join(root, 'routes/community.js'), 'utf8');
+const frontend = fs.readFileSync(path.join(root, 'public/client/connect.html'), 'utf8');
+const migration = fs.readFileSync(path.join(root, 'db/migrations/033_community_message_receipts.sql'), 'utf8');
+
+test('direct messages persist delivered and read timestamps', () => {
+  assert.match(migration, /add column if not exists delivered_at timestamptz/i);
+  assert.match(migration, /add column if not exists read_at timestamptz/i);
+  assert.match(routes, /\.update\(\{ delivered_at: deliveredAt \}\)/);
+  assert.match(routes, /delivered_at,read_at/);
+});
+
+test('direct chat exposes a recipient-only read receipt endpoint', () => {
+  assert.match(routes, /router\.post\('\/messages\/:memberId\/read'/);
+  assert.match(routes, /\.eq\('sender_user_id', other\)/);
+  assert.match(routes, /\.eq\('recipient_user_id', req\.user\.id\)/);
+  assert.match(routes, /\.update\(\{ delivered_at: readAt, read_at: readAt \}\)/);
+});
+
+test('direct chat uses server receipt states for single, double and blue double ticks', () => {
+  assert.match(frontend, /x\.read_at\?2:\(x\.delivered_at\?1:0\)/);
+  assert.match(frontend, /tk\(S\.receipts\?m\[3\]:Math\.min\(m\[3\]\|0,1\)\)/);
+  assert.match(frontend, /\.tk\.rd\{color:#34b7f1\}/);
+  assert.match(frontend, /\/messages\/\+encodeURIComponent\(id\)\+'\/read'/);
+});
+
+test('active direct conversations mark incoming messages read', () => {
+  assert.match(frontend, /if\(String\(open\)===peer\).*?\/read/s);
+});
