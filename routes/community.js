@@ -238,7 +238,7 @@ router.get('/inbox', async (req, res) => {
       if (String(row.recipient_user_id) !== String(req.user.id) || row.read_at) continue;
       const peer = String(row.sender_user_id);
       const pref = prefMap.get(peer) || {};
-      const cutoff = [pref.last_read_at, pref.marked_unread_at].filter(Boolean)
+      const cutoff = [pref.last_read_at || notificationCursor, pref.marked_unread_at].filter(Boolean)
         .map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
       if (!cutoff || new Date(row.created_at).getTime() > cutoff) unreadByPeer[peer] = (unreadByPeer[peer] || 0) + 1;
     }
@@ -270,7 +270,7 @@ router.get('/inbox', async (req, res) => {
     const unreadByGroup = {};
     for (const row of groupRows || []) {
       const gid = String(row.group_id), pref = groupPrefMap.get(gid) || {};
-      const cutoff = [pref.last_read_at, pref.marked_unread_at].filter(Boolean)
+      const cutoff = [pref.last_read_at || notificationCursor, pref.marked_unread_at].filter(Boolean)
         .map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
       if (!cutoff || new Date(row.created_at).getTime() > cutoff) unreadByGroup[gid] = (unreadByGroup[gid] || 0) + 1;
     }
