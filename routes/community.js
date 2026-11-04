@@ -408,7 +408,7 @@ router.post('/messages/:memberId/:messageId/reactions', messageLimiter, async (r
     const other = String(req.params.memberId || ''), id = String(req.params.messageId || '');
     const reaction = String(req.body?.reaction || '').trim();
     if (!validId(other) || !validId(id) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message.');
-    if (reaction && (Array.from(reaction).length > 16 || !/\p{Extended_Pictographic}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
+    if (reaction && (Array.from(reaction).length > 16 || !/\p{Emoji}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
     const { data: message, error: messageError } = await supabase.from('recovery_community_messages')
       .select('id').eq('id', id)
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
@@ -1532,7 +1532,7 @@ router.post('/groups/:groupId/messages/:messageId/reactions', messageLimiter, as
     const gid = String(req.params.groupId || ''), mid = String(req.params.messageId || '');
     const reaction = cleanText(req.body?.reaction, 16);
     if (!validId(gid) || !validId(mid)) return fail(res, 400, 'Invalid group or message ID.');
-    if (reaction && (Array.from(reaction).length > 16 || !/\p{Extended_Pictographic}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
+    if (reaction && (Array.from(reaction).length > 16 || !/\p{Emoji}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
     const { data: group, error: groupError } = await supabase.from('recovery_chat_groups')
       .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
     if (groupError) throw groupError;
