@@ -2214,7 +2214,7 @@ async function startSocialSignup(provider, errorTarget='loginError'){
     });
     if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)throw new Error('Supabase authentication is not configured.');
     const supabase=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{
-      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit',storage:window.localStorage}
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType: 'pkce',storage:window.localStorage}
     });
     localStorage.removeItem('clientUser');
     const {error}=await supabase.auth.signInWithOAuth({
