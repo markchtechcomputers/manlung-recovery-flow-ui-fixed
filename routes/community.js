@@ -98,7 +98,7 @@ async function saveDirectPreference(userId, otherUserId, patch) {
   const { data, error } = await supabase.from('recovery_chat_preferences')
     .upsert({ user_id: userId, other_user_id: otherUserId, ...patch, updated_at: new Date().toISOString() },
       { onConflict: 'user_id,other_user_id' })
-    .select('user_id,other_user_id,archived,muted,pinned,starred,manual_unread,manual_unread_at,chat_theme_id,background_color,background_image_url')
+    .select('user_id,other_user_id,archived,muted,pinned,starred,manual_unread,manual_unread_at,last_read_at,chat_theme_id,background_color,background_image_url')
     .single();
   if (error) throw error;
   return data;
@@ -267,7 +267,7 @@ router.get('/inbox', async (req, res) => {
     let preferences = [];
     if (peers.length) {
       const result = await supabase.from('recovery_chat_preferences')
-        .select('other_user_id,archived,muted,pinned,starred,manual_unread,manual_unread_at,chat_theme_id,background_color,background_image_url')
+        .select('other_user_id,archived,muted,pinned,starred,manual_unread,manual_unread_at,last_read_at,chat_theme_id,background_color,background_image_url')
         .eq('user_id', req.user.id).in('other_user_id', peers);
       if (result.error) throw result.error;
       preferences = result.data || [];
@@ -344,14 +344,14 @@ router.post('/messages/:memberId/read', async (req, res) => {
     if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid other member.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
     const { data: pref, error: prefError } = await supabase.from('recovery_chat_preferences')
-      .select('manual_unread_at').eq('user_id', req.user.id).eq('other_user_id', other).maybeSingle();
+      .select('manual_unread_at,last_read_at').eq('user_id', req.user.id).eq('other_user_id', other).maybeSingle();
     if (prefError) throw prefError;
     let query = supabase.from('recovery_community_messages').select('id,created_at')
       .eq('sender_user_id', other).eq('recipient_user_id', req.user.id).is('deleted_at', null)
       .order('created_at', { ascending: true }).limit(500);
     const { data: incoming, error } = await query;
     if (error) throw error;
-    const cutoff = pref?.manual_unread_at ? new Date(pref.manual_unread_at).getTime() : 0;
+    const cutoff = Math.max(pref?.manual_unread_at ? new Date(pref.manual_unread_at).getTime() : 0, pref?.last_read_at ? new Date(pref.last_read_at).getTime() : 0);
     const eligible = (incoming || []).filter(row => new Date(row.created_at).getTime() > cutoff);
     const ids = eligible.map(row => row.id);
     const now = new Date().toISOString();
@@ -375,7 +375,7 @@ router.post('/messages/:memberId/read', async (req, res) => {
         if (updateError) throw updateError;
       }
     }
-    await saveDirectPreference(req.user.id, other, { manual_unread: false, manual_unread_at: null });
+    await saveDirectPreference(req.user.id, other, { manual_unread: false, manual_unread_at: null, last_read_at: now });
     res.set('Cache-Control', 'no-store');
     return res.json({ success: true, readAt: now, messageIds: ids });
   } catch (error) { return handleDbError(res, error, 'Direct message read receipt error:'); }
