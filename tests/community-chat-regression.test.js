@@ -104,6 +104,8 @@ test('default avatars and cache-busted profile photos cover broken-image cases',
   assert.match(frontend, /const defaultAvatar=/);
   assert.match(frontend, /function avatarSrc\(/);
   assert.match(frontend, /avatarVersion/);
+  assert.match(frontend, /ml-message-row/);
+  assert.match(frontend, /imageAvatar\(mine\?/);
   assert.match(frontend, /document\.addEventListener\('error',event=>/);
   assert.match(frontend, /img\.remove\(\);parent\.classList\.add\('ml-default-avatar'\)/);
   assert.match(frontend, /avatar-placeholder\.svg/);
