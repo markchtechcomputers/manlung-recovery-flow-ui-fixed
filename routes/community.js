@@ -1335,10 +1335,7 @@ router.get('/groups/:groupId/reactions', async (req, res) => {
       .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
     if (groupError) throw groupError;
     if (!group) return fail(res, 404, 'Group not found.');
-    const isOfficialChannel = ['manlung-updates', 'manlung-official-updates'].includes(String(group.slug || ''))
-      || group.admin_only_announcements === true;
-    if (!isOfficialChannel) return fail(res, 403, 'Reactions are available in official channels only.');
-    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this channel to view reactions.');
+    if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to view reactions.');
     const { data: messages, error: messageError } = await supabase.from('recovery_chat_group_messages')
       .select('id').eq('group_id', gid).is('deleted_at', null)
       .order('created_at', { ascending: false }).limit(100);
@@ -1360,24 +1357,23 @@ router.post('/groups/:groupId/messages/:messageId/reactions', messageLimiter, as
   try {
     const gid = String(req.params.groupId || ''), mid = String(req.params.messageId || '');
     const reaction = cleanText(req.body?.reaction, 16);
-    const supported = ['👍','❤️','😂','😮','😢','🙏','🔥','🎉','👏','💚'];
     if (!validId(gid) || !validId(mid)) return fail(res, 400, 'Invalid group or message ID.');
-    if (!supported.includes(reaction)) return fail(res, 400, 'Choose a supported reaction.');
+    if (!reaction || Array.from(reaction).length > 16 || !/\\p{Extended_Pictographic}/u.test(reaction)) return fail(res, 400, 'Enter one emoji reaction.');
     const { data: group, error: groupError } = await supabase.from('recovery_chat_groups')
       .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
     if (groupError) throw groupError;
     if (!group) return fail(res, 404, 'Group not found.');
-    const isOfficialChannel = ['manlung-updates', 'manlung-official-updates'].includes(String(group.slug || ''))
-      || group.admin_only_announcements === true;
-    if (!isOfficialChannel) return fail(res, 403, 'Reactions are available in official channels only.');
-    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this channel to react.');
+    if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to react.');
     const { data: message, error: messageError } = await supabase.from('recovery_chat_group_messages')
       .select('id,group_id').eq('id', mid).eq('group_id', gid).is('deleted_at', null).maybeSingle();
     if (messageError) throw messageError;
     if (!message) return fail(res, 404, 'Message not found in this channel.');
-    // Idempotent upsert: another tap cannot delete an existing reaction.
+    // One reaction per member/message: selecting another emoji replaces it.
+    const { error: removeError } = await supabase.from('recovery_chat_group_reactions')
+      .delete().eq('message_id', mid).eq('user_id', req.user.id);
+    if (removeError) throw removeError;
     const { error } = await supabase.from('recovery_chat_group_reactions')
-      .upsert({ message_id: mid, user_id: req.user.id, reaction }, { onConflict: 'message_id,user_id,reaction' });
+      .insert({ message_id: mid, user_id: req.user.id, reaction });
     if (error) throw error;
     res.set('Cache-Control', 'no-store');
     return res.status(201).json({ success: true, reacted: true, reaction });
