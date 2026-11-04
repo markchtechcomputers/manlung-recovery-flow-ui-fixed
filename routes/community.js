@@ -435,7 +435,7 @@ router.post('/plans/initialize', async (req, res) => {
     try {
       const init=await axios.post(PAYSTACK_URL+'/transaction/initialize',{
         email,amount:plan.amountMinor,currency:'KES',reference,plan:planCode,
-        callback_url:process.env.PAYSTACK_CHAT_PLAN_CALLBACK_URL||(String(process.env.PUBLIC_APP_URL||'').replace(/\/+$/,'')+'/client/connect.html'),
+        callback_url:process.env.PAYSTACK_CHAT_PLAN_CALLBACK_URL||(String(process.env.PUBLIC_APP_URL||'').replace(/\/+$/,'')+'/client/connect'),
         metadata:{product:'manlung_community_subscription',plan_code:code,user_id:req.user.id,purchase_id:purchase.id,amount_kes:plan.amountKes}
       },{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:15000});
       if(!init.data?.status||!init.data?.data?.authorization_url) throw new Error('Paystack did not return checkout URL.');
@@ -1359,7 +1359,7 @@ router.post('/verification/initialize', statusLimiter, async (req,res) => {
   const reference='MTC-VERIFY-'+Date.now()+'-'+crypto.randomBytes(8).toString('hex');
   const {data:purchase,error:pe}=await supabase.from('recovery_chat_verification_purchases').insert({user_id:req.user.id,provider_reference:reference,amount_kes:100,currency:'KES',status:'pending'}).select('id,provider_reference').single(); if(pe)throw pe;
   try {
-   const init=await axios.post(PAYSTACK_URL+'/transaction/initialize',{email,amount:10000,currency:'KES',reference,callback_url:process.env.PAYSTACK_CHAT_VERIFICATION_CALLBACK_URL||(String(process.env.PUBLIC_APP_URL||'https://manlungrecovery.manlungshop.co.ke').replace(/\/+$/,'')+'/client/connect.html?verification=1'),metadata:{product:'manlung_verified_badge',user_id:req.user.id,purchase_id:purchase.id,amount_kes:100}},{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:15000});
+   const init=await axios.post(PAYSTACK_URL+'/transaction/initialize',{email,amount:10000,currency:'KES',reference,callback_url:process.env.PAYSTACK_CHAT_VERIFICATION_CALLBACK_URL||(String(process.env.PUBLIC_APP_URL||'https://manlungrecovery.manlungshop.co.ke').replace(/\/+$/,'')+'/client/connect?verification=1'),metadata:{product:'manlung_verified_badge',user_id:req.user.id,purchase_id:purchase.id,amount_kes:100}},{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:15000});
    if(!init.data?.status||!init.data?.data?.authorization_url)throw new Error('Paystack did not return a checkout URL.');
    return res.json({success:true,purchaseId:purchase.id,reference,authorizationUrl:init.data.data.authorization_url,amountKes:100});
   } catch(e){await supabase.from('recovery_chat_verification_purchases').update({status:'failed'}).eq('id',purchase.id);throw e;}

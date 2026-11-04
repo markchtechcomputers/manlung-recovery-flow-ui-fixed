@@ -190,6 +190,17 @@
       "dest": "/public/admin/$1"
     },
     {
+      "src": "/client/connect\\.html",
+      "status": 308,
+      "headers": {
+        "Location": "/client/connect"
+      }
+    },
+    {
+      "src": "/client/connect/?",
+      "dest": "/public/client/connect.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/$1"
     }
