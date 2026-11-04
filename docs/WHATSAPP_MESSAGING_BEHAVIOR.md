@@ -6,9 +6,10 @@ This change covers Manlung Community 1:1 conversations, community groups and the
 
 Assumptions:
 - The server is authoritative for message delivery/read state, per-chat unread state, preferences and reactions.
-- The app uses authenticated local notifications while the app is running. The current deployment does not have a configured Web Push subscription pipeline, so background/closed-app push delivery is not claimed.
+- The app uses authenticated local notifications while the app is running. The current deployment does not have a configured Web Push subscription pipeline, so background/closed-app push delivery is not claimed. The foreground app surfaces local notifications for direct and group messages.
 - A device notification cursor is reset at app start and when the page resumes from the background. Messages that arrived before that session/resume boundary remain in history and unread counts but are not replayed as pop-ups.
 - Group receipts use active, non-archived members as the recipient population.
+- Group mute, notification, unread cursor and theme preferences are stored on each user's group-membership row.
 
 ## Data model
 
@@ -35,6 +36,7 @@ Unread is computed from incoming messages newer than the later of `last_read_at`
 
 ### Group receipts
 `recovery_chat_group_message_receipts` stores per-member `delivered_at` and `read_at`.
+`recovery_chat_group_members` also stores per-member `last_read_at`, `marked_unread_at`, `notification_enabled` and theme settings.
 
 Aggregate group tick rule for a message sent by the current user:
 - **Single gray tick:** no active recipient has received it.
@@ -50,6 +52,7 @@ Aggregate group tick rule for a message sent by the current user:
 - `POST /api/community/messages/:memberId/read`: marks only messages newer than the conversation read cutoff as read; advances the cursor and clears manual unread.
 - `GET /api/community/preferences/:memberId` and `PUT /api/community/preferences/:memberId`: read/update mute, notification, unread-marker and theme preferences.
 - `GET /api/community/messages/:memberId/reactions` and `POST /api/community/messages/:memberId/:messageId/reactions`: direct reactions.
+- `GET /api/community/groups/:groupId/preferences` and `PUT /api/community/groups/:groupId/preferences`: group mute, notification, unread-marker and theme preferences.
 - `GET /api/community/groups/:groupId/messages` and `POST /api/community/groups/:groupId/read`: group history and receipts.
 - Group reaction endpoints now work for all joined groups, not only official channels.
 
