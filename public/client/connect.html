@@ -1043,7 +1043,7 @@ function ensureSpecialChatRecords(){
  return {saved,updates}
 }
 window.openSharedGroup=async function(groupId){
- const gid=String(groupId||'');if(!gid)return toast('This group has no valid ID.');
+ const gid=String(groupId||'');if(!gid)return toast('This group has no valid ID.');clearChatNotifications('group:'+gid);
  let group=(ML.groups||[]).find(g=>String(g.id)===gid);
  if(!group){try{const data=await apiReq('/groups');ML.groups=data.groups||[];group=ML.groups.find(g=>String(g.id)===gid)}catch(e){return toast(e.message||'Could not load community groups. Refresh and try again.')}}
  if(!group)return toast('This group is no longer available. Refresh Community and try again.');
