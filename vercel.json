@@ -147,6 +147,11 @@
   ],
   "routes": [
     {
+      "src": "^/verification/([^/]+)/?$",
+      "dest": "/public/selfie.html?id=$1",
+      "continue": false
+    },
+    {
       "src": "/api/auth/github(?:/(.*))?",
       "dest": "/api/auth-github.js"
     },
@@ -183,17 +188,15 @@
       "dest": "/public/admin/login.html"
     },
     {
-      "src": "/verification/([^/]+)",
-      "dest": "/public/selfie.html"
-    },
-    {
       "src": "/admin/(.*)",
       "dest": "/public/admin/$1"
     },
     {
       "src": "^/client/connect\\.html$",
       "status": 308,
-      "headers": { "Location": "/client/connect" }
+      "headers": {
+        "Location": "/client/connect"
+      }
     },
     {
       "src": "^/client/connect/?$",
