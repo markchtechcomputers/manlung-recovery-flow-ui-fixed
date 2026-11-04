@@ -72,7 +72,7 @@
 
         function clearOAuthUrl() {
             try {
-                window.history.replaceState({}, document.title, `${window.location.origin}/oauth-callback.html`);
+                window.history.replaceState({}, document.title, `${window.location.origin}/oauth-callback`);
             } catch (_) {}
         }
 
