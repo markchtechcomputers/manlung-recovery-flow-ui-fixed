@@ -20,8 +20,8 @@ test('direct chat exposes a recipient-only read receipt endpoint', () => {
   assert.match(routes, /\.eq\('sender_user_id', other\)/);
   assert.match(routes, /\.eq\('recipient_user_id', req\.user\.id\)/);
   assert.match(routes, /\.update\(\{ read_at: readAt \}\)/);
-  assert.match(routes, /\\.update\\(\\{ delivered_at: readAt \\}\\)/);
-  assert.match(routes, /\\.is\\('delivered_at', null\\)/);
+  assert.ok(routes.includes('.update({ delivered_at: readAt })'));
+  assert.ok(routes.includes(".is('delivered_at', null)"));
 });
 
 test('direct chat uses server receipt states for single, double and blue double ticks', () => {
