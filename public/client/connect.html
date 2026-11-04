@@ -934,6 +934,7 @@ async function liveSync(){
   const inbox=await apiReq('/inbox?device_id='+encodeURIComponent(deviceId));
   const rows=Array.isArray(inbox.messages)?inbox.messages:[];
   const prefs=new Map((inbox.preferences||[]).map(p=>[String(p.other_user_id),p]));
+  const groupPrefs=new Map((inbox.group_preferences||[]).map(p=>[String(p.group_id),p]));
   const byPeer=new Map();
   for(const row of rows){
    const peer=String(row.sender_user_id)===String(ML.me)?String(row.recipient_user_id):String(row.sender_user_id);
@@ -965,18 +966,28 @@ async function liveSync(){
     apiReq('/messages/'+encodeURIComponent(peer)+'/read',{method:'POST',body:'{}'}).then(()=>{c.markedUnreadAt=null;c.un=0;save()}).catch(()=>{});
    }
   }
+  for(const c of S.chats.filter(x=>x.groupId)){
+   const gid=String(c.groupId),pref=groupPrefs.get(gid)||{};
+   c.mu=!!pref.muted;c.notifyEnabled=pref.notification_enabled!==false;
+   c.themeKey=pref.theme_key||c.themeKey||S.chatTheme||'mint';c.themeColor=pref.theme_background_color||null;c.themeImage=pref.theme_background_image_url||null;
+   c.markedUnreadAt=pref.marked_unread_at||null;
+   const unread=Number((inbox.unread_by_group||{})[gid]||0),oldUnread=Number(c.un||0);c.un=String(open)===String(c.id)?0:unread;
+   if(oldUnread!==c.un)changed=true;
+  }
   const candidates=Array.isArray(inbox.notification_messages)?inbox.notification_messages:[];
   const byNotifyPeer=new Map();
   for(const row of candidates){
    const id=String(row.id||'');if(!id||window.__mlNotifiedMessageIds.has(id))continue;
    window.__mlNotifiedMessageIds.add(id);
    const peer=String(row.peer_id||row.sender_user_id||'');if(!peer||peer===String(open))continue;
-   const pref=prefs.get(peer)||{};if(pref.muted===true||pref.notification_enabled===false)continue;
+   const isGroup=row.kind==='group',pref=isGroup?groupPrefs.get(String(row.group_id))||{}:prefs.get(peer)||{};if(pref.muted===true||pref.notification_enabled===false)continue;
    if(!byNotifyPeer.has(peer))byNotifyPeer.set(peer,[]);
    byNotifyPeer.get(peer).push(row);
   }
   for(const [peer,items] of byNotifyPeer){
-   const c=S.chats.find(x=>String(x.memberId)===peer)||chat(member(peer)||{id:peer,name:'Member'});
+   const isGroup=items[0]?.kind==='group',gid=isGroup?String(items[0].group_id):'';
+   const c=isGroup?(S.chats.find(x=>String(x.groupId)===gid)||{id:'group:'+gid,groupId:gid,n:(ML.groups||[]).find(g=>String(g.id)===gid)?.name||'Group'}):(S.chats.find(x=>String(x.memberId)===peer)||chat(member(peer)||{id:peer,name:'Member'}));
+   items.sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0));
    const last=items[items.length-1],mapped=['th',String(last.message||''),time(last.created_at),0,null,c.n,null,null,0,new Date(last.created_at||0).getTime(),0,0,last.id];
    if(S.notif){ding();showIncomingMessageNotice(c,mapped);
     if('Notification'in window&&Notification.permission==='granted'){
