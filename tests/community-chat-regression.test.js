@@ -87,6 +87,7 @@ test('group reactions, group themes and aggregate group receipts are supported',
   assert.match(routes, /router\.put\('\/groups\/:groupId\/preferences'/);
   assert.match(routes, /recovery_chat_group_message_receipts/);
   assert.match(routes, /recipient_count: activeRecipientCount/);
+  assert.match(routes, /activeMemberIds/);
   assert.match(frontend, /ml-group-theme/);
   assert.match(frontend, /ml-group-mark-unread/);
   assert.match(frontend, /ml-group-receipt/);
@@ -100,4 +101,5 @@ test('messaging migration adds notification cursors, read state and theme fields
   assert.match(migration, /theme_background_image_url/);
   assert.match(migration, /delivered_at timestamptz/);
   assert.match(migration, /read_at timestamptz/);
+  assert.match(migration, /recovery_chat_message_receipts/);
 });
