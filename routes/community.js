@@ -57,6 +57,28 @@ async function requireGroupMember(groupId, userId) {
   if (error) throw error;
   return Boolean(data);
 }
+async function ensureGroupMembership(groupId, userId) {
+  const { data: existing, error: readError } = await supabase.from('recovery_chat_group_members')
+    .select('group_id').eq('group_id', groupId).eq('user_id', userId).maybeSingle();
+  if (readError) throw readError;
+  if (existing) {
+    const { error } = await supabase.from('recovery_chat_group_members')
+      .update({ archived: false }).eq('group_id', groupId).eq('user_id', userId);
+    if (error) throw error;
+    return;
+  }
+  const { error: insertError } = await supabase.from('recovery_chat_group_members')
+    .insert({ group_id: groupId, user_id: userId, archived: false, last_read_at: new Date().toISOString() });
+  if (insertError) {
+    if (insertError.code === '23505') {
+      const { error } = await supabase.from('recovery_chat_group_members')
+        .update({ archived: false }).eq('group_id', groupId).eq('user_id', userId);
+      if (error) throw error;
+      return;
+    }
+    throw insertError;
+  }
+}
 function handleDbError(res, error, context) {
   const code = String(error?.code || '');
   const message = String(error?.message || '');
@@ -1044,9 +1066,7 @@ router.get('/groups', async (req, res) => {
       // Updates is also readable by every authenticated client; main-app staff do not need client signup.
       const shouldAutoJoin = ['admin', 'owner'].includes(req.user.role) || group.slug === 'manlung-updates';
       if (shouldAutoJoin && !membership) {
-        const added = await supabase.from('recovery_chat_group_members')
-          .upsert({ group_id: group.id, user_id: req.user.id, archived: false }, { onConflict: 'group_id,user_id' });
-        if (added.error) throw added.error;
+        await ensureGroupMembership(group.id, req.user.id);
         membership = { group_id: group.id, archived: false };
       }
       if (!joined.some(x=>x.id===group.id)) joined.push({ ...group, joined: Boolean(membership), archived: Boolean(membership?.archived) });
@@ -1088,12 +1108,8 @@ router.post('/groups', async (req,res) => {
       .insert({slug,name,description,created_by:req.user.id,is_default:false,allow_member_invites:true,admin_only_announcements:false})
       .select('id,slug,name,description,is_default,avatar_url,created_at').single();
     if(error) throw error;
-    const {error:memberError}=await supabase.from('recovery_chat_group_members')
-      .insert({group_id:group.id,user_id:req.user.id,archived:false});
-    if(memberError) {
-      await supabase.from('recovery_chat_groups').delete().eq('id',group.id);
-      throw memberError;
-    }
+    try { await ensureGroupMembership(group.id, req.user.id); }
+    catch (memberError) { await supabase.from('recovery_chat_groups').delete().eq('id',group.id); throw memberError; }
     res.status(201).json({success:true,group:{...group,joined:true,archived:false}});
   } catch(error) { return handleDbError(res,error,'Community group create error:'); }
 });
@@ -1108,8 +1124,7 @@ router.post('/groups/:groupId/join', async (req,res) => {
     const {data:groupDetails,error:detailError}=await supabase.from('recovery_chat_groups').select('slug').eq('id',gid).maybeSingle();
     if(detailError) throw detailError;
     if(groupDetails?.slug==='manlung-team'&&!isAdmin(req.user)) return fail(res,403,'Manlung Team is available to admins and the owner only.');
-    const {error}=await supabase.from('recovery_chat_group_members').upsert({group_id:gid,user_id:req.user.id,archived:false},{onConflict:'group_id,user_id'});
-    if(error) throw error;
+    await ensureGroupMembership(gid, req.user.id);
     res.status(201).json({success:true,joined:true});
   } catch(error) { return handleDbError(res,error,'Group join error:'); }
 });
@@ -1133,8 +1148,7 @@ router.post('/groups/:groupId/members/:memberId', async (req,res) => {
     const {data:user,error:ue}=await supabase.from('recovery_users').select('id').eq('id',uid).maybeSingle();
     if(ue) throw ue;
     if(!user) return fail(res,404,'Registered member not found.');
-    const {error}=await supabase.from('recovery_chat_group_members').upsert({group_id:gid,user_id:uid,archived:false},{onConflict:'group_id,user_id'});
-    if(error) throw error;
+    await ensureGroupMembership(gid, uid);
     res.json({success:true,added:true});
   } catch(error) { return handleDbError(res,error,'Admin group add error:'); }
 });
@@ -1199,9 +1213,7 @@ router.post('/updates', messageLimiter, async (req, res) => {
     if (!channel) return fail(res, 503, 'The Manlung Updates channel is not ready yet. Refresh Community and try again.');
     // Staff are normally auto-joined by GET /groups, but posting must not fail
     // just because an admin has not opened the channel on this device yet.
-    const { error: membershipError } = await supabase.from('recovery_chat_group_members')
-      .upsert({ group_id: channel.id, user_id: req.user.id, archived: false }, { onConflict: 'group_id,user_id' });
-    if (membershipError) throw membershipError;
+    await ensureGroupMembership(channel.id, req.user.id);
     const message = (pinned ? '[PINNED] ' : '') + (title ? title + (body ? String.fromCharCode(10, 10) : '') : '') + body;
     const { data, error } = await supabase.from('recovery_chat_group_messages')
       .insert({ group_id: channel.id, sender_user_id: req.user.id, message })
