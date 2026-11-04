@@ -916,8 +916,9 @@ function showIncomingMessageNotice(c,last){
  }catch(_){}
 }
 // Keep chat previews, unread counts, and community statuses current without a manual refresh.
+function newNotificationDeviceId(){if(window.crypto&&typeof window.crypto.randomUUID==='function')return window.crypto.randomUUID();return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&3|8)).toString(16)})}
 function notificationDeviceId(){
- try{let id=localStorage.getItem('mlg-notification-device');if(!id){id=crypto.randomUUID();localStorage.setItem('mlg-notification-device',id)}return id}catch(_){return crypto.randomUUID()}
+ try{let id=localStorage.getItem('mlg-notification-device');if(!id){id=newNotificationDeviceId();localStorage.setItem('mlg-notification-device',id)}return id}catch(_){return newNotificationDeviceId()}
 }
 async function startNotificationSession(force=false){
  if(!ML.me||(!force&&window.__mlNotificationSessionUser===String(ML.me)))return;
