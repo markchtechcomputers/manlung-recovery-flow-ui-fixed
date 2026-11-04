@@ -252,7 +252,38 @@ router.get('/inbox', async (req, res) => {
       return pref.muted !== true && pref.notification_enabled !== false
         && new Date(row.created_at).getTime() > new Date(notificationCursor).getTime()
         && new Date(row.created_at).getTime() <= new Date(now).getTime();
-    }).map(row => ({ ...row, peer_id: row.sender_user_id }));
+    }).map(row => ({ ...row, kind: 'direct', peer_id: row.sender_user_id }));
+
+    const { data: groupPreferences, error: groupPreferencesError } = await supabase.from('recovery_chat_group_members')
+      .select('group_id,muted,archived,notification_enabled,last_read_at,marked_unread_at,theme_key,theme_background_color,theme_background_image_url')
+      .eq('user_id', req.user.id).or('archived.is.null,archived.eq.false');
+    if (groupPreferencesError) throw groupPreferencesError;
+    const groupIds = (groupPreferences || []).map(x => x.group_id);
+    const groupPrefMap = new Map((groupPreferences || []).map(p => [String(p.group_id), p]));
+    const { data: groupRows, error: groupRowsError } = groupIds.length
+      ? await supabase.from('recovery_chat_group_messages')
+          .select('id,group_id,sender_user_id,message,created_at,edited_at,deleted_at')
+          .in('group_id', groupIds).neq('sender_user_id', req.user.id).is('deleted_at', null)
+          .order('created_at', { ascending: false }).limit(500)
+      : { data: [], error: null };
+    if (groupRowsError) throw groupRowsError;
+    const unreadByGroup = {};
+    for (const row of groupRows || []) {
+      const gid = String(row.group_id), pref = groupPrefMap.get(gid) || {};
+      const cutoff = [pref.last_read_at, pref.marked_unread_at].filter(Boolean)
+        .map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
+      if (!cutoff || new Date(row.created_at).getTime() > cutoff) unreadByGroup[gid] = (unreadByGroup[gid] || 0) + 1;
+    }
+    for (const [gid, pref] of groupPrefMap) {
+      if (pref.marked_unread_at && !unreadByGroup[gid]) unreadByGroup[gid] = 1;
+    }
+    for (const row of groupRows || []) {
+      const pref = groupPrefMap.get(String(row.group_id)) || {};
+      if (pref.muted === true || pref.notification_enabled === false) continue;
+      if (new Date(row.created_at).getTime() <= new Date(notificationCursor).getTime()
+        || new Date(row.created_at).getTime() > new Date(now).getTime()) continue;
+      notificationMessages.push({ ...row, kind: 'group', peer_id: 'group:' + row.group_id, group_id: row.group_id });
+    }
 
     if (validId(deviceId)) {
       const { error: cursorUpdateError } = await supabase.from('recovery_chat_notification_cursors').upsert({
@@ -264,7 +295,9 @@ router.get('/inbox', async (req, res) => {
     res.set('Cache-Control', 'no-store');
     return res.json({
       success: true, messages: rows, preferences: preferences || [],
-      unread_by_peer: unreadByPeer, notification_messages: notificationMessages
+      group_preferences: groupPreferences || [],
+      unread_by_peer: unreadByPeer, unread_by_group: unreadByGroup,
+      notification_messages: notificationMessages
     });
   } catch (error) { return handleDbError(res, error, 'Community inbox error:'); }
 });
