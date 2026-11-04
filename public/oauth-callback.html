@@ -108,35 +108,52 @@
                 auth: {
                     persistSession: true,
                     autoRefreshToken: true,
-                    detectSessionInUrl: true,
-                    flowType: 'implicit',
+                    detectSessionInUrl: false,
+                    flowType: 'pkce',
                     storage: window.localStorage
                 }
             });
 
             const url = new URL(window.location.href);
             const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-            const hashError = hashParams.get('error_description') || hashParams.get('error');
+            const callbackError = url.searchParams.get('error_description') ||
+                url.searchParams.get('error') ||
+                hashParams.get('error_description') ||
+                hashParams.get('error');
 
-            if (hashError) {
+            if (callbackError) {
                 clearOAuthUrl();
-                throw new Error(hashError);
+                throw new Error(callbackError);
             }
 
             let session = null;
-            const { data: restored, error: restoreError } = await client.auth.getSession();
-            if (restoreError) throw restoreError;
-            session = restored?.session || null;
+            const authorizationCode = url.searchParams.get('code');
 
-            if (!session?.access_token) {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                const { data: retryData, error: retryError } = await client.auth.getSession();
-                if (retryError) throw retryError;
-                session = retryData?.session || null;
+            // Supabase now returns PKCE authorization codes. Exchange the code
+            // explicitly before asking the backend to create the Manlung session.
+            if (authorizationCode) {
+                const { data: exchanged, error: exchangeError } =
+                    await client.auth.exchangeCodeForSession(authorizationCode);
+                if (exchangeError) throw exchangeError;
+                session = exchanged?.session || null;
+            } else {
+                // Backward compatibility for older implicit-flow callback links.
+                const accessToken = url.searchParams.get('access_token') || hashParams.get('access_token');
+                const refreshToken = url.searchParams.get('refresh_token') || hashParams.get('refresh_token');
+                if (accessToken && refreshToken) {
+                    const { data: restoredTokens, error: tokenError } =
+                        await client.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+                    if (tokenError) throw tokenError;
+                    session = restoredTokens?.session || null;
+                } else {
+                    const { data: restored, error: restoreError } = await client.auth.getSession();
+                    if (restoreError) throw restoreError;
+                    session = restored?.session || null;
+                }
             }
 
             if (!session?.access_token) {
-                throw new Error('GitHub authentication completed, but the session could not be restored. Please try GitHub again.');
+                throw new Error('Social sign-in completed, but the secure session could not be restored. Please return to sign in and try again.');
             }
 
             clearOAuthUrl();
