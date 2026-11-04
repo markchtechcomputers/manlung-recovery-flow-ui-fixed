@@ -206,5 +206,12 @@
       "src": "/(.*)",
       "dest": "/public/$1"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/verification/:token",
+      "destination": "/selfie.html?id=:token",
+      "permanent": false
+    }
   ]
 }
