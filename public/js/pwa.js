@@ -88,30 +88,27 @@
         #manlung-pwa-welcome{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 35%,#173d62 0%,#0b2340 42%,#061326 100%);color:#f8fafc;text-align:center;opacity:1;visibility:visible;transition:opacity .42s ease,visibility .42s ease}
         #manlung-pwa-welcome.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
         #manlung-pwa-welcome .mr-welcome-content{width:min(100%,440px);display:flex;flex-direction:column;align-items:center;gap:18px;animation:mrWelcomeIn .65s cubic-bezier(.2,.75,.25,1) both}
-        #manlung-pwa-welcome img{display:block;width:clamp(88px,22vw,126px);height:clamp(88px,22vw,126px);object-fit:cover;border-radius:28px;background:#fff;box-shadow:0 18px 50px #0007,0 0 0 1px #ffffff35;animation:mrWelcomeIn .55s cubic-bezier(.2,.75,.25,1) both}
         #manlung-pwa-welcome h1{margin:8px 0 0;color:#fff;font:800 clamp(1.45rem,5vw,2rem)/1.2 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.035em;opacity:0;animation:mrWelcomeIn .48s ease .38s both}
         #manlung-pwa-welcome p{max-width:340px;margin:0;color:#d7e5f4;font:500 clamp(.9rem,3.2vw,1.02rem)/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;opacity:0;animation:mrWelcomeIn .48s ease .58s both}
         #manlung-pwa-welcome .mr-welcome-rule{width:54px;height:3px;border-radius:99px;background:linear-gradient(90deg,#22c55e,#38bdf8);opacity:0;animation:mrWelcomeIn .35s ease .26s both}
         @keyframes mrWelcomeIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-        @media(prefers-reduced-motion:reduce){#manlung-pwa-welcome,#manlung-pwa-welcome .mr-welcome-content,#manlung-pwa-welcome img,#manlung-pwa-welcome h1,#manlung-pwa-welcome p,#manlung-pwa-welcome .mr-welcome-rule{transition:none;animation:none;opacity:1}}
+        @media(prefers-reduced-motion:reduce){#manlung-pwa-welcome,#manlung-pwa-welcome .mr-welcome-content,#manlung-pwa-welcome h1,#manlung-pwa-welcome p,#manlung-pwa-welcome .mr-welcome-rule{transition:none;animation:none;opacity:1}}
       `;
       document.head.appendChild(style);
     }
 
-    let alreadyWelcomed = false;
-    try { alreadyWelcomed = sessionStorage.getItem('manlung-pwa-welcomed') === '1'; } catch (_) {}
-    if (!alreadyWelcomed && !document.getElementById('manlung-pwa-welcome')) {
-      try { sessionStorage.setItem('manlung-pwa-welcomed', '1'); } catch (_) {}
+    // Show the welcome message on each fresh app page load, including after refresh.
+    if (!document.getElementById('manlung-pwa-welcome')) {
       const splash = document.createElement('div');
       splash.id = 'manlung-pwa-welcome';
       splash.setAttribute('role', 'status');
       splash.setAttribute('aria-label', 'Welcome to Manlung Recovery');
-      splash.innerHTML = '<div class="mr-welcome-content"><img src="/icons/icon-192.png" alt="Manlung Recovery app icon"><div class="mr-welcome-rule"></div><h1>Welcome to Manlung Recovery</h1><p>where Technology meets your expectation</p></div>';
+      splash.innerHTML = '<div class="mr-welcome-content"><div class="mr-welcome-rule"></div><h1>Welcome to Manlung Recovery</h1><p>where Technology meets your expectation</p></div>';
       document.body.appendChild(splash);
       window.setTimeout(() => {
         splash.classList.add('is-leaving');
         window.setTimeout(() => splash.remove(), 480);
-      }, 1750);
+      }, 5500);
     }
   }
 
