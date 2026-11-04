@@ -5,6 +5,7 @@ begin;
 alter table public.recovery_chat_preferences
   add column if not exists manual_unread boolean not null default false,
   add column if not exists manual_unread_at timestamptz,
+  add column if not exists last_read_at timestamptz not null default now(),
   add column if not exists chat_theme_id text not null default 'mint',
   add column if not exists background_color text,
   add column if not exists background_image_url text;
@@ -63,13 +64,28 @@ create unique index if not exists recovery_chat_group_reactions_one_per_user_idx
 alter table public.recovery_chat_group_members
   add column if not exists manual_unread boolean not null default false,
   add column if not exists manual_unread_at timestamptz,
-  add column if not exists last_read_at timestamptz,
+  add column if not exists last_read_at timestamptz not null default now(),
   add column if not exists chat_theme_id text not null default 'mint',
   add column if not exists background_color text,
   add column if not exists background_image_url text;
 
 alter table public.recovery_chat_group_members
   drop constraint if exists recovery_chat_group_members_theme_id_check;
+
+-- Existing conversations have no reliable historical per-message read receipt.
+-- Establish a migration-time baseline so syncing legacy history never marks it new.
+insert into public.recovery_chat_preferences (user_id, other_user_id, last_read_at)
+select distinct sender_user_id, recipient_user_id, now()
+from public.recovery_community_messages
+where sender_user_id is not null and recipient_user_id is not null
+union
+select distinct recipient_user_id, sender_user_id, now()
+from public.recovery_community_messages
+where sender_user_id is not null and recipient_user_id is not null
+on conflict (user_id, other_user_id) do nothing;
+
+update public.recovery_chat_preferences set last_read_at = now() where last_read_at is null;
+update public.recovery_chat_group_members set last_read_at = now() where last_read_at is null;
 alter table public.recovery_chat_group_members
   add constraint recovery_chat_group_members_theme_id_check
   check (chat_theme_id in ('mint','classic','ocean','lavender','rose','forest','custom'));
