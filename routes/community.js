@@ -865,7 +865,11 @@ router.post('/groups', messageLimiter, async (req,res) => {
     const isStaff=isAdmin(req.user);
     if(name.length<2) return fail(res,400,'Group name must contain at least 2 characters.');
     if(description.length>2000) return fail(res,400,'Group description must be 2000 characters or fewer.');
-    if(avatar.length>180000 || (avatar && !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/i.test(avatar) && !/^https:\/\//i.test(avatar) && !(avatar.startsWith('/')&&!avatar.startsWith('//'))) return fail(res,400,'Group picture must be a PNG, JPEG or WebP image, secure HTTPS URL, or same-site path.');
+    const validAvatar = !avatar ||
+      /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/i.test(avatar) ||
+      /^https:\/\//i.test(avatar) ||
+      (avatar.startsWith('/') && !avatar.startsWith('//'));
+    if (avatar.length > 180000 || !validAvatar) return fail(res,400,'Group picture must be a PNG, JPEG or WebP image, secure HTTPS URL, or same-site path.');
     const slug='community-'+crypto.randomUUID();
     const approval_status=isStaff?'approved':'pending';
     const {data:group,error}=await supabase.from('recovery_chat_groups')
