@@ -100,7 +100,7 @@ async function collectUnreadMessageIds(table, filters, userId, cutoff) {
   while (true) {
     let query = supabase.from(table).select('id,created_at')
       .is('deleted_at', null).order('created_at', { ascending: true }).range(offset, offset + 499);
-    for (const [key, value] of Object.entries(filters || {})) query = query.eq(key, value);
+    for (const [key, value] of Object.entries(filters || {})) query = key.startsWith('!') ? query.neq(key.slice(1), value) : query.eq(key, value);
     if (cutoff) query = query.gt('created_at', new Date(cutoff).toISOString());
     const { data, error } = await query;
     if (error) throw error;
@@ -1347,15 +1347,8 @@ router.get('/groups/:groupId/messages', async (req, res) => {
       const cutoff = Math.max(self?.manual_unread_at ? new Date(self.manual_unread_at).getTime() : 0,
         self?.last_read_at ? new Date(self.last_read_at).getTime() : 0);
       const incomingIds = await collectUnreadMessageIds('recovery_chat_group_messages',
-        { group_id: gid }, req.user.id, cutoff);
-      // Exclude the current member's own messages from the group read cursor.
-      if (incomingIds.length) {
-        const { data: incomingRows, error: incomingError } = await supabase.from('recovery_chat_group_messages')
-          .select('id').in('id', incomingIds).neq('sender_user_id', req.user.id);
-        if (incomingError) throw incomingError;
-        const idsToRead = (incomingRows || []).map(x => x.id);
-        if (idsToRead.length) await markReceiptRowsRead('recovery_chat_group_message_receipts', req.user.id, idsToRead, new Date().toISOString());
-      }
+        { group_id: gid, '!sender_user_id': req.user.id }, req.user.id, cutoff);
+      if (incomingIds.length) await markReceiptRowsRead('recovery_chat_group_message_receipts', req.user.id, incomingIds, new Date().toISOString());
       const { error: clearError } = await supabase.from('recovery_chat_group_members')
         .update({ manual_unread: false, manual_unread_at: null, last_read_at: new Date().toISOString() })
         .eq('group_id', gid).eq('user_id', req.user.id);
