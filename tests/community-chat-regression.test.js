@@ -22,7 +22,7 @@ test('unread state and notification delivery use separate cursors', () => {
 
 test('mark as unread changes a conversation boundary, not message history', () => {
   assert.match(frontend, /function markChatUnread\(/);
-  assert.match(frontend, /function markGroupUnread/);
+  assert.match(frontend, /markGroupUnread=async/);
   assert.match(routes, /body\.mark_unread === true/);
   assert.match(routes, /marked_unread_at/);
   assert.match(routes, /last_read_at/);
