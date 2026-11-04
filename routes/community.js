@@ -30,6 +30,7 @@ function publicProfile(profile, user, presence) {
     username: user.username || null,
     role: user.role,
     avatar: profile?.avatar_visibility === 'private' ? null : (profile?.avatar_url || null),
+    avatarUpdatedAt: profile?.updated_at || null,
     avatarVisibility: profile?.avatar_visibility === 'private' ? 'private' : 'public',
     bio: profile?.bio || '',
     createdAt: user.created_at || null,
@@ -57,8 +58,13 @@ async function requireGroupMember(groupId, userId) {
   return Boolean(data);
 }
 function handleDbError(res, error, context) {
-  if (error?.code === '42P01' || /recovery_chat_|recovery_community_messages|recovery_peer_calls|recovery_peer_call_signals/.test(error?.message || '')) {
-    return fail(res, 503, 'Chat database SQL has not been applied yet. Run the supplied Manlung Chat SQL in Supabase.');
+  const code = String(error?.code || '');
+  const message = String(error?.message || '');
+  const schemaMissing = ['42P01', '42703', 'PGRST204', 'PGRST205'].includes(code)
+    || /schema cache|column .* does not exist|relation .* does not exist/i.test(message);
+  if (schemaMissing) {
+    console.error(context, { code, message, hint: error?.hint || null });
+    return fail(res, 503, 'The chat database schema is missing or out of date. Apply the latest Manlung Chat SQL migrations in the main Supabase project, then refresh.');
   }
   console.error(context, error?.message || error);
   return fail(res, 500, 'The request could not be completed.');
@@ -176,15 +182,126 @@ router.post('/voice/upload-url', messageLimiter, async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Voice upload URL error:'); }
 });
 
-router.get('/inbox', async (req, res) => {
+router.post('/notifications/session', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('recovery_community_messages')
-      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
-      .or('sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + req.user.id)
-      .is('deleted_at', null).order('created_at', { ascending: false }).limit(500);
+    const deviceId = String(req.body?.device_id || '');
+    if (!validId(deviceId)) return fail(res, 400, 'A valid device ID is required.');
+    const now = new Date().toISOString();
+    const { error } = await supabase.from('recovery_chat_notification_cursors').upsert({
+      user_id: req.user.id, device_id: deviceId, last_polled_at: now, updated_at: now
+    }, { onConflict: 'user_id,device_id' });
     if (error) throw error;
     res.set('Cache-Control', 'no-store');
-    return res.json({ success: true, messages: (data || []).reverse() });
+    return res.json({ success: true, sessionStartedAt: now });
+  } catch (error) { return handleDbError(res, error, 'Notification session error:'); }
+});
+
+router.get('/inbox', async (req, res) => {
+  try {
+    const now = new Date().toISOString();
+    const deviceId = String(req.query?.device_id || '');
+    let notificationCursor = now;
+    if (validId(deviceId)) {
+      const { data: cursor, error: cursorError } = await supabase.from('recovery_chat_notification_cursors')
+        .select('last_polled_at').eq('user_id', req.user.id).eq('device_id', deviceId).maybeSingle();
+      if (cursorError) throw cursorError;
+      if (cursor?.last_polled_at) notificationCursor = cursor.last_polled_at;
+    }
+
+    const { data: presence, error: presenceError } = await supabase.from('recovery_chat_presence')
+      .select('last_seen_at').eq('user_id', req.user.id).maybeSingle();
+    if (presenceError) throw presenceError;
+    const online = Boolean(presence?.last_seen_at && Date.now() - new Date(presence.last_seen_at).getTime() < 60000);
+    if (online) {
+      const { error: deliveryError } = await supabase.from('recovery_community_messages')
+        .update({ delivered_at: now }).eq('recipient_user_id', req.user.id)
+        .is('delivered_at', null).is('deleted_at', null);
+      if (deliveryError) throw deliveryError;
+    }
+
+    const [{ data, error }, { data: preferences, error: preferencesError }] = await Promise.all([
+      supabase.from('recovery_community_messages')
+        .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
+        .or('sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + req.user.id)
+        .is('deleted_at', null).order('created_at', { ascending: false }).limit(500),
+      supabase.from('recovery_chat_preferences')
+        .select('other_user_id,archived,muted,pinned,starred,last_read_at,marked_unread_at,notification_enabled,theme_key,theme_background_color,theme_background_image_url')
+        .eq('user_id', req.user.id)
+    ]);
+    if (error) throw error;
+    if (preferencesError) throw preferencesError;
+
+    const prefMap = new Map((preferences || []).map(p => [String(p.other_user_id), p]));
+    const rows = (data || []).reverse();
+    const unreadByPeer = {};
+    for (const row of rows) {
+      if (String(row.recipient_user_id) !== String(req.user.id) || row.read_at) continue;
+      const peer = String(row.sender_user_id);
+      const pref = prefMap.get(peer) || {};
+      const cutoff = [pref.last_read_at, pref.marked_unread_at].filter(Boolean)
+        .map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
+      if (!cutoff || new Date(row.created_at).getTime() > cutoff) unreadByPeer[peer] = (unreadByPeer[peer] || 0) + 1;
+    }
+    for (const [peer, pref] of prefMap) {
+      if (pref.marked_unread_at && !unreadByPeer[peer]) unreadByPeer[peer] = 1;
+    }
+
+    const notificationMessages = rows.filter(row => {
+      if (String(row.recipient_user_id) !== String(req.user.id) || row.read_at) return false;
+      const pref = prefMap.get(String(row.sender_user_id)) || {};
+      const notificationCutoff = [notificationCursor, pref.last_read_at, pref.marked_unread_at].filter(Boolean).map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
+      return pref.muted !== true && pref.notification_enabled !== false
+        && new Date(row.created_at).getTime() > notificationCutoff
+        && new Date(row.created_at).getTime() <= new Date(now).getTime();
+    }).map(row => ({ ...row, kind: 'direct', peer_id: row.sender_user_id }));
+
+    const { data: groupPreferences, error: groupPreferencesError } = await supabase.from('recovery_chat_group_members')
+      .select('group_id,muted,archived,notification_enabled,last_read_at,marked_unread_at,theme_key,theme_background_color,theme_background_image_url')
+      .eq('user_id', req.user.id).or('archived.is.null,archived.eq.false');
+    if (groupPreferencesError) throw groupPreferencesError;
+    const groupIds = (groupPreferences || []).map(x => x.group_id);
+    const groupPrefMap = new Map((groupPreferences || []).map(p => [String(p.group_id), p]));
+    const { data: groupRows, error: groupRowsError } = groupIds.length
+      ? await supabase.from('recovery_chat_group_messages')
+          .select('id,group_id,sender_user_id,message,created_at,edited_at,deleted_at')
+          .in('group_id', groupIds).neq('sender_user_id', req.user.id).is('deleted_at', null)
+          .order('created_at', { ascending: false }).limit(500)
+      : { data: [], error: null };
+    if (groupRowsError) throw groupRowsError;
+    const unreadByGroup = {};
+    for (const row of groupRows || []) {
+      const gid = String(row.group_id), pref = groupPrefMap.get(gid) || {};
+      const cutoff = [pref.last_read_at, pref.marked_unread_at].filter(Boolean)
+        .map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
+      if (!cutoff || new Date(row.created_at).getTime() > cutoff) unreadByGroup[gid] = (unreadByGroup[gid] || 0) + 1;
+    }
+    for (const [gid, pref] of groupPrefMap) {
+      if (pref.marked_unread_at && !unreadByGroup[gid]) unreadByGroup[gid] = 1;
+    }
+    for (const row of groupRows || []) {
+      const pref = groupPrefMap.get(String(row.group_id)) || {};
+      if (pref.muted === true || pref.notification_enabled === false) continue;
+      const cutoff = [pref.last_read_at, pref.marked_unread_at].filter(Boolean)
+        .map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
+      if (new Date(row.created_at).getTime() <= Math.max(new Date(notificationCursor).getTime(), cutoff)
+        || new Date(row.created_at).getTime() > new Date(now).getTime()) continue;
+      notificationMessages.push({ ...row, kind: 'group', peer_id: 'group:' + row.group_id, group_id: row.group_id });
+    }
+
+    if (validId(deviceId)) {
+      const { error: cursorUpdateError } = await supabase.from('recovery_chat_notification_cursors').upsert({
+        user_id: req.user.id, device_id: deviceId, last_polled_at: now, updated_at: now
+      }, { onConflict: 'user_id,device_id' });
+      if (cursorUpdateError) throw cursorUpdateError;
+    }
+
+    res.set('Cache-Control', 'no-store');
+    return res.json({
+      success: true, messages: rows, preferences: preferences || [],
+      group_preferences: groupPreferences || [],
+      unread_by_peer: unreadByPeer, unread_by_group: unreadByGroup,
+      notification_messages: notificationMessages
+    });
   } catch (error) { return handleDbError(res, error, 'Community inbox error:'); }
 });
 
@@ -194,8 +311,22 @@ router.get('/messages/:memberId', async (req, res) => {
     if (!validId(other)) return fail(res, 400, 'Invalid member ID.');
     if (other === String(req.user.id)) return fail(res, 400, 'Choose another member.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+
+    const { data: presence, error: presenceError } = await supabase.from('recovery_chat_presence')
+      .select('last_seen_at').eq('user_id', req.user.id).maybeSingle();
+    if (presenceError) throw presenceError;
+    const recipientOnline = Boolean(presence?.last_seen_at
+      && Date.now() - new Date(presence.last_seen_at).getTime() < 60000);
+    if (recipientOnline) {
+      const { error: deliveryError } = await supabase.from('recovery_community_messages')
+        .update({ delivered_at: new Date().toISOString() })
+        .eq('sender_user_id', other).eq('recipient_user_id', req.user.id)
+        .is('delivered_at', null).is('deleted_at', null);
+      if (deliveryError) throw deliveryError;
+    }
+
     const { data, error } = await supabase.from('recovery_community_messages')
-      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id')
+      .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
       .is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
     if (error) throw error;
@@ -213,20 +344,94 @@ router.get('/messages/:memberId', async (req, res) => {
       return { ...row, message: '', attachment: { isVoice: true, url: signed.signedUrl, duration, mime } };
     }));
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages });
+    return res.json({ success: true, messages });
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
 });
 
+router.post('/messages/:memberId/read', messageLimiter, async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
 
- // Direct-message reactions: counts and individual member reactions are visible to both participants.
- router.get('/messages/:memberId/reactions', async (req, res) => {
+    const { data: pref, error: prefError } = await supabase.from('recovery_chat_preferences')
+      .select('last_read_at,marked_unread_at').eq('user_id', req.user.id).eq('other_user_id', other).maybeSingle();
+    if (prefError) throw prefError;
+    const cutoff = [pref?.last_read_at, pref?.marked_unread_at].filter(Boolean)
+      .map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
+    const now = new Date().toISOString();
+
+    const { data: profile, error: profileError } = await supabase.from('recovery_chat_profiles')
+      .select('read_receipts_enabled').eq('user_id', req.user.id).maybeSingle();
+    if (profileError) throw profileError;
+
+    let readCount = 0;
+    if (profile?.read_receipts_enabled !== false) {
+      let update = supabase.from('recovery_community_messages').update({ read_at: now })
+        .eq('sender_user_id', other).eq('recipient_user_id', req.user.id)
+        .is('read_at', null).is('deleted_at', null);
+      if (cutoff) update = update.gt('created_at', new Date(cutoff).toISOString());
+      const { data, error } = await update.select('id');
+      if (error) throw error;
+      readCount = (data || []).length;
+    }
+
+    const { error: saveError } = await supabase.from('recovery_chat_preferences').upsert({
+      user_id: req.user.id, other_user_id: other, last_read_at: now,
+      marked_unread_at: null, updated_at: now
+    }, { onConflict: 'user_id,other_user_id' });
+    if (saveError) throw saveError;
     res.set('Cache-Control', 'no-store');
-    return res.json({ success: true, reactions: [] });
-  });
+    return res.json({ success: true, read_count: readCount, last_read_at: now });
+  } catch (error) { return handleDbError(res, error, 'Community message read receipt error:'); }
+});
+
+// Direct-message reactions are private to the two conversation participants.
+router.get('/messages/:memberId/reactions', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
+    const { data: messages, error: messageError } = await supabase.from('recovery_community_messages')
+      .select('id').or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+    if (messageError) throw messageError;
+    const ids = (messages || []).map(x => x.id);
+    if (!ids.length) return res.json({ success: true, reactions: [] });
+    const { data, error } = await supabase.from('recovery_chat_message_reactions')
+      .select('message_id,user_id,reaction,created_at').in('message_id', ids).order('created_at', { ascending: true });
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, reactions: data || [] });
+  } catch (error) { return handleDbError(res, error, 'Direct message reactions list error:'); }
+});
 
 router.post('/messages/:memberId/:messageId/reactions', messageLimiter, async (req, res) => {
-    return fail(res, 403, 'Reactions are available in official channels only.');
-  });
+  try {
+    const other = String(req.params.memberId || ''), id = String(req.params.messageId || '');
+    const reaction = String(req.body?.reaction || '').trim();
+    if (!validId(other) || !validId(id) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation or message.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable.');
+    if (reaction && (Array.from(reaction).length > 16 || !/\p{Emoji}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
+    const { data: message, error: messageError } = await supabase.from('recovery_community_messages')
+      .select('id').eq('id', id)
+      .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
+      .is('deleted_at', null).maybeSingle();
+    if (messageError) throw messageError;
+    if (!message) return fail(res, 404, 'Message not found in this conversation.');
+
+    const { error: deleteError } = await supabase.from('recovery_chat_message_reactions')
+      .delete().eq('message_id', id).eq('user_id', req.user.id);
+    if (deleteError) throw deleteError;
+    if (reaction) {
+      const { error } = await supabase.from('recovery_chat_message_reactions')
+        .insert({ message_id: id, user_id: req.user.id, reaction });
+      if (error) throw error;
+    }
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, reaction: reaction || null, removed: !reaction });
+  } catch (error) { return handleDbError(res, error, 'Direct message reaction update error:'); }
+});
 
 router.patch('/messages/:memberId/:messageId', messageLimiter, async (req, res) => {
   try {
@@ -676,21 +881,54 @@ router.patch('/friend-requests/:requestId', async (req, res) => {
   }
 });
 
+router.get('/preferences/:memberId', async (req, res) => {
+  try {
+    const other = String(req.params.memberId || '');
+    if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation.');
+    const { data, error } = await supabase.from('recovery_chat_preferences')
+      .select('other_user_id,archived,muted,pinned,starred,last_read_at,marked_unread_at,notification_enabled,theme_key,theme_background_color,theme_background_image_url')
+      .eq('user_id', req.user.id).eq('other_user_id', other).maybeSingle();
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, preferences: data || { other_user_id: other, muted: false, notification_enabled: true, theme_key: 'mint' } });
+  } catch (error) { return handleDbError(res, error, 'Chat preferences read error:'); }
+});
+
 router.put('/preferences/:memberId', async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
     if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Invalid conversation.');
-    const body = req.body || {}, patch = { user_id: req.user.id, other_user_id: other, updated_at: new Date().toISOString() };
-    for (const field of ['archived', 'muted', 'pinned', 'starred']) {
+    const body = req.body || {}, now = new Date().toISOString();
+    const patch = { user_id: req.user.id, other_user_id: other, updated_at: now };
+    for (const field of ['archived', 'muted', 'pinned', 'starred', 'notification_enabled']) {
       if (Object.hasOwn(body, field)) {
         if (typeof body[field] !== 'boolean') return fail(res, 400, field + ' must be true or false.');
         patch[field] = body[field];
       }
     }
-    if (!Object.keys(patch).some(k => ['archived', 'muted', 'pinned', 'starred'].includes(k))) return fail(res, 400, 'No preference changes provided.');
-    const { data, error } = await supabase.from('recovery_chat_preferences').upsert(patch, { onConflict: 'user_id,other_user_id' }).select('*').single();
+    if (body.mark_unread === true) patch.marked_unread_at = now;
+    if (body.mark_unread === false) patch.marked_unread_at = null;
+    if (Object.hasOwn(body, 'theme_key')) {
+      if (!['mint','classic','ocean','lavender','rose','forest','custom'].includes(body.theme_key)) return fail(res, 400, 'Choose a valid chat theme.');
+      patch.theme_key = body.theme_key;
+    }
+    if (Object.hasOwn(body, 'theme_background_color')) {
+      const color = body.theme_background_color == null ? null : String(body.theme_background_color);
+      if (color && !/^#[0-9a-f]{6}$/i.test(color)) return fail(res, 400, 'Background color must be a six-digit hex color.');
+      patch.theme_background_color = color;
+    }
+    if (Object.hasOwn(body, 'theme_background_image_url')) {
+      const image = body.theme_background_image_url == null ? null : String(body.theme_background_image_url).trim();
+      if (image && !(/^https:\/\//i.test(image) || (image.startsWith('/') && !image.startsWith('//')))) return fail(res, 400, 'Background image must use HTTPS or a same-site path.');
+      if (image && image.length > 2000) return fail(res, 400, 'Background image URL is too long.');
+      patch.theme_background_image_url = image;
+    }
+    if (!Object.keys(patch).some(k => !['user_id','other_user_id','updated_at'].includes(k))) return fail(res, 400, 'No preference changes provided.');
+    const { data, error } = await supabase.from('recovery_chat_preferences').upsert(patch, { onConflict: 'user_id,other_user_id' })
+      .select('other_user_id,archived,muted,pinned,starred,last_read_at,marked_unread_at,notification_enabled,theme_key,theme_background_color,theme_background_image_url').single();
     if (error) throw error;
-    res.json({ success: true, preferences: data });
+        res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, preferences: data });
   } catch (error) { return handleDbError(res, error, 'Chat preferences error:'); }
 });
 
@@ -973,26 +1211,162 @@ router.post('/updates', messageLimiter, async (req, res) => {
   } catch (error) { return handleDbError(res, error, 'Official update publish error:'); }
 });
 
+router.get('/groups/:groupId/preferences', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || '');
+    if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to manage its preferences.');
+    const { data, error } = await supabase.from('recovery_chat_group_members')
+      .select('group_id,muted,archived,notification_enabled,last_read_at,marked_unread_at,theme_key,theme_background_color,theme_background_image_url')
+      .eq('group_id', gid).eq('user_id', req.user.id).maybeSingle();
+    if (error) throw error;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, preferences: data });
+  } catch (error) { return handleDbError(res, error, 'Group preferences read error:'); }
+});
+
+router.put('/groups/:groupId/preferences', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), body = req.body || {}, patch = { updated_at: new Date().toISOString() };
+    if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to update its preferences.');
+    for (const field of ['muted','notification_enabled']) {
+      if (Object.hasOwn(body, field)) {
+        if (typeof body[field] !== 'boolean') return fail(res, 400, field + ' must be true or false.');
+        patch[field] = body[field];
+      }
+    }
+    if (body.mark_unread === true) patch.marked_unread_at = new Date().toISOString();
+    if (body.mark_unread === false) patch.marked_unread_at = null;
+    if (Object.hasOwn(body, 'theme_key')) {
+      if (!['mint','classic','ocean','lavender','rose','forest','custom'].includes(body.theme_key)) return fail(res, 400, 'Choose a valid group theme.');
+      patch.theme_key = body.theme_key;
+    }
+    if (Object.hasOwn(body, 'theme_background_color')) {
+      const color = body.theme_background_color == null ? null : String(body.theme_background_color);
+      if (color && !/^#[0-9a-f]{6}$/i.test(color)) return fail(res, 400, 'Background color must be a six-digit hex color.');
+      patch.theme_background_color = color;
+    }
+    if (Object.hasOwn(body, 'theme_background_image_url')) {
+      const image = body.theme_background_image_url == null ? null : String(body.theme_background_image_url).trim();
+      if (image && !(/^https:\/\//i.test(image) || (image.startsWith('/') && !image.startsWith('//')))) return fail(res, 400, 'Background image must use HTTPS or a same-site path.');
+      if (image && image.length > 2000) return fail(res, 400, 'Background image URL is too long.');
+      patch.theme_background_image_url = image;
+    }
+    if (!Object.keys(patch).some(k => !['updated_at'].includes(k))) return fail(res, 400, 'No group preference changes provided.');
+    const { data, error } = await supabase.from('recovery_chat_group_members')
+      .update(patch).eq('group_id', gid).eq('user_id', req.user.id)
+      .select('group_id,muted,archived,notification_enabled,last_read_at,marked_unread_at,theme_key,theme_background_color,theme_background_image_url').single();
+    if (error) throw error;
+        res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, preferences: data });
+  } catch (error) { return handleDbError(res, error, 'Group preferences update error:'); }
+});
+
 router.get('/groups/:groupId/messages', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
-    const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups').select('id,slug').eq('id', gid).maybeSingle();
+    const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups')
+      .select('id,slug,approval_status').eq('id', gid).maybeSingle();
     if (targetError) throw targetError;
-    if (!targetGroup) return fail(res, 404, 'Group not found.');
+    if (!targetGroup || targetGroup.approval_status !== 'approved') return fail(res, 404, 'Approved group not found.');
     if (targetGroup.slug === 'manlung-team' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Team is available to admins and the owner only.');
-    if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
-    // Fetch the newest 100 messages first, then return them oldest-to-newest for the chat UI.
-    // An ascending query with limit(100) would permanently hide every message after the first 100.
-    const { data, error } = await supabase.from('recovery_chat_group_messages')
-      .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at')
-      .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+    const isMember = await requireGroupMember(gid, req.user.id);
+    if (!isAdmin(req.user) && !isMember) return fail(res, 403, 'You are not a member of this group.');
+
+    const [{ data, error }, { data: members, error: memberError }] = await Promise.all([
+      supabase.from('recovery_chat_group_messages')
+        .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at')
+        .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(500),
+      supabase.from('recovery_chat_group_members').select('user_id')
+        .eq('group_id', gid).or('archived.is.null,archived.eq.false')
+    ]);
     if (error) throw error;
+    if (memberError) throw memberError;
+    const rows = (data || []).reverse();
+    const now = new Date().toISOString();
+    const receivedIds = rows.filter(x => String(x.sender_user_id) !== String(req.user.id)).map(x => x.id);
+    if (isMember && receivedIds.length) {
+      const { data: existing, error: receiptReadError } = await supabase.from('recovery_chat_group_message_receipts')
+        .select('message_id,delivered_at,read_at').eq('user_id', req.user.id).in('message_id', receivedIds);
+      if (receiptReadError) throw receiptReadError;
+      const seen = new Set((existing || []).map(x => String(x.message_id)));
+      const missing = receivedIds.filter(id => !seen.has(String(id)));
+      if (missing.length) {
+        const { error: insertError } = await supabase.from('recovery_chat_group_message_receipts')
+          .insert(missing.map(message_id => ({ message_id, user_id: req.user.id, delivered_at: now })));
+        if (insertError) throw insertError;
+      }
+      const undelivered = (existing || []).filter(x => !x.delivered_at).map(x => x.message_id);
+      if (undelivered.length) {
+        const { error: deliveryError } = await supabase.from('recovery_chat_group_message_receipts')
+          .update({ delivered_at: now }).eq('user_id', req.user.id).in('message_id', undelivered);
+        if (deliveryError) throw deliveryError;
+      }
+    }
+
+    const ownIds = rows.filter(x => String(x.sender_user_id) === String(req.user.id)).map(x => x.id);
+    const [{ data: receipts, error: receiptError }] = ownIds.length ? await Promise.all([
+      supabase.from('recovery_chat_group_message_receipts')
+        .select('message_id,user_id,delivered_at,read_at').in('message_id', ownIds)
+    ]) : [{ data: [], error: null }];
+    if (receiptError) throw receiptError;
+    const activeRecipientCount = Math.max(0, (members || []).filter(x => String(x.user_id) !== String(req.user.id)).length);
+    const activeMemberIds = new Set((members || []).map(x => String(x.user_id)));
+    const byMessage = new Map();
+    for (const receipt of receipts || []) {
+      if (!activeMemberIds.has(String(receipt.user_id)) || String(receipt.user_id) === String(req.user.id)) continue;
+      const key = String(receipt.message_id);
+      if (!byMessage.has(key)) byMessage.set(key, { delivered: 0, read: 0 });
+      const value = byMessage.get(key);
+      if (receipt.delivered_at) value.delivered++;
+      if (receipt.read_at) value.read++;
+    }
+    const messages = rows.map(message => {
+      if (String(message.sender_user_id) !== String(req.user.id)) return message;
+      const value = byMessage.get(String(message.id)) || { delivered: 0, read: 0 };
+      const status = activeRecipientCount > 0 && value.read >= activeRecipientCount ? 2 : value.delivered > 0 ? 1 : 0;
+      return { ...message, receipt_summary: {
+        delivered_count: value.delivered, read_count: value.read,
+        recipient_count: activeRecipientCount, status
+      }};
+    });
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages: (data || []).reverse() });
+    return res.json({ success: true, messages });
   } catch (error) { return handleDbError(res, error, 'Group message list error:'); }
 });
 
+router.post('/groups/:groupId/read', messageLimiter, async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || '');
+    if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to mark messages read.');
+    const { data: preference, error: preferenceReadError } = await supabase.from('recovery_chat_group_members')
+      .select('last_read_at,marked_unread_at').eq('group_id', gid).eq('user_id', req.user.id).maybeSingle();
+    if (preferenceReadError) throw preferenceReadError;
+    const cutoff = [preference?.last_read_at, preference?.marked_unread_at].filter(Boolean)
+      .map(x => new Date(x).getTime()).reduce((a, b) => Math.max(a, b), 0);
+    let messageQuery = supabase.from('recovery_chat_group_messages')
+      .select('id').eq('group_id', gid).neq('sender_user_id', req.user.id)
+      .is('deleted_at', null).order('created_at', { ascending: false }).limit(500);
+    if (cutoff) messageQuery = messageQuery.gt('created_at', new Date(cutoff).toISOString());
+    const { data: messages, error: messageError } = await messageQuery;
+    if (messageError) throw messageError;
+    const ids = (messages || []).map(x => x.id);
+    const now = new Date().toISOString();
+    if (ids.length) {
+      const { error } = await supabase.from('recovery_chat_group_message_receipts')
+        .update({ delivered_at: now, read_at: now }).eq('user_id', req.user.id).in('message_id', ids);
+      if (error) throw error;
+    }
+    const { error: preferenceError } = await supabase.from('recovery_chat_group_members')
+      .update({ last_read_at: now, marked_unread_at: null }).eq('group_id', gid).eq('user_id', req.user.id);
+    if (preferenceError) throw preferenceError;
+    res.set('Cache-Control', 'no-store');
+    return res.json({ success: true, read_count: ids.length });
+  } catch (error) { return handleDbError(res, error, 'Group read receipt error:'); }
+});
 router.post('/groups/:groupId/messages', messageLimiter, async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
@@ -1077,10 +1451,7 @@ router.get('/groups/:groupId/reactions', async (req, res) => {
       .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
     if (groupError) throw groupError;
     if (!group) return fail(res, 404, 'Group not found.');
-    const isOfficialChannel = ['manlung-updates', 'manlung-official-updates'].includes(String(group.slug || ''))
-      || group.admin_only_announcements === true;
-    if (!isOfficialChannel) return fail(res, 403, 'Reactions are available in official channels only.');
-    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this channel to view reactions.');
+    if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to view reactions.');
     const { data: messages, error: messageError } = await supabase.from('recovery_chat_group_messages')
       .select('id').eq('group_id', gid).is('deleted_at', null)
       .order('created_at', { ascending: false }).limit(100);
@@ -1102,27 +1473,28 @@ router.post('/groups/:groupId/messages/:messageId/reactions', messageLimiter, as
   try {
     const gid = String(req.params.groupId || ''), mid = String(req.params.messageId || '');
     const reaction = cleanText(req.body?.reaction, 16);
-    const supported = ['👍','❤️','😂','😮','😢','🙏','🔥','🎉','👏','💚'];
     if (!validId(gid) || !validId(mid)) return fail(res, 400, 'Invalid group or message ID.');
-    if (!supported.includes(reaction)) return fail(res, 400, 'Choose a supported reaction.');
+    if (reaction && (Array.from(reaction).length > 16 || !/\p{Emoji}/u.test(reaction))) return fail(res, 400, 'Enter one emoji reaction.');
     const { data: group, error: groupError } = await supabase.from('recovery_chat_groups')
       .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
     if (groupError) throw groupError;
     if (!group) return fail(res, 404, 'Group not found.');
-    const isOfficialChannel = ['manlung-updates', 'manlung-official-updates'].includes(String(group.slug || ''))
-      || group.admin_only_announcements === true;
-    if (!isOfficialChannel) return fail(res, 403, 'Reactions are available in official channels only.');
-    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this channel to react.');
+    if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to react.');
     const { data: message, error: messageError } = await supabase.from('recovery_chat_group_messages')
       .select('id,group_id').eq('id', mid).eq('group_id', gid).is('deleted_at', null).maybeSingle();
     if (messageError) throw messageError;
     if (!message) return fail(res, 404, 'Message not found in this channel.');
-    // Idempotent upsert: another tap cannot delete an existing reaction.
-    const { error } = await supabase.from('recovery_chat_group_reactions')
-      .upsert({ message_id: mid, user_id: req.user.id, reaction }, { onConflict: 'message_id,user_id,reaction' });
-    if (error) throw error;
+    // One reaction per member/message: selecting another emoji replaces it.
+    if (!reaction) {
+      const { error } = await supabase.from('recovery_chat_group_reactions').delete().eq('message_id', mid).eq('user_id', req.user.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from('recovery_chat_group_reactions')
+        .upsert({ message_id: mid, user_id: req.user.id, reaction }, { onConflict: 'message_id,user_id' });
+      if (error) throw error;
+    }
     res.set('Cache-Control', 'no-store');
-    return res.status(201).json({ success: true, reacted: true, reaction });
+    return res.status(200).json({ success: true, reacted: !!reaction, removed: !reaction, reaction: reaction || null });
   } catch (error) { return handleDbError(res, error, 'Channel reaction update error:'); }
 });
 
