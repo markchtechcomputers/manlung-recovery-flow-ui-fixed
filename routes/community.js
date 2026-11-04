@@ -1245,19 +1245,79 @@ router.get('/groups/:groupId/messages', async (req, res) => {
   try {
     const gid = String(req.params.groupId || '');
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
-    const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups').select('id,slug,approval_status').eq('id', gid).maybeSingle();
+    const { data: targetGroup, error: targetError } = await supabase.from('recovery_chat_groups')
+      .select('id,slug,approval_status').eq('id', gid).maybeSingle();
     if (targetError) throw targetError;
-    if (!targetGroup || targetGroup.approval_status!=='approved') return fail(res, 404, 'Approved group not found.');
+    if (!targetGroup || targetGroup.approval_status !== 'approved') return fail(res, 404, 'Approved group not found.');
     if (targetGroup.slug === 'manlung-team' && !isAdmin(req.user)) return fail(res, 403, 'Manlung Team is available to admins and the owner only.');
-    if (!isAdmin(req.user) && !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'You are not a member of this group.');
-    // Fetch the newest 100 messages first, then return them oldest-to-newest for the chat UI.
-    // An ascending query with limit(100) would permanently hide every message after the first 100.
+    const isMember = await requireGroupMember(gid, req.user.id);
+    if (!isAdmin(req.user) && !isMember) return fail(res, 403, 'You are not a member of this group.');
+
     const { data, error } = await supabase.from('recovery_chat_group_messages')
       .select('id,group_id,sender_user_id,message,reply_to_id,edited_at,deleted_at,created_at')
-      .eq('group_id', gid).is('deleted_at', null).order('created_at', { ascending: false }).limit(100);
+      .eq('group_id', gid).is('deleted_at', null)
+      .order('created_at', { ascending: false }).limit(100);
     if (error) throw error;
+    const messages = (data || []).reverse();
+
+    let memberIds = [];
+    if (isMember) {
+      const { data: membership, error: membershipError } = await supabase.from('recovery_chat_group_members')
+        .select('user_id,manual_unread_at').eq('group_id', gid);
+      if (membershipError) throw membershipError;
+      memberIds = (membership || []).map(x => String(x.user_id));
+      const self = (membership || []).find(x => String(x.user_id) === String(req.user.id));
+      const cutoff = self?.manual_unread_at ? new Date(self.manual_unread_at).getTime() : 0;
+      const incomingIds = messages.filter(x => String(x.sender_user_id) !== String(req.user.id)
+        && new Date(x.created_at).getTime() > cutoff).map(x => x.id);
+      if (incomingIds.length) {
+        const now = new Date().toISOString();
+        const { data: existing, error: receiptError } = await supabase.from('recovery_chat_group_message_receipts')
+          .select('message_id').eq('user_id', req.user.id).in('message_id', incomingIds);
+        if (receiptError) throw receiptError;
+        const existingIds = new Set((existing || []).map(x => String(x.message_id)));
+        const missing = incomingIds.filter(id => !existingIds.has(String(id))).map(message_id => ({
+          message_id, user_id: req.user.id, delivered_at: now, read_at: now
+        }));
+        if (missing.length) {
+          const { error: insertError } = await supabase.from('recovery_chat_group_message_receipts').insert(missing);
+          if (insertError) throw insertError;
+        }
+        const alreadyTracked = incomingIds.filter(id => existingIds.has(String(id)));
+        if (alreadyTracked.length) {
+          const { error: updateError } = await supabase.from('recovery_chat_group_message_receipts')
+            .update({ delivered_at: now, read_at: now }).eq('user_id', req.user.id).in('message_id', alreadyTracked);
+          if (updateError) throw updateError;
+        }
+      }
+      const { error: clearError } = await supabase.from('recovery_chat_group_members')
+        .update({ manual_unread: false, manual_unread_at: null })
+        .eq('group_id', gid).eq('user_id', req.user.id);
+      if (clearError) throw clearError;
+    }
+
+    const ownIds = messages.filter(x => String(x.sender_user_id) === String(req.user.id)).map(x => x.id);
+    let receipts = [];
+    if (ownIds.length) {
+      const { data: receiptRows, error: receiptError } = await supabase.from('recovery_chat_group_message_receipts')
+        .select('message_id,user_id,delivered_at,read_at').in('message_id', ownIds);
+      if (receiptError) throw receiptError;
+      receipts = receiptRows || [];
+    }
+    const recipientsByMessage = new Map();
+    for (const message of messages.filter(x => String(x.sender_user_id) === String(req.user.id))) {
+      const recipients = memberIds.filter(id => id !== String(message.sender_user_id));
+      const states = recipients.map(userId => receipts.find(r => String(r.message_id) === String(message.id) && String(r.user_id) === userId));
+      const delivered = recipients.length > 0 && states.every(r => Boolean(r?.delivered_at));
+      const read = recipients.length > 0 && states.every(r => Boolean(r?.read_at));
+      recipientsByMessage.set(String(message.id), read ? 2 : delivered ? 1 : 0);
+    }
+    const result = messages.map(message => ({
+      ...message,
+      receipt_state: recipientsByMessage.get(String(message.id)) || 0
+    }));
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages: (data || []).reverse() });
+    return res.json({ success: true, messages: result });
   } catch (error) { return handleDbError(res, error, 'Group message list error:'); }
 });
 
@@ -1342,22 +1402,16 @@ router.get('/groups/:groupId/reactions', async (req, res) => {
     const gid = String(req.params.groupId || '');
     if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
     const { data: group, error: groupError } = await supabase.from('recovery_chat_groups')
-      .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
+      .select('id,approval_status').eq('id', gid).maybeSingle();
     if (groupError) throw groupError;
-    if (!group) return fail(res, 404, 'Group not found.');
-    const isOfficialChannel = ['manlung-updates', 'manlung-official-updates'].includes(String(group.slug || ''))
-      || group.admin_only_announcements === true;
-    if (!isOfficialChannel) return fail(res, 403, 'Reactions are available in official channels only.');
-    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this channel to view reactions.');
+    if (!group || group.approval_status !== 'approved') return fail(res, 404, 'Approved group not found.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to view reactions.');
     const { data: messages, error: messageError } = await supabase.from('recovery_chat_group_messages')
       .select('id').eq('group_id', gid).is('deleted_at', null)
       .order('created_at', { ascending: false }).limit(100);
     if (messageError) throw messageError;
     const ids = (messages || []).map(x => x.id);
-    if (!ids.length) {
-      res.set('Cache-Control', 'no-store');
-      return res.json({ success: true, reactions: [] });
-    }
+    if (!ids.length) return res.json({ success: true, reactions: [] });
     const { data, error } = await supabase.from('recovery_chat_group_reactions')
       .select('message_id,user_id,reaction,created_at').in('message_id', ids).order('created_at', { ascending: true });
     if (error) throw error;
@@ -1370,28 +1424,80 @@ router.post('/groups/:groupId/messages/:messageId/reactions', messageLimiter, as
   try {
     const gid = String(req.params.groupId || ''), mid = String(req.params.messageId || '');
     const reaction = cleanText(req.body?.reaction, 16);
-    const supported = ['👍','❤️','😂','😮','😢','🙏','🔥','🎉','👏','💚'];
-    if (!validId(gid) || !validId(mid)) return fail(res, 400, 'Invalid group or message ID.');
-    if (!supported.includes(reaction)) return fail(res, 400, 'Choose a supported reaction.');
+    if (!validId(gid) || !validId(mid) || !reaction) return fail(res, 400, 'Choose one emoji reaction.');
     const { data: group, error: groupError } = await supabase.from('recovery_chat_groups')
-      .select('id,slug,admin_only_announcements').eq('id', gid).maybeSingle();
+      .select('id,approval_status').eq('id', gid).maybeSingle();
     if (groupError) throw groupError;
-    if (!group) return fail(res, 404, 'Group not found.');
-    const isOfficialChannel = ['manlung-updates', 'manlung-official-updates'].includes(String(group.slug || ''))
-      || group.admin_only_announcements === true;
-    if (!isOfficialChannel) return fail(res, 403, 'Reactions are available in official channels only.');
-    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this channel to react.');
+    if (!group || group.approval_status !== 'approved') return fail(res, 404, 'Approved group not found.');
+    if (!await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Join this group to react.');
     const { data: message, error: messageError } = await supabase.from('recovery_chat_group_messages')
       .select('id,group_id').eq('id', mid).eq('group_id', gid).is('deleted_at', null).maybeSingle();
     if (messageError) throw messageError;
-    if (!message) return fail(res, 404, 'Message not found in this channel.');
-    // Idempotent upsert: another tap cannot delete an existing reaction.
-    const { error } = await supabase.from('recovery_chat_group_reactions')
-      .upsert({ message_id: mid, user_id: req.user.id, reaction }, { onConflict: 'message_id,user_id,reaction' });
+    if (!message) return fail(res, 404, 'Message not found in this group.');
+    const { data: existing, error: existingError } = await supabase.from('recovery_chat_group_reactions')
+      .select('reaction').eq('message_id', mid).eq('user_id', req.user.id).maybeSingle();
+    if (existingError) throw existingError;
+    if (existing?.reaction === reaction) {
+      const { error } = await supabase.from('recovery_chat_group_reactions')
+        .delete().eq('message_id', mid).eq('user_id', req.user.id);
+      if (error) throw error;
+      return res.json({ success: true, reacted: false, reaction: null });
+    }
+    const { data, error } = await supabase.from('recovery_chat_group_reactions')
+      .upsert({ message_id: mid, user_id: req.user.id, reaction }, { onConflict: 'message_id,user_id' })
+      .select('message_id,user_id,reaction,created_at').single();
     if (error) throw error;
     res.set('Cache-Control', 'no-store');
-    return res.status(201).json({ success: true, reacted: true, reaction });
-  } catch (error) { return handleDbError(res, error, 'Channel reaction update error:'); }
+    return res.status(201).json({ success: true, reacted: true, reaction: data });
+  } catch (error) { return handleDbError(res, error, 'Group reaction update error:'); }
+});
+
+router.get('/groups/:groupId/preferences', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || '');
+    if (!validId(gid) || !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Group membership is required.');
+    const { data, error } = await supabase.from('recovery_chat_group_members')
+      .select('group_id,muted,archived,manual_unread,manual_unread_at,chat_theme_id,background_color,background_image_url')
+      .eq('group_id', gid).eq('user_id', req.user.id).maybeSingle();
+    if (error) throw error;
+    return res.json({ success: true, preference: data || { group_id: gid, chat_theme_id: 'mint' } });
+  } catch (error) { return handleDbError(res, error, 'Group chat preferences read error:'); }
+});
+
+router.patch('/groups/:groupId/preferences', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || ''), body = req.body || {}, patch = {};
+    if (!validId(gid) || !await requireGroupMember(gid, req.user.id)) return fail(res, 403, 'Group membership is required.');
+    for (const key of ['muted','archived']) {
+      if (Object.hasOwn(body, key)) {
+        if (typeof body[key] !== 'boolean') return fail(res, 400, key + ' must be true or false.');
+        patch[key] = body[key];
+      }
+    }
+    const themeError = validateChatThemePatch(body, patch);
+    if (themeError) return fail(res, 400, themeError);
+    const { data, error } = await supabase.from('recovery_chat_group_members')
+      .update({ ...patch }).eq('group_id', gid).eq('user_id', req.user.id)
+      .select('group_id,muted,archived,chat_theme_id,background_color,background_image_url').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Group membership not found.');
+    return res.json({ success: true, preference: data });
+  } catch (error) { return handleDbError(res, error, 'Group chat preferences update error:'); }
+});
+
+router.post('/groups/:groupId/unread', async (req, res) => {
+  try {
+    const gid = String(req.params.groupId || '');
+    if (!validId(gid)) return fail(res, 400, 'Invalid group ID.');
+    const now = new Date().toISOString();
+    const { data, error } = await supabase.from('recovery_chat_group_members')
+      .update({ manual_unread: true, manual_unread_at: now })
+      .eq('group_id', gid).eq('user_id', req.user.id)
+      .select('group_id,manual_unread,manual_unread_at').maybeSingle();
+    if (error) throw error;
+    if (!data) return fail(res, 404, 'Group membership not found.');
+    return res.json({ success: true, preference: data });
+  } catch (error) { return handleDbError(res, error, 'Group unread marker error:'); }
 });
 
 router.put('/groups/:groupId/archive', async (req, res) => {
