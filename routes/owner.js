@@ -11,6 +11,7 @@ const CallSession = require('../models/CallSession');
 const AdminPresence = require('../models/AdminPresence');
 const SecurityMonitoring = require('../models/SecurityMonitoring');
 const { sendEmail } = require('../services/email');
+const { buildAdminInvitationEmail } = require('../services/adminInvitationEmail');
 const { supabase } = require('../config/supabase');
 
 function checkValidation(req, res) {
@@ -356,7 +357,8 @@ router.post('/invitations', [body('email').trim().isEmail().normalizeEmail()], a
     const invitation = await AdminInvitation.create({ email: req.body.email, invitedBy: req.user.id });
     const link =
       `https://manlungrecovery.manlungshop.co.ke/admin/register.html?token=${encodeURIComponent(invitation.token)}&email=${encodeURIComponent(req.body.email)}`;
-    const mail = await sendEmail({ to:req.body.email, subject:'Manlung Recovery admin invitation', html:`<p>You have been invited to join the Manlung Recovery Admin portal.</p><p><a href="${link}">Complete your Admin registration</a></p><p>This invitation expires in 48 hours.</p>` });
+    const invitationEmail = buildAdminInvitationEmail({ email: req.body.email, link });
+    const mail = await sendEmail({ to: req.body.email, subject: 'You’re invited to Manlung Recovery Admin', html: invitationEmail.html, text: invitationEmail.text });
     await AdminAuditLog.record({ actor:req.user, target:{ id:req.user.id, username:req.user.username }, action:'invited_admin' });
     res.status(201).json({
       success: true,
