@@ -34,7 +34,7 @@
       "name": "Track a case",
       "short_name": "Track case",
       "description": "Open secure case tracking",
-      "url": "/client/track.html",
+      "url": "/client/track",
       "icons": [
         {
           "src": "/icons/icon-192.png",
@@ -47,7 +47,7 @@
       "name": "Request recovery help",
       "short_name": "Request help",
       "description": "Submit a recovery request",
-      "url": "/client/request.html",
+      "url": "/client/request",
       "icons": [
         {
           "src": "/icons/icon-192.png",

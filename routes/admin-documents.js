@@ -235,7 +235,7 @@ router.post('/:id/share', async (req, res) => {
     let emailSent = false;
     if (recipientEmail && process.env.RESEND_API_KEY && process.env.MANLUNG_FROM_EMAIL) {
       const base = process.env.PUBLIC_BASE_URL || 'https://manlungrecovery.manlungshop.co.ke';
-      const link = base.replace(/\/$/,'') + '/admin/investigation-notes.html?doc=' + encodeURIComponent(doc.id);
+      const link = base.replace(/\/$/,'') + '/admin/investigation-notes?doc=' + encodeURIComponent(doc.id);
       const pdf = makePdf(doc.title, doc.content);
       const send = await axios.post('https://api.resend.com/emails', {
         from: process.env.MANLUNG_FROM_EMAIL,

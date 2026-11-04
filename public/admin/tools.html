@@ -114,13 +114,13 @@ body{margin:0;background:var(--tool-bg);color:var(--tool-text);font-family:Inter
 html.dark .site-header{background:#111d29!important;border-color:#293949!important}
 html.dark .header-actions>a,html.dark .header-actions>button{background:#111d29!important;color:#e2e8f0!important;border-color:#293949!important}
 html.dark .header-actions>a:hover,html.dark .header-actions>button:hover{background:#122c3c!important;border-color:#0ea5e9!important;color:#e0f2fe!important}
-.header-actions>a.dashboard-header-btn,.header-actions>a[href="/admin/dashboard.html"]{
+.header-actions>a.dashboard-header-btn,.header-actions>a[href="/admin/dashboard"]{
   min-height:44px!important;padding:11px 16px!important;background:#0C3A4A!important;border-color:#0C3A4A!important;
   color:#fff!important;box-shadow:0 5px 13px rgba(12,58,74,.14)!important
 }
 .header-actions>a.dashboard-header-btn>i{font-size:16px!important}
-.header-actions>a.dashboard-header-btn:hover,.header-actions>a[href="/admin/dashboard.html"]:hover{background:#0EA5E9!important;border-color:#0EA5E9!important;color:#fff!important}
-html.dark .header-actions>a.dashboard-header-btn,html.dark .header-actions>a[href="/admin/dashboard.html"]{background:#0c718d!important;border-color:#0c718d!important;color:#fff!important}
+.header-actions>a.dashboard-header-btn:hover,.header-actions>a[href="/admin/dashboard"]:hover{background:#0EA5E9!important;border-color:#0EA5E9!important;color:#fff!important}
+html.dark .header-actions>a.dashboard-header-btn,html.dark .header-actions>a[href="/admin/dashboard"]{background:#0c718d!important;border-color:#0c718d!important;color:#fff!important}
 /* Remove all remnants of the drawer/sidebar; navigation now stays in the header. */
 .ml-admin-sidebar,.ml-admin-menu-overlay,.ml-admin-menu-toggle{display:none!important}
 body.ml-admin-menu-open{overflow:auto!important}
@@ -151,7 +151,7 @@ body.ml-admin-menu-open{overflow:auto!important}
  .header-actions{display:flex!important;flex:1 1 100%!important;justify-content:flex-start!important;gap:7px!important}
  .header-actions>a,.header-actions>button{min-height:39px!important;padding:9px 10px!important;font-size:10px!important}
  .header-actions>a>i,.header-actions>button>i{font-size:14px!important}
- .header-actions>a.dashboard-header-btn,.header-actions>a[href="/admin/dashboard.html"]{order:-1!important}
+ .header-actions>a.dashboard-header-btn,.header-actions>a[href="/admin/dashboard"]{order:-1!important}
  .tools-shell{padding:19px 14px 30px!important}
  .manlung-footer{width:100%!important;margin:0!important}
  .tool-icon{width:64px!important;height:64px!important;flex-basis:64px!important;font-size:27px!important}
@@ -165,7 +165,7 @@ body.ml-admin-menu-open{overflow:auto!important}
  .site-header .brand{flex-basis:100%!important}
  .header-actions{gap:6px!important}
  .header-actions>a,.header-actions>button{flex:1 1 auto!important;min-width:max-content!important;justify-content:center!important;padding:9px 10px!important;font-size:10px!important}
- .header-actions>a.dashboard-header-btn,.header-actions>a[href="/admin/dashboard.html"]{flex:1 0 100%!important;justify-content:center!important}
+ .header-actions>a.dashboard-header-btn,.header-actions>a[href="/admin/dashboard"]{flex:1 0 100%!important;justify-content:center!important}
  .tools-shell{padding:14px 12px 26px!important}
  .tool-icon{width:60px!important;height:60px!important;flex-basis:60px!important;font-size:25px!important}
  .tool-image-card .tool-icon{height:210px!important;min-height:210px!important;max-height:210px!important}
@@ -210,17 +210,17 @@ body.admin-page-bg .tools-shell .tool-grid{min-width:0!important}
       <div class="manlung-brand-copy"><h1>Manlung Recovery</h1><span>Admin Tools · Investigation &amp; Operations Center</span></div>
     </div>
     <nav class="header-actions" aria-label="Admin navigation">
-      <a class="btn btn-outline" href="/admin/dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-      <a class="btn btn-outline" href="/admin/dashboard.html#cases-section"><i class="fa-solid fa-folder-open"></i> Cases</a>
-      <a class="btn btn-outline" href="/admin/dashboard.html#donations-section"><i class="fa-solid fa-hand-holding-heart"></i> Donations</a>
-      <a class="btn btn-outline" href="/admin/dashboard.html#call-admin-section"><i class="fa-solid fa-phone-volume"></i> Call Admin</a>
-      <a class="btn btn-outline" href="/admin/reports.html"><i class="fa-solid fa-chart-line"></i> Reports</a>
-      <a class="btn btn-outline" href="/admin/operations.html"><i class="fa-solid fa-list-check"></i> Operations</a>
-      <a class="btn btn-outline" href="/admin/music.html"><i class="fa-solid fa-music"></i> Music</a>
-      <a class="btn btn-outline active" href="/admin/tools.html" aria-current="page"><i class="fa-solid fa-toolbox"></i> Tools</a>
-      <a class="btn btn-outline" href="/admin/connect.html"><i class="fa-solid fa-comments"></i> WhatsApp Chats</a>
+      <a class="btn btn-outline" href="/admin/dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+      <a class="btn btn-outline" href="/admin/dashboard#cases-section"><i class="fa-solid fa-folder-open"></i> Cases</a>
+      <a class="btn btn-outline" href="/admin/dashboard#donations-section"><i class="fa-solid fa-hand-holding-heart"></i> Donations</a>
+      <a class="btn btn-outline" href="/admin/dashboard#call-admin-section"><i class="fa-solid fa-phone-volume"></i> Call Admin</a>
+      <a class="btn btn-outline" href="/admin/reports"><i class="fa-solid fa-chart-line"></i> Reports</a>
+      <a class="btn btn-outline" href="/admin/operations"><i class="fa-solid fa-list-check"></i> Operations</a>
+      <a class="btn btn-outline" href="/admin/music"><i class="fa-solid fa-music"></i> Music</a>
+      <a class="btn btn-outline active" href="/admin/tools" aria-current="page"><i class="fa-solid fa-toolbox"></i> Tools</a>
+      <a class="btn btn-outline" href="/admin/connect"><i class="fa-solid fa-comments"></i> WhatsApp Chats</a>
       <a class="btn btn-outline" href="/"><i class="fa-solid fa-house"></i> Home</a>
-      <a class="btn btn-danger" href="/admin/login.html?logout=1" onclick="logoutFromTools(event)"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      <a class="btn btn-danger" href="/admin/login?logout=1" onclick="logoutFromTools(event)"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
     </nav>
   </div>
 </header>
@@ -234,7 +234,7 @@ body.admin-page-bg .tools-shell .tool-grid{min-width:0!important}
     <div class="tools-hero-side">
       <label class="tools-filter" for="toolSearch"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input id="toolSearch" type="search" placeholder="Search all tools…" autocomplete="off" aria-label="Search admin tools"><kbd>/</kbd></label>
       <div class="tool-search-status" id="toolSearchStatus" role="status" aria-live="polite">Browse the available admin tools below.</div>
-      <div class="hero-actions"><a class="btn btn-primary" href="/admin/dashboard.html"><i class="fas fa-folder-open"></i> Open Cases</a><a class="btn btn-outline" href="/admin/operations.html"><i class="fas fa-wave-square"></i> Live Operations</a></div>
+      <div class="hero-actions"><a class="btn btn-primary" href="/admin/dashboard"><i class="fas fa-folder-open"></i> Open Cases</a><a class="btn btn-outline" href="/admin/operations"><i class="fas fa-wave-square"></i> Live Operations</a></div>
     </div>
   </section>
 
@@ -256,8 +256,8 @@ body.admin-page-bg .tools-shell .tool-grid{min-width:0!important}
           <p>Open the dedicated recovery workspace to review registered devices, verify ownership, connect to supported official services, record recovery events and keep every case action traceable.</p>
           <div class="device-recovery-tags"><span>Android · Google Find Hub</span><span>iPhone &amp; iPad · Apple Find My</span><span>Windows · Find My Device</span><span>Mac · Apple Find My</span></div>
           <div class="hero-actions" style="margin-top:16px">
-            <a class="btn btn-primary" href="/admin/tools/device-recovery.html"><i class="fas fa-location-crosshairs"></i> Open Device Recovery</a>
-            <a class="btn btn-outline" href="/admin/tools/device-recovery.html#recovery-readiness"><i class="fas fa-shield-check"></i> Recovery Readiness</a>
+            <a class="btn btn-primary" href="/admin/tools/device-recovery"><i class="fas fa-location-crosshairs"></i> Open Device Recovery</a>
+            <a class="btn btn-outline" href="/admin/tools/device-recovery#recovery-readiness"><i class="fas fa-shield-check"></i> Recovery Readiness</a>
           </div>
         </div>
       </div>
@@ -307,42 +307,42 @@ body.admin-page-bg .tools-shell .tool-grid{min-width:0!important}
   </section>
   <div id="toolsMount">
     <section class="tool-section"><div class="section-head"><div><h2>Case Investigation</h2><p>Work with real case records, lifecycle, history, assignment and analysis.</p></div><span class="section-live">LIVE CASE DATA</span></div><div class="tool-grid">
-<a class="tool-card" href="/admin/dashboard.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-folder-open"></i></span><span class="tool-status">Live</span></div><h3>Case Lookup &amp; Search</h3><p>Search and open existing recovery cases from the live case workspace.</p><span class="tool-action">Open case workspace <i class="fas fa-arrow-right"></i></span></a>
-<a class="tool-card" href="/admin/operations.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-chart-line"></i></span><span class="tool-status">Live</span></div><h3>Case Analyzer</h3><p>Review status, priority, SLA state, assignment and operational workload for real cases.</p><span class="tool-action">Analyze live queue <i class="fas fa-arrow-right"></i></span></a>
-<a class="tool-card" href="/admin/dashboard.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-clock-rotate-left"></i></span><span class="tool-status">Live</span></div><h3>Case Timeline &amp; History</h3><p>Open the existing case workspace to review timeline, audit history, files and messages.</p><span class="tool-action">Review case history <i class="fas fa-arrow-right"></i></span></a>
-<a class="tool-card" href="/admin/operations.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-user-check"></i></span><span class="tool-status">Live</span></div><h3>Investigator Assignment</h3><p>Use the existing operational assignment workflow and keep the assigned investigator attached to the case record.</p><span class="tool-action">Open operations <i class="fas fa-arrow-right"></i></span></a>
+<a class="tool-card" href="/admin/dashboard"><div class="tool-top"><span class="tool-icon"><i class="fas fa-folder-open"></i></span><span class="tool-status">Live</span></div><h3>Case Lookup &amp; Search</h3><p>Search and open existing recovery cases from the live case workspace.</p><span class="tool-action">Open case workspace <i class="fas fa-arrow-right"></i></span></a>
+<a class="tool-card" href="/admin/operations"><div class="tool-top"><span class="tool-icon"><i class="fas fa-chart-line"></i></span><span class="tool-status">Live</span></div><h3>Case Analyzer</h3><p>Review status, priority, SLA state, assignment and operational workload for real cases.</p><span class="tool-action">Analyze live queue <i class="fas fa-arrow-right"></i></span></a>
+<a class="tool-card" href="/admin/dashboard"><div class="tool-top"><span class="tool-icon"><i class="fas fa-clock-rotate-left"></i></span><span class="tool-status">Live</span></div><h3>Case Timeline &amp; History</h3><p>Open the existing case workspace to review timeline, audit history, files and messages.</p><span class="tool-action">Review case history <i class="fas fa-arrow-right"></i></span></a>
+<a class="tool-card" href="/admin/operations"><div class="tool-top"><span class="tool-icon"><i class="fas fa-user-check"></i></span><span class="tool-status">Live</span></div><h3>Investigator Assignment</h3><p>Use the existing operational assignment workflow and keep the assigned investigator attached to the case record.</p><span class="tool-action">Open operations <i class="fas fa-arrow-right"></i></span></a>
 </div></section>
 <section class="tool-section"><div class="section-head"><div><h2>Tracking &amp; Audit</h2><p>Follow what happened, when it happened and which authorized account performed the action.</p></div></div><div class="tool-grid">
-      <a class="tool-card tool-image-card" href="/admin/operations.html"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/wTsYzPrL/Chat-GPT-Image-Sep-21-2026-10-50-49-AM.png" alt="Case Tracking toolbox"></span><span class="tool-status">Live</span></div><h3>Case Tracking</h3><p>Track active, closed, priority, assignment and SLA state from the operational view.</p><span class="tool-action">Track cases <i class="fas fa-arrow-right"></i></span></a>
-      <a class="tool-card" href="/admin/reports.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-file-lines"></i></span><span class="tool-status">Live</span></div><h3>Case Reports</h3><p>Open the existing reporting area for case reporting and operational summaries.</p><span class="tool-action">Open reports <i class="fas fa-arrow-right"></i></span></a>
-      <a class="tool-card owner-link" id="auditToolCard" href="/admin/tools/security.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-list-check"></i></span><span class="tool-status owner">Owner</span></div><h3>Activity &amp; Security Audit</h3><p>Owner-only security event and account monitoring using the existing audit infrastructure.</p><span class="tool-action">Open security center <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card tool-image-card" href="/admin/operations"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/wTsYzPrL/Chat-GPT-Image-Sep-21-2026-10-50-49-AM.png" alt="Case Tracking toolbox"></span><span class="tool-status">Live</span></div><h3>Case Tracking</h3><p>Track active, closed, priority, assignment and SLA state from the operational view.</p><span class="tool-action">Track cases <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card" href="/admin/reports"><div class="tool-top"><span class="tool-icon"><i class="fas fa-file-lines"></i></span><span class="tool-status">Live</span></div><h3>Case Reports</h3><p>Open the existing reporting area for case reporting and operational summaries.</p><span class="tool-action">Open reports <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card owner-link" id="auditToolCard" href="/admin/tools/security"><div class="tool-top"><span class="tool-icon"><i class="fas fa-list-check"></i></span><span class="tool-status owner">Owner</span></div><h3>Activity &amp; Security Audit</h3><p>Owner-only security event and account monitoring using the existing audit infrastructure.</p><span class="tool-action">Open security center <i class="fas fa-arrow-right"></i></span></a>
     </div></section>
 
     <section class="tool-section" id="access-accounts-section"><div class="section-head"><div><h2>Access &amp; Accounts</h2><p>Account and permission controls remain governed by the existing authorization model.</p></div></div><div class="tool-grid">
-      <a class="tool-card owner-link tool-image-card" id="userManagementCard" href="/admin/tools/security.html"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/YSgdGCbm/Chat-GPT-Image-Sep-22-2026-08-31-15-AM.png" alt="User Management security"></span><span class="tool-status owner">Owner</span></div><h3>User Management</h3><p>Review registered users, security status and session revocation where owner permissions allow it.</p><span class="tool-action">Open user security <i class="fas fa-arrow-right"></i></span></a>
-      <a class="tool-card" href="/admin/dashboard.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-user-lock"></i></span><span class="tool-status">Live</span></div><h3>Access Review</h3><p>Use the protected admin dashboard and existing session guard to review authorized access.</p><span class="tool-action">Open admin workspace <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card owner-link tool-image-card" id="userManagementCard" href="/admin/tools/security"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/YSgdGCbm/Chat-GPT-Image-Sep-22-2026-08-31-15-AM.png" alt="User Management security"></span><span class="tool-status owner">Owner</span></div><h3>User Management</h3><p>Review registered users, security status and session revocation where owner permissions allow it.</p><span class="tool-action">Open user security <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card" href="/admin/dashboard"><div class="tool-top"><span class="tool-icon"><i class="fas fa-user-lock"></i></span><span class="tool-status">Live</span></div><h3>Access Review</h3><p>Use the protected admin dashboard and existing session guard to review authorized access.</p><span class="tool-action">Open admin workspace <i class="fas fa-arrow-right"></i></span></a>
     </div></section>
 
     <section class="tool-section"><div class="section-head"><div><h2>Security Investigation</h2><p>Defensive investigation tools for authenticated administrators.</p></div></div><div class="tool-grid">
-      <a class="tool-card tool-image-card" href="/admin/tools/website-scanner.html"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/0yPvCntM/Chat-GPT-Image-Sep-21-2026-10-47-58-AM.png" alt="Website Safety Scanner toolbox"></span><span class="tool-status">Admin</span></div><h3>Website Safety Scanner</h3><p>Use the existing server-side scanner for DNS, TLS, redirects, headers and verified-domain signals.</p><span class="tool-action">Scan a website <i class="fas fa-arrow-right"></i></span></a>
-      <a class="tool-card owner-link" id="securityEventsCard" href="/admin/tools/security.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-shield-halved"></i></span><span class="tool-status owner">Owner</span></div><h3>Security Events</h3><p>Review authentication, account and administrative security events with severity filtering.</p><span class="tool-action">Review events <i class="fas fa-arrow-right"></i></span></a>
-      <a href="/admin/tools/link-analysis.html" class="tool-card tool-image-card" id="linkAnalysisCard"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/bvZB02jF/Chat-GPT-Image-Sep-21-2026-10-54-52-AM.png" alt="Link Analysis toolbox"></span><span class="tool-status" id="linkAnalysisStatus">Admin</span></div><h3>Link Analysis</h3><p>Activate the Link Analysis workspace to generate an authorized selfie request link for a case.</p><span class="tool-action" id="linkAnalysisAction">Open Link Analysis <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card tool-image-card" href="/admin/tools/website-scanner"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/0yPvCntM/Chat-GPT-Image-Sep-21-2026-10-47-58-AM.png" alt="Website Safety Scanner toolbox"></span><span class="tool-status">Admin</span></div><h3>Website Safety Scanner</h3><p>Use the existing server-side scanner for DNS, TLS, redirects, headers and verified-domain signals.</p><span class="tool-action">Scan a website <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card owner-link" id="securityEventsCard" href="/admin/tools/security"><div class="tool-top"><span class="tool-icon"><i class="fas fa-shield-halved"></i></span><span class="tool-status owner">Owner</span></div><h3>Security Events</h3><p>Review authentication, account and administrative security events with severity filtering.</p><span class="tool-action">Review events <i class="fas fa-arrow-right"></i></span></a>
+      <a href="/admin/tools/link-analysis" class="tool-card tool-image-card" id="linkAnalysisCard"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/bvZB02jF/Chat-GPT-Image-Sep-21-2026-10-54-52-AM.png" alt="Link Analysis toolbox"></span><span class="tool-status" id="linkAnalysisStatus">Admin</span></div><h3>Link Analysis</h3><p>Activate the Link Analysis workspace to generate an authorized selfie request link for a case.</p><span class="tool-action" id="linkAnalysisAction">Open Link Analysis <i class="fas fa-arrow-right"></i></span></a>
     </div></section>
 
 
     <section class="tool-section"><div class="section-head"><div><h2>Remote Support</h2><p>View an enrolled device only after the device owner explicitly approves the remote session.</p></div><span class="section-live">CONSENT REQUIRED</span></div><div class="tool-grid">
-<a class="tool-card remote-desktop-card" href="/admin/tools/remote-desktop.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-desktop"></i></span><span class="tool-status">Admin</span></div><h3>Remote Desktop</h3><p>Manage enrolled phones and computers, request a remote screen session, and end access immediately.</p><span class="tool-action white-remote-link">Open Remote Desktop <i class="fas fa-arrow-right"></i></span></a>
-<a class="tool-card" href="/remote/device.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-mobile-screen-button"></i></span><span class="tool-status">Device</span></div><h3>Device Connection</h3><p>Enroll an authorized phone or laptop and respond to remote-support requests with visible consent.</p><span class="tool-action">Open device connection <i class="fas fa-link"></i></span></a>
+<a class="tool-card remote-desktop-card" href="/admin/tools/remote-desktop"><div class="tool-top"><span class="tool-icon"><i class="fas fa-desktop"></i></span><span class="tool-status">Admin</span></div><h3>Remote Desktop</h3><p>Manage enrolled phones and computers, request a remote screen session, and end access immediately.</p><span class="tool-action white-remote-link">Open Remote Desktop <i class="fas fa-arrow-right"></i></span></a>
+<a class="tool-card" href="/remote/device"><div class="tool-top"><span class="tool-icon"><i class="fas fa-mobile-screen-button"></i></span><span class="tool-status">Device</span></div><h3>Device Connection</h3><p>Enroll an authorized phone or laptop and respond to remote-support requests with visible consent.</p><span class="tool-action">Open device connection <i class="fas fa-link"></i></span></a>
 </div></section>
 
 <section class="tool-section"><div class="section-head"><div><h2>Evidence &amp; Notifications</h2><p>Keep uploaded evidence, capture location metadata and case notification events connected to the same authorized case record.</p></div><span class="section-live">CASE EVIDENCE</span></div><div class="tool-grid">
-      <a class="tool-card tool-image-card" id="recoveryEvidenceCard" href="/admin/tools/recovery-evidence.html"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/zG3nHW9s/Chat-GPT-Image-Sep-22-2026-12-57-45-PM.png" alt="Recovery Evidence"></span><span class="tool-status">Admin</span></div><h3>Evidence Recovered / Picture Evidence</h3><p>Review real case evidence, picture captures, timestamps, source, device metadata and traceable capture-location data.</p><span class="tool-action">Open Evidence Review <i class="fas fa-arrow-right"></i></span></a>
-      <a class="tool-card" id="whatsappNotificationsCard" href="/admin/tools/recovery-evidence.html?channel=whatsapp"><div class="tool-top"><span class="tool-icon"><i class="fab fa-whatsapp"></i></span><span class="tool-status">Admin</span></div><h3>WhatsApp Case Notifications</h3><p>Review authorized WhatsApp notification events linked to cases. This is notification intake only, not private-chat scraping or covert message collection.</p><span class="tool-action">Open WhatsApp notifications <i class="fas fa-arrow-right"></i></span></a>
-      <a class="tool-card" href="/admin/tools/recovery-evidence.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-location-dot"></i></span><span class="tool-status">Traceable</span></div><h3>Evidence Location Trace</h3><p>Separate capture GPS from case-reported location and show source, accuracy, capture time and a map handoff when location was actually supplied.</p><span class="tool-action">Trace evidence location <i class="fas fa-map-location-dot"></i></span></a>
+      <a class="tool-card tool-image-card" id="recoveryEvidenceCard" href="/admin/tools/recovery-evidence"><div class="tool-top"><span class="tool-icon"><img class="tool-image" src="https://i.postimg.cc/zG3nHW9s/Chat-GPT-Image-Sep-22-2026-12-57-45-PM.png" alt="Recovery Evidence"></span><span class="tool-status">Admin</span></div><h3>Evidence Recovered / Picture Evidence</h3><p>Review real case evidence, picture captures, timestamps, source, device metadata and traceable capture-location data.</p><span class="tool-action">Open Evidence Review <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card" id="whatsappNotificationsCard" href="/admin/tools/recovery-evidence?channel=whatsapp"><div class="tool-top"><span class="tool-icon"><i class="fab fa-whatsapp"></i></span><span class="tool-status">Admin</span></div><h3>WhatsApp Case Notifications</h3><p>Review authorized WhatsApp notification events linked to cases. This is notification intake only, not private-chat scraping or covert message collection.</p><span class="tool-action">Open WhatsApp notifications <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card" href="/admin/tools/recovery-evidence"><div class="tool-top"><span class="tool-icon"><i class="fas fa-location-dot"></i></span><span class="tool-status">Traceable</span></div><h3>Evidence Location Trace</h3><p>Separate capture GPS from case-reported location and show source, accuracy, capture time and a map handoff when location was actually supplied.</p><span class="tool-action">Trace evidence location <i class="fas fa-map-location-dot"></i></span></a>
     </div></section>
     <section class="tool-section"><div class="section-head"><div><h2>Research &amp; Investigation</h2><p>Keep research tied to authorized case records instead of creating a parallel data store.</p></div></div><div class="tool-grid">
-      <a class="tool-card" href="/admin/dashboard.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-book-open"></i></span><span class="tool-status">Live</span></div><h3>Case Research Workspace</h3><p>Use case notes, timeline, messages and evidence already attached to the selected investigation.</p><span class="tool-action">Open research context <i class="fas fa-arrow-right"></i></span></a>
-      <a class="tool-card" href="/admin/investigation-notes.html"><div class="tool-top"><span class="tool-icon"><i class="fas fa-file-pen"></i></span><span class="tool-status">Private</span></div><h3>Investigation Notes</h3><p>Use the private Word-like document workspace to create, edit, save, export and explicitly share investigation documents.</p><span class="tool-action">Open document workspace <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card" href="/admin/dashboard"><div class="tool-top"><span class="tool-icon"><i class="fas fa-book-open"></i></span><span class="tool-status">Live</span></div><h3>Case Research Workspace</h3><p>Use case notes, timeline, messages and evidence already attached to the selected investigation.</p><span class="tool-action">Open research context <i class="fas fa-arrow-right"></i></span></a>
+      <a class="tool-card" href="/admin/investigation-notes"><div class="tool-top"><span class="tool-icon"><i class="fas fa-file-pen"></i></span><span class="tool-status">Private</span></div><h3>Investigation Notes</h3><p>Use the private Word-like document workspace to create, edit, save, export and explicitly share investigation documents.</p><span class="tool-action">Open document workspace <i class="fas fa-arrow-right"></i></span></a>
       <div class="tool-card disabled"><div class="tool-top"><span class="tool-icon"><i class="fas fa-database"></i></span><span class="tool-status info">No duplicate store</span></div><h3>Reference Materials</h3><p>No separate research database is created because the current project does not expose one.</p><span class="tool-action">Use authorized case context</span></div>
     </div></section>
 
@@ -352,13 +352,13 @@ body.admin-page-bg .tools-shell .tool-grid{min-width:0!important}
   <div class="manlung-footer-inner">
     <div class="manlung-footer-grid">
       <section class="manlung-footer-brand"><div class="manlung-footer-brand-row"><a href="/" aria-label="Manlung Recovery Home"><img src="/icons/icon-512.png" alt="Manlung Recovery" class="manlung-footer-logo" width="46" height="46"></a><div><h2>Manlung Recovery</h2><p class="manlung-footer-brand-subtitle">Cyber Recovery &amp; Digital Investigation Portal</p></div></div><p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p></section>
-      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
-      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links"><a href="/client/request.html">New Recovery Request</a><a href="/client/dashboard.html">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/donate.html" class="footer-important">Donate</a><a href="/contact.html">Contact</a></nav></section>
-      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
+      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links"><a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/knowledge">Knowledge</a><a href="/blog">Blog</a></nav></section>
+      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links"><a href="/client/request">New Recovery Request</a><a href="/client/dashboard">Client Portal</a><a href="/client/track">Track a Case</a><a href="/donate" class="footer-important">Donate</a><a href="/contact">Contact</a></nav></section>
+      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links"><a href="/privacy">Privacy Notice</a><a href="/terms">Terms &amp; Conditions</a><a href="/faq">FAQ</a></nav></section>
     </div>
     <div class="manlung-footer-divider"></div>
     <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com"><i class="fas fa-envelope"></i><span>manlungrecovery@outlook.com</span></a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="https://i.postimg.cc/DZHs0t4n/icons8-facebook-48.png" alt="Facebook" width="32" height="32" loading="lazy"></a><a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="https://i.postimg.cc/sD9QCBct/icons8-instagram-48.png" alt="Instagram" width="32" height="32" loading="lazy"></a><a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="X"><img src="https://i.postimg.cc/SNT49kNc/icons8-x-50.png" alt="X" width="32" height="32" loading="lazy"></a><a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="https://i.postimg.cc/3J667Rxx/icons8-tiktok-50.png" alt="TikTok" width="32" height="32" loading="lazy"></a><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="https://i.postimg.cc/W4V5bJLF/icons8-youtube-48.png" alt="YouTube" width="32" height="32" loading="lazy"></a><a href="https://news.google.com/" target="_blank" rel="noopener noreferrer" aria-label="Google News"><img src="https://i.postimg.cc/T2sQ5sMs/icons8-google-48.png" alt="Google News" width="32" height="32" loading="lazy"></a><a href="https://t.me/" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><img src="https://i.postimg.cc/ZRMP3Wgx/icons8-telegram-48.png" alt="Telegram" width="32" height="32" loading="lazy"></a></div></div>
-    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms">Terms &amp; Conditions</a><a href="/privacy">Privacy Notice</a></div></div>
   </div>
 <style id="manlung-footer-social-icons-v2">.manlung-footer-social{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap}.manlung-footer-social a{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:4px;border-radius:12px;background:rgba(255,255,255,.04);transition:transform .18s ease,background .18s ease}.manlung-footer-social a:hover{transform:translateY(-2px);background:rgba(37,99,235,.14)}.manlung-footer-social a img{display:block;width:32px;height:32px;object-fit:contain}.manlung-footer-social a:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}@media(max-width:600px){.manlung-footer-social{gap:10px}.manlung-footer-social a{width:40px;height:40px}}</style></footer>
 <script>
@@ -392,7 +392,7 @@ async function generateSelfieLink(){
     const r=await fetch('/api/cases/admin/selfie-requests',{method:'POST',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({reference})});
     const d=await r.json();
     if(!r.ok||!d.success)throw new Error(d.error||'Could not generate link.');
-    generatedSelfieUrl='https://manlungrecovery.manlungshop.co.ke/selfie.html?id='+encodeURIComponent(d.request.token);
+    generatedSelfieUrl='https://manlungrecovery.manlungshop.co.ke/selfie?id='+encodeURIComponent(d.request.token);
     const a=document.createElement('a');a.href=generatedSelfieUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent=generatedSelfieUrl;
     selfieOutput.textContent='';selfieOutput.appendChild(a);copySelfieBtn.disabled=false;if(shareSelfieBtn)shareSelfieBtn.disabled=false;selfieStatus.textContent='Link Generated';
     try{await navigator.clipboard.writeText(generatedSelfieUrl);selfieStatus.textContent='Link Generated · Copied'}catch(_){}
@@ -414,7 +414,7 @@ selfieReference?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDef
 
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(url,options={}){const r=await fetch(url,{credentials:'include',headers:{Accept:'application/json',...(options.headers||{})},...options});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||`Request failed (${r.status})`);return d}
-function logoutFromTools(e){e.preventDefault();fetch('/api/auth/admin/logout',{method:'POST',credentials:'include'}).finally(()=>location.href='/admin/login.html');}
+function logoutFromTools(e){e.preventDefault();fetch('/api/auth/admin/logout',{method:'POST',credentials:'include'}).finally(()=>location.href='/admin/login');}
 async function loadSnapshot(){
   const results=await Promise.allSettled([
     api('/api/cases/admin/stats'),
@@ -446,7 +446,7 @@ async function loadSnapshot(){
   $('metricUsedSelfie').textContent=selfie.filter(x=>x.status==='used').length;
   $('snapshotStatus').textContent='Updated '+new Date().toLocaleTimeString();
 }
-async function lookup(){const q=$('caseLookup').value.trim();const box=$('lookupResults');if(!q){box.innerHTML='<div class="notice">Enter a search term to query the existing case records.</div>';return}box.innerHTML='<div class="notice">Searching existing cases…</div>';try{const d=await api('/api/cases/admin/all?'+new URLSearchParams({search:q,limit:'10',page:'1'}));const cases=d.cases||[];if(!cases.length){box.innerHTML='<div class="notice">No existing cases matched that search.</div>';return}box.innerHTML=cases.map(c=>`<div class="result"><div class="result-main"><strong>${esc(c.caseId)}</strong><div class="result-meta">${esc(c.clientName||'')} · ${esc(c.caseType||'')} · ${esc(c.status||'')}</div></div><a class="btn btn-outline" href="/admin/dashboard.html?case=${encodeURIComponent(c.caseId)}">Open</a></div>`).join('')}catch(e){box.innerHTML=`<div class="notice" style="color:#b91c1c">${esc(e.message||'Case lookup failed.')}</div>`}}
+async function lookup(){const q=$('caseLookup').value.trim();const box=$('lookupResults');if(!q){box.innerHTML='<div class="notice">Enter a search term to query the existing case records.</div>';return}box.innerHTML='<div class="notice">Searching existing cases…</div>';try{const d=await api('/api/cases/admin/all?'+new URLSearchParams({search:q,limit:'10',page:'1'}));const cases=d.cases||[];if(!cases.length){box.innerHTML='<div class="notice">No existing cases matched that search.</div>';return}box.innerHTML=cases.map(c=>`<div class="result"><div class="result-main"><strong>${esc(c.caseId)}</strong><div class="result-meta">${esc(c.clientName||'')} · ${esc(c.caseType||'')} · ${esc(c.status||'')}</div></div><a class="btn btn-outline" href="/admin/dashboard?case=${encodeURIComponent(c.caseId)}">Open</a></div>`).join('')}catch(e){box.innerHTML=`<div class="notice" style="color:#b91c1c">${esc(e.message||'Case lookup failed.')}</div>`}}
 async $('caseLookupBtn').onclick=lookup;$('caseLookup').addEventListener('keydown',e=>{if(e.key==='Enter')lookup()});
 (async()=>{try{const d=await api('/api/auth/verify');if(d.success&&d.user){const owner=String(d.user.role||'').toLowerCase()==='owner';if(!owner){document.querySelectorAll('.owner-link').forEach(el=>{el.classList.add('disabled');el.removeAttribute('href');const action=el.querySelector('.tool-action');if(action)action.textContent='Owner-only control'})}}}catch(e){console.warn('Admin role check unavailable:',e)}loadSnapshot();const params=new URLSearchParams(location.search);if(params.get('case')){$('caseLookup').value=params.get('case');lookup()}})();
 </script>
@@ -752,8 +752,8 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .ml-admin-sidebar .header-actions>button,
 .ml-admin-sidebar .header-actions>select,
 .ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;padding-left:22px!important;padding-right:12px!important;margin-left:0!important;margin-right:0!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]{justify-content:flex-start!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*{margin-left:0!important;margin-right:10px!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]{justify-content:flex-start!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]>*{margin-left:0!important;margin-right:10px!important;text-align:left!important}
 .ml-admin-sidebar .header-actions [class*="language"],
 .ml-admin-sidebar .header-actions [aria-label*="Language"],
 .ml-admin-sidebar .header-actions [title*="Language"],
@@ -770,12 +770,12 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .ml-admin-sidebar .header-actions>button,
 .ml-admin-sidebar .header-actions>select,
 .ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:48px!important;margin:0!important;padding:12px 16px!important;gap:10px!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"],
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]{display:flex!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;padding-left:16px!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>i,
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>i{flex:0 0 20px!important;width:20px!important;min-width:20px!important;margin:0!important;text-align:center!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*:not(i),
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"],
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"]{display:flex!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;padding-left:16px!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]>i,
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"]>i{flex:0 0 20px!important;width:20px!important;min-width:20px!important;margin:0!important;text-align:center!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]>*:not(i),
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
 
 /* === Admin Tools: teal utility workspace reference design === */
 :root{--tool-bg:#F3F6F9;--tool-card:#FFFFFF;--tool-line:#E5E7EB;--tool-text:#1C2B33;--tool-muted:#7B8C98;--tool-accent:#0EA5E9;--tool-accent-2:#0C3A4A;--shadow-sm:0 2px 8px rgba(0,0,0,.04);--shadow-md:0 8px 24px rgba(0,0,0,.07);--radius-lg:20px;--radius-md:12px}
@@ -802,7 +802,7 @@ body{display:block!important;height:auto!important;min-height:100vh;background:v
 .ml-admin-sidebar .header-actions>button:hover{background:rgba(255,255,255,.08)!important;color:#fff!important;border-color:rgba(255,255,255,.07)!important}
 .ml-admin-sidebar .header-actions>a[aria-current="page"]{position:relative!important;background:rgba(255,255,255,.12)!important;color:#fff!important;border-color:rgba(255,255,255,.09)!important}
 .ml-admin-sidebar .header-actions>a[aria-current="page"]:before{content:"";position:absolute;left:-1px;top:50%;transform:translateY(-50%);height:30px;width:3px;border-radius:0 4px 4px 0;background:#0EA5E9}
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"],
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"],
 .ml-admin-sidebar .header-actions>a[href="/"]{display:none!important}
 .ml-admin-sidebar .header-actions>a[href*="logout"]{margin-top:auto!important;background:rgba(239,68,68,.11)!important;color:#fecaca!important;border-color:rgba(239,68,68,.1)!important}
 .ml-admin-sidebar .header-actions>a[href*="logout"]:hover{background:#dc2626!important;color:#fff!important}
@@ -930,7 +930,7 @@ html.dark .btn-outline{background:#111d29!important;color:#e2e8f0!important}
  .ml-admin-sidebar .header-actions>a>i,.ml-admin-sidebar .header-actions>button>i{flex:0 0 20px!important;width:20px!important;font-size:16px!important;text-align:center!important}
  .ml-admin-sidebar .header-actions>a:hover,.ml-admin-sidebar .header-actions>button:hover{background:#ffffff17!important;border-color:#ffffff35!important;color:#fff!important}
  .ml-admin-sidebar .header-actions>a[aria-current="page"]{background:#0EA5E933!important;border-color:#38BDF866!important;color:#fff!important}
- .ml-admin-sidebar .header-actions>a[href="/admin/connect.html"],.ml-admin-sidebar .header-actions>a[href="/"]{display:flex!important}
+ .ml-admin-sidebar .header-actions>a[href="/admin/connect"],.ml-admin-sidebar .header-actions>a[href="/"]{display:flex!important}
  .ml-admin-sidebar .header-actions>a[href*="logout"]{margin-top:4px!important;background:#dc262622!important;color:#fecaca!important;border-color:#dc262655!important}
  .tools-shell{width:100%!important;max-width:none!important;margin:0!important;padding:18px 16px 34px!important}
  .manlung-footer{width:100%!important;margin-left:0!important}

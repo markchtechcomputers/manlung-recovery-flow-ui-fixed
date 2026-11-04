@@ -140,7 +140,7 @@ router.post('/initialize', auth, async (req, res) => {
       }),
       callback_url:
         process.env.PAYSTACK_CALL_ADMIN_CALLBACK_URL ||
-        `${process.env.PUBLIC_APP_URL || `${req.protocol}://${req.get('host')}`}/client/settings.html`,
+        `${process.env.PUBLIC_APP_URL || `${req.protocol}://${req.get('host')}`}/client/settings`,
     };
 
     if (configuredPlan) {

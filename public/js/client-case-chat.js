@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  if (!location.pathname.startsWith('/client/track.html')) return;
+  if (!location.pathname.startsWith('/client/track')) return;
 
   const token = () => '';
   const user = () => { try { return JSON.parse(localStorage.getItem('clientUser') || 'null'); } catch (_) { return null; } };

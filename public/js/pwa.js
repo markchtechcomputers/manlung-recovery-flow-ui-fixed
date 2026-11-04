@@ -738,7 +738,7 @@
 
   function isAdminMusicPage() {
     return location.pathname.startsWith('/admin/') &&
-      location.pathname !== '/admin/music-player.html';
+      location.pathname !== '/admin/music-player';
   }
 
   function publishAdminMusic(song) {
@@ -767,7 +767,7 @@
 
     publishAdminMusic(song);
 
-    const url = '/admin/music-player.html';
+    const url = '/admin/music-player';
     const features = 'popup=yes,width=760,height=520,resizable=yes,scrollbars=no';
     let popup = musicPopup;
 

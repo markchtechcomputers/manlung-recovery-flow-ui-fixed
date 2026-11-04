@@ -20,7 +20,7 @@
     return next.startsWith('/') && !next.startsWith('//') ? next : '/';
   }
   function loginUrl() {
-    return `/login.html?next=${encodeURIComponent(safeNext())}`;
+    return `/login?next=${encodeURIComponent(safeNext())}`;
   }
 
   async function verifyClient() {
@@ -64,7 +64,7 @@
   async function logout() {
     clearClientSession();
     fetch('/api/auth/client/logout', { method: 'POST', credentials: 'include' }).finally(() => {
-      window.location.replace('/login.html?loggedOut=1');
+      window.location.replace('/login?loggedOut=1');
     });
   }
 
@@ -91,7 +91,7 @@
 
       const account = document.createElement('a');
       account.className = 'account-user';
-      account.href = '/client/dashboard.html';
+      account.href = '/client/dashboard';
       account.textContent = name;
 
       const out = document.createElement('button');
@@ -108,12 +108,12 @@
 
       const signIn = document.createElement('a');
       signIn.className = 'account-signin';
-      signIn.href = `/login.html?next=${encodeURIComponent(safeNext())}`;
+      signIn.href = `/login?next=${encodeURIComponent(safeNext())}`;
       signIn.innerHTML = '<i class="fas fa-right-to-bracket" aria-hidden="true"></i> Sign In';
 
       const signUp = document.createElement('a');
       signUp.className = 'account-signup';
-      signUp.href = `/login.html?mode=register&next=${encodeURIComponent(safeNext())}`;
+      signUp.href = `/login?mode=register&next=${encodeURIComponent(safeNext())}`;
       signUp.innerHTML = '<i class="fas fa-user-plus" aria-hidden="true"></i> Create Account';
 
       el.append(label, signIn, signUp);
@@ -129,19 +129,19 @@
   }
 
   function guardRequestLinks() {
-    document.querySelectorAll('a[href="/client/request.html"]').forEach((link) => {
+    document.querySelectorAll('a[href="/client/request"]').forEach((link) => {
       if (link.dataset.authGuardBound === 'true') return;
       link.dataset.authGuardBound = 'true';
       link.addEventListener('click', async (event) => {
         if (clientAuthenticated) return;
         event.preventDefault();
-        window.location.href = '/login.html?next=' + encodeURIComponent('/client/request.html');
+        window.location.href = '/login?next=' + encodeURIComponent('/client/request');
       });
     });
   }
 
   async function boot() {
-    if (location.pathname === '/login.html' || location.pathname.startsWith('/admin/')) return;
+    if (location.pathname === '/login' || location.pathname.startsWith('/admin/')) return;
     await verifyClient();
     renderAccountSection();
     guardRequestLinks();

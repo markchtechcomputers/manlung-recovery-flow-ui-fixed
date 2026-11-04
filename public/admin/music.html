@@ -408,15 +408,15 @@ body.admin-page-bg .queue-wrap { padding-top:5px !important; }
         <div><div class="logo-icon">MANLUNG</div><div class="logo-subtitle">RECOVERY · ADMIN</div></div>
       </div>
       <nav class="nav-menu" aria-label="Admin navigation">
-        <a href="/admin/dashboard.html" class="nav-item"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
-        <a href="/admin/dashboard.html#cases-section" class="nav-item"><i class="fa-solid fa-folder-open"></i><span>Cases</span></a>
-        <a href="/admin/dashboard.html#donations-section" class="nav-item"><i class="fa-solid fa-hand-holding-heart"></i><span>Donations</span></a>
-        <a href="/admin/dashboard.html#call-admin-section" class="nav-item"><i class="fa-solid fa-phone-volume"></i><span>Call Admin</span></a>
-        <a href="/admin/reports.html" class="nav-item"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
-        <a href="/admin/operations.html" class="nav-item"><i class="fa-solid fa-list-check"></i><span>Operations</span></a>
-        <a href="/admin/music.html" class="nav-item active" aria-current="page"><i class="fa-solid fa-music"></i><span>Music</span></a>
-        <a href="/admin/tools.html" class="nav-item"><i class="fa-solid fa-toolbox"></i><span>Tools</span></a>
-        <a href="/admin/connect.html" class="nav-item"><i class="fa-solid fa-comments"></i><span>WhatsApp Chats</span></a>
+        <a href="/admin/dashboard" class="nav-item"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+        <a href="/admin/dashboard#cases-section" class="nav-item"><i class="fa-solid fa-folder-open"></i><span>Cases</span></a>
+        <a href="/admin/dashboard#donations-section" class="nav-item"><i class="fa-solid fa-hand-holding-heart"></i><span>Donations</span></a>
+        <a href="/admin/dashboard#call-admin-section" class="nav-item"><i class="fa-solid fa-phone-volume"></i><span>Call Admin</span></a>
+        <a href="/admin/reports" class="nav-item"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
+        <a href="/admin/operations" class="nav-item"><i class="fa-solid fa-list-check"></i><span>Operations</span></a>
+        <a href="/admin/music" class="nav-item active" aria-current="page"><i class="fa-solid fa-music"></i><span>Music</span></a>
+        <a href="/admin/tools" class="nav-item"><i class="fa-solid fa-toolbox"></i><span>Tools</span></a>
+        <a href="/admin/connect" class="nav-item"><i class="fa-solid fa-comments"></i><span>WhatsApp Chats</span></a>
         <a href="/" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
         <a href="/api/auth/admin/logout" class="nav-item"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
       </nav>
@@ -570,7 +570,7 @@ body.admin-page-bg .queue-wrap { padding-top:5px !important; }
         addToQueue(song,true);queueIndex=selectedInQueue(song);renderQueue();updatePlayerInfo(song);updatePlayButton(true);
         var payload=persistSong(song,currentMode);
         var features='popup=yes,width=960,height=720,resizable=yes,scrollbars=yes';
-        try{playerWindow=window.open('/admin/music-player.html','manlungAdminMusicPlayer',features)}catch(_){playerWindow=null}
+        try{playerWindow=window.open('/admin/music-player','manlungAdminMusicPlayer',features)}catch(_){playerWindow=null}
         if(!playerWindow){updatePlayButton(false);setStatus('The browser blocked the player pop-up. Allow pop-ups for this site, then press Play again.','error');document.getElementById('playerArtist').textContent='Pop-up blocked — allow pop-ups';return}
         try{playerWindow.focus()}catch(_){}
         tellPlayer({type:'song',song:payload});
@@ -605,7 +605,7 @@ body.admin-page-bg .queue-wrap { padding-top:5px !important; }
         try{
           var response=await fetch('/api/youtube/search?q='+encodeURIComponent(query),{credentials:'include',cache:'no-store',headers:{'Accept':'application/json'}});
           var data=await response.json().catch(function(){return {}});
-          if(response.status===401||response.status===403){location.href='/admin/login.html';return}
+          if(response.status===401||response.status===403){location.href='/admin/login';return}
           if(!response.ok||!data.success)throw new Error(data.error||'YouTube search failed. Please try again.');
           var songs=Array.isArray(data.songs)?data.songs:[];
           renderResults(songs);

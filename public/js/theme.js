@@ -9,15 +9,15 @@
     window.__manlungBrowserOfflineSupportInstalled = true;
 
     function openOfflinePage() {
-      if (location.pathname === '/offline.html') return;
-      const offlineUrl = new URL('/offline.html', location.origin);
+      if (location.pathname === '/offline') return;
+      const offlineUrl = new URL('/offline', location.origin);
       offlineUrl.searchParams.set('return', location.href);
       location.replace(offlineUrl.href);
     }
 
     let failedProbes = 0;
     function checkSiteReachability() {
-      if (document.hidden || location.pathname === '/offline.html') return;
+      if (document.hidden || location.pathname === '/offline') return;
       const probe = new Image();
       probe.onload = () => { failedProbes = 0; };
       probe.onerror = () => {
@@ -263,7 +263,7 @@
   }
 
   function loadClientCaseChat() {
-    if (location.pathname.startsWith('/client/track.html')) {
+    if (location.pathname.startsWith('/client/track')) {
       loadScriptOnce('/js/client-case-chat.js?v=20260906c', 'manlung-client-case-chat');
     }
   }

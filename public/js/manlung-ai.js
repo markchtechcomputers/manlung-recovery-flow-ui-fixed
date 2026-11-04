@@ -10,8 +10,8 @@
 
     const WHATSAPP = 'https://wa.me/254745682493?text=Hello%20Manlung%20Recovery%20%F0%9F%91%8B%2C%20I%20came%20across%20your%20website%20and%20I%E2%80%99d%20like%20to%20get%20some%20help%20with%20my%20recovery%20request.%20Could%20you%20please%20guide%20me%20on%20what%20I%20need%20to%20do%20next%3F%20Thank%20you%21';
   const EMAIL = 'mailto:manlungrecovery@outlook.com?subject=Manlung%20Recovery%20AI%20Support';
-  const REQUEST = '/client/request.html';
-  const TRACK = '/client/track.html';
+  const REQUEST = '/client/request';
+  const TRACK = '/client/track';
 
   const KNOWLEDGE = {
     greeting: `Hey 👋 Welcome to Manlung Recovery. I’m your AI Support Assistant. I can explain how our recovery process works, help you choose the right next step, and connect you with human support when needed. What can I help you with today?`,
@@ -428,7 +428,7 @@
       <div class="manlung-ai-head"><div class="manlung-ai-avatar" aria-hidden="true">AI</div><div><div class="manlung-ai-title">Manlung AI</div><div class="manlung-ai-status"><i></i> Online • Conversational support</div></div><button type="button" class="manlung-ai-close" aria-label="Close">×</button></div>
       <div class="manlung-ai-toolbar"><button type="button" id="manlungAiLang">🌐 Auto: English</button><button type="button" id="manlungAiVoice">🔊 Voice on</button></div>
       <div class="manlung-ai-body" id="manlungAiMessages"></div>
-      <div class="manlung-ai-foot"><div class="manlung-ai-links"><a href="/client/request.html">New Request</a><a href="/client/track.html">Track Case</a><a href="https://wa.me/254745682493" target="_blank" rel="noopener">Human Support</a></div>
+      <div class="manlung-ai-foot"><div class="manlung-ai-links"><a href="/client/request">New Request</a><a href="/client/track">Track Case</a><a href="https://wa.me/254745682493" target="_blank" rel="noopener">Human Support</a></div>
       <div class="manlung-ai-voice-state" id="manlungAiVoiceState" aria-live="polite"><span class="manlung-ai-voice-dot"></span><span id="manlungAiVoiceStateText">Ready</span></div>
       <form class="manlung-ai-compose" id="manlungAiForm"><button class="manlung-ai-mic" id="manlungAiMic" type="button" aria-label="Start voice input" title="Speak">🎙</button><textarea class="manlung-ai-input" id="manlungAiInput" rows="1" placeholder="Message Manlung AI…"></textarea><button class="manlung-ai-send" type="submit">➤</button></form>
       <div class="manlung-ai-note">Tell me what happened in your own words. I’ll ask focused follow-up questions and guide the next step. Voice stays on until you stop it.</div></div></div>`;
@@ -564,7 +564,7 @@
       }
     };
   }
-  function injectHeaderTab(){const a=document.querySelector('.site-header .header-actions');if(!a||a.querySelector('[data-manlung-ai-tab]'))return;const b=document.createElement('a');b.href='/manlung-ai.html';b.dataset.manlungAiTab='true';b.className='manlung-ai-tab';b.innerHTML='<i class="fa-solid fa-robot" aria-hidden="true"></i> Manlung AI';b.setAttribute('aria-label','Open Manlung AI in its own page');a.appendChild(b);}
+  function injectHeaderTab(){const a=document.querySelector('.site-header .header-actions');if(!a||a.querySelector('[data-manlung-ai-tab]'))return;const b=document.createElement('a');b.href='/manlung-ai';b.dataset.manlungAiTab='true';b.className='manlung-ai-tab';b.innerHTML='<i class="fa-solid fa-robot" aria-hidden="true"></i> Manlung AI';b.setAttribute('aria-label','Open Manlung AI in its own page');a.appendChild(b);}
 
   function now() { return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
 

@@ -90,7 +90,7 @@
       '<div class="mcc-panel"><div class="mcc-head"><div class="mcc-icon"><img src="https://i.postimg.cc/7hFXFL2g/icons8-cookie-48.png" alt="Cookie" width="48" height="48" loading="eager" decoding="async" style="display:block;width:48px;height:48px;object-fit:contain"></div><div class="mcc-copy">'+
       '<h2 id="mcc-title">Your privacy matters</h2>' +
       '<p>Manlung Recovery uses essential storage to keep the website secure, remember your settings and support sign-in. Optional analytics and advertising tools are not currently activated by this consent manager. You can choose whether to allow optional categories and change your choice at any time.</p>' +
-      '<p style="margin-top:7px"><a href="/privacy.html#cookies">Read our cookie and storage notice</a>.</p></div></div>' +
+      '<p style="margin-top:7px"><a href="/privacy#cookies">Read our cookie and storage notice</a>.</p></div></div>' +
       '<div class="mcc-detail' + (showDetails ? ' is-open' : '') + '" id="mcc-detail">' +
       '<div class="mcc-choice"><div><strong>Strictly necessary</strong><small>Security, authentication, consent records and core site operation. Always active.</small></div><input type="checkbox" checked disabled aria-label="Strictly necessary always active"></div>' +
       '<div class="mcc-choice"><div><strong>Preferences</strong><small>Remember optional display and convenience preferences.</small></div><input type="checkbox" data-category="preferences" ' + (prefs.preferences ? 'checked' : '') + ' aria-label="Allow preference storage"></div>' +

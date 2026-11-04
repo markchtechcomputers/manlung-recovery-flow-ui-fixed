@@ -723,27 +723,27 @@ body.admin-page-bg .reports-flow-nav{position:sticky;top:8px;z-index:20;max-widt
 <body class="admin-page-bg">
 
 <aside class="reports-sidebar" aria-label="Admin navigation">
-  <a class="reports-sidebar-brand" href="/admin/dashboard.html">
+  <a class="reports-sidebar-brand" href="/admin/dashboard">
     <img src="/icons/icon-512.png" alt="Manlung Recovery">
     <span><strong>Manlung Recovery</strong><small>Admin Dashboard</small></span>
   </a>
   <nav class="reports-sidebar-nav" aria-label="Admin navigation">
-    <a href="/admin/dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
-    <a href="/admin/dashboard.html#cases-section"><i class="fa-solid fa-folder-open"></i><span>Cases</span></a>
-    <a href="/admin/dashboard.html#donations-section"><i class="fa-solid fa-hand-holding-heart"></i><span>Donations</span></a>
-    <a href="/admin/dashboard.html#call-admin-section"><i class="fa-solid fa-phone-volume"></i><span>Call Admin</span></a>
-    <a class="active" href="/admin/reports.html" aria-current="page"><i class="fa-solid fa-chart-pie"></i><span>Reports</span></a>
-    <a href="/admin/operations.html"><i class="fa-solid fa-list-check"></i><span>Operations</span></a>
-    <a href="/admin/music.html"><i class="fa-solid fa-music"></i><span>Music</span></a>
-    <a href="/admin/tools.html"><i class="fa-solid fa-toolbox"></i><span>Tools</span></a>
-    <a href="/admin/connect.html"><i class="fa-solid fa-comments"></i><span>WhatsApp Chats</span></a>
+    <a href="/admin/dashboard"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+    <a href="/admin/dashboard#cases-section"><i class="fa-solid fa-folder-open"></i><span>Cases</span></a>
+    <a href="/admin/dashboard#donations-section"><i class="fa-solid fa-hand-holding-heart"></i><span>Donations</span></a>
+    <a href="/admin/dashboard#call-admin-section"><i class="fa-solid fa-phone-volume"></i><span>Call Admin</span></a>
+    <a class="active" href="/admin/reports" aria-current="page"><i class="fa-solid fa-chart-pie"></i><span>Reports</span></a>
+    <a href="/admin/operations"><i class="fa-solid fa-list-check"></i><span>Operations</span></a>
+    <a href="/admin/music"><i class="fa-solid fa-music"></i><span>Music</span></a>
+    <a href="/admin/tools"><i class="fa-solid fa-toolbox"></i><span>Tools</span></a>
+    <a href="/admin/connect"><i class="fa-solid fa-comments"></i><span>WhatsApp Chats</span></a>
     <a href="/"><i class="fa-solid fa-house"></i><span>Home</span></a>
     <button type="button" id="reportsLogoutBtn"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
   </nav>
   <div class="reports-sidebar-foot">Cyber Recovery &amp; Digital Investigation Portal</div>
 </aside>
 <header class="reports-page-header">
-  <a class="reports-back-link" href="/admin/dashboard.html" aria-label="Back to Admin Dashboard" title="Back to Admin Dashboard">
+  <a class="reports-back-link" href="/admin/dashboard" aria-label="Back to Admin Dashboard" title="Back to Admin Dashboard">
     <i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back to Dashboard</span>
   </a>
   <div class="reports-header-title">
@@ -1419,7 +1419,7 @@ async function handleUnauthorized(res) {
     if (res.status === 401 || res.status === 403) {
         localStorage.removeItem('adminUser');
         fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
-        window.location.href = '/admin/login.html';
+        window.location.href = '/admin/login';
         return true;
     }
     return false;
@@ -1428,7 +1428,7 @@ async function handleUnauthorized(res) {
 function logout() {
     localStorage.removeItem('adminUser');
     fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
-    window.location.href = '/admin/login.html';
+    window.location.href = '/admin/login';
 }
 </script>
 
@@ -2963,7 +2963,7 @@ function logout() {
  var b=document.getElementById('reportsLogoutBtn');
  if(b)b.addEventListener('click',function(){
    if(typeof window.handleLogout==='function'){window.handleLogout();return;}
-   window.location.href='/admin/dashboard.html';
+   window.location.href='/admin/dashboard';
  });
  var t=document.querySelector('.reports-sidebar [data-theme-toggle]');
  if(t)t.addEventListener('click',function(){
@@ -2985,13 +2985,13 @@ function logout() {
         </div>
         <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
       </section>
-      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
-      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request.html">New Recovery Request</a><a href="/client/dashboard.html">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/donate.html" class="footer-important">Donate</a><a href="/careers.html" class="footer-important">Careers</a><a href="/contact.html">Contact</a></nav></section>
-      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
+      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/knowledge">Knowledge</a><a href="/blog">Blog</a></nav></section>
+      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request">New Recovery Request</a><a href="/client/dashboard">Client Portal</a><a href="/client/track">Track a Case</a><a href="/donate" class="footer-important">Donate</a><a href="/careers" class="footer-important">Careers</a><a href="/contact">Contact</a></nav></section>
+      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy">Privacy Notice</a><a href="/terms">Terms &amp; Conditions</a><a href="/faq">FAQ</a></nav></section>
     </div>
     <div class="manlung-footer-divider"></div>
     <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer">GitHub</a></div></div>
-    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms">Terms &amp; Conditions</a><a href="/privacy">Privacy Notice</a></div></div>
   </div>
 </footer>
 

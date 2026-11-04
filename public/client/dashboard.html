@@ -367,12 +367,12 @@
   color:#94a3b8;
   font-size:.68rem;
 }
-.site-header .header-actions a[href="/client/request.html"]{
+.site-header .header-actions a[href="/client/request"]{
   background:#2563eb;
   border-color:#2563eb;
   color:#fff;
 }
-.site-header .header-actions a[href="/client/request.html"] i{
+.site-header .header-actions a[href="/client/request"] i{
   color:#fff;
 }
 @media(max-width:650px){
@@ -400,7 +400,7 @@
     flex:none !important;
     align-items:center !important;
   }
-  .site-header .header-actions a[href="/client/request.html"]{
+  .site-header .header-actions a[href="/client/request"]{
     width:auto !important;
     min-height:42px !important;
     padding:.55rem .72rem !important;
@@ -409,11 +409,11 @@
     font-size:.7rem !important;
     border-radius:11px;
   }
-  .site-header .header-actions a[href="/client/request.html"] span{
+  .site-header .header-actions a[href="/client/request"] span{
     display:inline !important;
   }
   .site-header .header-actions button:not(.theme-toggle),
-  .site-header .header-actions a:not([href="/client/request.html"]){
+  .site-header .header-actions a:not([href="/client/request"]){
     display:none !important;
   }
 }
@@ -899,7 +899,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         </div>
       </div>
       <div class="dashboard-hero-action">
-        <a class="btn btn-primary dashboard-primary-action" href="/client/request.html">
+        <a class="btn btn-primary dashboard-primary-action" href="/client/request">
           <i class="fas fa-file-circle-plus"></i>
           <span>Submit a Case</span>
           <i class="fas fa-arrow-right dashboard-action-arrow"></i>
@@ -960,7 +960,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         <div class="dashboard-donation-number"><strong id="publicDonationTotal">KES 0</strong><span><b id="publicDonationCount">0</b> confirmed donations</span></div>
       </div>
       <div class="dashboard-support-action">
-        <a class="btn btn-primary" href="/donate.html"><i class="fas fa-heart"></i> Donate</a>
+        <a class="btn btn-primary" href="/donate"><i class="fas fa-heart"></i> Donate</a>
       </div>
     </section>
 
@@ -970,7 +970,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
           <div class="dashboard-section-icon"><i class="fas fa-list-check"></i></div>
           <div><span class="dashboard-section-kicker">Your recovery activity</span><h2>My Cases <span id="caseCount" class="dashboard-inline-count"></span></h2><p>Review every recovery request connected to your account.</p></div>
         </div>
-        <a class="dashboard-mini-link" href="/client/request.html"><i class="fas fa-plus"></i> New case</a>
+        <a class="dashboard-mini-link" href="/client/request"><i class="fas fa-plus"></i> New case</a>
       </div>
       <div id="casesState" class="loading">Loading your cases…</div>
       <div id="casesGrid" class="case-grid"></div>
@@ -1149,7 +1149,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         if (!res.ok || !data.success) {
           fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).catch(()=>{});
           localStorage.removeItem('clientUser');
-          window.location.href = '/login.html';
+          window.location.href = '/login';
           return false;
         }
 
@@ -1159,13 +1159,13 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
           (data.user.role === 'admin' ||
            data.user.role === 'owner')
         ) {
-          window.location.replace('/admin/dashboard.html');
+          window.location.replace('/admin/dashboard');
           return false;
         }
 
         if (!data.user || data.user.role !== 'client') {
           localStorage.removeItem('clientUser');
-          window.location.href = '/login.html';
+          window.location.href = '/login';
           return false;
         }
 
@@ -1223,7 +1223,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         // Do not expose a client-only page when the session cannot
         // be verified.
         localStorage.removeItem('clientUser');
-        window.location.replace('/login.html');
+        window.location.replace('/login');
         return false;
       }
     }
@@ -1274,13 +1274,13 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       applyTheme();
     })();
     function logout(){
-      fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).finally(()=>window.location.href='/login.html');
+      fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).finally(()=>window.location.href='/login');
     }
     function renderCases(cases){
       const state=document.getElementById('casesState');
       const grid=document.getElementById('casesGrid');
       document.getElementById('caseCount').textContent = `· ${cases.length} case${cases.length===1?'':'s'}`;
-      if(!cases.length){ state.innerHTML='<div class="empty"><i class="fas fa-folder-open" style="font-size:2rem;margin-bottom:.7rem;"></i><p>You have not submitted a recovery case yet.</p><a class="btn btn-primary" style="margin-top:1rem;" href="/client/request.html">Create your first case</a></div>'; return; }
+      if(!cases.length){ state.innerHTML='<div class="empty"><i class="fas fa-folder-open" style="font-size:2rem;margin-bottom:.7rem;"></i><p>You have not submitted a recovery case yet.</p><a class="btn btn-primary" style="margin-top:1rem;" href="/client/request">Create your first case</a></div>'; return; }
       state.style.display='none';
       grid.innerHTML=cases.map(c=>{
         const id=escapeHtml(c.caseId);
@@ -1290,7 +1290,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
           <div class="case-meta"><div><small>Last updated</small><strong>${formatDate(c.lastUpdated || c.createdAt)}</strong></div><div><small>Admin</small><strong>${escapeHtml(c.investigator || 'Not assigned yet')}</strong></div></div>
           ${c.publicNotes ? `<div class="feedback"><strong><i class="fas fa-message"></i> Admin update</strong><div style="margin-top:.35rem;white-space:pre-wrap;">${escapeHtml(c.publicNotes)}</div></div>` : ''}
           <div style="display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.8rem;">
-            <a class="btn btn-primary" href="/client/track.html?case=${encodeURIComponent(c.caseId)}"><i class="fas fa-eye"></i> View Progress</a>
+            <a class="btn btn-primary" href="/client/track?case=${encodeURIComponent(c.caseId)}"><i class="fas fa-eye"></i> View Progress</a>
             <button class="btn case-delete-btn" type="button" onclick="deleteCase('${id}')"><i class="fas fa-trash"></i> Delete</button>
           </div>
         </article>`;
@@ -1491,7 +1491,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 
         const redirectUrl =
           window.location.origin +
-          '/oauth-callback.html?action=delete-account&provider=' +
+          '/oauth-callback?action=delete-account&provider=' +
           encodeURIComponent(normalizedProvider);
 
         const {error}=await supabase.auth.signInWithOAuth({
@@ -1602,7 +1602,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 
         localStorage.removeItem('clientUser');
 
-        window.location.href='/login.html';
+        window.location.href='/login';
       }catch(error){
         console.error('Delete account error:',error);
 
@@ -2352,9 +2352,9 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         </div>
         <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
       </section>
-      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
-      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request.html">New Recovery Request</a><a href="/client/dashboard.html">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/donate.html" class="footer-important">Donate</a><a href="/careers.html" class="footer-important">Careers</a><a href="/contact.html">Contact</a></nav></section>
-      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
+      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/knowledge">Knowledge</a><a href="/blog">Blog</a></nav></section>
+      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request">New Recovery Request</a><a href="/client/dashboard">Client Portal</a><a href="/client/track">Track a Case</a><a href="/donate" class="footer-important">Donate</a><a href="/careers" class="footer-important">Careers</a><a href="/contact">Contact</a></nav></section>
+      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy">Privacy Notice</a><a href="/terms">Terms &amp; Conditions</a><a href="/faq">FAQ</a></nav></section>
     </div>
     <div class="manlung-footer-divider"></div>
     <div class="manlung-footer-contact-row">
@@ -2368,7 +2368,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         </nav>
       </div>
     </div>
-    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms">Terms &amp; Conditions</a><a href="/privacy">Privacy Notice</a></div></div>
   </div>
 </footer>
 <script id="client-security-enhancement">(function(){const q=id=>document.getElementById(id);function fmtClient(v){return v?new Date(v).toLocaleString():'—'}async function loadClientSecurity(){try{const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)return;const u=d.user||{};q('clientEmailSecurity').textContent=u.email_verified_at?'Verified':'Protected verification required';q('clientMfaSecurity').textContent=u.mfa_enabled?'Enabled':'Not enabled';q('clientAccountSecurity').textContent=u.security_status||'Active';q('clientLastLogin').textContent=fmtClient(u.last_login_at);const badge=q('clientSecurityBadge');if((u.security_status||'active')!=='active'){badge.textContent='Review account';badge.className='status-badge status-rejected'}else{badge.textContent='Account protected';badge.className='status-badge status-completed'}}catch(e){console.warn('Client security center',e)}}async function loadClientProgress(){try{const r=await fetch('/api/cases/client/me',{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)return;const cases=Array.isArray(d.cases)?d.cases:[];q('clientCaseTotal').textContent=cases.length;q('clientCaseActive').textContent=cases.filter(x=>/progress|active|investigat/i.test(x.status||'')).length;q('clientCaseCompleted').textContent=cases.filter(x=>/completed|closed/i.test(x.status||'')).length;q('clientEvidenceTotal').textContent=cases.reduce((n,x)=>n+(Array.isArray(x.files)?x.files.length:0),0)}catch(e){console.warn('Client progress',e)}}document.addEventListener('DOMContentLoaded',()=>{loadClientSecurity();loadClientProgress();setInterval(loadClientSecurity,60000);setInterval(loadClientProgress,30000)})})();</script>
@@ -2495,16 +2495,16 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
       logout:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>'
     };
     const links=[
-      ['dashboard','Dashboard','/client/dashboard.html'],
+      ['dashboard','Dashboard','/client/dashboard'],
       ['cases','My Cases','#myCasesSection'],
-      ['submit','Submit Case','/client/request.html'],
+      ['submit','Submit Case','/client/request'],
       ['notifications','Notifications','#manlungNotifications'],
       ['security','Security','#clientSecurityCenter']
     ];
     links.forEach(function(item){
       const a=document.createElement('a');a.href=item[2];a.className='client-side-nav-item';
       a.innerHTML=iconSvg[item[0]]+'<span>'+item[1]+'</span>';
-      if((item[1]==='My Cases'&&location.pathname==='/client/dashboard.html')||
+      if((item[1]==='My Cases'&&location.pathname==='/client/dashboard')||
          (item[1]==='My Cases'&&location.hash==='#myCasesSection')||
          (item[1]==='Notifications'&&location.hash==='#manlungNotifications')||
          (item[1]==='Security'&&location.hash==='#clientSecurityCenter'))a.classList.add('active');
@@ -2512,8 +2512,8 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
       nav.appendChild(a);
     });
     const sidebarFooter=document.createElement('div');sidebarFooter.className='client-side-footer';
-    const sideSettings=document.createElement('a');sideSettings.href='/client/settings.html';sideSettings.innerHTML=iconSvg.settings+'<span>Settings</span>';sideSettings.setAttribute('aria-label','Settings');sideSettings.title='Settings';
-    const logout=document.createElement('button');logout.type='button';logout.innerHTML=iconSvg.logout+'<span>Logout</span>';logout.setAttribute('aria-label','Logout');logout.title='Logout';logout.addEventListener('click',function(){if(typeof window.logout==='function')window.logout();else location.href='/login.html'});
+    const sideSettings=document.createElement('a');sideSettings.href='/client/settings';sideSettings.innerHTML=iconSvg.settings+'<span>Settings</span>';sideSettings.setAttribute('aria-label','Settings');sideSettings.title='Settings';
+    const logout=document.createElement('button');logout.type='button';logout.innerHTML=iconSvg.logout+'<span>Logout</span>';logout.setAttribute('aria-label','Logout');logout.title='Logout';logout.addEventListener('click',function(){if(typeof window.logout==='function')window.logout();else location.href='/login'});
     sidebarFooter.append(sideSettings,logout);
     const profile=document.createElement('div');profile.className='client-side-profile';
     const avatar=document.createElement('div');avatar.className='client-side-avatar';avatar.textContent='MR';
@@ -2529,7 +2529,7 @@ body.dark .overview-donations .community-grants-image-icon{background:#12352b!im
         title.innerHTML='<span class="dashboard-overview-title">Client Portal</span>';
         const actions=document.createElement('div');actions.className='dashboard-topbar-actions';
         const notices=document.createElement('button');notices.type='button';notices.className='dashboard-topbar-icon';notices.setAttribute('aria-label','View notifications');notices.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>';notices.addEventListener('click',function(){const target=document.getElementById('manlungNotifications');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});});
-        const settings=document.createElement('a');settings.className='dashboard-topbar-icon';settings.href='/client/settings.html';settings.setAttribute('aria-label','Settings');settings.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
+        const settings=document.createElement('a');settings.className='dashboard-topbar-icon';settings.href='/client/settings';settings.setAttribute('aria-label','Settings');settings.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
         const topAvatar=document.createElement('div');topAvatar.className='dashboard-topbar-avatar';topAvatar.id='clientTopbarAvatar';topAvatar.textContent='MR';topAvatar.setAttribute('aria-label','Client profile');
         const search=document.createElement('label');search.className='dashboard-search-box';search.innerHTML='<i class="fas fa-magnifying-glass" aria-hidden="true"></i><input id="clientDashboardSearch" type="search" placeholder="Search cases, updates..." autocomplete="off" aria-label="Search cases and updates">';
         const searchInput=search.querySelector('input');
@@ -3289,7 +3289,7 @@ body:has(.client-workspace) .client-side-nav a .client-nav-badge{
     const actionButtons=action.querySelector('#referenceActionButtons');
     const viewCases=document.createElement('a');viewCases.className='reference-view-cases';viewCases.href='#myCasesSection';viewCases.textContent='View Cases';
     if(originalAction){originalAction.classList.add('reference-submit-case');originalAction.innerHTML='<span>Submit a Case</span>';originalAction.removeAttribute('style');actionButtons.append(viewCases,originalAction);}
-    else {const submit=document.createElement('a');submit.className='reference-submit-case';submit.href='/client/request.html';submit.textContent='Submit a Case';actionButtons.append(viewCases,submit);}
+    else {const submit=document.createElement('a');submit.className='reference-submit-case';submit.href='/client/request';submit.textContent='Submit a Case';actionButtons.append(viewCases,submit);}
     if(originalActionNote)originalActionNote.remove();
     bottom.append(activity,action);
     pageMain.insertBefore(bottom,overview.nextSibling);

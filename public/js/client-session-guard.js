@@ -1,6 +1,6 @@
 /* Manlung Recovery — client weekly session guard. Server JWT remains authoritative. */
 (function(){'use strict';
-  const login='/login.html?reason=session-expired';
+  const login='/login?reason=session-expired';
   function clear(){try{localStorage.removeItem('clientUser');localStorage.removeItem('clientSessionStartedAt');}catch(_){}}
   async function check(){
     

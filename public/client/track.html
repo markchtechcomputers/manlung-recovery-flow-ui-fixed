@@ -253,7 +253,7 @@ function openCaseFromForm(event){
   const input=document.getElementById('trackCaseInput');
   const value=(input?.value||'').trim();
   if(!value) return false;
-  window.location.href='/client/track.html?case='+encodeURIComponent(value);
+  window.location.href='/client/track?case='+encodeURIComponent(value);
   return false;
 }
 </script>
@@ -509,7 +509,7 @@ body>.container{width:min(1180px,100%);max-width:1180px;margin:1.6rem auto 3rem;
                 <span id="caseIdHeading">Loading…</span>
             </div>
             <div class="header-actions">
-                <a href="/client/dashboard.html" class="btn btn-outline"> Dashboard</a>
+                <a href="/client/dashboard" class="btn btn-outline"> Dashboard</a>
                 <a href="/" class="btn btn-outline"> Home</a>
             </div>
         </div>
@@ -541,7 +541,7 @@ body>.container{width:min(1180px,100%);max-width:1180px;margin:1.6rem auto 3rem;
             const caseId = params.get('case');
             const content = document.getElementById('content');
             const token = null;
-            if (false) { window.location.href = '/login.html'; return; }
+            if (false) { window.location.href = '/login'; return; }
 
             if (!caseId) {
                 document.getElementById('caseIdHeading').textContent = 'Track an existing case';
@@ -581,7 +581,7 @@ body>.container{width:min(1180px,100%);max-width:1180px;margin:1.6rem auto 3rem;
 
                 if (!res.ok || !data.success || !data.case) {
                     const message = data.error || (res.status === 401 ? 'Please sign in to your Client Portal using the account that submitted this case, then try again.' : res.status === 404 ? 'This case was not found for your account. Check the case reference and sign in with the original account.' : `Case tracking is temporarily unavailable (HTTP ${res.status}). Please try again shortly.`);
-                    content.innerHTML = `<div class="card"><p class="error-text">${message}</p><p><a class="btn btn-primary" href="/client/dashboard.html">Open Client Portal</a> <a href="/contact.html">Contact support</a></p></div>`;
+                    content.innerHTML = `<div class="card"><p class="error-text">${message}</p><p><a class="btn btn-primary" href="/client/dashboard">Open Client Portal</a> <a href="/contact">Contact support</a></p></div>`;
                     return;
                 }
 
@@ -776,7 +776,7 @@ async function loadClientCaseMessages(caseId) {
         const data = await res.json().catch(() => ({}));
 
         if (res.status === 401) {
-            window.location.href = '/login.html';
+            window.location.href = '/login';
             return;
         }
 
@@ -895,13 +895,13 @@ document.addEventListener('keydown',function(e){
         </div>
         <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
       </section>
-      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
-      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request.html">New Recovery Request</a><a href="/client/dashboard.html">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/donate.html" class="footer-important">Donate</a><a href="/careers.html" class="footer-important">Careers</a><a href="/contact.html">Contact</a></nav></section>
-      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
+      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/knowledge">Knowledge</a><a href="/blog">Blog</a></nav></section>
+      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request">New Recovery Request</a><a href="/client/dashboard">Client Portal</a><a href="/client/track">Track a Case</a><a href="/donate" class="footer-important">Donate</a><a href="/careers" class="footer-important">Careers</a><a href="/contact">Contact</a></nav></section>
+      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy">Privacy Notice</a><a href="/terms">Terms &amp; Conditions</a><a href="/faq">FAQ</a></nav></section>
     </div>
     <div class="manlung-footer-divider"></div>
     <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="https://i.postimg.cc/DZHs0t4n/icons8-facebook-48.png" alt="Facebook" width="32" height="32" loading="lazy"></a><a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="https://i.postimg.cc/sD9QCBct/icons8-instagram-48.png" alt="Instagram" width="32" height="32" loading="lazy"></a><a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="X"><img src="https://i.postimg.cc/SNT49kNc/icons8-x-50.png" alt="X" width="32" height="32" loading="lazy"></a><a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="https://i.postimg.cc/3J667Rxx/icons8-tiktok-50.png" alt="TikTok" width="32" height="32" loading="lazy"></a><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="https://i.postimg.cc/W4V5bJLF/icons8-youtube-48.png" alt="YouTube" width="32" height="32" loading="lazy"></a><a href="https://news.google.com/" target="_blank" rel="noopener noreferrer" aria-label="Google News"><img src="https://i.postimg.cc/T2sQ5sMs/icons8-google-48.png" alt="Google News" width="32" height="32" loading="lazy"></a><a href="https://t.me/" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><img src="https://i.postimg.cc/ZRMP3Wgx/icons8-telegram-48.png" alt="Telegram" width="32" height="32" loading="lazy"></a></div></div>
-    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms">Terms &amp; Conditions</a><a href="/privacy">Privacy Notice</a></div></div>
   </div>
 <style id="manlung-footer-social-icons-v2">.manlung-footer-social{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap}.manlung-footer-social a{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:4px;border-radius:12px;background:rgba(255,255,255,.04);transition:transform .18s ease,background .18s ease}.manlung-footer-social a:hover{transform:translateY(-2px);background:rgba(37,99,235,.14)}.manlung-footer-social a img{display:block;width:32px;height:32px;object-fit:contain}.manlung-footer-social a:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}@media(max-width:600px){.manlung-footer-social{gap:10px}.manlung-footer-social a{width:40px;height:40px}}</style></footer>
 

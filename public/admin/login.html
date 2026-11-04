@@ -306,7 +306,7 @@ body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50
 </div>
 
 
-            <p style="text-align:center; margin-top:1rem;"><a href="/admin/register.html" style="color:#6ea8ff; font-size:0.85rem;">Have an Admin invitation? Create your account</a></p>
+            <p style="text-align:center; margin-top:1rem;"><a href="/admin/register" style="color:#6ea8ff; font-size:0.85rem;">Have an Admin invitation? Create your account</a></p>
             <div class="footer-text"><i class="fas fa-shield"></i> Protected by 256-bit encryption</div>
         </div>
     </div>
@@ -503,7 +503,7 @@ body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50
 
         function finishMfaEnrollment() {
             if (mfaEnrollmentUser) sessionStorage.setItem('adminUser', JSON.stringify({ ...mfaEnrollmentUser, mfa: true }));
-            window.location.href = '/admin/dashboard.html';
+            window.location.href = '/admin/dashboard';
         }
 
         function showMfaStep() {
@@ -570,7 +570,7 @@ body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50
                         return;
                     }
                     sessionStorage.setItem('adminUser', JSON.stringify(data.user));
-                    window.location.href = '/admin/dashboard.html';
+                    window.location.href = '/admin/dashboard';
                     return;
                 }
 
@@ -626,7 +626,7 @@ body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50
 
                 sessionStorage.setItem('adminUser', JSON.stringify(data.user));
                 pendingMfaTicket = null;
-                window.location.href = '/admin/dashboard.html';
+                window.location.href = '/admin/dashboard';
             } catch (error) {
                 errorEl.textContent = 'Connection error. Please try again.';
             }

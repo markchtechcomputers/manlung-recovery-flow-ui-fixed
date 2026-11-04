@@ -1,9 +1,9 @@
 /* Manlung Recovery — privileged 24-hour session guard. */
 (function(){'use strict';
-  const login='/admin/login.html?reason=session-expired';
+  const login='/admin/login?reason=session-expired';
   let checking=false;
   async function check(){
-    if(checking||location.pathname==='/admin/login.html')return; checking=true;
+    if(checking||location.pathname==='/admin/login')return; checking=true;
     try{
       const r=await fetch('/api/auth/verify',{credentials:'include',cache:'no-store'});
       if(r.status===401){

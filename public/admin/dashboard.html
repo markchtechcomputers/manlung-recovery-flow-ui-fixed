@@ -106,7 +106,7 @@
   color:#93c5fd;
 }
 
-.site-header .header-actions a[href="/admin/reports.html"] i{
+.site-header .header-actions a[href="/admin/reports"] i{
   color:#4ade80;
 }
 
@@ -753,15 +753,15 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
 <aside class="sidebar" aria-label="Admin sidebar">
 <div class="brand"><i class="fa-solid fa-shield-halved"></i><span>Manlung Recovery</span></div>
 <ul class="nav-menu">
-<li><a href="/admin/dashboard.html" class="nav-item active" aria-current="page"><i class="fa-solid fa-border-all"></i>Dashboard</a></li>
+<li><a href="/admin/dashboard" class="nav-item active" aria-current="page"><i class="fa-solid fa-border-all"></i>Dashboard</a></li>
 <li><a href="#cases-section" class="nav-item"><i class="fa-solid fa-folder-open"></i>Cases</a></li>
 <li><a href="#donations-section" class="nav-item"><i class="fa-solid fa-hand-holding-dollar"></i>Donations</a></li>
 <li><a href="#call-admin-section" class="nav-item"><i class="fa-solid fa-phone"></i>Call Admin</a></li>
-<li><a href="/admin/reports.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Reports</a></li>
-<li><a href="/admin/operations.html" class="nav-item"><i class="fa-solid fa-gears"></i>Operations</a></li>
-<li><a href="/admin/music.html" class="nav-item"><i class="fa-solid fa-music"></i>Music</a></li>
-<li><a href="/admin/tools.html" class="nav-item"><i class="fa-solid fa-screwdriver-wrench"></i>Tools</a></li>
-<li><a href="/admin/connect.html" class="nav-item"><i class="fa-brands fa-whatsapp"></i>WhatsApp Chats</a></li>
+<li><a href="/admin/reports" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Reports</a></li>
+<li><a href="/admin/operations" class="nav-item"><i class="fa-solid fa-gears"></i>Operations</a></li>
+<li><a href="/admin/music" class="nav-item"><i class="fa-solid fa-music"></i>Music</a></li>
+<li><a href="/admin/tools" class="nav-item"><i class="fa-solid fa-screwdriver-wrench"></i>Tools</a></li>
+<li><a href="/admin/connect" class="nav-item"><i class="fa-brands fa-whatsapp"></i>WhatsApp Chats</a></li>
 <li><a href="/" class="nav-item"><i class="fa-solid fa-house"></i>Home</a></li>
 </ul><div class="logout-wrapper"><a href="/api/auth/admin/logout" class="nav-item admin-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i>Logout</a></div>
 </aside><main class="main-content"><header class="top-header"><div><p class="welcome-text">Welcome back, Admin!</p><h1 class="page-title">Dashboard Overview</h1></div><div class="header-actions"><label class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input id="adminTopSearch" type="search" placeholder="Search name, phone, email, case ID, IMEI…" aria-label="Search cases"></label><div class="profile"><img class="admin-profile-avatar" src="/icons/icon-512.png" alt="Admin profile"><span class="admin-profile-name">Admin</span></div></div></header>
@@ -1184,7 +1184,7 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
                 localStorage.removeItem('adminUser');
                 sessionStorage.removeItem('adminUser');
                 fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
-                window.location.href = '/admin/login.html?reason=session-expired';
+                window.location.href = '/admin/login?reason=session-expired';
                 return true;
             }
             return false;
@@ -1748,7 +1748,7 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
                 if (xhr.status === 401 || xhr.status === 403) {
                     localStorage.removeItem('adminUser');
                     fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
-                    window.location.href = '/admin/login.html';
+                    window.location.href = '/admin/login';
                     return;
                 }
                 let data;
@@ -1792,7 +1792,7 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
         function handleLogout() {
             localStorage.removeItem('adminUser');
             fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
-            window.location.href = '/admin/login.html';
+            window.location.href = '/admin/login';
         }
 
         function applyTheme() {
@@ -2616,13 +2616,13 @@ async function sendAdminCaseMessage(caseId) {
         </div>
         <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
       </section>
-      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
-      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request.html">New Recovery Request</a><a href="/client/dashboard.html">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/donate.html" class="footer-important">Donate</a><a href="/careers.html" class="footer-important">Careers</a><a href="/contact.html">Contact</a></nav></section>
-      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
+      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/knowledge">Knowledge</a><a href="/blog">Blog</a></nav></section>
+      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request">New Recovery Request</a><a href="/client/dashboard">Client Portal</a><a href="/client/track">Track a Case</a><a href="/donate" class="footer-important">Donate</a><a href="/careers" class="footer-important">Careers</a><a href="/contact">Contact</a></nav></section>
+      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy">Privacy Notice</a><a href="/terms">Terms &amp; Conditions</a><a href="/faq">FAQ</a></nav></section>
     </div>
     <div class="manlung-footer-divider"></div>
     <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://www.linkedin.com/in/mark-ochiengke" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://github.com/markchtechcomputers" target="_blank" rel="noopener noreferrer">GitHub</a></div></div>
-    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms">Terms &amp; Conditions</a><a href="/privacy">Privacy Notice</a></div></div>
   </div>
 </footer>
 
@@ -2798,11 +2798,11 @@ a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="l
 .site-header .header-actions{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%!important}
 .site-header .header-actions>*{order:initial!important;position:static!important;float:none!important;margin:0!important}
 .site-header .header-actions [data-theme-toggle="true"]{order:0!important}
-.site-header .header-actions a[href="/admin/reports.html"]{order:1!important}
-.site-header .header-actions a[href="/admin/operations.html"]{order:2!important}
-.site-header .header-actions a[href="/admin/music.html"]{order:3!important}
-.site-header .header-actions a[href="/admin/tools.html"]{order:4!important}
-.site-header .header-actions a[href="/admin/connect.html"]{order:5!important}
+.site-header .header-actions a[href="/admin/reports"]{order:1!important}
+.site-header .header-actions a[href="/admin/operations"]{order:2!important}
+.site-header .header-actions a[href="/admin/music"]{order:3!important}
+.site-header .header-actions a[href="/admin/tools"]{order:4!important}
+.site-header .header-actions a[href="/admin/connect"]{order:5!important}
 .site-header .header-actions a[href="/"]{order:6!important}
 .site-header .header-actions button[onclick*="handleLogout"]{order:7!important;background:#dc3545!important;color:#fff!important;border-color:#c82333!important}
 .site-header .header-actions a,.site-header .header-actions button{flex:0 1 auto!important;min-height:38px!important;padding:8px 12px!important;gap:7px!important}
@@ -2985,8 +2985,8 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .ml-admin-sidebar .header-actions>button,
 .ml-admin-sidebar .header-actions>select,
 .ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;padding-left:22px!important;padding-right:12px!important;margin-left:0!important;margin-right:0!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]{justify-content:flex-start!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*{margin-left:0!important;margin-right:10px!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]{justify-content:flex-start!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]>*{margin-left:0!important;margin-right:10px!important;text-align:left!important}
 .ml-admin-sidebar .header-actions [class*="language"],
 .ml-admin-sidebar .header-actions [aria-label*="Language"],
 .ml-admin-sidebar .header-actions [title*="Language"],
@@ -3003,12 +3003,12 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .ml-admin-sidebar .header-actions>button,
 .ml-admin-sidebar .header-actions>select,
 .ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:48px!important;margin:0!important;padding:12px 16px!important;gap:10px!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"],
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]{display:flex!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;padding-left:16px!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>i,
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>i{flex:0 0 20px!important;width:20px!important;min-width:20px!important;margin:0!important;text-align:center!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*:not(i),
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"],
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"]{display:flex!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;padding-left:16px!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]>i,
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"]>i{flex:0 0 20px!important;width:20px!important;min-width:20px!important;margin:0!important;text-align:center!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]>*:not(i),
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
 </style>
 
 
@@ -3114,7 +3114,7 @@ body.admin-page-bg .admin-table tbody tr:hover{background:#faf9fc!important}
   justify-content:center!important;padding:11px 5px!important;font-size:0!important;min-height:44px!important;gap:0!important
  }
  body.admin-page-bg .site-header .header-actions a i,body.admin-page-bg .site-header .header-actions button i{font-size:16px!important;margin:0!important}
- body.admin-page-bg .site-header .header-actions a[href="/admin/reports.html"]::after{content:"";display:none}
+ body.admin-page-bg .site-header .header-actions a[href="/admin/reports"]::after{content:"";display:none}
  body.admin-page-bg>.container{margin-left:70px!important;padding:14px 10px 20px!important}
  #manlungDashboardTopbar{align-items:flex-start;flex-direction:column;padding:14px;margin-bottom:15px;gap:12px}
  #manlungDashboardTopbar .dash-page-heading{font-size:19px}
@@ -3429,11 +3429,11 @@ html body.admin-page-bg { top:0!important; }
 .ml-admin-sidebar .header-actions a[href*="#cases-section"]{order:2!important}
 .ml-admin-sidebar .header-actions a[href*="#donations-section"]{order:3!important}
 .ml-admin-sidebar .header-actions a[href*="#call-admin-section"]{order:4!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/reports.html"]{order:5!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/operations.html"]{order:6!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/music.html"]{order:7!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/tools.html"]{order:8!important}
-.ml-admin-sidebar .header-actions a[href*="/admin/connect.html"]{order:9!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/reports"]{order:5!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/operations"]{order:6!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/music"]{order:7!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/tools"]{order:8!important}
+.ml-admin-sidebar .header-actions a[href*="/admin/connect"]{order:9!important}
 .ml-admin-sidebar .header-actions a[href="/"],
 .ml-admin-sidebar .header-actions a[href$="/"]{order:11!important}
 .ml-admin-sidebar .header-actions [data-theme-toggle="true"]{order:12!important;align-self:stretch!important;width:100%!important;max-width:none!important}

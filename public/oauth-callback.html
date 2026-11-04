@@ -48,7 +48,7 @@
             <div class="oauth-spinner" id="oauthSpinner" role="status" aria-label="Signing in"></div>
             <h2 id="title" hidden></h2>
             <p id="status" style="color:var(--text-muted);">Please wait while we securely verify your account and prepare your dashboard.</p>
-            <a id="backLink" class="btn btn-primary oauth-back" href="/login.html" style="display:none;">Back to Sign In</a>
+            <a id="backLink" class="btn btn-primary oauth-back" href="/login" style="display:none;">Back to Sign In</a>
         </section>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -77,14 +77,14 @@
             status.classList.add('oauth-error');
             const spinner = document.getElementById('oauthSpinner');
             if (spinner) spinner.style.display = 'none';
-            backLink.href = '/login.html';
+            backLink.href = '/login';
             backLink.textContent = 'Back to Sign In';
             backLink.style.display = 'inline-flex';
         }
 
         function clearOAuthUrl() {
             try {
-                window.history.replaceState({}, document.title, `${window.location.origin}/oauth-callback.html`);
+                window.history.replaceState({}, document.title, `${window.location.origin}/oauth-callback`);
             } catch (_) {}
         }
 
@@ -157,7 +157,7 @@
             await client.auth.signOut();
             try { sessionStorage.removeItem('manlungOAuthProvider'); } catch (_) {}
             clearOAuthUrl();
-            window.location.replace('/client/dashboard.html');
+            window.location.replace('/client/dashboard');
         }
 
         (async function runCallback() {

@@ -73,7 +73,7 @@ async function sendClientWelcomeEmail(client, req) {
   const baseUrl = String(
     process.env.PUBLIC_APP_URL || 'https://manlungrecovery.manlungshop.co.ke'
   ).replace(/\/$/, '');
-  const portalUrl = `${baseUrl}/client/dashboard.html`;
+  const portalUrl = `${baseUrl}/client/dashboard`;
   const logoUrl = `${baseUrl}/icons/icon-512.png`;
   const supportEmail = 'manlungrecovery@outlook.com';
   const createdAt = client.created_at
@@ -772,7 +772,7 @@ router.get('/admin/logout', async (req, res) => {
   }
   clearAdminCookie(res);
   clearMfaTicketCookie(res);
-  return res.redirect('/admin/login.html?logout=1');
+  return res.redirect('/admin/login?logout=1');
 });
 
 router.post('/admin/logout', async (req, res) => {
@@ -1926,7 +1926,7 @@ router.post(
         `${req.protocol}://${req.get('host')}`;
 
       const resetLink =
-        `${base}/admin/reset-password.html?token=${rawToken}&email=${encodeURIComponent(email)}`;
+        `${base}/admin/reset-password?token=${rawToken}&email=${encodeURIComponent(email)}`;
 
       const emailResult =
         await sendEmail({
@@ -2280,7 +2280,7 @@ router.post(
           accountRole: client.role,
           redirect:
             client.role === 'owner' || client.role === 'admin'
-              ? '/admin/login.html'
+              ? '/admin/login'
               : '/login.html',
         });
       }

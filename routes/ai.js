@@ -33,18 +33,18 @@ HOW THE SERVICE WORKS
 
 OFFICIAL SITE ROUTES
 - Home: /
-- About: /about.html
-- Services: /services.html
-- New Recovery Request: /client/request.html
-- Client Portal: /client/dashboard.html
-- Track a Case: /client/track.html
-- FAQ: /faq.html
-- Knowledge: /knowledge.html
-- Blog: /blog.html
-- Contact: /contact.html
-- Privacy Notice: /privacy.html
-- Terms: /terms.html
-- AI assistant: /manlung-ai.html
+- About: /about
+- Services: /services
+- New Recovery Request: /client/request
+- Client Portal: /client/dashboard
+- Track a Case: /client/track
+- FAQ: /faq
+- Knowledge: /knowledge
+- Blog: /blog
+- Contact: /contact
+- Privacy Notice: /privacy
+- Terms: /terms
+- AI assistant: /manlung-ai
 
 CONTACT
 - Official support email published on the About and Contact pages: manlungrecovery@outlook.com.
@@ -102,7 +102,11 @@ function safePublicPath(requestPath) {
   let p = String(requestPath || '/index.html').split('?')[0].split('#')[0];
   if (!p.startsWith('/')) p = `/${p}`;
   if (p === '/') p = '/index.html';
-  const candidate = path.resolve(PUBLIC_ROOT, `.${p}`);
+  let candidate = path.resolve(PUBLIC_ROOT, `.${p}`);
+  if (!/\.html$/i.test(p) && !path.extname(p)) {
+    const extensionlessCandidate = path.resolve(PUBLIC_ROOT, `.${p}.html`);
+    if (fs.existsSync(extensionlessCandidate)) candidate = extensionlessCandidate;
+  }
   if (!candidate.startsWith(`${PUBLIC_ROOT}${path.sep}`) && candidate !== PUBLIC_ROOT) return null;
   return candidate;
 }

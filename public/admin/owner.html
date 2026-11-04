@@ -1155,16 +1155,16 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
                 <span>Owner-only — assign, suspend, and remove admin access</span>
             </div>
             <nav class="header-actions" aria-label="Admin navigation">
-                <a class="btn btn-outline" href="/admin/dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-                <a class="btn btn-outline" href="/admin/dashboard.html#cases-section"><i class="fa-solid fa-folder-open"></i> Cases</a>
-                <a class="btn btn-outline" href="/admin/dashboard.html#donations-section"><i class="fa-solid fa-hand-holding-heart"></i> Donations</a>
-                <a class="btn btn-outline" href="/admin/dashboard.html#call-admin-section"><i class="fa-solid fa-phone-volume"></i> Call Admin</a>
-                <a class="btn btn-outline active" href="/admin/owner.html" aria-current="page"><i class="fa-solid fa-users-gear"></i> Admin Management</a>
-                <a class="btn btn-outline" href="/admin/reports.html"><i class="fa-solid fa-chart-line"></i> Reports</a>
-                <a class="btn btn-outline" href="/admin/operations.html"><i class="fa-solid fa-list-check"></i> Operations</a>
-                <a class="btn btn-outline" href="/admin/music.html"><i class="fa-solid fa-music"></i> Music</a>
-                <a class="btn btn-outline" href="/admin/tools.html"><i class="fa-solid fa-toolbox"></i> Tools</a>
-                <a class="btn btn-outline" href="/admin/connect.html"><i class="fa-solid fa-comments"></i> WhatsApp Chats</a>
+                <a class="btn btn-outline" href="/admin/dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+                <a class="btn btn-outline" href="/admin/dashboard#cases-section"><i class="fa-solid fa-folder-open"></i> Cases</a>
+                <a class="btn btn-outline" href="/admin/dashboard#donations-section"><i class="fa-solid fa-hand-holding-heart"></i> Donations</a>
+                <a class="btn btn-outline" href="/admin/dashboard#call-admin-section"><i class="fa-solid fa-phone-volume"></i> Call Admin</a>
+                <a class="btn btn-outline active" href="/admin/owner" aria-current="page"><i class="fa-solid fa-users-gear"></i> Admin Management</a>
+                <a class="btn btn-outline" href="/admin/reports"><i class="fa-solid fa-chart-line"></i> Reports</a>
+                <a class="btn btn-outline" href="/admin/operations"><i class="fa-solid fa-list-check"></i> Operations</a>
+                <a class="btn btn-outline" href="/admin/music"><i class="fa-solid fa-music"></i> Music</a>
+                <a class="btn btn-outline" href="/admin/tools"><i class="fa-solid fa-toolbox"></i> Tools</a>
+                <a class="btn btn-outline" href="/admin/connect"><i class="fa-solid fa-comments"></i> WhatsApp Chats</a>
                 <a class="btn btn-outline" href="/"><i class="fa-solid fa-house"></i> Home</a>
                 <a class="btn btn-danger" id="ownerLogoutBtn" href="/api/auth/admin/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </nav>
@@ -1217,7 +1217,7 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
         <div class="card" style="text-align:center; padding:3rem;">
             <i class="fas fa-lock" style="font-size:2.5rem; color:var(--danger); margin-bottom:1rem;"></i>
             <p>This section is restricted to the site Owner.</p>
-            <a href="/admin/dashboard.html" class="btn btn-primary" style="margin-top:1rem;">Back to Dashboard</a>
+            <a href="/admin/dashboard" class="btn btn-primary" style="margin-top:1rem;">Back to Dashboard</a>
         </div>
     </div>
 
@@ -1253,7 +1253,7 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
             if (res.status === 401) {
                 localStorage.removeItem('adminUser');
                 fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
-                window.location.href = '/admin/login.html';
+                window.location.href = '/admin/login';
                 return true;
             }
             return false;
@@ -1262,7 +1262,7 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
         function handleLogout() {
             localStorage.removeItem('adminUser');
             fetch('/api/auth/admin/logout', { method: 'POST' }).catch(() => {});
-            window.location.href = '/admin/login.html';
+            window.location.href = '/admin/login';
         }
 
         document.getElementById('ownerLogoutBtn')?.addEventListener('click', handleLogout);
@@ -1500,7 +1500,7 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
 <script>
 async function loadMfaStatus() {
   const res = await fetch('/api/auth/admin/mfa/status', { credentials:'include' });
-  if (res.status === 401 || res.status === 403) { window.location.href='/admin/login.html'; return; }
+  if (res.status === 401 || res.status === 403) { window.location.href='/admin/login'; return; }
   const data = await res.json();
   const status = document.getElementById('mfaStatus');
   const setup = document.getElementById('mfaSetupBtn');
@@ -1541,7 +1541,7 @@ async function enableMfa() {
 
 '+data.recoveryCodes.join('\n');
   document.getElementById('mfaMessage').textContent='MFA is now enabled. Save the recovery codes. You will be signed out and must log in again with your authenticator code.';
-  setTimeout(() => { fetch('/api/auth/admin/logout', {method:'POST', credentials:'include'}).finally(() => { window.location.href='/admin/login.html'; }); }, 2500);
+  setTimeout(() => { fetch('/api/auth/admin/logout', {method:'POST', credentials:'include'}).finally(() => { window.location.href='/admin/login'; }); }, 2500);
 }
 
 async function disableMfa() {
@@ -1552,7 +1552,7 @@ async function disableMfa() {
   document.getElementById('mfaMessage').textContent = res.ok ? 'MFA disabled. Sign in again.' : (data.error || 'Could not disable MFA.');
   if (res.ok) {
     await fetch('/api/auth/admin/logout', {method:'POST', credentials:'include'});
-    window.location.href='/admin/login.html';
+    window.location.href='/admin/login';
   }
 }
 
@@ -1561,7 +1561,7 @@ loadMfaStatus().catch(() => {});
 <script>
 async function loadMfaStatus() {
   const res = await fetch('/api/auth/admin/mfa/status');
-  if (res.status === 401) { window.location.href='/admin/login.html'; return; }
+  if (res.status === 401) { window.location.href='/admin/login'; return; }
   const data = await res.json();
   const status = document.getElementById('mfaStatus');
   const setup = document.getElementById('mfaSetupBtn');
@@ -1661,13 +1661,13 @@ loadFreeCallAccess();
         </div>
         <p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p>
       </section>
-      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about.html">About</a><a href="/services.html">Services</a><a href="/knowledge.html">Knowledge</a><a href="/blog.html">Blog</a></nav></section>
-      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request.html">New Recovery Request</a><a href="/client/dashboard.html">Client Portal</a><a href="/client/track.html">Track a Case</a><a href="/donate.html" class="footer-important">Donate</a><a href="/careers.html" class="footer-important">Careers</a><a href="/contact.html">Contact</a></nav></section>
-      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy.html">Privacy Notice</a><a href="/terms.html">Terms &amp; Conditions</a><a href="/faq.html">FAQ</a></nav></section>
+      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links" aria-label="Explore links"><a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/knowledge">Knowledge</a><a href="/blog">Blog</a></nav></section>
+      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links" aria-label="Support links"><a href="/client/request">New Recovery Request</a><a href="/client/dashboard">Client Portal</a><a href="/client/track">Track a Case</a><a href="/donate" class="footer-important">Donate</a><a href="/careers" class="footer-important">Careers</a><a href="/contact">Contact</a></nav></section>
+      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links" aria-label="Legal links"><a href="/privacy">Privacy Notice</a><a href="/terms">Terms &amp; Conditions</a><a href="/faq">FAQ</a></nav></section>
     </div>
     <div class="manlung-footer-divider"></div>
     <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com">manlungrecovery@outlook.com</a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="https://i.postimg.cc/DZHs0t4n/icons8-facebook-48.png" alt="Facebook" width="32" height="32" loading="lazy"></a><a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="https://i.postimg.cc/sD9QCBct/icons8-instagram-48.png" alt="Instagram" width="32" height="32" loading="lazy"></a><a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="X"><img src="https://i.postimg.cc/SNT49kNc/icons8-x-50.png" alt="X" width="32" height="32" loading="lazy"></a><a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="https://i.postimg.cc/3J667Rxx/icons8-tiktok-50.png" alt="TikTok" width="32" height="32" loading="lazy"></a><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="https://i.postimg.cc/W4V5bJLF/icons8-youtube-48.png" alt="YouTube" width="32" height="32" loading="lazy"></a><a href="https://news.google.com/" target="_blank" rel="noopener noreferrer" aria-label="Google News"><img src="https://i.postimg.cc/T2sQ5sMs/icons8-google-48.png" alt="Google News" width="32" height="32" loading="lazy"></a><a href="https://t.me/" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><img src="https://i.postimg.cc/ZRMP3Wgx/icons8-telegram-48.png" alt="Telegram" width="32" height="32" loading="lazy"></a></div></div>
-    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms.html">Terms &amp; Conditions</a><a href="/privacy.html">Privacy Notice</a></div></div>
+    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms">Terms &amp; Conditions</a><a href="/privacy">Privacy Notice</a></div></div>
   </div>
 <style id="manlung-footer-social-icons-v2">.manlung-footer-social{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap}.manlung-footer-social a{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:4px;border-radius:12px;background:rgba(255,255,255,.04);transition:transform .18s ease,background .18s ease}.manlung-footer-social a:hover{transform:translateY(-2px);background:rgba(37,99,235,.14)}.manlung-footer-social a img{display:block;width:32px;height:32px;object-fit:contain}.manlung-footer-social a:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}@media(max-width:600px){.manlung-footer-social{gap:10px}.manlung-footer-social a{width:40px;height:40px}}</style></footer>
 
@@ -1792,8 +1792,8 @@ a#ownerLogoutBtn,.header-actions a[href*="logout"],.header-actions a[onclick*="l
 
 .site-header .header-actions{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:100%!important}
 .site-header .header-actions>*{order:initial!important;position:static!important;float:none!important;margin:0!important}
-.site-header .header-actions a[href="/admin/dashboard.html"]{order:1!important}
-.site-header .header-actions a[href="/admin/tools.html"]{order:2!important}
+.site-header .header-actions a[href="/admin/dashboard"]{order:1!important}
+.site-header .header-actions a[href="/admin/tools"]{order:2!important}
 .site-header .header-actions a#ownerLogoutBtn{order:3!important;background:#dc3545!important;color:#fff!important;border-color:#c82333!important}
 
 
@@ -1973,8 +1973,8 @@ html[data-theme="dark"] .ml-admin-sidebar .header-actions select * { color:#fff!
 .ml-admin-sidebar .header-actions>button,
 .ml-admin-sidebar .header-actions>select,
 .ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;padding-left:22px!important;padding-right:12px!important;margin-left:0!important;margin-right:0!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]{justify-content:flex-start!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*{margin-left:0!important;margin-right:10px!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]{justify-content:flex-start!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]>*{margin-left:0!important;margin-right:10px!important;text-align:left!important}
 .ml-admin-sidebar .header-actions [class*="language"],
 .ml-admin-sidebar .header-actions [aria-label*="Language"],
 .ml-admin-sidebar .header-actions [title*="Language"],
@@ -1997,12 +1997,12 @@ html.dark .ml-admin-sidebar .header-actions a[href^="#"]:hover,body.dark .ml-adm
 .ml-admin-sidebar .header-actions>button,
 .ml-admin-sidebar .header-actions>select,
 .ml-admin-sidebar .header-actions>[role="button"]{box-sizing:border-box!important;display:flex!important;flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:48px!important;margin:0!important;padding:12px 16px!important;gap:10px!important;text-align:left!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"],
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]{display:flex!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;padding-left:16px!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>i,
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>i{flex:0 0 20px!important;width:20px!important;min-width:20px!important;margin:0!important;text-align:center!important}
-.ml-admin-sidebar .header-actions>a[href="/admin/music.html"]>*:not(i),
-.ml-admin-sidebar .header-actions>a[href="/admin/connect.html"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"],
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"]{display:flex!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;padding-left:16px!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]>i,
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"]>i{flex:0 0 20px!important;width:20px!important;min-width:20px!important;margin:0!important;text-align:center!important}
+.ml-admin-sidebar .header-actions>a[href="/admin/music"]>*:not(i),
+.ml-admin-sidebar .header-actions>a[href="/admin/connect"]>*:not(i){margin-left:0!important;margin-right:0!important;text-align:left!important}
 
 
 /* OWNER PAGE TRUE EDGE-TO-EDGE LAYOUT */
@@ -2100,7 +2100,7 @@ body.admin-page-bg>#pageContent{margin-left:0!important}
   var title=brand?brand.textContent.trim():'Manlung Recovery';
   sidebar.innerHTML='<div class="ml-admin-sidebar-head"><div><div class="ml-admin-sidebar-title">Manlung Recovery</div><div class="ml-admin-sidebar-subtitle">'+title.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})+'</div></div><button type="button" class="ml-admin-sidebar-close" aria-label="Close navigation">×</button></div>';
 
-  var extraNav=[['/admin/operations.html','fa-list-check','Operations'],['/admin/music.html','fa-music','Music'],['/admin/connect.html','fa-users','Community'],['/','fa-house','Home']];
+  var extraNav=[['/admin/operations','fa-list-check','Operations'],['/admin/music','fa-music','Music'],['/admin/connect','fa-users','Community'],['/','fa-house','Home']];
   var languageControl=actions.querySelector('.language-control,[aria-label*="Language"],[title*="Language"],select[name*="language" i]');
   if(languageControl && !languageControl.matches('a,button')){
    var languageLink=document.createElement('a');

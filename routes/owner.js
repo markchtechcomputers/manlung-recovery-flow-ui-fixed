@@ -358,7 +358,7 @@ router.post('/invitations', [body('email').trim().isEmail().normalizeEmail()], a
     // The invitation token is the only credential in this URL. The invited
     // email is resolved server-side from the hashed token and is never trusted
     // from a query-string parameter.
-    const link = `${baseUrl}/admin/register.html?token=${encodeURIComponent(invitation.token)}`;
+    const link = `${baseUrl}/admin/register?token=${encodeURIComponent(invitation.token)}`;
     const safeEmail = String(req.body.email).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     const expiryDate = new Date(invitation.expires_at);
     const expiryLabel = expiryDate.toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Africa/Nairobi' });
