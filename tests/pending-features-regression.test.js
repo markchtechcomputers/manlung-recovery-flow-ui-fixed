@@ -13,6 +13,7 @@ const community = read('routes/community.js');
 test('Turnstile SDK remains lazy and server verification reuses TLS connections', () => {
   assert.match(login, /script\.src = 'https:\/\/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit'/);
   assert.match(login, /loadClientTurnstileApi\(\)\.then/);
+  assert.match(login, /data-manlung-turnstile-preconnect/);
   assert.match(turnstile, /new https\.Agent\(\{ keepAlive: true/);
   assert.match(turnstile, /timeout: 7000/);
 });
