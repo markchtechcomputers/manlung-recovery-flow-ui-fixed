@@ -13,8 +13,8 @@ const PAYSTACK_URL = 'https://api.paystack.co';
 const roles = ['client', 'admin', 'owner'];
 const CLIENT_PROFILE_PHOTO_BUCKET = 'client-profile-photos';
 
-async function resolveAvatarUrl(user, profile) {
-  if (profile?.avatar_visibility === 'private') return null;
+async function resolveAvatarUrl(user, profile, includePrivate = false) {
+  if (profile?.avatar_visibility === 'private' && !includePrivate) return null;
   if (profile?.avatar_url) return profile.avatar_url;
   if (!user?.avatar_path) return null;
   try {
@@ -42,7 +42,7 @@ function fail(res, status, error) { return res.status(status).json({ success: fa
 function cleanText(value, max) { return String(value == null ? '' : value).trim().slice(0, max); }
 function validId(value) { return UUID.test(String(value || '')); }
 function isAdmin(user) { return user && ['admin', 'owner'].includes(user.role); }
-function publicProfile(profile, user, presence, resolvedAvatar) {
+function publicProfile(profile, user, presence, resolvedAvatar, includePrivate = false) {
   const name = cleanText(profile?.display_name, 80) || cleanText(user.username, 80) || 'Member';
   const last = presence?.last_seen_at || null;
   const isVisible = profile?.presence_visibility !== 'nobody';
@@ -53,7 +53,7 @@ function publicProfile(profile, user, presence, resolvedAvatar) {
     name,
     username: user.username || null,
     role: user.role,
-    avatar: profile?.avatar_visibility === 'private' ? null : (resolvedAvatar || profile?.avatar_url || null),
+    avatar: profile?.avatar_visibility === 'private' && !includePrivate ? null : (resolvedAvatar || profile?.avatar_url || null),
     avatarVisibility: profile?.avatar_visibility === 'private' ? 'private' : 'public',
     bio: profile?.bio || '',
     createdAt: user.created_at || null,
@@ -141,7 +141,7 @@ router.get('/profile', async (req, res) => {
     ]);
     if (pe) throw pe; if (ue) throw ue;
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, profile: publicProfile(profile, user || req.user, null, await resolveAvatarUrl(user || req.user, profile)) });
+    res.json({ success: true, profile: publicProfile(profile, user || req.user, null, await resolveAvatarUrl(user || req.user, profile, true), true) });
   } catch (error) { return handleDbError(res, error, 'Profile read error:'); }
 });
 
