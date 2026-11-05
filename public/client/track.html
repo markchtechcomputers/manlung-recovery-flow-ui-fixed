@@ -587,11 +587,15 @@ body>.container{width:min(1180px,100%);max-width:1180px;margin:1.6rem auto 3rem;
 
                 const c = data.case;
                 const filesHtml = (c.files && c.files.length)
-                    ? c.files.map(f => `
+                    ? c.files.map(f => {
+                        const recoveredCopy = f.evidenceType === 'recovered-copy-verification';
+                        const label = recoveredCopy ? ('Recovered copy · Photo ' + (f.captureMetadata?.captureNumber || '') + ' of 4') : (f.originalName || f.filename);
+                        return `
                         <div class="file-item">
-                            <a href="${f.url}" target="_blank" rel="noopener"><i class="fas fa-file"></i> ${f.originalName || f.filename}</a>
-                            <span class="status">${f.uploadedBy || ''}</span>
-                        </div>`).join('')
+                            <a href="${f.url}" target="_blank" rel="noopener"><i class="fas fa-file"></i> ${label}</a>
+                            <span class="status">${recoveredCopy ? 'Manlung Recovery · Recovered evidence' : (f.uploadedBy || '')}</span>
+                        </div>`;
+                    }).join('')
                     : '<p style="color:var(--text-muted); font-size:0.9rem;">No files attached yet.</p>';
 
                 content.innerHTML = `
