@@ -1627,8 +1627,8 @@ router.put('/client/profile-photo', auth, async (req, res) => {
       return res.status(403).json({ success: false, error: 'Client access required.' });
     }
 
-    const imageData = String(req.body?.imageData || '');
-    const match = imageData.match(/^data:image\/jpeg;base64,([A-Za-z0-9+/]+={0,2})$/);
+    const imageBase64 = String(req.body?.imageBase64 || '');
+    const match = imageBase64.match(/^([A-Za-z0-9+/]+={0,2})$/);
     if (!match) {
       return res.status(400).json({ success: false, error: 'Please select a valid JPEG image.' });
     }
