@@ -455,25 +455,31 @@ router.post('/plans/initialize', async (req, res) => {
       email=cleanText(account?.email,254).toLowerCase();
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail(res,400,'Your sign-in email could not be found. Please update your account email before paying.');
+    // A recurring Paystack plan is optional. When no matching plan code exists,
+    // initialize a verified one-time checkout and grant exactly 30 days after
+    // Paystack confirms payment. Never block checkout on a missing plan code.
     const planCode=String(process.env[plan.planEnv]||'').trim();
-    if(!planCode) return fail(res,503,'The matching monthly Paystack plan is not configured: '+plan.planEnv+'.');
-    const remoteResponse=await axios.get(PAYSTACK_URL+'/plan/'+encodeURIComponent(planCode),{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:10000});
-    const remotePlan=remoteResponse.data?.data;
-    if(!remotePlan||Number(remotePlan.amount)!==plan.amountMinor||String(remotePlan.currency||'').toUpperCase()!=='KES'||String(remotePlan.interval||'').toLowerCase()!=='monthly')
-      return fail(res,503,'The configured Paystack plan must match the listed KES price and monthly billing interval.');
+    if(planCode){
+      const remoteResponse=await axios.get(PAYSTACK_URL+'/plan/'+encodeURIComponent(planCode),{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:10000});
+      const remotePlan=remoteResponse.data?.data;
+      if(!remotePlan||Number(remotePlan.amount)!==plan.amountMinor||String(remotePlan.currency||'').toUpperCase()!=='KES'||String(remotePlan.interval||'').toLowerCase()!=='monthly')
+        return fail(res,503,'The configured Paystack plan must match the listed KES price and monthly billing interval.');
+    }
     const reference='MTC-PLAN-'+Date.now()+'-'+crypto.randomBytes(8).toString('hex');
     const {data:purchase,error:pe}=await supabase.from('recovery_chat_plan_purchases')
-      .insert({user_id:req.user.id,provider_reference:reference,provider_plan_code:planCode,plan_code:code,amount_kes:plan.amountKes,currency:'KES',status:'pending'})
+      .insert({user_id:req.user.id,provider_reference:reference,provider_plan_code:planCode||null,plan_code:code,amount_kes:plan.amountKes,currency:'KES',status:'pending'})
       .select('id,provider_reference').single();
     if(pe) throw pe;
     try {
-      const init=await axios.post(PAYSTACK_URL+'/transaction/initialize',{
-        email,amount:plan.amountMinor,currency:'KES',reference,plan:planCode,
+      const payload={
+        email,amount:plan.amountMinor,currency:'KES',reference,
         callback_url:process.env.PAYSTACK_CHAT_PLAN_CALLBACK_URL||(String(process.env.PUBLIC_APP_URL||'').replace(/\/+$/,'')+'/client/connect'),
-        metadata:{product:'manlung_community_subscription',plan_code:code,user_id:req.user.id,purchase_id:purchase.id,amount_kes:plan.amountKes}
-      },{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:15000});
+        metadata:{product:'manlung_community_subscription',plan_code:code,user_id:req.user.id,purchase_id:purchase.id,amount_kes:plan.amountKes,billing_mode:planCode?'recurring':'one_time'}
+      };
+      if(planCode)payload.plan=planCode;
+      const init=await axios.post(PAYSTACK_URL+'/transaction/initialize',payload,{headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY},timeout:15000});
       if(!init.data?.status||!init.data?.data?.authorization_url) throw new Error('Paystack did not return checkout URL.');
-      res.json({success:true,purchaseId:purchase.id,reference,authorizationUrl:init.data.data.authorization_url,amountKes:plan.amountKes,planCode:code});
+      res.json({success:true,purchaseId:purchase.id,reference,authorizationUrl:init.data.data.authorization_url,amountKes:plan.amountKes,planCode:code,billingMode:planCode?'recurring':'one_time',durationDays:30});
     } catch(e) {
       await supabase.from('recovery_chat_plan_purchases').update({status:'failed'}).eq('id',purchase.id);
       throw e;
