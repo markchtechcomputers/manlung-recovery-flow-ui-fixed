@@ -392,7 +392,7 @@ async function generateSelfieLink(){
     const r=await fetch('/api/cases/admin/selfie-requests',{method:'POST',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({reference})});
     const d=await r.json();
     if(!r.ok||!d.success)throw new Error(d.error||'Could not generate link.');
-    generatedSelfieUrl='https://manlungrecovery.manlungshop.co.ke/verification/'+encodeURIComponent(d.request.token);
+    generatedSelfieUrl=new URL('/verification/'+encodeURIComponent(d.request.token),window.location.origin).href;
     const a=document.createElement('a');a.href=generatedSelfieUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent=generatedSelfieUrl;
     selfieOutput.textContent='';selfieOutput.appendChild(a);copySelfieBtn.disabled=false;if(shareSelfieBtn)shareSelfieBtn.disabled=false;selfieStatus.textContent='Link Generated';
     try{await navigator.clipboard.writeText(generatedSelfieUrl);selfieStatus.textContent='Link Generated · Copied'}catch(_){}
