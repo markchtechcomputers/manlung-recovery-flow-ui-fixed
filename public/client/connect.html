@@ -660,7 +660,7 @@ async function loadOfficialUpdates(c){
  try{const r=await apiReq('/updates');const items=Array.isArray(r.updates)?r.updates:[];c.m=items.map(x=>['th',String(x.body||x.message||x.content||x.title||''),new Date(x.created_at||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),0,null,x.author_name||'Manlung Admin',null,null,0,Date.parse(x.created_at||Date.now()),0,0,x.id]).filter(m=>m[1]);await refreshOfficialChannelReactions(c,false);if(!c.m.length)c.m=[['th','Welcome to Manlung Updates. Official news and announcements from the admins.','',0]];save()}catch(e){if(!c.m.length)c.m=[['th','Welcome to Manlung Updates. Official news and announcements from the admins.','',0]]}
 }
 function openChat(id){if(String(id).startsWith('shared-group-'))return window.openSharedGroup(String(id).slice(13));const special=ensureSpecialChats();let c=S.chats.find(c=>String(c.id)===String(id)||String(c.n||'').toLowerCase()===String(id).toLowerCase());if(String(id)==='102'||String(id).toLowerCase()==='saved messages')c=special.saved;if(String(id)==='101'||String(id)==='manlung-official-updates'||String(id).toLowerCase()==='manlung updates')c=special.updates;if(!c)return toast('This chat is unavailable.');if(c.groupId){if(typeof openSharedGroup==='function')return openSharedGroup(c.groupId);return toast('Group chat is loading. Please refresh and try again.')}open=c.id;purge(c);c.un=0;save();render();if(c.official||c.ch||String(c.id)==='manlung-official-updates')loadOfficialUpdates(c).then(()=>{if(String(open)===String(c.id))render()})}
-function drawChat(){const c=S.chats.find(c=>c.id===open);const d=document.createElement('div');d.id='chat';
+function drawChat(){const c=S.chats.find(c=>String(c.id)===String(open));const d=document.createElement('div');d.id='chat';
  if(!c)return;applyChatTheme(c,d);const readOnlyOfficial=!!(c.official||c.id==='manlung-official-updates');
  d.innerHTML=`<header><button class="backb" onclick="back()" aria-label="Back to chats">${ic(I.back)}${(u=>u?`<span class="badge">${u}</span>`:'')(S.chats.reduce((a,x)=>a+(x.id!==open?x.un:0),0))}</button>${c.remote?communityAvatar(c):sav(c.n)}<div class="grow"><div class="nm">${esc(c.n)}${window.verifiedBadge(window.chatMember(c)||c)}</div><div class="sub" id="pst">${sub()}</div></div>${c.g||c.ch?'':`<button class="ib" onclick="call('${esc(c.n)}',1)" aria-label="Video call">${ic(I.video)}</button><button class="ib" onclick="call('${esc(c.n)}',0)" aria-label="Voice call">${ic(I.phone)}</button>`}<button class="ib" onclick="pop=!pop;drawPop()" aria-label="More">${ic(I.more)}</button></header>
  <div id="msgs"><div class="dsep"><span>Today</span></div>${c.m.map(bub).join('')}</div>
@@ -957,27 +957,49 @@ window.openSharedGroup=async function(groupId){
  window.__mlGroupPoll=setInterval(()=>{if(!document.getElementById('ml-shared-group-chat')){clearInterval(window.__mlGroupPoll);window.__mlGroupPoll=null;return}if(!document.hidden)load(false)},3000);
  window.__mlGroupCountPoll=setInterval(async()=>{if(!document.getElementById('ml-shared-group-chat')){clearInterval(window.__mlGroupCountPoll);window.__mlGroupCountPoll=null;return}if(document.hidden)return;try{const data=await apiReq('/groups');const latestGroups=Array.isArray(data.groups)?data.groups:[];ML.groups=latestGroups;const fresh=latestGroups.find(g=>String(g.id)===gid);if(!fresh)return;group.member_count=Number(fresh.member_count)||0;const presence=panel.querySelector('#ml-group-presence');if(presence)presence.textContent=(isReadOnly?'Official channel · read-only':'Group chat · live updates every 3 seconds')+' · '+group.member_count+' '+(group.member_count===1?'member':'members');panel.querySelectorAll('[data-group-count="'+gid+'"]').forEach(el=>el.textContent=group.member_count+' '+(group.member_count===1?'MEMBER':'MEMBERS'))}catch(e){console.warn('Group member count refresh failed:',e.message)}},30000);
 };window.openChat=async function(id){
- const raw=String(id==null?'':id),key=raw.toLowerCase(),special=ensureSpecialChatRecords();
- if(key==='102'||key==='saved messages'){const c=special.saved;open=c.id;c.un=0;save();render();return}
- if(key==='101'||key==='manlung-official-updates'||key==='manlung updates'){const c=special.updates;try{const data=await apiReq('/groups');ML.groups=data.groups||[];const channel=ML.groups.find(g=>g.slug==='manlung-updates'||g.slug==='manlung-official-updates');if(channel){await window.openSharedGroup(channel.id);return}}catch(e){console.warn('Could not open official updates channel:',e.message)}open=c.id;c.un=0;save();render();await window.refreshOfficialUpdates(true);if(String(open)===String(c.id))render();window.decorateAdminUpdates&&window.decorateAdminUpdates();return}
- let c=S.chats.find(x=>String(x.id)===raw||String(x.memberId||'')===raw);
- if(!c)c=S.chats.find(x=>String(x.n||'').trim().toLowerCase()===key);
- // Rebuild the direct-message record from the authoritative member/request lists
- // instead of leaving accepted friends with a dead row when local chat state is stale.
- let m=(ML.members||[]).find(x=>String(x.id)===raw||String(nm(x)||'').trim().toLowerCase()===key||String(x.username||'').trim().toLowerCase()===key)||null;
- if(!m)m=(ML.requests||[]).find(x=>x&&x.member&&(String(x.member.id)===raw||String(nm(x.member)||'').trim().toLowerCase()===key||String(x.member.username||'').trim().toLowerCase()===key))?.member||null;
- if(!c&&m&&(acceptedFriendId(m.id)||['admin','owner'].includes(ML.role)||['admin','owner'].includes(window.__mlRole)))c=chat(m);
- if(!c&&(['admin','owner'].includes(ML.role)||['admin','owner'].includes(window.__mlRole))&&m)c=chat(m);
- if(!c)return toast('Friend chat could not be matched to a member. Refresh Community and try again.');
- if(c.groupId||c.g||c.ch){
-   const gid=c.groupId||((ML.groups||[]).find(g=>String(g.name||'').toLowerCase()===String(c.n||'').toLowerCase())||{}).id;
-   if(gid&&typeof window.openSharedGroup==='function'){await window.openSharedGroup(gid);return}
-   if(c.ch||c.official){const sp=ensureSpecialChatRecords();open=sp.updates.id;c.un=0;save();render();await window.refreshOfficialUpdates(true);if(String(open)===String(sp.updates.id))render();return}
+ const raw=String(id==null?'':id),key=raw.trim().toLowerCase();
+ try{
+  // Chat-list entries for joined groups/channels are synthetic and are not stored in S.chats.
+  if(raw.startsWith('shared-group-'))return await window.openSharedGroup(raw.slice(13));
+  const special=ensureSpecialChatRecords();
+  if(key==='102'||key==='saved messages'){const c=special.saved;open=c.id;c.un=0;tab='chats';save();render();return}
+  if(key==='101'||key==='manlung-official-updates'||key==='manlung updates'){
+   const c=special.updates;
+   try{const data=await apiReq('/groups');ML.groups=data.groups||[];const channel=ML.groups.find(g=>['manlung-updates','manlung-official-updates'].includes(String(g.slug||'')));if(channel){await window.openSharedGroup(channel.id);return}}catch(e){console.warn('Could not open official updates channel:',e.message)}
+   open=c.id;c.un=0;tab='chats';save();render();await window.refreshOfficialUpdates(true);if(String(open)===String(c.id))render();window.decorateAdminUpdates&&window.decorateAdminUpdates();return
+  }
+  let c=S.chats.find(x=>String(x.id)===raw||String(x.memberId||'')===raw)||null;
+  if(!c)c=S.chats.find(x=>String(x.n||'').trim().toLowerCase()===key)||null;
+  let m=(ML.members||[]).find(x=>String(x.id)===raw||String(nm(x)||'').trim().toLowerCase()===key||String(x.username||'').trim().toLowerCase()===key)||null;
+  if(!m&&c&&c.memberId)m=member(c.memberId)||null;
+  // Older locally cached chats may only have a display name. Resolve that name to the
+  // registered member so messages load using the real member UUID, not a stale local ID.
+  if(!m&&c)m=(ML.members||[]).find(x=>String(nm(x)||'').trim().toLowerCase()===String(c.n||'').trim().toLowerCase()||String(x.username||'').trim().toLowerCase()===String(c.n||'').trim().toLowerCase())||null;
+  if(!m)m=(ML.requests||[]).find(x=>x&&x.member&&(String(x.member.id)===raw||String(nm(x.member)||'').trim().toLowerCase()===key||String(x.member.username||'').trim().toLowerCase()===key))?.member||null;
+  if(!c&&m&&(acceptedFriendId(m.id)||['admin','owner'].includes(ML.role)||['admin','owner'].includes(window.__mlRole)))c=chat(m);
+  if(!c)return toast('This chat could not be matched to a conversation. Refresh Community and try again.');
+  if(m&&(!c.memberId||!c.remote||String(c.memberId)!==String(m.id))){
+   const old=c,remote=chat(m);
+   if(old!==remote){
+    if(!Array.isArray(remote.m)||!remote.m.length)remote.m=Array.isArray(old.m)?old.m:[];
+    remote.un=Math.max(Number(remote.un)||0,Number(old.un)||0);
+    remote.pin=remote.pin||old.pin||0;remote.ar=old.ar||0;remote.mu=remote.mu||old.mu||0;
+    if(old!==remote&&old.memberId==null&&old.groupId==null)S.chats=S.chats.filter(x=>x!==old);
+   }
+   c=remote;
+  }
+  if(c.groupId||c.g||c.ch){
+   const gid=c.groupId||((ML.groups||[]).find(g=>String(g.name||'').trim().toLowerCase()===String(c.n||'').trim().toLowerCase())||{}).id;
+   if(gid&&typeof window.openSharedGroup==='function')return await window.openSharedGroup(gid);
+   if(c.ch||c.official){const sp=ensureSpecialChatRecords();open=sp.updates.id;c.un=0;tab='chats';save();render();await window.refreshOfficialUpdates(true);if(String(open)===String(sp.updates.id))render();return}
    return toast('This group is still loading. Refresh Community and try again.');
- }
- open=c.id;c.un=0;save();tab='chats';render();
- const memberId=c.memberId||m&&m.id||c.id;
- if(memberId&&String(memberId)!=='102'&&String(memberId)!=='101')await loadMsgs(String(memberId),false);
+  }
+  open=c.id;c.un=0;tab='chats';save();render();
+  const memberId=c.memberId||(m&&m.id)||(c.remote?c.id:null);
+  if(memberId&&String(memberId)!=='102'&&String(memberId)!=='101'){
+   try{await loadMsgs(String(memberId),false)}catch(loadError){console.error('Could not load conversation messages:',loadError);toast(loadError.message||'Chat opened, but messages could not be loaded.')}
+  }
+ }catch(error){console.error('Could not open Manlung chat:',error);toast(error&&error.message||'Could not open this chat. Please refresh and try again.')}
 };
 window.publishAdminAnnouncement=async function(){if(!['admin','owner'].includes(ML.role))return toast('Admin access required.');const title=window.prompt('Announcement title (optional):','');if(title===null)return;const body=window.prompt('Announcement message:','');if(body===null||(!title.trim()&&!body.trim()))return toast('Enter a title or announcement message.');try{await apiReq('/updates',{method:'POST',body:JSON.stringify({title:title.trim(),body:body.trim(),is_published:true})});await window.refreshOfficialUpdates(true);render();window.decorateAdminUpdates&&window.decorateAdminUpdates();toast('Announcement published to all members.')}catch(e){toast(e.message||'Could not publish announcement.')}};
 window.decorateAdminUpdates=function(){if(!['admin','owner'].includes(ML.role)||String(open)!=='manlung-official-updates')return;const h=document.querySelector('#chat header');if(!h||h.querySelector('[data-admin-announcement]'))return;const b=document.createElement('button');b.className='btn';b.dataset.adminAnnouncement='1';b.type='button';b.textContent='+ Announce';b.style.padding='8px 11px';b.onclick=window.publishAdminAnnouncement;h.appendChild(b)};
