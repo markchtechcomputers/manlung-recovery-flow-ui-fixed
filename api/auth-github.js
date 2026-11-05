@@ -9,7 +9,7 @@ const app=express();
 // Vercel rewrites /api/auth/github/* to this function. Strip the public
 // prefix so the Express routes below receive /start and /callback.
 app.use((req,_res,next)=>{
-  req.url=String(req.url||'/').replace(/^\/api\/auth\/github(?=\/|\\?|$)/,'')||'/';
+  req.url=String(req.url||'/').replace(/^\/api\/auth\/github(?=\/|\?|$)/,'')||'/';
   next();
 });
 const CLIENT_ID=process.env.GITHUB_CLIENT_ID||'';
