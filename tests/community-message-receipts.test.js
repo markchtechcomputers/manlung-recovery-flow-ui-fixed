@@ -1,0 +1,4 @@
+const test=require('node:test'); const assert=require('node:assert/strict'); const fs=require('node:fs'); const path=require('node:path');
+const root=path.join(__dirname,'..'); const routes=fs.readFileSync(path.join(root,'routes/community.js'),'utf8'); const migration=fs.readFileSync(path.join(root,'db/migrations/033_community_message_receipts.sql'),'utf8');
+test('direct messages persist delivery and read timestamps',()=>{assert.match(migration,/add column if not exists delivered_at timestamptz/i);assert.match(migration,/add column if not exists read_at timestamptz/i);assert.match(routes,/\.update\(\{ delivered_at: readAt \}\)/);assert.match(routes,/delivered_at,read_at/);});
+test('marking direct messages read fills only missing delivery timestamps',()=>{assert.match(routes,/router\.post\('\/messages\/:memberId\/read'/);assert.ok(routes.includes(".is('delivered_at', null)"));assert.ok(routes.includes(".update({ read_at: readAt })"));});
