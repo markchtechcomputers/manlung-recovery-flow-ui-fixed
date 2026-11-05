@@ -97,18 +97,23 @@
       document.head.appendChild(style);
     }
 
-    // Show the welcome message on each fresh app page load, including after refresh.
-    if (!document.getElementById('manlung-pwa-welcome')) {
+    // Show one welcome splash per installed-app session, not on every page navigation.
+    let showWelcome = true;
+    try {
+      showWelcome = sessionStorage.getItem('manlung-pwa-welcome-shown-v1') !== '1';
+      if (showWelcome) sessionStorage.setItem('manlung-pwa-welcome-shown-v1', '1');
+    } catch (_) {}
+    if (showWelcome && !document.getElementById('manlung-pwa-welcome')) {
       const splash = document.createElement('div');
       splash.id = 'manlung-pwa-welcome';
       splash.setAttribute('role', 'status');
       splash.setAttribute('aria-label', 'Welcome to Manlung Recovery');
-      splash.innerHTML = '<div class="mr-welcome-content"><div class="mr-welcome-rule"></div><h1>Welcome to Manlung Recovery</h1><p>where Technology meets your expectation</p></div>';
+      splash.innerHTML = '<div class="mr-welcome-content"><div class="mr-welcome-rule"></div><h1>Welcome to Manlung Recovery</h1><p>We’re glad you’re here. Your recovery journey matters to us — secure support, clear updates, and help when you need it.</p></div>';
       document.body.appendChild(splash);
       window.setTimeout(() => {
         splash.classList.add('is-leaving');
         window.setTimeout(() => splash.remove(), 480);
-      }, 5500);
+      }, 3600);
     }
   }
 
@@ -657,7 +662,10 @@
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) updatePwaRegistration();
     });
-    window.setInterval(updatePwaRegistration, 15 * 60 * 1000);
+    window.addEventListener('focus', updatePwaRegistration);
+    window.addEventListener('online', updatePwaRegistration);
+    // Poll every five minutes while the app is open; browsers throttle this in the background.
+    window.setInterval(updatePwaRegistration, 5 * 60 * 1000);
   }
 
   setupPwaShell();
