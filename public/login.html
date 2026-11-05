@@ -1961,6 +1961,15 @@ async function setupClientTurnstile() {
     if (!clientTurnstileEnabled) return;
 
     clientTurnstileSiteKey = config.turnstileSiteKey;
+    // Warm the Cloudflare TLS connection without downloading its SDK until the user focuses a password field.
+    if (!document.querySelector('link[data-manlung-turnstile-preconnect]')) {
+      const hint = document.createElement('link');
+      hint.rel = 'preconnect';
+      hint.href = 'https://challenges.cloudflare.com';
+      hint.crossOrigin = 'anonymous';
+      hint.dataset.manlungTurnstilePreconnect = 'true';
+      document.head.appendChild(hint);
+    }
     // Load Cloudflare's third-party challenge only for password login or registration.
     // Google sign-in is independent of Turnstile and should not be held up by it.
   } catch (error) {
