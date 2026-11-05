@@ -1148,7 +1148,7 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
 
     const filesForCase = Array.isArray(existing.files) ? [...existing.files, ...newEvidence] : newEvidence;
     await Case.update(request.case_id, { files:filesForCase, last_updated:now });
-    await Promise.all(newEvidence.map(file => recordEvidenceAudit({ caseId:request.case_id, file, actorUserId:request.created_by || null, actorRole:'admin', category:'selfie-verification-batch' }))));
+    await Promise.all(newEvidence.map(file => recordEvidenceAudit({ caseId:request.case_id, file, actorUserId:request.created_by || null, actorRole:'admin', category:'selfie-verification-batch' })));
     return res.json({success:true,message:'Four verification images uploaded successfully.',evidence:{caseId:request.case_id,requestId:request.id,count:newEvidence.length}});
   } catch (error) {
     console.error('Video verification batch upload error:', error);
@@ -1398,7 +1398,7 @@ router.post(
 
       const newCase =
         await Case.create(caseFields);
-      await Promise.all(uploadedFiles.map(file => recordEvidenceAudit({ caseId:newCase.case_id, file, actorUserId:req.user?.id || null, actorRole:req.user?.role || 'guest', category:'client-submission' }))));
+      await Promise.all(uploadedFiles.map(file => recordEvidenceAudit({ caseId:newCase.case_id, file, actorUserId:req.user?.id || null, actorRole:req.user?.role || 'guest', category:'client-submission' })));
 
       // Notify every active Owner/Admin immediately when a new client request arrives.
       try {
