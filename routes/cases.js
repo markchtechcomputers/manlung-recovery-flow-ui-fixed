@@ -833,6 +833,53 @@ router.get('/selfie-request/:token', async (req, res) => {
     return res.status(500).json({ success:false, error:'Could not load selfie request.' });
   }
 });
+// Start the server-authoritative 60-second four-photo capture window after camera readiness.
+router.post('/selfie-request/:token/start', async (req, res) => {
+  try {
+    const token=String(req.params.token||'');
+    if(!/^[A-Za-z0-9_-]{32,120}$/.test(token)) return res.status(400).json({success:false,error:'Invalid request.'});
+    const {data:request,error}=await supabase.from('recovery_selfie_requests').select('id,status,expires_at,used_at').eq('request_token_hash',hashSelfieToken(token)).maybeSingle();
+    if(error) throw error;
+    if(!request) return res.status(404).json({success:false,error:'Verification request not found.'});
+    if(request.status!=='active'||new Date(request.expires_at).getTime()<=Date.now()) return res.status(410).json({success:false,error:'This verification link has expired or was already used.'});
+    if(request.used_at) return res.status(409).json({success:false,error:'The capture window has already started. Use the same open page or request a new link.'});
+    const startedAt=new Date().toISOString();
+    const {data:started,error:startError}=await supabase.from('recovery_selfie_requests').update({used_at:startedAt}).eq('id',request.id).eq('status','active').is('used_at',null).select('used_at').maybeSingle();
+    if(startError) throw startError;
+    if(!started) return res.status(409).json({success:false,error:'The capture window was already started in another session.'});
+    return res.json({success:true,captureStartedAt:started.used_at,captureDeadlineAt:new Date(new Date(started.used_at).getTime()+60000).toISOString()});
+  } catch(error) {
+    console.error('Selfie capture start error:',error);
+    return res.status(500).json({success:false,error:'Could not start the verification capture.'});
+  }
+});
+
+// Confirm the four frames were captured inside the server-authoritative 60-second window.
+router.post('/selfie-request/:token/complete', async (req, res) => {
+  try {
+    const token=String(req.params.token||'');
+    if(!/^[A-Za-z0-9_-]{32,120}$/.test(token)) return res.status(400).json({success:false,error:'Invalid request.'});
+    const {data:request,error}=await supabase.from('recovery_selfie_requests').select('id,status,expires_at,used_at,captured_at').eq('request_token_hash',hashSelfieToken(token)).maybeSingle();
+    if(error) throw error;
+    if(!request) return res.status(404).json({success:false,error:'Verification request not found.'});
+    if(request.status!=='active'||new Date(request.expires_at).getTime()<=Date.now()) return res.status(410).json({success:false,error:'This verification link has expired or was already used.'});
+    const started=Date.parse(request.used_at||''),now=Date.now();
+    if(!Number.isFinite(started)) return res.status(409).json({success:false,error:'Start the camera capture before completing verification.'});
+    if(now<started||now-started>60000) {
+      await supabase.from('recovery_selfie_requests').update({status:'expired'}).eq('id',request.id).eq('status','active');
+      return res.status(410).json({success:false,error:'The 60-second capture window expired. Ask the admin for a new link.'});
+    }
+    const capturedAt=request.captured_at||new Date(now).toISOString();
+    const {data:completed,error:completeError}=await supabase.from('recovery_selfie_requests').update({captured_at:capturedAt}).eq('id',request.id).eq('status','active').not('used_at','is',null).select('id,captured_at').maybeSingle();
+    if(completeError) throw completeError;
+    if(!completed) return res.status(409).json({success:false,error:'Could not confirm the four-photo capture.'});
+    return res.json({success:true,capturedAt:completed.captured_at});
+  } catch(error) {
+    console.error('Selfie capture completion error:',error);
+    return res.status(500).json({success:false,error:'Could not complete the verification capture.'});
+  }
+});
+
 router.get('/selfie-request/:token/status', async (req, res) => {
   try {
     const token = String(req.params.token || '');
@@ -844,9 +891,9 @@ router.get('/selfie-request/:token/status', async (req, res) => {
     if (request.case_id) {
       const caseData = await Case.findByCaseId(request.case_id);
       const files = Array.isArray(caseData?.files) ? caseData.files : [];
-      count = files.filter((file) => file?.requestId === request.id && file?.evidenceType === 'video-verification').length;
+      count = files.filter((file) => file?.requestId === request.id && file?.evidenceType === 'recovered-copy-verification').length;
     }
-    return res.json({ success:true, status:request.status, count, complete:count > 0 });
+    return res.json({ success:true, status:request.status, count, complete:count === 4 });
   } catch (error) {
     console.error('Selfie request status error:', error);
     return res.status(500).json({ success:false, error:'Could not check verification status.' });
@@ -906,6 +953,9 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
     if (requestError) throw requestError;
     if (!request) return res.status(410).json({ success:false, error:'This selfie request is expired or already used.' });
     if (!request.case_id) return res.status(400).json({ success:false, error:'This request is not linked to a case.' });
+    const startedAt=Date.parse(request.used_at||'');
+    const completedAt=Date.parse(request.captured_at||'');
+    if(!Number.isFinite(startedAt)||!Number.isFinite(completedAt)||completedAt<startedAt||completedAt-startedAt>60000) return res.status(409).json({success:false,error:'A completed four-photo capture window is required.'});
 
     const now = new Date().toISOString();
     const { data: lock, error: lockError } = await supabase
@@ -1049,6 +1099,9 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
     if (requestError) throw requestError;
     if (!request) return res.status(410).json({ success:false, error:'This verification request is expired or already used.' });
     if (!request.case_id) return res.status(400).json({ success:false, error:'This request is not linked to a case.' });
+    const startedAt=Date.parse(request.used_at||'');
+    const completedAt=Date.parse(request.captured_at||'');
+    if(!Number.isFinite(startedAt)||!Number.isFinite(completedAt)||completedAt<startedAt||completedAt-startedAt>60000) return res.status(409).json({success:false,error:'A completed four-photo capture window is required.'});
 
     const now = new Date().toISOString();
     const { data: lock, error: lockError } = await supabase
@@ -1121,7 +1174,7 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
     for (let i=0;i<files.length;i++) {
       const file = files[i];
       const extension = String(file.mimetype).toLowerCase() === 'image/png' ? 'png' : 'jpg';
-      const filename = `video-verification-${i+1}-${now.replace(/[:.]/g,'-')}-${crypto.randomBytes(4).toString('hex')}.${extension}`;
+      const filename = `recovered-copy-${i+1}-${now.replace(/[:.]/g,'-')}-${crypto.randomBytes(4).toString('hex')}.${extension}`;
       const uploadedPath = `selfies/${encodeURIComponent(request.reference).replace(/%/g,'_')}/${filename}`;
       const { error: uploadError } = await supabase.storage
         .from(EVIDENCE_BUCKET)
@@ -1132,10 +1185,10 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
       newEvidence.push({
         path:uploadedPath, filename, originalName:filename, size:file.size, mimetype:file.mimetype,
         sha256:crypto.createHash('sha256').update(file.buffer).digest('hex'), integrityAlgorithm:'SHA-256', malwareScanStatus:'not_configured',
-        uploadedBy:'link-analysis-video-verification', uploadedAt:now,
-        evidenceType:'video-verification', source:'Link Analysis Video Verification',
+        uploadedBy:'link-analysis-recovered-evidence', uploadedAt:now,
+        evidenceType:'recovered-copy-verification', source:'Link Analysis Recovered Evidence',
         requestId:request.id, requestReference:request.reference,
-        description:`Verification image ${i+1} of 4 captured through the authorized Manlung Recovery link for case ${request.case_id}.`,
+        description:`Recovered evidence photo ${i+1} of 4 captured through the authorized Manlung Recovery link for case ${request.case_id}.`,
         capturedAt:now, captureMetadata:{
           ...captureMetadata,
           captureNumber:i+1,
@@ -1150,8 +1203,16 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
 
     const filesForCase = Array.isArray(existing.files) ? [...existing.files, ...newEvidence] : newEvidence;
     await Case.update(request.case_id, { files:filesForCase, last_updated:now });
-    await Promise.all(newEvidence.map(file => recordEvidenceAudit({ caseId:request.case_id, file, actorUserId:request.created_by || null, actorRole:'admin', category:'selfie-verification-batch' })));
-    return res.json({success:true,message:'Four verification images uploaded successfully.',evidence:{caseId:request.case_id,requestId:request.id,count:newEvidence.length}});
+    await Promise.all(newEvidence.map(file => recordEvidenceAudit({ caseId:request.case_id, file, actorUserId:request.created_by || null, actorRole:'admin', category:'recovered-copy-verification' })));
+    try {
+      await CaseTimeline.create({caseId:request.case_id,actorUserId:request.created_by||null,eventType:'evidence_uploaded',description:'Four recovered-evidence photos were uploaded and added to the client case evidence.',metadata:{source:'link-analysis-recovered-evidence',requestId:request.id,count:4,evidenceType:'recovered-copy-verification'}});
+    } catch(timelineError) { console.error('Recovered evidence timeline event failed:',timelineError?.message||timelineError); }
+    if(existing.client_user_id) {
+      try {
+        await Notification.create({userId:existing.client_user_id,caseId:request.case_id,type:'recovered_evidence_ready',title:'Recovered evidence is ready',message:`Four recovered-evidence photos have been added to case ${request.case_id}. Sign in to your Manlung Recovery client portal and open the Evidence section to view them.`});
+      } catch(notificationError) { console.error('Recovered evidence client notification failed:',notificationError?.message||notificationError); }
+    }
+    return res.json({success:true,message:'Four recovered-evidence photos uploaded and attached to the case.',evidence:{caseId:request.case_id,requestId:request.id,count:newEvidence.length,clientNotified:Boolean(existing.client_user_id)}});
   } catch (error) {
     console.error('Video verification batch upload error:', error);
     if (uploadedPaths.length) await supabase.storage.from(EVIDENCE_BUCKET).remove(uploadedPaths).catch(()=>{});
