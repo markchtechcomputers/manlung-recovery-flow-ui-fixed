@@ -2209,11 +2209,14 @@ function notifyOtpSent() {
   manlungOtpWasSent = true;
   if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
     try {
-      new Notification('Manlung Recovery', {
-        body: 'Your verification email was sent. Open your inbox and paste the 8-digit code into Manlung Recovery.',
+      const notification = new Notification('Manlung Recovery', {
+        body: 'Your verification email was sent. Tap here to open your inbox, then return and paste the 8-digit code.',
         icon: '/icons/icon-192.png',
         tag: 'manlung-email-otp'
       });
+      notification.onclick = () => {
+        try { window.focus(); openOtpInbox(); notification.close(); } catch (_) {}
+      };
     } catch (_) {}
   }
 }
