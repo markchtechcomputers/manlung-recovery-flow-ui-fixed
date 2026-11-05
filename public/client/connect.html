@@ -597,7 +597,54 @@ body{background:var(--bg-body);color:var(--tx);font-family:Inter,-apple-system,B
 .ml-settings-section .set .sub{white-space:normal;line-height:1.45}
 @media(max-width:420px){.ml-settings-section{margin:0 10px 14px;border-radius:15px}.ml-settings-section>.sec{padding:13px 14px 9px}.ml-settings-section>.set{padding:12px 13px}.ml-settings-section>.card{margin:9px;padding:12px}}
 </style>
-<style>.ml-chat-close{font-size:26px;line-height:1;width:38px;height:38px;flex:none;border-radius:50%;display:grid;place-items:center}.ml-chat-close:focus-visible{outline:2px solid var(--ac);outline-offset:2px}</style></head><body>
+<style>.ml-chat-close{font-size:26px;line-height:1;width:38px;height:38px;flex:none;border-radius:50%;display:grid;place-items:center}.ml-chat-close:focus-visible{outline:2px solid var(--ac);outline-offset:2px}</style>
+<style id="manlung-responsive-connect-fix">
+html,body{width:100%;max-width:100%;height:100%;min-height:100%;overflow-x:hidden}
+body{min-height:100dvh}
+#app{width:100%;max-width:1180px;height:min(100dvh,980px);min-height:0;margin:0 auto;overflow:hidden}
+#app>header{flex:none;min-width:0;padding:clamp(10px,1.4vw,18px) clamp(12px,2vw,24px)}
+#app>header h1{font-size:clamp(18px,2vw,24px);min-width:0;overflow-wrap:anywhere}
+#app>main{min-width:0;min-height:0;overscroll-behavior:contain}
+#app nav{flex:none;min-width:0;max-width:100%;overflow-x:auto;justify-content:flex-start;gap:4px;padding-left:6px;padding-right:6px}
+#app nav button{flex:1 0 62px;min-width:62px;min-height:52px;font-size:10px;white-space:normal;overflow-wrap:anywhere}
+#app nav button span{width:100%;height:28px}
+#chat{max-width:min(900px,calc(100% - 36px));max-height:min(900px,calc(100% - 36px))}
+#msgs{min-width:0;overscroll-behavior:contain}
+.compose{padding:10px max(10px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.compose input{min-width:0}
+@media(min-width:761px){
+ body{background:var(--bg)}
+ #app{margin:14px auto;height:calc(100dvh - 28px);min-height:620px;border:1px solid var(--bd);border-radius:20px;box-shadow:0 12px 38px #0002}
+ #app>main{padding-bottom:4px}
+ #chat{width:min(900px,calc(100% - 56px));height:min(860px,calc(100% - 56px));border-radius:20px;border:1px solid var(--bd);box-shadow:0 22px 70px #0003}
+}
+@media(max-width:760px){
+ #app{width:100%;max-width:none;height:100dvh;height:100svh;min-height:0;margin:0;border:0;border-radius:0;box-shadow:none}
+ #app>header{gap:8px;padding:calc(9px + env(safe-area-inset-top)) 12px 9px}
+ #app>header h1{font-size:clamp(17px,5vw,21px)}
+ #app .ib{width:42px;height:42px;flex:none}
+ #app nav{padding-bottom:calc(5px + env(safe-area-inset-bottom))}
+ #app nav button{flex:0 0 64px;min-width:64px;min-height:54px;padding:7px 3px;font-size:10px}
+ #chat{left:0;top:0;width:100%;height:100%;max-width:none;max-height:100dvh;transform:none;border:0;border-radius:0;box-shadow:none}
+ #msgs{padding:10px}
+ .b{max-width:88%;font-size:14px}
+ .compose{gap:6px;padding:8px 9px calc(8px + env(safe-area-inset-bottom))}
+ .compose input{min-height:44px;padding:10px 13px}
+ .compose button{min-width:42px;min-height:42px}
+ .card{margin:8px 10px;padding:12px}
+ #ml-peer-call{padding:calc(18px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom));gap:12px}
+ #ml-peer-call .ml-call-avatar{width:92px;height:92px;margin-bottom:8px;font-size:34px}
+ #ml-peer-call #ml-peer-remote{max-height:42vh}
+ .ctl{gap:12px}.ctl button{width:54px;height:54px}
+}
+@media(max-width:360px){
+ #app nav button{flex-basis:58px;min-width:58px;font-size:9px}
+ .compose{gap:4px;padding-left:6px;padding-right:6px}
+ .b{max-width:92%}
+}
+</style>
+
+</head><body>
 <div id="app"><header id="hd"><div class="logo">M</div><h1>Manlung Community</h1></header><main id="mn" aria-live="polite"></main><nav id="nv"></nav><div id="toast"></div><input type="file" id="pi" accept="image/*" hidden><input type="file" id="status-media" accept="image/*,video/*" hidden></div>
 <script>
 const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
