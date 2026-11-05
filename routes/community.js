@@ -1655,6 +1655,9 @@ router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
 });
 router.get('/peer-calls/incoming',async(req,res)=>{
  try{
+  const stale=await supabase.from('recovery_peer_calls').update({status:'missed',ended_at:new Date().toISOString()})
+   .eq('status','ringing').lt('created_at',new Date(Date.now()-120000).toISOString());
+  if(stale.error) throw stale.error;
   const {data,error}=await supabase.from('recovery_peer_calls').select('id,caller_user_id,callee_user_id,call_mode,status,created_at')
    .eq('callee_user_id',req.user.id).eq('status','ringing').gt('created_at',new Date(Date.now()-120000).toISOString()).order('created_at',{ascending:false}).limit(5);
   if(error) throw error;
@@ -1697,11 +1700,23 @@ router.post('/peer-calls/:callId/signals',peerCallLimiter,async(req,res)=>{
   if(type==='offer'&&String(req.user.id)!==String(call.caller_user_id)) return fail(res,403,'Only the caller can send an offer.');
   if(type==='answer'&&String(req.user.id)!==String(call.callee_user_id)) return fail(res,403,'Only the recipient can send an answer.');
   if(type==='accept'&&String(req.user.id)!==String(call.callee_user_id)) return fail(res,403,'Only the recipient can accept this call.');
+  // Claim the call state transition before recording the signal so two
+  // devices cannot both accept the same ringing call.
+  if(type==='accept'){
+    const u=await supabase.from('recovery_peer_calls').update({status:'accepted',accepted_at:new Date().toISOString()})
+      .eq('id',id).eq('status','ringing').select('id').maybeSingle();
+    if(u.error) throw u.error;
+    if(!u.data) return fail(res,409,'This call was already answered or has ended.');
+  }
+  if(type==='reject'||type==='hangup'){
+    const u=await supabase.from('recovery_peer_calls').update({status:type==='reject'?'rejected':'ended',ended_at:new Date().toISOString()})
+      .eq('id',id).in('status',['ringing','accepted']).select('id').maybeSingle();
+    if(u.error) throw u.error;
+    if(!u.data) return fail(res,409,'This call has already ended.');
+  }
   const {data,error}=await supabase.from('recovery_peer_call_signals').insert({call_id:id,sender_user_id:req.user.id,signal_type:type,payload})
     .select('id,call_id,sender_user_id,signal_type,payload,created_at').single();
   if(error) throw error;
-  if(type==='accept') {const u=await supabase.from('recovery_peer_calls').update({status:'accepted',accepted_at:new Date().toISOString()}).eq('id',id).eq('status','ringing');if(u.error) throw u.error;}
-  if(type==='reject'||type==='hangup') {const u=await supabase.from('recovery_peer_calls').update({status:type==='reject'?'rejected':'ended',ended_at:new Date().toISOString()}).eq('id',id).in('status',['ringing','accepted']);if(u.error) throw u.error;}
   res.status(201).json({success:true,signal:data});
  }catch(error){return handleDbError(res,error,'Peer call signal write error:');}
 });
