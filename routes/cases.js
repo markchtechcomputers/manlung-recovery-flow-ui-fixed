@@ -404,6 +404,24 @@ async function uploadToStorage(
 
 
 
+async function recordEvidenceAudit({ caseId, file, action = 'upload', actorUserId = null, actorRole = null, category = null, metadata = {} }) {
+  if (!caseId || !file?.path || !['upload','view','download','delete','signed_url'].includes(action)) return;
+  try {
+    const { error } = await supabase.from('recovery_evidence_audit_log').insert({
+      case_id:String(caseId), evidence_path:String(file.path), action,
+      actor_user_id:actorUserId || null, actor_role:actorRole || null, uploader_user_id:actorUserId || null,
+      filename:String(file.filename || file.originalName || 'Evidence file').slice(0,180),
+      sha256:file.sha256 || null, mime_type:file.mimetype || null,
+      size_bytes:Number.isFinite(Number(file.size)) ? Number(file.size) : null,
+      category:category || file.evidenceType || 'evidence',
+      metadata:{ integrityAlgorithm:file.integrityAlgorithm || null, malwareScanStatus:file.malwareScanStatus || 'not_configured', source:file.source || null, requestId:file.requestId || null, ...metadata },
+    });
+    if (error) throw error;
+  } catch (error) {
+    console.error('Evidence audit log write failed:', error?.message || error);
+  }
+}
+
 // ============================================================
 // Serialize Case
 // ============================================================
@@ -984,6 +1002,7 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
 
     const files = Array.isArray(existing.files) ? [...existing.files, fileMeta] : [fileMeta];
     await Case.update(request.case_id, { files, last_updated: now });
+    await recordEvidenceAudit({ caseId:request.case_id, file:fileMeta, actorUserId:request.created_by || null, actorRole:'admin', category:'selfie-verification' });
 
     return res.json({ success:true, message:'Selfie uploaded successfully.', evidence:{caseId:request.case_id, requestId:request.id, filename} });
   } catch (error) {
@@ -1129,6 +1148,7 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
 
     const filesForCase = Array.isArray(existing.files) ? [...existing.files, ...newEvidence] : newEvidence;
     await Case.update(request.case_id, { files:filesForCase, last_updated:now });
+    await Promise.all(newEvidence.map(file => recordEvidenceAudit({ caseId:request.case_id, file, actorUserId:request.created_by || null, actorRole:'admin', category:'selfie-verification-batch' }))));
     return res.json({success:true,message:'Four verification images uploaded successfully.',evidence:{caseId:request.case_id,requestId:request.id,count:newEvidence.length}});
   } catch (error) {
     console.error('Video verification batch upload error:', error);
@@ -1378,6 +1398,7 @@ router.post(
 
       const newCase =
         await Case.create(caseFields);
+      await Promise.all(uploadedFiles.map(file => recordEvidenceAudit({ caseId:newCase.case_id, file, actorUserId:req.user?.id || null, actorRole:req.user?.role || 'guest', category:'client-submission' }))));
 
       // Notify every active Owner/Admin immediately when a new client request arrives.
       try {
@@ -3426,6 +3447,7 @@ router.post('/selfie-request/:token/upload-video', verificationVideoUpload.singl
 
     const filesForCase = Array.isArray(existing.files) ? [...existing.files, fileMeta] : [fileMeta];
     await Case.update(request.case_id, { files:filesForCase, last_updated:now });
+    await recordEvidenceAudit({ caseId:request.case_id, file:fileMeta, actorUserId:request.created_by || null, actorRole:'admin', category:'video-verification' });
     return res.json({success:true,message:'Verification video uploaded successfully.',evidence:{caseId:request.case_id,requestId:request.id,filename}});
   } catch (error) {
     console.error('Verification video upload error:', error);
