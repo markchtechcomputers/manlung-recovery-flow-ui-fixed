@@ -13,6 +13,8 @@ test('stored private-bucket profile photos are signed for member views and respe
   assert.match(routes, /createSignedUrl\(user\.avatar_path, 60 \* 60\)/);
   assert.match(routes, /profile\?\.avatar_visibility === 'private' && !includePrivate\) return null/);
   assert.match(routes, /resolveAvatarMap\(users, profiles\)/);
+  assert.match(routes, /storage\.from\(CLIENT_PROFILE_PHOTO_BUCKET\)[\s\S]*?upload\(photoPath, bytes/);
+  assert.match(routes, /update\(\{ avatar_path: photoPath \}\)/);
   assert.match(frontend, /window\.communityAvatar/);
   assert.match(frontend, /avatar:x\.owner&&x\.owner\.avatar/);
 });
