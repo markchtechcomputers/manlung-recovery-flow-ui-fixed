@@ -1179,11 +1179,14 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
             <div id="pendingAdminNotice" style="margin-top:.8rem;"></div>
         </div>
 
-        <div class="card" id="inviteAdminSection">
-            <div class="card-title"><i class="fas fa-envelope"></i> Invite Admin</div>
-            <p style="color:var(--text-muted);font-size:.85rem;">The Owner sends an invitation. The invited person creates their own Admin username and password.</p>
-            <div style="display:flex;gap:.6rem;"><input id="inviteEmail" type="email" placeholder="admin@example.com" style="flex:1"><button class="btn btn-primary" onclick="inviteAdmin()">Send Invitation</button></div>
-            <div id="inviteResult" style="margin-top:.7rem;color:var(--text-muted);font-size:.85rem;"></div>
+        <div class="card" id="inviteAdminSection" style="border:1px solid rgba(20,116,164,.2);">
+            <div style="display:flex;align-items:center;gap:13px;margin-bottom:12px;">
+                <img src="/icons/icon-512.png" alt="Manlung Recovery" width="46" height="46" style="border-radius:13px;object-fit:cover;box-shadow:0 5px 16px rgba(15,60,100,.14);">
+                <div><div class="card-title" style="margin:0;">Invite an Admin</div><p style="margin:4px 0 0;color:var(--text-muted);font-size:.82rem;">Secure, branded invitation from Manlung Recovery</p></div>
+            </div>
+            <p style="color:var(--text-muted);font-size:.85rem;">The invited person creates their own username and password. Admin access remains pending until you approve the account.</p>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;"><input id="inviteEmail" type="email" autocomplete="email" placeholder="admin@example.com" aria-label="Admin email address" style="flex:1;min-width:220px;"><button id="inviteAdminButton" class="btn btn-primary" type="button" onclick="inviteAdmin()">Send Invitation</button></div>
+            <div id="inviteResult" role="status" aria-live="polite" style="display:none;margin-top:12px;padding:12px 14px;border-radius:11px;font-size:.85rem;line-height:1.55;"></div>
         </div>
 
         <div class="card" id="currentAdminsSection">
@@ -1276,10 +1279,37 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
         }
 
         async function inviteAdmin() {
-            const email=document.getElementById('inviteEmail').value.trim(); const out=document.getElementById('inviteResult');
-            if(!email){out.textContent='Enter an email.';return;} out.textContent='Sending…';
-            const res=await fetch('/api/owner/invitations',{method:'POST',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify({email})});
-            const d=await res.json(); if(d.success){out.innerHTML=d.emailSent?'Invitation email sent.':`Email provider is not configured. Secure invitation link: <a href="${d.invitation.link}" target="_blank">Open invitation</a>`;document.getElementById('inviteEmail').value='';}else out.textContent=d.error||'Could not send invitation';
+            const email = document.getElementById('inviteEmail').value.trim();
+            const out = document.getElementById('inviteResult');
+            const button = document.getElementById('inviteAdminButton');
+            if (!email) { out.style.display='block'; out.textContent='Enter the Admin email address.'; out.style.background='#fff7ed'; out.style.color='#9a3412'; return; }
+            button.disabled = true; button.textContent = 'Sending…';
+            out.style.display='block'; out.textContent='Creating secure invitation…'; out.style.background='#eff6ff'; out.style.color='#1e40af';
+            try {
+                const res = await fetch('/api/owner/invitations', { method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body:JSON.stringify({email}) });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Could not create invitation.');
+                const invitation = data.invitation || {};
+                out.replaceChildren();
+                out.style.background = invitation.emailSent ? '#ecfdf5' : '#fff7ed';
+                out.style.color = invitation.emailSent ? '#166534' : '#9a3412';
+                const heading = document.createElement('strong');
+                heading.textContent = invitation.emailSent ? 'Invitation email sent' : 'Invitation created';
+                const detail = document.createElement('div');
+                detail.style.marginTop='4px';
+                detail.textContent = invitation.emailSent ? 'A branded Manlung Recovery invitation was sent to ' + email + '. The link expires in 48 hours.' : 'Email delivery is not configured. Copy the secure link below and share it with the intended recipient.';
+                out.append(heading, detail);
+                if (!invitation.emailSent && invitation.link) {
+                    const link = document.createElement('a');
+                    link.href = invitation.link; link.target='_blank'; link.rel='noopener noreferrer';
+                    link.textContent='Open secure invitation';
+                    link.style.display='inline-block'; link.style.marginTop='8px'; link.style.fontWeight='700';
+                    out.append(link);
+                }
+                document.getElementById('inviteEmail').value='';
+            } catch (error) {
+                out.style.background='#fef2f2'; out.style.color='#991b1b'; out.textContent=error.message || 'Could not send invitation.';
+            } finally { button.disabled=false; button.textContent='Send Invitation'; }
         }
 
         async function loadAdmins() {
