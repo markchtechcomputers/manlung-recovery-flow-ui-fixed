@@ -262,10 +262,28 @@ router.get('/messages/:memberId', async (req, res) => {
     if (!validId(other)) return fail(res, 400, 'Invalid member ID.');
     if (other === String(req.user.id)) return fail(res, 400, 'Choose another member.');
     if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const [friendshipResult, passResult, preferenceResult] = await Promise.all([
+      supabase.from('recovery_chat_friend_requests').select('id').eq('status','accepted')
+        .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')').limit(1),
+      supabase.from('recovery_chat_plan_purchases').select('user_id')
+        .in('user_id',[req.user.id,other]).eq('plan_code','chat_pass').eq('status','paid')
+        .gt('expires_at',new Date().toISOString()).limit(2),
+      supabase.from('recovery_chat_preferences').select('cleared_before')
+        .eq('user_id',req.user.id).eq('other_user_id',other).maybeSingle(),
+    ]);
+    if (friendshipResult.error) throw friendshipResult.error;
+    if (passResult.error) throw passResult.error;
+    if (preferenceResult.error) throw preferenceResult.error;
+    const chatAccess = Boolean(friendshipResult.data?.length || passResult.data?.length);
+    const clearedBefore = preferenceResult.data?.cleared_before || null;
     const { data, error } = await supabase.from('recovery_community_messages')
       .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
       .is('deleted_at', null).order('created_at', { ascending: true }).limit(100);
+    if (clearedBefore) {
+      const visible = (data || []).filter(row => new Date(row.created_at).getTime() > new Date(clearedBefore).getTime());
+      data.splice(0, data.length, ...visible);
+    }
     if (error) throw error;
     const incomingIds = (data || [])
       .filter(row => String(row.recipient_user_id) === String(req.user.id) && !row.delivered_at)
@@ -293,7 +311,7 @@ router.get('/messages/:memberId', async (req, res) => {
       return { ...row, message: '', attachment: { isVoice: true, url: signed.signedUrl, duration, mime } };
     }));
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, messages });
+    res.json({ success: true, messages, chatAccess, chatPassOwnerId: passResult.data?.[0]?.user_id || null });
   } catch (error) { return handleDbError(res, error, 'Community message list error:'); }
 });
 
@@ -432,10 +450,11 @@ router.post('/messages/:memberId', messageLimiter, async (req, res) => {
       .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')').limit(1);
     if (acceptedError) throw acceptedError;
     if (!accepted?.length) {
-      const { data: pass, error: passError } = await supabase.from('recovery_chat_plan_purchases')
-        .select('id').eq('user_id',req.user.id).eq('plan_code','chat_pass').eq('status','paid').gt('expires_at',new Date().toISOString()).limit(1);
+      const { data: passes, error: passError } = await supabase.from('recovery_chat_plan_purchases')
+        .select('user_id').in('user_id',[req.user.id,other]).eq('plan_code','chat_pass').eq('status','paid')
+        .gt('expires_at',new Date().toISOString()).limit(2);
       if (passError) throw passError;
-      if (!pass?.length) return fail(res,403,'Accept the friend request or purchase an active Chat pass to message this member.');
+      if (!passes?.length) return fail(res,403,'Accept the friend request or either member can purchase an active Chat pass to message here.');
     }
     const { data, error } = await supabase.from('recovery_community_messages')
       .insert({ sender_user_id: req.user.id, recipient_user_id: other, message })
@@ -868,6 +887,10 @@ router.put('/preferences/:memberId', async (req, res) => {
         patch[field] = body[field];
       }
     }
+    if (Object.hasOwn(body, 'cleared_before')) {
+      if (body.cleared_before !== null && (!String(body.cleared_before).trim() || !Number.isFinite(new Date(body.cleared_before).getTime()))) return fail(res, 400, 'cleared_before must be an ISO date or null.');
+      patch.cleared_before = body.cleared_before ? new Date(body.cleared_before).toISOString() : null;
+    }
     if (Object.hasOwn(body, 'manual_unread_at')) {
       if (body.manual_unread_at !== null && (!String(body.manual_unread_at).trim() || !Number.isFinite(new Date(body.manual_unread_at).getTime()))) return fail(res, 400, 'manual_unread_at must be an ISO date or null.');
       patch.manual_unread_at = body.manual_unread_at ? new Date(body.manual_unread_at).toISOString() : null;
@@ -882,7 +905,7 @@ router.put('/preferences/:memberId', async (req, res) => {
       if (background !== null && !['plain','soft','dots'].includes(background)) return fail(res, 400, 'Choose a supported chat background.');
       patch.chat_background = background;
     }
-    if (!Object.keys(patch).some(k => ['archived', 'muted', 'pinned', 'starred', 'manual_unread_at', 'chat_theme', 'chat_background'].includes(k))) return fail(res, 400, 'No preference changes provided.');
+    if (!Object.keys(patch).some(k => ['archived', 'muted', 'pinned', 'starred', 'manual_unread_at', 'cleared_before', 'chat_theme', 'chat_background'].includes(k))) return fail(res, 400, 'No preference changes provided.');
     const { data, error } = await supabase.from('recovery_chat_preferences').upsert(patch, { onConflict: 'user_id,other_user_id' }).select('*').single();
     if (error) throw error;
     res.json({ success: true, preferences: data });
