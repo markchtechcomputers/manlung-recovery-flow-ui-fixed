@@ -2,7 +2,7 @@ name: Test Manlung Recovery
 
 on:
   push:
-    branches: [main, owner-security-monitoring, hotfix/api-startup-diagnostic-20261103]
+    branches: [main, owner-security-monitoring, hotfix/api-startup-diagnostic-20261103, fix/oauth-clean-routes-20261105]
   pull_request:
     branches: [main, owner-security-monitoring]
   workflow_dispatch:
