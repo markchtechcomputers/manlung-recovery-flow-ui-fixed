@@ -2567,7 +2567,10 @@ async function startSocialSignup(provider, sourceButton){
     });
     const {error}=await client.auth.signInWithOAuth({
       provider,
-      options:{redirectTo:new URL('/oauth-callback',window.location.origin).href}
+      options:{
+        redirectTo:new URL('/oauth-callback',window.location.origin).href,
+        scopes:provider==='github'?'read:user user:email':'identify email'
+      }
     });
     if(error) throw error;
   } catch(err) {
