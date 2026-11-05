@@ -1,4 +1,4 @@
-name: Test Manlung Recovery
+name: Test Manlung Recovery OAuth and Routes
 
 on:
   push:
