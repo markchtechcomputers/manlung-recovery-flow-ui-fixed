@@ -5,6 +5,7 @@ const path = require('node:path');
 
 const read = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
 const login = read('public/login.html');
+const connect = read('public/client/connect.html');
 const copyOtp = read('public/copy-otp.html');
 const turnstile = read('services/turnstile.js');
 const statusMigration = read('db/migrations/034_status_plan_priority.sql');
@@ -104,4 +105,12 @@ test('clients can export their own case report and submit one satisfaction ratin
   assert.match(caseFeedbackMigration, /unique\(case_id,user_id\)/);
   assert.match(recoveryCenter, /Export case report/);
   assert.match(recoveryCenter, /data-feedback-submit/);
+});
+
+test('missed peer calls create notifications and history syncs across devices', () => {
+  assert.match(community, /async function markStalePeerCallsAsMissed\(\)/);
+  assert.match(community, /type:'missed_call'/);
+  assert.match(community, /router\.get\('\/peer-calls\/history'/);
+  assert.match(connect, /window\.syncPeerCallHistory=syncPeerCallHistory/);
+  assert.match(connect, /rq\('\/peer-calls\/history'\)/);
 });
