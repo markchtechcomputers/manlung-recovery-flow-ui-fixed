@@ -687,7 +687,7 @@ router.get('/friend-requests', async (req, res) => {
     const ids = [...new Set(data.map(x => x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id))];
     const [{ data: users, error: ue }, { data: profiles, error: pe }] = await Promise.all([
       ids.length ? supabase.from('recovery_users').select('id,username,role,security_status,avatar_path').in('id', ids) : Promise.resolve({ data: [], error: null }),
-      ids.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,bio').in('user_id', ids) : Promise.resolve({ data: [], error: null })
+      ids.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility,bio').in('user_id', ids) : Promise.resolve({ data: [], error: null })
     ]);
     if (ue) throw ue; if (pe) throw pe;
     const um = new Map((users || []).map(u => [u.id, u]));
