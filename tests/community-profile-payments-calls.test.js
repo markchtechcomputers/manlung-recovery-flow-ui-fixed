@@ -26,7 +26,7 @@ test('status plans use Paystack checkout rather than the former demo payment pro
   assert.doesNotMatch(routes, /The matching monthly Paystack plan is not configured/);
   assert.match(frontend, /window\.apiReq\('\/plans\/initialize'/);
   assert.doesNotMatch(frontend, /M-Pesa number \(demo, no real charge\)/);
-  assert.match(frontend, /planOf\(\)==='free'&&!credits\.freeAvailable/);
+  assert.match(frontend, /if\(!credits\.freeAvailable&&!\(credits\.planCode==='free'&&Number\(credits\.paidCredits\|\|0\)>0\)\)/);
   assert.match(frontend, /activeStatusPlan/);
 });
 
