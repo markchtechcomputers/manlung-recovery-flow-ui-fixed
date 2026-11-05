@@ -307,7 +307,7 @@ async function retryUpload(){
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/sw.js",{scope:"/"}).catch(()=>{});
 }
-startButton.addEventListener("click",captureFour);
+startButton.onclick=captureFour;
 window.addEventListener("online",async()=>{
   if(!busy){
     const result=await flushQueue();
