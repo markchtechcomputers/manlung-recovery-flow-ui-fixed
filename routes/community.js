@@ -1503,20 +1503,23 @@ router.post('/status/media', statusLimiter, express.raw({ type: ['image/*','vide
 
 router.get('/status', async (req, res) => {
   try {
+    const now = new Date();
+    const since = new Date(now.getTime() - 86400000).toISOString();
     const { data: posts, error } = await supabase.from('recovery_chat_status_posts')
       .select('id,user_id,status_type,text_content,media_path,caption,expires_at,created_at')
-      .gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(300);
+      .gt('expires_at', now.toISOString()).order('created_at', { ascending: false }).limit(300);
     if (error) throw error;
     const { data: hiddenRows, error: he } = await supabase.from('recovery_chat_status_hides').select('status_id').eq('user_id',req.user.id);
     if (he) throw he;
     const hiddenIds = new Set((hiddenRows || []).map(x => x.status_id));
     const users = [...new Set((posts || []).map(p => p.user_id))];
-    const [{ data: profiles, error: pe }, { data: wallet, error: we }, { data: avatarUsers, error: avatarError }] = await Promise.all([
+    const [{ data: profiles, error: pe }, { data: wallet, error: we }, { data: avatarUsers, error: avatarError }, { data: plans, error: planError }] = await Promise.all([
       users.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility,status_visibility').in('user_id', users) : Promise.resolve({ data: [], error: null }),
       supabase.from('recovery_chat_status_wallets').select('free_status_last_used_at,paid_status_credits').eq('user_id', req.user.id).maybeSingle(),
       users.length ? supabase.from('recovery_users').select('id,avatar_path').in('id', users) : Promise.resolve({ data: [], error: null }),
+      supabase.from('recovery_chat_plan_purchases').select('plan_code,expires_at').eq('user_id',req.user.id).eq('status','paid').gt('expires_at',now.toISOString()).in('plan_code',['plus','pro']).order('expires_at',{ascending:false}).limit(1),
     ]);
-    if (pe) throw pe; if (we) throw we; if (avatarError) throw avatarError;
+    if (pe) throw pe; if (we) throw we; if (avatarError) throw avatarError; if (planError) throw planError;
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
     const avatarMap = await resolveAvatarMap(avatarUsers, profiles);
     const statuses = await Promise.all((posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'))
@@ -1530,7 +1533,22 @@ router.get('/status', async (req, res) => {
         return { ...p, media_url, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: avatarMap.get(String(p.user_id)) || null } };
       }));
     const last = wallet?.free_status_last_used_at ? new Date(wallet.free_status_last_used_at).getTime() : 0;
-    res.json({ success: true, statuses, allowance: { freeAvailable: !last || Date.now() - last >= 86400000, freeLastUsedAt: wallet?.free_status_last_used_at || null, paidCredits: wallet?.paid_status_credits || 0 } });
+    const planCode = plans?.[0]?.plan_code || 'free';
+    const limit = planCode === 'plus' ? 3 : planCode === 'pro' ? 100 : 1;
+    const used = (posts || []).filter(p => String(p.user_id) === String(req.user.id) && new Date(p.created_at).getTime() > now.getTime() - 86400000).length;
+    const remaining = Math.max(0, limit - used);
+    res.set('Cache-Control','no-store');
+    res.json({
+      success: true,
+      statuses,
+      allowance: {
+        planCode, limit, used, remaining,
+        freeAvailable: remaining > 0,
+        freeLastUsedAt: wallet?.free_status_last_used_at || null,
+        paidCredits: wallet?.paid_status_credits || 0,
+        planExpiresAt: plans?.[0]?.expires_at || null,
+      }
+    });
   } catch (error) { return handleDbError(res, error, 'Status list error:'); }
 });
 
@@ -1562,10 +1580,34 @@ router.post('/status', statusLimiter, async (req, res) => {
 
 router.get('/status/credits', async (req, res) => {
   try {
-    const { data, error } = await supabase.from('recovery_chat_status_wallets').select('free_status_last_used_at,paid_status_credits').eq('user_id', req.user.id).maybeSingle();
-    if (error) throw error;
-    const last = data?.free_status_last_used_at ? new Date(data.free_status_last_used_at).getTime() : 0;
-    res.json({ success: true, freeAvailable: !last || Date.now() - last >= 86400000, freeLastUsedAt: data?.free_status_last_used_at || null, paidCredits: data?.paid_status_credits || 0, extraCreditsPriceKes: 100, creditsPerPurchase: 2 });
+    const now = new Date();
+    const since = new Date(now.getTime() - 86400000).toISOString();
+    const [{ data: wallet, error: walletError }, { data: plans, error: planError }, { count: used, error: countError }] = await Promise.all([
+      supabase.from('recovery_chat_status_wallets').select('free_status_last_used_at,paid_status_credits').eq('user_id', req.user.id).maybeSingle(),
+      supabase.from('recovery_chat_plan_purchases').select('plan_code,expires_at').eq('user_id', req.user.id).eq('status','paid').gt('expires_at',now.toISOString()).in('plan_code',['plus','pro']).order('expires_at',{ascending:false}).limit(1),
+      supabase.from('recovery_chat_status_posts').select('id',{count:'exact',head:true}).eq('user_id',req.user.id).gt('created_at',since),
+    ]);
+    if (walletError) throw walletError;
+    if (planError) throw planError;
+    if (countError) throw countError;
+    const planCode = plans?.[0]?.plan_code || 'free';
+    const limit = planCode === 'plus' ? 3 : planCode === 'pro' ? 100 : 1;
+    const usedToday = Number(used || 0);
+    const remaining = Math.max(0, limit - usedToday);
+    res.set('Cache-Control','no-store');
+    res.json({
+      success: true,
+      planCode,
+      limit,
+      used: usedToday,
+      remaining,
+      freeAvailable: remaining > 0,
+      freeLastUsedAt: wallet?.free_status_last_used_at || null,
+      paidCredits: wallet?.paid_status_credits || 0,
+      extraCreditsPriceKes: 100,
+      creditsPerPurchase: 2,
+      planExpiresAt: plans?.[0]?.expires_at || null,
+    });
   } catch (error) { return handleDbError(res, error, 'Status credits error:'); }
 });
 
