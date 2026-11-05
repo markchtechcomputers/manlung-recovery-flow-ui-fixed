@@ -257,45 +257,69 @@ router.get('/total', async (_req, res) => {
   }
 });
 
-// Admin dashboard: totals plus recent confirmed donations.
+// Authenticated donor history. A signed-in account can only see donations
+// created with the same verified account email.
+router.get('/history', auth, async (req, res) => {
+  try {
+    const email = String(req.user?.email || '').trim().toLowerCase();
+    if (!email) return res.status(400).json({ success:false, error:'Your account does not have a verified email address.' });
+    const { data, error } = await supabase.from(TABLE)
+      .select('reference,donor_name,amount_kes,status,paid_at,created_at')
+      .eq('donor_email', email)
+      .order('created_at', { ascending:false })
+      .limit(100);
+    if (error) throw error;
+    res.set('Cache-Control','no-store');
+    res.json({ success:true, donations:data||[] });
+  } catch (error) {
+    console.error('Donor history error:', error);
+    res.status(500).json({ success:false, error:'Could not load your donation history.' });
+  }
+});
+
+// Receipt data is available only to the authenticated donor after confirmation.
+router.get('/receipt/:reference', auth, async (req, res) => {
+  try {
+    const email = String(req.user?.email || '').trim().toLowerCase();
+    const reference = String(req.params.reference || '').trim();
+    if (!email || !reference || reference.length > 120) return res.status(400).json({ success:false, error:'A valid donation reference is required.' });
+    const { data, error } = await supabase.from(TABLE)
+      .select('reference,donor_name,donor_email,amount_kes,status,paid_at,created_at')
+      .eq('reference', reference)
+      .eq('donor_email', email)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ success:false, error:'Donation receipt not found for this account.' });
+    if (data.status !== 'confirmed') return res.status(409).json({ success:false, pending:true, status:data.status, error:'A receipt will be available after Paystack confirms the donation.' });
+    res.set('Cache-Control','no-store');
+    res.json({ success:true, receipt:{ ...data, currency:'KES', receiptNumber:data.reference } });
+  } catch (error) {
+    console.error('Donation receipt error:', error);
+    res.status(500).json({ success:false, error:'Could not load the donation receipt.' });
+  }
+});
+
+// Admin dashboard: confirmed totals plus recent donations in every payment state.
 router.get('/admin', adminAuth, async (_req, res) => {
   try {
-    let { data: confirmedRows, error: confirmedError } = await supabase
-      .from(TABLE)
-      .select('reference, donor_name, donor_email, amount_kes, status, paid_at, created_at')
-      .eq('status', 'confirmed')
-      .order('paid_at', { ascending: false, nullsFirst: false })
-      .order('created_at', { ascending: false })
-      .limit(1);
-
-    // Older databases may not have donor_name yet. Keep the dashboard usable
-    // while the migration is being applied.
-    if (confirmedError && /donor_name|column .* does not exist|PGRST204/i.test(String(confirmedError.message || confirmedError.details || ''))) {
-      ({ data: confirmedRows, error: confirmedError } = await supabase
-        .from(TABLE)
-        .select('reference, donor_email, amount_kes, status, paid_at, created_at')
-        .eq('status', 'confirmed')
-        .order('paid_at', { ascending: false, nullsFirst: false })
-        .order('created_at', { ascending: false })
-        .limit(100));
-    }
-    if (confirmedError) throw confirmedError;
-
-    const { data: totalsRows, error: totalsError } = await supabase
-      .from(TABLE)
-      .select('amount_kes')
-      .eq('status', 'confirmed');
-    if (totalsError) throw totalsError;
-
-    const rows = confirmedRows || [];
-    const totalKes = (totalsRows || [])
-      .reduce((sum, row) => sum + Number(row.amount_kes || 0), 0);
-    const confirmedCount = (totalsRows || []).length;
-
-    res.json({ success: true, totalKes, confirmedCount, donations: rows });
+    const { data, error } = await supabase.from(TABLE)
+      .select('reference,donor_name,donor_email,amount_kes,status,paid_at,created_at')
+      .order('created_at', { ascending:false })
+      .limit(250);
+    if (error) throw error;
+    const donations = data || [];
+    const confirmed = donations.filter(x => x.status === 'confirmed');
+    const totalKes = confirmed.reduce((sum, row) => sum + Number(row.amount_kes || 0), 0);
+    const counts = donations.reduce((out, row) => {
+      const status = String(row.status || 'pending');
+      out[status] = (out[status] || 0) + 1;
+      return out;
+    }, { pending:0, confirmed:0, failed:0 });
+    res.set('Cache-Control','no-store');
+    res.json({ success:true, totalKes, confirmedCount:counts.confirmed, counts, donations });
   } catch (error) {
     console.error('Admin donations error:', error);
-    res.status(500).json({ error: 'Could not load donations.' });
+    res.status(500).json({ error:'Could not load donations.' });
   }
 });
 
