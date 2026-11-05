@@ -87,3 +87,10 @@ test('owner reassignment validates the target administrator and records assignme
   assert.match(cases, /assigned_by_user_id: req\.user\.id/);
   assert.match(cases, /source:'owner_reassign'/);
 });
+
+test('evidence upload and delete actions are written to the durable audit table', () => {
+  assert.match(cases, /async function recordEvidenceAudit\(/);
+  assert.match(cases, /recovery_evidence_audit_log/);
+  assert.match(cases, /action,\s*actor_user_id/);
+  assert.match(cases, /action:'delete'/);
+});
