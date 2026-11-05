@@ -33,13 +33,13 @@ html.dark{--bg:#0a1020;--card:#111827;--line:#26364f;--text:#f8fafc;--muted:#94a
 <main class="page">
 <section class="hero"><div class="eyebrow">Security Investigation</div><h1>Link Analysis</h1><p>Generate an authorized, short-lived verification link tied to an existing Manlung Recovery case. The recipient completes the authorized four-image verification.</p></section>
 <section class="card">
-<h2>Four-Image Verification Link Generator</h2><p>Enter an existing case ID. The generated HTTPS link opens the authorized four-image verification page.</p>
+<h2>Four-Photo Recovered Evidence Link</h2><p>Enter the exact case ID. The recipient captures four photos within 60 seconds; the upload is attached to this case and made available to its client.</p>
 <div class="form"><label for="videoReference">Case ID</label><input id="videoReference" maxlength="120" autocomplete="off" placeholder="e.g. MRC-2026-001"></div>
 <div class="actions"><button type="button" class="btn btn-primary" id="generateVideoBtn">Generate Verification Link</button><button type="button" class="btn btn-outline" id="clearVideoBtn">Clear</button></div>
 <div class="output" id="videoOutput">Your secure verification link will appear here.</div>
 <button type="button" class="btn btn-outline" id="copyVideoBtn" disabled style="margin-top:9px">Copy Link</button>
 <div class="status" id="videoGeneratorStatus">Waiting</div>
-<div class="info"><strong>How it works:</strong> the request is short-lived and single-use. The recipient sees a clear consent screen, starts a roughly 6-second camera recording, and may allow location access so movement points can be captured during the recording. The verification page shows “Please wait…” while it checks, records and uploads, then closes itself when the browser permits it.</div>
+<div class="info"><strong>How it works:</strong> the link is tied to this exact case ID and is single-use. The recipient gives camera consent, then the page captures exactly four photos in a 60-second window and uploads them as recovered evidence. Once all four files are saved to the case, the client receives a case notification and can view the evidence in their portal. The capture page then closes automatically when the browser allows it. The link itself remains valid for up to 24 hours; the 60-second limit starts only when capture begins.</div>
 </section>
 </main>
 <script>
