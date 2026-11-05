@@ -188,6 +188,166 @@
       "dest": "/public/admin/login.html"
     },
     {
+      "src": "^/admin/connect/?$",
+      "dest": "/public/admin/connect.html"
+    },
+    {
+      "src": "^/admin/connect\\.html$",
+      "dest": "/public/admin/connect.html"
+    },
+    {
+      "src": "^/admin/control-center/?$",
+      "dest": "/public/admin/control-center.html"
+    },
+    {
+      "src": "^/admin/control-center\\.html$",
+      "dest": "/public/admin/control-center.html"
+    },
+    {
+      "src": "^/admin/dashboard/?$",
+      "dest": "/public/admin/dashboard.html"
+    },
+    {
+      "src": "^/admin/dashboard\\.html$",
+      "dest": "/public/admin/dashboard.html"
+    },
+    {
+      "src": "^/admin/index/?$",
+      "dest": "/public/admin/index.html"
+    },
+    {
+      "src": "^/admin/index\\.html$",
+      "dest": "/public/admin/index.html"
+    },
+    {
+      "src": "^/admin/investigation-notes/?$",
+      "dest": "/public/admin/investigation-notes.html"
+    },
+    {
+      "src": "^/admin/investigation-notes\\.html$",
+      "dest": "/public/admin/investigation-notes.html"
+    },
+    {
+      "src": "^/admin/login/?$",
+      "dest": "/public/admin/login.html"
+    },
+    {
+      "src": "^/admin/login\\.html$",
+      "dest": "/public/admin/login.html"
+    },
+    {
+      "src": "^/admin/music-player/?$",
+      "dest": "/public/admin/music-player.html"
+    },
+    {
+      "src": "^/admin/music-player\\.html$",
+      "dest": "/public/admin/music-player.html"
+    },
+    {
+      "src": "^/admin/music/?$",
+      "dest": "/public/admin/music.html"
+    },
+    {
+      "src": "^/admin/music\\.html$",
+      "dest": "/public/admin/music.html"
+    },
+    {
+      "src": "^/admin/operations/?$",
+      "dest": "/public/admin/operations.html"
+    },
+    {
+      "src": "^/admin/operations\\.html$",
+      "dest": "/public/admin/operations.html"
+    },
+    {
+      "src": "^/admin/owner/?$",
+      "dest": "/public/admin/owner.html"
+    },
+    {
+      "src": "^/admin/owner\\.html$",
+      "dest": "/public/admin/owner.html"
+    },
+    {
+      "src": "^/admin/register/?$",
+      "dest": "/public/admin/register.html"
+    },
+    {
+      "src": "^/admin/register\\.html$",
+      "dest": "/public/admin/register.html"
+    },
+    {
+      "src": "^/admin/reset-password/?$",
+      "dest": "/public/admin/reset-password.html"
+    },
+    {
+      "src": "^/admin/reset-password\\.html$",
+      "dest": "/public/admin/reset-password.html"
+    },
+    {
+      "src": "^/admin/reports/?$",
+      "dest": "/public/admin/reports.html"
+    },
+    {
+      "src": "^/admin/reports\\.html$",
+      "dest": "/public/admin/reports.html"
+    },
+    {
+      "src": "^/admin/tools/?$",
+      "dest": "/public/admin/tools.html"
+    },
+    {
+      "src": "^/admin/tools\\.html$",
+      "dest": "/public/admin/tools.html"
+    },
+    {
+      "src": "^/admin/tools/device-recovery/?$",
+      "dest": "/public/admin/tools/device-recovery.html"
+    },
+    {
+      "src": "^/admin/tools/device-recovery\\.html$",
+      "dest": "/public/admin/tools/device-recovery.html"
+    },
+    {
+      "src": "^/admin/tools/link-analysis/?$",
+      "dest": "/public/admin/tools/link-analysis.html"
+    },
+    {
+      "src": "^/admin/tools/link-analysis\\.html$",
+      "dest": "/public/admin/tools/link-analysis.html"
+    },
+    {
+      "src": "^/admin/tools/recovery-evidence/?$",
+      "dest": "/public/admin/tools/recovery-evidence.html"
+    },
+    {
+      "src": "^/admin/tools/recovery-evidence\\.html$",
+      "dest": "/public/admin/tools/recovery-evidence.html"
+    },
+    {
+      "src": "^/admin/tools/remote-desktop/?$",
+      "dest": "/public/admin/tools/remote-desktop.html"
+    },
+    {
+      "src": "^/admin/tools/remote-desktop\\.html$",
+      "dest": "/public/admin/tools/remote-desktop.html"
+    },
+    {
+      "src": "^/admin/tools/security/?$",
+      "dest": "/public/admin/tools/security.html"
+    },
+    {
+      "src": "^/admin/tools/security\\.html$",
+      "dest": "/public/admin/tools/security.html"
+    },
+    {
+      "src": "^/admin/tools/website-scanner/?$",
+      "dest": "/public/admin/tools/website-scanner.html"
+    },
+    {
+      "src": "^/admin/tools/website-scanner\\.html$",
+      "dest": "/public/admin/tools/website-scanner.html"
+    },
+    {
       "src": "^/admin/((?:[^./]+/)*[^./]+)/?$",
       "dest": "/public/admin/$1.html"
     },
