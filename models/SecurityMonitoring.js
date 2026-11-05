@@ -425,7 +425,7 @@ async function getCaseIntelligence(caseId) {
   if (docs.error) throw docs.error;
   const { data: row, error: caseError } = await supabase.from('recovery_cases').select('case_id,client_name,case_type,priority,status,files,created_at,last_updated').eq('case_id',caseId).maybeSingle();
   if (caseError) throw caseError;
-  const evidence = Array.isArray(row?.files) ? row.files.map((f,i)=>({ index:i, filename:f?.filename||f?.originalName||'Evidence file', path:f?.path||null, mimetype:f?.mimetype||null, size:f?.size||null, uploadedAt:f?.uploadedAt||null, uploadedBy:f?.uploadedBy||null, requestId:f?.requestId||null })) : [];
+  const evidence = Array.isArray(row?.files) ? row.files.map((f,i)=>({ index:i, filename:f?.filename||f?.originalName||'Evidence file', path:f?.path||null, mimetype:f?.mimetype||null, size:f?.size||null, sha256:f?.sha256||null, integrityAlgorithm:f?.integrityAlgorithm||null, malwareScanStatus:f?.malwareScanStatus||'not_configured', evidenceType:f?.evidenceType||null, source:f?.source||null, uploadedAt:f?.uploadedAt||null, uploadedBy:f?.uploadedBy||null, requestId:f?.requestId||null })) : [];
   return { case: row, timeline: timeline.data||[], documents: docs.data||[], evidence };
 }
 
