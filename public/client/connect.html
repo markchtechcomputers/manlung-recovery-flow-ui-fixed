@@ -1349,8 +1349,8 @@ function schedulePeerIceRestart(reason){
    const offer=await rtc.pc.createOffer({iceRestart:true});
    await rtc.pc.setLocalDescription(offer);
    await signal('offer',rtc.pc.localDescription.toJSON());
-  }catch(error){note(error);if(rtc.reconnectAttempts>=3)endCall(true);else schedulePeerIceRestart('failed')}
-  finally{rtc.reconnectInFlight=false}
+  }catch(error){note(error);if(rtc.reconnectAttempts>=3)endCall(true)}
+  finally{rtc.reconnectInFlight=false;if(!rtc.closed&&rtc.reconnectAttempts<3&&rtc.pc?.connectionState!=='connected'&&!rtc.reconnectTimer&&rtc.reconnectAttempts>0&&rtc.pc?.signalingState!=='closed')schedulePeerIceRestart('failed')}
  },delay)
 }
 async function poll(){
