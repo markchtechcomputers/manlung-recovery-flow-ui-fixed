@@ -1547,11 +1547,12 @@ router.get('/status', async (req, res) => {
     const [{ data: profiles, error: pe }, { data: wallet, error: we }, { data: avatarUsers, error: avatarError }, { data: plans, error: planError }] = await Promise.all([
       users.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility,status_visibility').in('user_id', users) : Promise.resolve({ data: [], error: null }),
       supabase.from('recovery_chat_status_wallets').select('free_status_last_used_at,paid_status_credits').eq('user_id', req.user.id).maybeSingle(),
-      users.length ? supabase.from('recovery_users').select('id,avatar_path').in('id', users) : Promise.resolve({ data: [], error: null }),
+      users.length ? supabase.from('recovery_users').select('id,username,avatar_path').in('id', users) : Promise.resolve({ data: [], error: null }),
       supabase.from('recovery_chat_plan_purchases').select('plan_code,expires_at').eq('user_id',req.user.id).eq('status','paid').gt('expires_at',now.toISOString()).in('plan_code',['plus','pro']).order('expires_at',{ascending:false}).limit(1),
     ]);
     if (pe) throw pe; if (we) throw we; if (avatarError) throw avatarError; if (planError) throw planError;
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
+    const statusUserMap = new Map((avatarUsers || []).map(u => [String(u.id), u]));
     const avatarMap = await resolveAvatarMap(avatarUsers, profiles);
     const statuses = await Promise.all((posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || (!blockedIds.has(p.user_id) && profileMap.get(p.user_id)?.status_visibility !== 'nobody')))
       .map(async p => {
@@ -1561,7 +1562,7 @@ router.get('/status', async (req, res) => {
           if (se) console.error('Could not sign status media URL:', se.message);
           else media_url = signed?.signedUrl || null;
         }
-        return { ...p, media_url, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: avatarMap.get(String(p.user_id)) || null } };
+        return { ...p, media_url, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || statusUserMap.get(String(p.user_id))?.username || 'Member', avatar: avatarMap.get(String(p.user_id)) || null } };
       }));
     const last = wallet?.free_status_last_used_at ? new Date(wallet.free_status_last_used_at).getTime() : 0;
     const planCode = plans?.[0]?.plan_code || 'free';
