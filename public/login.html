@@ -1639,6 +1639,8 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-visib
               style="letter-spacing:.35em;text-align:center;font-size:1.25rem;font-weight:700;"
             >
           </div>
+          <button type="button" class="btn" style="width:100%;margin-top:4px;" onclick="openOtpInbox()">Open email inbox</button>
+          <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="pasteOtpFromClipboard()">Paste code from clipboard</button>
           <button type="submit" class="btn btn-primary manlung-auth-primary">
             <i class="fas fa-shield-halved" aria-hidden="true"></i> Verify Email
           </button>
@@ -1773,6 +1775,8 @@ let clientTurnstileRetryButton = null;
 let clientRegisterTurnstileRetryButton = null;
 let clientTurnstileSetupPromise = null;
 let clientTurnstileSetupError = null;
+let clientLoginSubmitPending = false;
+let clientRegisterSubmitPending = false;
 
 function loadClientTurnstileApi() {
   if (window.turnstile) return Promise.resolve(window.turnstile);
@@ -1850,16 +1854,22 @@ function renderClientTurnstile(api) {
     appearance: 'always',
     'error-callback': (code) => {
       console.warn('Cloudflare Turnstile challenge error:', code || 'unknown');
+      clientLoginSubmitPending = false;
       showMessage(document.getElementById('loginError'), 'Cloudflare security verification could not complete. Check your connection, then retry the security check.');
       setTurnstileRetryVisible(true);
     },
     'expired-callback': () => {
+      clientLoginSubmitPending = false;
       showMessage(document.getElementById('loginError'), 'Security verification expired. Please complete it again.');
       setTurnstileRetryVisible(false);
     },
     callback: () => {
       showMessage(document.getElementById('loginError'), '');
       setTurnstileRetryVisible(false);
+      if (clientLoginSubmitPending) {
+        clientLoginSubmitPending = false;
+        document.getElementById('loginForm')?.requestSubmit();
+      }
     }
   });
 }
@@ -1905,16 +1915,22 @@ function renderClientRegisterTurnstile(api) {
     appearance: 'always',
     'error-callback': (code) => {
       console.warn('Cloudflare registration Turnstile challenge error:', code || 'unknown');
+      clientRegisterSubmitPending = false;
       showMessage(document.getElementById('registerError'), 'Cloudflare security verification could not complete. Check your connection, then retry the security check.');
       setRegisterTurnstileRetryVisible(true);
     },
     'expired-callback': () => {
+      clientRegisterSubmitPending = false;
       showMessage(document.getElementById('registerError'), 'Security verification expired. Please complete it again.');
       setRegisterTurnstileRetryVisible(false);
     },
     callback: () => {
       showMessage(document.getElementById('registerError'), '');
       setRegisterTurnstileRetryVisible(false);
+      if (clientRegisterSubmitPending) {
+        clientRegisterSubmitPending = false;
+        document.getElementById('registerForm')?.requestSubmit();
+      }
     }
   });
 }
@@ -1953,6 +1969,19 @@ async function setupClientTurnstile() {
 }
 document.addEventListener('DOMContentLoaded', () => {
   clientTurnstileSetupPromise = setupClientTurnstile();
+  clientTurnstileSetupPromise.then(() => {
+    if (!clientTurnstileEnabled) return;
+    const warmOnIntent = () => {
+      if (!clientTurnstileApi && !clientTurnstileApiPromise) {
+        loadClientTurnstileApi().then(api => { clientTurnstileApi = api; })
+          .catch(error => console.info('Turnstile will retry when needed:', error?.message || error));
+      }
+    };
+    ['loginEmail','loginPassword','regName','regEmail'].forEach(id => {
+      document.getElementById(id)?.addEventListener('focus', warmOnIntent, { once: true });
+    });
+    if (['loginEmail','loginPassword','regName','regEmail'].includes(document.activeElement?.id)) warmOnIntent();
+  });
 });
 
 async function ensureClientLoginTurnstile() {
@@ -1964,14 +1993,22 @@ async function ensureClientLoginTurnstile() {
     }
     return true;
   }
-  if (clientTurnstileWidget !== null) return true;
+  if (clientTurnstileWidget !== null) {
+    const token = window.turnstile?.getResponse(clientTurnstileWidget);
+    if (token) return true;
+    clientLoginSubmitPending = true;
+    showMessage(document.getElementById('loginError'), 'Complete the security check. Sign in will continue automatically.', 'info');
+    return false;
+  }
   try {
     const api = clientTurnstileApi || await loadClientTurnstileApi();
     clientTurnstileApi = api;
+    clientLoginSubmitPending = true;
     renderClientTurnstile(api);
-    showMessage(document.getElementById('loginError'), 'Complete the security check, then press Sign In again.', 'info');
+    showMessage(document.getElementById('loginError'), 'Complete the security check. Sign in will continue automatically.', 'info');
   } catch (error) {
-    showMessage(document.getElementById('loginError'), error?.message || 'Security verification could not be loaded. You can still use Google sign-in.');
+    clientLoginSubmitPending = false;
+    showMessage(document.getElementById('loginError'), error?.message || 'Cloudflare security verification could not be loaded. Retry the security check.');
     setTurnstileRetryVisible(true);
   }
   return false;
@@ -1999,9 +2036,11 @@ async function handleLogin(event) {
     const turnstileToken = clientTurnstileEnabled && window.turnstile && clientTurnstileWidget !== null
       ? window.turnstile.getResponse(clientTurnstileWidget) : null;
     if (clientTurnstileEnabled && !turnstileToken) {
-      showMessage(errorEl,'Please complete the Cloudflare security verification.');
+      clientLoginSubmitPending = true;
+      showMessage(errorEl,'Complete the security check. Sign in will continue automatically.','info');
       return;
     }
+    clientLoginSubmitPending = false;
     const res=await fetch('/api/auth/client/login',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -2136,6 +2175,46 @@ async function getManlungSupabaseClient() {
   return manlungOtpSupabase;
 }
 
+function openOtpInbox() {
+  const domain = (manlungOtpEmail.split('@')[1] || '').toLowerCase();
+  const inbox = /^(gmail\.com|googlemail\.com)$/.test(domain) ? 'https://mail.google.com/'
+    : /^(outlook\.com|hotmail\.com|live\.com|msn\.com)$/.test(domain) ? 'https://outlook.live.com/mail/'
+    : /^(yahoo\.com|ymail\.com)$/.test(domain) ? 'https://mail.yahoo.com/'
+    : /^icloud\.com$/.test(domain) ? 'https://www.icloud.com/mail/'
+    : 'mailto:' + encodeURIComponent(manlungOtpEmail);
+  window.open(inbox, '_blank', 'noopener,noreferrer');
+  document.getElementById('emailOtpCode')?.focus();
+}
+
+async function pasteOtpFromClipboard() {
+  const input = document.getElementById('emailOtpCode');
+  const errorEl = document.getElementById('emailOtpError');
+  try {
+    if (!navigator.clipboard?.readText) throw new Error('Clipboard access is not available in this browser.');
+    const value = (await navigator.clipboard.readText()).replace(/\D/g, '').slice(0, 8);
+    if (!/^\d{8}$/.test(value)) throw new Error('Your clipboard does not contain an 8-digit code. Copy the code from your email first.');
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus();
+    showMessage(errorEl, 'Code pasted. Tap Verify Email to continue.', 'success');
+  } catch (error) {
+    input?.focus();
+    showMessage(errorEl, error?.message || 'Copy the code from your email, return here, then paste it into the box.');
+  }
+}
+
+function notifyOtpSent() {
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    try {
+      new Notification('Manlung Recovery', {
+        body: 'Your verification code was sent. Open your email and paste the 8-digit code here.',
+        icon: '/icons/icon-192.png',
+        tag: 'manlung-email-otp'
+      });
+    } catch (_) {}
+  }
+}
+
 function showEmailOtpPanel(email) {
   manlungOtpEmail = String(email || '').trim().toLowerCase();
   document.getElementById('loginPanel').hidden = true;
@@ -2146,8 +2225,9 @@ function showEmailOtpPanel(email) {
   document.getElementById('tabRegister').classList.remove('active');
   document.getElementById('emailOtpDescription').textContent =
     'We sent an 8-digit Manlung Recovery verification code to ' +
-    manlungOtpEmail.replace(/^(.{2}).*(@.*)$/, '$1••••$2') + '.';
-  document.getElementById('emailOtpCode').focus();
+    manlungOtpEmail.replace(/^(.{2}).*(@.*)$/, '$1••••$2') + '. Open your inbox, copy the code, then return here.';
+  const codeInput = document.getElementById('emailOtpCode');
+  codeInput?.focus();
 }
 
 async function sendEmailOtp(isResend=false) {
@@ -2175,10 +2255,11 @@ async function sendEmailOtp(isResend=false) {
     showMessage(
       errorEl,
       isResend
-        ? 'A new Manlung Recovery verification code has been sent to your email.'
-        : 'Verification code sent. Check your email inbox.',
+        ? 'A new Manlung Recovery verification code has been sent. Open your inbox and use Paste code.'
+        : 'Verification code sent. Open your inbox, copy the code, then use Paste code.',
       'success'
     );
+    notifyOtpSent();
   } catch (err) {
     console.error('Email OTP send error:', err);
     showMessage(errorEl, err.message || 'Could not send the email verification code.');
@@ -2266,9 +2347,11 @@ async function handleRegister(event) {
   const turnstileToken = clientTurnstileEnabled && window.turnstile && clientRegisterTurnstileWidget !== null
     ? window.turnstile.getResponse(clientRegisterTurnstileWidget) : null;
   if (clientTurnstileEnabled && !turnstileToken) {
-    showMessage(errorEl, 'Please complete the Cloudflare security check before creating your account.');
+    clientRegisterSubmitPending = true;
+    showMessage(errorEl, 'Complete the security check. Account creation will continue automatically.', 'info');
     return;
   }
+  clientRegisterSubmitPending = false;
   if(password.length < 12 || password.length > 72){ showMessage(errorEl,'Password must be between 12 and 72 characters.'); return; }
   if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,72}$/.test(password)){ showMessage(errorEl,'Password must include uppercase and lowercase letters, a number, and a special character.'); return; }
   if(password !== passwordConfirm){ showMessage(errorEl,'Passwords do not match.'); return; }
