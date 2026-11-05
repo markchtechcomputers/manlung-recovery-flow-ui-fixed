@@ -146,9 +146,14 @@ const allowedOrigins = String(process.env.ALLOWED_ORIGINS || '')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-const effectiveAllowedOrigins = allowedOrigins.length
-  ? allowedOrigins
-  : defaultAllowedOrigins;
+const vercelDeploymentOrigin = process.env.VERCEL_URL
+  ? `https://${String(process.env.VERCEL_URL).replace(/^https?:\\/\\//i, '').replace(/\\/$/, '')}`
+  : null;
+
+const effectiveAllowedOrigins = [...new Set([
+  ...(allowedOrigins.length ? allowedOrigins : defaultAllowedOrigins),
+  vercelDeploymentOrigin,
+].filter(Boolean))];
 
 app.use(cors({
   origin: (origin, callback) => {
