@@ -1532,6 +1532,83 @@ router.get(
 
 
 
+// Client: export a privacy-safe case report with public timeline and conversation.
+router.get('/client/case/:caseId/export', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ success:false, error:'Client access required.' });
+    const caseId = String(req.params.caseId || '').trim();
+    const row = await Case.findByCaseId(caseId);
+    if (!row || String(row.client_user_id || '') !== String(req.user.id)) return res.status(404).json({ success:false, error:'Case not found.' });
+    const [timeline, messagesResult] = await Promise.all([
+      CaseTimeline.listForCase(caseId),
+      supabase.from('case_messages').select('sender_user_id,message,created_at')
+        .eq('case_id',caseId).order('created_at',{ascending:true}).limit(500),
+    ]);
+    if (messagesResult.error) throw messagesResult.error;
+    const safeEvents = (timeline || []).filter(item => [
+      'status_changed','investigator_changed','assignment_changed','evidence_uploaded','case_reopened','case_closed','client_feedback_submitted'
+    ].includes(String(item.event_type || '')));
+    const rows = [
+      ['Report','Manlung Recovery case report'],
+      ['Case ID',row.case_id],
+      ['Case type',row.case_type],
+      ['Status',row.status],
+      ['Priority',row.priority],
+      ['Created',row.created_at],
+      ['Last updated',row.last_updated],
+      ['Public update',row.public_notes || ''],
+      [],
+      ['Timeline date','Timeline event','Details'],
+      ...safeEvents.map(item => [item.created_at,item.event_type,item.description]),
+      [],
+      ['Conversation date','Sender','Message'],
+      ...(messagesResult.data || []).map(item => [item.created_at,String(item.sender_user_id)===String(req.user.id)?'You':'Manlung Recovery',item.message]),
+    ];
+    const csv = rows.map(row => row.map(value => {
+      const text = String(value == null ? '' : value).replace(/"/g,'""');
+      return /[",\n]/.test(text) ? '"'+text+'"' : text;
+    }).join(',')).join('\n');
+    res.setHeader('Content-Type','text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition',`attachment; filename="manlung-case-${String(row.case_id).replace(/[^a-zA-Z0-9_-]/g,'_')}.csv"`);
+    res.setHeader('Cache-Control','no-store');
+    return res.send(csv);
+  } catch (error) {
+    console.error('Client case export error:',error);
+    return res.status(500).json({ success:false, error:'Could not export this case report.' });
+  }
+});
+
+// Client: submit one satisfaction rating after a case is finished.
+router.post('/client/case/:caseId/feedback', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') return res.status(403).json({ success:false, error:'Client access required.' });
+    const caseId = String(req.params.caseId || '').trim();
+    const row = await Case.findByCaseId(caseId);
+    if (!row || String(row.client_user_id || '') !== String(req.user.id)) return res.status(404).json({ success:false, error:'Case not found.' });
+    if (!Case.FINISHED_STATUSES.includes(row.status)) return res.status(409).json({ success:false, error:'Feedback is available after the case is completed.' });
+    const rating = Number(req.body?.rating);
+    const feedback = String(req.body?.feedback || '').trim();
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5 || feedback.length > 1000) return res.status(400).json({ success:false, error:'Choose a 1–5 rating and keep feedback under 1,000 characters.' });
+    const { data, error } = await supabase.from('recovery_case_feedback')
+      .insert({ case_id:caseId, user_id:req.user.id, rating, feedback })
+      .select('id,case_id,rating,created_at').single();
+    if (error?.code === '23505') return res.status(409).json({ success:false, error:'Feedback has already been submitted for this case.' });
+    if (error) throw error;
+    try {
+      await CaseTimeline.create({ caseId, actorUserId:req.user.id, eventType:'client_feedback_submitted', description:`Client submitted a ${rating}/5 satisfaction rating.`, metadata:{ rating } });
+      const recipients = await User.listAdminsAndOwner();
+      await Promise.all((recipients || []).filter(user=>user?.id&&user.admin_status!=='suspended').map(user=>Notification.create({
+        userId:user.id,caseId,type:'case_feedback_received',title:'Client feedback received',
+        message:`Case ${caseId} received a ${rating}/5 satisfaction rating.`,
+      })));
+    } catch (notifyError) { console.error('Case feedback notification failed:',notifyError?.message||notifyError); }
+    return res.status(201).json({ success:true, feedback:data });
+  } catch (error) {
+    console.error('Client case feedback error:',error);
+    return res.status(500).json({ success:false, error:'Could not submit case feedback.' });
+  }
+});
+
 // ============================================================
 // Client: Delete Own Case
 // ============================================================
