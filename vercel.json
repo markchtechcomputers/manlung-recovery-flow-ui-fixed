@@ -156,7 +156,7 @@
       "dest": "/api/auth-github.js"
     },
     {
-      "src": "/oauth-callback(?:\\\\.html)?",
+      "src": "^/oauth-callback(?:\\.html)?$",
       "dest": "/public/oauth-callback.html"
     },
     {
@@ -188,6 +188,10 @@
       "dest": "/public/admin/login.html"
     },
     {
+      "src": "^/admin/((?:[^./]+/)*[^./]+)/?$",
+      "dest": "/public/admin/$1.html"
+    },
+    {
       "src": "/admin/(.*)",
       "dest": "/public/admin/$1"
     },
@@ -201,6 +205,14 @@
     {
       "src": "^/client/connect/?$",
       "dest": "/public/client/connect.html"
+    },
+    {
+      "src": "^/$",
+      "dest": "/public/index.html"
+    },
+    {
+      "src": "^/((?:[^./]+/)*[^./]+)/?$",
+      "dest": "/public/$1.html"
     },
     {
       "src": "/(.*)",
