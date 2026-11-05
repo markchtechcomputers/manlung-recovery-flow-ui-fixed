@@ -175,13 +175,12 @@ test('nested admin HTML pages have explicit clean and .html routes', () => {
 test('Link Analysis generators create deployment-relative canonical verification links', () => {
   const tools = fs.readFileSync(path.join(root, 'public/admin/tools.html'), 'utf8');
   const standalone = fs.readFileSync(path.join(root, 'public/admin/tools/link-analysis.html'), 'utf8');
-  const canonical = /new URL\\('\/verification\/'\\s*\\+\\s*encodeURIComponent\\(d\\.request\\.token\\),\\s*window\\.location\\.origin\\)\\.href/;
-  assert.match(tools, canonical);
-  assert.match(standalone, canonical);
-  assert.doesNotMatch(tools, /https:\\/\\/manlungrecovery\\.manlungshop\\.co\\.ke\\/verification\\//);
-  assert.doesNotMatch(standalone, /selfie\\.html\\?id=/);
+  const canonical = "new URL('/verification/'+encodeURIComponent(d.request.token),window.location.origin).href";
+  assert.ok(tools.includes(canonical));
+  assert.ok(standalone.includes(canonical));
+  assert.ok(!tools.includes('https://manlungrecovery.manlungshop.co.ke/verification/'));
+  assert.ok(!standalone.includes('selfie.html?id='));
 });
-
 test('verification token route resolves to the public selfie page before static fallback', () => {
   const index = vercel.routes.findIndex(item => item.src === '^/verification/([^/]+)/?$');
   const fallback = vercel.routes.findIndex(item => item.src === '/(.*)');
