@@ -33,7 +33,14 @@ test('status cards can resolve the poster name from the profile or account usern
 });
 
 test('the privacy page has an explicit clean URL route and rewrite', () => {
-  assert.match(vercel.routes, route => route.src === '^/privacy(?:\\.html)?/?$' && route.dest === '/public/privacy.html');
+  assert.ok(vercel.routes.some(route => route.src === '^/privacy(?:\\.html)?/?
+  assert.ok(vercel.rewrites.some(route => route.source === '/privacy' && route.destination === '/public/privacy'));
+});
+
+test('direct chats expose a close control that uses the shared back handler', () => {
+  assert.match(frontend, /class="ib ml-chat-close" onclick="back\(\)" aria-label="Close chat"/);
+});
+ && route.dest === '/public/privacy.html'));
   assert.ok(vercel.rewrites.some(route => route.source === '/privacy' && route.destination === '/public/privacy'));
 });
 
