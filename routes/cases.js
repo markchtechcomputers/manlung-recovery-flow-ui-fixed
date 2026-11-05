@@ -22,6 +22,18 @@ const {
   EVIDENCE_BUCKET,
 } = require('../config/supabase');
 
+// Internal operational targets only; configure the hour values per service policy.
+function caseSlaDueAt(priority, from = Date.now()) {
+  const key = String(priority || 'normal').trim().toLowerCase();
+  const envName = key === 'emergency' ? 'CASE_SLA_HOURS_EMERGENCY'
+    : key === 'urgent' ? 'CASE_SLA_HOURS_URGENT' : 'CASE_SLA_HOURS_NORMAL';
+  const fallback = key === 'emergency' ? 4 : key === 'urgent' ? 24 : 72;
+  const configured = Number(process.env[envName]);
+  const hours = Number.isFinite(configured) && configured > 0 ? configured : fallback;
+  return new Date(from + hours * 60 * 60 * 1000).toISOString();
+}
+
+
 
 
 async function recordCaseUpdateEvents({
@@ -483,6 +495,10 @@ function serializeCase(
     startedAt: row.started_at,
     completedAt: row.completed_at,
     completedBy: row.completed_by,
+    slaDueAt: row.sla_due_at || null,
+    closedAt: row.closed_at || null,
+    reopenedAt: row.reopened_at || null,
+    lastStatusChangedAt: row.last_status_changed_at || null,
   };
 
   if (includeInternal) {
@@ -1336,6 +1352,10 @@ router.post(
 
       // Requests are open worldwide, including visitors without an account.
       // Authenticated client submissions remain linked to that client account.
+      const submittedAt = new Date().toISOString();
+      caseFields.status = caseFields.status || 'Pending Review';
+      caseFields.last_status_changed_at = submittedAt;
+      caseFields.sla_due_at = caseSlaDueAt(caseFields.priority || 'normal', Date.parse(submittedAt));
       caseFields.client_user_id = req.user?.id || null;
       caseFields.email = req.user?.email || caseFields.email;
       caseFields.client_name =
@@ -2440,72 +2460,70 @@ router.post(
 
 router.post(
   '/owner/case/:caseId/reassign',
-
   ownerAuth,
-
-  [
-    body('adminId')
-      .notEmpty(),
-  ],
-
+  [body('adminId').notEmpty()],
   async (req, res) => {
-    if (!checkValidation(req, res)) {
-      return;
-    }
-
+    if (!checkValidation(req, res)) return;
     try {
-      const target =
-        await Case.findByCaseId(
-          req.params.caseId
-        );
-
-      if (!target) {
-        return res.status(404).json({
-          error: 'Case not found',
-        });
+      const existing = await Case.findByCaseId(req.params.caseId);
+      if (!existing) return res.status(404).json({ error:'Case not found' });
+      const targetAdmin = await User.findById(String(req.body.adminId));
+      if (!targetAdmin || targetAdmin.role !== 'admin' || targetAdmin.admin_status === 'suspended' || targetAdmin.security_status && targetAdmin.security_status !== 'active') {
+        return res.status(400).json({ error:'Choose an active administrator.' });
       }
-
-      const now =
-        new Date().toISOString();
-
-      const updated =
-        await Case.update(
-          req.params.caseId,
-          {
-            assigned_admin_id:
-              req.body.adminId,
-
-            assigned_at: now,
-
-            started_at: now,
-
-            status: 'Accepted',
-          }
-        );
-
-      res.json({
-        success: true,
-
-        case: serializeCase(
-          updated,
-          {
-            includeInternal: true,
-          }
-        ),
+      const now = new Date().toISOString();
+      const updated = await Case.update(req.params.caseId, {
+        assigned_admin_id: targetAdmin.id,
+        assigned_at: now,
+        assigned_by_user_id: req.user.id,
+        assignment_reason: String(req.body.reason || '').trim().slice(0,500) || null,
+        started_at: existing.started_at || now,
+        status: 'Accepted',
+        last_status_changed_at: existing.status === 'Accepted' ? (existing.last_status_changed_at || now) : now,
+        last_updated: now,
+        admin_read: false,
       });
+      await recordCaseUpdateEvents({ existing, updated, actorId:req.user.id, actorName:req.user.username, source:'owner_reassign' });
+      return res.json({ success:true, case:serializeCase(updated,{includeInternal:true}) });
     } catch (error) {
-      console.error(
-        'Reassign case error:',
-        error
-      );
-
-      res.status(500).json({
-        error:
-          'Could not reassign case',
-      });
+      console.error('Reassign case error:', error);
+      return res.status(500).json({ error:'Could not reassign case' });
     }
   }
 );
+
+// Owner-only reopen: completed cases return to the unassigned review queue.
+router.post('/owner/case/:caseId/reopen', ownerAuth, async (req, res) => {
+  try {
+    const existing = await Case.findByCaseId(req.params.caseId);
+    if (!existing) return res.status(404).json({ success:false, error:'Case not found.' });
+    if (!Case.FINISHED_STATUSES.includes(existing.status)) {
+      return res.status(409).json({ success:false, error:'Only a completed, closed or rejected case can be reopened.' });
+    }
+    const now = new Date().toISOString();
+    const updated = await Case.update(req.params.caseId, {
+      status:'Pending Review',
+      assigned_admin_id:null,
+      assigned_at:null,
+      assigned_by_user_id:req.user.id,
+      assignment_reason:'Case reopened by Owner',
+      started_at:null,
+      completed_at:null,
+      completed_by:null,
+      closed_at:null,
+      reopened_at:now,
+      last_status_changed_at:now,
+      sla_due_at:caseSlaDueAt(existing.priority || 'normal', Date.parse(now)),
+      last_updated:now,
+      admin_read:false,
+    });
+    await recordCaseUpdateEvents({ existing, updated, actorId:req.user.id, actorName:req.user.username, source:'owner_reopen' });
+    return res.json({ success:true, case:serializeCase(updated,{includeInternal:true}) });
+  } catch (error) {
+    console.error('Reopen case error:', error);
+    return res.status(500).json({ success:false, error:'Could not reopen case.' });
+  }
+});
 
 
 // ============================================================
