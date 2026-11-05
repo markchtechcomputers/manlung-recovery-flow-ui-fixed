@@ -626,14 +626,14 @@
 
   function cleanAIFormatting(value){
     return String(value||'')
-      .replace(/^\\s{0,3}#{1,6}\\s*/gm,'')
-      .replace(/\\*{2,}([^*]+)\\*{2,}/g,'$1')
-      .replace(/\\*([^*\\n]+)\\*/g,'$1')
+      .replace(/^\s{0,3}#{1,6}\s*/gm,'')
+      .replace(/\*{2,}([^*]+)\*{2,}/g,'$1')
+      .replace(/\*([^*\n]+)\*/g,'$1')
       .replace(/_{2}([^_]+)_{2}/g,'$1')
-      .replace(/`{1,3}/g,'')
-      .replace(/^\\s*[-*]\\s+/gm,'• ')
-      .replace(/^\\s*#{1,6}\\s*$/gm,'')
-      .replace(/\\*{2,}/g,'')
+      .replace(/\x60{1,3}/g,'')
+      .replace(/^\s*[-*]\s+/gm,'• ')
+      .replace(/^\s*#{1,6}\s*$/gm,'')
+      .replace(/\*{2,}/g,'')
       .trim();
   }
 
