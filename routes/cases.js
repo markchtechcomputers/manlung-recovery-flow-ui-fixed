@@ -25,9 +25,11 @@ const {
 // Internal operational targets only; configure the hour values per service policy.
 function caseSlaDueAt(priority, from = Date.now()) {
   const key = String(priority || 'normal').trim().toLowerCase();
-  const envName = key === 'emergency' ? 'CASE_SLA_HOURS_EMERGENCY'
-    : key === 'urgent' ? 'CASE_SLA_HOURS_URGENT' : 'CASE_SLA_HOURS_NORMAL';
-  const fallback = key === 'emergency' ? 4 : key === 'urgent' ? 24 : 72;
+  const tier = ['emergency','critical'].includes(key) ? 'emergency'
+    : ['urgent','high'].includes(key) ? 'urgent' : 'normal';
+  const envName = tier === 'emergency' ? 'CASE_SLA_HOURS_EMERGENCY'
+    : tier === 'urgent' ? 'CASE_SLA_HOURS_URGENT' : 'CASE_SLA_HOURS_NORMAL';
+  const fallback = tier === 'emergency' ? 4 : tier === 'urgent' ? 24 : 72;
   const configured = Number(process.env[envName]);
   const hours = Number.isFinite(configured) && configured > 0 ? configured : fallback;
   return new Date(from + hours * 60 * 60 * 1000).toISOString();
