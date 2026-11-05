@@ -13,6 +13,8 @@ const cases = read('routes/cases.js');
 const donations = read('routes/donations.js');
 const donationHistoryPage = read('public/donation-history.html');
 const donationReceiptPage = read('public/donation-receipt.html');
+const recoveryCenter = read('public/client/recovery-center.html');
+const caseFeedbackMigration = read('db/migrations/035_case_feedback.sql');
 
 test('Turnstile SDK remains lazy and server verification reuses TLS connections', () => {
   assert.match(login, /script\.src = 'https:\/\/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit'/);
@@ -93,4 +95,13 @@ test('evidence upload and delete actions are written to the durable audit table'
   assert.match(cases, /recovery_evidence_audit_log/);
   assert.match(cases, /action,\s*actor_user_id/);
   assert.match(cases, /action:'delete'/);
+});
+
+test('clients can export their own case report and submit one satisfaction rating', () => {
+  assert.match(cases, /router\.get\('\/client\/case\/:caseId\/export', auth/);
+  assert.match(cases, /router\.post\('\/client\/case\/:caseId\/feedback', auth/);
+  assert.match(cases, /recovery_case_feedback/);
+  assert.match(caseFeedbackMigration, /unique\(case_id,user_id\)/);
+  assert.match(recoveryCenter, /Export case report/);
+  assert.match(recoveryCenter, /data-feedback-submit/);
 });
