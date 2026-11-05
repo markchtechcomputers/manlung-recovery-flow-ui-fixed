@@ -302,21 +302,36 @@ router.get('/receipt/:reference', auth, async (req, res) => {
 // Admin dashboard: confirmed totals plus recent donations in every payment state.
 router.get('/admin', adminAuth, async (_req, res) => {
   try {
-    const { data, error } = await supabase.from(TABLE)
+    let { data, error } = await supabase.from(TABLE)
       .select('reference,donor_name,donor_email,amount_kes,status,paid_at,created_at')
       .order('created_at', { ascending:false })
       .limit(250);
+    if (error && /donor_name|column .* does not exist|PGRST204/i.test(String(error.message || error.details || ''))) {
+      ({ data, error } = await supabase.from(TABLE)
+        .select('reference,donor_email,amount_kes,status,paid_at,created_at')
+        .order('created_at', { ascending:false }).limit(250));
+    }
     if (error) throw error;
     const donations = data || [];
-    const confirmed = donations.filter(x => x.status === 'confirmed');
-    const totalKes = confirmed.reduce((sum, row) => sum + Number(row.amount_kes || 0), 0);
-    const counts = donations.reduce((out, row) => {
-      const status = String(row.status || 'pending');
-      out[status] = (out[status] || 0) + 1;
-      return out;
-    }, { pending:0, confirmed:0, failed:0 });
+    const counts = { pending:0, confirmed:0, failed:0 };
+    let totalKes = 0, totalCount = 0, offset = 0;
+    const pageSize = 1000;
+    while (true) {
+      const page = await supabase.from(TABLE).select('amount_kes,status')
+        .order('created_at', { ascending:true }).range(offset, offset + pageSize - 1);
+      if (page.error) throw page.error;
+      const rows = page.data || [];
+      totalCount += rows.length;
+      for (const row of rows) {
+        const status = String(row.status || 'pending');
+        counts[status] = (counts[status] || 0) + 1;
+        if (status === 'confirmed') totalKes += Number(row.amount_kes || 0);
+      }
+      if (rows.length < pageSize) break;
+      offset += pageSize;
+    }
     res.set('Cache-Control','no-store');
-    res.json({ success:true, totalKes, confirmedCount:counts.confirmed, counts, donations });
+    res.json({ success:true, totalKes, totalCount, confirmedCount:counts.confirmed, counts, donations });
   } catch (error) {
     console.error('Admin donations error:', error);
     res.status(500).json({ error:'Could not load donations.' });
