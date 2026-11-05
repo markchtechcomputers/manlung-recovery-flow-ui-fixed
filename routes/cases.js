@@ -3129,6 +3129,7 @@ router.post(
           files,
         }
       );
+      await recordEvidenceAudit({ caseId, file:fileMeta, actorUserId:req.user.id, actorRole:req.user.role, category:'admin-upload' });
 
       const {
         data,
@@ -3184,6 +3185,7 @@ router.delete('/admin/case/:caseId/file', ownerAuth, async (req, res) => {
     const { error } = await supabase.storage.from(EVIDENCE_BUCKET).remove([requestedPath]);
     if (error) throw error;
     await Case.update(caseId, { files: files.filter((file) => file?.path !== requestedPath) });
+    await recordEvidenceAudit({ caseId, file:target, action:'delete', actorUserId:req.user.id, actorRole:req.user.role, category:target.evidenceType || 'evidence' });
     res.json({ success: true, message: 'Case evidence file deleted by Owner.' });
   } catch (error) {
     console.error('Delete case evidence file error:', error);
