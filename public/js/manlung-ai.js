@@ -624,6 +624,19 @@
     body.scrollTop=body.scrollHeight;
   }
 
+  function cleanAIFormatting(value){
+    return String(value||'')
+      .replace(/^\\s{0,3}#{1,6}\\s*/gm,'')
+      .replace(/\\*{2,}([^*]+)\\*{2,}/g,'$1')
+      .replace(/\\*([^*\\n]+)\\*/g,'$1')
+      .replace(/_{2}([^_]+)_{2}/g,'$1')
+      .replace(/`{1,3}/g,'')
+      .replace(/^\\s*[-*]\\s+/gm,'• ')
+      .replace(/^\\s*#{1,6}\\s*$/gm,'')
+      .replace(/\\*{2,}/g,'')
+      .trim();
+  }
+
   function classify(message) {
     const m = message.toLowerCase().trim();
     if (/\b(hi|hello|hey|good morning|good afternoon|good evening)\b/.test(m)) return 'greeting';
@@ -675,7 +688,7 @@
       const res=await fetch('/api/ai-live/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(payload)});
       if(!res.ok||!res.body)throw new Error('Live AI connection failed');
       const reader=res.body.getReader(),decoder=new TextDecoder();let buf='',answer='';
-      const consume=raw=>{const part=parseAIChunk(raw);if(part){answer+=part;onText(part);}};
+      const consume=raw=>{const part=parseAIChunk(raw);if(part){answer+=part;onText(cleanAIFormatting(answer));}};
       while(true){
         const x=await reader.read();if(x.done)break;
         buf+=decoder.decode(x.value,{stream:true});
@@ -683,14 +696,14 @@
         packets.forEach(packet=>packet.split(/\r?\n/).forEach(line=>{if(line.startsWith('data:'))consume(line.slice(5));}));
       }
       if(buf.trim())buf.split(/\r?\n/).forEach(line=>{if(line.startsWith('data:'))consume(line.slice(5));});
-      if(answer.trim())return answer.trim();
+      if(answer.trim())return cleanAIFormatting(answer);
       throw new Error('Live AI returned an empty response');
     }catch(liveError){
       console.warn('Manlung live AI failed; trying standard chat API',liveError);
       const fallback=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
       const data=await fallback.json().catch(()=>({}));
       if(!fallback.ok||!data.success||!String(data.answer||'').trim())throw new Error(data.error||'Both AI endpoints failed');
-      const answer=String(data.answer).trim();
+      const answer=cleanAIFormatting(data.answer);
       onText(answer);
       return answer;
     }
@@ -708,8 +721,8 @@
     let answer='';
     let failed=false;
     try{
-      answer=await streamBackend(message,part=>{
-        ui.bubble.textContent+=part;
+      answer=await streamBackend(message,cleaned=>{
+        ui.bubble.textContent=cleaned;
         ui.meta.textContent='Manlung AI • responding…';
         speaker.push(part);
         const body=document.getElementById('manlungAiMessages');
@@ -720,11 +733,12 @@
       console.error('Manlung AI live response error',error);
     }
     if(!answer){
-      answer=KNOWLEDGE[intent]||KNOWLEDGE.unknown;
+      answer=cleanAIFormatting(KNOWLEDGE[intent]||KNOWLEDGE.unknown);
       if(failed && intent==='unknown'){
         answer='I’m having trouble reaching the live assistant right now. You can still tell me what happened, or use New Request / Human Support below and I’ll keep the conversation focused on your next step.';
       }
     }
+    answer=cleanAIFormatting(answer);
     ui.bubble.textContent=answer;
     ui.meta.textContent=failed?'Manlung AI • offline guidance':'Manlung AI';
     speaker.finish();
