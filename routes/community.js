@@ -275,6 +275,10 @@ router.get('/messages/:memberId', async (req, res) => {
     if (passResult.error) throw passResult.error;
     if (preferenceResult.error) throw preferenceResult.error;
     const chatAccess = Boolean(friendshipResult.data?.length || passResult.data?.length);
+    if (!chatAccess) {
+      res.set('Cache-Control', 'no-store');
+      return res.json({ success: true, messages: [], chatAccess: false, chatPassOwnerId: null });
+    }
     const clearedBefore = preferenceResult.data?.cleared_before || null;
     const { data, error } = await supabase.from('recovery_community_messages')
       .select('id,sender_user_id,recipient_user_id,message,created_at,edited_at,deleted_at,reply_to_id,delivered_at,read_at')
