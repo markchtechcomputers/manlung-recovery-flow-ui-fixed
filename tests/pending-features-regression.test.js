@@ -11,6 +11,8 @@ const statusMigration = read('db/migrations/034_status_plan_priority.sql');
 const community = read('routes/community.js');
 const cases = read('routes/cases.js');
 const donations = read('routes/donations.js');
+const donationHistoryPage = read('public/donation-history.html');
+const donationReceiptPage = read('public/donation-receipt.html');
 
 test('Turnstile SDK remains lazy and server verification reuses TLS connections', () => {
   assert.match(login, /script\.src = 'https:\/\/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit'/);
@@ -62,4 +64,11 @@ test('owner donation dashboard reports pending, confirmed and failed states', ()
   assert.match(donations, /router\.get\('\/admin', adminAuth/);
   assert.match(donations, /const counts = \{ pending:0, confirmed:0, failed:0 \}/);
   assert.match(donations, /while \(true\)/);
+});
+
+test('donation history and receipt pages expose the private donor flows', () => {
+  assert.match(donationHistoryPage, /\/api\/donations\/history/);
+  assert.match(donationHistoryPage, /View receipt/);
+  assert.match(donationReceiptPage, /\/api\/donations\/receipt\//);
+  assert.match(donationReceiptPage, /window\.print\(\)/);
 });
