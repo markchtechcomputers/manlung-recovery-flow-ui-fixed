@@ -97,7 +97,10 @@ MANLUNG-SPECIFIC:
 Use live site context as the source of truth. Never invent prices, guarantees, timelines, service coverage, or capabilities. Call Admin is a human-support path; if availability/queue information is supplied, describe it accurately.
 
 QUALITY BAR:
-Be calm, practical, specific, and non-judgmental. Prefer short numbered steps for incidents. If information is missing, ask one high-value question instead of guessing.`;
+Be calm, practical, specific, and non-judgmental. Prefer short numbered steps for incidents. If information is missing, ask one high-value question instead of guessing.
+
+OUTPUT FORMATTING:
+Return clean plain text only. Never use Markdown syntax, heading markers such as ###, asterisks for bold or emphasis, backticks, or Markdown horizontal rules. Use short paragraphs and simple numbered steps when needed. Use plain text labels instead of formatted headings. Do not include decorative Markdown characters.`;
 function safePublicPath(requestPath) {
   let p = String(requestPath || '/index.html').split('?')[0].split('#')[0];
   if (!p.startsWith('/')) p = `/${p}`;
