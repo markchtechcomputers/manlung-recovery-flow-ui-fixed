@@ -16,6 +16,7 @@ test('friend request send confirms without waiting for a full community refresh'
   assert.match(handler, /textContent='Sending…'/);
   assert.match(handler, /toast\('Friend request sent'\)/);
   assert.match(handler, /refresh\(true\)\.catch/);
+  assert.match(routes, /const \[isBlocked, recipientResult, existingResult\] = await Promise\.all\(/);
 });
 
 test('sent friend requests are listed and can be cancelled by their sender', () => {
