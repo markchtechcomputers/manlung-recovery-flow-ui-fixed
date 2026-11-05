@@ -58,3 +58,12 @@ test('peer calls retry a dropped ICE connection with a fresh offer', () => {
   assert.match(callModule, /clearTimeout\(rtc\.reconnectTimer\)/,
     'call teardown must clear the reconnection timer');
 });
+
+test('peer call UI reports network quality and TURN relay availability', () => {
+  assert.match(callModule, /id="ml-peer-quality"/);
+  assert.match(callModule, /function updatePeerNetworkQuality\(\)/);
+  assert.match(callModule, /currentRoundTripTime/);
+  assert.match(callModule, /TURN relay active/);
+  assert.match(callModule, /TURN relay not configured/);
+  assert.match(callModule, /clearInterval\(rtc\.statsTimer\)/);
+});
