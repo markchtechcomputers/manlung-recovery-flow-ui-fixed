@@ -65,6 +65,24 @@ test('nested admin HTML pages have explicit clean and .html routes', () => {
 });
 
 
+
+test('Vercel clean URL rewrites serve login, settings, and client portal pages', () => {
+  const rewrites = vercel.rewrites || [];
+  const expected = [
+    ['/login', '/public/login'],
+    ['/settings', '/public/settings'],
+    ['/client/dashboard', '/public/client/dashboard'],
+    ['/client/track', '/public/client/track'],
+    ['/client/settings', '/public/client/settings'],
+    ['/client/recovery-center', '/public/client/recovery-center'],
+    ['/client/request', '/public/client/request']
+  ];
+  for (const [source, destination] of expected) {
+    assert.ok(rewrites.some(item => item.source === source && item.destination === destination),
+      'rewrite maps ' + source + ' to ' + destination);
+  }
+});
+
 test('Vercel rewrites explicitly serve all admin pages and canonical verification links', () => {
   const rewrites = vercel.rewrites || [];
   const pages = [
