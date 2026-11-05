@@ -378,5 +378,107 @@
       "src": "/(.*)",
       "dest": "/public/$1"
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/public/admin/login"
+    },
+    {
+      "source": "/admin/connect",
+      "destination": "/public/admin/connect"
+    },
+    {
+      "source": "/admin/control-center",
+      "destination": "/public/admin/control-center"
+    },
+    {
+      "source": "/admin/dashboard",
+      "destination": "/public/admin/dashboard"
+    },
+    {
+      "source": "/admin/index",
+      "destination": "/public/admin/index"
+    },
+    {
+      "source": "/admin/investigation-notes",
+      "destination": "/public/admin/investigation-notes"
+    },
+    {
+      "source": "/admin/login",
+      "destination": "/public/admin/login"
+    },
+    {
+      "source": "/admin/music-player",
+      "destination": "/public/admin/music-player"
+    },
+    {
+      "source": "/admin/music",
+      "destination": "/public/admin/music"
+    },
+    {
+      "source": "/admin/operations",
+      "destination": "/public/admin/operations"
+    },
+    {
+      "source": "/admin/owner",
+      "destination": "/public/admin/owner"
+    },
+    {
+      "source": "/admin/register",
+      "destination": "/public/admin/register"
+    },
+    {
+      "source": "/admin/reset-password",
+      "destination": "/public/admin/reset-password"
+    },
+    {
+      "source": "/admin/reports",
+      "destination": "/public/admin/reports"
+    },
+    {
+      "source": "/admin/tools",
+      "destination": "/public/admin/tools"
+    },
+    {
+      "source": "/admin/tools/device-recovery",
+      "destination": "/public/admin/tools/device-recovery"
+    },
+    {
+      "source": "/admin/tools/link-analysis",
+      "destination": "/public/admin/tools/link-analysis"
+    },
+    {
+      "source": "/admin/tools/recovery-evidence",
+      "destination": "/public/admin/tools/recovery-evidence"
+    },
+    {
+      "source": "/admin/tools/remote-desktop",
+      "destination": "/public/admin/tools/remote-desktop"
+    },
+    {
+      "source": "/admin/tools/security",
+      "destination": "/public/admin/tools/security"
+    },
+    {
+      "source": "/admin/tools/website-scanner",
+      "destination": "/public/admin/tools/website-scanner"
+    },
+    {
+      "source": "/oauth-callback",
+      "destination": "/public/oauth-callback"
+    },
+    {
+      "source": "/verification/:token",
+      "destination": "/public/selfie?id=:token"
+    },
+    {
+      "source": "/client/connect",
+      "destination": "/public/client/connect"
+    },
+    {
+      "source": "/",
+      "destination": "/public/index"
+    }
   ]
 }
