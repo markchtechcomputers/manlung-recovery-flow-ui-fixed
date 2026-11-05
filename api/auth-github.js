@@ -5,6 +5,13 @@ const jwt=require('jsonwebtoken');
 const User=require('../models/User');
 
 const app=express();
+
+// Vercel rewrites /api/auth/github/* to this function. Strip the public
+// prefix so the Express routes below receive /start and /callback.
+app.use((req,_res,next)=>{
+  req.url=String(req.url||'/').replace(/^\/api\/auth\/github(?=\/|\\?|$)/,'')||'/';
+  next();
+});
 const CLIENT_ID=process.env.GITHUB_CLIENT_ID||'';
 const CLIENT_SECRET=process.env.GITHUB_CLIENT_SECRET||'';
 const APP_URL=(process.env.PUBLIC_APP_URL||'https://manlungrecovery.manlungshop.co.ke').replace(/\/$/,'');
@@ -48,7 +55,9 @@ app.get('/callback',async(req,res)=>{
   const state=String(req.query.state||'');
   const expected=readCookie(req,STATE_COOKIE);
   clearStateCookie(res);
-  if(!state||!expected||!crypto.timingSafeEqual(Buffer.from(state),Buffer.from(expected)))return res.redirect('/login.html?oauth=github-error');
+  const suppliedState=Buffer.from(state);
+  const expectedState=Buffer.from(expected);
+  if(!state||!expected||suppliedState.length!==expectedState.length||!crypto.timingSafeEqual(suppliedState,expectedState))return res.redirect('/login.html?oauth=github-error');
   if(req.query.error)return res.redirect('/login.html?oauth=github-cancelled');
   const code=String(req.query.code||'');
   if(!code)return res.redirect('/login.html?oauth=github-error');
