@@ -64,6 +64,26 @@ test('nested admin HTML pages have explicit clean and .html routes', () => {
   }
 });
 
+
+test('Vercel rewrites explicitly serve all admin pages and canonical verification links', () => {
+  const rewrites = vercel.rewrites || [];
+  const pages = [
+    'connect', 'control-center', 'dashboard', 'index', 'investigation-notes',
+    'login', 'music-player', 'music', 'operations', 'owner', 'register',
+    'reset-password', 'reports', 'tools', 'tools/device-recovery',
+    'tools/link-analysis', 'tools/recovery-evidence', 'tools/remote-desktop',
+    'tools/security', 'tools/website-scanner'
+  ];
+  for (const page of pages) {
+    const route = rewrites.find(item => item.source === '/admin/' + page);
+    assert.ok(route, 'rewrite exists for /admin/' + page);
+    assert.equal(route.destination, '/public/admin/' + page);
+  }
+  assert.ok(rewrites.some(item => item.source === '/verification/:token' && item.destination === '/public/selfie?id=:token'));
+  assert.ok(rewrites.some(item => item.source === '/oauth-callback' && item.destination === '/public/oauth-callback'));
+  assert.ok(rewrites.some(item => item.source === '/' && item.destination === '/public/index'));
+});
+
 test('Link Analysis generators create deployment-relative canonical verification links', () => {
   const tools = fs.readFileSync(path.join(root, 'public/admin/tools.html'), 'utf8');
   const standalone = fs.readFileSync(path.join(root, 'public/admin/tools/link-analysis.html'), 'utf8');
