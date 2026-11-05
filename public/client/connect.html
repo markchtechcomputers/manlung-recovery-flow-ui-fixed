@@ -385,6 +385,58 @@ nav button span{display:grid;place-items:center;width:58px;height:30px;border-ra
 .ml-group-fullscreen .ml-group-message-body{color:var(--chat-ink,#111b21)!important}
 .ml-group-fullscreen .ml-group-compose input{color:var(--chat-ink,#111b21)!important}
 
+
+/* Refined Settings experience */
+#mn.ml-settings-page{padding:4px 0 34px;max-width:920px;margin:0 auto}
+.ml-settings-heading{display:flex;align-items:center;gap:14px;margin:12px 16px 20px;padding:18px 20px;border:1px solid var(--bd);border-radius:18px;background:linear-gradient(120deg,var(--sf),var(--sf2));}
+.ml-settings-heading-icon{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border-radius:14px;background:var(--ac);color:var(--on);font-size:23px}
+.ml-settings-heading h2{margin:0;font-size:21px;line-height:1.2;font-weight:800;letter-spacing:-.03em;color:var(--tx)}
+.ml-settings-heading p{margin:5px 0 0;color:var(--muted,var(--tx2));font-size:13px;line-height:1.45}
+.ml-settings-section{margin:0 16px 16px;border:1px solid var(--bd);border-radius:17px;background:var(--sf);overflow:hidden;box-shadow:0 3px 12px #00000007}
+.ml-settings-section-head{padding:15px 17px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.ml-settings-section-title{font-size:13px;font-weight:800;letter-spacing:.015em;color:var(--tx)}
+.ml-settings-section-head p{margin:4px 0 0;font-size:12px;line-height:1.45;color:var(--tx2,#718096)}
+.ml-settings-section>.sec{display:none}
+.ml-settings-section>.set{min-height:62px;margin:0;padding:13px 17px;border:0;border-bottom:1px solid var(--bd);border-radius:0;background:transparent;gap:14px}
+.ml-settings-section>.set:last-child{border-bottom:0}
+.ml-settings-section>.row{margin:0;padding:15px 17px;background:transparent;border:0;border-bottom:1px solid var(--bd);align-items:flex-start}
+.ml-settings-section>.row:last-child{border-bottom:0}
+.ml-settings-section>.card{margin:12px;padding:15px;border:1px solid var(--bd);border-radius:14px;box-shadow:none}
+.ml-settings-section>.ml-profile-update-notice{margin:13px 14px 0;padding:13px 14px;border-radius:13px}
+.ml-settings-profile>.ml-settings-profile-row{padding:17px;gap:15px}
+.ml-settings-profile-row>.grow{min-width:0;display:flex;flex-direction:column;gap:7px}
+.ml-settings-profile-row .search{margin:0!important;border:1px solid var(--bd);border-radius:10px;padding:11px 12px;background:var(--sf2);color:var(--tx);font:inherit;font-size:14px}
+.ml-settings-profile-row textarea.search{min-height:82px;line-height:1.45}
+.ml-settings-profile-row label.sub{margin:4px 0 0!important;font-size:12px;font-weight:700;color:var(--tx2)}
+.ml-settings-profile-row .btn{min-height:43px;border-radius:11px;font-weight:750}
+.ml-settings-section .grow{min-width:0}
+.ml-settings-section .sub{white-space:normal;line-height:1.45}
+.ml-settings-section select:not(.search){max-width:54%;min-width:132px;padding:9px 30px 9px 11px;border:1px solid var(--bd);border-radius:10px;background:var(--sf2);color:var(--tx);font:inherit;font-size:13px}
+.ml-settings-section .seg{display:flex;gap:4px;padding:4px;border-radius:11px;background:var(--sf2)}
+.ml-settings-section .seg button{padding:8px 11px;border-radius:8px;font-size:12px}
+.ml-settings-section .seg button.on{background:var(--ac);color:var(--on)}
+.ml-settings-section .ml-chat-theme-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ml-settings-section .ml-chat-theme-option{min-height:76px}
+.ml-settings-personalisation .set,.ml-settings-privacy .set,.ml-settings-notifications .set,.ml-settings-chats .set{display:flex;align-items:center}
+.ml-settings-support .card{margin:12px;padding:8px 14px}
+.ml-settings-support .card>.row{padding:12px 2px;border-bottom:1px solid var(--bd);border-radius:0}
+.ml-settings-support .card>.row:last-child{border-bottom:0}
+.ml-settings-support .card>.sub{line-height:1.5}
+@media(max-width:560px){
+ #mn.ml-settings-page{padding-top:2px}
+ .ml-settings-heading{margin:8px 10px 14px;padding:15px;border-radius:15px}
+ .ml-settings-heading h2{font-size:19px}
+ .ml-settings-section{margin:0 10px 13px;border-radius:15px}
+ .ml-settings-section-head{padding:13px 14px 11px}
+ .ml-settings-section>.set{padding:12px 13px;gap:9px}
+ .ml-settings-section>.row{padding:13px}
+ .ml-settings-profile>.ml-settings-profile-row{padding:13px;flex-direction:column;align-items:stretch}
+ .ml-settings-profile-row>.avb{align-self:flex-start}
+ .ml-settings-section select:not(.search){min-width:116px;max-width:50%;font-size:12px}
+ .ml-settings-section .seg button{padding:8px 9px}
+ .ml-settings-section .ml-chat-theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(prefers-reduced-motion:no-preference){.ml-settings-section,.ml-settings-heading{transition:box-shadow .18s ease,border-color .18s ease}.ml-settings-section:focus-within{border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 12%,transparent)}}
 </style>
 <style id="ml-channel-reactions-mobile-fix">
 .ml-channel-reactions{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:6px}
@@ -584,16 +636,34 @@ function play(k,loop){try{ac=ac||new(window.AudioContext||window.webkitAudioCont
 function ding(){if(S.notif)play(S.tone)}
 function polishSettingsLayout(root){
  if(!root)return;
- const nodes=Array.from(root.childNodes);root.innerHTML='';let section=null;
+ const nodes=Array.from(root.childNodes);root.innerHTML='';
+ root.classList.add('ml-settings-page');
+ const hero=document.createElement('div');hero.className='ml-settings-heading';hero.innerHTML='<div class="ml-settings-heading-icon">⚙</div><div><h2>Settings</h2><p>Personalise your Manlung Community experience and manage your account.</p></div>';root.appendChild(hero);
+ const descriptions={'Profile':'Your public details and how other members recognise you.','Verified profile':'Add a trusted verification badge to your member profile.','Appearance':'Choose how Manlung looks on your device and inside conversations.','Personalisation':'Fine-tune your reading experience and account shortcuts.','Privacy':'Control who can contact you and what other members can see.','Privacy & legal':'Review how your account and chat information is handled.','Notifications':'Choose how you hear about messages and incoming calls.','Chats':'Manage your conversations and saved chat preferences.','Support':'Get help from the Manlung Recovery team.'};
+ let section=null,sectionName='';
+ const makeSection=(name,extra='')=>{
+  section=document.createElement('section');section.className='ml-settings-section'+(extra?' '+extra:'');section.dataset.section=name.toLowerCase().replace(/[^a-z]+/g,'-');root.appendChild(section);
+  const head=document.createElement('div');head.className='ml-settings-section-head';head.innerHTML='<div class="ml-settings-section-title">'+name+'</div><p>'+ (descriptions[name]||'') +'</p>';section.appendChild(head);sectionName=name;return section;
+ };
+ const isSupportCard=node=>node.nodeType===1&&node.classList.contains('card')&&/Call Admin/i.test(node.textContent||'');
  nodes.forEach(node=>{
   if(node.nodeType===1&&node.classList.contains('sec')){
-   section=document.createElement('section');section.className='ml-settings-section';root.appendChild(section);
+   const name=(node.textContent||'').trim();makeSection(name,name==='Appearance'?'ml-settings-appearance':'');node.remove();
+  }else if(isSupportCard(node)){
+   makeSection('Support','ml-settings-support');section.appendChild(node);
   }else if(!section){
-   section=document.createElement('section');section.className='ml-settings-section ml-settings-intro';root.appendChild(section);
+   makeSection('Profile','ml-settings-profile');
+  }else if(sectionName==='Appearance'&&node.nodeType===1&&node.classList.contains('set')&&/Starred messages/i.test(node.textContent||'')){
+   makeSection('Personalisation','ml-settings-personalisation');
+   section.appendChild(node);
   }
-  section.appendChild(node);
+  if(node.parentNode!==section)section.appendChild(node);
  });
- root.classList.add('ml-settings-page');
+ root.querySelectorAll('.ml-settings-section').forEach(sec=>{
+  const title=sec.dataset.section||'';
+  if(title==='profile'){const row=sec.querySelector(':scope > .row');if(row)row.classList.add('ml-settings-profile-row')}
+  sec.querySelectorAll(':scope > .set').forEach((el,i)=>{el.classList.add('ml-settings-row');if(i===0)el.classList.add('ml-settings-row-first')});
+ });
 }
 // render
 function render(){theme();S.chats=Array.isArray(S.chats)?S.chats:[];if(tab==='chats'&&typeof ensureSpecialChats==='function')ensureSpecialChats();S.inc=Array.isArray(S.inc)?S.inc:[];S.blocked=Array.isArray(S.blocked)?S.blocked:[];S.friends=Array.isArray(S.friends)?S.friends:[];S.req=Array.isArray(S.req)?S.req:[];S.stat=Array.isArray(S.stat)?S.stat:[];const h=$('#hd'),m=$('#mn');
