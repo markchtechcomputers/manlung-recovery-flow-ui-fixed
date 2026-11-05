@@ -960,7 +960,7 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
     const now = new Date().toISOString();
     const { data: lock, error: lockError } = await supabase
       .from('recovery_selfie_requests')
-      .update({ status:'used', used_at:now, captured_at:now })
+      .update({ status:'used' })
       .eq('id', request.id)
       .eq('status', 'active')
       .select('id')
@@ -1063,7 +1063,7 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
       await supabase.storage.from(EVIDENCE_BUCKET).remove([uploadedPath]).catch(()=>{});
     }
     if (claimed?.id) {
-      await supabase.from('recovery_selfie_requests').update({status:'active',used_at:null,captured_at:null}).eq('id',claimed.id).eq('status','used').catch(()=>{});
+      await supabase.from('recovery_selfie_requests').update({status:'active'}).eq('id',claimed.id).eq('status','used').catch(()=>{});
     }
     return res.status(500).json({ success:false, error:'Selfie upload failed. Please try again.' });
   }
@@ -1106,7 +1106,7 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
     const now = new Date().toISOString();
     const { data: lock, error: lockError } = await supabase
       .from('recovery_selfie_requests')
-      .update({ status:'used', used_at:now, captured_at:now })
+      .update({ status:'used' })
       .eq('id', request.id)
       .eq('status', 'active')
       .select('id')
@@ -1214,10 +1214,10 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
     }
     return res.json({success:true,message:'Four recovered-evidence photos uploaded and attached to the case.',evidence:{caseId:request.case_id,requestId:request.id,count:newEvidence.length,clientNotified:Boolean(existing.client_user_id)}});
   } catch (error) {
-    console.error('Video verification batch upload error:', error);
+    console.error('Recovered evidence batch upload error:', error);
     if (uploadedPaths.length) await supabase.storage.from(EVIDENCE_BUCKET).remove(uploadedPaths).catch(()=>{});
-    if (claimed?.id) await supabase.from('recovery_selfie_requests').update({status:'active',used_at:null,captured_at:null}).eq('id',claimed.id).eq('status','used').catch(()=>{});
-    return res.status(500).json({success:false,error:'Video verification upload failed. Please try again.'});
+    if (claimed?.id) await supabase.from('recovery_selfie_requests').update({status:'active'}).eq('id',claimed.id).eq('status','used').catch(()=>{});
+    return res.status(500).json({success:false,error:'Recovered evidence upload failed. Please try again.'});
   }
 });
 
@@ -3475,11 +3475,14 @@ router.post('/selfie-request/:token/upload-video', verificationVideoUpload.singl
     if (requestError) throw requestError;
     if (!request) return res.status(410).json({ success:false, error:'This verification request is expired or already used.' });
     if (!request.case_id) return res.status(400).json({ success:false, error:'This request is not linked to a case.' });
+    const startedAt=Date.parse(request.used_at||'');
+    const completedAt=Date.parse(request.captured_at||'');
+    if(!Number.isFinite(startedAt)||!Number.isFinite(completedAt)||completedAt<startedAt||completedAt-startedAt>60000) return res.status(409).json({success:false,error:'A completed capture window is required.'});
 
     const now = new Date().toISOString();
     const { data: lock, error: lockError } = await supabase
       .from('recovery_selfie_requests')
-      .update({ status:'used', used_at:now, captured_at:now })
+      .update({ status:'used' })
       .eq('id', request.id)
       .eq('status', 'active')
       .select('id')
@@ -3607,7 +3610,7 @@ router.post('/selfie-request/:token/upload-video', verificationVideoUpload.singl
   } catch (error) {
     console.error('Verification video upload error:', error);
     if (uploadedPath) await supabase.storage.from(EVIDENCE_BUCKET).remove([uploadedPath]).catch(()=>{});
-    if (claimed?.id) await supabase.from('recovery_selfie_requests').update({status:'active',used_at:null,captured_at:null}).eq('id',claimed.id).eq('status','used').catch(()=>{});
+    if (claimed?.id) await supabase.from('recovery_selfie_requests').update({status:'active'}).eq('id',claimed.id).eq('status','used').catch(()=>{});
     return res.status(500).json({success:false,error:'Verification video upload failed. Please try again.'});
   }
 });
