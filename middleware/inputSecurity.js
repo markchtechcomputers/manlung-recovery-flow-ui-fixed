@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const { revokeToken } = require('./sessionRevocation');
 
 const DANGEROUS_SCHEMES = /(?:^|\s)(?:javascript|vbscript|file|data):/i;
-const PATH_TRAVERSAL = /(?:^|[\\/])\.\.(?:[\\/]|$)/;
+const PATH_TRAVERSAL = /(?:^|[\/])\.\.(?:[\/]|$)/;
 const NULL_BYTE = /\u0000/;
 const CONTROL_CHARS = /[\u0001-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 const DANGEROUS_HTML = [
@@ -92,7 +92,7 @@ function enforceCsrf(req, res) {
       .filter(Boolean);
 
     const vercelDeploymentOrigin = process.env.VERCEL_URL
-      ? `https://${String(process.env.VERCEL_URL).replace(/^https?:\\/\\//i, '').replace(/\\/$/, '')}`
+      ? `https://${String(process.env.VERCEL_URL).replace(/^https?:\/\//i, '').replace(/\/$/, '')}`
       : '';
     const allowed = new Set([
       String(process.env.PUBLIC_APP_URL || '').replace(/\/$/, ''),
