@@ -9,6 +9,8 @@ const copyOtp = read('public/copy-otp.html');
 const turnstile = read('services/turnstile.js');
 const statusMigration = read('db/migrations/034_status_plan_priority.sql');
 const community = read('routes/community.js');
+const cases = read('routes/cases.js');
+const donations = read('routes/donations.js');
 
 test('Turnstile SDK remains lazy and server verification reuses TLS connections', () => {
   assert.match(login, /script\.src = 'https:\/\/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit'/);
@@ -41,4 +43,23 @@ test('presence heartbeat is refreshed by authenticated community clients', () =>
   assert.match(community, /router\.post\('\/presence\/heartbeat'/);
   assert.match(community, /recovery_chat_presence'\)\.upsert/);
   assert.match(community, /last_seen_at/);
+});
+
+test('evidence uploads retain SHA-256 integrity metadata', () => {
+  assert.match(cases, /sha256: crypto\.createHash\('sha256'\)\.update\(file\.buffer\)\.digest\('hex'\)/);
+  assert.match(cases, /integrityAlgorithm: 'SHA-256'/);
+  assert.match(cases, /malwareScanStatus: 'not_configured'/);
+});
+
+test('donors can access only their own history and confirmed receipts', () => {
+  assert.match(donations, /router\.get\('\/history', auth/);
+  assert.match(donations, /\.eq\('donor_email', email\)/);
+  assert.match(donations, /router\.get\('\/receipt\/:reference', auth/);
+  assert.match(donations, /data\.status !== 'confirmed'/);
+});
+
+test('owner donation dashboard reports pending, confirmed and failed states', () => {
+  assert.match(donations, /router\.get\('\/admin', adminAuth/);
+  assert.match(donations, /const counts = \{ pending:0, confirmed:0, failed:0 \}/);
+  assert.match(donations, /while \(true\)/);
 });
