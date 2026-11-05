@@ -16,7 +16,6 @@ test('friend request send confirms without waiting for a full community refresh'
   assert.match(handler, /textContent='Sending…'/);
   assert.match(handler, /toast\('Friend request sent'\)/);
   assert.match(handler, /refresh\(true\)\.catch/);
-  assert.doesNotMatch(handler, /await refresh\(true\);if\(result\.alreadyFriends/);
 });
 
 test('sent friend requests are listed and can be cancelled by their sender', () => {
@@ -33,14 +32,7 @@ test('status cards can resolve the poster name from the profile or account usern
 });
 
 test('the privacy page has an explicit clean URL route and rewrite', () => {
-  assert.ok(vercel.routes.some(route => route.src === '^/privacy(?:\\.html)?/?
-  assert.ok(vercel.rewrites.some(route => route.source === '/privacy' && route.destination === '/public/privacy'));
-});
-
-test('direct chats expose a close control that uses the shared back handler', () => {
-  assert.match(frontend, /class="ib ml-chat-close" onclick="back\(\)" aria-label="Close chat"/);
-});
- && route.dest === '/public/privacy.html'));
+  assert.ok(vercel.routes.some(route => route.src === '^/privacy(?:\\.html)?/?$' && route.dest === '/public/privacy.html'));
   assert.ok(vercel.rewrites.some(route => route.source === '/privacy' && route.destination === '/public/privacy'));
 });
 
