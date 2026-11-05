@@ -249,10 +249,19 @@ router.post('/messages/:memberId/read', messageLimiter, async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
     if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid member.');
+    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This conversation is unavailable because one account has blocked the other.');
+    const readAt = new Date().toISOString();
+    const { error: deliveryError } = await supabase.from('recovery_community_messages')
+      .update({ delivered_at: readAt })
+      .eq('sender_user_id', other)
+      .eq('recipient_user_id', req.user.id)
+      .is('delivered_at', null)
+      .is('deleted_at', null);
+    if (deliveryError) throw deliveryError;
     const sinceRaw = String(req.body?.since || '').trim();
     const since = sinceRaw && Number.isFinite(new Date(sinceRaw).getTime()) ? new Date(sinceRaw).toISOString() : null;
     let query = supabase.from('recovery_community_messages')
-      .update({ read_at: new Date().toISOString() })
+      .update({ read_at: readAt })
       .eq('sender_user_id', other).eq('recipient_user_id', req.user.id).is('read_at', null);
     if (since) query = query.gt('created_at', since);
     const { data, error } = await query.select('id');
