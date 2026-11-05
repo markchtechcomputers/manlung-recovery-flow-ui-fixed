@@ -762,16 +762,23 @@ router.post('/friend-requests/:memberId', async (req, res) => {
   try {
     const other = String(req.params.memberId || '');
     if (!validId(other) || other === String(req.user.id)) return fail(res, 400, 'Choose a valid member.');
-    if (await blockedEitherWay(req.user.id, other)) return fail(res, 403, 'This member is unavailable.');
-    const { data: recipient, error: re } = await supabase.from('recovery_users')
-      .select('id,role,security_status').eq('id', other).in('role', roles).maybeSingle();
-    if (re) throw re;
+    // These independent checks run together to avoid serial database round trips
+    // on the Add Friend action, which is especially noticeable on mobile networks.
+    const [isBlocked, recipientResult, existingResult] = await Promise.all([
+      blockedEitherWay(req.user.id, other),
+      supabase.from('recovery_users').select('id,role,security_status')
+        .eq('id', other).in('role', roles).maybeSingle(),
+      supabase.from('recovery_chat_friend_requests')
+        .select('id,sender_user_id,recipient_user_id,status')
+        .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
+        .in('status', ['pending','accepted']).limit(1).maybeSingle()
+    ]);
+    if (isBlocked) return fail(res, 403, 'This member is unavailable.');
+    if (recipientResult.error) throw recipientResult.error;
+    if (existingResult.error) throw existingResult.error;
+    const recipient = recipientResult.data;
+    const existing = existingResult.data;
     if (!recipient || (recipient.security_status && recipient.security_status !== 'active')) return fail(res, 404, 'Member not found.');
-    const { data: existing, error: ee } = await supabase.from('recovery_chat_friend_requests')
-      .select('id,sender_user_id,recipient_user_id,status')
-      .or('and(sender_user_id.eq.' + req.user.id + ',recipient_user_id.eq.' + other + '),and(sender_user_id.eq.' + other + ',recipient_user_id.eq.' + req.user.id + ')')
-      .in('status', ['pending','accepted']).limit(1).maybeSingle();
-    if (ee) throw ee;
     if (existing?.status === 'accepted') return res.json({ success: true, alreadyFriends: true, request: existing });
     if (existing?.status === 'pending') {
       if (existing.sender_user_id === other && existing.recipient_user_id === req.user.id) {
