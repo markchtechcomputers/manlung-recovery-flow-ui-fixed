@@ -1,6 +1,8 @@
 const https = require('https');
 
 const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+// Reuse TLS connections across warm serverless invocations to reduce verification latency.
+const VERIFY_AGENT = new https.Agent({ keepAlive: true, maxSockets: 32, timeout: 10000 });
 const TURNSTILE_SECRET_KEY =
   process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY ||
   process.env.TURNSTILE_SECRET_KEY;
@@ -29,7 +31,8 @@ function verifyTurnstile(token, remoteip) {
     const request = https.request(VERIFY_URL, {
       method: 'POST',
       headers: {'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(body.toString())},
-      timeout: 10000,
+      timeout: 7000,
+      agent: VERIFY_AGENT,
     }, (response) => {
       let raw = '';
       response.setEncoding('utf8');
