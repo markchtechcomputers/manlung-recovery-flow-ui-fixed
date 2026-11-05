@@ -47,3 +47,25 @@ This document is the working checklist for the full product pass. Existing worki
 - Never expose passwords, password hashes, MFA secrets, OTPs, recovery codes or API secrets in UI, logs or APIs.
 - Keep account lockout isolated per user account.
 - Keep owner-only controls server-enforced, not merely hidden in the UI.
+
+
+## Implementation status — 2026-11-05
+
+### Committed on `fix/oauth-clean-routes-20261105`
+- Friend-request send path now validates independent database checks in parallel; sent/received requests are visible, sent requests can be cancelled, and acceptance opens chat only after server confirmation.
+- Desktop/mobile chat close control, status poster-name fallback and the `/privacy` clean route are implemented.
+- Turnstile SDK loading remains lazy, with configured-only preconnect and reusable server-side TLS connections.
+- OTP browser notifications can open the inbox; clipboard paste/copy support remains available.
+- Peer calls now have bounded ICE-restart recovery with a watchdog, plus live RTT/network-quality and TURN-relay diagnostics.
+- Evidence uploads store SHA-256 integrity metadata; upload and owner-delete actions write to the evidence audit table when migrations are present.
+- Case creation records configurable internal SLA due times; owner reassignment validates an active administrator; owners can reopen finished cases.
+- Client Recovery Center supports privacy-safe case CSV export and post-completion satisfaction feedback.
+- Donations now have authenticated donor history, confirmed receipt data/print page, and owner visibility of pending/confirmed/failed records with all-row aggregates.
+- Recovery Center notification rendering and sender identity handling were corrected.
+
+### Still requiring external setup or verification
+- Supabase migrations `015_platform_completion.sql`, `016_operations_completion.sql`, `034_status_plan_priority.sql` and `035_case_feedback.sql` must be applied/verified in order. The connected Supabase tool returned a permission-denied response, so this pass did not change or verify the live database.
+- The Vercel Preview deployment for the current branch/commit is blocked by the team's daily deployment quota (HTTP 402, `api-deployments-free-per-day`). A scheduled Preview-only retry is set for 2026-11-06 09:00 Africa/Nairobi and targets the latest commit. Production remains untouched.
+- Real-device/end-to-end verification is still required for camera capture/upload, two-account friend/chat flows, OTP delivery and browser notifications, Paystack receipts, and voice/video calls across mobile networks.
+- Malware scanning is not configured; evidence metadata explicitly reports `not_configured`. SHA-256 is an integrity hash, not a malware scan.
+- Missed-call notification/history delivery, evidence preview/download audit events, broader admin availability/performance history, AI human escalation/prompt-injection evaluation, public SEO/conversion review, and production backup/dependency/secret-scan checks remain to be completed or independently verified.
