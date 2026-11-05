@@ -583,7 +583,7 @@ let ac;const T={Savanna:[523,659,784,659],Kilimanjaro:[392,523,392,587],Pop:[880
 function play(k,loop){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const seq=T[k]||T.Pop;let t=ac.currentTime;seq.forEach(f=>{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.28);o.start(t);o.stop(t+.3);t+=.25})}catch(e){}}
 function ding(){if(S.notif)play(S.tone)}
 function polishSettingsLayout(root){
- if(!root||root.dataset.settingsPolished==='1')return;
+ if(!root)return;
  const nodes=Array.from(root.childNodes);root.innerHTML='';let section=null;
  nodes.forEach(node=>{
   if(node.nodeType===1&&node.classList.contains('sec')){
@@ -593,7 +593,7 @@ function polishSettingsLayout(root){
   }
   section.appendChild(node);
  });
- root.classList.add('ml-settings-page');root.dataset.settingsPolished='1';
+ root.classList.add('ml-settings-page');
 }
 // render
 function render(){theme();S.chats=Array.isArray(S.chats)?S.chats:[];if(tab==='chats'&&typeof ensureSpecialChats==='function')ensureSpecialChats();S.inc=Array.isArray(S.inc)?S.inc:[];S.blocked=Array.isArray(S.blocked)?S.blocked:[];S.friends=Array.isArray(S.friends)?S.friends:[];S.req=Array.isArray(S.req)?S.req:[];S.stat=Array.isArray(S.stat)?S.stat:[];const h=$('#hd'),m=$('#mn');
