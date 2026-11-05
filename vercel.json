@@ -375,6 +375,10 @@
       "dest": "/public/index.html"
     },
     {
+      "src": "^/manlung-ai/?$",
+      "dest": "/public/manlung-ai.html"
+    },
+    {
       "src": "^/((?:[^./]+/)*[^./]+)/?$",
       "dest": "/public/$1.html"
     },
@@ -483,6 +487,10 @@
     {
       "source": "/client/connect",
       "destination": "/public/client/connect"
+    },
+    {
+      "source": "/manlung-ai",
+      "destination": "/public/manlung-ai"
     },
     {
       "source": "/",
