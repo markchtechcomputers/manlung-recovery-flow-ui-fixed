@@ -148,7 +148,7 @@
   "routes": [
     {
       "src": "^/verification/([^/]+)/?$",
-      "dest": "/selfie.html?id=$1",
+      "dest": "/public/selfie.html?id=$1",
       "continue": false
     },
     {
@@ -377,13 +377,6 @@
     {
       "src": "/(.*)",
       "dest": "/public/$1"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/verification/:token",
-      "destination": "/selfie.html?id=:token",
-      "permanent": false
     }
   ]
 }
