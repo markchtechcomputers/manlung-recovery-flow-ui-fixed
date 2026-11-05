@@ -11,7 +11,7 @@ const statusMigration = fs.readFileSync(path.join(root, 'db/migrations/034_statu
 test('stored private-bucket profile photos are signed for member views and respect avatar privacy', () => {
   assert.match(routes, /CLIENT_PROFILE_PHOTO_BUCKET = 'client-profile-photos'/);
   assert.match(routes, /createSignedUrl\(user\.avatar_path, 60 \* 60\)/);
-  assert.match(routes, /profile\?\.avatar_visibility === 'private'\) return null/);
+  assert.match(routes, /profile\?\.avatar_visibility === 'private' && !includePrivate\) return null/);
   assert.match(routes, /resolveAvatarMap\(users, profiles\)/);
   assert.match(frontend, /window\.communityAvatar/);
   assert.match(frontend, /avatar:x\.owner&&x\.owner\.avatar/);
