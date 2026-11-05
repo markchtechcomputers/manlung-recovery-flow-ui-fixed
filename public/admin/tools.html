@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="theme-color" content="#0C3A4A">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261022">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261105-admin-ui">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <title>Admin Tools · Manlung Recovery</title>
@@ -201,6 +201,23 @@ body.admin-page-bg .tools-shell .tool-grid{min-width:0!important}
 }
 @media(max-width:560px){body.admin-page-bg .tools-shell{padding:13px 12px 25px!important}}
 </style>
+<style id="admin-tools-page-layout-fix">
+html,body{width:100%;max-width:100%;min-width:0;margin:0;overflow-x:hidden}
+body.admin-page-bg{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.site-header{width:100%;flex:0 0 auto}
+.tools-shell{width:min(100% - 40px,1560px)!important;max-width:1560px!important;margin:0 auto!important;padding:24px 0 42px!important;flex:1 0 auto;text-align:left}
+.tools-hero{width:100%;justify-content:flex-start!important;align-items:flex-start!important;text-align:left!important}
+.tools-hero-copy,.tools-hero-side{min-width:0;text-align:left!important}
+.tool-section,.workspace,.link-analysis-workspace{width:100%;min-width:0;margin-left:0!important;margin-right:0!important;text-align:left}
+.section-head{justify-content:flex-start!important;text-align:left!important}
+.section-head>div{min-width:0}
+.tool-grid{width:100%;grid-template-columns:repeat(3,minmax(0,1fr))}
+.tool-card{text-align:left;min-width:0;min-height:320px}
+.workspace{align-items:start}
+.panel{text-align:left;min-width:0}
+@media(max-width:900px){.tools-shell{width:calc(100% - 32px)!important}.tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.tools-shell{width:calc(100% - 24px)!important;padding:14px 0 28px!important}.tools-hero{align-items:flex-start!important;text-align:left!important;padding:18px!important}.tool-grid,.workspace{grid-template-columns:minmax(0,1fr)!important}.tool-card{min-height:0}.section-head{align-items:flex-start!important}.device-recovery-hero{grid-template-columns:minmax(0,1fr)}}
+</style>
 </head>
 <body class="admin-page-bg">
 <header class="site-header">
@@ -348,19 +365,7 @@ body.admin-page-bg .tools-shell .tool-grid{min-width:0!important}
 
   </div>
 </main>
-<footer class="manlung-footer" aria-label="Manlung Recovery footer">
-  <div class="manlung-footer-inner">
-    <div class="manlung-footer-grid">
-      <section class="manlung-footer-brand"><div class="manlung-footer-brand-row"><a href="/" aria-label="Manlung Recovery Home"><img src="/icons/icon-512.png" alt="Manlung Recovery" class="manlung-footer-logo" width="46" height="46"></a><div><h2>Manlung Recovery</h2><p class="manlung-footer-brand-subtitle">Cyber Recovery &amp; Digital Investigation Portal</p></div></div><p class="manlung-footer-description">Structured digital recovery assistance, investigation support, cybersecurity awareness and secure case-management services.</p></section>
-      <section class="manlung-footer-column"><h3>Explore</h3><nav class="manlung-footer-links"><a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/knowledge">Knowledge</a><a href="/blog">Blog</a></nav></section>
-      <section class="manlung-footer-column"><h3>Support</h3><nav class="manlung-footer-links"><a href="/client/request">New Recovery Request</a><a href="/client/dashboard">Client Portal</a><a href="/client/track">Track a Case</a><a href="/donate" class="footer-important">Donate</a><a href="/contact">Contact</a></nav></section>
-      <section class="manlung-footer-column"><h3>Trust &amp; Legal</h3><p class="manlung-footer-trust-text">Access controls, authentication safeguards and responsible information handling help protect client and case information.</p><nav class="manlung-footer-links"><a href="/privacy">Privacy Notice</a><a href="/terms">Terms &amp; Conditions</a><a href="/faq">FAQ</a></nav></section>
-    </div>
-    <div class="manlung-footer-divider"></div>
-    <div class="manlung-footer-contact-row"><div class="manlung-footer-contact"><a href="mailto:manlungrecovery@outlook.com"><i class="fas fa-envelope"></i><span>manlungrecovery@outlook.com</span></a></div><div class="manlung-footer-social" aria-label="Manlung Recovery social links"><a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="https://i.postimg.cc/DZHs0t4n/icons8-facebook-48.png" alt="Facebook" width="32" height="32" loading="lazy"></a><a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="https://i.postimg.cc/sD9QCBct/icons8-instagram-48.png" alt="Instagram" width="32" height="32" loading="lazy"></a><a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="X"><img src="https://i.postimg.cc/SNT49kNc/icons8-x-50.png" alt="X" width="32" height="32" loading="lazy"></a><a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="https://i.postimg.cc/3J667Rxx/icons8-tiktok-50.png" alt="TikTok" width="32" height="32" loading="lazy"></a><a href="https://www.youtube.com/@manlungrecory" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="https://i.postimg.cc/W4V5bJLF/icons8-youtube-48.png" alt="YouTube" width="32" height="32" loading="lazy"></a><a href="https://news.google.com/" target="_blank" rel="noopener noreferrer" aria-label="Google News"><img src="https://i.postimg.cc/T2sQ5sMs/icons8-google-48.png" alt="Google News" width="32" height="32" loading="lazy"></a><a href="https://t.me/" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><img src="https://i.postimg.cc/ZRMP3Wgx/icons8-telegram-48.png" alt="Telegram" width="32" height="32" loading="lazy"></a></div></div>
-    <div class="manlung-footer-bottom"><span>&copy; 2026 <strong>Manlung Recovery</strong>. All rights reserved.</span><div class="manlung-footer-legal"><a href="/terms">Terms &amp; Conditions</a><a href="/privacy">Privacy Notice</a></div></div>
-  </div>
-<style id="manlung-footer-social-icons-v2">.manlung-footer-social{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap}.manlung-footer-social a{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:4px;border-radius:12px;background:rgba(255,255,255,.04);transition:transform .18s ease,background .18s ease}.manlung-footer-social a:hover{transform:translateY(-2px);background:rgba(37,99,235,.14)}.manlung-footer-social a img{display:block;width:32px;height:32px;object-fit:contain}.manlung-footer-social a:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}@media(max-width:600px){.manlung-footer-social{gap:10px}.manlung-footer-social a{width:40px;height:40px}}</style></footer>
+
 <script>
 const $=id=>document.getElementById(id);
 const linkAnalysisCard=document.getElementById('linkAnalysisCard');
