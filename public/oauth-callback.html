@@ -60,10 +60,13 @@
 
         function showError(message, redirect) {
             const title = document.getElementById('title');
+            title.hidden = false;
             const status = document.getElementById('status');
             const backLink = document.getElementById('backLink');
 
             if (redirect) {
+                const spinner = document.getElementById('oauthSpinner');
+                if (spinner) spinner.style.display = 'none';
                 title.textContent = 'Admin account detected';
                 status.textContent = message || 'This email belongs to an Admin or Owner account.';
                 backLink.href = redirect;
@@ -118,17 +121,33 @@
 
             const url = new URL(window.location.href);
             const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-            const hashError = hashParams.get('error_description') || hashParams.get('error');
+            const callbackError =
+                url.searchParams.get('error_description') ||
+                url.searchParams.get('error') ||
+                hashParams.get('error_description') ||
+                hashParams.get('error');
 
-            if (hashError) {
+            if (callbackError) {
                 clearOAuthUrl();
-                throw new Error(hashError);
+                throw new Error(callbackError);
             }
 
+            const authorizationCode = url.searchParams.get('code');
             let session = null;
             const { data: restored, error: restoreError } = await client.auth.getSession();
-            if (restoreError) throw restoreError;
+
+            if (restoreError && !authorizationCode) throw restoreError;
             session = restored?.session || null;
+
+            // supabase-js normally detects PKCE callback codes during client
+            // initialization. If that automatic exchange did not restore a
+            // session, explicitly exchange the still-present code as a fallback.
+            if (!session?.access_token && authorizationCode) {
+                const { data: exchanged, error: exchangeError } =
+                    await client.auth.exchangeCodeForSession(authorizationCode);
+                if (exchangeError) throw exchangeError;
+                session = exchanged?.session || null;
+            }
 
             if (!session?.access_token) {
                 await new Promise(resolve => setTimeout(resolve, 500));
