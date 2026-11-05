@@ -1641,6 +1641,7 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-visib
           </div>
           <button type="button" class="btn" style="width:100%;margin-top:4px;" onclick="openOtpInbox()">Open email inbox</button>
           <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="pasteOtpFromClipboard()">Paste code from clipboard</button>
+          <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="enableOtpNotifications()">Enable verification notifications</button>
           <button type="submit" class="btn btn-primary manlung-auth-primary">
             <i class="fas fa-shield-halved" aria-hidden="true"></i> Verify Email
           </button>
@@ -2151,6 +2152,7 @@ async function resendVerificationEmail(){
 }
 
 let manlungOtpEmail = '';
+let manlungOtpWasSent = false;
 let manlungOtpSupabase = null;
 
 async function getManlungSupabaseClient() {
@@ -2204,14 +2206,36 @@ async function pasteOtpFromClipboard() {
 }
 
 function notifyOtpSent() {
+  manlungOtpWasSent = true;
   if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
     try {
       new Notification('Manlung Recovery', {
-        body: 'Your verification code was sent. Open your email and paste the 8-digit code here.',
+        body: 'Your verification email was sent. Open your inbox and paste the 8-digit code into Manlung Recovery.',
         icon: '/icons/icon-192.png',
         tag: 'manlung-email-otp'
       });
     } catch (_) {}
+  }
+}
+
+async function enableOtpNotifications() {
+  const errorEl = document.getElementById('emailOtpError');
+  if (!('Notification' in window)) {
+    showMessage(errorEl, 'This browser does not support desktop notifications. You can still open your inbox and paste the code here.');
+    return;
+  }
+  try {
+    const permission = Notification.permission === 'default'
+      ? await Notification.requestPermission()
+      : Notification.permission;
+    if (permission !== 'granted') {
+      showMessage(errorEl, 'Notifications are blocked. You can still use Open email inbox and Paste code.');
+      return;
+    }
+    showMessage(errorEl, 'Notifications enabled. We will remind you when a verification email is sent.', 'success');
+    if (manlungOtpWasSent) notifyOtpSent();
+  } catch (_) {
+    showMessage(errorEl, 'Could not enable notifications in this browser. You can still paste the code manually.');
   }
 }
 
