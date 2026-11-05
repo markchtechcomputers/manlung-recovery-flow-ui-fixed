@@ -43,3 +43,39 @@ test('GitHub OAuth function strips the rewritten public route prefix', () => {
   assert.match(github, /Strip the public/);
   assert.match(github, /timingSafeEqual\(suppliedState,expectedState\)/);
 });
+
+test('nested admin HTML pages have explicit clean and .html routes', () => {
+  const paths = [
+    '/admin/dashboard',
+    '/admin/tools',
+    '/admin/tools/link-analysis',
+    '/admin/tools/recovery-evidence',
+    '/admin/tools/website-scanner'
+  ];
+  for (const page of paths) {
+    const escaped = page.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&');
+    const clean = vercel.routes.find(item => item.src === `^${escaped}/?$ `.trim());
+    const html = vercel.routes.find(item => item.src === `^${escaped}\\.html$`);
+    assert.ok(clean, `clean admin route exists for ${page}`);
+    assert.ok(html, `.html admin route exists for ${page}`);
+    assert.equal(clean.dest, `/public${page.replace(/^\\/admin\\//, '/admin/')}.html`);
+    assert.equal(html.dest, clean.dest);
+  }
+});
+
+test('Link Analysis generators create deployment-relative canonical verification links', () => {
+  const tools = fs.readFileSync(path.join(root, 'public/admin/tools.html'), 'utf8');
+  const standalone = fs.readFileSync(path.join(root, 'public/admin/tools/link-analysis.html'), 'utf8');
+  const canonical = /new URL\\('\/verification\/'\\s*\\+\\s*encodeURIComponent\\(d\\.request\\.token\\),\\s*window\\.location\\.origin\\)\\.href/;
+  assert.match(tools, canonical);
+  assert.match(standalone, canonical);
+  assert.doesNotMatch(tools, /https:\\/\\/manlungrecovery\\.manlungshop\\.co\\.ke\\/verification\\//);
+  assert.doesNotMatch(standalone, /selfie\\.html\\?id=/);
+});
+
+test('verification token route resolves to the public selfie page before static fallback', () => {
+  const index = vercel.routes.findIndex(item => item.src === '^/verification/([^/]+)/?$');
+  const fallback = vercel.routes.findIndex(item => item.src === '/(.*)');
+  assert.ok(index >= 0 && index < fallback);
+  assert.equal(vercel.routes[index].dest, '/selfie.html?id=$1');
+});
