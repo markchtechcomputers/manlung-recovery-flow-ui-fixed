@@ -1211,7 +1211,7 @@ document.getElementById('clientPhotoInput')?.addEventListener('change', async (e
       method: 'PUT',
       headers: authHeaders(),
       credentials: 'include',
-      body: JSON.stringify({ imageData: selectedProfilePhoto })
+      body: JSON.stringify({ imageBase64: selectedProfilePhoto.split(',')[1] || '' })
     });
     const data = await res.json().catch(() => ({}));
     if(res.status === 401){ logout(); return; }
