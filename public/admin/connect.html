@@ -1105,7 +1105,17 @@ if(document.readyState!=='loading'){boot();window.loadVerifiedBadgeStatus?.();ve
 (function(){
 /* Community peer calls are isolated from the existing Admin <-> Client call engine.
    They use the same authenticated polling + WebRTC/ICE flow, but their own peer-call API. */
-const api='/api/community',rtc={callId:null,pc:null,stream:null,poll:null,incomingTimer:null,last:0,mode:'audio',incoming:false,seen:new Set(),closed:true,iceQueue:[],polling:false,ending:false,connected:false,timeout:null,startedAt:0,peerName:'',direction:'outgoing'};window.__mlCallHistory=[];try{window.__mlCallHistory=JSON.parse(localStorage.getItem('mlg-call-history')||'[]')}catch(_){}function saveCallLog(status){const item={peer_name:rtc.peerName||'Manlung member',direction:rtc.direction,status:status||'ended',mode:rtc.mode,created_at:new Date(rtc.startedAt||Date.now()).toISOString(),duration_seconds:Math.max(0,Math.round((Date.now()-(rtc.startedAt||Date.now()))/1000))};window.__mlCallHistory.unshift(item);window.__mlCallHistory=window.__mlCallHistory.slice(0,100);try{localStorage.setItem('mlg-call-history',JSON.stringify(window.__mlCallHistory))}catch(_){}if(typeof render==='function'&&tab==='calls')render()}const CALL_ICONS={mute:'https://i.postimg.cc/ry0MF2V2/icons8-mute-50.png',mic:'https://i.postimg.cc/QMYZh0vF/icons8-microphone-50.png',camera:'https://i.postimg.cc/59CWW5gX/icons8-camera-50.png',accept:'https://i.postimg.cc/nLzNRqMn/icons8-call-48.png',end:'https://i.postimg.cc/hPVJvdDW/icons8-end-call-50.png'};function callIcon(url,alt){return '<img src="'+url+'" alt="'+alt+'" style="width:27px;height:27px;object-fit:contain" />'}function callAvatar(name,avatar){const label=String(name||'M').trim().slice(0,1).toUpperCase()||'M';return '<div class="ml-call-avatar" aria-label="'+esc(name||'Caller')+' profile picture">'+(avatar?'<img src="'+esc(avatar)+'" alt="'+esc(name||'Caller')+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">':esc(label))+'</div>'}function vibrate(pattern){try{if(navigator.vibrate)navigator.vibrate(pattern)}catch(_){}}
+const api='/api/community',rtc={callId:null,pc:null,stream:null,poll:null,incomingTimer:null,last:0,mode:'audio',incoming:false,seen:new Set(),closed:true,iceQueue:[],polling:false,ending:false,connected:false,timeout:null,startedAt:0,peerName:'',direction:'outgoing'};window.__mlCallHistory=[];try{window.__mlCallHistory=JSON.parse(localStorage.getItem('mlg-call-history')||'[]')}catch(_){}function saveCallLog(status){const item={peer_name:rtc.peerName||'Manlung member',direction:rtc.direction,status:status||'ended',mode:rtc.mode,created_at:new Date(rtc.startedAt||Date.now()).toISOString(),duration_seconds:Math.max(0,Math.round((Date.now()-(rtc.startedAt||Date.now()))/1000))};window.__mlCallHistory.unshift(item);window.__mlCallHistory=window.__mlCallHistory.slice(0,100);try{localStorage.setItem('mlg-call-history',JSON.stringify(window.__mlCallHistory))}catch(_){}if(typeof render==='function'&&tab==='calls')render()}const CALL_ICONS={mute:'mute',mic:'mic',camera:'camera',accept:'accept',end:'end'};
+function callIcon(name,alt){
+ const paths={
+  mute:'<path d="M3 3l18 18M9 9v2a3 3 0 0 0 4.7 2.45M15 9V5a3 3 0 0 0-5.9-.75M5 10v1a7 7 0 0 0 12 4.9M12 18v3m-4 0h8"/>',
+  mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4m-4 0h8"/>',
+  camera:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/>',
+  accept:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.5 2.8a2 2 0 0 1-.6 1.7L7.2 10a16 16 0 0 0 6 6l1.8-1.8a2 2 0 0 1 1.7-.6l2.8.5a2 2 0 0 1 1.7 1.8z"/>',
+  end:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.5 2.8a2 2 0 0 1-.6 1.7L7.2 10a16 16 0 0 0 6 6l1.8-1.8a2 2 0 0 1 1.7-.6l2.8.5a2 2 0 0 1 1.7 1.8z" transform="rotate(135 12 12)"/>'
+ };
+ return '<svg class="ml-call-svg" viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="'+String(alt||'')+'">'+(paths[name]||paths.mic)+'</svg>';
+}function callAvatar(name,avatar){const label=String(name||'M').trim().slice(0,1).toUpperCase()||'M';return '<div class="ml-call-avatar" aria-label="'+esc(name||'Caller')+' profile picture">'+(avatar?'<img src="'+esc(avatar)+'" alt="'+esc(name||'Caller')+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">':esc(label))+'</div>'}function vibrate(pattern){try{if(navigator.vibrate)navigator.vibrate(pattern)}catch(_){}}
 async function rq(path,opts={}){const r=await fetch(api+path,{credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},...opts});let d={};try{d=await r.json()}catch(e){}if(!r.ok||d.success===false){const x=new Error(d.error||'Call request failed ('+r.status+')');x.status=r.status;throw x}return d}
 function note(e){stopRingtone();const msg=e&&typeof e.message==='string'&&e.message.trim()&&e.message!=='null'?e.message:'Call could not be connected. Check microphone permission and try again.';toast(msg)}
 let lastCallState='';let activeCallNotification=null;
@@ -1119,7 +1129,7 @@ function startRingtone(){stopRingtone();try{const AC=window.AudioContext||window
 function callUI(name,mode,incoming,avatar){
  const old=document.querySelector('#ml-peer-call');if(old)old.remove();
  const el=document.createElement('div');el.id='ml-peer-call';el.className='ov';el.style.zIndex='100';
- el.innerHTML='<div style="text-align:center;padding:10px 0 16px">'+callAvatar(name,avatar)+'<div style="font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:#9fe8c8;margin-bottom:8px">'+(incoming?'Incoming call':(mode==='video'?'Video call':'Voice call'))+'</div><h2 id="ml-peer-name" style="margin:0 0 8px;font-size:27px;letter-spacing:-.5px">'+esc(name)+'</h2><div id="ml-peer-state">'+(incoming?'Incoming '+(mode==='video'?'video':'voice')+' call':'Calling '+esc(name)+'…')+'</div></div><div style="width:100%;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin:4px 0"><video id="ml-peer-remote" autoplay playsinline style="width:100%;max-height:42vh;object-fit:cover;background:#111;border-radius:18px;display:none"></video><audio id="ml-peer-audio" autoplay playsinline style="display:none"></audio><video id="ml-peer-local" autoplay playsinline muted style="width:34%;max-height:18vh;object-fit:cover;background:#222;border:2px solid #ffffff50;border-radius:14px;display:none"></video></div><div class="ctl ml-call-actions" style="display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap">'+(incoming?'<button id="ml-peer-answer" class="btn" title="Answer" aria-label="Answer" style="border-radius:50%;width:58px;height:58px;font-size:22px;background:#16a34a">'+callIcon(CALL_ICONS.accept,'Accept call')+'</button><button id="ml-peer-reject" class="end" title="Decline" aria-label="Decline" style="border-radius:50%;width:58px;height:58px;font-size:22px">'+callIcon(CALL_ICONS.end,'Decline call')+'</button>':'')+'<button id="ml-peer-mute" class="btn ghost" title="Mute microphone" aria-label="Mute microphone" style="border-radius:50%;width:54px;height:54px">'+callIcon(CALL_ICONS.mic,'Microphone on')+'</button>'+(mode==='video'?'<button id="ml-peer-camera" class="btn ghost" title="Turn camera off" aria-label="Turn camera off" style="border-radius:50%;width:54px;height:54px">'+callIcon(CALL_ICONS.camera,'Camera')+'</button>':'')+'<button id="ml-peer-end" class="end" title="End call" aria-label="End call" style="border-radius:50%;width:58px;height:58px;font-size:22px">'+callIcon(CALL_ICONS.end,'End call')+'</button></div>';
+ el.innerHTML='<div style="text-align:center;padding:10px 0 16px">'+callAvatar(name,avatar)+'<div style="font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:#9fe8c8;margin-bottom:8px">'+(incoming?'Incoming call':(mode==='video'?'Video call':'Voice call'))+'</div><h2 id="ml-peer-name" style="margin:0 0 8px;font-size:27px;letter-spacing:-.5px">'+esc(name)+'</h2><div id="ml-peer-state">'+(incoming?'Incoming '+(mode==='video'?'video':'voice')+' call':'Calling '+esc(name)+'…')+'</div></div><div class="ml-call-security" style="margin:12px auto 4px;max-width:440px;padding:10px 12px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:rgba(15,23,42,.32);color:#dbeafe;font-size:11px;line-height:1.55;text-align:center"><span aria-hidden="true">🔒</span> Call media is encrypted in transit using WebRTC (DTLS-SRTP). Call history stores call details, not audio or video. <a href="/privacy" target="_blank" rel="noopener" style="color:#93c5fd;text-decoration:underline">Call log privacy</a> · <a href="/terms" target="_blank" rel="noopener" style="color:#93c5fd;text-decoration:underline">Terms</a></div><div style="width:100%;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin:4px 0"><video id="ml-peer-remote" autoplay playsinline style="width:100%;max-height:42vh;object-fit:cover;background:#111;border-radius:18px;display:none"></video><audio id="ml-peer-audio" autoplay playsinline style="display:none"></audio><video id="ml-peer-local" autoplay playsinline muted style="width:34%;max-height:18vh;object-fit:cover;background:#222;border:2px solid #ffffff50;border-radius:14px;display:none"></video></div><div class="ctl ml-call-actions" style="display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap">'+(incoming?'<button id="ml-peer-answer" class="btn" title="Answer" aria-label="Answer" style="border-radius:50%;width:58px;height:58px;font-size:22px;background:#16a34a">'+callIcon(CALL_ICONS.accept,'Accept call')+'</button><button id="ml-peer-reject" class="end" title="Decline" aria-label="Decline" style="border-radius:50%;width:58px;height:58px;font-size:22px">'+callIcon(CALL_ICONS.end,'Decline call')+'</button>':'')+'<button id="ml-peer-mute" class="btn ghost" title="Mute microphone" aria-label="Mute microphone" style="border-radius:50%;width:54px;height:54px">'+callIcon(CALL_ICONS.mic,'Microphone on')+'</button>'+(mode==='video'?'<button id="ml-peer-camera" class="btn ghost" title="Turn camera off" aria-label="Turn camera off" style="border-radius:50%;width:54px;height:54px">'+callIcon(CALL_ICONS.camera,'Camera')+'</button>':'')+'<button id="ml-peer-end" class="end" title="End call" aria-label="End call" style="border-radius:50%;width:58px;height:58px;font-size:22px">'+callIcon(CALL_ICONS.end,'End call')+'</button></div>';
  $('#app').append(el);el.querySelector('#ml-peer-end').onclick=()=>endCall(true);
  const mute=el.querySelector('#ml-peer-mute');mute.onclick=()=>{const tracks=rtc.stream&&rtc.stream.getAudioTracks();if(tracks&&tracks.length){tracks.forEach(t=>t.enabled=!t.enabled);mute.innerHTML=callIcon(tracks[0].enabled?CALL_ICONS.mic:CALL_ICONS.mute,tracks[0].enabled?'Microphone on':'Microphone muted');mute.title=tracks[0].enabled?'Mute microphone':'Unmute microphone';mute.setAttribute('aria-label',mute.title)}};
  // Audio-only dialogs intentionally omit the camera button, so bind only when present.
@@ -1150,13 +1160,13 @@ async function poll(){
   if(rtc.callId!==pollCallId)return;
   if(d.call&&['ended','rejected','missed'].includes(d.call.status)){
    state(d.call.status==='rejected'?'Call declined':d.call.status==='missed'?'Missed call':'Call ended');
-   setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false)},100);return;
+   setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false,d.call.status==='rejected'?'reject':d.call.status==='missed'?'missed':'remote')},100);return;
   }
   for(const s of d.signals||[]){
    rtc.last=Math.max(rtc.last,Number(s.id)||0);
    if(s.signal_type==='reject'||s.signal_type==='hangup'){
     state(s.signal_type==='reject'?'Call declined':'Call ended');
-    setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false)},100);return;
+    setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false,s.signal_type==='reject'?'reject':'remote')},100);return;
    }
    if(!rtc.pc)continue;
    if(s.signal_type==='offer'&&rtc.incoming){
@@ -1169,7 +1179,7 @@ async function poll(){
     if(!rtc.pc.remoteDescription)rtc.iceQueue.push(s.payload);else try{await rtc.pc.addIceCandidate(s.payload)}catch(_){}
    }
   }
- }catch(e){if(e.status===404||e.status===409){state(e.message);setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false)},100)}}
+ }catch(e){if(e.status===404||e.status===409){state(e.message);setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false,'remote')},100)}}
  finally{rtc.polling=false}
 }
 function beginPoll(){clearInterval(rtc.poll);rtc.poll=setInterval(poll,500);poll()}
@@ -1188,13 +1198,26 @@ async function acceptIncoming(){
  catch(e){note(e);await endCall(true,'reject')}
 }
 async function endCall(notify,kind){
- if(rtc.ending)return;rtc.ending=true;const id=rtc.callId;
- if(notify&&id&&(!rtc.closed||kind==='reject')){try{await signal(kind||'hangup')}catch(_){}}
- rtc.closed=true;stopRingtone();if(id&&rtc.startedAt)saveCallLog(kind==='reject'?'missed':(rtc.connected?'ended':'cancelled'));clearInterval(rtc.poll);rtc.poll=null;clearTimeout(rtc.timeout);rtc.timeout=null;
+ if(rtc.ending)return;
+ rtc.ending=true;
+ const id=rtc.callId,wasConnected=!!rtc.connected;
+ if(notify&&id&&(!rtc.closed||kind==='reject')){
+  try{await signal(kind||'hangup')}catch(error){console.warn('Call end signal could not be confirmed:',error?.message||error)}
+ }
+ rtc.closed=true;stopRingtone();
+ clearTimeout(rtc.timeout);rtc.timeout=null;
+ clearTimeout(rtc.reconnectTimer);rtc.reconnectTimer=null;
+ clearInterval(rtc.statsTimer);rtc.statsTimer=null;
+ if(id&&rtc.startedAt)saveCallLog(kind==='reject'?'missed':(wasConnected?'ended':'cancelled'));
+ const message=kind==='reject'?'Call declined.':kind==='missed'?'This call was missed.':kind==='remote'?'Call ended by the other person.':'You ended the call.';
+ state(message);
+ clearInterval(rtc.poll);rtc.poll=null;
  if(rtc.pc){rtc.pc.ontrack=null;rtc.pc.onicecandidate=null;try{rtc.pc.close()}catch(_){}}
- if(rtc.stream)rtc.stream.getTracks().forEach(t=>t.stop());
- rtc.pc=null;rtc.stream=null;rtc.callId=null;rtc.incoming=false;rtc.connected=false;rtc.iceQueue=[];rtc.polling=false;
- const el=document.querySelector('#ml-peer-call');if(el)el.remove();rtc.ending=false
+ if(rtc.stream)rtc.stream.getTracks().forEach(track=>{try{track.stop()}catch(_){}});
+ rtc.pc=null;rtc.stream=null;rtc.callId=null;rtc.peerId=null;rtc.incoming=false;rtc.connected=false;rtc.iceQueue=[];rtc.polling=false;
+ const el=document.querySelector('#ml-peer-call');
+ rtc.ending=false;
+ if(el){clearTimeout(rtc.closeUiTimer);rtc.closeUiTimer=setTimeout(()=>{if(!rtc.callId&&el.isConnected)el.remove()},1800)}
 }
 window.call=function(name,video){startPeerCall(name,!!video)};
 async function incomingCheck(){
