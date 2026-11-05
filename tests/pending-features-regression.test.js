@@ -72,3 +72,18 @@ test('donation history and receipt pages expose the private donor flows', () => 
   assert.match(donationReceiptPage, /\/api\/donations\/receipt\//);
   assert.match(donationReceiptPage, /window\.print\(\)/);
 });
+
+test('case submission records an internal SLA target and owner can reopen finished cases', () => {
+  assert.match(cases, /function caseSlaDueAt\(priority/);
+  assert.match(cases, /caseFields\.sla_due_at = caseSlaDueAt/);
+  assert.match(cases, /router\.post\('\/owner\/case\/:caseId\/reopen', ownerAuth/);
+  assert.match(cases, /reopened_at:now/);
+  assert.match(cases, /sla_due_at:caseSlaDueAt/);
+});
+
+test('owner reassignment validates the target administrator and records assignment metadata', () => {
+  assert.match(cases, /const targetAdmin = await User\.findById/);
+  assert.match(cases, /targetAdmin\.role !== 'admin'/);
+  assert.match(cases, /assigned_by_user_id: req\.user\.id/);
+  assert.match(cases, /source:'owner_reassign'/);
+});
