@@ -445,8 +445,13 @@
   async function endCall(){
  const headers=authHeaders(),endedId=currentSessionId;
  if(!endedId)return;
- if(currentPeer){try{await currentPeer.end()}catch(error){console.warn('Call peer cleanup:',error?.message||error)}}
- if(currentSessionId&&headers){try{await fetch(`/api/calls/${encodeURIComponent(endedId)}/end`,{method:'PUT',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify({reason:'client_hangup'}),keepalive:true})}catch(error){console.warn('Call end request:',error?.message||error)}}
+ if(currentPeer){
+  // CallPeer.end() already sends the authenticated durable end request.
+  try{await currentPeer.end()}catch(error){console.warn('Call peer cleanup:',error?.message||error)}
+ }else if(currentSessionId&&headers){
+  // Ringing/queued calls have no WebRTC peer yet, so end the server session here.
+  try{await fetch(`/api/calls/${encodeURIComponent(endedId)}/end`,{method:'PUT',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify({reason:'client_hangup'}),keepalive:true})}catch(error){console.warn('Call end request:',error?.message||error)}
+ }
  renderCallUI('ended-by-local');
  cleanupCall();
  setTimeout(refreshEntitlementPanel,1800);
