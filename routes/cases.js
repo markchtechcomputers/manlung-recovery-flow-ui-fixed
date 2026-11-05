@@ -2567,6 +2567,7 @@ router.post(
     try {
       const existing = await Case.findByCaseId(req.params.caseId);
       if (!existing) return res.status(404).json({ error:'Case not found' });
+      if (Case.FINISHED_STATUSES.includes(existing.status)) return res.status(409).json({ error:'Reopen this case before reassigning it.' });
       const targetAdmin = await User.findById(String(req.body.adminId));
       if (!targetAdmin || targetAdmin.role !== 'admin' || targetAdmin.admin_status === 'suspended' || targetAdmin.security_status && targetAdmin.security_status !== 'active') {
         return res.status(400).json({ error:'Choose an active administrator.' });
@@ -2584,6 +2585,7 @@ router.post(
         admin_read: false,
       });
       await recordCaseUpdateEvents({ existing, updated, actorId:req.user.id, actorName:req.user.username, source:'owner_reassign' });
+      try { await Notification.create({ userId:targetAdmin.id, caseId:updated.case_id, type:'case_assigned', title:'A case was assigned to you', message:'Case '+updated.case_id+' has been assigned to you by the Owner.' }); } catch (notificationError) { console.error('Case assignment notification failed:',notificationError?.message||notificationError); }
       return res.json({ success:true, case:serializeCase(updated,{includeInternal:true}) });
     } catch (error) {
       console.error('Reassign case error:', error);
