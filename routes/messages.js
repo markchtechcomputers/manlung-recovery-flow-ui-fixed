@@ -116,6 +116,8 @@ router.get('/case/:caseId', auth, async (req, res) => {
       });
     }
 
+    await CaseMessage.markDeliveredForRecipient(req.params.caseId, req.user.id);
+    await Notification.markCaseMessagesRead(req.params.caseId, req.user.id);
     const messages =
       await CaseMessage.listForCase(
         req.params.caseId
@@ -129,6 +131,7 @@ router.get('/case/:caseId', auth, async (req, res) => {
         sender_user_id: item.sender_user_id,
         recipient_user_id: item.recipient_user_id,
         message: item.message,
+        delivered_at: item.delivered_at,
         read_at: item.read_at,
         created_at: item.created_at,
       })),
@@ -217,6 +220,7 @@ router.post(
           sender_user_id: created.sender_user_id,
           recipient_user_id: created.recipient_user_id,
           message: created.message,
+          delivered_at: created.delivered_at,
           read_at: created.read_at,
           created_at: created.created_at,
         },
@@ -245,6 +249,11 @@ router.post('/:messageId/read', auth, async (req, res) => {
         success: false,
         error: 'Message not found.',
       });
+    }
+
+    if (updated.case_id) {
+      await CaseMessage.markDeliveredForRecipient(updated.case_id, req.user.id);
+      await Notification.markCaseMessagesRead(updated.case_id, req.user.id);
     }
 
     res.json({
