@@ -893,14 +893,14 @@ body>main.container,body>main.container *{min-width:0}
 
     <section class="card settings-card">
       <h2><i class="fas fa-user-circle" aria-hidden="true"></i> Profile</h2>
-      <p>Keep your contact details current and personalise your client portal. Your chosen photo is saved in this browser and reused on your client dashboard until you change or remove it.</p>
+      <p>Keep your contact details current and personalise your client portal. Your profile photo is securely saved to your account and available whenever you sign in.</p>
 
       <div class="client-photo-editor">
         <div class="client-photo-preview" id="clientPhotoPreview" aria-label="Profile photo preview">MR</div>
         <div class="client-photo-controls">
           <label for="clientPhotoInput">Profile photo</label>
           <input id="clientPhotoInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-          <small>JPG, PNG, WebP or GIF · up to 8 MB. Your image is resized and saved in this browser, then shown beside your name in the client portal on this device. It remains until you replace or remove it. It is not synced to other devices.</small>
+          <small>JPG, PNG, WebP or GIF · up to 8 MB. Your image is resized and securely synced to your account, so it appears across your signed-in devices.</small>
           <button class="btn btn-outline" id="removeClientPhoto" type="button">Remove photo</button>
           <div id="photoStatus" class="settings-status" role="status" aria-live="polite"></div>
         </div>
@@ -1204,14 +1204,25 @@ document.getElementById('clientPhotoInput')?.addEventListener('change', async (e
   const input = event.currentTarget;
   const file = input.files && input.files[0];
   if(!file) return;
-  setStatus('photoStatus', 'Preparing your photo…', true);
+  setStatus('photoStatus', 'Preparing and securely uploading your photo…', true);
   try{
     selectedProfilePhoto = await compressProfilePhoto(file);
+    const res = await fetch('/api/auth/client/profile-photo', {
+      method: 'PUT',
+      headers: authHeaders(),
+      credentials: 'include',
+      body: JSON.stringify({ imageData: selectedProfilePhoto })
+    });
+    const data = await res.json().catch(() => ({}));
+    if(res.status === 401){ logout(); return; }
+    if(!res.ok || !data.success || !data.profilePicture){
+      throw new Error(data.error || 'Could not save your profile photo.');
+    }
     const user = getStoredClientUser();
-    renderClientPhoto(selectedProfilePhoto, user.username || user.email || 'MR');
-    user.profilePicture = selectedProfilePhoto;
+    user.profilePicture = data.profilePicture;
     localStorage.setItem(PHOTO_STORAGE_KEY, JSON.stringify(user));
-    setStatus('photoStatus', 'Photo updated on this device. It will appear on your client dashboard.', true);
+    renderClientPhoto(data.profilePicture, user.username || user.email || 'MR');
+    setStatus('photoStatus', 'Profile photo saved to your account and synced across devices.', true);
   }catch(error){
     selectedProfilePhoto = null;
     input.value = '';
@@ -1219,15 +1230,32 @@ document.getElementById('clientPhotoInput')?.addEventListener('change', async (e
   }
 });
 
-document.getElementById('removeClientPhoto')?.addEventListener('click', () => {
+document.getElementById('removeClientPhoto')?.addEventListener('click', async () => {
   const user = getStoredClientUser();
-  user.profilePicture = null;
-  localStorage.setItem(PHOTO_STORAGE_KEY, JSON.stringify(user));
-  selectedProfilePhoto = null;
-  const input = document.getElementById('clientPhotoInput');
-  if(input) input.value = '';
-  renderClientPhoto(null, user.username || user.email || 'MR');
-  setStatus('photoStatus', 'Profile photo removed on this device.', true);
+  const button = document.getElementById('removeClientPhoto');
+  if(button) button.disabled = true;
+  setStatus('photoStatus', 'Removing your saved photo…', true);
+  try{
+    const res = await fetch('/api/auth/client/profile-photo', {
+      method: 'DELETE',
+      headers: authHeaders(),
+      credentials: 'include'
+    });
+    const data = await res.json().catch(() => ({}));
+    if(res.status === 401){ logout(); return; }
+    if(!res.ok || !data.success) throw new Error(data.error || 'Could not remove your photo.');
+    user.profilePicture = null;
+    localStorage.setItem(PHOTO_STORAGE_KEY, JSON.stringify(user));
+    selectedProfilePhoto = null;
+    const input = document.getElementById('clientPhotoInput');
+    if(input) input.value = '';
+    renderClientPhoto(null, user.username || user.email || 'MR');
+    setStatus('photoStatus', 'Profile photo removed from your account.', true);
+  }catch(error){
+    setStatus('photoStatus', error.message || 'Could not remove your photo.');
+  }finally{
+    if(button) button.disabled = false;
+  }
 });
 
 async function loadProfile(){
@@ -1257,11 +1285,9 @@ async function loadProfile(){
     document.getElementById('profilePhone').value =
       data.user.phone || '';
 
-    let previousUser = {};
-    try { previousUser = JSON.parse(localStorage.getItem('clientUser') || '{}') || {}; } catch (_) {}
     const currentUser = {
       ...data.user,
-      profilePicture: previousUser.profilePicture || data.user.profilePicture || null
+      profilePicture: data.user.profilePicture || null
     };
     localStorage.setItem('clientUser', JSON.stringify(currentUser));
     renderClientPhoto(currentUser.profilePicture, currentUser.username || currentUser.email || 'MR');
