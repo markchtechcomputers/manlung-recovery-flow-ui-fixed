@@ -6,7 +6,7 @@ const path = require('node:path');
 const root = path.join(__dirname, '..');
 const frontend = fs.readFileSync(path.join(root, 'public/client/connect.html'), 'utf8');
 const routes = fs.readFileSync(path.join(root, 'routes/community.js'), 'utf8');
-const statusMigration = fs.readFileSync(path.join(root, 'db/migrations/028_community_entitlements_and_status_interactions.sql'), 'utf8');
+const statusMigration = fs.readFileSync(path.join(root, 'db/migrations/034_status_plan_priority.sql'), 'utf8');
 
 test('stored private-bucket profile photos are signed for member views and respect avatar privacy', () => {
   assert.match(routes, /CLIENT_PROFILE_PHOTO_BUCKET = 'client-profile-photos'/);
@@ -30,6 +30,7 @@ test('status plans use Paystack checkout rather than the former demo payment pro
 
 test('database status allowance enforces the paid Plus and Pro tiers', () => {
   assert.match(statusMigration, /when 'plus' then 3 when 'pro' then 100/);
+  assert.match(statusMigration, /order by case p\.plan_code when 'pro' then 2 when 'plus' then 1/);
   assert.match(statusMigration, /STATUS_ALLOWANCE_EXHAUSTED/);
 });
 
