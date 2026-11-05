@@ -186,7 +186,8 @@ function frameBlob(captureNumber,metadata){
 
 function pause(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function closeAfterSubmit(){
-  stopCamera();
+  if(stream){stream.getTracks().forEach(t=>{try{t.stop()}catch(_){}});stream=null;}
+  video.srcObject=null;
   setTimeout(()=>{
     try{window.close()}catch(_){}
     setTimeout(()=>{if(!document.hidden)location.replace("/");},500);
