@@ -1524,4 +1524,6 @@ rtc.incomingTimer=setInterval(()=>{if(window.__mlMe)incomingCheck()},2500);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&activeCallNotification){try{activeCallNotification.close()}catch(_){}activeCallNotification=null}if(document.hidden&&rtc.callId)notifyCall('Manlung call',rtc.peerName+' · Call continues in background','ml-call-'+rtc.callId)});
 })();
 </script>
-</body></html>
+  <script src="/js/pwa.js?v=20261105-auto-update-welcome" defer></script>
+</body>
+</html>
