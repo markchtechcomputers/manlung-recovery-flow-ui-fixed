@@ -91,10 +91,14 @@ function enforceCsrf(req, res) {
       .map((value) => value.trim().replace(/\/$/, ''))
       .filter(Boolean);
 
+    const vercelDeploymentOrigin = process.env.VERCEL_URL
+      ? `https://${String(process.env.VERCEL_URL).replace(/^https?:\\/\\//i, '').replace(/\\/$/, '')}`
+      : '';
     const allowed = new Set([
       String(process.env.PUBLIC_APP_URL || '').replace(/\/$/, ''),
       'https://manlungrecovery.manlungshop.co.ke',
       ...configuredOrigins,
+      vercelDeploymentOrigin,
       ...(process.env.NODE_ENV === 'production' ? [] : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:5000', 'http://127.0.0.1:3000']),
     ].filter(Boolean));
     if (!allowed.has(origin)) {
