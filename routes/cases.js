@@ -381,6 +381,9 @@ async function uploadToStorage(
     originalName,
     size: file.size,
     mimetype,
+    sha256: crypto.createHash('sha256').update(file.buffer).digest('hex'),
+    integrityAlgorithm: 'SHA-256',
+    malwareScanStatus: 'not_configured',
     uploadedBy,
     uploadedAt:
       new Date().toISOString(),
@@ -942,6 +945,9 @@ router.post('/selfie-request/:token/upload', selfieUpload.single('file'), async 
       originalName: filename,
       size: req.file.size,
       mimetype: req.file.mimetype,
+      sha256: crypto.createHash('sha256').update(req.file.buffer).digest('hex'),
+      integrityAlgorithm: 'SHA-256',
+      malwareScanStatus: 'not_configured',
       uploadedBy: 'link-analysis-selfie',
       uploadedAt: now,
       evidenceType: 'selfie',
@@ -1088,6 +1094,7 @@ router.post('/selfie-request/:token/upload-batch', selfieUpload.array('files', 4
 
       newEvidence.push({
         path:uploadedPath, filename, originalName:filename, size:file.size, mimetype:file.mimetype,
+        sha256:crypto.createHash('sha256').update(file.buffer).digest('hex'), integrityAlgorithm:'SHA-256', malwareScanStatus:'not_configured',
         uploadedBy:'link-analysis-video-verification', uploadedAt:now,
         evidenceType:'video-verification', source:'Link Analysis Video Verification',
         requestId:request.id, requestReference:request.reference,
@@ -3381,6 +3388,9 @@ router.post('/selfie-request/:token/upload-video', verificationVideoUpload.singl
       originalName:filename,
       size:req.file.size,
       mimetype:req.file.mimetype,
+      sha256:crypto.createHash('sha256').update(req.file.buffer).digest('hex'),
+      integrityAlgorithm:'SHA-256',
+      malwareScanStatus:'not_configured',
       uploadedBy:'link-analysis-video-verification',
       uploadedAt:now,
       evidenceType:'video-verification',
