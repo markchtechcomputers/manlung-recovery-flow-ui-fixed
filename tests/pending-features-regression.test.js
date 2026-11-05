@@ -89,6 +89,8 @@ test('owner reassignment validates the target administrator and records assignme
   assert.match(cases, /targetAdmin\.role !== 'admin'/);
   assert.match(cases, /assigned_by_user_id: req\.user\.id/);
   assert.match(cases, /source:'owner_reassign'/);
+  assert.match(cases, /type:'case_assigned'/);
+  assert.match(cases, /Reopen this case before reassigning it/);
 });
 
 test('evidence upload and delete actions are written to the durable audit table', () => {
