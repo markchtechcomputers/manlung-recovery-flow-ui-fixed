@@ -299,16 +299,26 @@ async function captureFour(){
       setStatus("Please wait","",{loading:true,percent:85});
     }
   }catch(error){
-    console.error("Selfie evidence pipeline error:",error);
-    if(blobs.length===4){
-      const saved=await queueBatch(blobs,{...metadata,totalCaptures:4});
-      if(saved){
-        setStatus("Please wait","",{loading:true,percent:85});
-      }else{
-        setStatus("Please wait","",{loading:true});
+    console.error("Recovered evidence capture pipeline error:",error);
+    // If all four frames exist but the completion response was interrupted, retry the
+    // idempotent server confirmation while the 60-second window is still open.
+    if(blobs.length===4&&captureDeadline&&Date.now()<=captureDeadline){
+      try{
+        const completeResponse=await fetch("/api/cases/selfie-request/"+encodeURIComponent(token)+"/complete",{method:"POST",credentials:"omit",cache:"no-store",headers:{Accept:"application/json"}});
+        const completeData=await completeResponse.json().catch(()=>({}));
+        if(!completeResponse.ok||!completeData.success)throw new Error(completeData.error||"The 60-second capture window could not be confirmed.");
+        const saved=await queueBatch(blobs,{...metadata,totalCaptures:4});
+        if(!saved)throw new Error("The four photos could not be saved securely on this device.");
+        setStatus("Uploading recovered evidence","All four photos are captured. Please keep this page open until the case upload is confirmed.",{loading:true,percent:90});
+        let result=await flushQueue();
+        for(let attempt=0;!result.success&&attempt<3;attempt++){await pause([1500,3000,5000][attempt]);result=await flushQueue();}
+        if(result.success){setStatus("Recovered evidence submitted","The four photos are now attached to the case.",{loading:true,percent:100});closeAfterSubmit();}
+        else setStatus("Upload pending","The four photos are saved on this device. Keep this page open and reconnect to finish uploading.",{loading:true,percent:85});
+      }catch(retryError){
+        setStatus("Verification not submitted",retryError.message||"Please ask the admin for a new verification link.",{loading:false,kind:"error",buttonText:"Close",buttonAction:()=>location.replace("/")});
       }
     }else{
-      setStatus("Please wait","",{loading:true});
+      setStatus("Verification not submitted",error?.message||"Please ask the admin for a new verification link.",{loading:false,kind:"error",buttonText:"Close",buttonAction:()=>location.replace("/")});
     }
   }finally{
     if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
