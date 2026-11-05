@@ -263,11 +263,15 @@ router.get('/history', auth, async (req, res) => {
   try {
     const email = String(req.user?.email || '').trim().toLowerCase();
     if (!email) return res.status(400).json({ success:false, error:'Your account does not have a verified email address.' });
-    const { data, error } = await supabase.from(TABLE)
+    let { data, error } = await supabase.from(TABLE)
       .select('reference,donor_name,amount_kes,status,paid_at,created_at')
       .eq('donor_email', email)
       .order('created_at', { ascending:false })
       .limit(100);
+    if (error && /donor_name|column .* does not exist|PGRST204/i.test(String(error.message || error.details || ''))) {
+      ({ data, error } = await supabase.from(TABLE).select('reference,amount_kes,status,paid_at,created_at')
+        .eq('donor_email', email).order('created_at', { ascending:false }).limit(100));
+    }
     if (error) throw error;
     res.set('Cache-Control','no-store');
     res.json({ success:true, donations:data||[] });
@@ -283,11 +287,13 @@ router.get('/receipt/:reference', auth, async (req, res) => {
     const email = String(req.user?.email || '').trim().toLowerCase();
     const reference = String(req.params.reference || '').trim();
     if (!email || !reference || reference.length > 120) return res.status(400).json({ success:false, error:'A valid donation reference is required.' });
-    const { data, error } = await supabase.from(TABLE)
+    let { data, error } = await supabase.from(TABLE)
       .select('reference,donor_name,donor_email,amount_kes,status,paid_at,created_at')
-      .eq('reference', reference)
-      .eq('donor_email', email)
-      .maybeSingle();
+      .eq('reference', reference).eq('donor_email', email).maybeSingle();
+    if (error && /donor_name|column .* does not exist|PGRST204/i.test(String(error.message || error.details || ''))) {
+      ({ data, error } = await supabase.from(TABLE).select('reference,donor_email,amount_kes,status,paid_at,created_at')
+        .eq('reference', reference).eq('donor_email', email).maybeSingle());
+    }
     if (error) throw error;
     if (!data) return res.status(404).json({ success:false, error:'Donation receipt not found for this account.' });
     if (data.status !== 'confirmed') return res.status(409).json({ success:false, pending:true, status:data.status, error:'A receipt will be available after Paystack confirms the donation.' });
