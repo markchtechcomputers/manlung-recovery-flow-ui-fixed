@@ -56,7 +56,7 @@ This document is the working checklist for the full product pass. Existing worki
 - Desktop/mobile chat close control, status poster-name fallback and the `/privacy` clean route are implemented.
 - Turnstile SDK loading remains lazy, with configured-only preconnect and reusable server-side TLS connections.
 - OTP browser notifications can open the inbox; clipboard paste/copy support remains available.
-- Peer calls now have bounded ICE-restart recovery with a watchdog, plus live RTT/network-quality and TURN-relay diagnostics.
+- Peer calls now have bounded ICE-restart recovery with a watchdog, live RTT/network-quality and TURN-relay diagnostics, account-synced call history, and in-app/email missed-call notifications.
 - Evidence uploads store SHA-256 integrity metadata; upload and owner-delete actions write to the evidence audit table when migrations are present.
 - Case creation records configurable internal SLA due times; owner reassignment validates an active administrator; owners can reopen finished cases.
 - Client Recovery Center supports privacy-safe case CSV export and post-completion satisfaction feedback.
@@ -68,4 +68,4 @@ This document is the working checklist for the full product pass. Existing worki
 - The Vercel Preview deployment for the current branch/commit is blocked by the team's daily deployment quota (HTTP 402, `api-deployments-free-per-day`). A scheduled Preview-only retry is set for 2026-11-06 09:00 Africa/Nairobi and targets the latest commit. Production remains untouched.
 - Real-device/end-to-end verification is still required for camera capture/upload, two-account friend/chat flows, OTP delivery and browser notifications, Paystack receipts, and voice/video calls across mobile networks.
 - Malware scanning is not configured; evidence metadata explicitly reports `not_configured`. SHA-256 is an integrity hash, not a malware scan.
-- Missed-call notification/history delivery, evidence preview/download audit events, broader admin availability/performance history, AI human escalation/prompt-injection evaluation, public SEO/conversion review, and production backup/dependency/secret-scan checks remain to be completed or independently verified.
+- Evidence preview/download audit events, broader admin availability/performance history, AI human escalation/prompt-injection evaluation, public SEO/conversion review, and production backup/dependency/secret-scan checks remain to be completed or independently verified.
