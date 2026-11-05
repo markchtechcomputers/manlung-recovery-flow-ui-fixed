@@ -11,6 +11,30 @@ router.use((req,res,next)=>req.path==='/plans/webhook'?next():auth(req,res,next)
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PAYSTACK_URL = 'https://api.paystack.co';
 const roles = ['client', 'admin', 'owner'];
+const CLIENT_PROFILE_PHOTO_BUCKET = 'client-profile-photos';
+
+async function resolveAvatarUrl(user, profile) {
+  if (profile?.avatar_visibility === 'private') return null;
+  if (profile?.avatar_url) return profile.avatar_url;
+  if (!user?.avatar_path) return null;
+  try {
+    const { data, error } = await supabase.storage.from(CLIENT_PROFILE_PHOTO_BUCKET)
+      .createSignedUrl(user.avatar_path, 60 * 60);
+    if (error) throw error;
+    return data?.signedUrl || null;
+  } catch (error) {
+    console.error('Community profile avatar signing failed:', error?.message || error);
+    return null;
+  }
+}
+
+async function resolveAvatarMap(users, profiles) {
+  const profileMap = new Map((profiles || []).map(profile => [String(profile.user_id), profile]));
+  const entries = await Promise.all((users || []).map(async user => [
+    String(user.id), await resolveAvatarUrl(user, profileMap.get(String(user.id)))
+  ]));
+  return new Map(entries);
+}
 const messageLimiter = rateLimit({ windowMs: 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });
 const statusLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, standardHeaders: true, legacyHeaders: false });
 
@@ -18,7 +42,7 @@ function fail(res, status, error) { return res.status(status).json({ success: fa
 function cleanText(value, max) { return String(value == null ? '' : value).trim().slice(0, max); }
 function validId(value) { return UUID.test(String(value || '')); }
 function isAdmin(user) { return user && ['admin', 'owner'].includes(user.role); }
-function publicProfile(profile, user, presence) {
+function publicProfile(profile, user, presence, resolvedAvatar) {
   const name = cleanText(profile?.display_name, 80) || cleanText(user.username, 80) || 'Member';
   const last = presence?.last_seen_at || null;
   const isVisible = profile?.presence_visibility !== 'nobody';
@@ -29,7 +53,7 @@ function publicProfile(profile, user, presence) {
     name,
     username: user.username || null,
     role: user.role,
-    avatar: profile?.avatar_visibility === 'private' ? null : (profile?.avatar_url || null),
+    avatar: profile?.avatar_visibility === 'private' ? null : (resolvedAvatar || profile?.avatar_url || null),
     avatarVisibility: profile?.avatar_visibility === 'private' ? 'private' : 'public',
     bio: profile?.bio || '',
     createdAt: user.created_at || null,
@@ -72,7 +96,7 @@ function handleDbError(res, error, context) {
 router.get('/members', async (req, res) => {
   try {
     const { data: users, error } = await supabase.from('recovery_users')
-      .select('id,username,role,last_login_at,created_at,security_status')
+      .select('id,username,role,last_login_at,created_at,security_status,avatar_path')
       .in('role', roles).order('created_at', { ascending: false }).limit(500);
     if (error) throw error;
     const ids = (users || []).map(u => u.id);
@@ -87,12 +111,13 @@ router.get('/members', async (req, res) => {
     const blocked = new Set();
     (blocks || []).forEach(b => { blocked.add(b.blocker_user_id); blocked.add(b.blocked_user_id); });
     const pMap = new Map((profiles || []).map(p => [p.user_id, p]));
+    const avatarMap = await resolveAvatarMap(users, profiles);
     const liveMap = new Map((presence || []).map(p => [p.user_id, p]));
     const members = (users || []).filter(u => u.id !== req.user.id && !blocked.has(u.id) && (!u.security_status || u.security_status === 'active'))
       .map(u => ({ user: u, profile: pMap.get(u.id) }))
       // A missing chat profile must not make a registered account disappear. Only explicit privacy settings hide it.
       .filter(x => x.profile?.discoverable !== false && x.profile?.profile_visibility !== 'nobody')
-      .map(x => publicProfile(x.profile, x.user, liveMap.get(x.user.id)));
+      .map(x => publicProfile(x.profile, x.user, liveMap.get(x.user.id), avatarMap.get(String(x.user.id))));
     res.set('Cache-Control', 'no-store');
     res.json({ success: true, members });
   } catch (error) { return handleDbError(res, error, 'Community member list error:'); }
@@ -112,11 +137,11 @@ router.get('/profile', async (req, res) => {
   try {
     const [{ data: profile, error: pe }, { data: user, error: ue }] = await Promise.all([
       supabase.from('recovery_chat_profiles').select('*').eq('user_id', req.user.id).maybeSingle(),
-      supabase.from('recovery_users').select('id,username,role,created_at').eq('id', req.user.id).maybeSingle(),
+      supabase.from('recovery_users').select('id,username,role,created_at,avatar_path').eq('id', req.user.id).maybeSingle(),
     ]);
     if (pe) throw pe; if (ue) throw ue;
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, profile: publicProfile(profile, user || req.user, null) });
+    res.json({ success: true, profile: publicProfile(profile, user || req.user, null, await resolveAvatarUrl(user || req.user, profile)) });
   } catch (error) { return handleDbError(res, error, 'Profile read error:'); }
 });
 
@@ -542,13 +567,14 @@ router.get('/status/:statusId/comments', async (req,res) => {
     const {data,error}=await supabase.from('recovery_chat_status_comments').select('id,status_id,user_id,comment,created_at').eq('status_id',id).order('created_at',{ascending:true}).limit(100);
     if(error) throw error;
     const ids=[...new Set((data||[]).map(x=>x.user_id))];
-    const {data:users,error:ue}=ids.length?await supabase.from('recovery_users').select('id,username').in('id',ids):{data:[],error:null};
+    const {data:users,error:ue}=ids.length?await supabase.from('recovery_users').select('id,username,avatar_path').in('id',ids):{data:[],error:null};
     if(ue) throw ue;
     const {data:profiles,error:pe2}=ids.length?await supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility').in('user_id',ids):{data:[],error:null};
     if(pe2) throw pe2;
     const um=new Map((users||[]).map(x=>[x.id,x])), pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
+    const avatarMap = await resolveAvatarMap(users, profiles);
     res.set('Cache-Control','no-store');
-    res.json({success:true,comments:(data||[]).map(x=>({id:x.id,comment:x.comment,createdAt:x.created_at,author:{id:x.user_id,name:pm.get(x.user_id)?.display_name||um.get(x.user_id)?.username||'Member',avatar:pm.get(x.user_id)?.avatar_url||null}}))});
+    res.json({success:true,comments:(data||[]).map(x=>({id:x.id,comment:x.comment,createdAt:x.created_at,author:{id:x.user_id,name:pm.get(x.user_id)?.display_name||um.get(x.user_id)?.username||'Member',avatar:avatarMap.get(String(x.user_id))||null}}))});
   } catch(error) { return handleDbError(res,error,'Status comments list error:'); }
 });
 router.post('/status/:statusId/comments', messageLimiter, async (req,res) => {
@@ -625,13 +651,14 @@ router.get('/status/:statusId/views', async (req,res) => {
     if(error) throw error;
     const ids=[...new Set((views||[]).map(x=>x.viewer_user_id))];
     const [{data:users,error:ue},{data:profiles,error:pe2}]=await Promise.all([
-      ids.length?supabase.from('recovery_users').select('id,username').in('id',ids):Promise.resolve({data:[],error:null}),
+      ids.length?supabase.from('recovery_users').select('id,username,avatar_path').in('id',ids):Promise.resolve({data:[],error:null}),
       ids.length?supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility').in('user_id',ids):Promise.resolve({data:[],error:null})
     ]);
     if(ue) throw ue; if(pe2) throw pe2;
     const um=new Map((users||[]).map(x=>[x.id,x])),pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
+    const avatarMap = await resolveAvatarMap(users, profiles);
     res.set('Cache-Control','no-store');
-    res.json({success:true,views:(views||[]).map(x=>({viewedAt:x.viewed_at,viewer:{id:x.viewer_user_id,name:pm.get(x.viewer_user_id)?.display_name||um.get(x.viewer_user_id)?.username||'Member',avatar:pm.get(x.viewer_user_id)?.avatar_visibility==='private'?null:pm.get(x.viewer_user_id)?.avatar_url||null}}))});
+    res.json({success:true,views:(views||[]).map(x=>({viewedAt:x.viewed_at,viewer:{id:x.viewer_user_id,name:pm.get(x.viewer_user_id)?.display_name||um.get(x.viewer_user_id)?.username||'Member',avatar:avatarMap.get(String(x.viewer_user_id))||null}}))});
   } catch(error) { return handleDbError(res,error,'Status viewers list error:'); }
 });
 
@@ -653,12 +680,13 @@ router.get('/friend-requests', async (req, res) => {
     const data = [...(acceptedRows || []), ...(pendingRows || [])];
     const ids = [...new Set(data.map(x => x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id))];
     const [{ data: users, error: ue }, { data: profiles, error: pe }] = await Promise.all([
-      ids.length ? supabase.from('recovery_users').select('id,username,role,security_status').in('id', ids) : Promise.resolve({ data: [], error: null }),
+      ids.length ? supabase.from('recovery_users').select('id,username,role,security_status,avatar_path').in('id', ids) : Promise.resolve({ data: [], error: null }),
       ids.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,bio').in('user_id', ids) : Promise.resolve({ data: [], error: null })
     ]);
     if (ue) throw ue; if (pe) throw pe;
     const um = new Map((users || []).map(u => [u.id, u]));
     const pm = new Map((profiles || []).map(p => [p.user_id, p]));
+    const avatarMap = await resolveAvatarMap(users, profiles);
     // If any request between these two accounts is accepted, treat them as friends
     // and never expose a duplicate pending row for the same pair.
     const acceptedOtherIds = new Set((data || []).filter(x => x.status === 'accepted')
@@ -670,7 +698,7 @@ router.get('/friend-requests', async (req, res) => {
       const otherId = x.sender_user_id === req.user.id ? x.recipient_user_id : x.sender_user_id;
       const u = um.get(otherId), p = pm.get(otherId) || {};
       return { ...x, direction: x.sender_user_id === req.user.id ? 'sent' : 'received',
-        member: { id: otherId, name: cleanText(p.display_name, 80) || cleanText(u.username, 80) || 'Member', username: u.username || null, avatar: p.avatar_url || null, bio: p.bio || '' } };
+        member: { id: otherId, name: cleanText(p.display_name, 80) || cleanText(u.username, 80) || 'Member', username: u.username || null, avatar: avatarMap.get(String(otherId)) || null, bio: p.bio || '' } };
     });
     res.set('Cache-Control', 'no-store');
     res.json({ success: true, requests });
@@ -1450,12 +1478,14 @@ router.get('/status', async (req, res) => {
     if (he) throw he;
     const hiddenIds = new Set((hiddenRows || []).map(x => x.status_id));
     const users = [...new Set((posts || []).map(p => p.user_id))];
-    const [{ data: profiles, error: pe }, { data: wallet, error: we }] = await Promise.all([
-      users.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,status_visibility').in('user_id', users) : Promise.resolve({ data: [], error: null }),
+    const [{ data: profiles, error: pe }, { data: wallet, error: we }, { data: avatarUsers, error: avatarError }] = await Promise.all([
+      users.length ? supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility,status_visibility').in('user_id', users) : Promise.resolve({ data: [], error: null }),
       supabase.from('recovery_chat_status_wallets').select('free_status_last_used_at,paid_status_credits').eq('user_id', req.user.id).maybeSingle(),
+      users.length ? supabase.from('recovery_users').select('id,avatar_path').in('id', users) : Promise.resolve({ data: [], error: null }),
     ]);
-    if (pe) throw pe; if (we) throw we;
+    if (pe) throw pe; if (we) throw we; if (avatarError) throw avatarError;
     const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
+    const avatarMap = await resolveAvatarMap(avatarUsers, profiles);
     const statuses = await Promise.all((posts || []).filter(p => !hiddenIds.has(p.id) && (p.user_id === req.user.id || profileMap.get(p.user_id)?.status_visibility !== 'nobody'))
       .map(async p => {
         let media_url = null;
@@ -1464,7 +1494,7 @@ router.get('/status', async (req, res) => {
           if (se) console.error('Could not sign status media URL:', se.message);
           else media_url = signed?.signedUrl || null;
         }
-        return { ...p, media_url, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: profileMap.get(p.user_id)?.avatar_url || null } };
+        return { ...p, media_url, owner: { id: p.user_id, name: profileMap.get(p.user_id)?.display_name || 'Member', avatar: avatarMap.get(String(p.user_id)) || null } };
       }));
     const last = wallet?.free_status_last_used_at ? new Date(wallet.free_status_last_used_at).getTime() : 0;
     res.json({ success: true, statuses, allowance: { freeAvailable: !last || Date.now() - last >= 86400000, freeLastUsedAt: wallet?.free_status_last_used_at || null, paidCredits: wallet?.paid_status_credits || 0 } });
@@ -1589,14 +1619,14 @@ async function peerParticipant(callId,userId) {
 }
 router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
  try{
-  if(req.user.role!=='client') return fail(res,403,'Client account required.');
+  if(!roles.includes(req.user.role)) return fail(res,403,'Registered member access required.');
   const other=String(req.body?.memberId||''),mode=req.body?.call_mode==='video'?'video':'audio';
   if(!validId(other)||other===String(req.user.id)) return fail(res,400,'Choose a valid registered member.');
   if(await blockedEitherWay(req.user.id,other)) return fail(res,403,'Calls are unavailable because one account has blocked the other.');
   if(!await areAcceptedFriends(req.user.id,other)) return fail(res,403,'Accept the friend request before calling this member.');
   const {data:callee,error:ce}=await supabase.from('recovery_users').select('id,role,security_status').eq('id',other).maybeSingle();
   if(ce) throw ce;
-  if(!callee||callee.role!=='client'||(callee.security_status&&callee.security_status!=='active')) return fail(res,404,'Member not found.');
+  if(!callee||!roles.includes(callee.role)||(callee.security_status&&callee.security_status!=='active')) return fail(res,404,'Member not found.');
   // Treat a member as online only when their authenticated client has sent a fresh heartbeat.
   // This server-side check prevents stale/fake client UI from starting calls to offline members.
   const {data:presence,error:presenceError}=await supabase.from('recovery_chat_presence')
@@ -1623,13 +1653,14 @@ router.get('/peer-calls/incoming',async(req,res)=>{
    .eq('callee_user_id',req.user.id).eq('status','ringing').gt('created_at',new Date(Date.now()-120000).toISOString()).order('created_at',{ascending:false}).limit(5);
   if(error) throw error;
   const ids=[...new Set((data||[]).map(x=>x.caller_user_id))];
-  const {data:users,error:ue}=ids.length?await supabase.from('recovery_users').select('id,username').in('id',ids):{data:[],error:null};
+  const {data:users,error:ue}=ids.length?await supabase.from('recovery_users').select('id,username,avatar_path').in('id',ids):{data:[],error:null};
   if(ue) throw ue;
   const {data:profiles,error:pe}=ids.length?await supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility').in('user_id',ids):{data:[],error:null};
   if(pe) throw pe;
   const um=new Map((users||[]).map(x=>[x.id,x])),pm=new Map((profiles||[]).map(x=>[x.user_id,x]));
+  const avatarMap = await resolveAvatarMap(users, profiles);
   res.set('Cache-Control','no-store');
-  res.json({success:true,calls:(data||[]).map(c=>({...c,caller:{name:pm.get(c.caller_user_id)?.display_name||um.get(c.caller_user_id)?.username||'Member',avatar:pm.get(c.caller_user_id)?.avatar_visibility==='private'?null:(pm.get(c.caller_user_id)?.avatar_url||null)}}))});
+  res.json({success:true,calls:(data||[]).map(c=>({...c,caller:{name:pm.get(c.caller_user_id)?.display_name||um.get(c.caller_user_id)?.username||'Member',avatar:avatarMap.get(String(c.caller_user_id))||null}}))});
  }catch(error){return handleDbError(res,error,'Incoming peer calls error:');}
 });
 router.get('/peer-calls/:callId/signals',async(req,res)=>{
