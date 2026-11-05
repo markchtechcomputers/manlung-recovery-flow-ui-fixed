@@ -2792,9 +2792,10 @@ function buildUpdateFields(
     updates.status !== undefined &&
     updates.status !== existing.status
   ) {
-    fields.status =
-      updates.status;
-
+    const changedAt = new Date().toISOString();
+    fields.status = updates.status;
+    fields.last_status_changed_at = changedAt;
+    fields.closed_at = Case.FINISHED_STATUSES.includes(updates.status) ? changedAt : null;
     changes.status = {
       from: existing.status,
       to: updates.status,
@@ -2924,6 +2925,16 @@ router.put(
         return res.status(403).json({
           error:
             'Claim this case before modifying it.',
+        });
+      }
+
+      if (
+        Case.FINISHED_STATUSES.includes(existing.status) &&
+        req.body.status !== undefined &&
+        !Case.FINISHED_STATUSES.includes(req.body.status)
+      ) {
+        return res.status(409).json({
+          error:'Use the Owner Reopen Case action to return a finished case to the review queue.',
         });
       }
 
