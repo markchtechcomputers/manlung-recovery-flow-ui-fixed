@@ -42,8 +42,19 @@ test('incoming polling does not create a second call UI while one is active', ()
 });
 
 test('global call buttons use the peer-call engine instead of a no-op placeholder', () => {
-  assert.match(source, /function call\(name,video\)\{return startPeerCall\(name,!!video\)\}/,
+  assert.match(source, /window\.call=function\(name,video,memberId\)\{startPeerCall\(name,!!video,memberId\)\}/,
     'global call target must start the real peer call');
   assert.doesNotMatch(source, /Voice and video calling are not connected yet/,
     'old disabled call placeholder must not remain in the shipped page');
+});
+
+test('peer calls retry a dropped ICE connection with a fresh offer', () => {
+  assert.match(callModule, /function schedulePeerIceRestart\(reason\)/);
+  assert.match(callModule, /createOffer\(\{iceRestart:true\}\)/);
+  assert.match(callModule, /rtc\.direction==='incoming'/,
+    'callee must accept renegotiation offers after the initial answer');
+  assert.match(callModule, /rtc\.reconnectAttempts>=3/,
+    'reconnection attempts must be bounded');
+  assert.match(callModule, /clearTimeout\(rtc\.reconnectTimer\)/,
+    'call teardown must clear the reconnection timer');
 });
