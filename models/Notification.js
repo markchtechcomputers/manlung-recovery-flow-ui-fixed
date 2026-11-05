@@ -108,6 +108,17 @@ async function markRead(id, userId) {
   return data;
 }
 
+async function markCaseMessagesRead(caseId, userId) {
+  const { error } = await supabase
+    .from(TABLE)
+    .update({ read_at: new Date().toISOString() })
+    .eq('case_id', caseId)
+    .eq('user_id', userId)
+    .eq('type', 'new_message')
+    .is('read_at', null);
+  if (error) throw error;
+}
+
 async function markAllRead(userId) {
   const { error } = await supabase
     .from(TABLE)
@@ -126,4 +137,5 @@ module.exports = {
   unreadCount,
   markRead,
   markAllRead,
+  markCaseMessagesRead,
 };
