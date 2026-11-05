@@ -15,17 +15,19 @@ const CLIENT_PROFILE_PHOTO_BUCKET = 'client-profile-photos';
 
 async function resolveAvatarUrl(user, profile, includePrivate = false) {
   if (profile?.avatar_visibility === 'private' && !includePrivate) return null;
-  if (profile?.avatar_url) return profile.avatar_url;
-  if (!user?.avatar_path) return null;
-  try {
-    const { data, error } = await supabase.storage.from(CLIENT_PROFILE_PHOTO_BUCKET)
-      .createSignedUrl(user.avatar_path, 60 * 60);
-    if (error) throw error;
-    return data?.signedUrl || null;
-  } catch (error) {
-    console.error('Community profile avatar signing failed:', error?.message || error);
-    return null;
+  // The private Storage path is the canonical, latest uploaded profile photo.
+  // Keep legacy chat-profile URLs as a fallback for older accounts.
+  if (user?.avatar_path) {
+    try {
+      const { data, error } = await supabase.storage.from(CLIENT_PROFILE_PHOTO_BUCKET)
+        .createSignedUrl(user.avatar_path, 60 * 60);
+      if (error) throw error;
+      if (data?.signedUrl) return data.signedUrl;
+    } catch (error) {
+      console.error('Community profile avatar signing failed:', error?.message || error);
+    }
   }
+  return profile?.avatar_url || null;
 }
 
 async function resolveAvatarMap(users, profiles) {
@@ -164,9 +166,34 @@ router.patch('/profile', async (req, res) => {
       const isImageData = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/i.test(raw);
       if (raw.length > 180000) return fail(res, 413, 'Profile image is too large. Choose a smaller image.');
       if (raw && !isImageData && !(raw.startsWith('/') && !raw.startsWith('//')) && !/^https:\/\//i.test(raw)) return fail(res, 400, 'Avatar must be an image, secure HTTPS URL or same-site path.');
-      patch.avatar_url = raw || null;
-      // A newly uploaded photo is public by default; members can explicitly switch it to private later.
-      if (raw) patch.avatar_visibility = 'public';
+      if (isImageData) {
+        const match = raw.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/i);
+        if (!match) return fail(res,400,'Profile image data is invalid.');
+        const mime = 'image/' + match[1].toLowerCase();
+        const extension = match[1].toLowerCase() === 'jpeg' ? 'jpg' : match[1].toLowerCase();
+        const bytes = Buffer.from(match[2], 'base64');
+        if (!bytes.length || bytes.length > 2 * 1024 * 1024) return fail(res,413,'Profile image must be 2 MB or smaller.');
+        const photoPath = String(req.user.id) + '/' + crypto.randomUUID() + '.' + extension;
+        const { error: uploadError } = await supabase.storage.from(CLIENT_PROFILE_PHOTO_BUCKET)
+          .upload(photoPath, bytes, { contentType: mime, upsert: false });
+        if (uploadError) throw uploadError;
+        const { error: userPhotoError } = await supabase.from('recovery_users')
+          .update({ avatar_path: photoPath }).eq('id', req.user.id);
+        if (userPhotoError) {
+          await supabase.storage.from(CLIENT_PROFILE_PHOTO_BUCKET).remove([photoPath]).catch(() => {});
+          throw userPhotoError;
+        }
+        // Store one canonical photo in private Storage so every member view
+        // can obtain a fresh signed URL instead of a stale inline data URL.
+        patch.avatar_url = null;
+        patch.avatar_visibility = 'public';
+      } else {
+        patch.avatar_url = raw || null;
+        const { error: userPhotoError } = await supabase.from('recovery_users')
+          .update({ avatar_path: null }).eq('id', req.user.id);
+        if (userPhotoError) throw userPhotoError;
+        if (raw) patch.avatar_visibility = 'public';
+      }
     }
     for (const field of ['discoverable', 'read_receipts_enabled']) {
       if (Object.hasOwn(body, field)) {
