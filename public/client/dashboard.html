@@ -1194,7 +1194,8 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         try { savedClientUser = JSON.parse(localStorage.getItem('clientUser') || '{}') || {}; } catch (_) {}
         const clientUser = {
           ...data.user,
-          profilePicture: data.user.profilePicture || savedClientUser.profilePicture || null
+          // The authenticated server response is authoritative; do not revive a stale local photo.
+          profilePicture: data.user.profilePicture || null
         };
         localStorage.setItem('clientUser', JSON.stringify(clientUser));
         const joinedName = [clientUser.first_name || clientUser.firstName, clientUser.last_name || clientUser.lastName].filter(Boolean).join(' ').trim();
