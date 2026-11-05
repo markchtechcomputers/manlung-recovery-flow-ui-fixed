@@ -186,5 +186,7 @@ test('verification token route resolves to the public selfie page before static 
   const index = vercel.routes.findIndex(item => item.src === '^/verification/([^/]+)/?$');
   const fallback = vercel.routes.findIndex(item => item.src === '/(.*)');
   assert.ok(index >= 0 && index < fallback);
-  assert.equal(vercel.routes[index].dest, '/selfie.html?id=$1');
+  assert.equal(vercel.routes[index].dest, '/public/selfie.html?id=$1');
+  assert.ok(fs.existsSync(path.join(root, 'public/selfie.html')));
+  assert.equal(vercel.redirects, undefined);
 });
