@@ -1351,6 +1351,7 @@ function schedulePeerIceRestart(reason){
    const offer=await rtc.pc.createOffer({iceRestart:true});
    await rtc.pc.setLocalDescription(offer);
    await signal('offer',rtc.pc.localDescription.toJSON());
+   clearTimeout(rtc.timeout);rtc.timeout=setTimeout(()=>{if(!rtc.closed&&rtc.pc&&rtc.pc.connectionState!=='connected')schedulePeerIceRestart('failed')},12000);
   }catch(error){note(error);retry=true;if(rtc.reconnectAttempts>=3)endCall(true)}
   finally{rtc.reconnectInFlight=false;if(retry&&!rtc.closed&&rtc.reconnectAttempts<3)schedulePeerIceRestart('failed')}
  },delay)
