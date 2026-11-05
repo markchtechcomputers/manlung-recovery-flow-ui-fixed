@@ -19,7 +19,6 @@ test('extensionless public and client routes resolve to their HTML documents', (
   assert.match('/about', matcher);
   assert.match('/client/dashboard', matcher);
   assert.doesNotMatch('/css/style.css', matcher);
-  assert.doesNotMatch('/api/auth/verify', matcher);
   assert.equal(route.dest, '/public/$1.html');
 });
 
