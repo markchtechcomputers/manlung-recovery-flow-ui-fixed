@@ -71,9 +71,9 @@
   // Installed-app shell: hide website chrome, normalize viewport sizing, and
   // show a short branded welcome once at the start of each installed-app session.
   function setupPwaShell() {
-    if (!isStandalone()) return;
+    const standaloneApp = isStandalone();
 
-    if (!document.getElementById('manlung-pwa-shell-style')) {
+    if (standaloneApp && !document.getElementById('manlung-pwa-shell-style')) {
       const style = document.createElement('style');
       style.id = 'manlung-pwa-shell-style';
       style.textContent = `
