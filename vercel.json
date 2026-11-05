@@ -479,6 +479,34 @@
     {
       "source": "/",
       "destination": "/public/index"
+    },
+    {
+      "source": "/settings",
+      "destination": "/public/settings"
+    },
+    {
+      "source": "/login",
+      "destination": "/public/login"
+    },
+    {
+      "source": "/client/dashboard",
+      "destination": "/public/client/dashboard"
+    },
+    {
+      "source": "/client/track",
+      "destination": "/public/client/track"
+    },
+    {
+      "source": "/client/settings",
+      "destination": "/public/client/settings"
+    },
+    {
+      "source": "/client/recovery-center",
+      "destination": "/public/client/recovery-center"
+    },
+    {
+      "source": "/client/request",
+      "destination": "/public/client/request"
     }
   ]
 }
