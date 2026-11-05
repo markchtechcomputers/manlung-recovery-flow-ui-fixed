@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
 const { auth } = require('../middleware/auth');
+const Notification = require('../models/Notification');
 
 router.use((req,res,next)=>req.path==='/plans/webhook'?next():auth(req,res,next));
 
@@ -1725,6 +1726,22 @@ async function hasCallPlan(userId) {
   .eq('user_id',userId).eq('plan_code','call').eq('status','paid').gt('expires_at',new Date().toISOString()).limit(1);
  if(error) throw error; return Boolean(data?.length);
 }
+async function markStalePeerCallsAsMissed() {
+ const cutoff = new Date(Date.now()-120000).toISOString();
+ const now = new Date().toISOString();
+ const {data,error}=await supabase.from('recovery_peer_calls')
+  .update({status:'missed',ended_at:now})
+  .eq('status','ringing').lt('created_at',cutoff)
+  .select('id,callee_user_id,call_mode,created_at');
+ if(error) throw error;
+ await Promise.all((data||[]).map(call=>Notification.create({
+  userId:call.callee_user_id,
+  type:'missed_call',
+  title:call.call_mode==='video'?'Missed video call':'Missed voice call',
+  message:'You missed a '+(call.call_mode==='video'?'video':'voice')+' call from a Manlung member. Open Community to view your call history.',
+ }).catch(error=>console.error('Missed call notification failed:',error?.message||error))));
+ return data||[];
+}
 async function peerParticipant(callId,userId) {
  const {data,error}=await supabase.from('recovery_peer_calls').select('*').eq('id',callId).maybeSingle();
  if(error) throw error;
@@ -1749,8 +1766,7 @@ router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
   const lastSeen=presence?.last_seen_at ? new Date(presence.last_seen_at).getTime() : NaN;
   const age=Date.now()-lastSeen;
   if(!Number.isFinite(lastSeen)||age<0||age>=60000) return fail(res,409,'This member is offline. You can call when they come online.');
-  const stale=await supabase.from('recovery_peer_calls').update({status:'missed',ended_at:new Date().toISOString()}).eq('status','ringing').lt('created_at',new Date(Date.now()-120000).toISOString());
-  if(stale.error) throw stale.error;
+  await markStalePeerCallsAsMissed();
   const {data:busy,error:be}=await supabase.from('recovery_peer_calls').select('id').in('status',['ringing','accepted'])
    .or('caller_user_id.eq.'+req.user.id+',callee_user_id.eq.'+req.user.id+',caller_user_id.eq.'+other+',callee_user_id.eq.'+other).limit(1);
   if(be) throw be;
@@ -1763,9 +1779,7 @@ router.post('/peer-calls',peerCallLimiter,async(req,res)=>{
 });
 router.get('/peer-calls/incoming',async(req,res)=>{
  try{
-  const stale=await supabase.from('recovery_peer_calls').update({status:'missed',ended_at:new Date().toISOString()})
-   .eq('status','ringing').lt('created_at',new Date(Date.now()-120000).toISOString());
-  if(stale.error) throw stale.error;
+  await markStalePeerCallsAsMissed();
   const {data,error}=await supabase.from('recovery_peer_calls').select('id,caller_user_id,callee_user_id,call_mode,status,created_at')
    .eq('callee_user_id',req.user.id).eq('status','ringing').gt('created_at',new Date(Date.now()-120000).toISOString()).order('created_at',{ascending:false}).limit(5);
   if(error) throw error;
@@ -1779,6 +1793,38 @@ router.get('/peer-calls/incoming',async(req,res)=>{
   res.set('Cache-Control','no-store');
   res.json({success:true,calls:(data||[]).map(c=>({...c,caller:{name:pm.get(c.caller_user_id)?.display_name||um.get(c.caller_user_id)?.username||'Member',avatar:avatarMap.get(String(c.caller_user_id))||null}}))});
  }catch(error){return handleDbError(res,error,'Incoming peer calls error:');}
+});
+router.get('/peer-calls/history',async(req,res)=>{
+ try{
+  const userId=String(req.user.id);
+  const {data,error}=await supabase.from('recovery_peer_calls')
+   .select('id,caller_user_id,callee_user_id,call_mode,status,created_at,accepted_at,ended_at')
+   .or('caller_user_id.eq.'+userId+',callee_user_id.eq.'+userId)
+   .order('created_at',{ascending:false}).limit(100);
+  if(error) throw error;
+  const rows=data||[];
+  const peerIds=[...new Set(rows.map(c=>String(c.caller_user_id)===userId?c.callee_user_id:c.caller_user_id).filter(Boolean).map(String))];
+  const [usersResult,profilesResult]=await Promise.all([
+   peerIds.length?supabase.from('recovery_users').select('id,username,avatar_path').in('id',peerIds):Promise.resolve({data:[],error:null}),
+   peerIds.length?supabase.from('recovery_chat_profiles').select('user_id,display_name,avatar_url,avatar_visibility').in('user_id',peerIds):Promise.resolve({data:[],error:null})
+  ]);
+  if(usersResult.error) throw usersResult.error;
+  if(profilesResult.error) throw profilesResult.error;
+  const users=usersResult.data||[],profiles=profilesResult.data||[];
+  const userMap=new Map(users.map(x=>[String(x.id),x]));
+  const profileMap=new Map(profiles.map(x=>[String(x.user_id),x]));
+  const avatars=await resolveAvatarMap(users,profiles);
+  res.set('Cache-Control','no-store');
+  return res.json({success:true,calls:rows.map(c=>{
+   const peerId=String(c.caller_user_id)===userId?c.callee_user_id:c.caller_user_id;
+   const peer=userMap.get(String(peerId)),profile=profileMap.get(String(peerId));
+   const started=c.accepted_at||c.created_at,end=c.ended_at;
+   const duration=end&&started?Math.max(0,Math.round((new Date(end).getTime()-new Date(started).getTime())/1000)):0;
+   return {...c,direction:String(c.caller_user_id)===userId?'outgoing':'incoming',peer_id:peerId,
+    peer:{id:peerId,name:profile?.display_name||peer?.username||'Manlung member',avatar:avatars.get(String(peerId))||null},
+    duration_seconds:duration};
+  })});
+ }catch(error){return handleDbError(res,error,'Peer call history error:')}
 });
 router.get('/peer-calls/:callId/signals',async(req,res)=>{
  try{
