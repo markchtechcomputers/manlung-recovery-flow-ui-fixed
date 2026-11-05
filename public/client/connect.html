@@ -1299,7 +1299,7 @@ if(document.readyState!=='loading'){boot();window.loadVerifiedBadgeStatus?.();ve
 (function(){
 /* Community peer calls are isolated from the existing Admin <-> Client call engine.
    They use the same authenticated polling + WebRTC/ICE flow, but their own peer-call API. */
-const api='/api/community',rtc={callId:null,pc:null,stream:null,poll:null,incomingTimer:null,last:0,mode:'audio',incoming:false,seen:new Set(),closed:true,iceQueue:[],polling:false,ending:false,connected:false,timeout:null,startedAt:0,peerName:'',direction:'outgoing',peerId:null};window.__mlCallHistory=[];try{window.__mlCallHistory=JSON.parse(localStorage.getItem('mlg-call-history')||'[]')}catch(_){}function saveCallLog(status){const item={peer_name:rtc.peerName||'Manlung member',peer_id:rtc.peerId||null,direction:rtc.direction,status:status||'ended',mode:rtc.mode,created_at:new Date(rtc.startedAt||Date.now()).toISOString(),duration_seconds:Math.max(0,Math.round((Date.now()-(rtc.startedAt||Date.now()))/1000))};window.__mlCallHistory.unshift(item);window.__mlCallHistory=window.__mlCallHistory.slice(0,100);try{localStorage.setItem('mlg-call-history',JSON.stringify(window.__mlCallHistory))}catch(_){}if(typeof render==='function'&&tab==='calls')render()}const CALL_ICONS={mute:'https://i.postimg.cc/ry0MF2V2/icons8-mute-50.png',mic:'https://i.postimg.cc/QMYZh0vF/icons8-microphone-50.png',camera:'https://i.postimg.cc/59CWW5gX/icons8-camera-50.png',accept:'https://i.postimg.cc/nLzNRqMn/icons8-call-48.png',end:'https://i.postimg.cc/hPVJvdDW/icons8-end-call-50.png'};function callIcon(url,alt){return '<img src="'+url+'" alt="'+alt+'" style="width:27px;height:27px;object-fit:contain" />'}function callAvatar(name,avatar){const label=String(name||'M').trim().slice(0,1).toUpperCase()||'M';return '<div class="ml-call-avatar" aria-label="'+esc(name||'Caller')+' profile picture">'+(avatar?'<img src="'+esc(avatar)+'" alt="'+esc(name||'Caller')+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">':esc(label))+'</div>'}function vibrate(pattern){try{if(navigator.vibrate)navigator.vibrate(pattern)}catch(_){}}
+const api='/api/community',rtc={callId:null,pc:null,stream:null,poll:null,incomingTimer:null,last:0,mode:'audio',incoming:false,seen:new Set(),closed:true,iceQueue:[],polling:false,ending:false,connected:false,timeout:null,reconnectTimer:null,reconnectAttempts:0,reconnectInFlight:false,startedAt:0,peerName:'',direction:'outgoing',peerId:null};window.__mlCallHistory=[];try{window.__mlCallHistory=JSON.parse(localStorage.getItem('mlg-call-history')||'[]')}catch(_){}function saveCallLog(status){const item={peer_name:rtc.peerName||'Manlung member',peer_id:rtc.peerId||null,direction:rtc.direction,status:status||'ended',mode:rtc.mode,created_at:new Date(rtc.startedAt||Date.now()).toISOString(),duration_seconds:Math.max(0,Math.round((Date.now()-(rtc.startedAt||Date.now()))/1000))};window.__mlCallHistory.unshift(item);window.__mlCallHistory=window.__mlCallHistory.slice(0,100);try{localStorage.setItem('mlg-call-history',JSON.stringify(window.__mlCallHistory))}catch(_){}if(typeof render==='function'&&tab==='calls')render()}const CALL_ICONS={mute:'https://i.postimg.cc/ry0MF2V2/icons8-mute-50.png',mic:'https://i.postimg.cc/QMYZh0vF/icons8-microphone-50.png',camera:'https://i.postimg.cc/59CWW5gX/icons8-camera-50.png',accept:'https://i.postimg.cc/nLzNRqMn/icons8-call-48.png',end:'https://i.postimg.cc/hPVJvdDW/icons8-end-call-50.png'};function callIcon(url,alt){return '<img src="'+url+'" alt="'+alt+'" style="width:27px;height:27px;object-fit:contain" />'}function callAvatar(name,avatar){const label=String(name||'M').trim().slice(0,1).toUpperCase()||'M';return '<div class="ml-call-avatar" aria-label="'+esc(name||'Caller')+' profile picture">'+(avatar?'<img src="'+esc(avatar)+'" alt="'+esc(name||'Caller')+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">':esc(label))+'</div>'}function vibrate(pattern){try{if(navigator.vibrate)navigator.vibrate(pattern)}catch(_){}}
 async function rq(path,opts={}){const r=await fetch(api+path,{credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},...opts});let d={};try{d=await r.json()}catch(e){}if(!r.ok||d.success===false){const x=new Error(d.error||'Call request failed ('+r.status+')');x.status=r.status;throw x}return d}
 function note(e){stopRingtone();const msg=e&&typeof e.message==='string'&&e.message.trim()&&e.message!=='null'?e.message:'Call could not be connected. Check microphone permission and try again.';toast(msg)}
 let lastCallState='';let activeCallNotification=null;
@@ -1329,12 +1329,29 @@ async function setup(mode){
  rtc.pc=new RTCPeerConnection(config);
  rtc.pc.onicecandidate=e=>{if(e.candidate)signal('ice',e.candidate.toJSON()).catch(note)};
  rtc.pc.ontrack=e=>{const stream=e.streams&&e.streams[0];if(!stream)return;const v=document.querySelector('#ml-peer-remote'),a=document.querySelector('#ml-peer-audio');if(stream.getVideoTracks().length&&v){v.srcObject=stream;v.style.display='block';v.play().catch(()=>{})}if(a){a.srcObject=stream;a.play().catch(()=>state('Tap the call screen to enable audio'))}};
- rtc.pc.onconnectionstatechange=()=>{if(!rtc.pc)return;const s=rtc.pc.connectionState;if(s==='connected'){rtc.connected=true;clearTimeout(rtc.timeout);state('Connected')}else if(s==='connecting')state('Connecting media…');else if(s==='disconnected')state('Connection interrupted — trying to recover…');else if(s==='failed'){state('Connection failed. Check your network or TURN relay.');endCall(true)}};
+ rtc.pc.onconnectionstatechange=()=>{if(!rtc.pc)return;const s=rtc.pc.connectionState;if(s==='connected'){rtc.connected=true;rtc.reconnectAttempts=0;clearTimeout(rtc.timeout);clearTimeout(rtc.reconnectTimer);rtc.reconnectTimer=null;state('Connected')}else if(s==='connecting')state('Connecting media…');else if(s==='disconnected'||s==='failed'){state('Connection interrupted — trying to recover…');schedulePeerIceRestart(s)}};
  try{rtc.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:mode==='video'?{facingMode:'user'}:false})}
  catch(e){if(mode==='video'){try{rtc.stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});rtc.mode='audio';state('Camera unavailable; continuing with voice call')}catch(_){throw e}}else throw e}
  rtc.stream.getTracks().forEach(t=>rtc.pc.addTrack(t,rtc.stream));
  const local=document.querySelector('#ml-peer-local');if(local&&rtc.stream.getVideoTracks().length){local.srcObject=rtc.stream;local.style.display='block';local.play().catch(()=>{})}
  rtc.timeout=setTimeout(()=>{if(!rtc.closed&&!rtc.connected){state('No connection yet. Check microphone permission and network/TURN settings.');endCall(true)}},35000)
+}
+function schedulePeerIceRestart(reason){
+ if(rtc.closed||rtc.direction!=='outgoing'||rtc.reconnectTimer||rtc.reconnectInFlight)return;
+ if(rtc.reconnectAttempts>=3){state('Connection failed after several recovery attempts. Check the network or TURN relay.');endCall(true);return}
+ const delay=reason==='failed'?500:1600;
+ rtc.reconnectTimer=setTimeout(async()=>{
+  rtc.reconnectTimer=null;
+  if(rtc.closed||!rtc.pc||rtc.pc.connectionState==='connected')return;
+  rtc.reconnectInFlight=true;rtc.reconnectAttempts++;
+  try{
+   state('Reconnecting media… attempt '+rtc.reconnectAttempts+'/3');
+   const offer=await rtc.pc.createOffer({iceRestart:true});
+   await rtc.pc.setLocalDescription(offer);
+   await signal('offer',rtc.pc.localDescription.toJSON());
+  }catch(error){note(error);if(rtc.reconnectAttempts>=3)endCall(true);else schedulePeerIceRestart('failed')}
+  finally{rtc.reconnectInFlight=false}
+ },delay)
 }
 async function poll(){
  if(!rtc.callId||rtc.closed||rtc.polling)return;rtc.polling=true;
@@ -1353,7 +1370,7 @@ async function poll(){
     setTimeout(()=>{if(rtc.callId===pollCallId)endCall(false)},100);return;
    }
    if(!rtc.pc)continue;
-   if(s.signal_type==='offer'&&rtc.incoming){
+   if(s.signal_type==='offer'&&rtc.direction==='incoming'){
     await rtc.pc.setRemoteDescription(s.payload);
     for(const c of rtc.iceQueue.splice(0)){try{await rtc.pc.addIceCandidate(c)}catch(_){}}
     const ans=await rtc.pc.createAnswer();await rtc.pc.setLocalDescription(ans);await signal('answer',rtc.pc.localDescription.toJSON());rtc.incoming=false;state('Calling…')
@@ -1372,19 +1389,19 @@ async function startPeerCall(name,video,memberId){
  const m=(window.__mlMembers||[]).find(x=>memberId&&String(x.id)===String(memberId))||(window.__mlMembers||[]).find(x=>(x.name||x.username)===name||x.username===name);
  if(!m)return toast('Choose a registered member from Community.');
  
- requestCallNotifications();rtc.closed=false;rtc.ending=false;rtc.connected=false;rtc.last=0;rtc.incoming=false;rtc.iceQueue=[];rtc.mode=video?'video':'audio';rtc.startedAt=Date.now();rtc.peerName=name;rtc.peerId=m.id;rtc.direction='outgoing';lastCallState='';vibrate([180,80,180]);
+ requestCallNotifications();rtc.closed=false;rtc.ending=false;rtc.connected=false;rtc.reconnectAttempts=0;clearTimeout(rtc.reconnectTimer);rtc.reconnectTimer=null;rtc.last=0;rtc.incoming=false;rtc.iceQueue=[];rtc.mode=video?'video':'audio';rtc.startedAt=Date.now();rtc.peerName=name;rtc.peerId=m.id;rtc.direction='outgoing';lastCallState='';vibrate([180,80,180]);
  try{const d=await rq('/peer-calls',{method:'POST',body:JSON.stringify({memberId:m.id,call_mode:rtc.mode})});rtc.callId=d.call.id;callUI(name,rtc.mode,false,m.avatar||m.avatar_url||null);startRingtone();await setup(rtc.mode);const offer=await rtc.pc.createOffer();await rtc.pc.setLocalDescription(offer);await signal('offer',rtc.pc.localDescription.toJSON());state('Ringing…');beginPoll()}
  catch(e){note(e);await endCall(!!rtc.callId,'hangup')}
 }
 async function acceptIncoming(){
  stopRingtone();if(!rtc.callId||rtc.ending)return;
- try{rtc.closed=false;rtc.ending=false;await setup(rtc.mode);rtc.last=0;await signal('accept');rtc.incoming=true;state('Connecting…');beginPoll()}
+ try{rtc.closed=false;rtc.ending=false;rtc.reconnectAttempts=0;clearTimeout(rtc.reconnectTimer);rtc.reconnectTimer=null;await setup(rtc.mode);rtc.last=0;await signal('accept');rtc.incoming=true;state('Connecting…');beginPoll()}
  catch(e){note(e);await endCall(true,'reject')}
 }
 async function endCall(notify,kind){
  if(rtc.ending)return;rtc.ending=true;const id=rtc.callId;
  if(notify&&id&&(!rtc.closed||kind==='reject')){try{await signal(kind||'hangup')}catch(_){}}
- rtc.closed=true;stopRingtone();if(id&&rtc.startedAt)saveCallLog(kind==='reject'?'missed':(rtc.connected?'ended':'cancelled'));clearInterval(rtc.poll);rtc.poll=null;clearTimeout(rtc.timeout);rtc.timeout=null;
+ rtc.closed=true;stopRingtone();clearTimeout(rtc.reconnectTimer);rtc.reconnectTimer=null;if(id&&rtc.startedAt)saveCallLog(kind==='reject'?'missed':(rtc.connected?'ended':'cancelled'));clearInterval(rtc.poll);rtc.poll=null;clearTimeout(rtc.timeout);rtc.timeout=null;
  if(rtc.pc){rtc.pc.ontrack=null;rtc.pc.onicecandidate=null;try{rtc.pc.close()}catch(_){}}
  if(rtc.stream)rtc.stream.getTracks().forEach(t=>t.stop());
  rtc.pc=null;rtc.stream=null;rtc.callId=null;rtc.peerId=null;rtc.incoming=false;rtc.connected=false;rtc.iceQueue=[];rtc.polling=false;
