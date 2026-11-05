@@ -356,6 +356,10 @@
       "dest": "/public/admin/$1"
     },
     {
+      "src": "^/privacy(?:\\.html)?/?$",
+      "dest": "/public/privacy.html"
+    },
+    {
       "src": "^/client/connect\\.html$",
       "status": 308,
       "headers": {
@@ -471,6 +475,10 @@
     {
       "source": "/verification/:token",
       "destination": "/public/selfie?id=:token"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/public/privacy"
     },
     {
       "source": "/client/connect",
