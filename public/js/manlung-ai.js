@@ -724,7 +724,7 @@
       answer=await streamBackend(message,cleaned=>{
         ui.bubble.textContent=cleaned;
         ui.meta.textContent='Manlung AI • responding…';
-        speaker.push(part);
+        speaker.push(cleaned);
         const body=document.getElementById('manlungAiMessages');
         if(body)body.scrollTo({top:body.scrollHeight,behavior:'smooth'});
       },priorHistory,lang);
