@@ -133,6 +133,9 @@ function trackLogoutRevocation(req, res) {
 function inspectString(value, keyPath) {
   if (NULL_BYTE.test(value) || CONTROL_CHARS.test(value)) return 'Input contains invalid control characters.';
   const key = String(keyPath || '').split('.').pop();
+  // JPEG bytes are sent as strict base64 to the authenticated profile-photo route.
+  // Validate the encoded alphabet here; the route separately verifies the JPEG signature.
+  if (key === 'imageBase64' && value.length <= 1400000 && /^[A-Za-z0-9+/]+={0,2}$/.test(value)) return null;
   if (URL_LIKE_KEYS.has(key) && DANGEROUS_SCHEMES.test(value)) return 'Unsafe URL scheme detected.';
   if (PATH_LIKE_KEYS.has(key) && PATH_TRAVERSAL.test(value)) return 'Unsafe file path detected.';
   for (const pattern of DANGEROUS_HTML) if (pattern.test(value)) return 'Potentially executable HTML or script content detected.';
