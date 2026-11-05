@@ -147,7 +147,7 @@ const allowedOrigins = String(process.env.ALLOWED_ORIGINS || '')
   .filter(Boolean);
 
 const vercelDeploymentOrigin = process.env.VERCEL_URL
-  ? `https://${String(process.env.VERCEL_URL).replace(/^https?:\\/\\//i, '').replace(/\\/$/, '')}`
+  ? `https://${String(process.env.VERCEL_URL).replace(/^https?:\/\//i, '').replace(/\/$/, '')}`
   : null;
 
 const effectiveAllowedOrigins = [...new Set([
