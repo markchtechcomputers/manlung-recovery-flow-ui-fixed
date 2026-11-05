@@ -1344,13 +1344,14 @@ function schedulePeerIceRestart(reason){
   rtc.reconnectTimer=null;
   if(rtc.closed||!rtc.pc||rtc.pc.connectionState==='connected')return;
   rtc.reconnectInFlight=true;rtc.reconnectAttempts++;
+  let retry=false;
   try{
    state('Reconnecting media… attempt '+rtc.reconnectAttempts+'/3');
    const offer=await rtc.pc.createOffer({iceRestart:true});
    await rtc.pc.setLocalDescription(offer);
    await signal('offer',rtc.pc.localDescription.toJSON());
-  }catch(error){note(error);if(rtc.reconnectAttempts>=3)endCall(true)}
-  finally{rtc.reconnectInFlight=false;if(!rtc.closed&&rtc.reconnectAttempts<3&&rtc.pc?.connectionState!=='connected'&&!rtc.reconnectTimer&&rtc.reconnectAttempts>0&&rtc.pc?.signalingState!=='closed')schedulePeerIceRestart('failed')}
+  }catch(error){note(error);retry=true;if(rtc.reconnectAttempts>=3)endCall(true)}
+  finally{rtc.reconnectInFlight=false;if(retry&&!rtc.closed&&rtc.reconnectAttempts<3)schedulePeerIceRestart('failed')}
  },delay)
 }
 async function poll(){
