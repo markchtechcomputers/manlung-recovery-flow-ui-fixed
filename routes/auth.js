@@ -1568,6 +1568,23 @@ router.post(
 // CLIENT PROFILE
 // ============================================================
 
+const CLIENT_PROFILE_PHOTO_BUCKET = 'client-profile-photos';
+
+async function createClientProfilePhotoUrl(user) {
+  if (!user?.avatar_path) return null;
+  try {
+    const { data, error } = await supabase.storage
+      .from(CLIENT_PROFILE_PHOTO_BUCKET)
+      .createSignedUrl(user.avatar_path, 60 * 60);
+    if (error) throw error;
+    return data?.signedUrl || null;
+  } catch (error) {
+    console.error('Client profile photo URL error:', error?.message || error);
+    return null;
+  }
+}
+
+
 router.get(
   '/client/me',
   auth,
@@ -1580,6 +1597,7 @@ router.get(
         });
       }
 
+      const profilePicture = await createClientProfilePhotoUrl(req.user);
       return res.json({
         success: true,
         user: {
@@ -1589,11 +1607,11 @@ router.get(
           phone: req.user.phone || '',
           role: req.user.role,
           createdAt: req.user.created_at,
+          profilePicture,
         },
       });
     } catch (error) {
       console.error('Client profile load error:', error);
-
       return res.status(500).json({
         success: false,
         error: 'Could not load your profile.',
@@ -1601,6 +1619,96 @@ router.get(
     }
   }
 );
+
+router.put('/client/profile-photo', auth, async (req, res) => {
+  let uploadedPath = null;
+  try {
+    if (req.user.role !== 'client') {
+      return res.status(403).json({ success: false, error: 'Client access required.' });
+    }
+
+    const imageData = String(req.body?.imageData || '');
+    const match = imageData.match(/^data:image\\/jpeg;base64,([A-Za-z0-9+/]+={0,2})$/);
+    if (!match) {
+      return res.status(400).json({ success: false, error: 'Please select a valid JPEG image.' });
+    }
+
+    const buffer = Buffer.from(match[1], 'base64');
+    if (!buffer.length || buffer.length > 1024 * 1024 ||
+        buffer[0] !== 0xff || buffer[1] !== 0xd8 || buffer[2] !== 0xff) {
+      return res.status(400).json({ success: false, error: 'The photo is invalid or too large. Please choose another image.' });
+    }
+
+    const suffix = crypto.randomBytes(6).toString('hex');
+    uploadedPath = `${req.user.id}/avatar-${Date.now()}-${suffix}.jpg`;
+    const { error: uploadError } = await supabase.storage
+      .from(CLIENT_PROFILE_PHOTO_BUCKET)
+      .upload(uploadedPath, buffer, {
+        contentType: 'image/jpeg',
+        cacheControl: '3600',
+        upsert: false,
+      });
+    if (uploadError) throw uploadError;
+
+    const { data: updated, error: updateError } = await supabase
+      .from('recovery_users')
+      .update({ avatar_path: uploadedPath })
+      .eq('id', req.user.id)
+      .eq('role', 'client')
+      .select('id, avatar_path')
+      .maybeSingle();
+
+    if (updateError || !updated) {
+      await supabase.storage.from(CLIENT_PROFILE_PHOTO_BUCKET).remove([uploadedPath]);
+      if (updateError) throw updateError;
+      return res.status(404).json({ success: false, error: 'Client account not found.' });
+    }
+
+    if (req.user.avatar_path && req.user.avatar_path !== uploadedPath) {
+      const { error: removeError } = await supabase.storage
+        .from(CLIENT_PROFILE_PHOTO_BUCKET)
+        .remove([req.user.avatar_path]);
+      if (removeError) console.error('Previous client profile photo cleanup failed:', removeError.message);
+    }
+
+    const profilePicture = await createClientProfilePhotoUrl(updated);
+    return res.json({ success: true, profilePicture });
+  } catch (error) {
+    if (uploadedPath) {
+      await supabase.storage.from(CLIENT_PROFILE_PHOTO_BUCKET).remove([uploadedPath]).catch(() => {});
+    }
+    console.error('Client profile photo upload error:', error?.message || error);
+    return res.status(500).json({ success: false, error: 'Could not save your profile photo. Please try again.' });
+  }
+});
+
+router.delete('/client/profile-photo', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'client') {
+      return res.status(403).json({ success: false, error: 'Client access required.' });
+    }
+
+    const oldPath = req.user.avatar_path || null;
+    const { error: updateError } = await supabase
+      .from('recovery_users')
+      .update({ avatar_path: null })
+      .eq('id', req.user.id)
+      .eq('role', 'client');
+    if (updateError) throw updateError;
+
+    if (oldPath) {
+      const { error: removeError } = await supabase.storage
+        .from(CLIENT_PROFILE_PHOTO_BUCKET)
+        .remove([oldPath]);
+      if (removeError) console.error('Client profile photo removal cleanup failed:', removeError.message);
+    }
+
+    return res.json({ success: true, profilePicture: null });
+  } catch (error) {
+    console.error('Client profile photo removal error:', error?.message || error);
+    return res.status(500).json({ success: false, error: 'Could not remove your profile photo. Please try again.' });
+  }
+});
 
 router.patch(
   '/client/profile',
@@ -2549,6 +2657,9 @@ router.get(
   '/verify',
   auth,
   async (req, res) => {
+    const profilePicture = req.user.role === 'client'
+      ? await createClientProfilePhotoUrl(req.user)
+      : null;
     res.json({
       success: true,
       user: {
@@ -2556,6 +2667,7 @@ router.get(
         username: req.user.username,
         email: req.user.email,
         role: req.user.role,
+        profilePicture,
         auth_provider: req.user.auth_provider || null,
         email_verified_at: req.user.email_verified_at || null,
         email_otp_required: Boolean(req.user.email_otp_required),
