@@ -419,6 +419,85 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
 @media(max-width:760px){.site-header{width:calc(100% - 20px);margin-top:10px}.site-header .container-narrow{flex-wrap:wrap;padding:.75rem}.site-header .brand{flex:1 1 100%}.site-header .brand>span{font-size:.68rem}.site-header .header-actions{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.site-header .header-actions a,.site-header .header-actions button{justify-content:center;text-align:center}.progress-bar-wrap{width:calc(100% - 20px);padding:.7rem .8rem}.body>.container-narrow,body>.container-narrow{width:calc(100% - 20px);padding:.8rem}.request-welcome-mark{display:none}.request-intake-stepper .stepper-heading{align-items:flex-start;flex-direction:column;gap:.25rem}.request-dashboard-note .request-flow-head{align-items:flex-start}}
 @media(max-width:620px){.request-intake-stepper{padding:.95rem .7rem}.request-intake-steps{grid-template-columns:1fr;gap:.65rem}.request-intake-steps:before{left:16px;right:auto;top:18px;bottom:18px;width:2px;height:auto}.request-intake-step{flex-direction:row;justify-content:flex-start;text-align:left;gap:.65rem}.request-intake-step .step-label{font-size:.75rem}.request-intake-step .step-number{flex:0 0 33px}.request-benefits span{border-radius:7px}.request-toolbar{grid-template-columns:1fr}.request-meta{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Phone-first recovery request layout */
+@media (max-width: 640px) {
+  html, body { width:100%; max-width:100%; overflow-x:hidden; }
+  body { font-size:15px; }
+  .site-header { width:calc(100% - 16px); margin:8px auto 0; border-radius:13px 13px 0 0; }
+  .site-header .container-narrow { min-height:0; padding:.75rem; gap:.65rem; }
+  .site-header .brand { display:grid; grid-template-columns:36px minmax(0,1fr); column-gap:.6rem; row-gap:.2rem; align-items:center; }
+  .site-header .manlung-home-logo { grid-row:1 / span 2; }
+  .site-header .manlung-site-logo { width:36px; height:36px; }
+  .site-header .brand h1 { min-width:0; font-size:1rem; line-height:1.2; overflow-wrap:anywhere; }
+  .site-header .brand>span { grid-column:2; white-space:normal; font-size:.68rem; }
+  .site-header .header-actions { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.35rem; }
+  .site-header .header-actions a,.site-header .header-actions button { min-width:0; min-height:40px; padding:.45rem .25rem; font-size:.72rem; }
+  .progress-bar-wrap { width:calc(100% - 16px); padding:.65rem .75rem; }
+  .progress-bar-label { justify-content:space-between; gap:.5rem; font-size:.68rem; }
+  body>.container-narrow { width:calc(100% - 16px); margin:0 auto 12px; padding:.65rem; border-radius:0 0 13px 13px; }
+  .request-welcome { padding:1rem; margin-bottom:.7rem; border-radius:12px; }
+  .request-welcome h2 { font-size:1.28rem; line-height:1.22; }
+  .request-welcome p { font-size:.82rem; line-height:1.55; }
+  .request-eyebrow { font-size:.61rem; letter-spacing:.075em; }
+  .request-benefits { display:grid; grid-template-columns:1fr; gap:.35rem; margin-top:.75rem; }
+  .request-benefits span { padding:.4rem .5rem; font-size:.68rem; }
+  .request-intake-stepper { margin-bottom:.7rem; padding:.8rem; border-radius:11px; }
+  .request-intake-stepper .stepper-heading { margin-bottom:.65rem; }
+  .request-intake-stepper .stepper-heading strong { font-size:.82rem; }
+  .request-intake-stepper .stepper-heading span { font-size:.67rem; line-height:1.4; }
+  .request-intake-steps { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.45rem; }
+  .request-intake-steps:before { display:none; }
+  .request-intake-step { min-width:0; flex-direction:row; justify-content:flex-start; gap:.45rem; padding:.45rem; border:1px solid #e2e8f0; border-radius:8px; text-align:left; }
+  .request-intake-step:last-child { grid-column:1 / -1; }
+  .request-intake-step .step-number { flex:0 0 27px; width:27px; height:27px; font-size:.68rem; }
+  .request-intake-step .step-label { min-width:0; font-size:.66rem; line-height:1.25; overflow-wrap:anywhere; }
+  .request-dashboard-note { margin-bottom:.7rem; padding:.8rem; }
+  .request-dashboard-note .request-flow-head { display:flex; flex-direction:column; align-items:stretch; gap:.7rem; }
+  .request-dashboard-note h2 { margin-bottom:.35rem; }
+  .request-dashboard-note .request-flow-sub { font-size:.76rem; }
+  .request-dashboard-note .request-flow-head>.btn { width:100%; justify-content:center; }
+  #incidentForm { gap:0; }
+  #incidentForm>.card { margin-bottom:.7rem; padding:.9rem; border-radius:11px; }
+  #incidentForm .card-title { gap:.5rem; margin-bottom:.8rem; padding-bottom:.65rem; font-size:.86rem; line-height:1.3; }
+  #incidentForm .card-title>i { flex-basis:30px; width:30px; height:30px; font-size:.82rem; }
+  #incidentForm .row-2,#incidentForm .row-3 { display:grid; grid-template-columns:minmax(0,1fr); gap:.1rem; }
+  #incidentForm .form-group { min-width:0; margin-bottom:.75rem; }
+  #incidentForm .form-group label { font-size:.74rem; }
+  #incidentForm input:not([type=checkbox]):not([type=file]),#incidentForm select,#incidentForm textarea { width:100%; min-width:0; min-height:46px; box-sizing:border-box; padding:.72rem .75rem; font-size:16px; }
+  #incidentForm textarea { min-height:116px; }
+  #incidentForm input[type=file] { display:block; width:100%; max-width:100%; min-width:0; font-size:.75rem; }
+  #incidentForm .checkbox-group { gap:.6rem; padding:.7rem; margin:.55rem 0; }
+  #incidentForm .checkbox-group label { font-size:.74rem; line-height:1.5; }
+  #incidentForm .upload-policy { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.35rem; }
+  #incidentForm .upload-policy-item { min-width:0; padding:.5rem .3rem; text-align:center; font-size:.65rem; line-height:1.4; overflow-wrap:anywhere; }
+  #incidentForm .upload-zone-enhanced { padding:1rem .75rem; min-height:0; text-align:center; }
+  #incidentForm .upload-zone-enhanced h3 { font-size:.9rem; line-height:1.35; }
+  #incidentForm .upload-zone-enhanced p { font-size:.72rem; line-height:1.5; }
+  #incidentForm .security-upload-note { align-items:flex-start; gap:.5rem; padding:.7rem; font-size:.7rem; line-height:1.5; }
+  #incidentForm .upload-queue { min-width:0; }
+  #incidentForm .upload-item { min-width:0; }
+  #incidentForm .upload-item-head { min-width:0; gap:.45rem; }
+  #incidentForm .upload-item-main { min-width:0; }
+  #incidentForm .upload-item-name { overflow-wrap:anywhere; word-break:break-word; }
+  #incidentForm .upload-item-actions button { min-width:38px; min-height:38px; }
+  #incidentForm .case-turnstile { min-width:0; margin:.7rem 0; padding:.8rem; overflow:hidden; }
+  #caseTurnstileWidget { width:100%; min-width:0; overflow:hidden; }
+  #caseTurnstileWidget iframe { max-width:100%; }
+  #incidentForm #submitBtn,#incidentForm button[type=reset] { width:100%; min-height:48px; }
+  #incidentForm>div:last-child { display:grid!important; grid-template-columns:1fr; gap:.55rem!important; }
+  #incidentForm #submitStatus { grid-column:1; font-size:.75rem!important; line-height:1.4; }
+  #submissionModal { width:calc(100% - 24px); max-height:calc(100dvh - 24px); overflow-y:auto; padding:1.1rem; }
+}
+@media (max-width: 380px) {
+  .site-header .header-actions a,.site-header .header-actions button { font-size:.66rem; }
+  .request-intake-step .step-label { font-size:.62rem; }
+  #incidentForm .upload-policy-item { font-size:.6rem; }
+}
+@media (min-width: 641px) and (max-width: 900px) {
+  #incidentForm .row-2,#incidentForm .row-3 { gap:.7rem; }
+  body>.container-narrow { padding:1rem; }
+}
 </style>
 
 </head>
@@ -910,6 +989,32 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
             initializeCaseTurnstile(true);
         });
         initializeCaseTurnstile();
+
+        // Clear every attachment source and the in-memory queue when starting a fresh request.
+        document.getElementById("incidentForm").addEventListener("reset", () => {
+            window.setTimeout(() => {
+                pendingFiles = [];
+                renderFileList();
+                document.querySelectorAll('#incidentForm input[type="file"]').forEach(input => { input.value = ""; });
+                localStorage.removeItem(DRAFT_KEY);
+                const draftBanner = document.getElementById("draftBanner");
+                if (draftBanner) draftBanner.style.display = "none";
+                caseTurnstileToken = "";
+                caseTurnstilePassed = false;
+                caseSubmitButton.disabled = true;
+                if (window.turnstile && caseTurnstileId !== null) {
+                    try { window.turnstile.reset(caseTurnstileId); } catch (_) {}
+                }
+                caseTurnstileStatus.textContent = "Complete the Cloudflare check before submitting.";
+                const retry = document.getElementById("caseTurnstileRetry");
+                if (retry) retry.hidden = true;
+                const progress = document.getElementById("submitProgressPanel");
+                if (progress) progress.classList.remove("show");
+                const status = document.getElementById("submitStatus");
+                if (status) status.textContent = "";
+                updateProgress();
+            }, 0);
+        });
 
         function handleSubmit(event) {
             event.preventDefault();
