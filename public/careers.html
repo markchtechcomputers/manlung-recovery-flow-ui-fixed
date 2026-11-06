@@ -263,6 +263,8 @@ let turnstileReady = false;
 const turnstileHelp = document.getElementById('turnstileHelp');
 const careerSubmit = document.getElementById('careerSubmit');
 async function setupTurnstile() {
+  // Prevent repeated initialization from creating duplicate challenge frames.
+  if (turnstileWidgetId !== null || document.querySelector('#turnstileWidget iframe')) return;
   try {
     const configResponse = await fetch('/api/careers/turnstile-config', { headers: { Accept: 'application/json' } });
     const config = await configResponse.json();
