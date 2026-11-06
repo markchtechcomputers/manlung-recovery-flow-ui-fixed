@@ -441,7 +441,6 @@
   function setInstallButtonLabel(button, label) {
     const target = button.querySelector('[data-install-label]');
     if (target) target.textContent = label;
-    else button.textContent = label;
   }
 
   // Keep browser PWA files fresh and notify users when a new service worker is ready.
