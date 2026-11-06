@@ -300,6 +300,13 @@ function checkValidation(req, res) {
 
 
 function rejectInvalidCaseBeforeAuth(req, res, next) {
+  const evidenceBytes = (req.files || []).reduce((total, file) => total + Number(file.size || 0), 0);
+  if (evidenceBytes > 4 * 1024 * 1024) {
+    return res.status(413).json({
+      error: 'All evidence attachments together must be 4 MB or less. Remove some files and retry.',
+    });
+  }
+
   if (req.body?.hp_confirm) {
     console.warn(
       '⚠️ Honeypot field was filled on /api/cases/submit — request ignored. IP:',
