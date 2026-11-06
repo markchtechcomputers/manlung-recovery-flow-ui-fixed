@@ -208,7 +208,7 @@
     },
     {
       "src": "^/oauth-callback(?:\\.html)?$",
-      "dest": "/public/oauth-callback.html"
+      "dest": "/public/oauth-callback"
     },
     {
       "src": "/api/auth/google(?:/(.*))?",
@@ -228,7 +228,7 @@
     },
     {
       "src": "/api/download-apk",
-      "dest": "/public/install.html"
+      "dest": "/public/install"
     },
     {
       "src": "/api/(.*)",
@@ -236,31 +236,31 @@
     },
     {
       "src": "/admin",
-      "dest": "/public/admin/login.html"
+      "dest": "/public/admin/login"
     },
     {
       "src": "^/admin/connect/?$",
-      "dest": "/public/admin/connect.html"
+      "dest": "/public/admin/connect"
     },
     {
       "src": "^/admin/connect\\.html$",
-      "dest": "/public/admin/connect.html"
+      "dest": "/public/admin/connect"
     },
     {
       "src": "^/admin/control-center/?$",
-      "dest": "/public/admin/control-center.html"
+      "dest": "/public/admin/control-center"
     },
     {
       "src": "^/admin/control-center\\.html$",
-      "dest": "/public/admin/control-center.html"
+      "dest": "/public/admin/control-center"
     },
     {
       "src": "^/admin/dashboard/?$",
-      "dest": "/public/admin/dashboard.html"
+      "dest": "/public/admin/dashboard"
     },
     {
       "src": "^/admin/dashboard\\.html$",
-      "dest": "/public/admin/dashboard.html"
+      "dest": "/public/admin/dashboard"
     },
     {
       "src": "^/admin/index/?$",
@@ -278,135 +278,135 @@
     },
     {
       "src": "^/admin/investigation-notes/?$",
-      "dest": "/public/admin/investigation-notes.html"
+      "dest": "/public/admin/investigation-notes"
     },
     {
       "src": "^/admin/investigation-notes\\.html$",
-      "dest": "/public/admin/investigation-notes.html"
+      "dest": "/public/admin/investigation-notes"
     },
     {
       "src": "^/admin/login/?$",
-      "dest": "/public/admin/login.html"
+      "dest": "/public/admin/login"
     },
     {
       "src": "^/admin/login\\.html$",
-      "dest": "/public/admin/login.html"
+      "dest": "/public/admin/login"
     },
     {
       "src": "^/admin/music-player/?$",
-      "dest": "/public/admin/music-player.html"
+      "dest": "/public/admin/music-player"
     },
     {
       "src": "^/admin/music-player\\.html$",
-      "dest": "/public/admin/music-player.html"
+      "dest": "/public/admin/music-player"
     },
     {
       "src": "^/admin/music/?$",
-      "dest": "/public/admin/music.html"
+      "dest": "/public/admin/music"
     },
     {
       "src": "^/admin/music\\.html$",
-      "dest": "/public/admin/music.html"
+      "dest": "/public/admin/music"
     },
     {
       "src": "^/admin/operations/?$",
-      "dest": "/public/admin/operations.html"
+      "dest": "/public/admin/operations"
     },
     {
       "src": "^/admin/operations\\.html$",
-      "dest": "/public/admin/operations.html"
+      "dest": "/public/admin/operations"
     },
     {
       "src": "^/admin/owner/?$",
-      "dest": "/public/admin/owner.html"
+      "dest": "/public/admin/owner"
     },
     {
       "src": "^/admin/owner\\.html$",
-      "dest": "/public/admin/owner.html"
+      "dest": "/public/admin/owner"
     },
     {
       "src": "^/admin/register/?$",
-      "dest": "/public/admin/register.html"
+      "dest": "/public/admin/register"
     },
     {
       "src": "^/admin/register\\.html$",
-      "dest": "/public/admin/register.html"
+      "dest": "/public/admin/register"
     },
     {
       "src": "^/admin/reset-password/?$",
-      "dest": "/public/admin/reset-password.html"
+      "dest": "/public/admin/reset-password"
     },
     {
       "src": "^/admin/reset-password\\.html$",
-      "dest": "/public/admin/reset-password.html"
+      "dest": "/public/admin/reset-password"
     },
     {
       "src": "^/admin/reports/?$",
-      "dest": "/public/admin/reports.html"
+      "dest": "/public/admin/reports"
     },
     {
       "src": "^/admin/reports\\.html$",
-      "dest": "/public/admin/reports.html"
+      "dest": "/public/admin/reports"
     },
     {
       "src": "^/admin/tools/?$",
-      "dest": "/public/admin/tools.html"
+      "dest": "/public/admin/tools"
     },
     {
       "src": "^/admin/tools\\.html$",
-      "dest": "/public/admin/tools.html"
+      "dest": "/public/admin/tools"
     },
     {
       "src": "^/admin/tools/device-recovery/?$",
-      "dest": "/public/admin/tools/device-recovery.html"
+      "dest": "/public/admin/tools/device-recovery"
     },
     {
       "src": "^/admin/tools/device-recovery\\.html$",
-      "dest": "/public/admin/tools/device-recovery.html"
+      "dest": "/public/admin/tools/device-recovery"
     },
     {
       "src": "^/admin/tools/link-analysis/?$",
-      "dest": "/public/admin/tools/link-analysis.html"
+      "dest": "/public/admin/tools/link-analysis"
     },
     {
       "src": "^/admin/tools/link-analysis\\.html$",
-      "dest": "/public/admin/tools/link-analysis.html"
+      "dest": "/public/admin/tools/link-analysis"
     },
     {
       "src": "^/admin/tools/recovery-evidence/?$",
-      "dest": "/public/admin/tools/recovery-evidence.html"
+      "dest": "/public/admin/tools/recovery-evidence"
     },
     {
       "src": "^/admin/tools/recovery-evidence\\.html$",
-      "dest": "/public/admin/tools/recovery-evidence.html"
+      "dest": "/public/admin/tools/recovery-evidence"
     },
     {
       "src": "^/admin/tools/remote-desktop/?$",
-      "dest": "/public/admin/tools/remote-desktop.html"
+      "dest": "/public/admin/tools/remote-desktop"
     },
     {
       "src": "^/admin/tools/remote-desktop\\.html$",
-      "dest": "/public/admin/tools/remote-desktop.html"
+      "dest": "/public/admin/tools/remote-desktop"
     },
     {
       "src": "^/admin/tools/security/?$",
-      "dest": "/public/admin/tools/security.html"
+      "dest": "/public/admin/tools/security"
     },
     {
       "src": "^/admin/tools/security\\.html$",
-      "dest": "/public/admin/tools/security.html"
+      "dest": "/public/admin/tools/security"
     },
     {
       "src": "^/admin/tools/website-scanner/?$",
-      "dest": "/public/admin/tools/website-scanner.html"
+      "dest": "/public/admin/tools/website-scanner"
     },
     {
       "src": "^/admin/tools/website-scanner\\.html$",
-      "dest": "/public/admin/tools/website-scanner.html"
+      "dest": "/public/admin/tools/website-scanner"
     },
     {
       "src": "^/admin/((?:[^./]+/)*[^./]+)/?$",
-      "dest": "/public/admin/$1.html"
+      "dest": "/public/admin/$1"
     },
     {
       "src": "/admin/(.*)",
@@ -414,7 +414,7 @@
     },
     {
       "src": "^/privacy(?:\\.html)?/?$",
-      "dest": "/public/privacy.html"
+      "dest": "/public/privacy"
     },
     {
       "src": "^/client/connect\\.html$",
@@ -425,63 +425,63 @@
     },
     {
       "src": "^/client/connect/?$",
-      "dest": "/public/client/connect.html"
+      "dest": "/public/client/connect"
     },
     {
       "src": "^/$",
-      "dest": "/public/index.html"
+      "dest": "/public/index"
     },
     {
       "src": "^/manlung-ai/?$",
-      "dest": "/public/manlung-ai.html"
+      "dest": "/public/manlung-ai"
     },
     {
       "src": "^/terms(?:\\.html)?/?$",
-      "dest": "/public/terms.html"
+      "dest": "/public/terms"
     },
     {
       "src": "^/donate(?:\\.html)?/?$",
-      "dest": "/public/donate.html"
+      "dest": "/public/donate"
     },
     {
       "src": "^/donation(?:\\.html)?/?$",
-      "dest": "/public/donate.html"
+      "dest": "/public/donate"
     },
     {
       "src": "^/blog(?:\\.html)?/?$",
-      "dest": "/public/blog.html"
+      "dest": "/public/blog"
     },
     {
       "src": "^/knowledge(?:\\.html)?/?$",
-      "dest": "/public/knowledge.html"
+      "dest": "/public/knowledge"
     },
     {
       "src": "^/services(?:\\.html)?/?$",
-      "dest": "/public/services.html"
+      "dest": "/public/services"
     },
     {
       "src": "^/about(?:\\.html)?/?$",
-      "dest": "/public/about.html"
+      "dest": "/public/about"
     },
     {
       "src": "^/contact(?:\\.html)?/?$",
-      "dest": "/public/contact.html"
+      "dest": "/public/contact"
     },
     {
       "src": "^/careers(?:\\.html)?/?$",
-      "dest": "/public/careers.html"
+      "dest": "/public/careers"
     },
     {
       "src": "^/trust(?:\\.html)?/?$",
-      "dest": "/public/trust.html"
+      "dest": "/public/trust"
     },
     {
       "src": "^/faq(?:\\.html)?/?$",
-      "dest": "/public/faq.html"
+      "dest": "/public/faq"
     },
     {
       "src": "^/((?:[^./]+/)*[^./]+)/?$",
-      "dest": "/public/$1.html"
+      "dest": "/public/$1"
     },
     {
       "src": "/(.*)",
