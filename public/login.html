@@ -1849,6 +1849,7 @@ function renderClientTurnstile(api) {
   // Idempotency guard: one widget per sign-in form, even if rapid submits
   // or multiple event paths request initialization at the same time.
   if (!host || !clientTurnstileSiteKey || clientTurnstileWidget !== null || host.querySelector('iframe')) return;
+  host.innerHTML = '';
   clientTurnstileWidget = api.render(host, {
     sitekey: clientTurnstileSiteKey,
     theme: 'auto',
