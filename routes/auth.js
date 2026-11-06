@@ -685,8 +685,9 @@ router.post(
         });
       }
 
-      const session = await User.bumpSessionVersion(admin.id);
-      issueAdminSession(res, { ...admin, session_version: session?.session_version });
+      // Keep independent browser/device sessions valid. Session revocation is
+      // reserved for explicit logout-all, password/security changes, or account actions.
+      issueAdminSession(res, admin);
 
       console.log(`Admin/Owner login successful: ${admin.username} (${admin.role})`);
 
@@ -738,14 +739,15 @@ router.post('/client/logout-all', auth, async (req, res) => {
 router.post('/client/logout', auth, async (req, res) => {
   try {
     if (req.user.role !== 'client') return res.status(403).json({ error: 'Client access required.' });
-    await User.bumpSessionVersion(req.user.id);
+    // A normal logout clears this browser's cookie only. Use /client/logout-all
+    // when the user explicitly wants to revoke every active device session.
     clearClientCookie(res);
     await SecurityMonitoring.recordEvent({
       eventType: 'LOGOUT',
       userId: req.user.id,
       ipAddress: req.ip,
       userAgent: req.get('user-agent'),
-      details: { role: req.user.role, all_sessions: true },
+      details: { role: req.user.role, all_sessions: false },
     });
     return res.json({ success: true });
   } catch (error) {
@@ -1537,8 +1539,9 @@ router.post(
       // Each successful login creates a new account session version.
       // Any older browser session carrying the previous version is rejected
       // by the auth middleware on its next request.
-      const session = await User.bumpSessionVersion(client.id);
-      const token = signToken({ ...client, session_version: session?.session_version });
+      // Do not invalidate other active devices on every successful login.
+      // The existing session_version remains available for explicit revocation.
+      const token = signToken(client);
       setClientCookie(res, token);
 
       res.json({
