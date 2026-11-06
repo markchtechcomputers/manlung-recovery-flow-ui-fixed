@@ -409,7 +409,7 @@
 
   function createGlobalInstallControl() {
     if (isStandalone() || document.getElementById('manlung-pwa-global-install') ||
-        document.querySelector('[data-manlung-install]')) return;
+        document.querySelector('[data-manlung-install]') || document.getElementById('install-button')) return;
 
     if (!document.getElementById('manlung-pwa-global-install-style')) {
       const style = document.createElement('style');
