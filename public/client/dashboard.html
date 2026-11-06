@@ -1152,23 +1152,46 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       // No client session: return to client sign-in.
       
 
+      let verificationTimeout = null;
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000);
+        verificationTimeout = setTimeout(() => controller.abort(), 12000);
         const res = await fetch('/api/auth/verify', {
           credentials: 'include',
           cache: 'no-store',
           signal: controller.signal
         });
-        clearTimeout(timeout);
+        clearTimeout(verificationTimeout);
+        verificationTimeout = null;
 
         const data = await res.json().catch(() => ({}));
 
-        if (!res.ok || !data.success) {
-          fetch('/api/auth/client/logout',{method:'POST',credentials:'include'}).catch(()=>{});
+        // Only a confirmed 401 means the session is no longer valid.
+        // Do not call the logout endpoint here: a failed health check must
+        // never revoke otherwise-valid sessions on other devices.
+        if (res.status === 401) {
           localStorage.removeItem('clientUser');
-          try{sessionStorage.removeItem('manlung_client_session_token')}catch(_){}
-          window.location.href = '/login';
+          try { sessionStorage.removeItem('manlung_client_session_token'); } catch (_) {}
+          window.location.replace('/login?session=expired');
+          return false;
+        }
+
+        if (res.status === 403) {
+          const state = document.getElementById('casesState');
+          if (state) {
+            state.className = 'error-box';
+            state.textContent = data.error || 'This account is currently not permitted to access the Client Portal. Contact support.';
+          }
+          return false;
+        }
+
+        if (!res.ok || !data.success) {
+          const state = document.getElementById('casesState');
+          if (state) {
+            state.className = 'error-box';
+            state.innerHTML = '<strong>We could not verify your session right now.</strong><p>Please check your connection and try again. You have not been signed out.</p><button class="btn btn-primary" type="button" onclick="window.location.reload()">Try Again</button>';
+          }
+          console.error('Client session verification returned a temporary error:', res.status, data.error || '');
           return false;
         }
 
@@ -1235,15 +1258,16 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 
         return true;
       } catch (error) {
-        console.error(
-          'Client portal role check failed:',
-          error
-        );
+        if (verificationTimeout) clearTimeout(verificationTimeout);
+        console.error('Client portal session check failed:', error);
 
-        // Do not expose a client-only page when the session cannot
-        // be verified.
-        localStorage.removeItem('clientUser');
-        window.location.replace('/login');
+        // Network failures and timeouts are not proof that a session expired.
+        // Keep the cookie and local account record intact and allow a retry.
+        const state = document.getElementById('casesState');
+        if (state) {
+          state.className = 'error-box';
+          state.innerHTML = '<strong>Connection problem while checking your session.</strong><p>Your account has not been signed out. Check your internet connection and try again.</p><button class="btn btn-primary" type="button" onclick="window.location.reload()">Try Again</button>';
+        }
         return false;
       }
     }
@@ -1322,7 +1346,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
       try{
         const res=await fetch('/api/cases/client/me',{headers:authHeaders()});
         const data=await res.json().catch(()=>({}));
-        if(res.status===401){ logout(); return; }
+        if(res.status===401){ localStorage.removeItem('clientUser'); try{sessionStorage.removeItem('manlung_client_session_token')}catch(_){} window.location.replace('/login?session=expired'); return; }
         if(!res.ok || !data.success){ throw new Error(data.error || `Server returned ${res.status}`); }
         renderCases(Array.isArray(data.cases) ? data.cases : []);
       }catch(error){
@@ -1349,7 +1373,9 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
         const data = await res.json().catch(()=>({}));
 
         if(res.status === 401){
-          logout();
+          localStorage.removeItem('clientUser');
+          try{sessionStorage.removeItem('manlung_client_session_token')}catch(_){}
+          window.location.replace('/login?session=expired');
           return;
         }
 
