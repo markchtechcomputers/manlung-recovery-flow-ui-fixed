@@ -7,7 +7,6 @@
     <title>New Request · Manlung Recovery</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <style>
         .container-narrow { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
         .progress-bar-wrap { position: sticky; top: 0; z-index: 20; background: var(--page-bg); border-bottom: 1px solid var(--card-border); padding: 0.5rem 1.5rem; }
@@ -653,7 +652,7 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
                     <div class="checkbox-group"><input type="checkbox" id="term2" required><label>I understand that submitting false information may result in my request being rejected.</label></div>
                 </div>
 
-                <div class="case-turnstile"><strong>Cloudflare security verification</strong><div id="caseTurnstileWidget" aria-label="Cloudflare security verification"></div><small id="caseTurnstileStatus" role="status" aria-live="polite">Loading verification…</small></div>
+                <div class="case-turnstile"><strong>Cloudflare security verification</strong><div id="caseTurnstileWidget" aria-label="Cloudflare security verification"></div><small id="caseTurnstileStatus" role="status" aria-live="polite">Loading verification…</small><button id="caseTurnstileRetry" type="button" class="btn btn-outline" hidden style="margin-top:.5rem">Retry security check</button></div>
                 <div class="submit-progress-panel" id="submitProgressPanel" aria-live="polite">
   <div class="submit-progress-row"><span id="submitProgressState"><i class="fas fa-cloud-arrow-up"></i> Uploading</span><span id="submitProgressPct">0%</span></div>
   <div class="submit-progress-track"><div class="submit-progress-fill" id="submitProgressFill"></div></div>
@@ -856,33 +855,60 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
         const caseTurnstileStatus = document.getElementById("caseTurnstileStatus");
         const caseSubmitButton = document.getElementById("submitBtn");
         caseSubmitButton.disabled = true;
-        async function initializeCaseTurnstile() {
+        async function loadCaseTurnstileApi(forceReload = false) {
+            if (!forceReload && window.turnstile && typeof window.turnstile.render === "function") return window.turnstile;
+            const previous = document.querySelector('script[data-case-turnstile-sdk]');
+            if (previous) previous.remove();
+            if (forceReload) {
+                try { delete window.turnstile; } catch (_) { window.turnstile = undefined; }
+            }
+            return new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+                script.async = true;
+                script.defer = true;
+                script.dataset.caseTurnstileSdk = "true";
+                script.onload = () => window.turnstile && typeof window.turnstile.render === "function"
+                    ? resolve(window.turnstile)
+                    : reject(new Error("Cloudflare loaded but did not initialize. Please retry."));
+                script.onerror = () => reject(new Error("Cloudflare verification could not connect. Check your connection or content blocker, then retry."));
+                document.head.appendChild(script);
+            });
+        }
+        async function initializeCaseTurnstile(forceReload = false) {
+            const retryButton = document.getElementById("caseTurnstileRetry");
+            caseSubmitButton.disabled = true;
+            caseTurnstileToken = "";
+            caseTurnstilePassed = false;
             try {
-                const response = await fetch("/api/cases/turnstile-config", { headers: { Accept: "application/json" } });
+                const response = await fetch("/api/cases/turnstile-config", { cache: "no-store", headers: { Accept: "application/json" } });
                 const config = await response.json();
-                if (!response.ok || !config.siteKey) throw new Error("Cloudflare verification is not configured. Please contact support.");
-                let attempts = 0;
-                await new Promise((resolve, reject) => {
-                    const wait = () => {
-                        if (window.turnstile && typeof window.turnstile.render === "function") return resolve();
-                        if (++attempts > 80) return reject(new Error("Cloudflare verification did not load. Refresh the page and try again."));
-                        setTimeout(wait, 150);
-                    };
-                    wait();
-                });
-                caseTurnstileId = window.turnstile.render("#caseTurnstileWidget", {
+                if (!response.ok || !config.siteKey) throw new Error(config.error || "Cloudflare verification is not configured. Please contact support.");
+                const turnstile = await loadCaseTurnstileApi(forceReload);
+                if (caseTurnstileId !== null) {
+                    try { turnstile.remove(caseTurnstileId); } catch (_) {}
+                    caseTurnstileId = null;
+                }
+                caseTurnstileId = turnstile.render("#caseTurnstileWidget", {
                     sitekey: config.siteKey,
                     callback: token => { caseTurnstileToken = token; caseTurnstilePassed = true; caseSubmitButton.disabled = false; caseTurnstileStatus.textContent = "Verification complete. You can submit your request."; },
                     "expired-callback": () => { caseTurnstileToken = ""; caseTurnstilePassed = false; caseSubmitButton.disabled = true; caseTurnstileStatus.textContent = "Verification expired. Please verify again."; },
-                    "error-callback": () => { caseTurnstileToken = ""; caseTurnstilePassed = false; caseSubmitButton.disabled = true; caseTurnstileStatus.textContent = "Verification failed. Refresh the page and try again."; },
+                    "error-callback": () => { caseTurnstileToken = ""; caseTurnstilePassed = false; caseSubmitButton.disabled = true; caseTurnstileStatus.textContent = "Cloudflare could not verify this browser. Check the connection or allowed domain, then retry."; if (retryButton) retryButton.hidden = false; },
                     theme: "auto"
                 });
-                caseTurnstileStatus.textContent = "Complete the Cloudflare check before submitting."; 
+                caseTurnstileStatus.textContent = "Complete the Cloudflare check before submitting.";
+                if (retryButton) retryButton.hidden = true;
             } catch (error) {
                 caseTurnstileStatus.textContent = error.message || "Cloudflare verification is unavailable.";
                 caseSubmitButton.disabled = true;
+                if (retryButton) retryButton.hidden = false;
             }
         }
+        document.getElementById("caseTurnstileRetry")?.addEventListener("click", () => {
+            document.getElementById("caseTurnstileRetry").hidden = true;
+            caseTurnstileStatus.textContent = "Retrying Cloudflare verification…";
+            initializeCaseTurnstile(true);
+        });
         initializeCaseTurnstile();
 
         function handleSubmit(event) {
