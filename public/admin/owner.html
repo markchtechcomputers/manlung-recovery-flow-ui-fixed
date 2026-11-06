@@ -582,6 +582,39 @@ body.admin-page-bg>section.container>.card h2 i{color:#a78bfa;}
   #adminsList .case-item>div:last-child,#careerApplications .case-item>div:last-child{justify-content:flex-start !important;}
   #pageContent>.card:nth-child(4)>.card-title::after{font-size:.52rem;}
 }
+
+/* Live Owner overview — all values are loaded from authenticated aggregate APIs. */
+#ownerLiveOverview{border:1px solid #bfdbfe!important;background:linear-gradient(145deg,#f8fbff,#fff)!important}
+#ownerLiveOverview>.card-title{color:#0f172a!important}
+#ownerLiveOverview .owner-live-section{margin-top:1.1rem}
+#ownerLiveOverview .owner-live-section h3{margin:0 0 .65rem;color:#334155;font-size:.9rem;font-weight:850;letter-spacing:.02em}
+#ownerLiveOverview .owner-live-grid{display:grid;gap:.7rem;grid-template-columns:repeat(5,minmax(0,1fr))}
+#ownerLiveOverview .owner-live-grid.donations{grid-template-columns:repeat(4,minmax(0,1fr))}
+#ownerLiveOverview .owner-live-metric{min-width:0;padding:.9rem 1rem;border:1px solid #e2e8f0;border-radius:13px;background:#fff;box-shadow:0 4px 12px rgba(15,23,42,.045)}
+#ownerLiveOverview .owner-live-metric span{display:block;color:#64748b;font-size:.73rem;font-weight:750}
+#ownerLiveOverview .owner-live-metric strong{display:block;margin-top:.25rem;color:#0f172a;font-size:1.55rem;font-weight:900;line-height:1.2;font-variant-numeric:tabular-nums}
+#ownerLiveOverview .owner-live-metric.total{border-color:#bfdbfe;background:#eff6ff}
+#ownerLiveOverview .owner-live-metric.pending strong{color:#b45309}
+#ownerLiveOverview .owner-live-metric.progress strong{color:#2563eb}
+#ownerLiveOverview .owner-live-metric.resolved strong,#ownerLiveOverview .owner-live-metric.confirmed strong{color:#16a34a}
+#ownerLiveOverview .owner-live-metric.rejected strong,#ownerLiveOverview .owner-live-metric.failed strong{color:#dc2626}
+#ownerLiveOverview .owner-live-foot{margin:.7rem 0 0;color:#475569;font-size:.82rem;font-weight:700}
+#ownerLiveOverview .owner-live-toolbar{display:flex;align-items:center;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+#ownerLiveOverview .owner-live-toolbar p{margin:0;color:#64748b;font-size:.78rem}
+#ownerLiveOverview .owner-live-toolbar button{min-height:34px;padding:.4rem .7rem!important}
+html.dark #ownerLiveOverview,body.dark #ownerLiveOverview{background:linear-gradient(145deg,#101923,#0b1219)!important;border-color:rgba(96,165,250,.25)!important}
+html.dark #ownerLiveOverview>.card-title,body.dark #ownerLiveOverview>.card-title,
+html.dark #ownerLiveOverview .owner-live-section h3,body.dark #ownerLiveOverview .owner-live-section h3{color:#f8fafc!important}
+html.dark #ownerLiveOverview .owner-live-metric,body.dark #ownerLiveOverview .owner-live-metric{background:#0b1219;border-color:rgba(148,163,184,.18);box-shadow:none}
+html.dark #ownerLiveOverview .owner-live-metric span,body.dark #ownerLiveOverview .owner-live-metric span,
+html.dark #ownerLiveOverview .owner-live-toolbar p,body.dark #ownerLiveOverview .owner-live-toolbar p,
+html.dark #ownerLiveOverview .owner-live-foot,body.dark #ownerLiveOverview .owner-live-foot{color:#94a3b8}
+html.dark #ownerLiveOverview .owner-live-metric strong,body.dark #ownerLiveOverview .owner-live-metric strong{color:#f8fafc}
+html.dark #ownerLiveOverview .owner-live-metric.total,body.dark #ownerLiveOverview .owner-live-metric.total{background:rgba(37,99,235,.12);border-color:rgba(96,165,250,.28)}
+@media(max-width:1024px){#ownerLiveOverview .owner-live-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){#ownerLiveOverview .owner-live-grid,#ownerLiveOverview .owner-live-grid.donations{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){#ownerLiveOverview .owner-live-grid,#ownerLiveOverview .owner-live-grid.donations{grid-template-columns:minmax(0,1fr)}}
+
 </style>
 <style id="admins-section-3-redesign">
 /* Section 3 — Current Admins & Owner */
@@ -1172,6 +1205,38 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
     </header>
 
     <div class="owner-page-content" id="pageContent" style="display:none;">
+
+    <section class="card" id="ownerLiveOverview" aria-labelledby="ownerLiveOverviewTitle">
+      <div class="owner-live-toolbar">
+        <div>
+          <div class="card-title" id="ownerLiveOverviewTitle"><i class="fas fa-chart-pie"></i> Live Platform Overview</div>
+          <p id="ownerOverviewUpdated" role="status" aria-live="polite">Loading exact totals from the database…</p>
+        </div>
+        <button class="btn btn-outline" type="button" onclick="loadOwnerLiveOverview()"><i class="fas fa-rotate"></i> Refresh totals</button>
+      </div>
+      <div class="owner-live-section">
+        <h3><i class="fas fa-folder-open"></i> Cases</h3>
+        <div class="owner-live-grid">
+          <div class="owner-live-metric total"><span>Total cases</span><strong id="ownerCasesTotal">—</strong></div>
+          <div class="owner-live-metric pending"><span>Pending review</span><strong id="ownerCasesPending">—</strong></div>
+          <div class="owner-live-metric progress"><span>In progress</span><strong id="ownerCasesProgress">—</strong></div>
+          <div class="owner-live-metric resolved"><span>Resolved</span><strong id="ownerCasesResolved">—</strong></div>
+          <div class="owner-live-metric rejected"><span>Rejected</span><strong id="ownerCasesRejected">—</strong></div>
+        </div>
+        <p class="owner-live-foot" id="ownerCasesWorkload">Active workload: loading…</p>
+      </div>
+      <div class="owner-live-section">
+        <h3><i class="fas fa-hand-holding-heart"></i> Donations · Payment status breakdown</h3>
+        <div class="owner-live-grid donations">
+          <div class="owner-live-metric total"><span>Total payments</span><strong id="ownerPaymentsTotal">—</strong></div>
+          <div class="owner-live-metric confirmed"><span>Confirmed</span><strong id="ownerPaymentsConfirmed">—</strong></div>
+          <div class="owner-live-metric pending"><span>Pending</span><strong id="ownerPaymentsPending">—</strong></div>
+          <div class="owner-live-metric failed"><span>Failed</span><strong id="ownerPaymentsFailed">—</strong></div>
+        </div>
+        <p class="owner-live-foot" id="ownerDonationsSummary">Confirmed total: loading…</p>
+      </div>
+    </section>
+
         <div class="card" id="ownerApprovalQueue" style="border:2px solid var(--accent);">
 
             <div class="card-title"><i class="fas fa-user-shield"></i> Owner Approval Queue</div>
@@ -1310,6 +1375,67 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
             } catch (error) {
                 out.style.background='#fef2f2'; out.style.color='#991b1b'; out.textContent=error.message || 'Could not send invitation.';
             } finally { button.disabled=false; button.textContent='Send Invitation'; }
+        }
+
+
+        function setOwnerOverviewValue(id, value) {
+            const element = document.getElementById(id);
+            if (element) element.textContent = Number(value || 0).toLocaleString('en-KE');
+        }
+
+        async function loadOwnerLiveOverview() {
+            const updated = document.getElementById('ownerOverviewUpdated');
+            if (updated) updated.textContent = 'Refreshing live database totals…';
+            try {
+                const [caseResponse, donationResponse] = await Promise.all([
+                    fetch('/api/cases/admin/stats', { headers: authHeaders(), credentials: 'include', cache: 'no-store' }),
+                    fetch('/api/donations/admin', { headers: authHeaders(), credentials: 'include', cache: 'no-store' })
+                ]);
+                if (await handleUnauthorized(caseResponse)) return;
+                if (await handleUnauthorized(donationResponse)) return;
+                if (caseResponse.status === 403 || donationResponse.status === 403) {
+                    showDenied();
+                    return;
+                }
+                if (!caseResponse.ok || !donationResponse.ok) {
+                    throw new Error('The live statistics endpoints did not return successfully.');
+                }
+                const [caseData, donationData] = await Promise.all([caseResponse.json(), donationResponse.json()]);
+                if (!caseData.success || !donationData.success) {
+                    throw new Error(caseData.error || donationData.error || 'Could not load live totals.');
+                }
+
+                const cases = caseData.stats || {};
+                const pending = Number(cases.pending || 0);
+                const progress = Number(cases.progress || 0);
+                const resolved = Number(cases.closed || 0);
+                const rejected = Number(cases.rejected || 0);
+                const totalCases = Number(cases.total || 0);
+                setOwnerOverviewValue('ownerCasesTotal', totalCases);
+                setOwnerOverviewValue('ownerCasesPending', pending);
+                setOwnerOverviewValue('ownerCasesProgress', progress);
+                setOwnerOverviewValue('ownerCasesResolved', resolved);
+                setOwnerOverviewValue('ownerCasesRejected', rejected);
+                const workload = document.getElementById('ownerCasesWorkload');
+                if (workload) workload.textContent = 'Active workload: ' + (pending + progress).toLocaleString('en-KE') + ' open cases · ' + totalCases.toLocaleString('en-KE') + ' total cases';
+
+                const counts = donationData.counts || {};
+                const confirmed = Number(counts.confirmed || 0);
+                const pendingPayments = Number(counts.pending || 0);
+                const failed = Number(counts.failed || 0);
+                const totalPayments = Number(donationData.totalCount ?? (confirmed + pendingPayments + failed));
+                setOwnerOverviewValue('ownerPaymentsTotal', totalPayments);
+                setOwnerOverviewValue('ownerPaymentsConfirmed', confirmed);
+                setOwnerOverviewValue('ownerPaymentsPending', pendingPayments);
+                setOwnerOverviewValue('ownerPaymentsFailed', failed);
+                const donationSummary = document.getElementById('ownerDonationsSummary');
+                if (donationSummary) donationSummary.textContent = 'Confirmed total: KES ' + Number(donationData.totalKes || 0).toLocaleString('en-KE') + ' · Based on ' + totalPayments.toLocaleString('en-KE') + ' payment records';
+
+                if (updated) updated.textContent = 'Live totals · Updated ' + new Date().toLocaleTimeString('en-KE', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+            } catch (error) {
+                console.error('Owner live overview error:', error);
+                if (updated) updated.textContent = 'Could not refresh live totals. Use Refresh totals to try again.';
+            }
         }
 
         async function loadAdmins() {
@@ -1513,6 +1639,8 @@ body.admin-page-bg>section.container select,body.admin-page-bg>section.container
                     return;
                 }
                 document.getElementById('pageContent').style.display = 'block';
+                loadOwnerLiveOverview();
+                setInterval(loadOwnerLiveOverview, 30000);
                 loadAdmins();
                 loadAuditLog();
                 loadCareerApplications();
