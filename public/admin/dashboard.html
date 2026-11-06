@@ -1533,6 +1533,24 @@ html.dark #adminAppContainer .mrd-chart-foot,body.dark #adminAppContainer .mrd-c
                 }
                 renderCaseModal(data.case);
                 await loadAdminCaseMessages(caseId);
+
+                // Opening the case means the admin has now reviewed it.
+                // Mark its notifications/messages read as well, then refresh
+                // the overview and case list so unread counts/badges stay in sync.
+                try {
+                    const readRes = await fetch(`/api/cases/admin/case/${encodeURIComponent(caseId)}/activity/read`, {
+                        method: 'POST',
+                        headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ all: true })
+                    });
+                    if (readRes.ok) {
+                        await Promise.all([loadStats(), loadCases(currentPage)]);
+                    } else {
+                        console.warn('Could not mark case as read:', await readRes.text());
+                    }
+                } catch (readError) {
+                    console.warn('Could not mark case as read:', readError);
+                }
             } catch (e) {
                 console.error(e);
                 document.getElementById('modalBody').innerHTML = '<p class="error-text">Error loading case.</p>';
