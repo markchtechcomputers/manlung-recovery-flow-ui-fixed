@@ -406,6 +406,44 @@
     return banner;
   }
 
+
+  function createGlobalInstallControl() {
+    if (isStandalone() || document.getElementById('manlung-pwa-global-install') ||
+        document.querySelector('[data-manlung-install]')) return;
+
+    if (!document.getElementById('manlung-pwa-global-install-style')) {
+      const style = document.createElement('style');
+      style.id = 'manlung-pwa-global-install-style';
+      style.textContent = `
+        #manlung-pwa-global-install{position:fixed;right:14px;bottom:calc(82px + env(safe-area-inset-bottom));z-index:9997;display:grid;justify-items:end;gap:8px;max-width:calc(100vw - 28px)}
+        #manlung-pwa-global-install .mr-global-install-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:8px 14px;border:1px solid #93c5fd;border-radius:999px;background:#0b3158;color:#fff;font:800 13px/1.2 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 8px 24px rgba(2,6,23,.24);cursor:pointer}
+        #manlung-pwa-global-install .mr-global-install-button img{width:30px;height:30px;flex:0 0 30px;border-radius:8px;object-fit:cover}
+        #manlung-pwa-global-install .mr-global-install-help{max-width:290px;padding:11px 13px;border:1px solid #bfdbfe;border-radius:12px;background:#eff6ff;color:#102a43;font:600 12px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 8px 24px rgba(2,6,23,.18)}
+        #manlung-pwa-global-install .mr-global-install-help[hidden]{display:none}
+        @media(min-width:768px){#manlung-pwa-global-install{bottom:18px}}
+        @media(prefers-reduced-motion:reduce){#manlung-pwa-global-install *{animation:none!important;transition:none!important}}
+      `;
+      document.head.appendChild(style);
+    }
+
+    const root = document.createElement('div');
+    root.id = 'manlung-pwa-global-install';
+    root.innerHTML = `
+      <div class="mr-global-install-help" hidden role="status">Open your browser menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>. On iPhone/iPad, use the Share menu and choose <strong>Add to Home Screen</strong>.</div>
+      <button type="button" class="mr-global-install-button manlung-pwa-download" aria-label="Install Manlung Recovery app">
+        <img src="https://manlungrecovery.manlungshop.co.ke/icons/icon-512.png" alt="" width="30" height="30">
+        <span data-install-label>Install app</span>
+      </button>
+    `;
+    document.body.appendChild(root);
+  }
+
+  function setInstallButtonLabel(button, label) {
+    const target = button.querySelector('[data-install-label]');
+    if (target) target.textContent = label;
+    else button.textContent = label;
+  }
+
   // Keep browser PWA files fresh and notify users when a new service worker is ready.
   const UPDATE_NOTICE_ID = 'manlung-runtime-update-notice';
   let pwaRegistration = null;
@@ -682,14 +720,15 @@
   window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault();
     deferredInstallPrompt = event;
-    const button = document.querySelector('.manlung-pwa-download');
-    if (button) button.textContent = 'INSTALL';
+    document.querySelectorAll('.manlung-pwa-download').forEach(button => setInstallButtonLabel(button, 'Install app'));
   });
 
   // Offer installation on the homepage. Browsers without an install prompt
   // can use their own menu to add this PWA to the home screen.
   window.addEventListener('load', () => {
-    if (isStandalone() || !IS_HOME || wasRecentlyDismissed()) return;
+    if (isStandalone()) return;
+    createGlobalInstallControl();
+    if (!IS_HOME || wasRecentlyDismissed()) return;
     const banner = createBanner();
     window.requestAnimationFrame(() => banner.classList.add('is-visible'));
   });
@@ -701,10 +740,11 @@
       banner.classList.remove('is-visible');
       window.setTimeout(() => banner.remove(), 300);
     }
+    document.getElementById('manlung-pwa-global-install')?.remove();
   });
 
   document.addEventListener('click', async event => {
-    const button = event.target.closest('.manlung-pwa-download');
+    const button = event.target.closest('.manlung-pwa-download,[data-manlung-install]');
     if (!button) return;
 
     if (deferredInstallPrompt) {
@@ -715,14 +755,22 @@
       if (choice?.outcome === 'accepted') {
         const banner = document.getElementById('manlung-pwa-banner');
         if (banner) banner.classList.remove('is-visible');
+        document.getElementById('manlung-pwa-global-install')?.remove();
       }
       return;
     }
 
-    const banner = document.getElementById('manlung-pwa-banner');
+    const banner = button.closest('.manlung-pwa-banner');
     const copy = banner?.querySelector('.manlung-pwa-text');
     if (copy) copy.textContent = 'Open your browser menu and choose Install app or Add to Home screen.';
-    button.textContent = 'BROWSER MENU';
+    const globalRoot = button.closest('#manlung-pwa-global-install');
+    const help = globalRoot?.querySelector('.mr-global-install-help') ||
+      button.closest('.mr-pwa-promo')?.querySelector('.mr-pwa-footnote');
+    if (help) {
+      if ('hidden' in help) help.hidden = false;
+      else help.textContent = 'This browser has no one-tap install prompt. Open the browser menu and choose Install app / Add to Home screen. On iPhone/iPad, use Share → Add to Home Screen.';
+    }
+    setInstallButtonLabel(button, 'How to install');
   });
 
   /*
