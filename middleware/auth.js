@@ -46,26 +46,38 @@ async function verifyTokenCandidate(token) {
 
 async function verifyRequestToken(req) {
   const bearerToken = req.header('Authorization')?.replace(/^Bearer\\s+/i, '') || null;
-  const cookieToken = getCookie(req, ADMIN_COOKIE) || getCookie(req, CLIENT_COOKIE);
+  const adminCookieToken = getCookie(req, ADMIN_COOKIE);
+  const clientCookieToken = getCookie(req, CLIENT_COOKIE);
 
-  // Browser sessions are issued as HttpOnly cookies. Prefer that fresh,
-  // server-managed credential over a stale Authorization header left in
-  // localStorage by an older client build. Native/API clients without a cookie
-  // continue to authenticate with Bearer tokens.
-  const candidates = [];
-  if (cookieToken) candidates.push(cookieToken);
-  if (bearerToken && bearerToken !== cookieToken) candidates.push(bearerToken);
-  if (!candidates.length) return { token: null, decoded: null, user: null };
-
-  let lastError = null;
-  for (const candidate of candidates) {
+  // Use an explicitly supplied Bearer credential first. Browser clients may
+  // still carry an older localStorage token after a fresh login, so if that
+  // token fails, fall back only to a cookie for the same account. This avoids
+  // silently switching the request to a different signed-in account.
+  if (bearerToken) {
     try {
-      return await verifyTokenCandidate(candidate);
+      return await verifyTokenCandidate(bearerToken);
     } catch (error) {
-      lastError = error;
+      const bearerHint = jwt.decode(bearerToken);
+      const matchingCookie = bearerHint?.role === 'client'
+        ? clientCookieToken
+        : bearerHint?.role === 'admin' || bearerHint?.role === 'owner'
+          ? adminCookieToken
+          : (adminCookieToken || clientCookieToken);
+      if (matchingCookie && matchingCookie !== bearerToken && bearerHint?.id) {
+        const cookieHint = jwt.decode(matchingCookie);
+        const sameAccount = String(cookieHint?.id || '') === String(bearerHint.id) &&
+          (!bearerHint.role || !cookieHint?.role || cookieHint.role === bearerHint.role);
+        if (sameAccount) return verifyTokenCandidate(matchingCookie);
+      }
+      throw error;
     }
   }
-  throw lastError || new Error('INVALID_TOKEN');
+
+  // Admin/Owner sessions are HttpOnly-cookie based. Client sessions also
+  // remain usable when the browser has no Authorization header.
+  const cookieToken = adminCookieToken || clientCookieToken;
+  if (!cookieToken) return { token: null, decoded: null, user: null };
+  return verifyTokenCandidate(cookieToken);
 }
 
 const auth = async (req, res, next) => {
