@@ -1673,6 +1673,21 @@ html body.manlung-auth-page .manlung-social-grid .manlung-google-btn:focus-visib
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script>
 function showTab(tab) {
+  // Keep only the active auth form's challenge mounted. Switching tabs
+  // removes the hidden form's iframe so challenge instances cannot stack up.
+  if (tab === 'register' && clientTurnstileWidget !== null) {
+    try { clientTurnstileApi?.remove(clientTurnstileWidget); } catch (_) {}
+    clientTurnstileWidget = null;
+    const loginHost = document.getElementById('clientTurnstile');
+    if (loginHost) loginHost.innerHTML = '';
+    clientLoginSubmitPending = false;
+  } else if (tab === 'login' && clientRegisterTurnstileWidget !== null) {
+    try { clientTurnstileApi?.remove(clientRegisterTurnstileWidget); } catch (_) {}
+    clientRegisterTurnstileWidget = null;
+    const registerHost = document.getElementById('clientRegisterTurnstile');
+    if (registerHost) registerHost.innerHTML = '';
+    clientRegisterSubmitPending = false;
+  }
   document.getElementById('loginPanel').hidden = tab !== 'login';
   document.getElementById('registerPanel').hidden = tab !== 'register';
   document.getElementById('forgotForm').hidden = true;
