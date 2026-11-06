@@ -2794,7 +2794,7 @@ router.post('/admin/case/:caseId/activity/read', adminAuth, async (req, res) => 
       if (n.error) throw n.error;
       const m = await supabase.from('case_messages').update({ read_at:now }).eq('case_id',caseId).eq('recipient_user_id',req.user.id).is('read_at',null);
       if (m.error) throw m.error;
-      await Case.update(caseId,{admin_read:true,last_updated:now});
+      await Case.update(caseId,{admin_read:true});
       return res.json({success:true,markedAt:now});
     }
     const id = itemId.replace(/^notification-|^message-|^call-/,'');
@@ -2805,7 +2805,7 @@ router.post('/admin/case/:caseId/activity/read', adminAuth, async (req, res) => 
       const m = await supabase.from('case_messages').update({read_at:now}).eq('id',id).eq('case_id',caseId).eq('recipient_user_id',req.user.id).is('read_at',null);
       if (m.error) throw m.error;
     } else if (kind === 'call') {
-      await Case.update(caseId,{admin_read:true,last_updated:now});
+      await Case.update(caseId,{admin_read:true});
     } else {
       return res.status(400).json({success:false,error:'Unsupported activity item.'});
     }
