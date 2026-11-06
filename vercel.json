@@ -379,6 +379,50 @@
       "dest": "/public/manlung-ai.html"
     },
     {
+      "src": "^/terms(?:\\.html)?/?$",
+      "dest": "/public/terms.html"
+    },
+    {
+      "src": "^/donate(?:\\.html)?/?$",
+      "dest": "/public/donate.html"
+    },
+    {
+      "src": "^/donation(?:\\.html)?/?$",
+      "dest": "/public/donate.html"
+    },
+    {
+      "src": "^/blog(?:\\.html)?/?$",
+      "dest": "/public/blog.html"
+    },
+    {
+      "src": "^/knowledge(?:\\.html)?/?$",
+      "dest": "/public/knowledge.html"
+    },
+    {
+      "src": "^/services(?:\\.html)?/?$",
+      "dest": "/public/services.html"
+    },
+    {
+      "src": "^/about(?:\\.html)?/?$",
+      "dest": "/public/about.html"
+    },
+    {
+      "src": "^/contact(?:\\.html)?/?$",
+      "dest": "/public/contact.html"
+    },
+    {
+      "src": "^/careers(?:\\.html)?/?$",
+      "dest": "/public/careers.html"
+    },
+    {
+      "src": "^/trust(?:\\.html)?/?$",
+      "dest": "/public/trust.html"
+    },
+    {
+      "src": "^/faq(?:\\.html)?/?$",
+      "dest": "/public/faq.html"
+    },
+    {
       "src": "^/((?:[^./]+/)*[^./]+)/?$",
       "dest": "/public/$1.html"
     },
