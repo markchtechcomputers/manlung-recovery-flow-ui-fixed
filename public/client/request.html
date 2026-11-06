@@ -1033,6 +1033,27 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
             const scamFiles = Array.from(document.getElementById('scamEvidence').files || []);
             const idFiles = Array.from(document.getElementById('idEvidence').files || []);
             const allFiles = [...pendingFiles, ...scamFiles, ...idFiles];
+            const allowedTypes = new Set(['application/pdf', 'image/jpeg', 'image/png']);
+            if (allFiles.length > 10) {
+                submitBtn.disabled = false;
+                statusEl.textContent = '';
+                toast('You can attach a maximum of 10 evidence files per case.', 'error');
+                return;
+            }
+            const invalidFile = allFiles.find(file =>
+                !allowedTypes.has(String(file.type || '').toLowerCase()) ||
+                file.size <= 0 || file.size > 10 * 1024 * 1024
+            );
+            if (invalidFile) {
+                submitBtn.disabled = false;
+                statusEl.textContent = '';
+                toast(invalidFile.size > 10 * 1024 * 1024
+                    ? invalidFile.name + ' exceeds the 10 MB per-file limit.'
+                    : invalidFile.size <= 0
+                        ? invalidFile.name + ' is empty.'
+                        : invalidFile.name + ' is not supported. Use PDF, JPG/JPEG or PNG.', 'error');
+                return;
+            }
 
             const fd = new FormData();
             const fields = {
@@ -1062,6 +1083,7 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/api/cases/submit');
             xhr.withCredentials = true;
+            xhr.timeout = 120000;
 
             const progressPanel=document.getElementById('submitProgressPanel'), progressFill=document.getElementById('submitProgressFill'), progressPct=document.getElementById('submitProgressPct'), progressState=document.getElementById('submitProgressState');
             const setFlowStep=(step,pct,label)=>{ if(progressPanel)progressPanel.classList.add('show'); if(progressFill)progressFill.style.width=pct+'%'; if(progressPct)progressPct.textContent=pct+'%'; if(progressState)progressState.innerHTML='<i class="fas '+(step==='failed'?'fa-circle-xmark':step==='completed'?'fa-circle-check':step==='processing'?'fa-gears':'fa-cloud-arrow-up')+'"></i> '+label; document.querySelectorAll('#requestFlowSteps .flow-step').forEach(el=>{const s=el.dataset.step;el.classList.toggle('active',s===step);el.classList.toggle('done',['upload','processing','review','completed'].indexOf(s)<['upload','processing','review','completed'].indexOf(step));});};
@@ -1093,16 +1115,23 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
                 }
             };
 
-            xhr.onerror = () => {
+            const handleTransportFailure = (message) => {
                 statusEl.textContent = '';
+                // A Turnstile token is single-use; require a fresh verification before retry.
+                caseTurnstileToken = '';
+                caseTurnstilePassed = false;
                 submitBtn.disabled = true;
-                caseTurnstileToken = ""; caseTurnstilePassed = false;
-                if (window.turnstile && caseTurnstileId !== null) window.turnstile.reset(caseTurnstileId);
-                caseTurnstileStatus.textContent = "Please complete the Cloudflare check again before another submission.";
-                setFlowStep('failed',100,'Could not reach the server.');
-                if(typeof toast==='function') toast('Could not reach the server. Please check your connection and try again.','error');
-                alert('Could not reach the server. Is it running, and is the URL correct?');
+                if (window.turnstile && caseTurnstileId !== null) {
+                    try { window.turnstile.reset(caseTurnstileId); } catch (_) {}
+                }
+                caseTurnstileStatus.textContent = 'Connection interrupted. Complete the Cloudflare check again, then retry your submission.';
+                setFlowStep('failed', 100, message);
+                if (typeof toast === 'function') toast(message + ' Your form and selected files are still here. Verify again and retry.', 'error');
             };
+
+            xhr.onerror = () => handleTransportFailure('Could not reach the server.');
+            xhr.ontimeout = () => handleTransportFailure('The submission timed out.');
+            xhr.onabort = () => handleTransportFailure('The submission was interrupted.');
 
             xhr.send(fd);
         }
