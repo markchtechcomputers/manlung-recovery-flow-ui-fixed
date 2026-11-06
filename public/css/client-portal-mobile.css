@@ -237,3 +237,61 @@ main.live{width:min(100% - 32px,1120px);margin:24px auto 100px}
   .client-mobile-nav{left:6px;right:6px}
 }
 @media(prefers-reduced-motion:reduce){.client-mobile-nav *{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* Lost-device recovery page: align it with the client portal without changing its workflow. */
+body.dr-page{
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+}
+.dr-page .dr-shell{width:min(100% - 40px,1280px);padding-bottom:120px}
+.dr-page .dr-hero,.dr-page .dr-card{box-shadow:var(--client-shadow)}
+.dr-page .dr-card{min-width:0;overflow-wrap:anywhere}
+.dr-page .dr-form input,.dr-page .dr-form textarea,.dr-page .dr-form select{
+  max-width:100%;font:inherit;
+}
+.dr-page .dr-form input:focus-visible,.dr-page .dr-form textarea:focus-visible,
+.dr-page .dr-form select:focus-visible,.dr-page .dr-platform:focus-visible{
+  outline:3px solid rgba(37,99,235,.35);outline-offset:2px;
+}
+@media(max-width:760px){
+  .dr-page .site-header{position:sticky;top:0;z-index:100}
+  .dr-page .site-header .container{width:100%;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px}
+  .dr-page .site-header .brand{flex:1 1 100%;min-width:0}
+  .dr-page .site-header .header-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .dr-page .site-header .header-actions .btn{width:100%;min-width:0;min-height:42px;justify-content:center;padding:9px 8px;font-size:.76rem}
+  .dr-page .dr-shell{width:100%;padding:14px 16px calc(116px + env(safe-area-inset-bottom,0px))}
+  .dr-page .dr-hero{padding:18px;border-radius:18px;gap:14px}
+  .dr-page .dr-hero h1{font-size:1.35rem;line-height:1.2}
+  .dr-page .dr-hero p{font-size:.84rem}
+  .dr-page .dr-actions{display:grid;grid-template-columns:1fr;gap:8px}
+  .dr-page .dr-actions .btn{width:100%;min-height:46px;justify-content:center}
+  .dr-page .dr-grid{grid-template-columns:minmax(0,1fr);gap:12px;margin-top:12px}
+  .dr-page .dr-card{padding:15px;border-radius:16px}
+  .dr-page .dr-title{align-items:flex-start;flex-direction:column;gap:6px}
+  .dr-page .dr-title h2{font-size:1rem;line-height:1.3}
+  .dr-page .dr-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .dr-page .dr-metric{min-width:0;padding:10px}
+  .dr-page .dr-metric strong{font-size:.92rem;overflow-wrap:anywhere}
+  .dr-page .dr-platforms{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .dr-page .dr-platform{min-width:0;padding:12px 8px}
+  .dr-page .dr-form{grid-template-columns:minmax(0,1fr);gap:11px}
+  .dr-page .dr-form .full{grid-column:auto}
+  .dr-page .dr-label{min-width:0;font-size:.78rem}
+  .dr-page .dr-label input,.dr-page .dr-label textarea{min-height:46px;font-size:16px}
+  .dr-page .dr-label textarea{min-height:110px}
+  .dr-page .dr-verification-grid,.dr-page .dr-help-grid,.dr-page .dr-location-meta{grid-template-columns:minmax(0,1fr)}
+  .dr-page .dr-device-grid{grid-template-columns:minmax(0,1fr);gap:9px}
+  .dr-page .dr-device-card{min-width:0}
+  .dr-page .dr-trace-grid{grid-template-columns:minmax(0,1fr)}
+  .dr-page .dr-trace-actions{display:grid;grid-template-columns:1fr}
+  .dr-page .dr-trace-actions .btn{width:100%;min-height:44px}
+  .dr-page .dr-trace-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dr-page .dr-owner-grid{grid-template-columns:minmax(0,1fr)}
+  .dr-page .dr-row{gap:5px}
+  .dr-page .dr-row strong{overflow-wrap:anywhere}
+}
+@media(max-width:380px){
+  .dr-page .dr-metrics,.dr-page .dr-trace-fields{grid-template-columns:minmax(0,1fr)}
+  .dr-page .dr-platforms{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
