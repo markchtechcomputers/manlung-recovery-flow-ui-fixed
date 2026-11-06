@@ -959,7 +959,13 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
                 document.head.appendChild(script);
             });
         }
+        let caseTurnstileSetupInProgress = false;
         async function initializeCaseTurnstile(forceReload = false) {
+            // A single widget is allowed for this form. Ignore duplicate setup
+            // calls while initialization is in progress or already mounted.
+            if (caseTurnstileSetupInProgress) return;
+            if (!forceReload && (caseTurnstileId !== null || document.querySelector("#caseTurnstileWidget iframe"))) return;
+            caseTurnstileSetupInProgress = true;
             const retryButton = document.getElementById("caseTurnstileRetry");
             caseSubmitButton.disabled = true;
             caseTurnstileToken = "";
@@ -986,6 +992,8 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
                 caseTurnstileStatus.textContent = error.message || "Cloudflare verification is unavailable.";
                 caseSubmitButton.disabled = true;
                 if (retryButton) retryButton.hidden = false;
+            } finally {
+                caseTurnstileSetupInProgress = false;
             }
         }
         document.getElementById("caseTurnstileRetry")?.addEventListener("click", () => {
