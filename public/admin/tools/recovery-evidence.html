@@ -184,5 +184,6 @@ $('search').addEventListener('input',renderCases);$('refresh').onclick=loadCases
 (async()=>{try{const d=await api('/api/auth/verify');currentRole=String(d.user?.role||'').toLowerCase();if(!d.success||!['admin','owner'].includes(currentRole)){location.replace('/admin/login');return}await loadCases()}catch(e){location.replace('/admin/login')}})();
 </script>
 
+<script src="/js/pwa.js" defer></script>
 </body>
 </html>
