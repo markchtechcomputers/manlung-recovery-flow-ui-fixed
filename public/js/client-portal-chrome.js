@@ -3,7 +3,7 @@
   if(window.__manlungClientPortalChrome)return;
   window.__manlungClientPortalChrome=true;
   if(!document.body)return;
-  const path=location.pathname.replace(/\\/+$/,'')||'/';
+  const path=location.pathname.replace(/\/+$/,'')||'/';
   const links=[
     {href:'/client/dashboard',label:'Dashboard',icon:'fa-house',match:p=>p==='/client/dashboard'},
     {href:'/client/request',label:'New case',icon:'fa-file-circle-plus',match:p=>p==='/client/request'},
