@@ -1291,6 +1291,7 @@ html.dark #adminAppContainer .mrd-chart-foot,body.dark #adminAppContainer .mrd-c
             legend.innerHTML=safe.map(x=>'<li><i style="background:'+x.color+'"></i><span>'+x.label+'</span><b>'+x.value.toLocaleString('en-KE')+'</b></li>').join('');
         }
         function updateCaseFlowChart(stats) {
+            window.__mrdLatestCaseStats=stats||{};
             const s=stats||{};
             const pending=Number(s.pending)||0, progress=Number(s.progress)||0, closed=Number(s.closed)||0, rejected=Number(s.rejected)||0;
             renderAdminDonut('caseFlowDonut','caseFlowLegend','caseFlowTotal',[
@@ -1304,6 +1305,7 @@ html.dark #adminAppContainer .mrd-chart-foot,body.dark #adminAppContainer .mrd-c
             if(note)note.textContent='Active workload: '+active.toLocaleString('en-KE')+' open cases · '+(Number(s.total)||0).toLocaleString('en-KE')+' total cases';
         }
         function updateDonationStatusChart(rows, data) {
+            window.__mrdLatestDonationData={donations:Array.isArray(rows)?rows:[],data:data||{}};
             const list=Array.isArray(rows)?rows:[];
             const counts={confirmed:0,pending:0,failed:0};
             list.forEach(d=>{const status=String(d.status||'pending').toLowerCase();if(status==='confirmed')counts.confirmed++;else if(status==='failed')counts.failed++;else counts.pending++;});
