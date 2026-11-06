@@ -85,6 +85,8 @@ body:has(.center-wrap){background:radial-gradient(ellipse at 12% 8%,rgba(20,184,
 <style id="manlung-admin-turnstile-single-use-fix">
 /* Keep the challenge visible and give configuration/load failures readable feedback. */
 #adminTurnstile{min-height:65px;display:flex;justify-content:center;align-items:center;overflow-x:auto}
+.admin-turnstile-retry{display:block;margin:10px auto 0;padding:8px 13px;border:1px solid #b91c1c;border-radius:9px;background:#2b1115;color:#fecaca;font:700 .8rem inherit;cursor:pointer}
+.admin-turnstile-retry[hidden]{display:none!important}
 #loginError{overflow-wrap:anywhere}
 </style>
 
@@ -225,7 +227,7 @@ body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50
                     <label><i class="fas fa-lock"></i> Password</label>
                     <input type="password" id="adminPassword" placeholder="Enter password" required>
                 </div>
-                <div class="manlung-turnstile-box" aria-label="Cloudflare Turnstile"><div id="adminTurnstile" class="manlung-turnstile-widget"></div></div><button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                <div class="manlung-turnstile-box" aria-label="Cloudflare Turnstile"><div id="adminTurnstile" class="manlung-turnstile-widget"></div><button id="adminTurnstileRetry" type="button" class="admin-turnstile-retry" hidden>Retry security check</button></div><button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
                     <i class="fas fa-arrow-right-to-bracket"></i> Login
                 </button>
                 <div id="loginError" class="error-text"></div>
@@ -323,6 +325,26 @@ body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50
             if (errorEl) errorEl.textContent = message || '';
         }
 
+        function showTurnstileRetry(show) {
+            const retryButton = document.getElementById('adminTurnstileRetry');
+            if (retryButton) retryButton.hidden = !show;
+        }
+
+        function retryAdminTurnstile() {
+            adminTurnstileLoadError = null;
+            showTurnstileStatus('');
+            showTurnstileRetry(false);
+            if (window.turnstile && adminTurnstileWidget !== null) {
+                try { window.turnstile.reset(adminTurnstileWidget); return; }
+                catch (error) { console.warn('Admin Turnstile reset failed:', error); }
+            }
+            const widgetBox = document.getElementById('adminTurnstile');
+            if (widgetBox) widgetBox.replaceChildren();
+            adminTurnstileWidget = null;
+            adminTurnstileSetupComplete = false;
+            setupAdminTurnstile();
+        }
+
         function waitForTurnstile(timeoutMs = 15000) {
             return new Promise((resolve, reject) => {
                 if (window.turnstile) return resolve(window.turnstile);
@@ -376,14 +398,16 @@ body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50
                     callback: () => {
                         adminTurnstileLoadError = null;
                         showTurnstileStatus('');
+                        showTurnstileRetry(false);
                     },
                     'expired-callback': () => {
                         adminTurnstileLoadError = 'Cloudflare verification expired. Complete the challenge again.';
                         showTurnstileStatus(adminTurnstileLoadError);
                     },
                     'error-callback': () => {
-                        adminTurnstileLoadError = 'Cloudflare could not verify this browser. Check your connection or disable content-blocking extensions, then refresh.';
+                        adminTurnstileLoadError = 'Cloudflare could not verify this browser. Check your connection, allow challenges.cloudflare.com, or disable content-blocking extensions, then retry.';
                         showTurnstileStatus(adminTurnstileLoadError);
+                        showTurnstileRetry(true);
                     },
                     'timeout-callback': () => {
                         adminTurnstileLoadError = 'Cloudflare verification timed out. Complete it again.';
@@ -394,11 +418,13 @@ body:has(.center-wrap){min-height:100vh;background:radial-gradient(ellipse at 50
             } catch (error) {
                 adminTurnstileLoadError = error?.message || 'Cloudflare security verification failed to load.';
                 console.error('Admin Turnstile setup failed:', error);
-                showTurnstileStatus(adminTurnstileLoadError + ' Refresh the page and try again.');
+                showTurnstileStatus(adminTurnstileLoadError + ' You can retry the security check below.');
+                showTurnstileRetry(true);
             } finally {
                 adminTurnstileSetupComplete = true;
             }
         }
+        document.getElementById('adminTurnstileRetry')?.addEventListener('click', retryAdminTurnstile);
         window.addEventListener('load', setupAdminTurnstile);
         let pendingMfaTicket = null;
         let mfaEnrollmentUser = null;
