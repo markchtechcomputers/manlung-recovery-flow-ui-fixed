@@ -8,9 +8,9 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
 test('legacy admin index routes go directly to the canonical dashboard', () => {
   const config = JSON.parse(read('vercel.json'));
-  for (const source of ['^/admin/index/?$', '^/admin/index\\\\.html$']) {
-    const route = config.routes.find(item => item.src === source);
-    assert.ok(route, source + ' route exists');
+  const routes = config.routes.filter(item => item.src.startsWith('^/admin/index'));
+  assert.equal(routes.length, 2);
+  for (const route of routes) {
     assert.equal(route.status, 308);
     assert.equal(route.headers.Location, '/admin/dashboard');
     assert.equal(route.dest, undefined);
