@@ -120,18 +120,18 @@ const auth = async (req, res, next) => {
 };
 
 const optionalAuth = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, CLIENT_COOKIE) || getCookie(req, ADMIN_COOKIE);
-  if (!token) return next();
   try {
-    if (isTokenRevoked(token)) return res.status(401).json({ error: 'Session revoked.', code: 'SESSION_REVOKED' });
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-    if (!user) return res.status(401).json({ error: 'User not found' });
-    if (isDurablyRevoked(decoded, user)) return res.status(401).json({ error: 'Session revoked.', code: 'SESSION_REVOKED' });
-    if (isSessionExpired(decoded, user)) return res.status(401).json({ error: 'Session expired.', code: 'SESSION_EXPIRED' });
+    const { decoded, user } = await verifyRequestToken(req);
+    if (!user) return next();
+    if (isSessionExpired(decoded, user)) {
+      return res.status(401).json({ error: 'Session expired.', code: 'SESSION_EXPIRED' });
+    }
     req.user = user;
-    next();
+    return next();
   } catch (error) {
+    if (error.message === 'TOKEN_REVOKED' || error.message === 'SESSION_VERSION_REVOKED') {
+      return res.status(401).json({ error: 'Session revoked.', code: 'SESSION_REVOKED' });
+    }
     console.error('Optional authentication error:', error);
     return res.status(401).json({ error: 'Invalid token' });
   }
