@@ -30,50 +30,42 @@ function isDurablyRevoked(decoded, user) {
   return tokenVersion !== currentVersion;
 }
 
-async function verifyRequestToken(req) {
-  const bearerToken = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || null;
-  const cookieToken = getCookie(req, ADMIN_COOKIE) || getCookie(req, CLIENT_COOKIE);
-  const token = bearerToken || cookieToken;
-  if (!token) return { token: null, decoded: null, user: null };
-
-  let verifiedToken = token;
-  let decoded;
-
-  try {
-    if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
-  } catch (error) {
-    // A stale client-side Bearer token can survive an old deployment or secret
-    // rotation. If the secure HttpOnly session cookie is valid, prefer it rather
-    // than letting the stale header break an otherwise valid browser session.
-    if (
-      bearerToken &&
-      cookieToken &&
-      error instanceof jwt.JsonWebTokenError &&
-      error.message === 'invalid signature'
-    ) {
-      verifiedToken = cookieToken;
-      if (isTokenRevoked(verifiedToken)) throw new Error('TOKEN_REVOKED');
-      decoded = jwt.verify(verifiedToken, process.env.JWT_SECRET);
-      if (isTokenRevoked(verifiedToken)) throw new Error('TOKEN_REVOKED');
-    } else {
-      throw error;
-    }
-  }
+async function verifyTokenCandidate(token) {
+  if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
 
   const user = await User.findById(decoded.id);
-  if (user && isDurablyRevoked(decoded, user)) throw new Error('SESSION_VERSION_REVOKED');
-
-  if (
-    user &&
-    user.security_status &&
-    user.security_status !== 'active'
-  ) {
+  if (!user) throw new Error('USER_NOT_FOUND');
+  if (isDurablyRevoked(decoded, user)) throw new Error('SESSION_VERSION_REVOKED');
+  if (user.security_status && user.security_status !== 'active') {
     throw new Error(`ACCOUNT_${String(user.security_status).toUpperCase()}`);
   }
+  return { token, decoded, user };
+}
 
-  return { token: verifiedToken, decoded, user };
+async function verifyRequestToken(req) {
+  const bearerToken = req.header('Authorization')?.replace(/^Bearer\\s+/i, '') || null;
+  const cookieToken = getCookie(req, ADMIN_COOKIE) || getCookie(req, CLIENT_COOKIE);
+
+  // Browser sessions are issued as HttpOnly cookies. Prefer that fresh,
+  // server-managed credential over a stale Authorization header left in
+  // localStorage by an older client build. Native/API clients without a cookie
+  // continue to authenticate with Bearer tokens.
+  const candidates = [];
+  if (cookieToken) candidates.push(cookieToken);
+  if (bearerToken && bearerToken !== cookieToken) candidates.push(bearerToken);
+  if (!candidates.length) return { token: null, decoded: null, user: null };
+
+  let lastError = null;
+  for (const candidate of candidates) {
+    try {
+      return await verifyTokenCandidate(candidate);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error('INVALID_TOKEN');
 }
 
 const auth = async (req, res, next) => {
