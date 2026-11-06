@@ -1307,15 +1307,26 @@ html.dark #adminAppContainer .mrd-chart-foot,body.dark #adminAppContainer .mrd-c
         function updateDonationStatusChart(rows, data) {
             window.__mrdLatestDonationData={donations:Array.isArray(rows)?rows:[],data:data||{}};
             const list=Array.isArray(rows)?rows:[];
-            const counts={confirmed:0,pending:0,failed:0};
-            list.forEach(d=>{const status=String(d.status||'pending').toLowerCase();if(status==='confirmed')counts.confirmed++;else if(status==='failed')counts.failed++;else counts.pending++;});
+            // Prefer full-table aggregates from /api/donations/admin. The
+            // donations array is intentionally limited to recent records.
+            const aggregate=data&&data.counts&&typeof data.counts==='object'?data.counts:null;
+            const counts=aggregate?{
+                confirmed:Number(aggregate.confirmed)||0,
+                pending:Number(aggregate.pending)||0,
+                failed:Number(aggregate.failed)||0
+            }:{confirmed:0,pending:0,failed:0};
+            if(!aggregate)list.forEach(d=>{const status=String(d.status||'pending').toLowerCase();if(status==='confirmed')counts.confirmed++;else if(status==='failed')counts.failed++;else counts.pending++;});
+            const paymentTotal=Number(data&&data.totalCount);
+            const chartTotal=Number.isFinite(paymentTotal)&&paymentTotal>=0?paymentTotal:counts.confirmed+counts.pending+counts.failed;
             renderAdminDonut('donationStatusDonut','donationStatusLegend','donationStatusTotal',[
                 {label:'Confirmed',color:'#16a34a',value:counts.confirmed},
                 {label:'Pending',color:'#2563eb',value:counts.pending},
                 {label:'Failed',color:'#ef4444',value:counts.failed}
             ]);
+            const total=document.getElementById('donationStatusTotal');
+            if(total)total.textContent=chartTotal.toLocaleString('en-KE');
             const note=document.getElementById('donationChartNote');
-            if(note)note.textContent='Confirmed total: KES '+Number(data.totalKes||0).toLocaleString('en-KE')+' · Based on '+list.length+' returned payment records';
+            if(note)note.textContent='Confirmed total: KES '+Number(data.totalKes||0).toLocaleString('en-KE')+' · Based on '+chartTotal.toLocaleString('en-KE')+' payment records';
         }
 
         async function loadStats() {
