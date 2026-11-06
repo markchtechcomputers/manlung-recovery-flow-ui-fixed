@@ -521,8 +521,10 @@
   }
 
   function boot() {
+    const isAdminLogin = /^\/admin\/login(?:\.html)?\/?$/.test(location.pathname);
     const isAuthPage = document.body?.classList.contains('manlung-auth-page') ||
-      /\/login(?:\.html)?\/?$/.test(location.pathname);
+      /\/login(?:\.html)?\/?$/.test(location.pathname) || isAdminLogin;
+    const isHomePage = location.pathname === '/' || location.pathname === '/index.html';
     if (!isAuthPage) installGlobalLanguageSelector();
     removeLegacyNavigationColours();
     convertLegacyButtons();
@@ -534,7 +536,9 @@
     installCallIconFix();
     loadAdminCallIcons();
     if (!isAuthPage) {
-      loadContactFab();
+      // Keep the floating Contact Us / Call Admin menu on the homepage only.
+      // It must not cover sign-in controls or compete with the install CTA elsewhere.
+      if (isHomePage) loadContactFab();
       loadManlungAI();
     }
     loadClientCaseChat();
