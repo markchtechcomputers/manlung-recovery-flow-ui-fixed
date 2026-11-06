@@ -636,12 +636,10 @@
 
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (pwaHadController) {
-        // Refresh immediately when safe; keep the update prompt if a form has edits.
-        if (hasUnsavedPwaInput()) offerPwaRefresh();
-        else {
-          try { sessionStorage.setItem('manlung-pwa-controller-refresh', '1'); } catch (_) {}
-          window.location.reload();
-        }
+        // Do not force-reload a newly opened dashboard or interrupt a client workflow.
+        // The current document already came from the network; offer a deliberate refresh
+        // so users never see a stale page flash caused by an automatic SW handover.
+        offerPwaRefresh();
       }
       pwaHadController = true;
     });
