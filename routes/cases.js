@@ -1429,6 +1429,8 @@ router.post(
       });
     }
 
+    const uploadedFiles = [];
+    let caseCreated = false;
     try {
       const caseFields =
         mapBodyToCaseFields(req.body);
@@ -1445,8 +1447,6 @@ router.post(
         req.user?.username ||
         caseFields.client_name;
 
-      const uploadedFiles = [];
-
       for (const file of req.files || []) {
         uploadedFiles.push(
           await uploadToStorage(
@@ -1461,6 +1461,7 @@ router.post(
 
       const newCase =
         await Case.create(caseFields);
+      caseCreated = true;
       await Promise.all(uploadedFiles.map(file => recordEvidenceAudit({ caseId:newCase.case_id, file, actorUserId:req.user?.id || null, actorRole:req.user?.role || 'guest', category:'client-submission' })));
 
       // Notify every active Owner/Admin immediately when a new client request arrives.
@@ -1518,10 +1519,24 @@ ${(newCase.incident_desc || '').substring(
         error
       );
 
+      // If intake failed before the case row was committed, remove any evidence
+      // already uploaded so a retry does not leave orphaned private files.
+      if (!caseCreated && uploadedFiles.length) {
+        try {
+          const paths = uploadedFiles.map(file => file.path).filter(Boolean);
+          if (paths.length) {
+            const { error: cleanupError } = await supabase.storage
+              .from(EVIDENCE_BUCKET)
+              .remove(paths);
+            if (cleanupError) console.error('Case submission evidence rollback failed:', cleanupError);
+          }
+        } catch (cleanupError) {
+          console.error('Case submission evidence rollback failed:', cleanupError);
+        }
+      }
+
       res.status(500).json({
-        error:
-          error.message ||
-          'Failed to submit case',
+        error: 'We could not complete your case submission. Your details remain in the form; please retry or contact support if the problem continues.',
       });
     }
   }
