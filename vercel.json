@@ -264,11 +264,17 @@
     },
     {
       "src": "^/admin/index/?$",
-      "dest": "/public/admin/index.html"
+      "status": 308,
+      "headers": {
+        "Location": "/admin/dashboard"
+      }
     },
     {
       "src": "^/admin/index\\.html$",
-      "dest": "/public/admin/index.html"
+      "status": 308,
+      "headers": {
+        "Location": "/admin/dashboard"
+      }
     },
     {
       "src": "^/admin/investigation-notes/?$",
