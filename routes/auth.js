@@ -178,6 +178,10 @@ const ownerIdentity = async (req, res, next) => {
 };
 
 function setClientCookie(res, token) {
+  // A browser profile has one active Manlung role at a time. Clear the
+  // opposite role cookie so the shared auth middleware cannot select an
+  // older Admin session when a Client signs in (or vice versa).
+  clearAdminCookie(res);
   res.cookie(CLIENT_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -197,6 +201,7 @@ function clearClientCookie(res) {
 }
 
 function setAdminCookie(res, token) {
+  clearClientCookie(res);
   res.cookie(ADMIN_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
