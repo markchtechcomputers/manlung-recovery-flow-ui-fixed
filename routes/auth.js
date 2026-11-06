@@ -874,8 +874,8 @@ router.post('/admin/mfa/login', [
       return res.status(401).json({ error: 'Invalid authentication code.' });
     }
 
-    const session = await User.bumpSessionVersion(admin.id);
-    issueAdminSession(res, { ...admin, session_version: session?.session_version });
+    // MFA completion establishes a session without invalidating other devices.
+    issueAdminSession(res, admin);
     clearMfaTicketCookie(res);
 
     await SecurityMonitoring.recordEvent({
@@ -2466,9 +2466,8 @@ router.post(
         sendClientWelcomeEmail(client, req).catch(() => {});
       }
 
-      // Social login follows the same single-browser session rule as password login.
-      const session = await User.bumpSessionVersion(client.id);
-      const token = signToken({ ...client, session_version: session?.session_version });
+      // Social login preserves existing device sessions just like password login.
+      const token = signToken(client);
       setClientCookie(res, token);
 
       return res.json({
