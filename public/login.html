@@ -1846,8 +1846,9 @@ function setTurnstileRetryVisible(visible) {
 
 function renderClientTurnstile(api) {
   const host = document.getElementById('clientTurnstile');
-  if (!host || !clientTurnstileSiteKey) return;
-  host.innerHTML = '';
+  // Idempotency guard: one widget per sign-in form, even if rapid submits
+  // or multiple event paths request initialization at the same time.
+  if (!host || !clientTurnstileSiteKey || clientTurnstileWidget !== null || host.querySelector('iframe')) return;
   clientTurnstileWidget = api.render(host, {
     sitekey: clientTurnstileSiteKey,
     theme: 'auto',
