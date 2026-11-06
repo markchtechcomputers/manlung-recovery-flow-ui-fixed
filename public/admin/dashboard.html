@@ -746,7 +746,54 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
  #adminAppContainer .dashboard-cases-card .filters-bar label{justify-content:flex-start!important}
  #adminAppContainer .dashboard-stats-card{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
-</style></head>
+</style>
+<style id="mrd-dashboard-pie-charts">
+#adminAppContainer .mrd-section-heading{display:grid!important;grid-template-columns:minmax(240px,1fr) minmax(440px,1.12fr)!important;align-items:start!important;gap:22px!important}
+#adminAppContainer .mrd-section-heading>h2,#adminAppContainer .mrd-section-heading>p{grid-column:1}
+#adminAppContainer .mrd-section-heading .mrd-dashboard-insights{grid-column:2;grid-row:1/3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;min-width:0}
+#adminAppContainer .mrd-chart-card{min-width:0;padding:14px;border:1px solid #e2e8f0;border-radius:16px;background:#fff;box-shadow:0 8px 22px rgba(15,23,42,.045)}
+#adminAppContainer .mrd-chart-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+#adminAppContainer .mrd-chart-head strong{display:block;color:#172033;font-size:12px;font-weight:850}
+#adminAppContainer .mrd-chart-head span{display:block;color:#64748b;font-size:10px;margin-top:3px}
+#adminAppContainer .mrd-chart-head>i{color:#64748b;font-size:15px}
+#adminAppContainer .mrd-chart-body{display:flex;align-items:center;gap:12px;min-width:0}
+#adminAppContainer .mrd-donut{--chart-data:conic-gradient(#ef4444 0deg,#2563eb 0deg,#16a34a 0deg,#94a3b8 0deg);position:relative;display:grid;place-items:center;width:112px;height:112px;flex:0 0 112px;border-radius:50%;background:var(--chart-data)}
+#adminAppContainer .mrd-donut:before{content:"";position:absolute;inset:17px;border-radius:50%;background:#fff}
+#adminAppContainer .mrd-donut>span{position:relative;z-index:1;text-align:center}
+#adminAppContainer .mrd-donut b{display:block;color:#172033;font-size:19px;line-height:1.1;font-weight:900}
+#adminAppContainer .mrd-donut small{display:block;color:#64748b;font-size:9px;margin-top:3px}
+#adminAppContainer .mrd-chart-legend{display:grid;gap:7px;list-style:none;margin:0;padding:0;min-width:0;flex:1}
+#adminAppContainer .mrd-chart-legend li{display:grid;grid-template-columns:8px minmax(0,1fr) auto;align-items:center;gap:6px;color:#64748b;font-size:9px;min-width:0}
+#adminAppContainer .mrd-chart-legend li i{width:7px;height:7px;border-radius:50%;display:block}
+#adminAppContainer .mrd-chart-legend li i.red{background:#ef4444}
+#adminAppContainer .mrd-chart-legend li i.blue{background:#2563eb}
+#adminAppContainer .mrd-chart-legend li i.green{background:#16a34a}
+#adminAppContainer .mrd-chart-legend li i.grey{background:#94a3b8}
+#adminAppContainer .mrd-chart-legend li b{color:#172033;font-size:10px;font-weight:850}
+#adminAppContainer .mrd-chart-foot{margin-top:11px;padding-top:9px;border-top:1px solid #f1f5f9;color:#64748b;font-size:9px;line-height:1.45}
+@media(max-width:1180px){
+ #adminAppContainer .mrd-section-heading{grid-template-columns:1fr!important}
+ #adminAppContainer .mrd-section-heading .mrd-dashboard-insights{grid-column:1;grid-row:auto;max-width:760px}
+}
+@media(max-width:700px){
+ #adminAppContainer .mrd-section-heading{gap:12px!important;margin-bottom:16px!important}
+ #adminAppContainer .mrd-section-heading .mrd-dashboard-insights{grid-template-columns:1fr;max-width:none;gap:10px}
+ #adminAppContainer .mrd-chart-card{padding:13px}
+ #adminAppContainer .mrd-donut{width:104px;height:104px;flex-basis:104px}
+}
+@media(max-width:370px){
+ #adminAppContainer .mrd-chart-body{gap:8px}
+ #adminAppContainer .mrd-donut{width:92px;height:92px;flex-basis:92px}
+ #adminAppContainer .mrd-chart-legend li{font-size:8px}
+}
+html.dark #adminAppContainer .mrd-chart-card,body.dark #adminAppContainer .mrd-chart-card{background:#101b28;border-color:rgba(148,163,184,.18)}
+html.dark #adminAppContainer .mrd-chart-head strong,html.dark #adminAppContainer .mrd-chart-legend li b,html.dark #adminAppContainer .mrd-donut b,body.dark #adminAppContainer .mrd-chart-head strong,body.dark #adminAppContainer .mrd-chart-legend li b,body.dark #adminAppContainer .mrd-donut b{color:#f8fafc}
+html.dark #adminAppContainer .mrd-chart-head span,html.dark #adminAppContainer .mrd-chart-legend li,html.dark #adminAppContainer .mrd-chart-foot,body.dark #adminAppContainer .mrd-chart-head span,body.dark #adminAppContainer .mrd-chart-legend li,body.dark #adminAppContainer .mrd-chart-foot{color:#94a3b8}
+html.dark #adminAppContainer .mrd-donut:before,body.dark #adminAppContainer .mrd-donut:before{background:#101b28}
+html.dark #adminAppContainer .mrd-chart-foot,body.dark #adminAppContainer .mrd-chart-foot{border-color:rgba(148,163,184,.12)}
+</style>
+
+</head>
 <body class="admin-page-bg">
     <div class="bg-shape-1" aria-hidden="true"></div><div class="bg-shape-2" aria-hidden="true"></div>
 <div class="app-container" id="adminAppContainer">
@@ -1225,6 +1272,50 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
             }
         }
 
+
+        function renderAdminDonut(id, legendId, totalId, entries) {
+            const donut=document.getElementById(id), legend=document.getElementById(legendId), totalEl=document.getElementById(totalId);
+            if(!donut||!legend||!totalEl)return;
+            const safe=entries.map(x=>({label:x.label,color:x.color,value:Math.max(0,Number(x.value)||0)}));
+            const total=safe.reduce((sum,x)=>sum+x.value,0);
+            totalEl.textContent=total.toLocaleString('en-KE');
+            let cursor=0;
+            const stops=safe.map(x=>{
+                const start=total?cursor/total*360:0;
+                cursor+=x.value;
+                const end=total?cursor/total*360:0;
+                return x.color+' '+start+'deg '+end+'deg';
+            });
+            donut.style.setProperty('--chart-data',total?'conic-gradient('+stops.join(',')+')':'conic-gradient(#e2e8f0 0deg 360deg)');
+            donut.setAttribute('aria-label',safe.map(x=>x.label+': '+x.value).join(', '));
+            legend.innerHTML=safe.map(x=>'<li><i style="background:'+x.color+'"></i><span>'+x.label+'</span><b>'+x.value.toLocaleString('en-KE')+'</b></li>').join('');
+        }
+        function updateCaseFlowChart(stats) {
+            const s=stats||{};
+            const pending=Number(s.pending)||0, progress=Number(s.progress)||0, closed=Number(s.closed)||0, rejected=Number(s.rejected)||0;
+            renderAdminDonut('caseFlowDonut','caseFlowLegend','caseFlowTotal',[
+                {label:'Pending review',color:'#ef4444',value:pending},
+                {label:'In progress',color:'#2563eb',value:progress},
+                {label:'Resolved',color:'#16a34a',value:closed},
+                {label:'Rejected',color:'#94a3b8',value:rejected}
+            ]);
+            const active=pending+progress;
+            const note=document.getElementById('caseWorkloadNote');
+            if(note)note.textContent='Active workload: '+active.toLocaleString('en-KE')+' open cases · '+(Number(s.total)||0).toLocaleString('en-KE')+' total cases';
+        }
+        function updateDonationStatusChart(rows, data) {
+            const list=Array.isArray(rows)?rows:[];
+            const counts={confirmed:0,pending:0,failed:0};
+            list.forEach(d=>{const status=String(d.status||'pending').toLowerCase();if(status==='confirmed')counts.confirmed++;else if(status==='failed')counts.failed++;else counts.pending++;});
+            renderAdminDonut('donationStatusDonut','donationStatusLegend','donationStatusTotal',[
+                {label:'Confirmed',color:'#16a34a',value:counts.confirmed},
+                {label:'Pending',color:'#2563eb',value:counts.pending},
+                {label:'Failed',color:'#ef4444',value:counts.failed}
+            ]);
+            const note=document.getElementById('donationChartNote');
+            if(note)note.textContent='Confirmed total: KES '+Number(data.totalKes||0).toLocaleString('en-KE')+' · Based on '+list.length+' returned payment records';
+        }
+
         async function loadStats() {
             try {
                 const res = await fetchWithTimeout('/api/cases/admin/stats', { headers: authHeaders() });
@@ -1237,6 +1328,7 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
                     document.getElementById('statProgress').textContent = data.stats.progress ?? 0;
                     document.getElementById('statClosed').textContent = data.stats.closed ?? 0;
                     document.getElementById('statRejected').textContent = data.stats.rejected ?? 0;
+                    updateCaseFlowChart(data.stats);
                 } else {
                     console.error('Admin stats error:', data.error);
                 }
@@ -2416,6 +2508,7 @@ body.admin-page-bg footer,.site-footer,.public-footer{display:none!important}
                 document.getElementById('donationCountAdmin').textContent = data.confirmedCount || 0;
                 const body = document.getElementById('donationsBody');
                 const rows = data.donations || [];
+                updateDonationStatusChart(rows, data);
                 body.innerHTML = rows.length ? rows.map(d => `
                     <tr>
                         <td>${d.paid_at ? new Date(d.paid_at).toLocaleString() : new Date(d.created_at).toLocaleString()}</td>
@@ -3947,6 +4040,17 @@ body.admin-page-bg{
    widgets.setAttribute('aria-label','Dashboard widgets');
    heading.insertAdjacentElement('afterend',widgets);
   }
+
+  var insights=document.getElementById('mrdDashboardInsights');
+  if(!insights){
+   insights=document.createElement('aside');
+   insights.id='mrdDashboardInsights';
+   insights.className='mrd-dashboard-insights';
+   insights.setAttribute('aria-label','Dashboard analytics');
+   insights.innerHTML='<section class="mrd-chart-card"><div class="mrd-chart-head"><div><strong>Case workflow</strong><span>Current case distribution</span></div><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></div><div class="mrd-chart-body"><div class="mrd-donut" id="caseFlowDonut" role="img" aria-label="Case workflow chart"><span><b id="caseFlowTotal">0</b><small>Cases</small></span></div><ul class="mrd-chart-legend" id="caseFlowLegend"><li><i class="red"></i><span>Pending review</span><b>0</b></li><li><i class="blue"></i><span>In progress</span><b>0</b></li><li><i class="green"></i><span>Resolved</span><b>0</b></li><li><i class="grey"></i><span>Rejected</span><b>0</b></li></ul></div><div class="mrd-chart-foot" id="caseWorkloadNote">Workload: loading…</div></section><section class="mrd-chart-card"><div class="mrd-chart-head"><div><strong>Donations</strong><span>Payment status breakdown</span></div><i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i></div><div class="mrd-chart-body"><div class="mrd-donut donation" id="donationStatusDonut" role="img" aria-label="Donation payment status chart"><span><b id="donationStatusTotal">0</b><small>Payments</small></span></div><ul class="mrd-chart-legend" id="donationStatusLegend"><li><i class="green"></i><span>Confirmed</span><b>0</b></li><li><i class="blue"></i><span>Pending</span><b>0</b></li><li><i class="red"></i><span>Failed</span><b>0</b></li></ul></div><div class="mrd-chart-foot" id="donationChartNote">Donation activity: loading…</div></section>';
+   heading.appendChild(insights);
+  }
+
   /* Move existing functional widgets; never replace them with static/demo records. */
   widgets.append(profile,call,donations);
   if(!profile.querySelector('.card-title')){
