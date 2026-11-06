@@ -295,3 +295,38 @@ body.dr-page{
   .dr-page .dr-metrics,.dr-page .dr-trace-fields{grid-template-columns:minmax(0,1fr)}
   .dr-page .dr-platforms{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* Donation history and receipt are authenticated client-account destinations too. */
+body.client-donation-history,body.client-donation-receipt{overflow-x:hidden;-webkit-text-size-adjust:100%}
+.client-donation-history .wrap,.client-donation-receipt .wrap{
+  width:min(100% - 32px,900px);margin:24px auto;padding:0 0 112px;
+}
+.client-donation-history .head{gap:14px;align-items:center}
+.client-donation-history .head nav{display:flex;flex-wrap:wrap;gap:8px}
+.client-donation-history .card,.client-donation-receipt .receipt{border-radius:18px;box-shadow:var(--client-shadow)}
+.client-donation-history .row{min-width:0;overflow-wrap:anywhere}
+.client-donation-receipt .receipt{padding:clamp(22px,5vw,40px)}
+.client-donation-receipt .line{min-width:0}
+.client-donation-receipt .line strong{max-width:65%;overflow-wrap:anywhere}
+@media(max-width:760px){
+  .client-donation-history .wrap,.client-donation-receipt .wrap{width:100%;margin:0;padding:14px 16px calc(112px + env(safe-area-inset-bottom,0px))}
+  .client-donation-history .head{display:grid;gap:12px}
+  .client-donation-history .head h1,.client-donation-receipt h1{font-size:1.35rem;line-height:1.2}
+  .client-donation-history .head nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .client-donation-history .head nav .btn{min-width:0;min-height:44px;justify-content:center;text-align:center}
+  .client-donation-history .card{padding:15px;margin-top:12px}
+  .client-donation-history .row{align-items:flex-start;flex-direction:column;gap:9px;padding:13px 0}
+  .client-donation-history .row>div:last-child{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+  .client-donation-history .row .btn{min-height:42px;justify-content:center}
+  .client-donation-receipt .receipt{padding:20px;border-radius:16px}
+  .client-donation-receipt .amount{font-size:1.8rem;overflow-wrap:anywhere}
+  .client-donation-receipt .line{align-items:flex-start;flex-direction:column;gap:5px}
+  .client-donation-receipt .line strong{max-width:100%;text-align:left}
+  .client-donation-receipt .actions{display:grid;grid-template-columns:1fr}
+  .client-donation-receipt .actions .btn{min-height:46px;display:flex;align-items:center;justify-content:center}
+}
+@media print{
+  .client-mobile-nav{display:none!important}
+  .client-donation-history .wrap,.client-donation-receipt .wrap{padding:0;margin:0 auto}
+}
