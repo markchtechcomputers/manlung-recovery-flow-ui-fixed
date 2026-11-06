@@ -703,7 +703,7 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
                     <div class="card-title"><i class="fas fa-paperclip"></i> Add Evidence / Upload Files <span style="font-weight:400;font-size:.8rem;color:var(--text-muted);">Secure evidence intake</span></div>
                     <div class="upload-policy" aria-label="Upload requirements">
                       <div class="upload-policy-item"><i class="fas fa-file-circle-check"></i><strong>Formats</strong><br>PDF, JPG/JPEG, PNG</div>
-                      <div class="upload-policy-item"><i class="fas fa-weight-hanging"></i><strong>Size</strong><br>Up to 10 MB per file</div>
+                      <div class="upload-policy-item"><i class="fas fa-weight-hanging"></i><strong>Size</strong><br>4 MB total per case</div>
                       <div class="upload-policy-item"><i class="fas fa-layer-group"></i><strong>Batch</strong><br>Up to 10 files</div>
                     </div>
                     <div class="upload-zone-enhanced" id="fileUploadZone" role="button" tabindex="0" aria-label="Choose evidence files">
@@ -772,18 +772,22 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
     <script>
         let pendingFiles = []; // File objects staged for upload (from the general upload zone)
 
-        const allowedUploadTypes=['application/pdf','image/jpeg','image/png']; const maxUploadBytes=10*1024*1024;
+        const allowedUploadTypes=['application/pdf','image/jpeg','image/png']; const MAX_CASE_EVIDENCE_BYTES=4*1024*1024; const maxUploadBytes=MAX_CASE_EVIDENCE_BYTES;
         function addUploadFiles(files){
           const incoming=Array.from(files||[]);
           if(pendingFiles.length+incoming.length>10){ toast('Maximum 10 evidence files can be submitted at once.','error'); return; }
+          let queuedBytes=pendingFiles.reduce((sum,file)=>sum+Number(file.size||0),0);
+          let added=0;
           incoming.forEach(file=>{
-            if(file.size>maxUploadBytes){ toast(file.name+' exceeds the 10 MB per-file limit.','error'); return; }
-            if(!allowedUploadTypes.includes(String(file.type||'').toLowerCase())){ toast(file.name+' is not supported. Use PDF, JPG/JPEG or PNG.','error'); return; }
             if(pendingFiles.some(f=>f.name===file.name&&f.size===file.size)){ return; }
+            if(!allowedUploadTypes.includes(String(file.type||'').toLowerCase())){ toast(file.name+' is not supported. Use PDF, JPG/JPEG or PNG.','error'); return; }
+            if(file.size<=0 || queuedBytes+file.size>MAX_CASE_EVIDENCE_BYTES){ toast('All evidence attachments together must be 4 MB or less. '+file.name+' was not added.','error'); return; }
             pendingFiles.push(file);
+            queuedBytes+=file.size;
+            added++;
           });
           renderFileList();
-          if(incoming.length) toast('Evidence added to the secure upload queue.','success');
+          if(added) toast('Evidence added to the secure upload queue.','success');
         }
         const fileUploadInput=document.getElementById('fileUpload'), fileUploadZone=document.getElementById('fileUploadZone');
         if(fileUploadInput&&fileUploadZone){
@@ -1040,18 +1044,22 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
                 toast('You can attach a maximum of 10 evidence files per case.', 'error');
                 return;
             }
+            const totalFileBytes = allFiles.reduce((sum, file) => sum + Number(file.size || 0), 0);
+            if (totalFileBytes > MAX_CASE_EVIDENCE_BYTES) {
+                submitBtn.disabled = false;
+                statusEl.textContent = '';
+                toast('All evidence attachments together must be 4 MB or less. Remove some files before submitting.', 'error');
+                return;
+            }
             const invalidFile = allFiles.find(file =>
-                !allowedTypes.has(String(file.type || '').toLowerCase()) ||
-                file.size <= 0 || file.size > 10 * 1024 * 1024
+                !allowedTypes.has(String(file.type || '').toLowerCase()) || file.size <= 0
             );
             if (invalidFile) {
                 submitBtn.disabled = false;
                 statusEl.textContent = '';
-                toast(invalidFile.size > 10 * 1024 * 1024
-                    ? invalidFile.name + ' exceeds the 10 MB per-file limit.'
-                    : invalidFile.size <= 0
-                        ? invalidFile.name + ' is empty.'
-                        : invalidFile.name + ' is not supported. Use PDF, JPG/JPEG or PNG.', 'error');
+                toast(invalidFile.size <= 0
+                    ? invalidFile.name + ' is empty.'
+                    : invalidFile.name + ' is not supported. Use PDF, JPG/JPEG or PNG.', 'error');
                 return;
             }
 
@@ -1109,9 +1117,18 @@ body.dark #draftBanner{background:#052e1a;border-color:#166534;color:#bbf7d0}
                     document.body.style.overflow = 'hidden';
                     clearDraft();
                 } else {
+                    // The verification token may have been consumed by the server.
+                    // Require a fresh challenge before allowing another attempt.
+                    caseTurnstileToken = '';
+                    caseTurnstilePassed = false;
+                    submitBtn.disabled = true;
+                    if (window.turnstile && caseTurnstileId !== null) {
+                        try { window.turnstile.reset(caseTurnstileId); } catch (_) {}
+                    }
+                    caseTurnstileStatus.textContent = 'Submission was not completed. Verify again before retrying; your form and selected files are preserved.';
                     setFlowStep('failed',100,'Upload or submission failed.');
-                    if(typeof toast==='function') toast((data&&data.error)||`Submission failed (status ${xhr.status}). Please try again.`,'error');
-                    alert((data && data.error) || `Error submitting request (status ${xhr.status}). Please try again.`);
+                    if(typeof toast==='function') toast((data&&data.error)||`Submission failed (status ${xhr.status}). Please verify again and retry.`,'error');
+                    alert((data && data.error) || `Error submitting request (status ${xhr.status}). Please verify again and retry.`);
                 }
             };
 
