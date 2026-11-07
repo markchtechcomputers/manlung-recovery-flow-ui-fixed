@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const { revokeToken } = require('./sessionRevocation');
 
 const DANGEROUS_SCHEMES = /(?:^|\s)(?:javascript|vbscript|file|data):/i;
 const PATH_TRAVERSAL = /(?:^|[\\/])\.\.(?:[\\/]|$)/;
@@ -112,19 +111,6 @@ function enforceCsrf(req, res) {
   return true;
 }
 
-function trackLogoutRevocation(req, res) {
-  if (req.method !== 'POST' || !req.path.endsWith('/admin/logout')) return;
-  const token = req.headers.authorization?.replace(/^Bearer\s+/i, '') || parseCookie(req, ADMIN_COOKIE);
-  if (!token) return;
-  let decoded = null;
-  try { decoded = require('jsonwebtoken').decode(token); } catch (_) { decoded = null; }
-  res.on('finish', () => {
-    if (res.statusCode >= 200 && res.statusCode < 400) {
-      revokeToken(token, decoded?.exp);
-      securityLog('session_revoked', req);
-    }
-  });
-}
 
 function inspectString(value, keyPath) {
   if (NULL_BYTE.test(value) || CONTROL_CHARS.test(value)) return 'Input contains invalid control characters.';
@@ -173,7 +159,6 @@ function inputSecurity(req, res, next) {
         return res.status(400).json({ success: false, error });
       }
     }
-    trackLogoutRevocation(req, res);
     return next();
   } catch (error) {
     console.error('Input security middleware error:', error);

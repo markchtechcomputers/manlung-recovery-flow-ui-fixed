@@ -40,9 +40,9 @@ async function verifyRequestToken(req) {
   let decoded;
 
   try {
-    if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
+    if (await isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
     decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
+    if (await isTokenRevoked(token)) throw new Error('TOKEN_REVOKED');
   } catch (error) {
     // A stale client-side Bearer token can survive an old deployment or secret
     // rotation. If the secure HttpOnly session cookie is valid, prefer it rather
@@ -54,9 +54,9 @@ async function verifyRequestToken(req) {
       error.message === 'invalid signature'
     ) {
       verifiedToken = cookieToken;
-      if (isTokenRevoked(verifiedToken)) throw new Error('TOKEN_REVOKED');
+      if (await isTokenRevoked(verifiedToken)) throw new Error('TOKEN_REVOKED');
       decoded = jwt.verify(verifiedToken, process.env.JWT_SECRET);
-      if (isTokenRevoked(verifiedToken)) throw new Error('TOKEN_REVOKED');
+      if (await isTokenRevoked(verifiedToken)) throw new Error('TOKEN_REVOKED');
     } else {
       throw error;
     }
@@ -92,6 +92,12 @@ const auth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    if (error.code === 'REVOCATION_STORE_UNAVAILABLE') {
+      return res.status(503).json({
+        error: 'Session security service temporarily unavailable. Please try again.',
+        code: 'REVOCATION_STORE_UNAVAILABLE',
+      });
+    }
     if (error.message === 'TOKEN_REVOKED' || error.message === 'SESSION_VERSION_REVOKED') {
       return res.status(401).json({
         error: 'Session revoked. Please sign in again.',
@@ -119,7 +125,7 @@ const optionalAuth = async (req, res, next) => {
   const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '') || getCookie(req, CLIENT_COOKIE) || getCookie(req, ADMIN_COOKIE);
   if (!token) return next();
   try {
-    if (isTokenRevoked(token)) return res.status(401).json({ error: 'Session revoked.', code: 'SESSION_REVOKED' });
+    if (await isTokenRevoked(token)) return res.status(401).json({ error: 'Session revoked.', code: 'SESSION_REVOKED' });
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) return res.status(401).json({ error: 'User not found' });
@@ -128,6 +134,12 @@ const optionalAuth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    if (error.code === 'REVOCATION_STORE_UNAVAILABLE') {
+      return res.status(503).json({
+        error: 'Session security service temporarily unavailable. Please try again.',
+        code: 'REVOCATION_STORE_UNAVAILABLE',
+      });
+    }
     console.error('Optional authentication error:', error);
     return res.status(401).json({ error: 'Invalid token' });
   }

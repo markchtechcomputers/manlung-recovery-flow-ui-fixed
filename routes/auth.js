@@ -15,6 +15,7 @@ const SecurityMonitoring = require('../models/SecurityMonitoring');
 const RemoteDesktop = require('../models/RemoteDesktop');
 const Case = require('../models/Case');
 const { auth } = require('../middleware/auth');
+const { revokeToken } = require('../middleware/sessionRevocation');
 const AdminInvitation = require('../models/AdminInvitation');
 const AdminPermission = require('../models/AdminPermission');
 const { sendEmail } = require('../services/email');
@@ -784,6 +785,7 @@ router.post('/admin/logout', async (req, res) => {
     if (token) {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        await revokeToken(token, decoded.exp);
         const admin = await User.findById(decoded.id);
 
         if (admin && (admin.role === 'admin' || admin.role === 'owner')) {
@@ -799,7 +801,15 @@ router.post('/admin/logout', async (req, res) => {
             },
           });
         }
-      } catch (_) {
+      } catch (error) {
+        if (error.code === 'REVOCATION_STORE_UNAVAILABLE') {
+          clearAdminCookie(res);
+          return res.status(503).json({
+            success: false,
+            error: 'Session security service temporarily unavailable. Please try again.',
+            code: 'REVOCATION_STORE_UNAVAILABLE',
+          });
+        }
         // Logout must still succeed if the session is expired or invalid.
       }
     }
